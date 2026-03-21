@@ -32,9 +32,8 @@ export default function DashboardPage() {
     getSuggestions().then(setSuggestions).catch(console.error);
   }, []);
 
-  if (!overview) return <div className="text-gray-400">Yükleniyor...</div>;
-
   const streakMsg = useMemo(() => {
+    if (!overview) return '';
     const messages = [
       { min: 0, msg: 'Bugün başla, streak oluştur!' },
       { min: 1, msg: 'Harika başlangıç, devam et!' },
@@ -44,7 +43,9 @@ export default function DashboardPage() {
       { min: 30, msg: 'Bir ay! Artık durdurulamaz!' },
     ];
     return [...messages].reverse().find(s => overview.current_streak_days >= s.min)?.msg || '';
-  }, [overview.current_streak_days]);
+  }, [overview]);
+
+  if (!overview) return <div className="text-gray-400">Yükleniyor...</div>;
 
   return (
     <div className="space-y-6">
