@@ -1,0 +1,122 @@
+{
+  "id": "challenge-jwt-auth",
+  "title": "JWT Authentication Sistemi Kur",
+  "difficulty": "orta",
+  "category": "backend",
+  "tags": ["jwt", "authentication", "bcrypt", "middleware", "refresh-token", "express"],
+  "related_lesson": "mod-12-auth/lesson-01",
+  "description_tr": "Express.js ile JWT tabanlı authentication sistemi kur: kullanıcı kaydı (bcrypt ile şifre hash'leme), login (access + refresh token), token doğrulama middleware'i ve token yenileme endpoint'i.",
+  "description_detail": "Tam çalışan bir JWT authentication sistemi oluşturacaksınız: (1) POST /register - bcrypt ile şifre hash'leyerek kullanıcı kaydı, (2) POST /login - email/şifre doğrulama ve JWT token çifti oluşturma (access: 15dk, refresh: 7gün), (3) authenticate middleware - Bearer token doğrulama, (4) POST /refresh - refresh token ile yeni access token alma, (5) GET /profile - korumalı endpoint örneği.",
+  "examples": [
+    {
+      "input": "POST /api/auth/register\n{\n  \"name\": \"Ahmet Yilmaz\",\n  \"email\": \"ahmet@example.com\",\n  \"password\": \"Secure123!\"\n}",
+      "output": "201 Created\n{\n  \"id\": 1,\n  \"name\": \"Ahmet Yilmaz\",\n  \"email\": \"ahmet@example.com\",\n  \"createdAt\": \"2024-01-15T10:30:00Z\"\n}",
+      "explanation": "Şifre bcrypt ile hash'lenir, kullanıcı oluşturulur. Response'da şifre ASLA dönmez."
+    },
+    {
+      "input": "POST /api/auth/login\n{\n  \"email\": \"ahmet@example.com\",\n  \"password\": \"Secure123!\"\n}",
+      "output": "200 OK\n{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiIs...\"\n}\n+ Set-Cookie: refreshToken=eyJ...; HttpOnly; Secure; SameSite=Strict",
+      "explanation": "Access token response body'de, refresh token httpOnly cookie'de döner."
+    },
+    {
+      "input": "GET /api/profile\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIs...",
+      "output": "200 OK\n{\n  \"id\": 1,\n  \"name\": \"Ahmet Yilmaz\",\n  \"email\": \"ahmet@example.com\"\n}",
+      "explanation": "authenticate middleware token'ı doğrular, req.user'a kullanıcı bilgisini ekler."
+    },
+    {
+      "input": "GET /api/profile\n(Token yok)",
+      "output": "401 Unauthorized\n{\n  \"error\": \"Token gerekli\"\n}",
+      "explanation": "Token olmadan korumalı endpoint'e erişim engellenir."
+    }
+  ],
+  "constraints": [
+    "bcrypt salt rounds: 12 kullanılmalı",
+    "Access token süresi: 15 dakika",
+    "Refresh token süresi: 7 gün",
+    "Refresh token httpOnly cookie'de saklanmalı",
+    "Response'da şifre hash'i ASLA dönmemeli",
+    "Token payload'ında sadece userId ve role olmalı",
+    "Hatalı login denemesinde generic hata mesajı döndürülmeli (email mi şifre mi yanlış belirtilmemeli)",
+    "JWT secret'lar environment variable'dan okunmalı"
+  ],
+  "starter_code": {
+    "javascript": "const express = require('express');\nconst bcrypt = require('bcrypt');\nconst jwt = require('jsonwebtoken');\nconst cookieParser = require('cookie-parser');\n\nconst app = express();\napp.use(express.json());\napp.use(cookieParser());\n\n// In-memory kullanıcı deposu (gerçek projede veritabanı kullan)\nconst users = [];\nlet nextId = 1;\n\nconst ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'access-secret-key';\nconst REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'refresh-secret-key';\n\n// ==========================================\n// 1. POST /api/auth/register\n// - name, email, password al\n// - Şifreyi bcrypt ile hash'le (saltRounds: 12)\n// - Kullanıcıyı kaydet\n// - Şifre hash'i OLMADAN kullanıcıyı döndür (201)\n// ==========================================\napp.post('/api/auth/register', async (req, res) => {\n  // Implementasyonunuzu buraya yazın\n});\n\n// ==========================================\n// 2. POST /api/auth/login\n// - email ve password al\n// - Kullanıcıyı bul ve şifreyi doğrula\n// - Access token (15dk) ve refresh token (7gün) oluştur\n// - Access token body'de, refresh token httpOnly cookie'de döndür\n// ==========================================\napp.post('/api/auth/login', async (req, res) => {\n  // Implementasyonunuzu buraya yazın\n});\n\n// ==========================================\n// 3. authenticate middleware\n// - Authorization header'dan Bearer token al\n// - Token'ı doğrula\n// - req.user'a decoded payload ata\n// - Hata durumunda 401 döndür\n// ==========================================\nfunction authenticate(req, res, next) {\n  // Implementasyonunuzu buraya yazın\n}\n\n// ==========================================\n// 4. POST /api/auth/refresh\n// - Cookie'den refresh token al\n// - Doğrula ve yeni access token oluştur\n// ==========================================\napp.post('/api/auth/refresh', async (req, res) => {\n  // Implementasyonunuzu buraya yazın\n});\n\n// ==========================================\n// 5. GET /api/profile (korumalı endpoint)\n// - authenticate middleware kullan\n// - req.user'dan kullanıcı bilgisini getir\n// ==========================================\napp.get('/api/profile', authenticate, async (req, res) => {\n  // Implementasyonunuzu buraya yazın\n});\n\nmodule.exports = app;",
+    "python": "from flask import Flask, request, jsonify, make_response\nimport bcrypt\nimport jwt\nimport os\nfrom datetime import datetime, timedelta\nfrom functools import wraps\n\napp = Flask(__name__)\n\nusers = []\nnext_id = 1\n\nACCESS_SECRET = os.getenv('JWT_ACCESS_SECRET', 'access-secret-key')\nREFRESH_SECRET = os.getenv('JWT_REFRESH_SECRET', 'refresh-secret-key')\n\n# 1. POST /api/auth/register\n@app.route('/api/auth/register', methods=['POST'])\ndef register():\n    # Implementasyonunuzu buraya yazın\n    pass\n\n# 2. POST /api/auth/login\n@app.route('/api/auth/login', methods=['POST'])\ndef login():\n    # Implementasyonunuzu buraya yazın\n    pass\n\n# 3. authenticate decorator\ndef authenticate(f):\n    @wraps(f)\n    def decorated(*args, **kwargs):\n        # Implementasyonunuzu buraya yazın\n        pass\n    return decorated\n\n# 4. POST /api/auth/refresh\n@app.route('/api/auth/refresh', methods=['POST'])\ndef refresh():\n    # Implementasyonunuzu buraya yazın\n    pass\n\n# 5. GET /api/profile (korumalı)\n@app.route('/api/profile')\n@authenticate\ndef profile():\n    # Implementasyonunuzu buraya yazın\n    pass"
+  },
+  "test_cases": [
+    {
+      "input": {"test": "register_success", "code": "POST /api/auth/register {name, email, password}"},
+      "expected": "201, user object without password"
+    },
+    {
+      "input": {"test": "register_duplicate_email", "code": "POST /api/auth/register (same email twice)"},
+      "expected": "409, error message"
+    },
+    {
+      "input": {"test": "login_success", "code": "POST /api/auth/login {email, password}"},
+      "expected": "200, {accessToken}, Set-Cookie: refreshToken"
+    },
+    {
+      "input": {"test": "login_wrong_password", "code": "POST /api/auth/login {email, wrong_password}"},
+      "expected": "401, generic error (not revealing which field is wrong)"
+    },
+    {
+      "input": {"test": "profile_with_token", "code": "GET /api/profile with valid Bearer token"},
+      "expected": "200, user profile data"
+    },
+    {
+      "input": {"test": "profile_without_token", "code": "GET /api/profile without Authorization header"},
+      "expected": "401, error message"
+    },
+    {
+      "input": {"test": "refresh_token", "code": "POST /api/auth/refresh with valid cookie"},
+      "expected": "200, {accessToken} (new)"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"test": "password_not_in_response", "code": "Register and check response body"},
+      "expected": "Response body does NOT contain password or passwordHash"
+    },
+    {
+      "input": {"test": "password_is_hashed", "code": "Register and check stored user"},
+      "expected": "Stored password is bcrypt hash, not plain text"
+    },
+    {
+      "input": {"test": "access_token_expires", "code": "Decode access token and check exp"},
+      "expected": "Token expires in ~15 minutes"
+    },
+    {
+      "input": {"test": "refresh_cookie_httponly", "code": "Check Set-Cookie header"},
+      "expected": "Cookie has HttpOnly flag"
+    },
+    {
+      "input": {"test": "expired_token_returns_401", "code": "GET /api/profile with expired token"},
+      "expected": "401, token expired error"
+    },
+    {
+      "input": {"test": "invalid_token_returns_401", "code": "GET /api/profile with tampered token"},
+      "expected": "401, invalid token error"
+    },
+    {
+      "input": {"test": "login_nonexistent_user", "code": "POST /api/auth/login with unknown email"},
+      "expected": "401, same generic error as wrong password"
+    }
+  ],
+  "hints": [
+    "Register: await bcrypt.hash(password, 12) ile şifreyi hash'le. Response'da password alanını çıkarmak için destructuring kullan: const { passwordHash, ...userResponse } = user;",
+    "Login: await bcrypt.compare(password, user.passwordHash) ile şifreyi doğrula. jwt.sign({ userId, role }, SECRET, { expiresIn: '15m' }) ile token oluştur. Refresh token'ı res.cookie() ile httpOnly cookie'ye yaz.",
+    "Middleware: const token = req.headers.authorization?.split(' ')[1]; ile token'ı al. jwt.verify(token, ACCESS_SECRET) ile doğrula. Hata durumunda 401 döndür. Başarılıysa req.user = decoded; next();",
+    "Refresh: const { refreshToken } = req.cookies; ile cookie'den al. jwt.verify(refreshToken, REFRESH_SECRET) ile doğrula. Yeni access token oluştur ve döndür."
+  ],
+  "solution": {
+    "javascript": "const express = require('express');\nconst bcrypt = require('bcrypt');\nconst jwt = require('jsonwebtoken');\nconst cookieParser = require('cookie-parser');\n\nconst app = express();\napp.use(express.json());\napp.use(cookieParser());\n\nconst users = [];\nlet nextId = 1;\n\nconst ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'access-secret-key';\nconst REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'refresh-secret-key';\n\n// 1. Register\napp.post('/api/auth/register', async (req, res) => {\n  try {\n    const { name, email, password } = req.body;\n\n    if (!name || !email || !password) {\n      return res.status(400).json({ error: 'Tüm alanlar zorunludur' });\n    }\n\n    if (users.find(u => u.email === email)) {\n      return res.status(409).json({ error: 'Bu email zaten kayıtlı' });\n    }\n\n    const passwordHash = await bcrypt.hash(password, 12);\n    const user = {\n      id: nextId++,\n      name,\n      email,\n      passwordHash,\n      role: 'user',\n      createdAt: new Date().toISOString()\n    };\n    users.push(user);\n\n    const { passwordHash: _, ...userResponse } = user;\n    res.status(201).json(userResponse);\n  } catch (error) {\n    res.status(500).json({ error: 'Sunucu hatası' });\n  }\n});\n\n// 2. Login\napp.post('/api/auth/login', async (req, res) => {\n  try {\n    const { email, password } = req.body;\n    const user = users.find(u => u.email === email);\n\n    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {\n      return res.status(401).json({ error: 'Geçersiz email veya şifre' });\n    }\n\n    const accessToken = jwt.sign(\n      { userId: user.id, role: user.role },\n      ACCESS_SECRET,\n      { expiresIn: '15m' }\n    );\n\n    const refreshToken = jwt.sign(\n      { userId: user.id },\n      REFRESH_SECRET,\n      { expiresIn: '7d' }\n    );\n\n    res.cookie('refreshToken', refreshToken, {\n      httpOnly: true,\n      secure: true,\n      sameSite: 'strict',\n      maxAge: 7 * 24 * 60 * 60 * 1000,\n      path: '/api/auth/refresh'\n    });\n\n    res.json({ accessToken });\n  } catch (error) {\n    res.status(500).json({ error: 'Sunucu hatası' });\n  }\n});\n\n// 3. Middleware\nfunction authenticate(req, res, next) {\n  const authHeader = req.headers.authorization;\n  if (!authHeader?.startsWith('Bearer ')) {\n    return res.status(401).json({ error: 'Token gerekli' });\n  }\n\n  const token = authHeader.split(' ')[1];\n\n  try {\n    const decoded = jwt.verify(token, ACCESS_SECRET);\n    req.user = decoded;\n    next();\n  } catch (error) {\n    if (error.name === 'TokenExpiredError') {\n      return res.status(401).json({ error: 'Token süresi dolmuş', code: 'TOKEN_EXPIRED' });\n    }\n    return res.status(401).json({ error: 'Geçersiz token' });\n  }\n}\n\n// 4. Refresh\napp.post('/api/auth/refresh', (req, res) => {\n  const { refreshToken } = req.cookies;\n  if (!refreshToken) {\n    return res.status(401).json({ error: 'Refresh token bulunamadı' });\n  }\n\n  try {\n    const decoded = jwt.verify(refreshToken, REFRESH_SECRET);\n    const user = users.find(u => u.id === decoded.userId);\n    if (!user) {\n      return res.status(401).json({ error: 'Kullanıcı bulunamadı' });\n    }\n\n    const accessToken = jwt.sign(\n      { userId: user.id, role: user.role },\n      ACCESS_SECRET,\n      { expiresIn: '15m' }\n    );\n\n    res.json({ accessToken });\n  } catch (error) {\n    return res.status(401).json({ error: 'Geçersiz refresh token' });\n  }\n});\n\n// 5. Profile\napp.get('/api/profile', authenticate, (req, res) => {\n  const user = users.find(u => u.id === req.user.userId);\n  if (!user) {\n    return res.status(404).json({ error: 'Kullanıcı bulunamadı' });\n  }\n  const { passwordHash, ...profile } = user;\n  res.json(profile);\n});\n\nmodule.exports = app;",
+    "python": "from flask import Flask, request, jsonify, make_response\nimport bcrypt\nimport jwt\nimport os\nfrom datetime import datetime, timedelta\nfrom functools import wraps\n\napp = Flask(__name__)\nusers = []\nnext_id = 1\nACCESS_SECRET = os.getenv('JWT_ACCESS_SECRET', 'access-secret-key')\nREFRESH_SECRET = os.getenv('JWT_REFRESH_SECRET', 'refresh-secret-key')\n\n@app.route('/api/auth/register', methods=['POST'])\ndef register():\n    global next_id\n    data = request.json\n    if any(u['email'] == data['email'] for u in users):\n        return jsonify({'error': 'Bu email zaten kayitli'}), 409\n    password_hash = bcrypt.hashpw(data['password'].encode(), bcrypt.gensalt(12))\n    user = {'id': next_id, 'name': data['name'], 'email': data['email'],\n            'password_hash': password_hash, 'role': 'user',\n            'created_at': datetime.utcnow().isoformat()}\n    next_id += 1\n    users.append(user)\n    return jsonify({'id': user['id'], 'name': user['name'],\n                    'email': user['email'], 'createdAt': user['created_at']}), 201\n\n@app.route('/api/auth/login', methods=['POST'])\ndef login():\n    data = request.json\n    user = next((u for u in users if u['email'] == data['email']), None)\n    if not user or not bcrypt.checkpw(data['password'].encode(), user['password_hash']):\n        return jsonify({'error': 'Gecersiz email veya sifre'}), 401\n    access_token = jwt.encode({'userId': user['id'], 'role': user['role'],\n        'exp': datetime.utcnow() + timedelta(minutes=15)}, ACCESS_SECRET)\n    refresh_token = jwt.encode({'userId': user['id'],\n        'exp': datetime.utcnow() + timedelta(days=7)}, REFRESH_SECRET)\n    resp = make_response(jsonify({'accessToken': access_token}))\n    resp.set_cookie('refreshToken', refresh_token, httponly=True,\n                    secure=True, samesite='Strict', max_age=7*24*60*60)\n    return resp\n\ndef authenticate(f):\n    @wraps(f)\n    def decorated(*args, **kwargs):\n        auth = request.headers.get('Authorization', '')\n        if not auth.startswith('Bearer '):\n            return jsonify({'error': 'Token gerekli'}), 401\n        try:\n            decoded = jwt.decode(auth.split(' ')[1], ACCESS_SECRET, algorithms=['HS256'])\n            request.user = decoded\n        except jwt.ExpiredSignatureError:\n            return jsonify({'error': 'Token suresi dolmus'}), 401\n        except jwt.InvalidTokenError:\n            return jsonify({'error': 'Gecersiz token'}), 401\n        return f(*args, **kwargs)\n    return decorated\n\n@app.route('/api/profile')\n@authenticate\ndef profile():\n    user = next((u for u in users if u['id'] == request.user['userId']), None)\n    if not user:\n        return jsonify({'error': 'Kullanici bulunamadi'}), 404\n    return jsonify({'id': user['id'], 'name': user['name'],\n                    'email': user['email'], 'role': user['role']})",
+    "explanation_tr": "Register: bcrypt.hash(password, 12) ile şifreyi hash'ler, kullanıcıyı kaydeder ve response'da passwordHash alanını çıkararak döndürür.\n\nLogin: bcrypt.compare ile şifreyi doğrular. jwt.sign ile access token (15dk) ve refresh token (7gün) oluşturur. Access token body'de, refresh token httpOnly cookie'de döner. Generic hata mesajı kullanılır.\n\nMiddleware: Authorization header'dan Bearer token'ı parse eder, jwt.verify ile doğrular, decoded payload'ı req.user'a atar. TokenExpiredError özel olarak yakalanır.\n\nRefresh: Cookie'den refresh token'ı alır, doğrular, yeni access token oluşturup döndürür.\n\nProfile: authenticate middleware ile korunur, req.user.userId ile kullanıcıyı bulur, passwordHash olmadan döndürür."
+  },
+  "complexity": {
+    "optimal_time": "O(n) for user lookup (O(1) with DB index)",
+    "optimal_space": "O(n) for user storage"
+  },
+  "learn_after_solving": "Bu challenge ile production-grade JWT authentication sisteminin temellerini uyguladın. bcrypt ile güvenli şifre saklama, access/refresh token pattern, httpOnly cookie güvenliği ve middleware-based route protection konularını pratik ettin. Gerçek projede bu temel üzerine: rate limiting, token blacklist (Redis), RBAC, OAuth 2.0 entegrasyonu ve password reset akışı eklenmelidir."
+}

@@ -1,0 +1,123 @@
+{
+  "id": "mod-15-ml-math/quiz-01",
+  "title": "ML Matematik Temelleri ve Python ML Quiz",
+  "description": "Linear algebra, calculus, probability, optimization, NumPy, Pandas ve Scikit-learn bilgini test eden kapsamlı quiz.",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "İki vektörün dot product'ı negatif bir değer veriyorsa, bu ne anlama gelir?",
+      "options": [
+        "Vektörler aynı yöne bakıyor",
+        "Vektörler birbirine dik (90 derece)",
+        "Vektörler zıt yönlere bakıyor (aralarındaki açı 90 dereceden büyük)",
+        "Vektörlerin büyüklüğü eşit"
+      ],
+      "correct": 2,
+      "explanation": "Dot product = |a| * |b| * cos(theta). cos(theta) negatif olması için theta > 90 derece olmalıdır, yani vektörler ters yönlere bakıyor demektir."
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "difficulty": "orta",
+      "question": "Gradient descent'te learning rate çok büyük seçilirse, loss fonksiyonu her zaman azalır ama çok yavaş azalır.",
+      "correct": false,
+      "explanation": "Tam tersi: learning rate çok büyükse gradient step'leri aşırı büyük olur ve minimum noktayı atlayıp ıraksama (divergence) yaşanır. Loss artmaya başlar veya NaN olur. Yavaş yakınsama küçük learning rate'in sorunudur."
+    },
+    {
+      "id": "q3",
+      "type": "code_completion",
+      "difficulty": "orta",
+      "question": "Aşağıdaki NumPy kodunda StandardScaler mantığını uygulayan eksik kısmı tamamlayın (Z-score normalization):",
+      "code": "import numpy as np\n\nX = np.array([[1, 200], [2, 400], [3, 600]])\nmean = X.mean(axis=0)\nstd = X.std(axis=0)\n\nX_normalized = _______________\n# Sonuç: her sütunun mean=0, std=1 olmalı",
+      "correct": "(X - mean) / std",
+      "explanation": "Z-score normalization formülü: X_normalized = (X - mean) / std. Broadcasting sayesinde (3,2) - (2,) = (3,2) olur. Bu StandardScaler'ın yaptığı işlemdir."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "difficulty": "zor",
+      "question": "Scikit-learn'de data leakage'dan kaçınmak için aşağıdakilerden hangisi DOĞRU yaklaşımdır?",
+      "options": [
+        "scaler.fit(X) yapıp sonra X_train ve X_test'e transform uygulamak",
+        "scaler.fit_transform(X_train) yapıp X_test'e sadece transform uygulamak",
+        "X_train ve X_test'e ayrı ayrı fit_transform uygulamak",
+        "Scaling hiçbir zaman data leakage'a neden olmaz"
+      ],
+      "correct": 1,
+      "explanation": "Doğru yaklaşım: scaler sadece X_train üzerinde fit edilmeli. X_test'e bu parametrelerle transform uygulanmalı. Tüm X üzerinde fit yapmak veya X_test'e ayrı fit yapmak data leakage yaratır."
+    },
+    {
+      "id": "q5",
+      "type": "explain_code",
+      "difficulty": "zor",
+      "question": "Aşağıdaki kodun ne yaptığını ve neden bu sonucu verdiğini açıklayın:",
+      "code": "import numpy as np\n\ny_true = np.array([1, 0, 1, 1, 0, 0, 0, 0, 0, 0])\ny_pred = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])\n\naccuracy = np.mean(y_true == y_pred)\nprint(f'Accuracy: {accuracy}')  # 0.8",
+      "correct": "Bu kod imbalanced dataset'te accuracy paradoksunu gösterir. 10 sample'da 8 tanesi class 0, 2 tanesi class 1. Model HİÇBİR pozitif örneği tahmin edemese bile (hepsine 0 dese), sadece çoğunluk sınıfına ait olduğu için %80 accuracy elde eder. Bu yüzden imbalanced verilerde accuracy yanıltıcıdır ve F1, Precision, Recall gibi metrikler kullanılmalıdır.",
+      "explanation": "Accuracy paradoksu: model hiçbir şey öğrenmeden sadece çoğunluk sınıfını tahmin ederek yüksek accuracy alabilir. Bu nedenle imbalanced dataset'lerde precision, recall ve F1 score kullanmak gerekir."
+    },
+    {
+      "id": "q6",
+      "type": "order_steps",
+      "difficulty": "orta",
+      "question": "Scikit-learn ile bir ML pipeline'ının doğru adım sırasını belirleyin:",
+      "steps": [
+        "GridSearchCV ile hyperparameter tuning yap",
+        "Veriyi train/test olarak böl (train_test_split)",
+        "Test seti üzerinde final evaluation yap",
+        "Preprocessing pipeline oluştur (imputer + scaler + encoder)",
+        "Cross-validation ile model karşılaştırması yap"
+      ],
+      "correct": [1, 3, 4, 0, 2],
+      "explanation": "Doğru sıra: (1) Train/test split -> (2) Preprocessing pipeline -> (3) CV ile model karşılaştırma -> (4) En iyi model için hyperparameter tuning -> (5) Test'te final evaluation. Split her zaman ilk yapılmalı ki data leakage olmasın."
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "Bayes Theorem'e göre: Bir hastalığın prevalansı %1, testin sensitivity'si %99, specificity'si %95. Test pozitif çıkan bir kişinin gerçekten hasta olma olasılığı yaklaşık nedir?",
+      "options": [
+        "%99 (testin doğruluğu kadar)",
+        "%95 (specificity kadar)",
+        "%17 (base rate etkisi nedeniyle düşük)",
+        "%50 (belirsiz)"
+      ],
+      "correct": 2,
+      "explanation": "Bayes: P(hasta|pozitif) = P(pos|hasta)*P(hasta) / P(pos) = 0.99*0.01 / (0.99*0.01 + 0.05*0.99) = 0.0099 / 0.0594 ≈ 0.167 (%17). Nadir hastalıklarda false positive oranı yüksek olduğu için pozitif test bile düşük olasılık verir. Bu base rate fallacy'dir."
+    },
+    {
+      "id": "q8",
+      "type": "true_false",
+      "difficulty": "kolay",
+      "question": "L1 regularization (Lasso) bazı weight'leri tam olarak sıfır yapabilir ve bu sayede otomatik feature selection etkisi yaratır.",
+      "correct": true,
+      "explanation": "L1 regularization, loss fonksiyonuna |w| ceza terimi ekler. Bu terimin türevi sabit olduğu için küçük weight'ler tam sıfıra çekilir. L2 (Ridge) ise weight'leri küçültür ama asla tam sıfır yapmaz."
+    },
+    {
+      "id": "q9",
+      "type": "code_completion",
+      "difficulty": "zor",
+      "question": "Aşağıdaki Pandas kodunda groupby ile her kategorinin ortalama satışını ve toplam adetini hesaplayan eksik kısmı tamamlayın:",
+      "code": "import pandas as pd\n\ndf = pd.DataFrame({\n    'kategori': ['A', 'B', 'A', 'B', 'A'],\n    'satis': [100, 200, 150, 250, 120],\n    'adet': [2, 3, 1, 4, 2]\n})\n\nresult = df.groupby('kategori').agg(_______________).reset_index()",
+      "correct": "ort_satis=('satis', 'mean'), toplam_adet=('adet', 'sum')",
+      "explanation": "Pandas'ın named aggregation syntax'ı: .agg(yeni_ad=('sütun', 'fonksiyon')). Bu şekilde birden fazla sütuna farklı aggregation fonksiyonları uygulanabilir ve sonuç sütunlarına anlamlı isimler verilebilir."
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "Chain rule (zincir kuralı) neural network'lerde neden kritik öneme sahiptir?",
+      "options": [
+        "Forward pass'te activation fonksiyonlarını hesaplamak için kullanılır",
+        "Backpropagation'da her layer'ın weight'lerine göre loss'un gradient'ini hesaplamak için kullanılır",
+        "Batch normalization'ı uygulamak için gereklidir",
+        "Learning rate'i otomatik ayarlamak için kullanılır"
+      ],
+      "correct": 1,
+      "explanation": "Chain rule, backpropagation algoritmasının matematiksel temelidir. dL/dW1 = dL/dz2 * dz2/da1 * da1/dz1 * dz1/dW1 şeklinde her layer'ın gradient'i bir önceki layer'ın gradient'i üzerinden zincirleme hesaplanır. Bu sayede output'taki hata tüm layer'lara geri yayılır."
+    }
+  ]
+}

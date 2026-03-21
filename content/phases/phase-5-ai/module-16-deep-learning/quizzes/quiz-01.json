@@ -1,0 +1,123 @@
+{
+  "id": "mod-16-deep-learning/quiz-01",
+  "title": "Neural Networks ve Transformers Quiz",
+  "description": "Deep learning temelleri, activation functions, backpropagation, CNN, RNN/LSTM, Transformer mimarisi, BERT, GPT ve Hugging Face bilgini test eden quiz.",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "Neural network'te activation function kullanılmazsa ne olur?",
+      "options": [
+        "Model daha hızlı eğitilir",
+        "Kaç layer eklenirse eklensin, sonuç tek bir linear transformation'a eşdeğer olur",
+        "Gradient vanishing problemi ortadan kalkar",
+        "Model daha iyi generalize eder"
+      ],
+      "correct": 1,
+      "explanation": "Activation function olmadan her layer sadece linear transform yapar: y = W2(W1x + b1) + b2 = (W2@W1)x + (W2@b1+b2). Bu tek bir matrix çarpımına sadeleşir. Non-linearity ekleyen activation function, modelin karmaşık pattern'ları öğrenmesini sağlar."
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "difficulty": "kolay",
+      "question": "ReLU activation function'ın türevi negatif input'lar için 0, pozitif input'lar için 1'dir.",
+      "correct": true,
+      "explanation": "ReLU(x) = max(0, x). Türevi: x > 0 ise 1, x < 0 ise 0 (x = 0'da technically tanımsız ama pratikte 0 alınır). Bu basit türev, gradient hesaplamayı hızlandırır ve gradient vanishing problemini sigmoid/tanh'a göre azaltır."
+    },
+    {
+      "id": "q3",
+      "type": "explain_code",
+      "difficulty": "zor",
+      "question": "Aşağıdaki attention hesaplamasının ne yaptığını ve sqrt(d_k) ile bölmenin neden gerekli olduğunu açıklayın:",
+      "code": "scores = Q @ K.T / np.sqrt(d_k)\nweights = softmax(scores)\noutput = weights @ V",
+      "correct": "Bu kod Scaled Dot-Product Attention implementasyonudur. Adımlar: (1) Q ve K'nın dot product'ı ile attention score'ları hesaplanır -- her query'nin her key ile ne kadar uyumlu olduğu ölçülür. (2) sqrt(d_k) ile bölme yapılır çünkü d_k büyüdükçe dot product değerleri de büyür ve softmax fonksiyonunu saturate eder (neredeyse one-hot distribution verir), bu da gradient'leri çok küçültür. Scaling ile daha smooth bir distribution elde edilir. (3) Softmax ile score'lar olasılık dağılımına dönüştürülür. (4) Bu olasılıklarla V (value) matrisinin ağırlıklı toplamı hesaplanır.",
+      "explanation": "Scaled dot-product attention, Transformer mimarisinin temel bloğudur. sqrt(d_k) scaling'i olmadan büyük boyutlarda softmax gradient'leri çok küçük olur ve model öğrenemez."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "Dropout regularization tekniği test (inference) aşamasında nasıl uygulanır?",
+      "options": [
+        "Training'deki ile aynı şekilde rastgele nöronlar kapatılır",
+        "Tüm nöronlar açık kalır, inverted dropout kullanıldıysa ek işlem gerekmez",
+        "Dropout oranı yarıya düşürülerek uygulanır",
+        "Sadece output layer'daki nöronlara uygulanır"
+      ],
+      "correct": 1,
+      "explanation": "Inverted dropout kullanıldığında (modern standart), training sırasında aktif nöronların çıktısı 1/keep_prob ile çarpılır. Bu sayede test'te hiçbir ek işlem gerekmez -- tüm nöronlar açık kalır ve beklenen çıktı değeri korunur."
+    },
+    {
+      "id": "q5",
+      "type": "order_steps",
+      "difficulty": "orta",
+      "question": "Bir neural network training loop'unun doğru adım sırasını belirleyin:",
+      "steps": [
+        "Loss fonksiyonunu hesapla (forward pass sonucu ve gerçek label ile)",
+        "Weight'leri güncelle (optimizer.step())",
+        "Forward pass: input'u model'den geçir, tahmin al",
+        "Gradient'leri sıfırla (optimizer.zero_grad())",
+        "Backward pass: loss.backward() ile gradient'leri hesapla"
+      ],
+      "correct": [3, 2, 0, 4, 1],
+      "explanation": "Doğru sıra: (1) Gradient'leri sıfırla -> (2) Forward pass -> (3) Loss hesapla -> (4) Backward pass (gradient hesapla) -> (5) Weight update. Gradient sıfırlama ilk yapılmalı çünkü PyTorch gradient'leri accumulate eder. Forward ve loss hesaplama sıralı. Backward ile gradient hesaplandıktan sonra optimizer weight'leri günceller."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "difficulty": "zor",
+      "question": "BERT ve GPT arasındaki temel mimari fark nedir?",
+      "options": [
+        "BERT daha fazla parametre kullanır",
+        "BERT encoder-only (bidirectional), GPT decoder-only (autoregressive/causal)",
+        "GPT sadece İngilizce destekler",
+        "BERT supervised learning, GPT unsupervised learning kullanır"
+      ],
+      "correct": 1,
+      "explanation": "BERT sadece Transformer encoder kullanır ve bidirectional'dır -- her token hem sağındaki hem solundaki token'lara bakabilir (MLM pre-training). GPT sadece decoder kullanır ve autoregressive'dir -- her token yalnızca solundaki (önceki) token'lara bakabilir (causal masking). Bu mimari fark, BERT'i anlama (NLU) görevlerinde, GPT'yi üretme (NLG) görevlerinde güçlü kılar."
+    },
+    {
+      "id": "q7",
+      "type": "code_completion",
+      "difficulty": "orta",
+      "question": "PyTorch'ta bir classification model tanımlarken eksik activation fonksiyonlarını tamamlayın:",
+      "code": "import torch.nn as nn\n\nmodel = nn.Sequential(\n    nn.Linear(20, 64),\n    _______________,    # Hidden layer activation\n    nn.Dropout(0.3),\n    nn.Linear(64, 10),\n    _______________     # Output layer activation (10 sınıf)\n)",
+      "correct": "nn.ReLU() ve nn.Softmax(dim=1) (veya LogSoftmax + NLLLoss, ya da CrossEntropyLoss kullanıyorsan softmax gereksiz)",
+      "explanation": "Hidden layer'da ReLU standart tercihtir (non-linearity ekler, gradient vanishing olmaz). Output layer'da 10 sınıflı classification için Softmax kullanılır (olasılık dağılımı verir). Pratikte PyTorch'ta CrossEntropyLoss, softmax'ı içinde barındırır, bu yüzden output'ta softmax koymamak da yaygındır."
+    },
+    {
+      "id": "q8",
+      "type": "true_false",
+      "difficulty": "orta",
+      "question": "Vision Transformer (ViT), resmi küçük patch'lere bölerek her patch'i bir token gibi işler ve CNN'deki gibi convolutional layer kullanmaz.",
+      "correct": true,
+      "explanation": "ViT, resmi sabit boyutlu patch'lere böler (örn. 16x16), her patch'i linear projection ile embedding'e dönüştürür, positional encoding ekler ve standart Transformer encoder'dan geçirir. Convolutional layer kullanmaz, tamamen attention-based çalışır. Büyük veri setlerinde CNN'den daha iyi performans gösterebilir."
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "difficulty": "zor",
+      "question": "Transfer learning'de LoRA (Low-Rank Adaptation) yönteminin full fine-tuning'e göre en büyük avantajı nedir?",
+      "options": [
+        "Her zaman daha yüksek accuracy verir",
+        "Orijinal model ağırlıklarını değiştirmeden küçük adaptasyon matrisleri ekler, böylece çok daha az memory ve hesaplama gerektirir",
+        "Sadece NLP modellerinde kullanılabilir",
+        "Pre-training aşamasında uygulanır"
+      ],
+      "correct": 1,
+      "explanation": "LoRA, orijinal weight matrislerini dondurur ve küçük rank-decomposition matrisleri (A ve B, rank r << d) ekler. W_new = W_original + A@B. Bu sayede eğitilecek parametre sayısı dramatik azalır (örn. %0.1), memory kullanımı düşer ve birden fazla task adaptasyonu aynı base model üzerinde yapılabilir."
+    },
+    {
+      "id": "q10",
+      "type": "explain_code",
+      "difficulty": "orta",
+      "question": "Aşağıdaki Hugging Face kodunun ne yaptığını ve her adımı açıklayın:",
+      "code": "from transformers import pipeline\n\nclassifier = pipeline('zero-shot-classification')\nresult = classifier(\n    'Bu telefon bataryası çok çabuk bitiyor',\n    candidate_labels=['şikayet', 'öneri', 'soru', 'övgü']\n)",
+      "correct": "Bu kod zero-shot classification yapar: modeli hiç eğitmeden (fine-tuning olmadan) verilen metni belirtilen kategorilere sınıflandırır. (1) pipeline('zero-shot-classification') Hugging Face'ten zero-shot classification için pre-trained bir NLI (Natural Language Inference) modeli yükler. (2) classifier() fonksiyonuna sınıflandırılacak metin ve aday etiketler verilir. (3) Model, metni her candidate label ile NLI çifti olarak değerlendirir ve her label için bir olasılık skoru üretir. Bu örnekte 'şikayet' en yüksek skoru alacaktır çünkü batarya problemi bir şikayettir. Zero-shot'ın avantajı: yeni kategoriler eklenmesi için yeniden eğitim gerekmez.",
+      "explanation": "Zero-shot classification, transfer learning'in güçlü bir uygulamasıdır. NLI modeli 'bu metin X kategorisiyle ilgili mi?' sorusunu her kategori için cevaplar. Yeni task'lar için eğitim gerektirmez."
+    }
+  ]
+}

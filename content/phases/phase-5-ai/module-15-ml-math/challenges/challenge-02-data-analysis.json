@@ -1,0 +1,77 @@
+{
+  "id": "challenge-data-analysis",
+  "title": "NumPy/Pandas ile Veri Analizi",
+  "difficulty": "orta",
+  "category": "ai",
+  "tags": ["numpy", "pandas", "data-analysis", "data-cleaning", "statistics"],
+  "related_lesson": "mod-15-ml-math/lesson-01",
+  "description_tr": "Gercek dunyadan bir veri setini yukle, temizle, analiz et ve istatistiksel ozetler cikar. NumPy ve Pandas kutuphanelerini etkin kullan.",
+  "description_detail": "Bir e-ticaret veri seti uzerinde kapsamli veri analizi yapin. Eksik veri temizleme, feature engineering, gruplama/aggregation ve istatistiksel analiz adimlarini icermeli. Sonuclari ozet bir rapor formatinda sunun.",
+  "examples": [
+    {
+      "input": "df = load_sales_data()",
+      "output": "{'total_revenue': 1250000, 'top_category': 'Electronics', 'avg_order': 85.50, 'monthly_growth': 0.12}",
+      "explanation": "Veri setinden temel metrikleri cikarip ozet rapor olusturuyoruz."
+    }
+  ],
+  "constraints": [
+    "Sadece NumPy ve Pandas kullanin (sklearn haric)",
+    "Eksik verileri uygun stratejilerle doldurun (mean/median/mode)",
+    "Outlier tespiti ve temizligi yapin (IQR yontemi)",
+    "Sonuclari dictionary formatinda dondurun"
+  ],
+  "starter_code": {
+    "python": "import pandas as pd\nimport numpy as np\n\ndef analyze_sales_data(csv_path: str) -> dict:\n    \"\"\"\n    E-ticaret satis verisini analiz et.\n    \n    Veri setindeki kolonlar:\n    - order_id, customer_id, product_name, category, price, quantity,\n      order_date, city, payment_method, discount, rating\n    \n    Yapilacaklar:\n    1. Veriyi yukle ve temizle:\n       - Eksik 'price' degerlerini kategori ortalamasiyla doldur\n       - Eksik 'rating' degerlerini medyanla doldur\n       - Negatif price/quantity satirlarini sil\n       - Outlier'lari IQR yontemiyle tespit et ve sil (price kolonu)\n    \n    2. Feature engineering:\n       - 'total' kolonu ekle (price * quantity * (1 - discount/100))\n       - 'order_month' kolonu ekle (order_date'ten)\n       - 'is_high_value' kolonu ekle (total > 500 ise True)\n    \n    3. Analiz ve raporlama - su metrikleri dondur:\n       - total_revenue: Toplam gelir\n       - total_orders: Toplam siparis sayisi\n       - avg_order_value: Ortalama siparis degeri\n       - top_category: En cok gelir getiren kategori\n       - top_city: En cok siparis veren sehir\n       - monthly_revenue: Aylik gelir dict'i {ay: gelir}\n       - payment_distribution: Odeme yontemi dagilimi {yontem: yuzde}\n       - category_stats: Kategori bazli {kategori: {count, avg_price, total_revenue}}\n    \"\"\"\n    pass",
+    "javascript": "/**\n * E-ticaret satis verisini analiz et.\n * Not: JavaScript'te pandas yerine basit array islemleri kullaniyoruz.\n * \n * @param {Array<Object>} data - Satis verileri dizisi\n * Her obje: {order_id, customer_id, product_name, category, price, quantity,\n *            order_date, city, payment_method, discount, rating}\n * \n * Yapilacaklar:\n * 1. Veriyi temizle (eksik degerler, negatifler, outlier'lar)\n * 2. Feature engineering (total, order_month, is_high_value)\n * 3. Analiz metrikleri hesapla ve dondur\n */\nfunction analyzeSalesData(data) {\n    // IMPLEMENT ET\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"data_has_missing_values": true},
+      "expected": "missing_values_handled",
+      "description": "Eksik price degerleri kategori ortalamasiyla, rating medyanla doldurulmali"
+    },
+    {
+      "input": {"data_has_outliers": true},
+      "expected": "outliers_removed",
+      "description": "IQR yontemiyle price outlier'lari tespit edilip silinmeli"
+    },
+    {
+      "input": {"check": "feature_engineering"},
+      "expected": "has_computed_columns",
+      "description": "total, order_month ve is_high_value kolonlari dogru hesaplanmali"
+    },
+    {
+      "input": {"check": "metrics"},
+      "expected": "all_metrics_present",
+      "description": "Tum rapor metrikleri (total_revenue, top_category, vb.) donmeli"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"check": "empty_data"},
+      "expected": "handles_empty_gracefully",
+      "description": "Bos veri seti icin hata vermemeli, varsayilan degerler donmeli"
+    },
+    {
+      "input": {"check": "payment_distribution"},
+      "expected": "percentages_sum_100",
+      "description": "Odeme yontemi yuzdeleri toplam 100 etmeli"
+    }
+  ],
+  "hints": [
+    "Pandas'ta eksik degerleri gruba gore doldurmak icin: df['price'] = df.groupby('category')['price'].transform(lambda x: x.fillna(x.mean()))",
+    "IQR ile outlier tespiti: Q1 = df['price'].quantile(0.25), Q3 = df['price'].quantile(0.75), IQR = Q3 - Q1. Outlier siniri: Q1 - 1.5*IQR ile Q3 + 1.5*IQR arasi disindakiler.",
+    "Aylik gelir icin: df['order_month'] = pd.to_datetime(df['order_date']).dt.to_period('M'). Sonra groupby('order_month')['total'].sum() ile aylik toplamlari al.",
+    "value_counts(normalize=True) ile yuzde dagilimi alabilirsin. Sonucu .to_dict() ile dictionary'e cevir."
+  ],
+  "solution": {
+    "python": "import pandas as pd\nimport numpy as np\n\ndef analyze_sales_data(csv_path: str) -> dict:\n    df = pd.read_csv(csv_path)\n    \n    # 1. Temizlik\n    df['price'] = df.groupby('category')['price'].transform(lambda x: x.fillna(x.mean()))\n    df['rating'] = df['rating'].fillna(df['rating'].median())\n    df = df[(df['price'] > 0) & (df['quantity'] > 0)]\n    \n    Q1 = df['price'].quantile(0.25)\n    Q3 = df['price'].quantile(0.75)\n    IQR = Q3 - Q1\n    df = df[(df['price'] >= Q1 - 1.5 * IQR) & (df['price'] <= Q3 + 1.5 * IQR)]\n    \n    # 2. Feature Engineering\n    df['total'] = df['price'] * df['quantity'] * (1 - df['discount'].fillna(0) / 100)\n    df['order_date'] = pd.to_datetime(df['order_date'])\n    df['order_month'] = df['order_date'].dt.to_period('M').astype(str)\n    df['is_high_value'] = df['total'] > 500\n    \n    # 3. Analiz\n    category_stats = df.groupby('category').agg(\n        count=('order_id', 'count'),\n        avg_price=('price', 'mean'),\n        total_revenue=('total', 'sum')\n    ).round(2).to_dict('index')\n    \n    return {\n        'total_revenue': round(df['total'].sum(), 2),\n        'total_orders': len(df),\n        'avg_order_value': round(df['total'].mean(), 2),\n        'top_category': df.groupby('category')['total'].sum().idxmax(),\n        'top_city': df['city'].value_counts().index[0],\n        'monthly_revenue': df.groupby('order_month')['total'].sum().round(2).to_dict(),\n        'payment_distribution': (df['payment_method'].value_counts(normalize=True) * 100).round(1).to_dict(),\n        'category_stats': category_stats\n    }",
+    "javascript": "function analyzeSalesData(data) {\n    // Temizlik\n    const categoryAvg = {};\n    data.forEach(row => {\n        if (row.price > 0) {\n            if (!categoryAvg[row.category]) categoryAvg[row.category] = { sum: 0, count: 0 };\n            categoryAvg[row.category].sum += row.price;\n            categoryAvg[row.category].count++;\n        }\n    });\n    data.forEach(row => {\n        if (!row.price && categoryAvg[row.category]) {\n            row.price = categoryAvg[row.category].sum / categoryAvg[row.category].count;\n        }\n    });\n    const ratings = data.filter(r => r.rating).map(r => r.rating).sort((a,b) => a-b);\n    const medianRating = ratings[Math.floor(ratings.length / 2)];\n    data.forEach(r => { if (!r.rating) r.rating = medianRating; });\n    data = data.filter(r => r.price > 0 && r.quantity > 0);\n    \n    // Feature engineering\n    data.forEach(r => {\n        r.total = r.price * r.quantity * (1 - (r.discount || 0) / 100);\n        r.order_month = new Date(r.order_date).toISOString().slice(0, 7);\n        r.is_high_value = r.total > 500;\n    });\n    \n    const totalRevenue = data.reduce((s, r) => s + r.total, 0);\n    return {\n        total_revenue: Math.round(totalRevenue * 100) / 100,\n        total_orders: data.length,\n        avg_order_value: Math.round(totalRevenue / data.length * 100) / 100,\n        top_category: Object.entries(data.reduce((acc, r) => { acc[r.category] = (acc[r.category]||0) + r.total; return acc; }, {})).sort((a,b) => b[1]-a[1])[0][0],\n        top_city: Object.entries(data.reduce((acc, r) => { acc[r.city] = (acc[r.city]||0) + 1; return acc; }, {})).sort((a,b) => b[1]-a[1])[0][0]\n    };\n}",
+    "explanation_tr": "Veri analizi pipeline'i olusturduk: 1) Temizlik - eksik degerler icin gruplara gore ortalama/medyan doldurma, negatif verileri silme, IQR ile outlier tespiti. 2) Feature engineering - hesaplanmis kolonlar ekleme. 3) Aggregation - groupby ile kategori/ay bazli istatistikler. Bu pipeline her data science projesinin temelini olusturur."
+  },
+  "complexity": {
+    "optimal_time": "O(n log n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Veri analizi pipeline'inin temel asamalarini (temizlik, feature engineering, aggregation) ogrendin. Pandas groupby, transform ve agg fonksiyonlari veri biliminin temelleridir. Bu beceriler hem veri muhendisligi hem ML pozisyonlari icin gereklidir."
+}

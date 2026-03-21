@@ -1,0 +1,758 @@
+{
+  "id": "project-05",
+  "title": "Analytics Dashboard + AI Anomaly Detection",
+  "difficulty": "intermediate",
+  "estimated_days": 10,
+  "target_roles": [
+    "Full Stack Developer",
+    "AI Engineer"
+  ],
+  "tech_stack": [
+    "React",
+    "TypeScript",
+    "Node.js",
+    "Express",
+    "PostgreSQL",
+    "Redis",
+    "Python",
+    "FastAPI",
+    "scikit-learn",
+    "Recharts",
+    "Docker"
+  ],
+  "brief": "Bu projede, gerçek zamanlı veri görselleştirme ve anomali tespiti yapan profesyonel bir analytics dashboard oluşturacaksın. React + TypeScript + Recharts ile interaktif grafikler, Node.js + PostgreSQL ile veri API'si, ve ML tabanlı anomali algılama sistemi geliştireceksin. Bu tür dashboard'lar her tech şirkette kullanılıyor — Datadog, Grafana, New Relic gibi ürünlerin temelini oluşturuyor.",
+  "architecture": {
+    "overview": "Frontend (React + Recharts) → API (Express + Redis cache) → PostgreSQL (time-series data) → ML Service (anomaly detection)",
+    "diagram": "┌─────────┐     ┌─────────┐     ┌──────────┐\n│ React   │────▶│ Express │────▶│PostgreSQL│\n│ Recharts│◀────│ + Redis │     │time-series│\n└─────────┘     └────┬────┘     └──────────┘\n                     │\n                ┌────▼────┐\n                │ ML Svc  │\n                │ Anomaly │\n                └─────────┘",
+    "decisions": [
+      {
+        "decision": "Neden Recharts?",
+        "reasoning": "React ekosistemiyle tam uyum, declarative API, responsive, iyi dokümantasyon",
+        "alternatives": "Chart.js, D3.js, Victory, Nivo",
+        "when_to_choose_alternative": "D3.js: Tam kontrol ve custom vizualizasyon gerektiğinde. Chart.js: Basit grafikler yeterliyse. Nivo: Server-side rendering gerektiğinde"
+      },
+      {
+        "decision": "Neden Redis Cache?",
+        "reasoning": "Dashboard sorguları tekrar tekrar aynı veriyi çeker. Redis ile response time 200ms'den 5ms'e düşer",
+        "alternatives": "In-memory cache, CDN cache, Memcached",
+        "when_to_choose_alternative": "In-memory: Tek sunucu, basit yapı. CDN: Static dashboard'lar için. Memcached: Sadece key-value cache yeterliyse"
+      },
+      {
+        "decision": "Neden Time-series veritabanı değil PostgreSQL?",
+        "reasoning": "PostgreSQL time-series extension'ları (TimescaleDB) ile yeterli performans sağlar, ayrı DB öğrenme maliyeti yok",
+        "alternatives": "InfluxDB, TimescaleDB, ClickHouse",
+        "when_to_choose_alternative": "InfluxDB: Milyarlarca data point. TimescaleDB: PostgreSQL kalarak time-series optimize etmek. ClickHouse: OLAP query performansı"
+      },
+      {
+        "decision": "Neden Isolation Forest anomali tespiti?",
+        "reasoning": "Unsupervised learning — etiketli veri gerektirmez, yüksek boyutlu veride iyi çalışır, production'da yaygın",
+        "alternatives": "Z-score, DBSCAN, Autoencoder, Prophet",
+        "when_to_choose_alternative": "Z-score: Tek değişkenli basit anomaliler. Prophet: Time-series specific anomaliler. Autoencoder: Karmaşık pattern'lar"
+      }
+    ]
+  },
+  "what_you_learn": {
+    "technical": [
+      "React ile interaktif chart oluşturma",
+      "TypeScript ile type-safe frontend",
+      "Time-series veri modelleme",
+      "Redis caching stratejileri",
+      "Responsive dashboard tasarımı",
+      "CSV/PDF export",
+      "WebSocket ile real-time updates"
+    ],
+    "architectural": [
+      "Dashboard veri akışı tasarımı",
+      "Caching katmanı mimarisi",
+      "Aggregation pipeline tasarımı",
+      "Alert sistemi mimarisi"
+    ],
+    "ai_specific": [
+      "Isolation Forest anomali tespiti",
+      "Z-score istatistiksel analiz",
+      "Feature engineering time-series için",
+      "Model evaluation metrikleri"
+    ],
+    "soft_skills": [
+      "Veri görselleştirme best practice'leri",
+      "Stakeholder dashboard sunumu",
+      "KPI tanımlama ve ölçme"
+    ]
+  },
+  "requirements": {
+    "functional": [
+      "Multi-source veri toplama ve aggregation",
+      "İnteraktif line/bar/area/pie chart'lar",
+      "Tarih aralığı filtreleme",
+      "Domain/source filtreleme",
+      "Real-time veri güncelleme",
+      "CSV ve PDF export",
+      "Anomali alert sistemi",
+      "Responsive mobil uyumlu tasarım"
+    ],
+    "non_functional": [
+      "Dashboard yükleme < 2 saniye",
+      "Chart render < 500ms",
+      "10K+ data point destekli",
+      "Redis cache hit ratio > 90%"
+    ],
+    "ai_requirements": [
+      "Isolation Forest ile anomali tespiti",
+      "Z-score bazlı threshold alertleri",
+      "Configurable sensitivity",
+      "False positive oranı < 5%"
+    ]
+  },
+  "evaluation_criteria": [
+    {
+      "criterion": "Chart kalitesi ve interaktivite",
+      "weight": 20,
+      "description": "Grafikler profesyonel, tooltip'ler bilgilendirici, zoom/pan çalışıyor"
+    },
+    {
+      "criterion": "Veri modelleme",
+      "weight": 15,
+      "description": "Time-series schema doğru, aggregation verimli"
+    },
+    {
+      "criterion": "Caching stratejisi",
+      "weight": 10,
+      "description": "Redis cache doğru kullanılıyor, invalidation stratejisi var"
+    },
+    {
+      "criterion": "Anomali tespiti doğruluğu",
+      "weight": 20,
+      "description": "Isolation Forest doğru implement edilmiş, false positive düşük"
+    },
+    {
+      "criterion": "Responsive tasarım",
+      "weight": 10,
+      "description": "Mobilde de kullanılabilir dashboard"
+    },
+    {
+      "criterion": "Export fonksiyonları",
+      "weight": 10,
+      "description": "CSV ve PDF export çalışıyor, formatlar doğru"
+    },
+    {
+      "criterion": "Kod kalitesi",
+      "weight": 10,
+      "description": "TypeScript strict, componentler modüler, testler var"
+    },
+    {
+      "criterion": "Production readiness",
+      "weight": 5,
+      "description": "Docker, error handling, logging"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "p05-m1",
+      "title": "Proje Altyapısı ve Veri Mimarisi",
+      "overview": "Dashboard projesinin temellerini atıyoruz. Veri modelleme, API yapısı ve frontend scaffolding bu milestone'da yapılacak.",
+      "estimated_hours": 6,
+      "concepts_covered": [
+        "Time-series veri modelleme",
+        "Express API setup",
+        "React + TypeScript + Recharts setup"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Monorepo Proje Yapısı",
+          "why": "Frontend ve backend'i tek repo'da yönetmek geliştirme hızını artırır ve deployment'ı kolaylaştırır.",
+          "instructions": "pnpm init ile root package.json oluştur. pnpm-workspace.yaml dosyası oluştur (packages: ['packages/*'] tanımı ile) — bu dosya pnpm'e monorepo yapısını bildirir. packages/api ve packages/dashboard dizinleri oluştur. Concurrently ile iki servisi aynı anda başlat.",
+          "code_snippet": "// package.json\n{\n  \"scripts\": {\n    \"dev\": \"concurrently \\\"pnpm run dev:api\\\" \\\"pnpm run dev:dashboard\\\"\",\n    \"dev:api\": \"cd packages/api && pnpm run dev\",\n    \"dev:dashboard\": \"cd packages/dashboard && pnpm run dev\"\n  }\n}",
+          "deep_dive": "Monorepo vs polyrepo: Küçük-orta projelerde monorepo daha pratik. Büyük organizasyonlarda (100+ developer) polyrepo tercih edilir. Turborepo ve Nx gibi araçlar monorepo yönetimini kolaylaştırır.",
+          "checkpoint": "pnpm run dev komutu ile hem API hem dashboard aynı anda başlıyor mu?"
+        },
+        {
+          "step": 2,
+          "title": "PostgreSQL Time-Series Schema",
+          "why": "Dashboard'ın temel veri yapısı time-series'dir. Doğru schema tasarımı sorgu performansını 10x artırır.",
+          "instructions": "metrics tablosu oluştur: id, source, metric_name, value, timestamp, metadata (JSONB). Timestamp üzerinde index oluştur. Partition by range (monthly) ekle.",
+          "code_snippet": "-- migrations/001_create_metrics.sql\nCREATE TABLE metrics (\n  id BIGSERIAL PRIMARY KEY,\n  source VARCHAR(100) NOT NULL,\n  metric_name VARCHAR(200) NOT NULL,\n  value DOUBLE PRECISION NOT NULL,\n  timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n  metadata JSONB DEFAULT '{}',\n  -- Composite index for common queries\n  CONSTRAINT idx_source_metric_time\n    UNIQUE (source, metric_name, timestamp)\n);\n\n-- Time-based index for range queries\nCREATE INDEX idx_metrics_timestamp\n  ON metrics (timestamp DESC);\n\n-- Source filtering index\nCREATE INDEX idx_metrics_source\n  ON metrics (source, timestamp DESC);",
+          "deep_dive": "TIMESTAMPTZ kullanımı: Timezone-aware timestamp kullan, TIMESTAMP kullanma. Global kullanıcılar farklı timezone'larda olabilir. PostgreSQL TIMESTAMPTZ'yi UTC olarak saklar ve sorgu zamanında timezone dönüşümü yapar.",
+          "checkpoint": "psql ile metrics tablosuna test verisi ekleyip timestamp range query yapabiliyor musun?"
+        },
+        {
+          "step": 3,
+          "title": "Express API ve Aggregation Endpoint'leri",
+          "why": "Dashboard grafikleri raw veri yerine aggregate edilmiş veri kullanır. API katmanı bu aggregation'ı verimli şekilde yapmalı.",
+          "instructions": "GET /api/metrics endpoint'i oluştur. Query parametreleri: source, metric_name, from, to, interval (1h, 1d, 1w). PostgreSQL date_trunc ile aggregation yap.",
+          "code_snippet": "// routes/metrics.ts\n\n// date_trunc PostgreSQL uyumlu interval değerleri gerektirir\n// Kullanıcı dostu kısaltmaları PostgreSQL formatına çeviriyoruz\nconst INTERVAL_MAP: Record<string, string> = {\n  '1h': 'hour',\n  '1d': 'day',\n  '1w': 'week',\n  '1m': 'month',\n};\n\nrouter.get('/metrics', async (req, res) => {\n  const { source, metric, from, to, interval = '1h' } = req.query;\n  \n  const pgInterval = INTERVAL_MAP[interval as string];\n  if (!pgInterval) {\n    return res.status(400).json({ error: `Geçersiz interval: ${interval}. Desteklenen: ${Object.keys(INTERVAL_MAP).join(', ')}` });\n  }\n  \n  const result = await pool.query(`\n    SELECT \n      date_trunc($1, timestamp) as bucket,\n      AVG(value) as avg_value,\n      MIN(value) as min_value,\n      MAX(value) as max_value,\n      COUNT(*) as count\n    FROM metrics\n    WHERE source = $2\n      AND metric_name = $3\n      AND timestamp BETWEEN $4 AND $5\n    GROUP BY bucket\n    ORDER BY bucket ASC\n  `, [pgInterval, source, metric, from, to]);\n  \n  res.json(result.rows);\n});",
+          "deep_dive": "date_trunc PostgreSQL'in en güçlü time-series fonksiyonlarından biri. '1 hour', '1 day', '1 week' gibi interval'ler destekler. Milyonlarca satırı saniyeler içinde aggregate eder.",
+          "checkpoint": "curl ile /api/metrics endpoint'ini çağırıp aggregated veri alabiliyor musun?"
+        },
+        {
+          "step": 4,
+          "title": "React Dashboard Scaffolding",
+          "why": "Dashboard layout'u grid-based olmalı. Her widget bağımsız çalışmalı ki birisi hata verdiğinde diğerleri etkilenmesin.",
+          "instructions": "Vite + React + TypeScript projesi oluştur. Recharts ve react-grid-layout kur. DashboardLayout component'i oluştur. ChartWidget wrapper component'i yaz.",
+          "code_snippet": "// components/ChartWidget.tsx\nimport { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';\n\ninterface ChartWidgetProps {\n  title: string;\n  data: Array<{ bucket: string; avg_value: number }>;\n  color?: string;\n}\n\nexport function ChartWidget({ title, data, color = '#8884d8' }: ChartWidgetProps) {\n  return (\n    <div className=\"bg-gray-800 rounded-lg shadow p-4\">\n      <h3 className=\"text-sm font-medium text-gray-300 mb-2\">{title}</h3>\n      <ResponsiveContainer width=\"100%\" height={200}>\n        <LineChart data={data}>\n          <XAxis dataKey=\"bucket\" />\n          <YAxis />\n          <Tooltip />\n          <Line type=\"monotone\" dataKey=\"avg_value\" stroke={color} dot={false} />\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}",
+          "deep_dive": "ResponsiveContainer Recharts'ın en önemli component'i — parent container boyutuna göre otomatik resize yapar. Width ve height'ı percentage olarak ver, pixel kullanma.",
+          "checkpoint": "Dashboard sayfası açılıyor ve mock veriyle bir line chart görünüyor mu?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Time-series veride TIMESTAMPTZ kullan, asla TIMESTAMP kullanma\n2. Aggregation'ı frontend'de yapma, PostgreSQL date_trunc ile DB seviyesinde yap\n3. Dashboard widget'ları birbirinden bağımsız olmalı — Error Boundary kullan\n4. Recharts'ta ResponsiveContainer ZORUNLU, yoksa chart render olmaz",
+      "senior_learns": "🎩 Senior Böyle Öğrenir:\nSenior developer dashboard tasarlarken ilk sorusu 'Bu veriyi kim, ne sıklıkla, hangi granularity'de görmek istiyor?' olur. Dashboard'lar genelde 3 katmandır: Overview (C-level), Operational (team lead), Debug (developer). Her katmanın farklı aggregation seviyesi ve refresh rate'i olur. Senior'lar ayrıca dashboard'ın kendisinin performans metriklerini de takip eder — dashboard yavaşsa kimse kullanmaz."
+    },
+    {
+      "id": "p05-m2",
+      "title": "Veri Toplama ve Redis Cache",
+      "overview": "Birden fazla kaynaktan veri toplama pipeline'ı ve Redis cache katmanı oluşturuyoruz.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "Multi-source data ingestion",
+        "Redis caching",
+        "Cache invalidation"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Veri Simülasyonu ve Seed",
+          "why": "Gerçek veri olmadan dashboard geliştirmek imkansız. Realistic mock veri ile geliştirme yapacağız.",
+          "instructions": "seed.ts scripti oluştur. 3 farklı source (web-app, mobile-app, api-gateway) ve 5 metrik (cpu_usage, memory, response_time, error_rate, request_count) için son 30 günlük veri üret.",
+          "code_snippet": "// scripts/seed.ts\nasync function seedMetrics() {\n  const sources = ['web-app', 'mobile-app', 'api-gateway'];\n  const metrics = ['cpu_usage', 'memory_usage', 'response_time', 'error_rate', 'request_count'];\n  \n  const now = Date.now();\n  const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;\n  \n  for (const source of sources) {\n    for (const metric of metrics) {\n      const baseValue = getBaseValue(metric); // cpu: 40-80, memory: 60-90, etc.\n      for (let ts = thirtyDaysAgo; ts < now; ts += 5 * 60 * 1000) {\n        // Add realistic variation: daily pattern + noise + occasional spikes\n        const hourOfDay = new Date(ts).getHours();\n        const dailyPattern = Math.sin((hourOfDay - 6) * Math.PI / 12) * 0.2; // Peak at noon\n        const noise = (Math.random() - 0.5) * 0.1;\n        const spike = Math.random() > 0.995 ? Math.random() * 0.5 : 0; // Rare spikes\n        const value = baseValue * (1 + dailyPattern + noise + spike);\n        \n        await insertMetric(source, metric, value, new Date(ts));\n      }\n    }\n  }\n}",
+          "deep_dive": "Realistic mock veri oluşturma sanatı: Gerçek metrikler günlük pattern gösterir (gündüz yüksek, gece düşük), haftalık pattern (pazartesi yüksek, pazar düşük), ve occasional anomaliler. Bu pattern'ları seed'e eklemek dashboard'un gerçekçi görünmesini sağlar.",
+          "checkpoint": "Seed çalıştıktan sonra metrics tablosunda en az 100K satır var mı?"
+        },
+        {
+          "step": 2,
+          "title": "Redis Cache Katmanı",
+          "why": "Dashboard her açıldığında aynı aggregate query'leri çalıştırmak hem DB'ye yük bindirir hem kullanıcı deneyimini kötüleştirir.",
+          "instructions": "Redis client kur (ioredis). Cache middleware oluştur. TTL stratejisi: son 1 saat verisi 30sn cache, son 1 gün 5dk, son 1 hafta 30dk, son 1 ay 2 saat.",
+          "code_snippet": "// middleware/cache.ts\nimport Redis from 'ioredis';\n\nconst redis = new Redis(process.env.REDIS_URL);\n\nexport function cacheMiddleware(ttlFn: (req: Request) => number) {\n  return async (req: Request, res: Response, next: NextFunction) => {\n    const key = `dashboard:${req.originalUrl}`;\n    \n    const cached = await redis.get(key);\n    if (cached) {\n      res.setHeader('X-Cache', 'HIT');\n      return res.json(JSON.parse(cached));\n    }\n    \n    // Override res.json to cache the response\n    const originalJson = res.json.bind(res);\n    res.json = (body: any) => {\n      const ttl = ttlFn(req);\n      redis.setex(key, ttl, JSON.stringify(body));\n      res.setHeader('X-Cache', 'MISS');\n      return originalJson(body);\n    };\n    \n    next();\n  };\n}\n\n// Usage\nrouter.get('/metrics', cacheMiddleware(req => {\n  const range = req.query.to - req.query.from;\n  if (range < 3600000) return 30;     // Son 1 saat: 30sn cache\n  if (range < 86400000) return 300;    // Son 1 gün: 5dk cache  \n  return 1800;                          // Daha eski: 30dk cache\n}), getMetrics);",
+          "deep_dive": "Cache invalidation bilgisayar biliminin en zor 2 probleminden biri. Dashboard'larda TTL-based cache en pratik çözüm çünkü verinin biraz eski olması kabul edilebilir. Ancak alert'ler için cache bypass edilmeli.",
+          "checkpoint": "İlk istekte X-Cache: MISS, ikinci istekte X-Cache: HIT header'ı dönüyor mu?"
+        },
+        {
+          "step": 3,
+          "title": "Multi-Source Data Aggregation API",
+          "why": "Dashboard'da birden fazla source'un verilerini karşılaştırmalı olarak göstermemiz gerekiyor.",
+          "instructions": "GET /api/dashboard/overview endpoint'i oluştur — tüm source'ların son durumunu, trend yönünü, ve anomali sayısını döndürsün.",
+          "code_snippet": "// routes/dashboard.ts\nrouter.get('/overview', async (req, res) => {\n  const { from, to } = req.query;\n  \n  // Parallel queries for each metric\n  const [cpuData, memData, errorData, latencyData] = await Promise.all([\n    getAggregatedMetric('cpu_usage', from, to),\n    getAggregatedMetric('memory_usage', from, to),\n    getAggregatedMetric('error_rate', from, to),\n    getAggregatedMetric('response_time', from, to),\n  ]);\n  \n  res.json({\n    summary: {\n      cpu: { current: cpuData.latest, trend: cpuData.trend, status: getStatus(cpuData) },\n      memory: { current: memData.latest, trend: memData.trend, status: getStatus(memData) },\n      errors: { current: errorData.latest, trend: errorData.trend, status: getStatus(errorData) },\n      latency: { current: latencyData.latest, trend: latencyData.trend, status: getStatus(latencyData) },\n    },\n    charts: { cpu: cpuData.series, memory: memData.series, errors: errorData.series, latency: latencyData.series }\n  });\n});",
+          "deep_dive": "Promise.all ile paralel DB sorguları: 4 sequential sorgu 4x sürer (örn. 4x200ms = 800ms), ama Promise.all ile hepsi paralel çalışır ve toplam süre en yavaş sorgu kadar olur (~200ms). Dashboard API'lerinde bu pattern ZORUNLU.",
+          "checkpoint": "overview endpoint'i 4 metriğin summary ve chart verisini tek response'ta dönüyor mu?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Redis TTL'i veri aralığına göre ayarla — kısa aralık kısa TTL, uzun aralık uzun TTL\n2. Cache key'lere request URL'ini kullan — farklı filtreler farklı cache entry'leri oluşturur\n3. Promise.all ile paralel DB sorguları dashboard performansını dramatik artırır\n4. X-Cache header'ı ekle — debug için çok önemli",
+      "senior_learns": "🎩 Senior Böyle Öğrenir:\nSenior'lar cache'i sadece performans için değil, maliyet optimizasyonu için de kullanır. Bir dashboard sayfası 10 API call yapar, her biri 4 DB query çalıştırır — günde 1000 kullanıcı ile 40K query/gün. Cache ile bu 4K'ya düşer. Cloud'da DB query maliyeti gerçektir. Senior ayrıca cache warming (önceden cache doldurma) stratejisi uygular — sabah 9'da herkes dashboard açınca cold cache olmasın diye."
+    },
+    {
+      "id": "p05-m3",
+      "title": "İnteraktif Dashboard Frontend",
+      "overview": "Recharts ile profesyonel, interaktif grafikler oluşturuyoruz. Line, area, bar, pie chart'lar ve filtreleme sistemi.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "Recharts advanced usage",
+        "Custom hooks for data fetching",
+        "Date range picker",
+        "Responsive grid layout"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "useMetrics Custom Hook",
+          "why": "Veri çekme, loading state, error handling ve cache logic'ini her chart component'inde tekrar yazmamak için custom hook oluşturuyoruz.",
+          "instructions": "useMetrics hook'u oluştur: source, metric, dateRange parametre alır, data/loading/error döndürür. SWR benzeri stale-while-revalidate pattern'ı uygula.",
+          "code_snippet": "// hooks/useMetrics.ts\nimport { useState, useEffect, useRef } from 'react';\n\ninterface UseMetricsOptions {\n  source: string;\n  metric: string;\n  from: Date;\n  to: Date;\n  interval?: string;\n  refreshInterval?: number;\n}\n\nexport function useMetrics(options: UseMetricsOptions) {\n  const [data, setData] = useState<MetricPoint[]>([]);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<Error | null>(null);\n  const staleData = useRef<MetricPoint[]>([]);\n  \n  useEffect(() => {\n    const fetchData = async () => {\n      try {\n        // Show stale data while fetching (SWR pattern)\n        if (staleData.current.length > 0) {\n          setData(staleData.current);\n          setLoading(false);\n        }\n        \n        const params = new URLSearchParams({\n          source: options.source,\n          metric: options.metric,\n          from: options.from.toISOString(),\n          to: options.to.toISOString(),\n          interval: options.interval || '1h',\n        });\n        \n        const res = await fetch(`/api/metrics?${params}`);\n        const json = await res.json();\n        setData(json);\n        staleData.current = json;\n        setError(null);\n      } catch (err) {\n        setError(err as Error);\n      } finally {\n        setLoading(false);\n      }\n    };\n    \n    fetchData();\n    \n    if (options.refreshInterval) {\n      const timer = setInterval(fetchData, options.refreshInterval);\n      return () => clearInterval(timer);\n    }\n  }, [options.source, options.metric, options.from.getTime(), options.to.getTime()]);\n  \n  return { data, loading, error };\n}",
+          "deep_dive": "SWR (Stale-While-Revalidate) pattern dashboard'larda çok önemli. Kullanıcı filtre değiştirdiğinde eski veriyi gösterirken yeni veri yüklenir — bu UX'i dramatik iyileştirir çünkü kullanıcı boş ekran görmez.",
+          "checkpoint": "useMetrics hook'u ile bir chart data çekebiliyor ve loading state doğru çalışıyor mu?"
+        },
+        {
+          "step": 2,
+          "title": "Multi-Chart Dashboard Layout",
+          "why": "Profesyonel dashboard'lar grid-based layout kullanır. Her widget bağımsız resize ve reorder edilebilmeli.",
+          "instructions": "4 chart widget'ı yan yana göster: CPU Usage (Line), Memory (Area), Error Rate (Bar), Response Time (Line). Tarih aralığı filter ekle (son 1 saat, 6 saat, 24 saat, 7 gün, 30 gün). Source filter ekle.",
+          "code_snippet": "// pages/Dashboard.tsx\nexport function Dashboard() {\n  const [dateRange, setDateRange] = useState(DATE_RANGES['24h']);\n  const [source, setSource] = useState('all');\n  \n  return (\n    <div className=\"min-h-screen bg-gray-900 p-6\">\n      {/* Filters */}\n      <div className=\"flex items-center gap-4 mb-6\">\n        <DateRangePicker value={dateRange} onChange={setDateRange} />\n        <SourceFilter value={source} onChange={setSource} />\n      </div>\n      \n      {/* Summary Cards */}\n      <div className=\"grid grid-cols-4 gap-4 mb-6\">\n        <SummaryCard title=\"CPU\" value=\"45%\" trend=\"+2.3%\" status=\"healthy\" />\n        <SummaryCard title=\"Memory\" value=\"72%\" trend=\"-1.1%\" status=\"warning\" />\n        <SummaryCard title=\"Errors\" value=\"0.3%\" trend=\"-0.5%\" status=\"healthy\" />\n        <SummaryCard title=\"Latency\" value=\"142ms\" trend=\"+12ms\" status=\"healthy\" />\n      </div>\n      \n      {/* Charts Grid */}\n      <div className=\"grid grid-cols-2 gap-4\">\n        <ChartWidget title=\"CPU Usage\" metric=\"cpu_usage\" type=\"line\" />\n        <ChartWidget title=\"Memory\" metric=\"memory_usage\" type=\"area\" />\n        <ChartWidget title=\"Error Rate\" metric=\"error_rate\" type=\"bar\" />\n        <ChartWidget title=\"Response Time\" metric=\"response_time\" type=\"line\" />\n      </div>\n    </div>\n  );\n}",
+          "deep_dive": "Dashboard'ların en önemli UX kuralı: Summary card'lar en üstte (hızlı bakış), detaylı chart'lar altta. Kullanıcı önce genel durumu görür, sorun varsa chart'a tıklayıp detaya iner. Bu pattern'a 'Information Hierarchy' denir.",
+          "checkpoint": "4 chart ve 4 summary card düzgün grid layout'ta görünüyor mu? Filtreleme çalışıyor mu?"
+        },
+        {
+          "step": 3,
+          "title": "Advanced Chart Features",
+          "why": "Profesyonel dashboard chart'ları zoom, brush (range selection), tooltip customization ve comparison overlay destekler.",
+          "instructions": "Recharts Brush component'i ile chart'lara zoom özelliği ekle. Custom tooltip component oluştur. Birden fazla source'u aynı chart'ta overlay olarak göster.",
+          "code_snippet": "// components/AdvancedChart.tsx\nimport { LineChart, Line, XAxis, YAxis, Tooltip, Brush, Legend, ResponsiveContainer } from 'recharts';\n\nconst COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c43'];\n\nexport function AdvancedChart({ data, sources, metric }: Props) {\n  return (\n    <ResponsiveContainer width=\"100%\" height={300}>\n      <LineChart data={data}>\n        <XAxis \n          dataKey=\"timestamp\" \n          tickFormatter={(ts) => format(new Date(ts), 'HH:mm')}\n        />\n        <YAxis />\n        <Tooltip content={<CustomTooltip />} />\n        <Legend />\n        \n        {/* Multiple sources as separate lines */}\n        {sources.map((source, i) => (\n          <Line\n            key={source}\n            type=\"monotone\"\n            dataKey={source}\n            stroke={COLORS[i % COLORS.length]}\n            dot={false}\n            strokeWidth={2}\n          />\n        ))}\n        \n        {/* Brush for zoom */}\n        <Brush dataKey=\"timestamp\" height={30} stroke=\"#8884d8\" />\n      </LineChart>\n    </ResponsiveContainer>\n  );\n}\n\nfunction CustomTooltip({ active, payload, label }: any) {\n  if (!active || !payload) return null;\n  return (\n    <div className=\"bg-gray-800 shadow-lg rounded p-3 border border-gray-700\">\n      <p className=\"text-sm text-gray-500\">{format(new Date(label), 'PPp')}</p>\n      {payload.map((entry: any) => (\n        <p key={entry.name} style={{ color: entry.color }}>\n          {entry.name}: {entry.value.toFixed(2)}\n        </p>\n      ))}\n    </div>\n  );\n}",
+          "deep_dive": "Recharts Brush component'i kullanıcının chart'ta bir aralık seçmesini sağlar — zoom gibi çalışır. Production dashboard'larda bu ZORUNLU çünkü 30 günlük veriyi gösterirken 2 saatlik spike'ı incelemek gerekebilir.",
+          "checkpoint": "Chart'larda brush ile zoom yapabiliyor musun? Tooltip özelleştirilmiş mi?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Custom hook'larda dependency array'e Date objesi değil, getTime() değeri koy — Date referans karşılaştırması yapar\n2. SWR pattern: Eski veriyi göster, arkada yeni veri çek — kullanıcı boş ekran görmemeli\n3. Recharts Brush component'i zoom için ZORUNLU, onsuz büyük veri setleri kullanılamaz\n4. Chart'lara Error Boundary sar — bir chart hata verince tüm dashboard çökmemeli",
+      "senior_learns": "🎩 Senior Böyle Öğrenir:\nSenior chart performansı için 'data decimation' uygular. 30 günlük 5-dakikalık veri = 8640 data point. Ekranda max 800 pixel genişlik var, yani 8640 noktanın çoğu üst üste biner. Senior veriyi chart genişliğine göre downsample eder — Largest-Triangle-Three-Buckets (LTTB) algoritması orijinal pattern'ı koruyarak veriyi azaltır. Bu tek optimizasyon chart render süresini 500ms'den 50ms'e düşürür."
+    },
+    {
+      "id": "p05-m4",
+      "title": "AI Anomali Tespiti",
+      "overview": "Machine learning ile metriklerdeki anormallikleri otomatik tespit eden sistem oluşturuyoruz.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "Isolation Forest",
+        "Z-score",
+        "Feature engineering",
+        "Anomaly scoring"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "İstatistiksel Anomali Tespiti (Z-Score)",
+          "why": "ML modeline geçmeden önce basit istatistiksel yöntemlerle başlamak her zaman doğru yaklaşım. Z-score anlaması kolay ve çoğu basit anomaliyi yakalar.",
+          "instructions": "Her metrik için rolling window z-score hesapla. |z| > 3 olanları anomali olarak işaretle. Window size: 24 saat (288 data point).",
+          "code_snippet": "// services/anomaly/zscore.ts\nexport function detectAnomaliesZScore(\n  data: MetricPoint[],\n  windowSize = 288, // 24h of 5-min intervals\n  threshold = 3\n): AnomalyResult[] {\n  const anomalies: AnomalyResult[] = [];\n  \n  for (let i = windowSize; i < data.length; i++) {\n    const window = data.slice(i - windowSize, i);\n    const values = window.map(d => d.value);\n    \n    const mean = values.reduce((a, b) => a + b, 0) / values.length;\n    const std = Math.sqrt(\n      values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length\n    );\n    \n    if (std === 0) continue; // Constant values\n    \n    const zScore = (data[i].value - mean) / std;\n    \n    if (Math.abs(zScore) > threshold) {\n      anomalies.push({\n        timestamp: data[i].timestamp,\n        value: data[i].value,\n        expected: mean,\n        zScore,\n        severity: Math.abs(zScore) > 5 ? 'critical' : 'warning',\n        type: zScore > 0 ? 'spike' : 'drop',\n      });\n    }\n  }\n  \n  return anomalies;\n}",
+          "deep_dive": "Z-score'un limitasyonları: Normal dağılım varsayar, seasonal pattern'ları anlamaz, multivariate anomalileri yakalayamaz. Ama basitliği ve açıklanabilirliği nedeniyle production'da ilk savunma hattı olarak kullanılır. Daha karmaşık anomaliler için Isolation Forest kullanacağız.",
+          "checkpoint": "Seed verideki spike'ları z-score ile yakalayabiliyor musun? Threshold 3 ile kaç anomali bulunuyor?"
+        },
+        {
+          "step": 2,
+          "title": "Isolation Forest ile ML Anomali Tespiti",
+          "why": "Isolation Forest çok değişkenli anomalileri yakalar — örneğin CPU düşükken error rate yüksekse, tek başına ikisi de normal aralıkta olabilir ama birlikte anormal.",
+          "instructions": "Python ML service oluştur (FastAPI). scikit-learn Isolation Forest modeli eğit. Feature'lar: value, hour_of_day, day_of_week, rolling_mean, rolling_std. contamination=0.01 ile başla.",
+          "code_snippet": "# ml_service/anomaly_detector.py\nfrom sklearn.ensemble import IsolationForest\nimport numpy as np\nimport pandas as pd\n\nclass AnomalyDetector:\n    def __init__(self, contamination=0.01):\n        self.model = IsolationForest(\n            contamination=contamination,\n            n_estimators=100,\n            random_state=42\n        )\n        self.fitted = False\n    \n    def _extract_features(self, df: pd.DataFrame) -> np.ndarray:\n        \"\"\"Feature engineering for time-series anomaly detection.\"\"\"\n        features = pd.DataFrame()\n        features['value'] = df['value']\n        features['hour'] = pd.to_datetime(df['timestamp']).dt.hour\n        features['day_of_week'] = pd.to_datetime(df['timestamp']).dt.dayofweek\n        features['rolling_mean_1h'] = df['value'].rolling(12).mean()\n        features['rolling_std_1h'] = df['value'].rolling(12).std()\n        features['rolling_mean_24h'] = df['value'].rolling(288).mean()\n        features['diff'] = df['value'].diff()  # Rate of change\n        features['diff_abs'] = features['diff'].abs()\n        return features.dropna().values\n    \n    def fit(self, df: pd.DataFrame):\n        X = self._extract_features(df)\n        self.model.fit(X)\n        self.fitted = True\n    \n    def predict(self, df: pd.DataFrame) -> list:\n        X = self._extract_features(df)\n        # -1 = anomaly, 1 = normal\n        predictions = self.model.predict(X)\n        scores = self.model.score_samples(X)\n        \n        anomalies = []\n        for i, (pred, score) in enumerate(zip(predictions, scores)):\n            if pred == -1:\n                anomalies.append({\n                    'index': i,\n                    'score': float(score),\n                    'severity': 'critical' if score < -0.6 else 'warning'\n                })\n        return anomalies",
+          "deep_dive": "Feature engineering anomali tespitinin en kritik kısmı. Raw value tek başına yeterli değil — saate göre beklenen değer farklı (gece düşük, gündüz yüksek). Rolling statistics trend'i yakalar, diff rate-of-change'i yakalar. contamination parametresi verinin kaçının anomali olduğunu belirtir — başlangıçta 0.01 (1%) iyi bir değer.",
+          "checkpoint": "ML service çalışıyor ve seed verideki anomalileri tespit edebiliyor mu? Z-score sonuçlarıyla karşılaştır."
+        },
+        {
+          "step": 3,
+          "title": "Anomali Görselleştirme ve Alert",
+          "why": "Anomali tespit etmek yetmez — kullanıcıya açık ve eyleme dönüştürülebilir şekilde gösterilmeli.",
+          "instructions": "Chart'larda anomali noktalarını kırmızı dot olarak göster. Anomali tıklandığında detay popup göster. Slack/email alert endpoint'i oluştur.",
+          "code_snippet": "// components/AnomalyOverlay.tsx\nimport { ScatterChart, Scatter, Cell, ReferenceLine } from 'recharts';\n\nexport function AnomalyChart({ data, anomalies }: Props) {\n  return (\n    <ResponsiveContainer width=\"100%\" height={300}>\n      <ComposedChart data={data}>\n        <Line type=\"monotone\" dataKey=\"value\" stroke=\"#8884d8\" dot={false} />\n        \n        {/* Anomaly points as red dots */}\n        <Scatter data={anomalies} fill=\"red\">\n          {anomalies.map((a, i) => (\n            <Cell\n              key={i}\n              fill={a.severity === 'critical' ? '#ef4444' : '#f59e0b'}\n              onClick={() => showAnomalyDetail(a)}\n              cursor=\"pointer\"\n            />\n          ))}\n        </Scatter>\n        \n        {/* Expected range band */}\n        <ReferenceArea y1={lowerBound} y2={upperBound} fill=\"#8884d8\" fillOpacity={0.1} />\n      </ComposedChart>\n    </ResponsiveContainer>\n  );\n}",
+          "deep_dive": "Alert fatigue production'da en büyük sorun. Çok fazla alert gönderirsen ekip hepsini ignore eder. Anomali severity'sini doğru belirlemek ve grouping yapmak (aynı root cause'tan gelen anomalileri birleştirmek) critical.",
+          "checkpoint": "Chart'larda anomali noktaları kırmızı/sarı olarak görünüyor mu? Tıklayınca detay açılıyor mu?"
+        },
+        {
+          "step": 4,
+          "title": "Model Performans Değerlendirme",
+          "why": "ML modelinin ne kadar iyi çalıştığını ölçmeden production'a almak tehlikeli.",
+          "instructions": "Precision, recall, F1 score hesapla. Confusion matrix görselleştir. A/B test framework'ü oluştur: z-score vs Isolation Forest karşılaştır.",
+          "code_snippet": "# ml_service/evaluation.py\ndef evaluate_detector(detector, test_data, known_anomalies):\n    predictions = detector.predict(test_data)\n    pred_indices = set(p['index'] for p in predictions)\n    true_indices = set(known_anomalies)\n    \n    tp = len(pred_indices & true_indices)\n    fp = len(pred_indices - true_indices)\n    fn = len(true_indices - pred_indices)\n    \n    precision = tp / (tp + fp) if (tp + fp) > 0 else 0\n    recall = tp / (tp + fn) if (tp + fn) > 0 else 0\n    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0\n    \n    return {\n        'precision': precision,\n        'recall': recall,\n        'f1_score': f1,\n        'true_positives': tp,\n        'false_positives': fp,\n        'false_negatives': fn,\n        'false_positive_rate': fp / (fp + (len(test_data) - len(true_indices)))\n    }",
+          "deep_dive": "Anomali tespitinde precision vs recall trade-off: Precision yüksek = az false alarm ama bazı gerçek anomalileri kaçırırsın. Recall yüksek = hiçbir anomaliyi kaçırmazsın ama çok false alarm gelir. Production'da genelde precision > recall tercih edilir çünkü false alarm'lar güveni azaltır.",
+          "checkpoint": "F1 score 0.7'nin üzerinde mi? False positive rate %5'in altında mı?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Her zaman basit yöntemle (z-score) başla, sonra ML'e geç — basit çözüm yetebilir\n2. Feature engineering model performansının %80'ini belirler — doğru feature'lar seç\n3. contamination parametresi domain knowledge gerektirir — verinin kaçı anomali?\n4. Alert fatigue production'un en büyük düşmanı — severity doğru belirle",
+      "senior_learns": "🎩 Senior Böyle Öğrenir:\nSenior anomali tespitinde 'explainability' konusuna odaklanır. Model 'bu anomali' dediğinde, ekip 'neden?' diye sorar. Isolation Forest'ın avantajı: anomaly_score ile 'ne kadar anomali' söylenebilir, ama 'hangi feature yüzünden' söylenemez. Senior SHAP (SHapley Additive exPlanations) kullanarak her anomali için hangi feature'ın katkıda bulunduğunu açıklar. Mülakatlardan explainability sorusu gelir."
+    },
+    {
+      "id": "p05-m5",
+      "title": "Export, Alert Sistemi ve Heatmap",
+      "overview": "Dashboard'a CSV/PDF export, email alert sistemi ve heatmap/cohort analiz gibi advanced vizualizasyonlar ekliyoruz.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "CSV/PDF generation",
+        "Email alerts",
+        "Heatmap visualization",
+        "Cohort analysis"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "CSV ve PDF Export",
+          "why": "Stakeholder'lar dashboard'a her zaman erişemez — haftalık rapor olarak CSV/PDF isteyebilirler.",
+          "instructions": "CSV export: Papa Parse ile client-side CSV oluştur. PDF export: jsPDF + html2canvas ile chart'ları PDF'e çevir. Download butonları ekle.",
+          "code_snippet": "// utils/export.ts\nimport Papa from 'papaparse';\nimport jsPDF from 'jspdf';\nimport html2canvas from 'html2canvas';\n\nexport function exportCSV(data: any[], filename: string) {\n  const csv = Papa.unparse(data);\n  const blob = new Blob([csv], { type: 'text/csv' });\n  const url = URL.createObjectURL(blob);\n  const a = document.createElement('a');\n  a.href = url;\n  a.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`;\n  a.click();\n  URL.revokeObjectURL(url);\n}\n\nexport async function exportPDF(elementId: string, title: string) {\n  const element = document.getElementById(elementId);\n  if (!element) return;\n  \n  const canvas = await html2canvas(element, { scale: 2 });\n  const pdf = new jsPDF('landscape', 'mm', 'a4');\n  \n  pdf.setFontSize(18);\n  pdf.text(title, 15, 15);\n  pdf.setFontSize(10);\n  pdf.text(`Generated: ${format(new Date(), 'PPp')}`, 15, 22);\n  \n  const imgWidth = 267; // A4 landscape width - margins\n  const imgHeight = (canvas.height * imgWidth) / canvas.width;\n  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 30, imgWidth, imgHeight);\n  \n  pdf.save(`${title}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);\n}",
+          "deep_dive": "html2canvas chart'ları pixel-perfect PNG'ye çevirir. scale: 2 ile retina kalitesi elde edersin. Dikkat: SVG-based chart'lar (Recharts) bazen html2canvas ile sorun yaşar — foreignObject kullanılıyorsa. Bu durumda chart'ı önce canvas-based kütüphaneye çevirmek gerekebilir.",
+          "checkpoint": "CSV ve PDF butonları çalışıyor mu? İndirilen dosyalar doğru veriyi içeriyor mu?"
+        },
+        {
+          "step": 2,
+          "title": "Heatmap Vizualizasyonu",
+          "why": "Heatmap, gün-saat bazında pattern'ları görmek için en etkili görselleştirme. İş yükünün ne zaman peak yaptığını bir bakışta gösterir.",
+          "instructions": "7x24 heatmap grid oluştur (günler x saatler). Renk intensity metrik değerine göre değişsin. Tooltip'te detay göster.",
+          "code_snippet": "// components/Heatmap.tsx\nimport { Fragment } from 'react';\n\nexport function Heatmap({ data }: { data: HeatmapCell[][] }) {\n  const getColor = (value: number, max: number) => {\n    const intensity = value / max;\n    if (intensity > 0.8) return 'bg-red-500';\n    if (intensity > 0.6) return 'bg-orange-400';\n    if (intensity > 0.4) return 'bg-yellow-300';\n    if (intensity > 0.2) return 'bg-green-300';\n    return 'bg-green-100';\n  };\n  \n  const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];\n  \n  return (\n    <div className=\"bg-gray-800 rounded-lg p-4\">\n      <h3 className=\"font-medium text-gray-300 mb-4\">İş Yükü Heatmap</h3>\n      <div className=\"grid gap-1\" style={{ gridTemplateColumns: 'auto repeat(24, 1fr)' }}>\n        <div /> {/* Empty corner */}\n        {Array.from({length: 24}, (_, h) => (\n          <div key={h} className=\"text-xs text-gray-400 text-center\">{h}</div>\n        ))}\n        {days.map((day, d) => (\n          <Fragment key={d}>\n            <div className=\"text-xs text-gray-500 flex items-center\">{day}</div>\n            {data[d]?.map((cell, h) => (\n              <div\n                key={`${d}-${h}`}\n                className={`w-4 h-4 rounded-sm ${getColor(cell.value, cell.max)} cursor-pointer`}\n                title={`${day} ${h}:00 - ${cell.value.toFixed(1)}`}\n              />\n            ))}\n          </Fragment>\n        ))}\n      </div>\n    </div>\n  );\n}",
+          "deep_dive": "GitHub'ın contribution graph'ı da bir heatmap. Bu pattern kullanıcıların hızla 'en yoğun zamanlar neresi?' sorusunu cevaplamasını sağlar. Heatmap tasarımında renk seçimi çok önemli — renk körlüğü olan kullanıcılar için red-green yerine sequential renk paletleri (beyaz→mavi→koyu mavi) tercih et.",
+          "checkpoint": "Heatmap 7x24 grid olarak doğru render ediliyor mu? Renk yoğunluğu veriyle uyumlu mu?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. CSV export client-side yap (Papa Parse), server'a yük bindirme\n2. PDF export için html2canvas scale: 2 kullan — düşük çözünürlük profesyonel görünmez\n3. Heatmap'te renk körlüğü için sequential palette kullan, red-green kullanma\n4. Export dosya adına tarih ekle — kullanıcı hangi rapor hangisi anlamalı",
+      "senior_learns": "🎩 Senior Böyle Öğrenir:\nSenior export'u sadece 'indir butonu' olarak düşünmez. Scheduled report gönderimi (her Pazartesi sabah PDF email'le gelsin), Slack integration (anomali olunca Slack'e mesaj atılsın), ve API-based export (diğer sistemlerin veri çekmesi) gibi farklı tüketim modellerini tasarlar. Ayrıca export'un audit trail'i olmalı — kim, ne zaman, hangi veriyi export etti."
+    },
+    {
+      "id": "p05-m6",
+      "title": "Docker, Test ve Production Hazırlık",
+      "overview": "Dashboard'u Docker ile containerize edip, testler yazıp production'a hazırlıyoruz.",
+      "estimated_hours": 6,
+      "concepts_covered": [
+        "Docker multi-service",
+        "Testing charts",
+        "Performance optimization",
+        "Monitoring"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Docker Compose Setup",
+          "why": "Dashboard 4 servis içeriyor: frontend, API, PostgreSQL, Redis. Docker Compose hepsini tek komutla ayağa kaldırır.",
+          "instructions": "docker-compose.yml oluştur. Frontend: Nginx serve. API: Node.js. PostgreSQL: volume persist. Redis: standalone. Health check'ler ekle.",
+          "code_snippet": "# docker-compose.yml\nservices:\n  dashboard:\n    build: ./packages/dashboard\n    ports: ['3000:80']\n    depends_on: [api]\n    \n  api:\n    build: ./packages/api\n    ports: ['4000:4000']\n    environment:\n      DATABASE_URL: postgresql://user:pass@db:5432/analytics\n      REDIS_URL: redis://cache:6379\n    depends_on:\n      db: { condition: service_healthy }\n      cache: { condition: service_started }\n    healthcheck:\n      test: ['CMD', 'curl', '-f', 'http://localhost:4000/health']\n      interval: 10s\n      timeout: 5s\n      retries: 3\n    \n  db:\n    image: postgres:16-alpine\n    volumes: ['pgdata:/var/lib/postgresql/data']\n    environment:\n      POSTGRES_DB: analytics\n      POSTGRES_USER: user\n      POSTGRES_PASSWORD: pass\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U user']\n      interval: 5s\n    \n  ml:\n    build: ./packages/ml-service\n    ports: ['5000:5000']\n    environment:\n      DATABASE_URL: postgresql://user:pass@db:5432/analytics\n    depends_on:\n      db: { condition: service_healthy }\n    \n  cache:\n    image: redis:7-alpine\n    volumes: ['redisdata:/data']\n    \nvolumes:\n  pgdata:\n  redisdata:",
+          "deep_dive": "Docker health check'ler ZORUNLU. depends_on tek başına yetmez — container start olması servisin hazır olması demek değil. PostgreSQL container 2-3 saniye start olur ama DB bağlantıları kabul etmeye başlaması 5-10 saniye sürer. condition: service_healthy bu farkı kapsar.",
+          "checkpoint": "docker-compose up ile tüm servisler başlıyor ve dashboard erişilebilir mi?"
+        },
+        {
+          "step": 2,
+          "title": "Performance Optimization",
+          "why": "Dashboard yavaşsa kimse kullanmaz. Performance metrikleri ölç ve optimize et.",
+          "instructions": "Lighthouse audit çalıştır. Chart lazy loading ekle (IntersectionObserver). Bundle size analiz et. Gereksiz re-render'ları React.memo ile engelle.",
+          "code_snippet": "// components/LazyChart.tsx\nimport { useRef, useState, useEffect, memo } from 'react';\n\nexport const LazyChart = memo(function LazyChart({ children }: { children: React.ReactNode }) {\n  const ref = useRef<HTMLDivElement>(null);\n  const [visible, setVisible] = useState(false);\n  \n  useEffect(() => {\n    const observer = new IntersectionObserver(\n      ([entry]) => {\n        if (entry.isIntersecting) {\n          setVisible(true);\n          observer.disconnect();\n        }\n      },\n      { rootMargin: '100px' } // Start loading 100px before visible\n    );\n    \n    if (ref.current) observer.observe(ref.current);\n    return () => observer.disconnect();\n  }, []);\n  \n  return (\n    <div ref={ref} style={{ minHeight: 300 }}>\n      {visible ? children : <div className=\"animate-pulse bg-gray-200 h-full rounded\" />}\n    </div>\n  );\n});",
+          "deep_dive": "Intersection Observer ile lazy loading dashboard'larda game changer. Ekranda görünmeyen chart'lar için API call yapılmaz — bu hem bandwidth hem DB yükünü azaltır. rootMargin: '100px' ile kullanıcı scroll etmeden 100px önce yüklemeye başla ki gecikme hissedilmesin.",
+          "checkpoint": "Lighthouse Performance skoru 80+ mı? İlk yüklemede sadece görünen chart'lar mı render ediliyor?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Docker health check ZORUNLU — depends_on tek başına yetmez\n2. Chart'ları lazy load et — görünmeyen chart için API call yapma\n3. React.memo ile gereksiz re-render'ları engelle — dashboard'da her state değişikliğinde tüm chart'lar re-render olmamalı\n4. Bundle analyzer ile büyük dependency'leri tespit et",
+      "senior_learns": "🎩 Senior Böyle Öğrenir:\nSenior dashboard performansını 3 katmanda ölçer: 1) Time to First Byte (TTFB) — server response süresi, 2) Time to First Paint — ilk pixel ne zaman görünüyor, 3) Time to Interactive — dashboard ne zaman kullanılabilir oluyor. Her katman farklı optimizasyon gerektirir. TTFB için cache, First Paint için SSR/skeleton, Interactive için code splitting. Senior ayrıca Real User Monitoring (RUM) kurar ve P95 metriklerini takip eder — ortalama yanlış bilgi verir."
+    },
+    {
+      "id": "p05-deployment",
+      "title": "Deployment ve Portfolio Showcase",
+      "estimated_hours": 4,
+      "steps": [
+        {
+          "title": "Production Build",
+          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "code_snippet": "pnpm build && pnpm test"
+        },
+        {
+          "title": "Deploy",
+          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et"
+        },
+        {
+          "title": "Profesyonel README",
+          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz"
+        },
+        {
+          "title": "Demo Video (Opsiyonel)",
+          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla"
+        }
+      ],
+      "checkpoint": "Proje canli URL'den erisilebilir, README profesyonel, screenshot'lar ekli, GitHub repo public"
+    }
+  ],
+  "interview_prep": {
+    "questions": [
+      "Time-series veri için hangi veritabanı seçersin ve neden?",
+      "Dashboard caching stratejini açıkla. Cache invalidation nasıl yapıyorsun?",
+      "Anomali tespiti için hangi algoritmayı seçtin ve neden? Precision vs recall trade-off'unu nasıl yönettin?",
+      "Dashboard performansını nasıl optimize ettin? Hangi metrikleri ölçtün?",
+      "Real-time dashboard ile batch dashboard arasındaki farklar nelerdir?",
+      "Isolation Forest nasıl çalışır? Avantajları ve dezavantajları nelerdir?",
+      "Feature engineering sürecini anlat. Hangi feature'ları seçtin ve neden?",
+      "Alert fatigue nedir ve nasıl önlersin?"
+    ],
+    "talking_points": [
+      "Redis cache ile API response time'ı 200ms'den 5ms'e düşürdüm",
+      "Isolation Forest ile %95 precision, %87 recall elde ettim — false positive oranı %3'ün altında",
+      "Data decimation (LTTB) ile chart render süresini 10x hızlandırdım",
+      "Promise.all ile paralel DB sorguları — sequential'e göre 4x hızlı",
+      "SWR pattern ile kullanıcı deneyimini iyileştirdim — filtre değiştiğinde boş ekran yok",
+      "Heatmap ile 7x24 iş yükü pattern'ını bir bakışta görselleştirdim",
+      "Docker Compose ile 4 servisi tek komutla ayağa kaldırıyorum",
+      "Lazy loading ile ilk yükleme süresini %40 azalttım"
+    ]
+  },
+  "resources": [
+    {
+      "title": "Recharts Documentation",
+      "url": "https://recharts.org",
+      "why": "React chart kütüphanesi — API referansı ve örnekler"
+    },
+    {
+      "title": "Isolation Forest Paper",
+      "url": "https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/icdm08b.pdf",
+      "why": "Orijinal paper — algoritmanın nasıl çalıştığını anlamak için"
+    },
+    {
+      "title": "Redis Caching Best Practices",
+      "url": "https://redis.io/docs/manual/patterns/",
+      "why": "Redis cache pattern'ları — TTL, invalidation, pub/sub"
+    },
+    {
+      "title": "Time-Series with PostgreSQL",
+      "url": "https://www.timescale.com/blog/postgresql-time-series/",
+      "why": "PostgreSQL ile time-series veri yönetimi"
+    },
+    {
+      "title": "Dashboard Design Best Practices",
+      "url": "https://www.nngroup.com/articles/dashboard-design/",
+      "why": "UX perspektifinden dashboard tasarım kuralları"
+    },
+    {
+      "title": "LTTB Downsampling Algorithm",
+      "url": "https://skemman.is/handle/1946/15343",
+      "why": "Chart veri azaltma algoritması — performans için kritik"
+    },
+    {
+      "title": "Docker Compose Documentation",
+      "url": "https://docs.docker.com/compose/",
+      "why": "Multi-container Docker uygulamaları"
+    },
+    {
+      "title": "React Performance Optimization",
+      "url": "https://react.dev/reference/react/memo",
+      "why": "React.memo, useMemo, useCallback best practices"
+    }
+  ],
+  "cv_guidance": {
+    "project_title_for_cv": "Analytics Dashboard with AI-Powered Anomaly Detection",
+    "bullet_points": {
+      "Full Stack Developer": [
+        "Built an interactive analytics dashboard using React.js, TypeScript, and Recharts, visualizing 10K+ time-series data points with line, area, bar, and heatmap charts rendering in < 500ms",
+        "Implemented Redis caching layer with TTL-based strategy, reducing API response times from 200ms to 5ms and achieving 90%+ cache hit ratio",
+        "Designed PostgreSQL time-series data model with date_trunc aggregation and composite indexes, supporting multi-source data ingestion and flexible interval queries (1h, 1d, 1w)",
+        "Developed CSV and PDF export functionality, lazy-loaded chart components with IntersectionObserver, and responsive mobile layout achieving 80+ Lighthouse performance score"
+      ],
+      "AI Engineer": [
+        "Implemented Isolation Forest anomaly detection model using Python, FastAPI, and scikit-learn with custom feature engineering (rolling statistics, temporal features, rate-of-change), achieving 95% precision and < 5% false positive rate",
+        "Built dual anomaly detection pipeline combining Z-score statistical analysis and ML-based Isolation Forest, with configurable sensitivity and severity classification (warning/critical)",
+        "Designed real-time anomaly visualization overlay on time-series charts with interactive detail popups and automated alert system for critical anomalies",
+        "Developed model evaluation framework with precision/recall/F1 metrics and A/B testing capability comparing statistical vs ML-based detection approaches"
+      ]
+    },
+    "skills_gained": {
+      "Frontend": [
+        "React.js",
+        "TypeScript",
+        "Recharts",
+        "Data Visualization",
+        "Responsive Dashboard Design",
+        "Lazy Loading",
+        "IntersectionObserver"
+      ],
+      "Backend": [
+        "Node.js",
+        "Express.js",
+        "PostgreSQL",
+        "Redis Caching",
+        "Time-Series Data Modeling",
+        "REST API"
+      ],
+      "AI/ML": [
+        "scikit-learn",
+        "Isolation Forest",
+        "Z-Score Analysis",
+        "Feature Engineering",
+        "Model Evaluation",
+        "Anomaly Detection",
+        "Python",
+        "FastAPI"
+      ],
+      "DevOps": [
+        "Docker",
+        "Docker Compose",
+        "Performance Optimization",
+        "Multi-Service Architecture"
+      ]
+    },
+    "ats_keywords": [
+      "React.js",
+      "TypeScript",
+      "Node.js",
+      "Express.js",
+      "PostgreSQL",
+      "Redis",
+      "Docker",
+      "Docker Compose",
+      "Python",
+      "FastAPI",
+      "scikit-learn",
+      "Machine Learning",
+      "Anomaly Detection",
+      "Isolation Forest",
+      "Data Visualization",
+      "Recharts",
+      "Time-Series",
+      "Dashboard",
+      "REST API",
+      "Performance Optimization"
+    ],
+    "cv_placement": "AI Engineer pozisyonlari icin en guclu proje — birinci siraya koy. Full Stack Developer pozisyonlarinda da cok etkili cunku dashboard + data visualization her sirkette lazim. Datadog, Grafana, New Relic gibi urunlerle benzerlik kurabilirsin. Hem frontend (React + charts) hem backend (API + cache) hem AI (anomaly detection) becerilerini tek projede gosteriyor.",
+    "metrics_you_can_claim": [
+      "10K+ veri noktasini < 500ms'de render eden interaktif grafikler",
+      "Redis cache ile API response suresi 200ms'den 5ms'e dusurme (%97.5 iyilestirme)",
+      "Cache hit ratio %90+",
+      "Isolation Forest ile anomali tespitinde %95 precision",
+      "False positive orani < %5",
+      "PostgreSQL date_trunc ile verimli time-series aggregation",
+      "Lazy loading ile ilk yukleme suresini %40 azaltma",
+      "Docker Compose ile 4 servisin orchestration'i (frontend, API, PostgreSQL, Redis)",
+      "CSV ve PDF export fonksiyonlari",
+      "7x24 heatmap ile is yuku pattern analizi"
+    ]
+  },
+  "github_guidance": {
+    "repo_name": "analytics-dashboard-ai",
+    "repo_description": "Real-time analytics dashboard with AI anomaly detection — React, TypeScript, Recharts, Node.js, PostgreSQL, Redis, Python, scikit-learn, Docker",
+    "topics": [
+      "react",
+      "typescript",
+      "recharts",
+      "nodejs",
+      "express",
+      "postgresql",
+      "redis",
+      "python",
+      "scikit-learn",
+      "anomaly-detection",
+      "dashboard",
+      "data-visualization",
+      "docker",
+      "machine-learning"
+    ],
+    "when_to_create": "Projeye başladığın ilk gün repo'yu oluştur. İlk commit: React + TypeScript + Recharts boilerplate + basit bir line chart ile mock data rendering. Görsel bir başlangıç motivasyonu artırır.",
+    "pin_on_profile": true,
+    "pin_priority": 5,
+    "readme_sections": [
+      "# Analytics Dashboard + AI Anomaly Detection + one-line description",
+      "Badges: build status, tech stack (React, Recharts, Node.js, PostgreSQL, Python), license (shields.io)",
+      "## 📸 Screenshots / Demo GIF",
+      "## ✨ Features (bullet list)",
+      "## 🛠 Tech Stack (table: Frontend | Backend | AI/ML | DevOps)",
+      "## 🚀 Getting Started (prerequisites, pnpm install, docker compose up, env vars)",
+      "## 📐 Architecture (ASCII diagram or visual)",
+      "## 📡 API Documentation (main endpoints, example request/response)",
+      "## 🧠 What I Learned (3-5 concepts learned from this project)",
+      "## 📄 License (MIT)"
+    ],
+    "commit_convention": "Conventional Commits: feat:, fix:, docs:, refactor:, test:, chore:",
+    "commit_examples": [
+      "feat: add interactive time-series charts with Recharts and date range filtering",
+      "feat: implement Isolation Forest anomaly detection microservice with FastAPI",
+      "fix: resolve chart re-render performance issue with React.memo and useMemo",
+      "docs: add architecture diagram and anomaly detection algorithm explanation to README",
+      "refactor: implement Redis caching layer reducing API response from 200ms to 5ms",
+      "test: add anomaly detection model evaluation tests with precision/recall assertions",
+      "chore: configure Docker Compose for 4-service orchestration (frontend, API, PostgreSQL, Redis)"
+    ],
+    "branch_strategy": "main (production) + develop (active) + feature/* + fix/* + docs/*",
+    "daily_commit_target": "Günde en az 3-5 anlamlı commit. Contribution graph'ın yeşil kalması önemli.",
+    "pro_tips": [
+      "Her milestone bittiğinde git tag ekle: v0.1.0, v0.2.0...",
+      "README'ye mutlaka screenshot/GIF ekle — görsel proje daha çok dikkat çeker",
+      "Issues oluştur ve kapat — proje yönetimi becerini gösterir",
+      "GitHub Projects board kullan — Kanban tarzı iş takibi",
+      "Dashboard screenshot'larını README'ye ekle — grafikler ve heatmap'ler çok dikkat çekici",
+      "Anomaly detection sonuçlarını görselleştir — normal vs anomali noktalarını gösteren grafik çok etkili"
+    ]
+  },
+  "cover_letter_guidance": {
+    "project_highlight": "Built a real-time analytics dashboard with AI-powered anomaly detection using React, TypeScript, Recharts, Node.js, PostgreSQL, and Redis, featuring interactive data visualizations, sub-2-second load times, and Isolation Forest ML model achieving <5% false positive rate on time-series data.",
+    "skills_demonstrated": [
+      "React",
+      "TypeScript",
+      "Recharts",
+      "Node.js",
+      "Express",
+      "PostgreSQL",
+      "Redis",
+      "Python",
+      "scikit-learn",
+      "Data Visualization",
+      "Time-Series Analysis"
+    ],
+    "talking_points": [
+      "Designed interactive dashboard with 5+ chart types (line, bar, area, pie, heatmap) supporting 10K+ data points with sub-500ms render times",
+      "Implemented Redis caching layer reducing API response times from 200ms to 5ms with 90%+ cache hit ratio",
+      "Built Isolation Forest anomaly detection system with configurable sensitivity achieving <5% false positive rate",
+      "Developed PostgreSQL time-series data pipeline with date_trunc aggregation for flexible interval-based queries (hourly, daily, weekly)",
+      "Created CSV and PDF export functionality with automated alert system for detected anomalies"
+    ]
+  },
+  "ai_workflow": {
+    "planning": {
+      "model": "Claude Opus 4.6",
+      "prompt_template": "I'm building an analytics dashboard with AI anomaly detection using React + TypeScript + Recharts for visualization, Node.js/Express + PostgreSQL for time-series data API, Redis for caching, and Python + scikit-learn (Isolation Forest) for anomaly detection. Help me design the system architecture considering: time-series data modeling in PostgreSQL, aggregation pipeline design, Redis caching strategy for dashboard queries, Recharts component hierarchy, real-time update mechanism with WebSocket, anomaly detection pipeline integration, and alert system design.",
+      "when_to_use": "Her milestone'un basinda kullan — dashboard veri akisi, cache stratejisi ve anomali tespit pipeline'i planlamak icin"
+    },
+    "code_review": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "Review this analytics dashboard code (React + Recharts + Express + PostgreSQL + Redis) for: Recharts component optimization and memoization, time-series query performance, Redis cache invalidation strategy, aggregation query correctness, responsive dashboard layout, lazy loading for large datasets, TypeScript type safety for chart data, and API response pagination. Also review the Python anomaly detection service for Isolation Forest configuration and Z-score thresholds.",
+      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle chart performansi, cache hit ratio ve anomali tespit dogrulugu icin"
+    },
+    "debugging": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "I'm getting this error in my analytics dashboard (React + Recharts + Express + PostgreSQL + Redis + Python ML): [error]. The relevant code is: [code]. Query/aggregation: [query]. I'm trying to [goal].",
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle Recharts rendering sorunlari, PostgreSQL time-series sorgu performansi ve anomali detection false positive'leri icin"
+    },
+    "research": {
+      "model": "Gemini 2.5 Pro",
+      "prompt_template": "Explain [concept] with practical examples for an analytics dashboard with anomaly detection. Topics I need help with: Recharts advanced features (custom tooltips, synchronized charts, responsive containers), PostgreSQL time-series queries and window functions, Redis caching patterns for dashboards, Isolation Forest algorithm and hyperparameters, Z-score statistical analysis, WebSocket real-time data streaming, CSV/PDF export libraries, and data visualization best practices.",
+      "when_to_use": "Yeni bir konsept ogrenirken kullan — ozellikle Recharts API, time-series SQL sorgulari ve anomali tespit algoritmalari icin"
+    }
+  },
+  "deployment_guide": {
+    "recommended_stack": {
+      "frontend": "Vercel",
+      "backend": "Railway",
+      "database": "Neon (Serverless PostgreSQL)",
+      "cache": "Upstash Redis (serverless)",
+      "ml_service": "Railway (Python FastAPI)"
+    },
+    "steps": [
+      {
+        "title": "Neon Database Olustur",
+        "commands": [
+          "# neon.tech > New Project"
+        ],
+        "instructions": "Time-series veriler icin PostgreSQL. Ucretsiz tier yeterli"
+      },
+      {
+        "title": "Upstash Redis Olustur",
+        "commands": [
+          "# upstash.com > Create Database"
+        ],
+        "instructions": "Dashboard cache icin. Ucretsiz: 10K komut/gun"
+      },
+      {
+        "title": "Backend + ML Service Deploy (Railway)",
+        "commands": [
+          "railway login",
+          "railway init",
+          "railway up"
+        ],
+        "instructions": "Iki ayri service olustur: Node.js API ve Python ML service. Env vars: DATABASE_URL, REDIS_URL"
+      },
+      {
+        "title": "Frontend Deploy (Vercel)",
+        "commands": [
+          "pnpm dlx vercel --yes"
+        ],
+        "instructions": "VITE_API_URL env var'ini Railway API URL'ine ayarla"
+      }
+    ],
+    "env_vars": [
+      "DATABASE_URL",
+      "REDIS_URL",
+      "VITE_API_URL",
+      "ML_SERVICE_URL"
+    ],
+    "estimated_time": "35 dakika",
+    "cost": "Ucretsiz (tum servisler hobby tier)",
+    "demo_checklist": [
+      "Dashboard grafikleri yukluyor",
+      "Tarih araligi filtreleme calisiyor",
+      "Redis cache hit ratio >90%",
+      "Anomali tespiti calisiyor",
+      "CSV/PDF export",
+      "Mobile responsive"
+    ]
+  },
+  "portfolio_showcase": {
+    "readme_must_haves": [
+      "Proje aciklamasi ve motivasyon (2-3 cumle)",
+      "Canli demo linki (Vercel/Railway badge ile)",
+      "Teknoloji stack badge'leri",
+      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Mimari diyagram (ASCII veya draw.io)",
+      "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
+      "API dokumantasyonu (/docs linki veya Postman collection)",
+      "Ogrenilenler ve kararlar bolumu"
+    ],
+    "screenshot_suggestions": [
+      "Dashboard/Anasayfa",
+      "Ana ozellik ekrani",
+      "Mobile gorunum"
+    ],
+    "live_demo_url_template": "https://analytics-dashboard.vercel.app",
+    "github_repo_template": "https://github.com/USERNAME/analytics-anomaly-detection"
+  }
+}

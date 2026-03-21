@@ -1,0 +1,80 @@
+{
+  "title": "Custom Context Manager",
+  "description": "Kaynak yönetimi için custom context manager implementasyonu",
+  "description_detail": "# Custom Context Manager\n\nPython'da context manager pattern'ini kullanarak kaynak yönetimi yapan sınıflar oluşturun.\n\n## İstenilen Implementasyonlar\n\n### 1. `Timer` Context Manager\nBir kod bloğunun çalışma süresini ölçer.\n```python\nwith Timer() as t:\n    time.sleep(0.1)\nprint(t.elapsed)  # ~0.1\n```\n\n### 2. `FileManager` Context Manager\nDosya açma/kapama işlemini yönetir, hata durumunda da dosyayı kapatır.\n\n### 3. `TransactionManager` Context Manager\nBir listeye yapılan değişiklikleri takip eder. Hata olursa rollback yapar.\n```python\ndata = [1, 2, 3]\nwith TransactionManager(data) as txn:\n    txn.append(4)\n    raise Exception('fail')\n# data hala [1, 2, 3]\n```",
+  "difficulty": "orta",
+  "category": "python",
+  "tags": ["context-manager", "resource-management", "oop", "python"],
+  "examples": [
+    {
+      "input": "Timer context manager kullanarak süre ölç",
+      "output": "elapsed = 0.1 (yaklaşık)",
+      "explanation": "__enter__ ve __exit__ ile zamanlama yapılır"
+    },
+    {
+      "input": "TransactionManager ile hatalı işlem",
+      "output": "data değişmez (rollback)",
+      "explanation": "Exception durumunda orijinal veri korunur"
+    }
+  ],
+  "constraints": [
+    "__enter__ ve __exit__ method'ları implement edilmeli",
+    "Timer saniye cinsinden float döndürmeli",
+    "TransactionManager exception'da rollback yapmalı",
+    "Exception'lar suppress edilmemeli (yeniden raise edilmeli)"
+  ],
+  "starter_code": {
+    "python": "import time\n\nclass Timer:\n    def __init__(self):\n        self.elapsed = 0\n    \n    def __enter__(self):\n        # Your code here\n        pass\n    \n    def __exit__(self, exc_type, exc_val, exc_tb):\n        # Your code here\n        pass\n\nclass TransactionManager:\n    def __init__(self, data: list):\n        # Your code here\n        pass\n    \n    def __enter__(self):\n        # Your code here\n        pass\n    \n    def __exit__(self, exc_type, exc_val, exc_tb):\n        # Your code here\n        pass",
+    "javascript": "class Timer {\n  constructor() {\n    this.elapsed = 0;\n  }\n  \n  start() {\n    // Your code here\n  }\n  \n  stop() {\n    // Your code here\n  }\n}\n\nclass TransactionManager {\n  constructor(data) {\n    // Your code here\n  }\n  \n  begin() {\n    // Your code here\n  }\n  \n  commit() {\n    // Your code here\n  }\n  \n  rollback() {\n    // Your code here\n  }\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"class": "Timer", "action": "measure_sleep", "duration": 0.05},
+      "expected_output": "elapsed > 0"
+    },
+    {
+      "input": {"class": "TransactionManager", "data": [1, 2, 3], "action": "append_then_fail", "value": 4},
+      "expected_output": [1, 2, 3]
+    },
+    {
+      "input": {"class": "TransactionManager", "data": [1, 2, 3], "action": "append_success", "value": 4},
+      "expected_output": [1, 2, 3, 4]
+    },
+    {
+      "input": {"class": "TransactionManager", "data": [], "action": "append_success", "value": 1},
+      "expected_output": [1]
+    },
+    {
+      "input": {"class": "TransactionManager", "data": [10, 20], "action": "extend_then_fail", "value": [30, 40]},
+      "expected_output": [10, 20]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"class": "Timer", "action": "no_sleep"},
+      "expected_output": "elapsed >= 0"
+    },
+    {
+      "input": {"class": "TransactionManager", "data": [1], "action": "clear_then_fail"},
+      "expected_output": [1]
+    },
+    {
+      "input": {"class": "TransactionManager", "data": [5, 6, 7], "action": "pop_success"},
+      "expected_output": [5, 6]
+    }
+  ],
+  "hints": [
+    "__enter__ method'unda kaynağı hazırla ve self döndür; __exit__ method'unda temizlik yap",
+    "Timer için __enter__'da başlangıç zamanını kaydet, __exit__'de farkı hesapla",
+    "TransactionManager için __enter__'da verinin kopyasını al, __exit__'de exception varsa orijinal veriyi geri yükle"
+  ],
+  "solution": {
+    "python": "import time\n\nclass Timer:\n    def __init__(self):\n        self.elapsed = 0\n        self._start = None\n    \n    def __enter__(self):\n        self._start = time.time()\n        return self\n    \n    def __exit__(self, exc_type, exc_val, exc_tb):\n        self.elapsed = time.time() - self._start\n        return False\n\nclass TransactionManager:\n    def __init__(self, data: list):\n        self._data = data\n        self._backup = None\n    \n    def __enter__(self):\n        self._backup = self._data.copy()\n        return self._data\n    \n    def __exit__(self, exc_type, exc_val, exc_tb):\n        if exc_type is not None:\n            self._data.clear()\n            self._data.extend(self._backup)\n        return False",
+    "javascript": "class Timer {\n  constructor() {\n    this.elapsed = 0;\n    this._start = null;\n  }\n\n  start() {\n    this._start = performance.now();\n    return this;\n  }\n\n  stop() {\n    this.elapsed = (performance.now() - this._start) / 1000;\n  }\n}\n\nclass TransactionManager {\n  constructor(data) {\n    this._data = data;\n    this._backup = null;\n  }\n\n  begin() {\n    this._backup = [...this._data];\n    return this._data;\n  }\n\n  commit() {\n    this._backup = null;\n  }\n\n  rollback() {\n    this._data.length = 0;\n    this._data.push(...this._backup);\n    this._backup = null;\n  }\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n) for backup/restore",
+    "optimal_space": "O(n) for backup copy"
+  },
+  "learn_after_solving": "Context manager pattern'ini, RAII (Resource Acquisition Is Initialization) prensibini ve exception-safe kaynak yönetimini öğrenirsin. Bu pattern veritabanı bağlantıları, dosya işlemleri ve transaction yönetiminde kritik öneme sahiptir."
+}

@@ -1,0 +1,87 @@
+{
+  "id": "challenge-design-patterns",
+  "title": "Design Pattern Implementasyonu",
+  "difficulty": "zor",
+  "category": "architecture",
+  "tags": ["design-patterns", "strategy", "observer", "factory", "oop", "solid"],
+  "related_lesson": "mod-18-architecture/lesson-01",
+  "description_tr": "Verilen problemler icin dogru design pattern'i sec ve implement et: Strategy, Observer ve Factory.",
+  "description_detail": "3 farkli problem senaryosu verilecek. Her biri icin en uygun design pattern'i secin ve uygulayin. Pattern secim gerekcenizi aciklayin. SOLID prensiplerine uyumlu, genisletilebilir kod yazin.",
+  "examples": [
+    {
+      "input": "problem = 'Farkli odeme yontemlerini destekleyen bir sistem'",
+      "output": "pattern = 'Strategy', implementation = PaymentStrategy class hierarchy",
+      "explanation": "Odeme yontemleri runtime'da degistirilebildigi icin Strategy pattern uygundur."
+    }
+  ],
+  "constraints": [
+    "Her pattern icin interface/abstract class tanimlayin",
+    "En az 3 concrete implementation yazin",
+    "Open/Closed prensibine uyun (yeni tur eklemek icin mevcut kodu degistirmeyin)",
+    "Type annotation/JSDoc kulllanin"
+  ],
+  "starter_code": {
+    "python": "from abc import ABC, abstractmethod\nfrom typing import List, Dict, Any, Callable\n\n# === PROBLEM 1: Strategy Pattern ===\n# Bir e-ticaret sitesi farkli kargo hesaplama yontemlerini desteklemeli.\n# Yontemler: standart (agirlik * 5), express (agirlik * 10 + 15), ucretsiz (0, 200TL ustu)\n# Yeni kargo yontemi eklemek mevcut kodu degistirmemeli.\n\nclass ShippingStrategy(ABC):\n    @abstractmethod\n    def calculate(self, weight: float, order_total: float) -> float:\n        pass\n\n# StandardShipping, ExpressShipping, FreeShipping siniflarini yazin\n# ShippingCalculator context sinifini yazin (strategy'yi runtime'da degistirebilmeli)\n\n\n# === PROBLEM 2: Observer Pattern ===\n# Bir stok takip sistemi: Urun stoku degistiginde email servisi,\n# SMS servisi ve dashboard log'a bildirim gitmeli.\n# Yeni observer eklemek mevcut kodu degistirmemeli.\n\nclass Observer(ABC):\n    @abstractmethod\n    def update(self, product: str, old_stock: int, new_stock: int) -> None:\n        pass\n\n# EmailNotifier, SMSNotifier, DashboardLogger observer siniflarini yazin\n# StockManager (Subject) sinifini yazin - observer'lari subscribe/unsubscribe edebilmeli\n\n\n# === PROBLEM 3: Factory Pattern ===\n# Farkli veritabani turlerini destekleyen bir baglanti sistemi.\n# Turler: PostgreSQL, MongoDB, Redis\n# Her birinin connect(), query(), disconnect() metotlari var.\n# Yeni DB turu eklemek icin Factory'ye kayit olmak yeterli olmali.\n\nclass DatabaseConnection(ABC):\n    @abstractmethod\n    def connect(self) -> str:\n        pass\n    \n    @abstractmethod\n    def query(self, sql: str) -> List[Dict]:\n        pass\n    \n    @abstractmethod\n    def disconnect(self) -> str:\n        pass\n\n# PostgresConnection, MongoConnection, RedisConnection siniflarini yazin\n# DatabaseFactory sinifini yazin - register() ile yeni DB turu kaydedilebilmeli\n\n\ndef test_patterns() -> dict:\n    \"\"\"Tum pattern'leri test et ve sonuclari dondur.\"\"\"\n    pass",
+    "javascript": "// === PROBLEM 1: Strategy Pattern ===\n// Kargo hesaplama: standart, express, ucretsiz\n// Yeni yontem eklemek icin mevcut kodu degistirmeden genisletilebilmeli\n\nclass ShippingStrategy {\n    /** @param {number} weight @param {number} orderTotal @returns {number} */\n    calculate(weight, orderTotal) { throw new Error('Not implemented'); }\n}\n\n// StandardShipping, ExpressShipping, FreeShipping siniflarini yazin\n// ShippingCalculator context sinifini yazin\n\n\n// === PROBLEM 2: Observer Pattern ===\n// Stok takip: stok degisince email, SMS, dashboard'a bildirim\n\nclass Observer {\n    /** @param {string} product @param {number} oldStock @param {number} newStock */\n    update(product, oldStock, newStock) { throw new Error('Not implemented'); }\n}\n\n// EmailNotifier, SMSNotifier, DashboardLogger observer siniflarini yazin\n// StockManager (Subject) sinifini yazin\n\n\n// === PROBLEM 3: Factory Pattern ===\n// Veritabani baglantisi: PostgreSQL, MongoDB, Redis\n\nclass DatabaseConnection {\n    connect() { throw new Error('Not implemented'); }\n    query(sql) { throw new Error('Not implemented'); }\n    disconnect() { throw new Error('Not implemented'); }\n}\n\n// PostgresConnection, MongoConnection, RedisConnection siniflarini yazin\n// DatabaseFactory sinifini yazin - register() ile genisletilebilmeli\n\n\nfunction testPatterns() {\n    /** Tum pattern'leri test et ve sonuclari dondur */\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"pattern": "strategy", "weight": 5, "order_total": 100, "method": "standard"},
+      "expected": 25,
+      "description": "Strategy: Standart kargo 5kg icin 25TL olmali (5 * 5)"
+    },
+    {
+      "input": {"pattern": "strategy", "weight": 3, "order_total": 250, "method": "free"},
+      "expected": 0,
+      "description": "Strategy: 200TL ustu siparislerde ucretsiz kargo"
+    },
+    {
+      "input": {"pattern": "observer", "product": "Laptop", "old_stock": 10, "new_stock": 2},
+      "expected": "all_observers_notified",
+      "description": "Observer: Stok degisikliginde tum aboneler bilgilendirilmeli"
+    },
+    {
+      "input": {"pattern": "factory", "db_type": "postgres"},
+      "expected": "postgres_connection_created",
+      "description": "Factory: 'postgres' tipi ile PostgresConnection olusturulmali"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"pattern": "strategy", "weight": 2, "order_total": 150, "method": "express"},
+      "expected": 35,
+      "description": "Strategy: Express kargo 2kg icin 35TL (2*10 + 15)"
+    },
+    {
+      "input": {"pattern": "observer", "action": "unsubscribe_then_notify"},
+      "expected": "unsubscribed_not_notified",
+      "description": "Observer: Unsubscribe edilen observer bildirim almamali"
+    },
+    {
+      "input": {"pattern": "factory", "db_type": "unknown"},
+      "expected": "error_unknown_type",
+      "description": "Factory: Bilinmeyen DB turu icin hata firlatmali"
+    },
+    {
+      "input": {"pattern": "factory", "action": "register_new_type"},
+      "expected": "new_type_registered",
+      "description": "Factory: Yeni DB turu register() ile kaydedilip kullanilabilmeli"
+    }
+  ],
+  "hints": [
+    "Strategy Pattern: Context sinifi bir strategy referansi tutar ve calculate() cagrisini strategy'ye delege eder. setStrategy() ile runtime'da degistirilebilir. if-else zincirinden kacinmak icin kullanilir.",
+    "Observer Pattern: Subject sinifinda observers listesi, subscribe(observer), unsubscribe(observer) ve notify() metotlari olmali. notify() tum observer'larin update()'ini cagirir. Loose coupling saglar.",
+    "Factory Pattern: Static bir registry (dict/Map) kullan. register(type, class) ile yeni tipler kaydedilir, create(type) ile instance olusturulur. Bu sayede yeni tip icin Factory kodunu degistirmen gerekmez (Open/Closed).",
+    "Her pattern SOLID'in farkli prensiplerini uygular: Strategy -> Open/Closed + Dependency Inversion, Observer -> Single Responsibility + Loose Coupling, Factory -> Open/Closed + Dependency Inversion."
+  ],
+  "solution": {
+    "python": "from abc import ABC, abstractmethod\nfrom typing import List, Dict, Any, Type\n\n# Strategy Pattern\nclass ShippingStrategy(ABC):\n    @abstractmethod\n    def calculate(self, weight: float, order_total: float) -> float:\n        pass\n\nclass StandardShipping(ShippingStrategy):\n    def calculate(self, weight: float, order_total: float) -> float:\n        return weight * 5\n\nclass ExpressShipping(ShippingStrategy):\n    def calculate(self, weight: float, order_total: float) -> float:\n        return weight * 10 + 15\n\nclass FreeShipping(ShippingStrategy):\n    def calculate(self, weight: float, order_total: float) -> float:\n        return 0 if order_total >= 200 else weight * 5\n\nclass ShippingCalculator:\n    def __init__(self, strategy: ShippingStrategy):\n        self._strategy = strategy\n    \n    def set_strategy(self, strategy: ShippingStrategy):\n        self._strategy = strategy\n    \n    def calculate(self, weight: float, order_total: float) -> float:\n        return self._strategy.calculate(weight, order_total)\n\n# Observer Pattern\nclass Observer(ABC):\n    @abstractmethod\n    def update(self, product: str, old_stock: int, new_stock: int) -> None:\n        pass\n\nclass EmailNotifier(Observer):\n    def __init__(self):\n        self.notifications = []\n    def update(self, product: str, old_stock: int, new_stock: int) -> None:\n        self.notifications.append(f'EMAIL: {product} stok {old_stock}->{new_stock}')\n\nclass SMSNotifier(Observer):\n    def __init__(self):\n        self.notifications = []\n    def update(self, product: str, old_stock: int, new_stock: int) -> None:\n        self.notifications.append(f'SMS: {product} stok {old_stock}->{new_stock}')\n\nclass DashboardLogger(Observer):\n    def __init__(self):\n        self.logs = []\n    def update(self, product: str, old_stock: int, new_stock: int) -> None:\n        self.logs.append(f'LOG: {product} stok {old_stock}->{new_stock}')\n\nclass StockManager:\n    def __init__(self):\n        self._observers: List[Observer] = []\n        self._stocks: Dict[str, int] = {}\n    \n    def subscribe(self, observer: Observer):\n        self._observers.append(observer)\n    \n    def unsubscribe(self, observer: Observer):\n        self._observers.remove(observer)\n    \n    def _notify(self, product: str, old_stock: int, new_stock: int):\n        for obs in self._observers:\n            obs.update(product, old_stock, new_stock)\n    \n    def update_stock(self, product: str, new_stock: int):\n        old_stock = self._stocks.get(product, 0)\n        self._stocks[product] = new_stock\n        self._notify(product, old_stock, new_stock)\n\n# Factory Pattern\nclass DatabaseConnection(ABC):\n    @abstractmethod\n    def connect(self) -> str: pass\n    @abstractmethod\n    def query(self, sql: str) -> List[Dict]: pass\n    @abstractmethod\n    def disconnect(self) -> str: pass\n\nclass PostgresConnection(DatabaseConnection):\n    def connect(self): return 'Connected to PostgreSQL'\n    def query(self, sql): return [{'result': f'PG: {sql}'}]\n    def disconnect(self): return 'Disconnected from PostgreSQL'\n\nclass MongoConnection(DatabaseConnection):\n    def connect(self): return 'Connected to MongoDB'\n    def query(self, sql): return [{'result': f'Mongo: {sql}'}]\n    def disconnect(self): return 'Disconnected from MongoDB'\n\nclass RedisConnection(DatabaseConnection):\n    def connect(self): return 'Connected to Redis'\n    def query(self, sql): return [{'result': f'Redis: {sql}'}]\n    def disconnect(self): return 'Disconnected from Redis'\n\nclass DatabaseFactory:\n    _registry: Dict[str, Type[DatabaseConnection]] = {}\n    \n    @classmethod\n    def register(cls, db_type: str, db_class: Type[DatabaseConnection]):\n        cls._registry[db_type] = db_class\n    \n    @classmethod\n    def create(cls, db_type: str) -> DatabaseConnection:\n        if db_type not in cls._registry:\n            raise ValueError(f'Unknown database type: {db_type}')\n        return cls._registry[db_type]()\n\nDatabaseFactory.register('postgres', PostgresConnection)\nDatabaseFactory.register('mongo', MongoConnection)\nDatabaseFactory.register('redis', RedisConnection)",
+    "javascript": "// Strategy\nclass StandardShipping extends ShippingStrategy {\n    calculate(weight, orderTotal) { return weight * 5; }\n}\nclass ExpressShipping extends ShippingStrategy {\n    calculate(weight, orderTotal) { return weight * 10 + 15; }\n}\nclass FreeShipping extends ShippingStrategy {\n    calculate(weight, orderTotal) { return orderTotal >= 200 ? 0 : weight * 5; }\n}\nclass ShippingCalculator {\n    constructor(strategy) { this.strategy = strategy; }\n    setStrategy(s) { this.strategy = s; }\n    calculate(w, t) { return this.strategy.calculate(w, t); }\n}\n\n// Observer\nclass EmailNotifier extends Observer {\n    constructor() { super(); this.notifications = []; }\n    update(product, old, n) { this.notifications.push(`EMAIL: ${product} ${old}->${n}`); }\n}\nclass SMSNotifier extends Observer {\n    constructor() { super(); this.notifications = []; }\n    update(product, old, n) { this.notifications.push(`SMS: ${product} ${old}->${n}`); }\n}\nclass DashboardLogger extends Observer {\n    constructor() { super(); this.logs = []; }\n    update(product, old, n) { this.logs.push(`LOG: ${product} ${old}->${n}`); }\n}\nclass StockManager {\n    constructor() { this.observers = []; this.stocks = {}; }\n    subscribe(o) { this.observers.push(o); }\n    unsubscribe(o) { this.observers = this.observers.filter(x => x !== o); }\n    updateStock(product, newStock) {\n        const old = this.stocks[product] || 0;\n        this.stocks[product] = newStock;\n        this.observers.forEach(o => o.update(product, old, newStock));\n    }\n}\n\n// Factory\nclass PostgresConnection extends DatabaseConnection {\n    connect() { return 'Connected to PostgreSQL'; }\n    query(sql) { return [{result: `PG: ${sql}`}]; }\n    disconnect() { return 'Disconnected from PostgreSQL'; }\n}\nclass MongoConnection extends DatabaseConnection {\n    connect() { return 'Connected to MongoDB'; }\n    query(sql) { return [{result: `Mongo: ${sql}`}]; }\n    disconnect() { return 'Disconnected from MongoDB'; }\n}\nclass RedisConnection extends DatabaseConnection {\n    connect() { return 'Connected to Redis'; }\n    query(sql) { return [{result: `Redis: ${sql}`}]; }\n    disconnect() { return 'Disconnected from Redis'; }\n}\nclass DatabaseFactory {\n    static registry = new Map();\n    static register(type, cls) { this.registry.set(type, cls); }\n    static create(type) {\n        if (!this.registry.has(type)) throw new Error(`Unknown: ${type}`);\n        return new (this.registry.get(type))();\n    }\n}\nDatabaseFactory.register('postgres', PostgresConnection);\nDatabaseFactory.register('mongo', MongoConnection);\nDatabaseFactory.register('redis', RedisConnection);",
+    "explanation_tr": "Uc temel GoF pattern'i uyguladik: Strategy ile algoritma ailesi olusturup runtime'da degistirdik (if-else yerine polimorfizm). Observer ile gevsel bagli event sistemi kurduk (yeni dinleyici eklemek icin Subject'i degistirmek gerekmiyor). Factory ile nesne olusturma sorumlulugunu merkezilestirdik (register/create ile Open/Closed)."
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "En cok kullanilan 3 design pattern'i (Strategy, Observer, Factory) pratikte uyguladiniz. Bu pattern'lar SOLID prensiplerine uyumlu, genisletilebilir kod yazmanin temelleridir. Senior mulakatlarda 'Bu problemi hangi pattern ile cozersin?' sorusu klasiktir."
+}

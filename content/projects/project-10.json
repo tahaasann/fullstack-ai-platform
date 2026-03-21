@@ -1,0 +1,843 @@
+{
+  "id": "project-10",
+  "title": "AI Code Review & Analysis Tool (Capstone)",
+  "difficulty": "Uzman",
+  "estimated_days": 21,
+  "tech_stack": [
+    "Next.js",
+    "TypeScript",
+    "FastAPI",
+    "PostgreSQL",
+    "Anthropic API",
+    "GitHub API",
+    "Docker",
+    "Redis",
+    "Celery"
+  ],
+  "target_roles": [
+    "Full Stack Developer",
+    "AI Engineer",
+    "DevTools Engineer"
+  ],
+  "brief": "Bu capstone projede, tum ogrendigin Full Stack + AI Engineer becerilerini birlestirerek production-ready bir AI code review araci insa edeceksin. GitHub'a entegre olan, pull request'leri otomatik analiz eden, kod kalitesi skorlayan, guvenlik aciklari tespit eden ve iyilestirme onerileri sunan kapsamli bir platform.\n\nDusun: CodeRabbit, GitHub Copilot Code Review veya Codacy'nin AI-powered versiyonu. Bu tool, gelistirme takimlarinin kod kalitesini artirmasina, bug'lari erken yakalamasina ve code review surecini hizlandirmasina yardimci olur.\n\nBu proje portfolyonun en guclu parcasi olacak. GitHub API entegrasyonu, LLM-powered analiz, webhook'lar, CI/CD pipeline entegrasyonu, real-time dashboard ve takim analitikleri — hepsi bir arada. Mulakatta bu projeyi anlatirken hem teknik derinligini hem de urun dusunceni gostereceksin.",
+  "architecture": {
+    "overview": "Sistem, GitHub webhook'lari ile tetiklenen event-driven mimaride calisiyor. PR acildiginda webhook FastAPI'ya istek gonder, Celery worker kodu analiz eder, Anthropic Claude API ile AI review yapar, sonuclari PostgreSQL'e kaydeder ve GitHub'a yorum olarak gonderir. Redis cache ve job queue olarak kullaniliyor.",
+    "diagram": "\n┌──────────┐  webhook  ┌──────────────┐     ┌──────────────┐\n│  GitHub  │─────────►│  FastAPI      │────►│  PostgreSQL  │\n│  (PRs)   │◄─────────│  API Server   │     │  (Reviews)   │\n│          │  comments │              │     └──────────────┘\n└──────────┘          └──────┬───────┘\n                             │\n               ┌─────────────┼─────────────┐\n               │             │             │\n        ┌──────▼──────┐ ┌───▼────┐ ┌─────▼──────┐\n        │   Celery    │ │ Redis  │ │  Claude    │\n        │  Workers    │ │(Cache) │ │   API      │\n        │             │ │(Queue) │ │            │\n        │ - Analyzer  │ └────────┘ │ - Review   │\n        │ - Security  │            │ - Score    │\n        │ - Metrics   │            │ - Suggest  │\n        └─────────────┘            └────────────┘\n               │\n        ┌──────▼──────┐\n        │  Next.js    │\n        │  Dashboard  │\n        └─────────────┘\n        ",
+    "decisions": [
+      {
+        "decision": "Neden Anthropic Claude API?",
+        "reasoning": "Claude buyuk context window'u (1M token) ile buyuk PR'lari tek seferde analiz edebilir. Kod anlama yetenegi guclu, talimat takibi iyi ve structured output (JSON) uretmede basarili.",
+        "alternatives": "OpenAI GPT-4, Google Gemini, acik kaynak modeller (CodeLlama)",
+        "when_to_choose_alternative": "Maliyet kritikse acik kaynak modeller self-host edilebilir. OpenAI function calling daha olgun."
+      },
+      {
+        "decision": "Neden Next.js (Frontend)?",
+        "reasoning": "Dashboard SSR ile hizli yuklenir, API routes ile BFF (Backend for Frontend) pattern uygulanir, TypeScript first-class. GitHub OAuth icin built-in destek.",
+        "alternatives": "React SPA, Remix, SvelteKit",
+        "when_to_choose_alternative": "Basit SPA yeterliyse React + Vite daha hafif. Remix nested routing'de guclu."
+      },
+      {
+        "decision": "Neden event-driven (webhook)?",
+        "reasoning": "Polling ile GitHub'i kontrol etmek verimsiz ve rate limit'e takilir. Webhook ile event-driven mimari daha verimli, daha hizli ve daha olceklenebilir.",
+        "alternatives": "GitHub polling, GitHub Actions, GitHub App",
+        "when_to_choose_alternative": "CI/CD entegrasyonu icin GitHub Actions daha dogal. GitHub App daha zengin permissions modeli sunar."
+      },
+      {
+        "decision": "Neden ayri Celery workers?",
+        "reasoning": "Kod analizi CPU/IO yogun is — webhook handler'da yapmak timeout'a neden olur. Celery ile asenkron isleme, retry, priority queue ve olcekleme mumkun.",
+        "alternatives": "Background tasks (FastAPI), serverless functions, RQ",
+        "when_to_choose_alternative": "Cok basit isler icin FastAPI BackgroundTasks yeter. Serverless event-driven workload'lar icin uygun."
+      }
+    ]
+  },
+  "what_you_learn": {
+    "technical": [
+      "GitHub API & Webhook entegrasyonu",
+      "Anthropic Claude API ile kod analizi",
+      "AST (Abstract Syntax Tree) parsing",
+      "Code complexity metrics hesaplama",
+      "OWASP guvenlik pattern tespiti",
+      "Next.js full-stack development",
+      "Celery distributed task processing"
+    ],
+    "architectural": [
+      "Event-driven architecture (webhook pattern)",
+      "Multi-file code analysis pipeline",
+      "Review scoring system tasarimi",
+      "CI/CD pipeline entegrasyonu",
+      "Multi-tenant architecture basics"
+    ],
+    "ai_specific": [
+      "LLM ile structured code analysis",
+      "Prompt engineering for code review",
+      "Multi-file context management",
+      "Confidence scoring ve hallucination detection",
+      "Custom rule engine + LLM hybrid approach"
+    ],
+    "soft_skills": [
+      "Developer tool UX tasarimi",
+      "Open source proje yonetimi",
+      "Technical writing (review comments)",
+      "Product thinking — developer pain points"
+    ]
+  },
+  "requirements": {
+    "functional": [
+      "GitHub webhook ile PR acildiginda otomatik analiz",
+      "Multi-file kod incelemesi",
+      "Kod kalitesi skoru (0-100)",
+      "Guvenlik acigi tespiti (OWASP top 10)",
+      "Satir bazli iyilestirme onerileri",
+      "Review gecmisi ve trend grafikleri",
+      "Takim performans dashboard'u",
+      "Ozellesstirilebilir review kurallari"
+    ],
+    "non_functional": [
+      "PR analizi < 2 dakika (ortalama PR)",
+      "GitHub rate limit'lere uyumlu",
+      "Multi-repo destegi",
+      "Webhook secret validation (guvenlik)"
+    ],
+    "ai_requirements": [
+      "LLM review sonuclarinda confidence scoring",
+      "Hallucination'lari minimize eden prompt design",
+      "Context window'a sigmayan buyuk PR'lar icin chunking",
+      "Review kalitesi feedback loop (kullanici geri bildirimi)"
+    ]
+  },
+  "evaluation_criteria": [
+    {
+      "criterion": "GitHub Integration",
+      "weight": 15,
+      "description": "Webhook, PR analiz, yorum gonderme tam calisiyor mu?"
+    },
+    {
+      "criterion": "AI Code Analysis Quality",
+      "weight": 25,
+      "description": "Review kalitesi iyi mi? Actionable feedback veriyor mu?"
+    },
+    {
+      "criterion": "Security Analysis",
+      "weight": 15,
+      "description": "OWASP pattern'leri tespit ediliyor mu?"
+    },
+    {
+      "criterion": "Dashboard & Analytics",
+      "weight": 15,
+      "description": "Kullanici dostu, bilgilendirici dashboard"
+    },
+    {
+      "criterion": "Scoring System",
+      "weight": 10,
+      "description": "Tutarli ve anlamli kod kalite skoru"
+    },
+    {
+      "criterion": "Architecture & Code Quality",
+      "weight": 20,
+      "description": "Temiz mimari, test coverage, dokumantasyon"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "p10-m1",
+      "title": "Proje Altyapisi & GitHub API Entegrasyonu",
+      "overview": "Projeyi kur, GitHub OAuth ve webhook entegrasyonunu implement et.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "GitHub API",
+        "OAuth",
+        "webhooks",
+        "project setup"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Monorepo & Tech Stack Setup",
+          "why": "Full-stack + worker + AI — cok bilesenli proje icin temiz yapi sart.",
+          "instructions": "Proje yapisi:\n/frontend (Next.js + TypeScript)\n/backend (FastAPI)\n/workers (Celery)\n/analysis (AI + code analysis modules)\n\ndocker-compose: PostgreSQL, Redis, backend, frontend, worker",
+          "code_snippet": "# docker-compose.yml\nservices:\n  db:\n    image: postgres:16\n  redis:\n    image: redis:7-alpine\n  backend:\n    build: ./backend\n    depends_on: [db, redis]\n  worker:\n    build: ./backend\n    command: celery -A worker worker\n  frontend:\n    build: ./frontend\n    ports: ['3000:3000']",
+          "checkpoint": "Tum servisler hatasiz ayaga kalkiyor mu?"
+        },
+        {
+          "step": 2,
+          "title": "GitHub OAuth Entegrasyonu",
+          "why": "Kullanicinin GitHub repo'larina erisim icin OAuth sart.",
+          "instructions": "GitHub OAuth App olustur:\n1. GitHub Developer Settings'ten OAuth App kaydet\n2. Auth.js (next-auth v5) ile GitHub provider kur\n3. Access token'i guvenli sakla\n4. Scope: repo, read:org\n5. Token refresh mekanizmasi",
+          "checkpoint": "GitHub ile login olup repo listesini gorebiliyor musun?"
+        },
+        {
+          "step": 3,
+          "title": "Webhook Setup & Validation",
+          "why": "PR acildiginda otomatik analiz icin webhook gerekli. Secret validation guvenlik icin sart.",
+          "instructions": "Webhook endpoint:\n1. POST /api/webhooks/github\n2. X-Hub-Signature-256 ile signature dogrulama\n3. Event type filtering (pull_request, push)\n4. Payload parsing ve job queue'ya ekleme",
+          "code_snippet": "import hmac, hashlib\n\ndef verify_signature(payload: bytes, signature: str, secret: str) -> bool:\n    expected = 'sha256=' + hmac.new(\n        secret.encode(), payload, hashlib.sha256\n    ).hexdigest()\n    return hmac.compare_digest(expected, signature)",
+          "checkpoint": "GitHub'dan test webhook gonderip signature dogrulamasi calisiyor mu?"
+        },
+        {
+          "step": 4,
+          "title": "PR Diff Parsing",
+          "why": "Analiz icin PR'daki degisiklikleri dosya bazinda parse etmek gerekli.",
+          "instructions": "GitHub API ile PR diff'i al:\n1. GET /repos/{owner}/{repo}/pulls/{number}/files\n2. Her dosyanin patch'ini parse et\n3. Eklenen, silinen, degistirilen satirlari ayir\n4. Buyuk PR'lari chunk'la (max 50 dosya/chunk)",
+          "checkpoint": "Bir PR'in dosya listesini ve diff'ini alabildin mi?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Webhook secret'ini ASLA koda yazma — env variable kullan\n2. Signature dogrulama OLMADAN webhook kabul etme — guvenlik acigi\n3. GitHub rate limit: authenticated 5000 req/hour — kalan limit'i header'dan oku\n4. PR event'larinde action field'i kontrol et: opened, synchronize, reopened",
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nGitHub App vs OAuth App: GitHub App daha guclu — installation-level permissions, webhook management, rate limit daha yuksek. Production icin GitHub App tercih et.\n\nWebhook reliability: GitHub webhook'lari at-least-once delivery garanti eder — idempotent handler yaz. Recent Deliveries tab'indan basarisiz webhook'lari kontrol et."
+    },
+    {
+      "id": "p10-m2",
+      "title": "Code Parsing & Metrik Hesaplama",
+      "overview": "Kodu analiz et: complexity, readability metrikleri hesapla, pattern tespiti yap.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "AST",
+        "code metrics",
+        "complexity",
+        "static analysis"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Language Detection & Parser Setup",
+          "why": "Farkli diller farkli parser gerektirir. Oncelikle en yaygin dilleri destekle.",
+          "instructions": "Dil destegi:\n1. Python: ast module\n2. JavaScript/TypeScript: tree-sitter veya babel\n3. Generic: line-based analiz\n\nLanguage detection: dosya uzantisi + shebang",
+          "checkpoint": "Python ve JS dosyalarini dogru parse edebiliyor musun?"
+        },
+        {
+          "step": 2,
+          "title": "Complexity Metrics",
+          "why": "Cyclomatic complexity, cognitive complexity gibi metrikler kod kalitesinin objektif olcumleri.",
+          "instructions": "Metrikler:\n1. Lines of code (LOC)\n2. Cyclomatic complexity\n3. Function/method uzunlugu\n4. Nesting depth\n5. Parameter sayisi\n6. Import sayisi",
+          "code_snippet": "def calculate_complexity(code: str) -> dict:\n    tree = ast.parse(code)\n    functions = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]\n    return {\n        'loc': len(code.splitlines()),\n        'num_functions': len(functions),\n        'avg_function_length': avg([count_lines(f) for f in functions]),\n        'max_nesting': max_nesting_depth(tree),\n        'cyclomatic': cyclomatic_complexity(tree)\n    }",
+          "checkpoint": "Bir Python dosyasinin complexity metriklerini hesaplayabiliyor musun?"
+        },
+        {
+          "step": 3,
+          "title": "Code Pattern Detection",
+          "why": "Bilinen anti-pattern'leri ve code smell'leri otomatik tespit etmek review kalitesini artirir.",
+          "instructions": "Pattern tespiti:\n1. Long function (50+ satir)\n2. Deep nesting (4+ level)\n3. Too many parameters (5+)\n4. Magic numbers\n5. Duplicate code blocks\n6. Unused imports/variables",
+          "checkpoint": "Kasitli olarak kotu kod yazip pattern'leri tespit edebildin mi?"
+        },
+        {
+          "step": 4,
+          "title": "Scoring Algorithm",
+          "why": "Tum metrikleri tek bir skora donusturmek hizli degerlendirme saglar.",
+          "instructions": "Skor hesaplama:\n1. Her metrik icin 0-100 normalizasyon\n2. Agirlikli ortalama (complexity %30, readability %25, patterns %25, security %20)\n3. Severity bazli puan dusumu\n4. Trend karsilastirma (onceki PR'larla)",
+          "checkpoint": "Iyi ve kotu kodun skorlari anlamli sekilde farkli mi?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. AST parsing hataya acik — try-catch ile sarma, parse edilemezse line-based analize gec\n2. Complexity threshold'lari konfigüre edilebilir olmali — her takim farkli standartlar kullanir\n3. Scoring formula'yi transparent yap — kullanici neden dusuk skor aldigini gormeli\n4. False positive'leri minimize et — yanlis uyarilar tool'a guveni azaltir",
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nStatik analiz + AI hybrid approach en guclu kombinasyon. Statik analiz kesin kurallar icin (complexity, pattern), AI nuansli konular icin (naming, architecture, logic). Ikisini ayri calistirip sonuclari birlesttir.\n\nMetrik inflation'a dikkat: takimlar skoru yukseltmek icin metrikleri game edebilir. Metrikler rehber olmali, hedef degil."
+    },
+    {
+      "id": "p10-m3",
+      "title": "AI-Powered Code Review Engine",
+      "overview": "Anthropic Claude API ile akilli kod incelemesi. Multi-file analiz, structured output, actionable feedback.",
+      "estimated_hours": 12,
+      "concepts_covered": [
+        "Claude API",
+        "prompt engineering",
+        "structured output",
+        "multi-file analysis"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Review Prompt Engineering",
+          "why": "Prompt kalitesi = review kalitesi. Iyi prompt actionable, specific ve tutarli review uretir.",
+          "instructions": "Review prompt tasarimi:\n1. System prompt: rol, format, kurallar\n2. Code context: diff, dosya adi, dil\n3. Output format: structured JSON\n4. Severity levels: critical, warning, suggestion, praise\n5. Few-shot examples",
+          "code_snippet": "REVIEW_PROMPT = '''\nSen deneyimli bir code reviewer'sin.\n\nDosya: {filename}\nDil: {language}\nDiff:\n```\n{diff}\n```\n\nAsagidaki formatta JSON yanit ver:\n{{\n  \"issues\": [\n    {{\n      \"line\": 42,\n      \"severity\": \"warning\",\n      \"category\": \"readability\",\n      \"message\": \"...\",\n      \"suggestion\": \"...\",\n      \"code_fix\": \"...\"\n    }}\n  ],\n  \"summary\": \"...\",\n  \"score\": 85\n}}\n'''",
+          "checkpoint": "Claude bir diff'i analiz edip structured JSON donduruyor mu?"
+        },
+        {
+          "step": 2,
+          "title": "Multi-file Context Management",
+          "why": "Buyuk PR'larda tek seferde tum dosyalari gondermek context window'u asabilir.",
+          "instructions": "Context stratejisi:\n1. Dosyalari onem sirasina gore sirala (core logic > tests > config)\n2. Iliskili dosyalari birlikte analiz et (component + test)\n3. Context window budget: her dosyaya max token ayir\n4. Buyuk PR'lari chunk'la, sonuclari birlesttir",
+          "checkpoint": "10+ dosyali PR'da tum dosyalar analiz ediliyor mu?"
+        },
+        {
+          "step": 3,
+          "title": "Review Quality & Confidence Scoring",
+          "why": "AI review'un guvenilirligini gostermek kullanici guveni icin onemli.",
+          "instructions": "Kalite kontrol:\n1. Her issue'ya confidence score ekle\n2. Dusuk confidence issue'lari 'suggestion' olarak isaretle\n3. Review consistency check: ayni pattern icin ayni oneri\n4. User feedback: helpful/not helpful butonlari",
+          "checkpoint": "Confidence score'lar anlamli mi? Dusuk confidence issue'lar dogru isaretleniyor mu?"
+        },
+        {
+          "step": 4,
+          "title": "GitHub PR Comment Integration",
+          "why": "Review sonuclarini GitHub PR'ina yorum olarak gondermek developer workflow'ina entegre eder.",
+          "instructions": "GitHub comment API:\n1. PR review comment olustur (satir bazli)\n2. Review summary comment (genel degerlendirme)\n3. Status check: pass/fail\n4. Re-review support (code push sonrasi)",
+          "code_snippet": "# GitHub API ile review comment gonder\nasync def post_review_comment(owner, repo, pr_number, review):\n    await github.post(\n        f'/repos/{owner}/{repo}/pulls/{pr_number}/reviews',\n        json={\n            'body': review.summary,\n            'event': 'COMMENT',\n            'comments': [\n                {'path': i.file, 'line': i.line, 'body': i.message}\n                for i in review.issues\n            ]\n        }\n    )",
+          "checkpoint": "PR'a otomatik review yorumlari gonderiliyor mu?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Prompt'ta ASLA 'her seyi bul' deme — spesifik kategoriler ver\n2. JSON output icin Claude'un structured output ozelligini kullan\n3. Rate limit: Anthropic API'de dakika/saat limit var — queue ile yonet\n4. Review tonunu pozitif tut — sadece hata degil, iyi kod icin praise de ver",
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nAI code review'un en buyuk riski: false positive'ler. Cok fazla yanlis uyari developer'larin tool'u ignore etmesine neden olur. Precision > Recall prensibi: az ama dogru uyari, cok ama yanlis uyaridan iyidir.\n\nLLM'in code review'daki en buyuk gucu: naming, architecture suggestions, potential bugs. En buyuk zayifligi: context-dependent logic (business rules). Hybrid approach: LLM + static analysis + custom rules."
+    },
+    {
+      "id": "p10-m4",
+      "title": "Guvenlik Analizi & OWASP Taramasi",
+      "overview": "OWASP top 10 pattern'lerini tespit eden guvenlik analiz modulu.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "OWASP",
+        "security patterns",
+        "vulnerability detection",
+        "code scanning"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "OWASP Pattern Tanima",
+          "why": "En yaygin guvenlik aciklari belirli pattern'lere sahip — bunlari regex + AST ile tespit edebilirsin.",
+          "instructions": "Pattern'ler:\n1. SQL Injection: string concatenation in queries\n2. XSS: unescaped user input in HTML\n3. CSRF: missing token validation\n4. Hardcoded secrets: API key, password patterns\n5. Insecure deserialization\n6. Path traversal",
+          "checkpoint": "Her OWASP kategorisi icin en az 1 test case ile tespit calisiyor mu?"
+        },
+        {
+          "step": 2,
+          "title": "AI-Enhanced Security Review",
+          "why": "Regex kaciramayacagi karmasik guvenlik sorunlarini LLM tespit edebilir.",
+          "instructions": "Claude'a guvenlik odakli prompt:\n1. Authentication/authorization logic review\n2. Data flow analysis (user input -> database)\n3. Encryption usage check\n4. Error handling (bilgi sizintisi riski)\n5. Dependency vulnerability hints",
+          "checkpoint": "Kasitli guvenlik acigi olan kodda AI dogru tespit yapiyor mu?"
+        },
+        {
+          "step": 3,
+          "title": "Security Report & Severity",
+          "why": "Guvenlik bulgularini net raporlamak ve onceliklendirmek duzeltme surecini hizlandirir.",
+          "instructions": "Guvenlik raporu:\n1. Severity: Critical, High, Medium, Low\n2. OWASP kategorisi\n3. Etkilenen dosya ve satir\n4. Aciklama ve exploit senaryosu\n5. Duzeltme onerisi + kod ornegi\n6. Benzer code pattern arama (ayni bug baska yerde var mi?)",
+          "checkpoint": "Guvenlik raporu okunakli ve actionable mi?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Guvenlik bulgusu = CRITICAL priority — review'deki diger konulardan once goster\n2. False positive guvenlik uyarisi cok tehlikeli — gercek uyarilar da ignore edilir\n3. Hardcoded secret tespiti icin regex pattern'leri: AWS key, JWT secret, API key format'lari\n4. .env dosyalarinin PR'da olup olmadigini MUTLAKA kontrol et",
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nGuvenlik analizi katmanli olmali: 1) Static pattern matching (hizli, kesin), 2) AST-based analysis (daha derin), 3) LLM-based review (nuansli). Katmanlar birbirini tamamlar.\n\nSecurity findings icin SLA tanimla: Critical = 24 saat, High = 3 gun, Medium = sprint icinde. Metrigi takip et."
+    },
+    {
+      "id": "p10-m5",
+      "title": "Frontend Dashboard & Review UI",
+      "overview": "Next.js ile review sonuclarini gosteren, trend analizi yapan kapsamli dashboard.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "Next.js",
+        "data visualization",
+        "developer UX",
+        "responsive design"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Repository & PR Management",
+          "why": "Kullanicinin repo'larini ve PR'larini gorup yonetebilmesi ana sayfa.",
+          "instructions": "Sayfalar:\n1. Repo listesi (connected repos)\n2. PR listesi (reviewed, pending, failed)\n3. PR detail: review sonuclari, issues, score\n4. Repository settings (rules, thresholds)",
+          "checkpoint": "Repo'lari goruntulup PR review sonuclarina erisebiliyor musun?"
+        },
+        {
+          "step": 2,
+          "title": "Code Review Visualization",
+          "why": "Review sonuclarini diff goruntusunde gostermek developer'in alisdigi deneyimi saglar.",
+          "instructions": "Review UI:\n1. Side-by-side diff gorunumu\n2. Satir bazli issue isaretleri (renkli)\n3. Issue detay popup (mesaj + fix onerisi)\n4. Severity filtreleme\n5. Issue resolve/dismiss butonlari",
+          "checkpoint": "Diff uzerinde review issue'lari gorunuyor mu?"
+        },
+        {
+          "step": 3,
+          "title": "Analytics & Trends",
+          "why": "Takim performansini zaman icerisinde izlemek iyilestirme firsatlarini gosterir.",
+          "instructions": "Analytics dashboard:\n1. Ortalama kod kalite skoru (haftalik trend)\n2. En sik tespit edilen issue tipleri\n3. Gelistirici bazli istatistikler\n4. Repo bazli karsilastirma\n5. Resolution rate (fix edilen issue yuzdesi)",
+          "checkpoint": "Son 30 gunun trend grafikleri dogru gorunuyor mu?"
+        },
+        {
+          "step": 4,
+          "title": "Notification & Integration",
+          "why": "Review sonuclarini developer'a bildirmek action almayı hizlandirir.",
+          "instructions": "Bildirimler:\n1. Email notification (review tamamlandi)\n2. Slack webhook entegrasyonu (opsiyonel)\n3. Dashboard in-app notifications\n4. Weekly digest email",
+          "checkpoint": "Review tamamlandiginda bildirim aliniyor mu?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Developer tool UX'i BASIT olmali — cok fazla bilgi bunaltir\n2. Diff gorunumunde performans onemli — buyuk PR'lar icin lazy loading\n3. Dark mode ZORUNLU — developer'lar dark mode kullanir\n4. Keyboard shortcuts ekle — developer'lar mouse sevmez",
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nDeveloper tool'larinda adoption en buyuk zorluk. Tool kullanmak ZORLA degil, KOLAYLIK sunarak saglanir. Eger tool yavaslama yaratiyorsa kimse kullanmaz.\n\nMetrik: 'Time to first insight' — PR acilmasindan ilk review comment'e kadar gecen sure. 2 dakikadan fazla olmamali."
+    },
+    {
+      "id": "p10-m6",
+      "title": "Custom Rules & Configuration",
+      "overview": "Takim bazli ozellesstirilebilir review kurallari ve konfigurrasyon sistemi.",
+      "estimated_hours": 6,
+      "concepts_covered": [
+        "rule engine",
+        "configuration",
+        "customization",
+        "team management"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Rule Engine",
+          "why": "Her takimin farkli standartlari var — ozellesstirilebilir kurallar adoption'i arttirir.",
+          "instructions": "Rule sistemi:\n1. Built-in rules (complexity, naming, security)\n2. Rule enable/disable per repo\n3. Severity override (warning -> error)\n4. Custom rules (regex-based)\n5. Rule priority ve ordering",
+          "checkpoint": "Bir rule'u devre disi birakip review'dan cikarildigini dogrulayabiliyor musun?"
+        },
+        {
+          "step": 2,
+          "title": "Configuration File (.codereview.yml)",
+          "why": "Repo'da konfigürasyon dosyasi tutmak version control ve takim paylasimi saglar.",
+          "instructions": "Config dosyasi:\n- ignore_paths: ['test/', 'migrations/']\n- max_complexity: 15\n- required_test_coverage: 80\n- severity_overrides: {}\n- custom_rules: []\n- language_specific: {}",
+          "checkpoint": "Config dosyasi repo'dan okunup kurallari degistiriyor mu?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Default kurallar SENSIBLE olmali — hemen kullanilabilir\n2. Config dosyasi YAML olmali — JSON developer-friendly degil\n3. ignore_paths ile test ve migration dosyalarini haricc tutmayi unutma\n4. Config degisikliklerini de review et — kural gevsetme kasitli mi?",
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nIyi default'lar tool adoption'in anahtari. Cok restrictive = kimse kullanmaz, cok permissive = deger katmaz. 'Opinionated but configurable' yaklasimiyla basla."
+    },
+    {
+      "id": "p10-m7",
+      "title": "CI/CD Entegrasyonu & GitHub Actions",
+      "overview": "GitHub Actions ile CI pipeline entegrasyonu, status check ve auto-merge kurallari.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "GitHub Actions",
+        "CI/CD",
+        "status checks",
+        "automation"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "GitHub Status Check",
+          "why": "PR'in merge edilebilmesi icin review check'in gecmesi zorunlu kilmak kaliteyi garanti eder.",
+          "instructions": "Status check:\n1. Review tamamlandiginda GitHub status update\n2. Score threshold'a gore pass/fail\n3. Required check olarak ayarla\n4. Re-run on push",
+          "checkpoint": "PR'da status check gorunuyor ve merge'i etkiliyor mu?"
+        },
+        {
+          "step": 2,
+          "title": "GitHub Actions Workflow",
+          "why": "Kullanicilarin kendi CI/CD pipeline'larına entegre edebilmesi icin Action yayinla.",
+          "instructions": "GitHub Action:\n1. Action definition (action.yml)\n2. Docker-based action\n3. Input parameters (API key, threshold)\n4. Output: review results\n5. Marketplace'e publish (opsiyonel)",
+          "code_snippet": "# .github/workflows/code-review.yml\nname: AI Code Review\non:\n  pull_request:\n    types: [opened, synchronize]\njobs:\n  review:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: your-org/ai-code-review@v1\n        with:\n          api-key: ${{ secrets.REVIEW_API_KEY }}\n          min-score: 70",
+          "checkpoint": "GitHub Action PR acildiginda tetikleniyor mu?"
+        },
+        {
+          "step": 3,
+          "title": "Auto-merge Rules",
+          "why": "Yuksek skorlu PR'lari otomatik merge etmek gelistirme hizini arttirir.",
+          "instructions": "Auto-merge:\n1. Score > threshold AND no critical issues\n2. All status checks passed\n3. Required reviewers approved\n4. Config ile enable/disable\n5. Audit log",
+          "checkpoint": "Yuksek skorlu PR otomatik merge ediliyor mu? Dusuk skorlu bekliyor mu?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Status check REQUIRED olmali ama override edilebilir olmali (acil durum icin)\n2. Auto-merge DIKKATLI kullan — yalnız confidence yuksekse ve critical issue yoksa\n3. GitHub Actions secrets guvenli sakla\n4. Rate limiting: cok PR acilirsa queue'ya al, API limit'i asma",
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nCI/CD entegrasyonu developer tool adoption'in en guclu itici gucu. Workflow'a entegre olan tool kullanilir, entegre olmayan ise unutulur.\n\nGuard rail: auto-merge'i kademeli ac. Once sadece docs PR'lari, sonra kucuk PR'lar, sonra genel. Guven olustrurarak ilerle."
+    },
+    {
+      "id": "p10-m8",
+      "title": "Production Deployment & Monitoring",
+      "overview": "Docker deployment, monitoring, error tracking ve production hardening.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "Docker",
+        "monitoring",
+        "error tracking",
+        "production"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Production Docker Setup",
+          "why": "Tum bilesenleri production-ready container olarak paketlemek.",
+          "instructions": "Production:\n1. Multi-stage Dockerfile (her bilesenservice)\n2. Nginx reverse proxy\n3. SSL/TLS (Let's Encrypt)\n4. Environment variable management\n5. Docker secrets\n6. Health check endpoints",
+          "checkpoint": "Production docker-compose ile tum sistem calisiyor mu?"
+        },
+        {
+          "step": 2,
+          "title": "Monitoring & Alerting",
+          "why": "Production'da ne oldugunu bilmek sorunlari hizla cozmek icin sart.",
+          "instructions": "Monitoring:\n1. API response time tracking\n2. Worker queue depth\n3. Error rate dashboard\n4. LLM API usage ve maliyet\n5. Webhook delivery success rate\n6. Alert: error spike, queue buildup, API limit",
+          "checkpoint": "Dashboard'da tum metrikler gorunuyor mu?"
+        },
+        {
+          "step": 3,
+          "title": "Error Tracking & Logging",
+          "why": "Production hatalari hizla tespit ve cozulebilmeli.",
+          "instructions": "Observability:\n1. Structured logging (JSON)\n2. Request tracing (correlation ID)\n3. Error grouping ve alerting\n4. LLM call logging (prompt, response, latency, cost)\n5. Webhook event audit log",
+          "checkpoint": "Bir hata oldugunda log'da bulabildiyor ve trace edebiliyor musun?"
+        },
+        {
+          "step": 4,
+          "title": "Performance Optimization",
+          "why": "Review suresi uzun olursa developer deneyimi kotulesir.",
+          "instructions": "Optimizasyon:\n1. Parallel file analysis (asyncio)\n2. Caching: ayni dosya tekrar analiz etme\n3. Incremental review: sadece degisen dosyalari analiz et\n4. LLM response streaming\n5. Database query optimization",
+          "checkpoint": "Ortalama review suresi 2 dakikanin altinda mi?"
+        }
+      ],
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. LLM maliyet takibi ZORUNLU — her review'in maliyetini bil\n2. Correlation ID ile request tracing — distributed system'de debug icin sart\n3. Webhook retry mekanizmasi: GitHub 3x retry yapar, idempotent handler yaz\n4. Cache invalidation: repo'da force push olursa cache temizle",
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nBu capstone projeyi portfolyonda sunarken:\n1. Problem → Solution → Impact format kullan\n2. Teknik derinlik goster: 'Claude'un 1M context window'unu neden sectim'\n3. Trade-off'lari anlat: 'Precision vs recall — az ama dogru uyari'\n4. Metrik goster: 'Review suresi ortalama 90 saniye, %92 developer satisfaction'\n5. Gelecek planlarindan bahset: 'Auto-fix, multi-language support, IDE plugin'\n\nBu proje tek basina Full Stack + AI Engineer pozisyonuna basvurmak icin yeterli portfolyo parcasi."
+    },
+    {
+      "id": "p10-deployment",
+      "title": "Deployment ve Portfolio Showcase",
+      "estimated_hours": 4,
+      "steps": [
+        {
+          "title": "Production Build",
+          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "code_snippet": "pnpm build && pnpm test"
+        },
+        {
+          "title": "Deploy",
+          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et"
+        },
+        {
+          "title": "Profesyonel README",
+          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz"
+        },
+        {
+          "title": "Demo Video (Opsiyonel)",
+          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla"
+        }
+      ],
+      "checkpoint": "Proje canli URL'den erisilebilir, README profesyonel, screenshot'lar ekli, GitHub repo public"
+    }
+  ],
+  "interview_prep": {
+    "questions": [
+      "Bu projenin mimarisini bastan sona anlatir misiniz?",
+      "GitHub webhook'lari nasil calisiyor? Guvenlik icin ne yaptiniz?",
+      "AI code review'un kalitesini nasil olcuyorsunuz?",
+      "False positive'leri nasil minimize ettiniz?",
+      "Buyuk PR'lari nasil handle ediyorsunuz? Context window limiti?",
+      "OWASP guvenlik taramasi nasil calisiyor?",
+      "Scoring algoritmaniz nasil calisir? Nasil kalibre ettiniz?",
+      "Bu sistemi 1000 repo icin nasil olceklerdiniz?",
+      "LLM maliyetini nasil optimize ettiniz?",
+      "Developer adoption icin ne stratejiler kullandiniz?",
+      "En zorlandiginiz teknik problem neydi ve nasil cozdiniz?",
+      "Bu projeyi tekrar yapacak olsaniz neyi farkli yapardiniZ?"
+    ],
+    "talking_points": [
+      "Event-driven architecture: webhook -> queue -> worker -> result",
+      "Hybrid analysis: static (AST + regex) + AI (Claude) + custom rules",
+      "Multi-file context management ve token budgeting",
+      "GitHub API entegrasyonu ve rate limit yonetimi",
+      "Developer UX: hizli, actionable, non-blocking review",
+      "Security-first: OWASP detection, webhook validation, secret management",
+      "MLOps benzeri yaklasiM: review kalitesini olcme ve iyilestirme dongusu",
+      "Production concerns: monitoring, cost tracking, error handling"
+    ]
+  },
+  "resources": [
+    {
+      "title": "GitHub REST API Documentation",
+      "url": "https://docs.github.com/en/rest",
+      "why": "GitHub API entegrasyonu icin resmi dokuman"
+    },
+    {
+      "title": "Anthropic Claude API Docs",
+      "url": "https://docs.anthropic.com/",
+      "why": "Claude API kullanimi icin resmi dokuman"
+    },
+    {
+      "title": "OWASP Top 10",
+      "url": "https://owasp.org/www-project-top-ten/",
+      "why": "En yaygin web guvenlik aciklari referansi"
+    },
+    {
+      "title": "Next.js Documentation",
+      "url": "https://nextjs.org/docs",
+      "why": "Next.js full-stack development icin"
+    },
+    {
+      "title": "tree-sitter",
+      "url": "https://tree-sitter.github.io/tree-sitter/",
+      "why": "Multi-language code parsing icin"
+    },
+    {
+      "title": "Celery Documentation",
+      "url": "https://docs.celeryq.dev/",
+      "why": "Asenkron task processing icin"
+    }
+  ],
+  "cv_guidance": {
+    "project_title_for_cv": "AI-Powered Code Review & Security Analysis Tool with GitHub Integration",
+    "bullet_points": {
+      "Full Stack Developer": [
+        "Built production-ready AI code review platform using Next.js, TypeScript, and FastAPI with GitHub OAuth, webhook integration, and event-driven architecture processing PRs in <2 minutes",
+        "Developed comprehensive developer dashboard with Next.js featuring side-by-side diff visualization, trend analytics, team performance metrics, and configurable review rules across multiple repositories",
+        "Implemented Celery distributed worker system with Redis queue for parallel code analysis, handling concurrent PR reviews with retry logic and priority-based scheduling",
+        "Designed CI/CD integration with GitHub Actions and status checks, enabling automated code quality gates with customizable thresholds and team-specific .codereview.yml configuration"
+      ],
+      "AI Engineer": [
+        "Engineered LLM-powered code review system using Anthropic Claude API with 1M context window for multi-file analysis, structured JSON output, and confidence-scored feedback with <5% false positive rate",
+        "Built hybrid code analysis engine combining static analysis (AST parsing, cyclomatic complexity, pattern detection) with AI-powered review (Claude) for nuanced code quality assessment across Python and JavaScript",
+        "Implemented OWASP Top 10 security scanning with layered detection: regex pattern matching, AST-based analysis, and LLM-powered vulnerability review with severity classification (Critical/High/Medium/Low)",
+        "Designed intelligent context management system with token budgeting, file prioritization, and chunking strategy for large PRs, achieving consistent review quality across 50+ file pull requests"
+      ]
+    },
+    "skills_gained": {
+      "Frontend": [
+        "Next.js",
+        "React.js",
+        "TypeScript",
+        "Data Visualization",
+        "Diff Viewer",
+        "Dark Mode"
+      ],
+      "Backend": [
+        "FastAPI",
+        "Python",
+        "PostgreSQL",
+        "Redis",
+        "Celery",
+        "REST API",
+        "Webhook Handling"
+      ],
+      "AI/ML": [
+        "Anthropic Claude API",
+        "Prompt Engineering",
+        "Structured Output",
+        "Code Analysis",
+        "AST Parsing",
+        "Confidence Scoring",
+        "Hallucination Detection"
+      ],
+      "DevOps": [
+        "Docker",
+        "Docker Compose",
+        "GitHub Actions",
+        "CI/CD",
+        "GitHub API",
+        "OAuth",
+        "Nginx",
+        "SSL/TLS",
+        "Structured Logging",
+        "Monitoring"
+      ]
+    },
+    "ats_keywords": [
+      "Anthropic Claude",
+      "LLM",
+      "Large Language Models",
+      "AI Code Review",
+      "Static Analysis",
+      "AST",
+      "Abstract Syntax Tree",
+      "OWASP",
+      "Security Analysis",
+      "Code Quality",
+      "GitHub API",
+      "GitHub Actions",
+      "Webhooks",
+      "OAuth",
+      "CI/CD Pipeline",
+      "Prompt Engineering",
+      "Structured Output",
+      "Next.js",
+      "React.js",
+      "TypeScript",
+      "FastAPI",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Celery",
+      "Docker",
+      "Nginx",
+      "Event-Driven Architecture",
+      "Developer Tools",
+      "DevOps"
+    ],
+    "cv_placement": "CAPSTONE PROJE — CV'nizin en ust sirasinda gosterin. Bu proje tek basina Full Stack Developer + AI Engineer pozisyonlarina basvurmak icin yeterli bir portfolyo parcasidir. GitHub entegrasyonu, LLM-powered analiz, CI/CD pipeline ve production-ready deployment hepsini iceriyor. Mulakatta bu projeyi detayli anlatin. Tarih: '2025 – 2026'.",
+    "metrics_you_can_claim": [
+      "Anthropic Claude API ile multi-file AI code review sistemi gelistirdim — ortalama PR analiz suresi <2 dakika",
+      "Hybrid analiz: static (AST + regex) + AI (Claude) ile %5'in altinda false positive orani",
+      "OWASP Top 10 guvenlik taramasi ile 6 kategoride otomatik vulnerability detection",
+      "GitHub webhook entegrasyonu ile event-driven PR analiz pipeline'i kurdum",
+      "200K context window ile 50+ dosyali PR'larda tutarli review kalitesi sagladim",
+      "Cyclomatic complexity, nesting depth, code smell tespiti ile 0-100 kod kalite skoru",
+      "GitHub Actions ve status checks ile CI/CD pipeline entegrasyonu",
+      "Takim bazinda haftalik trend analizi ve gelistirici performans dashboard'u",
+      "Ozellestirillebilir .codereview.yml konfigurasyonu ile repo bazinda kural yonetimi"
+    ]
+  },
+  "github_guidance": {
+    "repo_name": "ai-code-review-tool",
+    "repo_description": "AI-powered code review & security analysis tool with GitHub integration, Claude API multi-file analysis, OWASP scanning, and CI/CD pipeline — Next.js, FastAPI, Celery",
+    "topics": [
+      "code-review",
+      "anthropic",
+      "claude-api",
+      "github-api",
+      "webhooks",
+      "owasp",
+      "security-analysis",
+      "ast",
+      "static-analysis",
+      "nextjs",
+      "fastapi",
+      "typescript",
+      "celery",
+      "redis",
+      "postgresql",
+      "developer-tools",
+      "ci-cd",
+      "docker"
+    ],
+    "when_to_create": "Milestone 1'in 3. adimini (Webhook Setup & Validation) bitirdiginde repo'yu olustur. Ilk commit docker-compose + webhook endpoint + signature validation olmali.",
+    "pin_on_profile": true,
+    "pin_priority": 1,
+    "readme_sections": [
+      "# AI Code Review Tool — Automated code review & security analysis with Claude API (Capstone)",
+      "Badges: build status, tech stack (Next.js, FastAPI, Claude API), license (shields.io)",
+      "## 📸 Screenshots / Demo GIF — PR review comments on GitHub, diff visualization, security report, analytics dashboard",
+      "## ✨ Features (GitHub webhook PR analysis, multi-file AI review with Claude, OWASP security scanning, code quality scoring 0-100, line-by-line suggestions, configurable rules, CI/CD status checks, team analytics)",
+      "## 🛠 Tech Stack (table: Frontend: Next.js, TypeScript | Backend: FastAPI, Python, PostgreSQL, Redis, Celery | AI/ML: Anthropic Claude API, AST Parsing, OWASP Patterns | DevOps: Docker, GitHub Actions, Nginx)",
+      "## 🚀 Getting Started (prerequisites, pnpm install, docker compose up, GitHub OAuth app setup, Anthropic API key)",
+      "## 📐 Architecture (ASCII diagram: GitHub PR webhook → FastAPI → Celery Worker → Claude API + Static Analysis → GitHub PR Comments + Dashboard)",
+      "## 📡 API Documentation (POST /api/webhooks/github, GET /api/reviews/{id}, GET /api/repos/{id}/analytics, POST /api/repos/{id}/settings)",
+      "## 🧠 What I Learned (event-driven architecture, hybrid analysis (static + AI), prompt engineering for code review, GitHub API rate limiting, context window management for large PRs)",
+      "## 📄 License (MIT)"
+    ],
+    "commit_convention": "Conventional Commits: feat:, fix:, docs:, refactor:, test:, chore:",
+    "commit_examples": [
+      "feat: integrate Claude API for multi-file code review analysis",
+      "feat: add OWASP Top 10 security pattern detection with regex + AST",
+      "feat: implement GitHub webhook handler with HMAC signature validation",
+      "feat: build code quality scoring algorithm with weighted metrics (complexity, readability, security)",
+      "fix: resolve context window overflow for 50+ file PRs with chunking strategy"
+    ],
+    "branch_strategy": "main (production) + develop (active) + feature/* + fix/* + docs/*",
+    "daily_commit_target": "Günde en az 3-5 anlamlı commit. Contribution graph'ın yeşil kalması önemli.",
+    "pro_tips": [
+      "Bu capstone projeyi GitHub profile'inda EN UST'e pin'le. README'yi en detayli ve profesyonel sekilde yaz — bu tek basina is basvurusu icin yeterli portfolyo parcasi.",
+      "GitHub PR'a gercekten yorum atan calisir bir demo kur — recruiter'a canli demo gosterebilmek mulakat kazandirir. ngrok ile webhook'u disariya ac.",
+      "Hybrid analysis yaklasimini (static + AI) README'de vurgula ve karsilastirma tablosu koy: 'Static-only vs AI-only vs Hybrid' precision/recall metrikleri.",
+      "OWASP security scanning bolumunu ayri bir section olarak README'ye ekle ve tespit edebildigin vulnerability kategorilerini listele — guvenlik bilgisi her zaman ekstra puan kazandirir."
+    ]
+  },
+  "cover_letter_guidance": {
+    "project_highlight": "Engineered a production-ready AI code review and security analysis tool with GitHub webhook integration, Anthropic Claude API multi-file analysis, OWASP Top 10 vulnerability scanning, and CI/CD pipeline status checks, processing pull requests in under 2 minutes with <5% false positive rate.",
+    "skills_demonstrated": [
+      "Next.js",
+      "TypeScript",
+      "FastAPI",
+      "Python",
+      "PostgreSQL",
+      "Redis",
+      "Celery",
+      "Anthropic Claude API",
+      "GitHub API",
+      "OWASP",
+      "AST Parsing",
+      "Docker",
+      "GitHub Actions",
+      "CI/CD"
+    ],
+    "talking_points": [
+      "Built hybrid code analysis engine combining static analysis (AST parsing, cyclomatic complexity, pattern detection) with LLM-powered review using Claude's 1M context window",
+      "Implemented OWASP Top 10 security scanning with layered detection (regex + AST + AI) achieving vulnerability detection across 6 categories including SQL injection and XSS",
+      "Designed event-driven architecture with GitHub webhooks, Celery distributed workers, and Redis job queuing for parallel PR analysis under 2 minutes",
+      "Developed intelligent context management with token budgeting and file prioritization for consistent review quality across 50+ file pull requests",
+      "Created configurable .codereview.yml rule engine with team-specific thresholds, GitHub Actions integration, and automated status checks for code quality gates"
+    ]
+  },
+  "ai_workflow": {
+    "planning": {
+      "model": "Claude Opus 4.6",
+      "prompt_template": "I'm building an AI-powered code review and security analysis tool using Next.js + TypeScript frontend, FastAPI backend, Anthropic Claude API for code analysis, GitHub API + webhooks, Celery + Redis for async processing, and PostgreSQL. Help me design the system architecture considering: GitHub webhook event-driven pipeline, PR diff parsing and multi-file analysis, Claude API prompt engineering for structured code review, AST parsing for complexity metrics (cyclomatic complexity, nesting depth), OWASP Top 10 security pattern detection, scoring algorithm design, GitHub status checks and PR comment integration, CI/CD with GitHub Actions, and configurable rule engine with .codereview.yml.",
+      "when_to_use": "Her milestone'un basinda kullan — webhook pipeline, code analysis engine ve scoring sistemi planlamak icin"
+    },
+    "code_review": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "Review this AI code review tool (FastAPI + Claude API + GitHub API + Celery) for: webhook signature validation security, GitHub API rate limit handling, Claude API prompt quality for code analysis (structured JSON output, confidence scoring), AST parsing error handling, OWASP pattern detection accuracy, scoring algorithm consistency and transparency, Celery task retry and error handling, Next.js SSR and GitHub OAuth flow, and multi-file context management with token budgeting.",
+      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle review prompt kalitesi, guvenlik taramasi dogrulugu ve scoring tutarliligi icin"
+    },
+    "debugging": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "I'm getting this error in my AI code review tool (FastAPI + Claude API + GitHub API + Celery + Next.js): [error]. The relevant code is: [code]. Webhook payload: [payload]. Claude prompt: [prompt]. I'm trying to [goal].",
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle GitHub webhook hatalari, Claude API structured output sorunlari, AST parsing hatalari ve GitHub PR comment API sorunlari icin"
+    },
+    "research": {
+      "model": "Gemini 2.5 Pro",
+      "prompt_template": "Explain [concept] with practical examples for an AI code review tool. Topics I need help with: GitHub REST API (pulls, reviews, comments, status checks), GitHub webhook events and signature validation, Anthropic Claude API with 1M context window, prompt engineering for code analysis (structured JSON output), Python ast module for code parsing, cyclomatic complexity calculation, OWASP Top 10 vulnerability patterns, tree-sitter for multi-language parsing, Next.js API routes and GitHub OAuth, and Celery distributed task processing.",
+      "when_to_use": "Yeni bir konsept ogrenirken kullan — ozellikle GitHub API, Claude code analysis, AST parsing ve OWASP security patterns icin"
+    }
+  },
+  "deployment_guide": {
+    "recommended_stack": {
+      "frontend": "Vercel (Next.js)",
+      "backend": "Railway (FastAPI)",
+      "database": "Neon (Serverless PostgreSQL)",
+      "task_queue": "Railway (Celery + Upstash Redis)",
+      "ai": "Anthropic Claude API",
+      "integration": "GitHub App"
+    },
+    "steps": [
+      {
+        "title": "GitHub App Olustur",
+        "commands": [
+          "# github.com/settings/apps > New GitHub App"
+        ],
+        "instructions": "Permissions: Pull requests (read/write), Contents (read), Checks (read/write). Webhook URL'ini Railway'e yonlendir"
+      },
+      {
+        "title": "Neon + Upstash Olustur",
+        "commands": [
+          "# neon.tech > New Project",
+          "# upstash.com > Create Database"
+        ],
+        "instructions": "PostgreSQL review sonuclari icin, Redis job queue icin"
+      },
+      {
+        "title": "Backend Deploy (Railway)",
+        "commands": [
+          "railway up"
+        ],
+        "instructions": "FastAPI + Celery workers. Env vars: GITHUB_APP_ID, GITHUB_PRIVATE_KEY, ANTHROPIC_API_KEY, DATABASE_URL, REDIS_URL"
+      },
+      {
+        "title": "Frontend Deploy (Vercel)",
+        "commands": [
+          "pnpm dlx vercel --yes"
+        ],
+        "instructions": "NEXT_PUBLIC_API_URL ve GitHub OAuth env var'larini ayarla"
+      },
+      {
+        "title": "GitHub App Install",
+        "instructions": "Test repository'ye GitHub App'i yukle. Test PR aciniz ve otomatik review'i dogrulayin"
+      }
+    ],
+    "env_vars": [
+      "GITHUB_APP_ID",
+      "GITHUB_PRIVATE_KEY",
+      "GITHUB_WEBHOOK_SECRET",
+      "ANTHROPIC_API_KEY",
+      "DATABASE_URL",
+      "REDIS_URL",
+      "NEXT_PUBLIC_API_URL"
+    ],
+    "estimated_time": "60 dakika",
+    "cost": "~$5-20/ay (Claude API kullanima gore)",
+    "demo_checklist": [
+      "GitHub App yukleme ve yetkilendirme",
+      "PR acildiginda otomatik review basliyor",
+      "Kod kalitesi skoru gorunuyor",
+      "Guvenlik taramasi sonuclari",
+      "PR'a yorum olarak oneriler",
+      "Dashboard'da takim analitikleri",
+      "Configurable .codereview.yml calisiyor"
+    ]
+  },
+  "portfolio_showcase": {
+    "readme_must_haves": [
+      "Proje aciklamasi ve motivasyon (2-3 cumle)",
+      "Canli demo linki (Vercel/Railway badge ile)",
+      "Teknoloji stack badge'leri",
+      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Mimari diyagram (ASCII veya draw.io)",
+      "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
+      "API dokumantasyonu (/docs linki veya Postman collection)",
+      "Ogrenilenler ve kararlar bolumu"
+    ],
+    "screenshot_suggestions": [
+      "Dashboard/Anasayfa",
+      "Ana ozellik ekrani",
+      "Mobile gorunum"
+    ],
+    "live_demo_url_template": "https://ai-code-review.vercel.app",
+    "github_repo_template": "https://github.com/USERNAME/ai-code-review-tool"
+  }
+}

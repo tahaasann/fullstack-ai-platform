@@ -1,0 +1,139 @@
+{
+  "id": "mod-02-python/quiz-01",
+  "title": "Python Temelleri & OOP Quiz",
+  "description": "Python ortamları, OOP, decorator, generator ve type hint konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Python'da sanal ortam (virtual environment) oluşturmak için hangi komut kullanılır?",
+      "options": [
+        "python -m pip install venv",
+        "python -m venv myenv",
+        "python --create-env myenv",
+        "pip create venv myenv"
+      ],
+      "correct": 1,
+      "explanation": "python -m venv myenv komutu, 'myenv' adında yeni bir sanal ortam oluşturur. venv modülü Python 3.3+ ile birlikte gelir ve projelerin bağımlılıklarını izole etmek için kullanılır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Python'da çoklu kalıtım (multiple inheritance) durumunda MRO (Method Resolution Order) hangi algoritmayı kullanır?",
+      "options": [
+        "Depth-First Search (DFS)",
+        "Breadth-First Search (BFS)",
+        "C3 Linearization",
+        "Binary Search"
+      ],
+      "correct": 2,
+      "explanation": "Python 3, MRO için C3 Linearization algoritmasını kullanır. Bu algoritma diamond problemi çözer ve her sınıfın yalnızca bir kez ve doğru sırayla çağrılmasını garanti eder. ClassName.__mro__ ile sırayı görebilirsin.",
+      "difficulty": "zor",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Aşağıdakilerden hangisi Python'da encapsulation (kapsülleme) için name mangling uygular?",
+      "options": [
+        "_degisken (tek alt tire)",
+        "__degisken (çift alt tire)",
+        "__degisken__ (çift alt tire her iki taraf)",
+        "private degisken (private anahtar kelimesi)"
+      ],
+      "correct": 1,
+      "explanation": "Çift alt tire (__degisken) ile başlayan isimler Python tarafından name mangling'e uğrar ve _ClassName__degisken şekline dönüştürülür. Tek alt tire (_degisken) sadece konvansiyon olarak 'private' kabul edilir. Çift alt tireli isimler (__init__ gibi) ise dunder (magic) metotlardır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Aşağıdaki decorator tanımlarından hangisi doğrudur?",
+      "options": [
+        "def decorator(func):\n    func()\n    return func",
+        "def decorator(func):\n    def wrapper(*args, **kwargs):\n        return func(*args, **kwargs)\n    return wrapper",
+        "def decorator(func):\n    return func(*args)",
+        "def decorator():\n    def wrapper(func):\n        func()\n    return wrapper"
+      ],
+      "correct": 1,
+      "explanation": "Doğru decorator yapısı: Dış fonksiyon (decorator) orijinal fonksiyonu parametre alır, iç fonksiyon (wrapper) *args ve **kwargs ile tüm argümanları yakalar, orijinal fonksiyonu çağırır ve sonucunu döndürür. Dış fonksiyon wrapper'ı döndürür.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Python'da type hint kullanırken, bir fonksiyonun hem string hem int kabul eden parametresini nasıl tanımlarsın?",
+      "options": [
+        "def func(x: string | integer) -> None:",
+        "def func(x: Union[str, int]) -> None:",
+        "def func(x: str & int) -> None:",
+        "def func(x: [str, int]) -> None:"
+      ],
+      "correct": 1,
+      "explanation": "Union[str, int] (typing modülünden) birden fazla tipi kabul eden parametreler için kullanılır. Python 3.10+ ile x: str | int söz dizimi de kullanılabilir, ancak Union daha geniş uyumluluk sağlar.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "type": "true_false",
+      "question": "Python'da generator fonksiyonlar tüm değerleri bellekte tutmak yerine, her çağrıda bir sonraki değeri 'yield' ile üretir ve bu sayede bellek verimliliği sağlar.",
+      "correct": true,
+      "explanation": "Doğru! Generator'lar lazy evaluation kullanır - değerler yalnızca istendiğinde üretilir. Bu, büyük veri setleriyle çalışırken bellek kullanımını dramatik şekilde azaltır. Örneğin, 1 milyon satırlık bir dosyayı generator ile satır satır işleyebilirsin.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "type": "code_completion",
+      "question": "Aşağıdaki generator fonksiyonunu tamamla. Fonksiyon verilen n sayısına kadar Fibonacci sayılarını üretmelidir:",
+      "code_template": "def fibonacci(n):\n    a, b = 0, 1\n    for _ in range(n):\n        _____ a\n        a, b = b, a + b",
+      "correct_answers": ["yield"],
+      "explanation": "Generator fonksiyonlarda 'yield' anahtar kelimesi kullanılır. yield, return'den farklı olarak fonksiyonun durumunu korur ve bir sonraki next() çağrısında kaldığı yerden devam eder. Bu sayede tüm Fibonacci dizisi bellekte tutulmaz.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "code_completion",
+      "question": "Aşağıdaki sınıfta @property decorator'unu kullanarak 'alan' attribute'unu tamamla:",
+      "code_template": "class Dikdortgen:\n    def __init__(self, en, boy):\n        self.en = en\n        self.boy = boy\n\n    _____\n    def alan(self):\n        return self.en * self.boy",
+      "correct_answers": ["@property"],
+      "explanation": "@property decorator'u, bir metodu attribute gibi erişilebilir yapar. dikdortgen.alan() yerine dikdortgen.alan şeklinde parantez olmadan kullanılabilir. Bu, getter/setter pattern'inin Pythonic yoludur.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "order_steps",
+      "question": "Bir Python projesini sıfırdan kurarken aşağıdaki adımlar hangi sırayla yapılmalıdır?",
+      "steps": [
+        "Proje dizinini oluştur (mkdir myproject && cd myproject)",
+        "Sanal ortam oluştur (python -m venv .venv)",
+        "Sanal ortamı aktifleştir (source .venv/bin/activate)",
+        "Bağımlılıkları yükle (uv pip install -r requirements.txt)",
+        "requirements.txt dosyasını oluştur veya güncelle (uv pip freeze > requirements.txt)"
+      ],
+      "correct_order": [0, 1, 2, 3, 4],
+      "explanation": "Sıra: Önce proje dizini oluşturulur, sonra izole bir sanal ortam oluşturulur, ortam aktifleştirilir, bağımlılıklar yüklenir ve son olarak requirements.txt ile bağımlılıklar kaydedilir. Bu akış her Python projesinin temelidir. 📌 2026 Notu: Modern Python projelerinde `uv` aracı tercih edilir — `uv init`, `uv add paket` ve `uv.lock` ile aynı adımlar 10-100x daha hızlı yapılır.",
+      "difficulty": "kolay",
+      "points": 15
+    },
+    {
+      "id": "q10",
+      "type": "explain_code",
+      "question": "Aşağıdaki Python kodu ne yapar? Her satırı açıkla.",
+      "code": "from functools import wraps\n\ndef retry(max_attempts=3):\n    def decorator(func):\n        @wraps(func)\n        def wrapper(*args, **kwargs):\n            for attempt in range(max_attempts):\n                try:\n                    return func(*args, **kwargs)\n                except Exception as e:\n                    if attempt == max_attempts - 1:\n                        raise\n            return wrapper\n    return decorator",
+      "correct_keywords": ["decorator", "parametreli", "retry", "tekrar deneme", "hata yakalama", "try-except", "wraps", "max_attempts"],
+      "sample_answer": "Bu kod, parametreli bir decorator tanımlar. @retry(max_attempts=3) şeklinde kullanılır. Dekore edilen fonksiyon hata fırlatırsa, max_attempts kadar tekrar dener. Son denemede de hata olursa, hatayı yukarı fırlatır (raise). @wraps(func) ise orijinal fonksiyonun adı ve docstring'inin korunmasını sağlar. Bu pattern, ağ istekleri veya veritabanı bağlantıları gibi geçici hatalara açık işlemlerde yaygın kullanılır.",
+      "difficulty": "zor",
+      "points": 15
+    }
+  ]
+}

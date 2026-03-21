@@ -1,0 +1,118 @@
+{
+  "id": "mod-19-system-design/quiz-01",
+  "title": "System Design & Data Structures Quiz",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "CAP Theorem'e gore, distributed bir sistemde network partition oldugunda hangi iki ozellik arasinda secim yapilmak zorundadir?",
+      "options": [
+        "Consistency ve Availability",
+        "Consistency ve Partition Tolerance",
+        "Availability ve Partition Tolerance",
+        "Scalability ve Consistency"
+      ],
+      "correct": 0,
+      "explanation": "Network partition (P) kacinilamaz oldugundan, gercek secim Consistency (CP) ile Availability (AP) arasindadir. Partition oldugunda ya tutarlilik ya da erisebilirlikten feragat etmek gerekir."
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "difficulty": "kolay",
+      "question": "Cache-aside pattern'de write islemi yapilirken, once cache guncellenir sonra database'e yazilir.",
+      "correct": false,
+      "explanation": "Cache-aside pattern'de write islemi: (1) Database'e yaz, (2) Cache'i invalidate et (sil). Cache'i guncellemek yerine silmek daha guvenlidir. Tersi yapilirsa inconsistency riski artar."
+    },
+    {
+      "id": "q3",
+      "type": "code_completion",
+      "difficulty": "orta",
+      "question": "Asagidaki binary search implementasyonundaki eksik satiri tamamlayin:\n\ndef binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            _______________\n        else:\n            right = mid - 1\n    return -1",
+      "correct": "left = mid + 1",
+      "explanation": "arr[mid] < target ise, aranan deger ortadan buyuktur. Dolayisiyla sol siniri mid + 1'e tasiyarak sag yarida aramaya devam ederiz. left = mid degil mid + 1 olmali, yoksa sonsuz donguye girebilir."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "difficulty": "zor",
+      "question": "Twitter'in timeline tasariminda 'hybrid fan-out' yaklasimi ne anlama gelir?",
+      "options": [
+        "Tum kullanicilar icin fan-out on read kullanilir",
+        "Normal kullanicilar icin push (fan-out on write), unlu kullanicilar icin pull (fan-out on read) kullanilir",
+        "Sadece gece saatlerinde fan-out yapilir",
+        "Her tweet hem cache'e hem database'e ayni anda yazilir"
+      ],
+      "correct": 1,
+      "explanation": "Hybrid model: Normal kullanicilar tweet attiginda takipcilerin timeline cache'ine push edilir (hizli read). Ama 10M+ takipcisi olan unlulerin tweetleri push edilmez (cok pahali). Timeline olusturulurken bu tweetler pull ile cekilir ve merge edilir."
+    },
+    {
+      "id": "q5",
+      "type": "explain_code",
+      "difficulty": "orta",
+      "question": "Asagidaki kodun ne yaptigini ve time complexity'sini aciklayin:\n\ndef mystery(nums, k):\n    heap = nums[:k]\n    heapq.heapify(heap)\n    for num in nums[k:]:\n        if num > heap[0]:\n            heapq.heapreplace(heap, num)\n    return heap[0]",
+      "correct": "Bu fonksiyon, verilen bir dizideki k. en buyuk elemani bulur. K boyutunda bir min-heap olusturur. Kalan elemanlar icinde heap'in tepesinden (en kucukten) buyuk olanlar heap'e eklenir. Sonunda heap'in tepesindeki eleman k. en buyuk degerdir. Time complexity: O(n log k).",
+      "explanation": "Min-heap kullanarak k. en buyuk elemani bulmak klasik bir interview sorusudur. Heap size'i k'da sabit tutarak O(n log k) elde edilir. Full sort O(n log n) olacagindan bu daha verimlidir."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "difficulty": "kolay",
+      "question": "Hangi data structure O(1) amortized time ile insert, delete ve lookup islemi yapar?",
+      "options": [
+        "Array",
+        "Linked List",
+        "Hash Table",
+        "Binary Search Tree"
+      ],
+      "correct": 2,
+      "explanation": "Hash Table (dictionary/hash map) amortized O(1) ile insert, delete ve lookup yapar. Array O(n) delete, Linked List O(n) lookup, BST O(log n) average (balanced ise) complexity'ye sahiptir."
+    },
+    {
+      "id": "q7",
+      "type": "order_steps",
+      "difficulty": "orta",
+      "question": "System design interview'da asagidaki adimlari dogru siraya koyun:",
+      "steps": [
+        "Back-of-envelope hesaplamalari yap",
+        "Functional ve non-functional requirements belirle",
+        "Belirli alanlara derinles (deep dive)",
+        "High-level sistem diagrami ciz"
+      ],
+      "correct": [1, 0, 3, 2],
+      "explanation": "System design interview sirasi: (1) Requirements - ne yapilacagini anla, (2) Estimation - buyuklukleri hesapla, (3) High-Level Design - komponentleri ciz, (4) Deep Dive - bottleneck'leri incele. Hemen cozume atlamak en buyuk hata."
+    },
+    {
+      "id": "q8",
+      "type": "true_false",
+      "difficulty": "orta",
+      "question": "Dijkstra algoritmasi negative weight edge'ler iceren graph'larda dogru sonuc verir.",
+      "correct": false,
+      "explanation": "Dijkstra algoritmasi negative weight edge'lerde YANLIS sonuc verir. Cunku greedy yaklasimla bir node'u 'kesinlestirdiginde', daha sonra negative edge uzerinden daha kisa yol bulunabilir. Negative weight'ler icin Bellman-Ford algoritmasi kullanilmalidir."
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "difficulty": "zor",
+      "question": "Consistent hashing'in normal hash (key % N) yerine tercih edilmesinin temel nedeni nedir?",
+      "options": [
+        "Daha hizli hash hesaplamasi yapar",
+        "Node eklendiginde/cikarildiginda sadece K/N key yer degistirir, tumu degil",
+        "Daha az bellek kullanir",
+        "Collision olasiligi sifirdir"
+      ],
+      "correct": 1,
+      "explanation": "Normal hash'te node sayisi degisince (N degisince) neredeyse tum key'ler yer degistirir. Consistent hashing'te sadece K/N (K=toplam key, N=node sayisi) key etkilenir. Bu ozellikle cache server'lar eklenip cikarildiginda buyuk avantaj saglar."
+    },
+    {
+      "id": "q10",
+      "type": "code_completion",
+      "difficulty": "zor",
+      "question": "Asagidaki sliding window fonksiyonunda, tekrar eden karakter bulundugunda pencereyi daraltmak icin eksik kodu tamamlayin:\n\ndef length_of_longest_substring(s):\n    char_set = set()\n    left = 0\n    max_length = 0\n    for right in range(len(s)):\n        while s[right] in char_set:\n            _______________\n            left += 1\n        char_set.add(s[right])\n        max_length = max(max_length, right - left + 1)\n    return max_length",
+      "correct": "char_set.remove(s[left])",
+      "explanation": "Sag pointer'daki karakter zaten set'te varsa (tekrar), sol pointer'daki karakteri set'ten cikarip pencereyi daraltmamiz gerekir. s[left]'i remove edip left'i artirarak tekrar eden karakter cikarildikca pencere kuculur ve yeni karakter eklenebilir hale gelir."
+    }
+  ]
+}

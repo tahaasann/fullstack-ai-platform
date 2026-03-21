@@ -1,0 +1,81 @@
+{
+  "id": "challenge-xss-csrf",
+  "title": "XSS ve CSRF Zafiyet Tespiti ve Duzeltme",
+  "difficulty": "zor",
+  "category": "security",
+  "tags": ["xss", "csrf", "security", "sanitization", "web-security"],
+  "related_lesson": "mod-14-security/lesson-01",
+  "description_tr": "Verilen kod parcalarindaki XSS ve CSRF zafiyetlerini tespit et ve guvenli versiyonlarini yaz.",
+  "description_detail": "5 farkli kod parcasi verilecek. Her birinde en az bir guvenlik acigi var. Zafiyeti tespit edip, guvenli versiyonunu yazin. React frontend ve Express backend kodlari iceren gercekci senaryolar.",
+  "examples": [
+    {
+      "input": "vulnerable_code = '<div dangerouslySetInnerHTML={{__html: userInput}} />'",
+      "output": "safe_code = '<div>{DOMPurify.sanitize(userInput)}</div>'",
+      "explanation": "dangerouslySetInnerHTML ile kullanici girdisi dogrudan DOM'a enjekte ediliyor. DOMPurify ile sanitize edilmeli."
+    }
+  ],
+  "constraints": [
+    "Her zafiyetin ne oldugunu aciklayin (XSS/CSRF/Injection)",
+    "Duzeltme islevi bozmasin, sadece guvenlestirsin",
+    "Modern guvenlik kutuphaneleri kullanilabilir (DOMPurify, helmet, csurf)",
+    "Hem client hem server tarafinda koruma saglanmali"
+  ],
+  "starter_code": {
+    "javascript": "// === ZAFIYET 1: Reflected XSS ===\n// Bu Express route'unda XSS zafiyeti var. Duzeltin.\nfunction vulnerableSearch(req, res) {\n    const query = req.query.q;\n    res.send(`<h1>Arama sonuclari: ${query}</h1>`);\n}\nfunction fixedSearch(req, res) {\n    // DUZELTILMIS VERSIYONU YAZIN\n}\n\n// === ZAFIYET 2: Stored XSS ===\n// Bu React component'inde XSS zafiyeti var. Duzeltin.\nfunction VulnerableComment({ comment }) {\n    return <div dangerouslySetInnerHTML={{__html: comment.body}} />;\n}\nfunction FixedComment({ comment }) {\n    // DUZELTILMIS VERSIYONU YAZIN\n}\n\n// === ZAFIYET 3: CSRF ===\n// Bu form handler CSRF korunmasi yok. Duzeltin.\nfunction vulnerableTransfer(req, res) {\n    const { to, amount } = req.body;\n    transferMoney(req.user.id, to, amount);\n    res.json({ success: true });\n}\nfunction fixedTransfer(req, res) {\n    // DUZELTILMIS VERSIYONU YAZIN (CSRF token dogrulamasi ekleyin)\n}\n\n// === ZAFIYET 4: DOM-based XSS ===\n// Bu kod URL fragment'indan XSS'e acik. Duzeltin.\nfunction vulnerableRedirect() {\n    const hash = window.location.hash.substring(1);\n    document.getElementById('content').innerHTML = hash;\n}\nfunction fixedRedirect() {\n    // DUZELTILMIS VERSIYONU YAZIN\n}\n\n// === ZAFIYET 5: Header Injection ===\n// Bu Express middleware'inde guvenlik header'lari eksik. Ekleyin.\nfunction vulnerableHeaders(req, res, next) {\n    next();\n}\nfunction fixedHeaders(req, res, next) {\n    // DUZELTILMIS VERSIYONU YAZIN (guvenlik header'lari ekleyin)\n}",
+    "python": "# === ZAFIYET 1: Reflected XSS ===\n# Bu Flask route'unda XSS zafiyeti var. Duzeltin.\ndef vulnerable_search(request):\n    query = request.args.get('q', '')\n    return f'<h1>Arama sonuclari: {query}</h1>'\n\ndef fixed_search(request):\n    # DUZELTILMIS VERSIYONU YAZIN\n    pass\n\n# === ZAFIYET 2: SQL Injection ===\n# Bu sorgu SQL injection'a acik. Duzeltin.\ndef vulnerable_get_user(user_id):\n    query = f\"SELECT * FROM users WHERE id = '{user_id}'\"\n    return db.execute(query)\n\ndef fixed_get_user(user_id):\n    # DUZELTILMIS VERSIYONU YAZIN\n    pass\n\n# === ZAFIYET 3: CSRF ===\n# Bu endpoint CSRF korunmasi yok. Duzeltin.\ndef vulnerable_transfer(request):\n    to = request.form['to']\n    amount = request.form['amount']\n    transfer_money(request.user.id, to, amount)\n    return {'success': True}\n\ndef fixed_transfer(request):\n    # DUZELTILMIS VERSIYONU YAZIN\n    pass\n\n# === ZAFIYET 4: Command Injection ===\n# Bu kod command injection'a acik. Duzeltin.\nimport os\ndef vulnerable_ping(hostname):\n    return os.system(f'ping -c 4 {hostname}')\n\ndef fixed_ping(hostname):\n    # DUZELTILMIS VERSIYONU YAZIN\n    pass\n\n# === ZAFIYET 5: Insecure Deserialization ===\n# Bu kod pickle ile guvenlik acigi olusturuyor. Duzeltin.\nimport pickle\ndef vulnerable_load(data):\n    return pickle.loads(data)\n\ndef fixed_load(data):\n    # DUZELTILMIS VERSIYONU YAZIN\n    pass"
+  },
+  "test_cases": [
+    {
+      "input": {"function": "fixedSearch", "payload": "<script>alert('xss')</script>"},
+      "expected": "no_script_execution",
+      "description": "Reflected XSS: Script tag'leri encode edilmeli veya strip edilmeli"
+    },
+    {
+      "input": {"function": "FixedComment", "payload": "<img onerror=alert(1) src=x>"},
+      "expected": "sanitized_html",
+      "description": "Stored XSS: Zararli HTML attribute'leri temizlenmeli"
+    },
+    {
+      "input": {"function": "fixedTransfer", "payload": "cross_origin_request"},
+      "expected": "csrf_token_required",
+      "description": "CSRF: Token dogrulamasi olmadan islem yapilmamali"
+    },
+    {
+      "input": {"function": "fixedRedirect", "payload": "<img src=x onerror=alert(1)>"},
+      "expected": "text_content_only",
+      "description": "DOM XSS: innerHTML yerine textContent kullanilmali"
+    },
+    {
+      "input": {"function": "fixedHeaders"},
+      "expected": "security_headers_present",
+      "description": "CSP, X-Frame-Options, X-Content-Type-Options header'lari olmali"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"function": "fixedSearch", "payload": "javascript:alert(1)"},
+      "expected": "protocol_blocked",
+      "description": "javascript: protocol'u de engellemeli"
+    },
+    {
+      "input": {"function": "fixedTransfer", "payload": "same_origin_with_token"},
+      "expected": "transfer_success",
+      "description": "Gecerli CSRF token ile islem basarili olmali"
+    }
+  ],
+  "hints": [
+    "XSS'in 3 turu var: Reflected (URL'den), Stored (veritabanindan), DOM-based (client-side). Her birinin savunmasi farkli.",
+    "CSRF korunmasi icin: 1) CSRF token (Synchronizer Token Pattern), 2) SameSite cookie attribute, 3) Origin/Referer header kontrolu. En guvenlisi hepsini birlikte kullanmak.",
+    "Express'te helmet middleware'i tum guvenlik header'larini otomatik ekler. CSP (Content-Security-Policy) ile script kaynaklarini kisitlayabilirsin. Python'da html.escape() ile HTML encoding yapabilirsin."
+  ],
+  "solution": {
+    "javascript": "// ZAFIYET 1: Reflected XSS Fix\nconst escapeHtml = require('escape-html');\nfunction fixedSearch(req, res) {\n    const query = escapeHtml(req.query.q || '');\n    res.send(`<h1>Arama sonuclari: ${query}</h1>`);\n}\n\n// ZAFIYET 2: Stored XSS Fix\nconst DOMPurify = require('dompurify');\nfunction FixedComment({ comment }) {\n    const clean = DOMPurify.sanitize(comment.body);\n    return <div dangerouslySetInnerHTML={{__html: clean}} />;\n}\n\n// ZAFIYET 3: CSRF Fix\nconst csrf = require('csurf');\nfunction fixedTransfer(req, res) {\n    if (!req.csrfToken || req.body._csrf !== req.csrfToken()) {\n        return res.status(403).json({ error: 'Invalid CSRF token' });\n    }\n    const { to, amount } = req.body;\n    transferMoney(req.user.id, to, amount);\n    res.json({ success: true });\n}\n\n// ZAFIYET 4: DOM XSS Fix\nfunction fixedRedirect() {\n    const hash = window.location.hash.substring(1);\n    document.getElementById('content').textContent = hash;\n}\n\n// ZAFIYET 5: Security Headers Fix\nconst helmet = require('helmet');\nfunction fixedHeaders(req, res, next) {\n    res.setHeader('Content-Security-Policy', \"default-src 'self'\");\n    res.setHeader('X-Frame-Options', 'DENY');\n    res.setHeader('X-Content-Type-Options', 'nosniff');\n    res.setHeader('X-XSS-Protection', '1; mode=block');\n    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');\n    next();\n}",
+    "python": "import html\nfrom markupsafe import escape\nimport subprocess\nimport json\n\n# ZAFIYET 1: Reflected XSS Fix\ndef fixed_search(request):\n    query = html.escape(request.args.get('q', ''))\n    return f'<h1>Arama sonuclari: {query}</h1>'\n\n# ZAFIYET 2: SQL Injection Fix\ndef fixed_get_user(user_id):\n    query = \"SELECT * FROM users WHERE id = %s\"\n    return db.execute(query, (user_id,))\n\n# ZAFIYET 3: CSRF Fix\ndef fixed_transfer(request):\n    token = request.form.get('csrf_token')\n    if not token or token != request.session.get('csrf_token'):\n        return {'error': 'Invalid CSRF token'}, 403\n    to = request.form['to']\n    amount = request.form['amount']\n    transfer_money(request.user.id, to, amount)\n    return {'success': True}\n\n# ZAFIYET 4: Command Injection Fix\ndef fixed_ping(hostname):\n    import re\n    if not re.match(r'^[a-zA-Z0-9.-]+$', hostname):\n        raise ValueError('Invalid hostname')\n    return subprocess.run(['ping', '-c', '4', hostname], capture_output=True)\n\n# ZAFIYET 5: Insecure Deserialization Fix\ndef fixed_load(data):\n    return json.loads(data)",
+    "explanation_tr": "Her zafiyet farkli bir saldiri vektorunu temsil eder: XSS kullanici girdisinin HTML/JS olarak yorumlanmasindan, CSRF cross-origin istek sahteciligindan, SQL/Command Injection parametrelerin dogrudan sorgu/komuta eklenmesinden kaynaklanir. Savunma prensibi: ASLA kullanici girdisine guvenme, her zaman encode/escape/sanitize yap."
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Web guvenliginin temel prensiplerini ogrendin: input validation, output encoding, CSRF token'lar ve guvenlik header'lari. OWASP Top 10'un en kritik maddelerini pratikte uyguladiniz. Bu bilgi her senior developer mulakati icin sart."
+}

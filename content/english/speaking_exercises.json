@@ -1,0 +1,328 @@
+{
+  "title": "Konuşma Pratikleri",
+  "description": "Akıcı İngilizce için günlük pratik senaryoları. Her egzersiz gerçek iş hayatından alınmış durumları simüle eder.",
+  "exercises": [
+    {
+      "id": "speak-01",
+      "title": "2-Minute Self Introduction",
+      "type": "monologue",
+      "difficulty": "kolay",
+      "instructions_tr": "Kendini 2 dakikada tanıt. Adın, geçmişin, ne üzerinde çalıştığın ve nereye gitmek istediğini anlat. Ezberleme — ana noktaları bil ve doğal konuş.",
+      "template_en": "Hi, I'm [name]. I graduated from [school] with a degree in [field]. Over the past [time], I've been focusing on [skills/technologies]. I've built a few projects — the one I'm most proud of is [project], where I [what you did]. What excites me most about software development is [passion]. Right now, I'm looking for opportunities where I can [goal] and grow as an engineer.",
+      "tips_tr": [
+        "Ezberlemek yerine 4-5 ana noktayı bil ve doğal konuş",
+        "Göz teması kur (video görüşmede kameraya bak, ekrana değil)",
+        "1-2 somut örnek ver — 'I built X using Y' gibi",
+        "'Um' ve 'like' gibi dolgu kelimelerden kaçın — sessizlik daha iyi",
+        "Sonunda ne aradığını net söyle — 'I'm looking for...' ile bitir"
+      ],
+      "follow_up_questions": [
+        "What's the most challenging project you've worked on?",
+        "Why did you choose this particular tech stack?",
+        "Where do you see yourself in 2-3 years?",
+        "What got you interested in software development in the first place?"
+      ]
+    },
+    {
+      "id": "speak-02",
+      "title": "Explain Your Current Project",
+      "type": "monologue",
+      "difficulty": "orta",
+      "instructions_tr": "Şu anda üzerinde çalıştığın projeyi 3 dakikada açıkla. Projenin ne yaptığını, hangi teknolojileri kullandığını, mimari kararlarını ve karşılaştığın zorlukları anlat.",
+      "template_en": "So the project I've been working on is [name/description]. Basically, it's a [type of app] that lets users [main functionality]. On the backend, I'm using [tech stack] — I chose [technology] because [reason]. The frontend is built with [framework]. One interesting challenge I ran into was [challenge]. I solved it by [solution]. If I were to do it again, I'd probably [improvement]. Overall, I've learned a ton about [learning area].",
+      "tips_tr": [
+        "'Basically, it's a...' ile başla — karmaşık şeyleri basitleştir",
+        "Neden o teknolojiyi seçtiğini açıkla — 'I chose X because...'",
+        "Bir zorluktan ve nasıl çözdüğünden bahset — bu en ilginç kısım",
+        "Ne öğrendiğini ve neyi farklı yapardığını ekle",
+        "3 dakikayı geçme — özlü ol"
+      ],
+      "follow_up_questions": [
+        "What was the hardest bug you encountered?",
+        "How would you scale this if it had 10x users?",
+        "What would you change about the architecture?",
+        "Did you consider any alternative technologies?"
+      ]
+    },
+    {
+      "id": "speak-03",
+      "title": "Describe a Bug You Fixed (STAR Method)",
+      "type": "monologue",
+      "difficulty": "orta",
+      "instructions_tr": "Çözdüğün ilginç bir bug'ı STAR (Situation, Task, Action, Result) yöntemiyle anlat. Durumu kısaca anlat, ne yapman gerektiğini, nasıl yaklaştığını ve sonucu açıkla.",
+      "template_en": "So this was back when I was working on [project]. [Situation:] We started getting reports from users that [symptom]. [Task:] I was assigned to figure out what was going on and fix it. [Action:] The first thing I did was check the logs, and I noticed [observation]. That led me to suspect [hypothesis]. I dug deeper and found that [root cause]. The fix involved [solution]. [Result:] After deploying the fix, [positive outcome]. We also added [preventive measure] to make sure it wouldn't happen again.",
+      "tips_tr": [
+        "Durumu 2-3 cümlede anlat — uzatma",
+        "Debug sürecini adım adım anlat — düşünce sürecini göster",
+        "Kök nedeni bulmayı vurgula — 'The root cause turned out to be...'",
+        "Sonucu somut rakamlarla ver — '99.9% uptime' gibi",
+        "Önleyici tedbir eklediğinden bahset — olgunluk gösterir"
+      ],
+      "follow_up_questions": [
+        "How long did it take you to find the root cause?",
+        "What tools did you use for debugging?",
+        "What would you do differently next time?",
+        "How did you prevent this from happening again?"
+      ]
+    },
+    {
+      "id": "speak-04",
+      "title": "Explain a Technical Concept to Non-Technical Person",
+      "type": "monologue",
+      "difficulty": "zor",
+      "instructions_tr": "Teknik bir kavramı (API, veritabanı, Docker, CI/CD gibi) teknik bilgisi olmayan birine anlat. Jargon kullanma, analoji ve günlük hayattan örnekler kullan.",
+      "template_en": "Okay, so imagine you're at a restaurant. [Analogy setup]. An API is basically like the waiter — you don't go into the kitchen and talk to the chef directly. Instead, you tell the waiter what you want, the waiter takes your order to the kitchen, and brings back your food. In software, an API works the same way. Your app doesn't directly access the database or another service — it sends a request through the API, and the API brings back the data. The menu is like the API documentation — it tells you what you can order and how to order it.",
+      "tips_tr": [
+        "'Imagine you're at...' veya 'Think of it like...' ile başla",
+        "Bir analoji seç ve ona bağlı kal — karıştırma",
+        "Teknik terimleri günlük kelimelere çevir",
+        "'Does that make sense?' diye sor — anlaşıldığını kontrol et",
+        "Karşı tarafın 'aha' anını hedefle"
+      ],
+      "follow_up_questions": [
+        "Can you give me a real-world example of this?",
+        "Why is this important for our product?",
+        "What happens if this breaks?",
+        "How does this affect the user experience?"
+      ]
+    },
+    {
+      "id": "speak-05",
+      "title": "Give a Standup Update",
+      "type": "monologue",
+      "difficulty": "kolay",
+      "instructions_tr": "30 saniyede standup update'ini ver. Dün ne yaptığını, bugün ne yapacağını ve varsa engelleri bildir. Kısa, net ve yapılandırılmış ol.",
+      "template_en": "Yesterday I [completed task]. I also spent some time on [secondary task]. Today I'm going to [plan for today]. I'm aiming to have [deliverable] ready by [time]. [If blocker:] One thing — I'm blocked on [blocker]. I need [what you need] from [who] to move forward. [If no blocker:] No blockers on my end.",
+      "tips_tr": [
+        "30 saniyeyi geçme — herkes bekliyor",
+        "Yaptığın işi geçmiş zamanda anlat: 'I finished', 'I completed'",
+        "Bugünkü planı gelecek zamanda anlat: 'I'm going to', 'I'll be working on'",
+        "Blocker varsa kime ihtiyacın olduğunu net söyle",
+        "Detaylara girme — 'I can give more details after standup' de"
+      ],
+      "follow_up_questions": [
+        "Do you need help with anything?",
+        "Is that going to be ready for the demo on Friday?",
+        "Can you give a rough estimate on the remaining work?",
+        "Should we reprioritize anything based on this?"
+      ]
+    },
+    {
+      "id": "speak-06",
+      "title": "Propose a Technical Solution",
+      "type": "monologue",
+      "difficulty": "zor",
+      "instructions_tr": "Bir teknik soruna çözüm öner. Problemi tanımla, önerdiğin çözümü açıkla, alternatifleri ele al ve neden bu yaklaşımı seçtiğini savun.",
+      "template_en": "So the problem we're facing is [problem description]. We've got a few options here. Option A is [first approach] — the upside is [benefit], but the downside is [drawback]. Option B is [second approach] — it's [comparison to A]. My recommendation is Option [choice], and here's why: [reasoning]. The implementation would take roughly [timeline]. We'd need to [dependencies]. The main risk is [risk], but we can mitigate that by [mitigation]. Any questions or concerns?",
+      "tips_tr": [
+        "Problemi net tanımla — herkes aynı sayfada olmalı",
+        "En az 2 alternatif sun — tek seçenek sunma",
+        "Her seçeneğin artı ve eksilerini belirt",
+        "Önerini gerekçelendir — 'My recommendation is X because...'",
+        "Riskleri proaktif olarak ele al — 'The main risk is... but we can mitigate...'",
+        "Zaman tahmini ver — 'roughly 2 sprints'"
+      ],
+      "follow_up_questions": [
+        "What happens if this doesn't work as expected?",
+        "Have you considered the scalability implications?",
+        "What's the minimum viable version of this?",
+        "How would we roll this back if something goes wrong?"
+      ]
+    },
+    {
+      "id": "speak-07",
+      "title": "Disagree with a Technical Decision",
+      "type": "dialogue",
+      "difficulty": "zor",
+      "instructions_tr": "Bir teknik kararla kibar ama kararlı bir şekilde katılmadığını ifade et. Karşı tarafın argümanını kabul et, kendi perspektifini sun, kanıtlarla destekle.",
+      "template_en": "I see where you're coming from with [their approach], and I understand the appeal — [acknowledge their reasoning]. That said, I have some concerns about [specific concern]. In my experience, [counter-example or evidence]. I'd actually suggest we consider [your alternative] instead, because [reasoning]. The trade-off would be [what you'd give up], but I think that's worth it because [justification]. What do you think? Am I missing something?",
+      "tips_tr": [
+        "Her zaman karşı tarafın argümanını kabul ederek başla",
+        "'You're wrong' asla deme — 'I have some concerns about...' de",
+        "Kişisel deneyimden örnek ver — 'In my experience...'",
+        "Alternatif sun — sadece eleştirme, çözüm de öner",
+        "'What do you think? Am I missing something?' ile bitir — diyalog davet et",
+        "Ego savaşına girme — doğru çözümü bulmaya odaklan"
+      ],
+      "follow_up_questions": [
+        "What evidence do you have to support your approach?",
+        "Have you seen this work in production at scale?",
+        "What's the worst case scenario with your approach?",
+        "Can we run a quick proof of concept to test both?"
+      ]
+    },
+    {
+      "id": "speak-08",
+      "title": "Ask for a Code Review",
+      "type": "dialogue",
+      "difficulty": "kolay",
+      "instructions_tr": "PR'ını açtın ve takımdan review istemen gerekiyor. Değişikliklerini kısaca özetle, neye dikkat etmelerini söyle ve ne zaman review yapabileceklerini sor.",
+      "template_en": "Hey [name], I just put up a PR for [feature/fix]. It's a [size — small/medium/large] change — about [number] files touched. Here's the TL;DR: [1-2 sentence summary]. I'm particularly looking for feedback on [specific area]. The tests are all passing and I've tested it manually in staging. No rush, but if you could take a look by [time], that'd be great. Let me know if you have any questions — happy to walk through the code.",
+      "tips_tr": [
+        "PR'ın büyüklüğünü belirt — reviewer'ın zamanını planlamasına yardımcı olur",
+        "'TL;DR' ile kısa özet ver — kimse uzun açıklama okumak istemez",
+        "Hangi konuda özellikle feedback istediğini söyle",
+        "Testlerin geçtiğini belirt — güven verir",
+        "'No rush, but by [time]' ile beklentini ilet"
+      ],
+      "follow_up_questions": [
+        "Is there a specific part you're unsure about?",
+        "Did you consider any alternative approaches?",
+        "Are there any breaking changes I should know about?",
+        "Should I test anything specific before approving?"
+      ]
+    },
+    {
+      "id": "speak-09",
+      "title": "Report a Production Incident",
+      "type": "monologue",
+      "difficulty": "orta",
+      "instructions_tr": "Production'da bir sorun var ve bunu Slack'te takıma rapor etmen gerekiyor. Net, kısa ve yapılandırılmış ol. Ne olduğunu, etkisini, şu ana kadar ne yaptığını ve ne zaman güncelleyeceğini bildir.",
+      "template_en": "[Severity] Incident: [Brief description]. Impact: [Who is affected and how]. Timeline: First reports came in at [time]. What we know so far: [findings]. Current status: [what you're doing right now]. Next update in [time]. I'll keep this thread updated. [If help needed:] Could use a hand with [specific ask].",
+      "tips_tr": [
+        "İlk mesajda 4 şeyi kapsayın: ne oldu, kim etkilendi, ne yapıyorsun, ne zaman güncelleyeceksin",
+        "Panik yapma — sakin ve olgusal yaz",
+        "Thread kullan — ana kanalı spam'leme",
+        "Düzenli güncelleme ver — 'Still investigating' bile yeterli",
+        "Suçlama yapma — çözüme odaklan",
+        "Çözüldüğünde 'Resolved' mesajı at ve kısa özet ver"
+      ],
+      "follow_up_questions": [
+        "What's the blast radius of this?",
+        "Do we need to notify affected users?",
+        "Should we roll back or push a hotfix?",
+        "Who else should we loop in?"
+      ]
+    },
+    {
+      "id": "speak-10",
+      "title": "Explain Why You Chose React Over Angular",
+      "type": "dialogue",
+      "difficulty": "orta",
+      "instructions_tr": "Bir teknoloji seçimini gerekçelendir. Neden React'i (veya başka bir teknolojiyi) seçtiğini, alternatifleri neden eledini ve hangi kriterlere göre karar verdiğini açıkla.",
+      "template_en": "Great question. So when I was evaluating frontend frameworks, I looked at three main criteria: [criterion 1], [criterion 2], and [criterion 3]. React stood out because [reason 1]. Compared to Angular, it has a [advantage] — for example, [concrete example]. That said, Angular has its strengths too, especially [Angular strength]. But for our use case — [specific context] — React was the better fit because [specific reason]. The ecosystem was also a factor — [ecosystem benefit]. If we were building [different type of app], I might've gone with [alternative] instead.",
+      "tips_tr": [
+        "Fanboy gibi konuşma — 'React is the best' deme",
+        "Kriterleri belirle ve nesnel karşılaştır",
+        "Alternatiflerin güçlü yanlarını da kabul et",
+        "'For our use case' de — bağlama özel karar ver",
+        "Farklı bir durumda farklı seçim yapacağını göster — olgunluk"
+      ],
+      "follow_up_questions": [
+        "What are the main drawbacks of your choice?",
+        "How would you migrate if you needed to switch?",
+        "What about newer options like Svelte or Solid?",
+        "How does this choice affect hiring?"
+      ]
+    },
+    {
+      "id": "speak-11",
+      "title": "Describe Your Ideal Team Culture",
+      "type": "monologue",
+      "difficulty": "orta",
+      "instructions_tr": "İdeal takım kültürünü tanımla. Nasıl bir ortamda en iyi çalıştığını, hangi değerlere önem verdiğini ve geçmiş deneyimlerinden örnekler ver.",
+      "template_en": "For me, the ideal team culture is one where people feel safe to speak up and make mistakes. I really value [value 1] — like, if I push a bug to production, I want the response to be 'let's fix it and learn from it,' not 'whose fault is this?' I also care a lot about [value 2]. In my experience, teams that [positive behavior] tend to ship better code. One thing I've seen work really well is [specific practice]. On the flip side, I struggle in environments where [negative trait]. At the end of the day, I want to work with people who are [qualities] and who genuinely enjoy what they do.",
+      "tips_tr": [
+        "Somut örnekler ver — soyut konuşma",
+        "Geçmiş deneyimlerinden referans ver",
+        "Hem istediğin hem istemediğin şeyleri söyle",
+        "Blameless culture, psychological safety gibi kavramlara değin",
+        "Gerçekçi ol — 'ping pong masası' değil, gerçek değerlerden bahset"
+      ],
+      "follow_up_questions": [
+        "How do you handle conflict within a team?",
+        "What does 'psychological safety' look like in practice?",
+        "How do you give feedback to teammates?",
+        "What's the most dysfunctional team you've been on and what did you learn?"
+      ]
+    },
+    {
+      "id": "speak-12",
+      "title": "Walk Through Your GitHub Portfolio",
+      "type": "monologue",
+      "difficulty": "orta",
+      "instructions_tr": "GitHub portföyünü gezdirerek projelerini anlat. En önemli 2-3 projeyi seç, ne yaptıklarını, hangi teknolojileri kullandığını ve ne öğrendiğini açıkla.",
+      "template_en": "Sure, let me walk you through my GitHub. So the main projects you'll see here are [project 1], [project 2], and [project 3]. Let's start with [project 1] — this is a [description]. I built it using [tech stack]. The most interesting part is [highlight]. If you look at the code, you'll notice I focused on [code quality aspect]. [Project 2] is a [description]. This one taught me a lot about [learning]. I'm most proud of [specific achievement]. I try to keep my repos well-documented — you'll see a README with setup instructions, architecture diagrams, and a contributing guide.",
+      "tips_tr": [
+        "2-3 projeye odaklan — hepsini anlatmaya çalışma",
+        "Her proje için: ne yaptığını, neden yaptığını, ne öğrendiğini anlat",
+        "Kod kalitesini vurgula — testler, CI/CD, dokümantasyon",
+        "Canlı demo varsa göster — çok etkili",
+        "README kalitesi önemli — buna değin"
+      ],
+      "follow_up_questions": [
+        "Which project are you most proud of and why?",
+        "What would you refactor if you had more time?",
+        "Do you have any contributions to open source?",
+        "How did you decide what to build?"
+      ]
+    },
+    {
+      "id": "speak-13",
+      "title": "Explain a System Design (URL Shortener)",
+      "type": "monologue",
+      "difficulty": "zor",
+      "instructions_tr": "Basit bir URL kısaltıcı sistem tasarımını adım adım açıkla. Gereksinimleri tanımla, yüksek seviye mimariyi çiz, bileşenleri açıkla ve ölçeklendirme stratejisini anlat.",
+      "template_en": "Alright, so let's design a URL shortener. First, let me clarify the requirements. We need to generate short URLs from long ones, redirect users when they visit the short URL, and track click analytics. For the high-level architecture, I'd go with [components]. The core flow would be: user submits a long URL, we generate a unique short code using [algorithm], store the mapping in [database], and return the short URL. For the redirect, when someone hits the short URL, we look up the mapping and send a 301 redirect. For scale, I'd add [caching strategy] in front of the database since reads will far outnumber writes. If we need to handle [scale], we could [scaling approach]. The tricky parts are [edge cases].",
+      "tips_tr": [
+        "Gereksinimleri netleştirerek başla — 'Let me clarify the requirements'",
+        "Yüksek seviyeden başla, sonra detaylara in",
+        "Trade-off'ları tartış — 'The trade-off here is...'",
+        "Rakamlarla konuş — 'If we need to handle 1M URLs per day...'",
+        "Edge case'leri düşün — hash collision, expired URLs, abuse",
+        "Ölçeklendirme stratejisini anlat — caching, sharding, CDN"
+      ],
+      "follow_up_questions": [
+        "How would you handle hash collisions?",
+        "What happens if your database goes down?",
+        "How would you implement URL expiration?",
+        "What's your strategy for preventing abuse?"
+      ]
+    },
+    {
+      "id": "speak-14",
+      "title": "Give Feedback on Someone's Code",
+      "type": "dialogue",
+      "difficulty": "orta",
+      "instructions_tr": "Bir meslektaşının kodunu inceleyip yapıcı geri bildirim ver. Olumlu yönleri belirt, iyileştirme önerilerini nazikçe sun ve kararı onlara bırak.",
+      "template_en": "Hey, I went through your PR and overall it's looking really solid. I especially liked how you [specific positive]. A couple of things I noticed: First, in [file/function], I think we could [improvement suggestion]. The reason is [reasoning]. It's not a blocker though — just a suggestion. Second, I noticed [potential issue]. Have you considered [alternative approach]? That might help with [benefit]. Other than that, the logic is clean and the tests look comprehensive. Nice work! Let me know what you think about those suggestions.",
+      "tips_tr": [
+        "Her zaman pozitifle başla — 'Overall it's looking solid'",
+        "Spesifik ol — 'in line 42 of auth.ts' gibi",
+        "Önerini gerekçelendir — 'because...'",
+        "Blocker mı değil mi belirt — 'Not a blocker, just a suggestion'",
+        "'You should' yerine 'Have you considered...' veya 'What do you think about...' kullan",
+        "Kararı onlara bırak — 'Let me know what you think'"
+      ],
+      "follow_up_questions": [
+        "What was your reasoning behind this approach?",
+        "Did you consider any edge cases here?",
+        "Is there documentation for this new behavior?",
+        "Should we add a test for the error case?"
+      ]
+    },
+    {
+      "id": "speak-15",
+      "title": "Negotiate a Deadline",
+      "type": "dialogue",
+      "difficulty": "zor",
+      "instructions_tr": "Bir proje veya özellik için verilen sürenin gerçekçi olmadığını düşünüyorsun. Deadline'ı müzakere et — problemi açıkla, alternatifler sun, uzlaşmaya var.",
+      "template_en": "I want to be upfront about the timeline for [feature]. The current deadline is [date], but after digging into the requirements, I think we're looking at [realistic timeline] to do this properly. Here's why: [specific reasons]. Now, I know the deadline is important, so here are some options. Option 1: We deliver the full feature by [later date]. Option 2: We ship a stripped-down version by [original date] with just [core features], and add [remaining features] in a follow-up sprint. Option 3: We bring in [additional resource] to speed things up, though there'll be a ramp-up period. I'd recommend Option [choice] because [reasoning]. What works best for the business?",
+      "tips_tr": [
+        "'I want to be upfront' ile başla — şeffaflık güven oluşturur",
+        "Neden geciktiğini somut sebeplerle açıkla",
+        "Sadece problem sunma — çözüm öner",
+        "En az 2-3 alternatif sun",
+        "Bir öneride bulun ama kararı karşı tarafa bırak",
+        "'What works best for the business?' ile bitir — iş odaklı düşündüğünü göster",
+        "Asla 'I can't do it' deme — 'Here's what we can do' de"
+      ],
+      "follow_up_questions": [
+        "What's the absolute minimum we need for launch?",
+        "What are the consequences of missing this deadline?",
+        "Can we reduce the scope without losing the core value?",
+        "Is there any part we can parallelize?"
+      ]
+    }
+  ]
+}

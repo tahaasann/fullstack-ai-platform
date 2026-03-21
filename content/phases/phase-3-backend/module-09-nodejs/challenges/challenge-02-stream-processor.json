@@ -1,0 +1,84 @@
+{
+  "title": "Stream Processor",
+  "description": "Veriyi chunk'lar halinde işleyen stream processor implementasyonu",
+  "description_detail": "# Stream Processor\n\nBüyük veriyi chunk'lar halinde işleyen bir stream processor yazın. Tüm veriyi belleğe yüklemeden satır satır veya chunk chunk işlem yapın.\n\n## İstenilen Fonksiyonlar\n\n### 1. `createStreamProcessor(chunkSize)`\nVeriyi belirtilen boyutta chunk'lara ayırarak işleyen bir processor döndürür.\n\n### 2. `processLines(text, transformFn)`\nMetni satır satır işler, her satıra transform fonksiyonu uygular.\n\n### 3. `chunkArray(array, size)`\nBir array'i belirtilen boyutta parçalara ayırır.\n\n### 4. `batchProcess(items, batchSize, processFn)`\nItems'ları batch'ler halinde işler. Her batch'in sonucunu birleştirir.\n\n## Örnek\n```javascript\nchunkArray([1,2,3,4,5], 2) → [[1,2], [3,4], [5]]\nprocessLines('a\\nb\\nc', x => x.toUpperCase()) → ['A', 'B', 'C']\n```",
+  "difficulty": "orta",
+  "category": "nodejs",
+  "tags": ["streams", "chunking", "batch-processing", "performance"],
+  "examples": [
+    {
+      "input": "chunkArray([1,2,3,4,5,6,7], 3)",
+      "output": "[[1,2,3], [4,5,6], [7]]",
+      "explanation": "7 eleman 3'erli gruplardan oluşur, son grup kalan 1 eleman"
+    },
+    {
+      "input": "processLines('hello\\nworld', s => s.toUpperCase())",
+      "output": "['HELLO', 'WORLD']",
+      "explanation": "Her satır büyük harfe dönüştürülür"
+    }
+  ],
+  "constraints": [
+    "chunkArray orijinal array'i değiştirmemeli",
+    "processLines boş satırları filtrelmeli",
+    "batchProcess sıralı çalışmalı (paralel değil)",
+    "Bellek kullanımı minimize edilmeli"
+  ],
+  "starter_code": {
+    "python": "def chunk_array(array, size):\n    # Your code here\n    pass\n\ndef process_lines(text, transform_fn):\n    # Your code here\n    pass\n\ndef batch_process(items, batch_size, process_fn):\n    # Your code here\n    pass",
+    "javascript": "function chunkArray(array, size) {\n  // Your code here\n}\n\nfunction processLines(text, transformFn) {\n  // Your code here\n}\n\nasync function batchProcess(items, batchSize, processFn) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "chunk", "array": [1,2,3,4,5], "size": 2},
+      "expected_output": [[1,2],[3,4],[5]]
+    },
+    {
+      "input": {"fn": "chunk", "array": [1,2,3,4], "size": 4},
+      "expected_output": [[1,2,3,4]]
+    },
+    {
+      "input": {"fn": "chunk", "array": [], "size": 3},
+      "expected_output": []
+    },
+    {
+      "input": {"fn": "lines", "text": "hello\nworld\ntest", "transform": "upper"},
+      "expected_output": ["HELLO", "WORLD", "TEST"]
+    },
+    {
+      "input": {"fn": "lines", "text": "a\n\nb\n\nc", "transform": "identity"},
+      "expected_output": ["a", "b", "c"]
+    },
+    {
+      "input": {"fn": "batch", "items": [1,2,3,4,5,6], "batchSize": 2, "process": "sum"},
+      "expected_output": [3, 7, 11]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "chunk", "array": [1], "size": 5},
+      "expected_output": [[1]]
+    },
+    {
+      "input": {"fn": "chunk", "array": [1,2,3,4,5,6,7,8,9,10], "size": 3},
+      "expected_output": [[1,2,3],[4,5,6],[7,8,9],[10]]
+    },
+    {
+      "input": {"fn": "batch", "items": [], "batchSize": 5, "process": "sum"},
+      "expected_output": []
+    }
+  ],
+  "hints": [
+    "chunkArray: bir for döngüsü ile 0'dan array.length'e kadar step=size ile ilerle, slice(i, i+size) ile parçala",
+    "processLines: text.split('\\n') ile satırlara ayır, filter ile boşları kaldır, map ile transform uygula",
+    "batchProcess: chunkArray ile batch'lere ayır, her batch için processFn çağır, sonuçları birleştir"
+  ],
+  "solution": {
+    "python": "def chunk_array(array, size):\n    if size <= 0:\n        return []\n    return [array[i:i+size] for i in range(0, len(array), size)]\n\ndef process_lines(text, transform_fn):\n    lines = text.split('\\n')\n    return [transform_fn(line) for line in lines if line.strip()]\n\ndef batch_process(items, batch_size, process_fn):\n    chunks = chunk_array(items, batch_size)\n    return [process_fn(chunk) for chunk in chunks]",
+    "javascript": "function chunkArray(array, size) {\n  if (size <= 0) return [];\n  const chunks = [];\n  for (let i = 0; i < array.length; i += size) {\n    chunks.push(array.slice(i, i + size));\n  }\n  return chunks;\n}\n\nfunction processLines(text, transformFn) {\n  return text.split('\\n')\n    .filter(line => line.trim())\n    .map(transformFn);\n}\n\nasync function batchProcess(items, batchSize, processFn) {\n  const chunks = chunkArray(items, batchSize);\n  const results = [];\n  for (const chunk of chunks) {\n    const result = await processFn(chunk);\n    results.push(result);\n  }\n  return results;\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Stream processing, chunking ve batch processing pattern'lerini öğrenirsin. Node.js streams, büyük dosya işleme ve veritabanı bulk operasyonlarında bu pattern'ler zorunludur."
+}

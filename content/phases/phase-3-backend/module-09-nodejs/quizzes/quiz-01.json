@@ -1,0 +1,108 @@
+{
+  "id": "mod-09-node/quiz-01",
+  "title": "Node.js ve Express.js Quiz",
+  "description": "Node.js runtime, event loop, Express.js middleware, routing, validation ve proje yapısı konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Node.js event loop'unda setTimeout callback'leri hangi fazda çalıştırılır?",
+      "options": [
+        "poll fazı",
+        "timers fazı",
+        "check fazı",
+        "pending callbacks fazı"
+      ],
+      "correct": 1,
+      "explanation": "setTimeout ve setInterval callback'leri timers fazında çalıştırılır. poll fazı I/O event'lerini bekler ve işler, check fazı setImmediate callback'leri içindir, pending callbacks fazı ise önceki iterasyondan kalan I/O callback'leri içindir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "question": "Express.js'te error handling middleware'i normal middleware'den ayıran şey, 4 parametre (err, req, res, next) almasıdır. Express bu parametre sayısına bakarak otomatik olarak error handler olarak tanır.",
+      "correct": true,
+      "explanation": "Doğru! Express, middleware fonksiyonunun parametre sayısını kontrol eder. 4 parametre alan fonksiyonlar error handling middleware olarak kabul edilir. next parametresini kullanmasan bile tanımlamalısın, aksi halde Express bunu normal middleware olarak işler.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "code_completion",
+      "question": "Aşağıdaki Express middleware'inde, isteğin bir sonraki middleware'e geçmesi için boşluğu doldurun:",
+      "code_template": "function logger(req, res, next) {\n  console.log(`${req.method} ${req.url}`);\n  _____;\n}",
+      "correct_answers": ["next()"],
+      "explanation": "next() fonksiyonu, middleware zincirinde bir sonraki middleware'e geçişi sağlar. next() çağrılmazsa istek askıda kalır ve client timeout alır. Alternatif olarak res.json() veya res.send() ile response göndererek zinciri sonlandırabilirsin.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Node.js'te büyük bir dosyayı (2GB) okurken hangisini kullanmalısın?",
+      "options": [
+        "fs.readFileSync() - senkron okuma en güvenlidir",
+        "fs.readFile() - asenkron okuma yeterlidir",
+        "fs.createReadStream() - stream ile parça parça okuma",
+        "Buffer.alloc(2GB) - tüm dosyayı buffer'a yükle"
+      ],
+      "correct": 2,
+      "explanation": "2GB'lık bir dosyayı readFile ile okumak tüm dosyayı belleğe yükler ve Node.js'in bellek limitini aşar. createReadStream() dosyayı chunk'lar halinde okur (varsayılan 64KB), böylece bellek kullanımı sabit kalır. Büyük dosyalar için her zaman stream kullan.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "explain_code",
+      "question": "Aşağıdaki Express.js kodu ne yapar? Her bölümü açıkla.",
+      "code": "function authorize(...roles) {\n  return (req, res, next) => {\n    if (!req.user || !roles.includes(req.user.role)) {\n      return res.status(403).json({ error: 'Yetkiniz yok' });\n    }\n    next();\n  };\n}\n\napp.delete('/users/:id', authenticate, authorize('admin', 'moderator'), controller.remove);",
+      "correct_keywords": ["factory pattern", "closure", "middleware", "role-based", "authorization", "yetkilendirme", "admin", "403"],
+      "sample_answer": "Bu kod, factory pattern kullanarak role-based authorization middleware'i oluşturur. authorize() fonksiyonu izin verilen rolleri parametre alır ve bir middleware fonksiyonu döndürür (closure). Middleware, req.user objesinin var olup olmadığını ve kullanıcının rolünün izin verilen roller arasında olup olmadığını kontrol eder. Yetkisiz erişimde 403 status kodu ile hata döner. DELETE /users/:id route'unda önce authenticate middleware'i çalışır (token doğrulama), sonra authorize middleware'i sadece admin ve moderator rollerine izin verir.",
+      "difficulty": "zor",
+      "points": 15
+    },
+    {
+      "id": "q6",
+      "type": "order_steps",
+      "question": "Layered architecture'da bir HTTP isteğinin işlenme sırası nasıldır?",
+      "steps": [
+        "Express middleware'ler çalışır (auth, validation, logging)",
+        "Route tanımı eşleşir ve ilgili controller'a yönlendirilir",
+        "Controller, request'ten verileri alır ve service'e iletir",
+        "Service, business logic'i uygular ve model katmanını çağırır",
+        "Model, veritabanı işlemini gerçekleştirir ve sonucu döner"
+      ],
+      "correct_order": [0, 1, 2, 3, 4],
+      "explanation": "HTTP isteği sırasıyla: 1) Global ve route-level middleware'lerden geçer, 2) Eşleşen route bulunur, 3) Controller HTTP request/response ile ilgilenir, 4) Service business logic uygular, 5) Model veritabanı erişimi yapar. Her katman sadece kendi sorumluluğuyla ilgilenir.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Multer ile dosya yükleme yaparken kullanıcının gönderdiği orijinal dosya adını neden doğrudan kullanmamalısın?",
+      "options": [
+        "Performans düşer",
+        "Dosya boyutu artar",
+        "Path traversal saldırısına açık olur (../../etc/passwd gibi)",
+        "Multer orijinal dosya adını desteklemez"
+      ],
+      "correct": 2,
+      "explanation": "Kullanıcı dosya adı olarak ../../etc/passwd gibi bir değer gönderebilir. Bu, path traversal saldırısı ile sunucudaki hassas dosyalara erişim sağlayabilir. Her zaman UUID veya hash ile benzersiz, güvenli bir dosya adı oluşturmalısın.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "true_false",
+      "question": "Winston logger'da log seviyesi 'warn' olarak ayarlandığında, sadece warn ve error seviyesindeki loglar kayıt altına alınır; info, debug ve verbose seviyesindeki loglar göz ardı edilir.",
+      "correct": true,
+      "explanation": "Doğru! Winston'da log seviyeleri hiyerarşik çalışır: error (0) > warn (1) > info (2) > http (3) > verbose (4) > debug (5) > silly (6). Seviye 'warn' ayarlandığında, sadece warn (1) ve error (0) yani kendisi ve üstündeki seviyeler loglanır. Bu, production'da gereksiz log üretimini önler.",
+      "difficulty": "orta",
+      "points": 10
+    }
+  ]
+}

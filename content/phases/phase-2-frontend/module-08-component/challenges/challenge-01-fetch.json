@@ -1,0 +1,100 @@
+{
+  "id": "challenge-fetch",
+  "title": "Data Fetching Hook",
+  "difficulty": "zor",
+  "category": "react",
+  "tags": ["custom-hook", "data-fetching", "cache", "retry", "error-handling", "typescript"],
+  "related_lesson": "mod-08-api/lesson-02",
+  "description_tr": "Cache mekanizmasi, otomatik retry ve kapsamli hata yonetimi iceren bir useFetch custom hook'u yaz.",
+  "description_detail": "Bir useFetch custom hook'u yazacaksiniz. Hook su ozelliklere sahip olmalidir: (1) Verilen URL'den veri ceker ve { data, error, loading } dondurur. (2) Basit bir in-memory cache tutar - ayni URL icin tekrar istek yapmaz, cache'ten dondurur. (3) Basarisiz istekleri belirli sayida otomatik tekrar dener (retry). (4) Component unmount oldugunda devam eden istegi iptal eder (AbortController). (5) Cache'i manuel olarak temizleyebilecek bir invalidate fonksiyonu dondurur.",
+  "examples": [
+    {
+      "input": "const { data, loading, error } = useFetch('https://api.example.com/users');",
+      "output": "{ data: [...users], loading: false, error: null }",
+      "explanation": "Hook URL'den veri ceker, loading state'i yonetir ve sonucu dondurur."
+    },
+    {
+      "input": "// Ilk cagri\nconst result1 = useFetch('/api/users');\n// Ikinci cagri (ayni URL)\nconst result2 = useFetch('/api/users');",
+      "output": "Ikinci cagri network istegi yapmaz, cache'ten dondurur",
+      "explanation": "Ayni URL icin cache mekanizmasi devreye girer."
+    },
+    {
+      "input": "const { data, error } = useFetch('/api/fail', { retries: 3 });",
+      "output": "3 basarisiz denemeden sonra error dondurur",
+      "explanation": "Basarisiz istekler belirtilen retry sayisi kadar tekrar denenir."
+    }
+  ],
+  "constraints": [
+    "useFetch hook'u url ve options parametresi almalidir",
+    "options icinde retries (default: 3) ve cacheTime (default: 60000ms) olmalidir",
+    "Cache in-memory olmalidir (global Map veya object)",
+    "AbortController ile component unmount'ta istek iptal edilmelidir",
+    "Hook { data, error, loading, invalidate } dondurmelidir",
+    "invalidate fonksiyonu ilgili URL'in cache'ini temizleyip yeniden fetch etmelidir",
+    "Her retry arasinda exponential backoff uygulanmalidir (1s, 2s, 4s...)",
+    "4xx hatalarinda retry yapilmamalidir (sadece 5xx ve network hatalari)"
+  ],
+  "starter_code": {
+    "python": "import asyncio\nimport time\nfrom typing import Any, Optional, Dict, Tuple\n\n# Global cache\n_cache: Dict[str, Tuple[Any, float]] = {}\n\nasync def fetch_with_retry(\n    url: str,\n    retries: int = 3,\n    cache_time: int = 60,\n) -> Dict[str, Any]:\n    \"\"\"URL'den veri ceken, cache ve retry destekli fonksiyon.\n    \n    Args:\n        url: Veri cekilecek URL\n        retries: Basarisiz isteklerde tekrar deneme sayisi\n        cache_time: Cache suresi (saniye)\n    \n    Returns:\n        {\"data\": Any, \"error\": Optional[str], \"from_cache\": bool}\n    \"\"\"\n    # Implementasyonu burada yaz\n    pass\n\n\ndef invalidate_cache(url: str) -> None:\n    \"\"\"Belirtilen URL'in cache'ini temizler.\"\"\"\n    # Implementasyonu burada yaz\n    pass\n\n\ndef clear_all_cache() -> None:\n    \"\"\"Tum cache'i temizler.\"\"\"\n    # Implementasyonu burada yaz\n    pass",
+    "javascript": "// Global cache\nconst cache = new Map();\n\n/**\n * Custom useFetch hook - cache, retry ve error handling destekli.\n * \n * @param {string} url - Veri cekilecek URL\n * @param {Object} options - Ayarlar\n * @param {number} options.retries - Retry sayisi (default: 3)\n * @param {number} options.cacheTime - Cache suresi ms (default: 60000)\n * @returns {{ data: any, error: Error|null, loading: boolean, invalidate: () => void }}\n */\nfunction useFetch(url, options = {}) {\n  const { retries = 3, cacheTime = 60000 } = options;\n\n  // State tanimlamalari\n  // const [data, setData] = useState(null);\n  // const [error, setError] = useState(null);\n  // const [loading, setLoading] = useState(true);\n\n  // Cache kontrolu\n  // Retry mekanizmasi (exponential backoff)\n  // AbortController ile cleanup\n  // invalidate fonksiyonu\n\n  // Implementasyonu burada yaz\n}\n\n/**\n * Retry mekanizmali fetch yardimci fonksiyonu.\n * 4xx hatalarinda retry yapmaz, 5xx ve network hatalarinda yapar.\n * Exponential backoff: 1s, 2s, 4s...\n */\nasync function fetchWithRetry(url, retries, signal) {\n  // Implementasyonu burada yaz\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"test": "basic_fetch", "code": "result = await fetch_with_retry('https://jsonplaceholder.typicode.com/users/1')"},
+      "expected": "data is not None and error is None"
+    },
+    {
+      "input": {"test": "cache_hit", "code": "r1 = await fetch_with_retry('/api/data')\nr2 = await fetch_with_retry('/api/data')\nassert r2['from_cache'] == True"},
+      "expected": true
+    },
+    {
+      "input": {"test": "invalidate_works", "code": "await fetch_with_retry('/api/data')\ninvalidate_cache('/api/data')\nr = await fetch_with_retry('/api/data')\nassert r['from_cache'] == False"},
+      "expected": true
+    },
+    {
+      "input": {"test": "returns_error_on_failure", "code": "result = await fetch_with_retry('https://httpstat.us/500', retries=1)"},
+      "expected": "error is not None"
+    },
+    {
+      "input": {"test": "no_retry_on_4xx", "code": "# 404 hatasi icin retry yapilmamalidir\nstart = time.time()\nresult = await fetch_with_retry('https://httpstat.us/404', retries=3)\nelapsed = time.time() - start\nassert elapsed < 2  # retry yapilmadigi icin hizli bitmeli"},
+      "expected": true
+    },
+    {
+      "input": {"test": "clear_all_cache_works", "code": "await fetch_with_retry('/api/a')\nawait fetch_with_retry('/api/b')\nclear_all_cache()\nassert len(_cache) == 0"},
+      "expected": true
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"test": "cache_expiry", "code": "# cache_time=1 saniye ile test\nawait fetch_with_retry('/api/data', cache_time=1)\nawait asyncio.sleep(1.5)\nr = await fetch_with_retry('/api/data', cache_time=1)\nassert r['from_cache'] == False"},
+      "expected": true
+    },
+    {
+      "input": {"test": "retry_count_respected", "code": "# retry sayisi asilmamali\ncall_count = 0\n# mock fetch ile test\nassert call_count <= retries + 1"},
+      "expected": true
+    },
+    {
+      "input": {"test": "exponential_backoff", "code": "# Retry'lar arasi sure artmali\n# 1. retry: ~1s, 2. retry: ~2s\nstart = time.time()\nresult = await fetch_with_retry('https://httpstat.us/500', retries=2)\nelapsed = time.time() - start\nassert elapsed >= 2.5  # en az 1s + 2s backoff"},
+      "expected": true
+    },
+    {
+      "input": {"test": "different_urls_different_cache", "code": "r1 = await fetch_with_retry('/api/users')\nr2 = await fetch_with_retry('/api/posts')\n# Farkli URL'ler farkli cache entry'leri olmali\nassert '/api/users' in _cache and '/api/posts' in _cache"},
+      "expected": true
+    }
+  ],
+  "hints": [
+    "Cache icin global bir Map (JS) veya dictionary (Python) kullan. Anahtar olarak URL, deger olarak { data, timestamp } sakla. Her fetch oncesi cache'te URL var mi ve timestamp + cacheTime > Date.now() mu kontrol et.",
+    "Retry mekanizmasi icin bir for dongusu kullan. Her denemede hata olursa, sonraki deneme oncesi Math.pow(2, attempt) * 1000 ms bekle (exponential backoff). ONEMLI: response.status 400-499 arasindaysa retry YAPMA (client hatasi), sadece 500+ ve network hatalarinda retry yap.",
+    "Tam cozum ipucu: AbortController ile component unmount'ta istegi iptal et. useEffect'in cleanup fonksiyonunda controller.abort() cagir. invalidate fonksiyonu icin cache.delete(url) yap ve setData(null) + setLoading(true) ile state'i resetle, ardından yeni fetch baslat. Global cache kullanarak farkli component instance'lari arasinda cache paylasimi sagla."
+  ],
+  "solution": {
+    "python": "import asyncio\nimport time\nimport aiohttp\nfrom typing import Any, Optional, Dict, Tuple\n\n_cache: Dict[str, Tuple[Any, float]] = {}\n\nasync def fetch_with_retry(\n    url: str,\n    retries: int = 3,\n    cache_time: int = 60,\n) -> Dict[str, Any]:\n    # Cache kontrolu\n    if url in _cache:\n        data, timestamp = _cache[url]\n        if time.time() - timestamp < cache_time:\n            return {\"data\": data, \"error\": None, \"from_cache\": True}\n        else:\n            del _cache[url]  # Suresi dolmus, temizle\n\n    last_error = None\n    for attempt in range(retries + 1):\n        try:\n            async with aiohttp.ClientSession() as session:\n                async with session.get(url) as response:\n                    # 4xx hatalarinda retry yapma\n                    if 400 <= response.status < 500:\n                        return {\n                            \"data\": None,\n                            \"error\": f\"Client error: {response.status}\",\n                            \"from_cache\": False,\n                        }\n                    \n                    # 5xx hatalarinda retry yap\n                    if response.status >= 500:\n                        raise Exception(f\"Server error: {response.status}\")\n                    \n                    data = await response.json()\n                    _cache[url] = (data, time.time())\n                    return {\"data\": data, \"error\": None, \"from_cache\": False}\n\n        except Exception as e:\n            last_error = str(e)\n            if attempt < retries:\n                # Exponential backoff\n                await asyncio.sleep(2 ** attempt)\n\n    return {\"data\": None, \"error\": last_error, \"from_cache\": False}\n\n\ndef invalidate_cache(url: str) -> None:\n    if url in _cache:\n        del _cache[url]\n\n\ndef clear_all_cache() -> None:\n    _cache.clear()",
+    "javascript": "const cache = new Map();\n\nfunction useFetch(url, options = {}) {\n  const { retries = 3, cacheTime = 60000 } = options;\n  const [data, setData] = useState(null);\n  const [error, setError] = useState(null);\n  const [loading, setLoading] = useState(true);\n\n  const fetchData = useCallback(async (signal) => {\n    // Cache kontrolu\n    const cached = cache.get(url);\n    if (cached && Date.now() - cached.timestamp < cacheTime) {\n      setData(cached.data);\n      setLoading(false);\n      return;\n    }\n\n    setLoading(true);\n    setError(null);\n\n    let lastError = null;\n    for (let attempt = 0; attempt <= retries; attempt++) {\n      try {\n        const response = await fetch(url, { signal });\n\n        // 4xx hatalarinda retry yapma\n        if (response.status >= 400 && response.status < 500) {\n          throw new Error(`Client error: ${response.status}`);\n        }\n\n        // 5xx hatalarinda retry yap\n        if (response.status >= 500) {\n          throw new Error(`Server error: ${response.status}`);\n        }\n\n        const json = await response.json();\n        cache.set(url, { data: json, timestamp: Date.now() });\n        setData(json);\n        setError(null);\n        setLoading(false);\n        return;\n      } catch (err) {\n        if (err.name === 'AbortError') return;\n\n        // 4xx icin retry yapma\n        if (err.message.startsWith('Client error')) {\n          setError(err);\n          setLoading(false);\n          return;\n        }\n\n        lastError = err;\n        if (attempt < retries) {\n          await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 1000));\n        }\n      }\n    }\n\n    setError(lastError);\n    setLoading(false);\n  }, [url, retries, cacheTime]);\n\n  useEffect(() => {\n    const controller = new AbortController();\n    fetchData(controller.signal);\n    return () => controller.abort();\n  }, [fetchData]);\n\n  const invalidate = useCallback(() => {\n    cache.delete(url);\n    setData(null);\n    setLoading(true);\n    const controller = new AbortController();\n    fetchData(controller.signal);\n  }, [url, fetchData]);\n\n  return { data, error, loading, invalidate };\n}",
+    "explanation_tr": "useFetch hook'u su adimlari izler:\n\n1. Cache kontrolu: Global Map'te URL'i arar. Varsa ve suresi dolmamissa cache'ten dondurur. Zaman: O(1).\n\n2. Fetch islemi: Cache'te yoksa veya suresi dolmussa fetch() ile veri ceker. response.ok kontrolu yapar.\n\n3. Retry mekanizmasi: 5xx ve network hatalarinda exponential backoff ile tekrar dener (1s, 2s, 4s). 4xx hatalarinda retry YAPMAZ cunku client hatasi tekrar denemekle duzelmez.\n\n4. AbortController: useEffect cleanup'inda controller.abort() ile component unmount oldugunda devam eden istegi iptal eder. Memory leak ve race condition onler.\n\n5. invalidate fonksiyonu: Cache'ten URL'i siler ve yeni fetch baslatir. Kullanici 'Yenile' butonuna bastiginda veya mutation sonrasi cagrilir.\n\nZaman karmasikligi: O(1) cache hit, O(retries) cache miss. Alan karmasikligi: O(n) - n benzersiz URL sayisi."
+  },
+  "complexity": {
+    "optimal_time": "O(1) cache hit, O(retries) cache miss",
+    "optimal_space": "O(n) - n unique URL count"
+  },
+  "learn_after_solving": "Bu challenge ile custom hook yazmayi, cache mekanizmasi tasarlamayi, retry pattern'i ve AbortController kullanimini ogrendin. Production'da TanStack Query veya SWR bu islemleri otomatik yapar, ancak altindaki mekanizmayi anlamak debugging ve mimari kararlar icin kritiktir. Ayrica exponential backoff, 4xx vs 5xx hata ayrimi ve race condition onleme gibi production-grade kavramlari pratikte uygulamis oldun."
+}

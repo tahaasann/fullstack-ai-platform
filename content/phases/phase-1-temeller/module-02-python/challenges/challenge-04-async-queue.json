@@ -1,0 +1,80 @@
+{
+  "title": "Async Task Queue",
+  "description": "Öncelik sırasına göre çalışan basit bir async task queue implementasyonu",
+  "description_detail": "# Async Task Queue\n\nÖncelik bazlı bir task queue implementasyonu yapın. Yüksek öncelikli görevler önce çalışır.\n\n## İstenilen Sınıf: `TaskQueue`\n\n### Methodlar\n- `add_task(task_fn, priority=0)` — Queue'ya yeni görev ekler. Priority yükseldikçe öncelik artar.\n- `process()` — Tüm görevleri öncelik sırasına göre çalıştırır, sonuçları liste olarak döndürür.\n- `size` — Queue'daki bekleyen görev sayısı.\n\n## Örnek\n```python\nq = TaskQueue()\nq.add_task(lambda: 'low', priority=1)\nq.add_task(lambda: 'high', priority=10)\nq.add_task(lambda: 'mid', priority=5)\nresults = q.process()\n# ['high', 'mid', 'low']\n```\n\n## Not\nBu challenge senkron versiyondur. Async/await kullanmanıza gerek yoktur.",
+  "difficulty": "orta",
+  "category": "python",
+  "tags": ["queue", "priority", "data-structures", "python"],
+  "examples": [
+    {
+      "input": "add_task('A', priority=1), add_task('B', priority=3), add_task('C', priority=2)",
+      "output": "['B', 'C', 'A']",
+      "explanation": "En yüksek priority (3) önce çalışır"
+    },
+    {
+      "input": "add_task('X', priority=1), add_task('Y', priority=1)",
+      "output": "['X', 'Y']",
+      "explanation": "Aynı priority'de ekleme sırası korunur (FIFO)"
+    }
+  ],
+  "constraints": [
+    "Yüksek priority değeri = daha yüksek öncelik",
+    "Aynı priority'de FIFO sırası korunmalı",
+    "process() çağrıldıktan sonra queue boşalmalı",
+    "Boş queue'da process() boş liste döndürmeli"
+  ],
+  "starter_code": {
+    "python": "class TaskQueue:\n    def __init__(self):\n        # Your code here\n        pass\n    \n    def add_task(self, task_fn, priority=0):\n        # Your code here\n        pass\n    \n    def process(self):\n        # Your code here\n        pass\n    \n    @property\n    def size(self):\n        # Your code here\n        pass",
+    "javascript": "class TaskQueue {\n  constructor() {\n    // Your code here\n  }\n\n  addTask(taskFn, priority = 0) {\n    // Your code here\n  }\n\n  process() {\n    // Your code here\n  }\n\n  get size() {\n    // Your code here\n  }\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"tasks": [{"value": "a", "priority": 1}, {"value": "b", "priority": 3}, {"value": "c", "priority": 2}]},
+      "expected_output": ["b", "c", "a"]
+    },
+    {
+      "input": {"tasks": []},
+      "expected_output": []
+    },
+    {
+      "input": {"tasks": [{"value": "only", "priority": 5}]},
+      "expected_output": ["only"]
+    },
+    {
+      "input": {"tasks": [{"value": "x", "priority": 0}, {"value": "y", "priority": 0}, {"value": "z", "priority": 0}]},
+      "expected_output": ["x", "y", "z"]
+    },
+    {
+      "input": {"tasks": [{"value": "low", "priority": -1}, {"value": "high", "priority": 100}, {"value": "mid", "priority": 50}]},
+      "expected_output": ["high", "mid", "low"]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"tasks": [{"value": "1", "priority": 1}, {"value": "2", "priority": 1}, {"value": "3", "priority": 2}, {"value": "4", "priority": 2}]},
+      "expected_output": ["3", "4", "1", "2"]
+    },
+    {
+      "input": {"tasks": [{"value": "a", "priority": 10}], "check_size_before": true},
+      "expected_output": {"size_before": 1, "results": ["a"], "size_after": 0}
+    },
+    {
+      "input": {"tasks": [{"value": "p1", "priority": 5}, {"value": "p2", "priority": 5}, {"value": "p3", "priority": 5}, {"value": "p4", "priority": 10}]},
+      "expected_output": ["p4", "p1", "p2", "p3"]
+    }
+  ],
+  "hints": [
+    "Her task'ı (priority, insertion_order, task_fn) tuple olarak sakla",
+    "Python'da heapq modülünü kullanabilirsin (min-heap, priority'yi negatif yap)",
+    "Alternatif olarak sıralama kullanabilirsin: sorted(tasks, key=lambda x: -x.priority)"
+  ],
+  "solution": {
+    "python": "import heapq\n\nclass TaskQueue:\n    def __init__(self):\n        self._queue = []\n        self._counter = 0\n    \n    def add_task(self, task_fn, priority=0):\n        heapq.heappush(self._queue, (-priority, self._counter, task_fn))\n        self._counter += 1\n    \n    def process(self):\n        results = []\n        while self._queue:\n            _, _, task_fn = heapq.heappop(self._queue)\n            results.append(task_fn())\n        return results\n    \n    @property\n    def size(self):\n        return len(self._queue)",
+    "javascript": "class TaskQueue {\n  constructor() {\n    this._queue = [];\n    this._counter = 0;\n  }\n\n  addTask(taskFn, priority = 0) {\n    this._queue.push({ taskFn, priority, order: this._counter++ });\n  }\n\n  process() {\n    this._queue.sort((a, b) => {\n      if (b.priority !== a.priority) return b.priority - a.priority;\n      return a.order - b.order;\n    });\n    const results = this._queue.map(item => item.taskFn());\n    this._queue = [];\n    return results;\n  }\n\n  get size() {\n    return this._queue.length;\n  }\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n log n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Priority queue veri yapısını, heap kullanımını ve task scheduling mantığını öğrenirsin. Bu pattern iş kuyruğu sistemlerinde (Celery, Bull, RabbitMQ) ve işletim sistemi zamanlayıcılarında temel yapı taşıdır."
+}

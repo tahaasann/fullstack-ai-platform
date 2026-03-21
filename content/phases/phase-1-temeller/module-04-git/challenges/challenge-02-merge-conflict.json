@@ -1,0 +1,80 @@
+{
+  "title": "Merge Conflict Resolver",
+  "description": "Git merge conflict marker'larını parse et ve çöz",
+  "description_detail": "# Merge Conflict Resolver\n\nGit merge conflict marker'ları içeren bir metin verildiğinde, conflict bölgelerini tespit edip çözün.\n\n## Conflict Formatı\n```\nnormal line\n<<<<<<< HEAD\ncurrent branch content\n=======\nincoming branch content\n>>>>>>> feature-branch\nnormal line\n```\n\n## İstenilen Fonksiyonlar\n\n### 1. `parseConflicts(text)`\nMetindeki conflict bölgelerini tespit eder.\nDöndürür: `[{ current: string, incoming: string, lineStart: number }]`\n\n### 2. `resolveConflicts(text, strategy)`\nStrategy'ye göre conflict'leri çözer:\n- `'current'`: HEAD versiyonunu kullan\n- `'incoming'`: Gelen branch versiyonunu kullan\n- `'both'`: İkisini de tut (current önce)\n\nDöndürür: Temizlenmiş metin string'i",
+  "difficulty": "kolay",
+  "category": "git",
+  "tags": ["git", "merge", "parsing", "string-manipulation"],
+  "examples": [
+    {
+      "input": "resolveConflicts('<<<<<<< HEAD\\nA\\n=======\\nB\\n>>>>>>> dev', 'current')",
+      "output": "A",
+      "explanation": "Strategy 'current' olduğu için HEAD versiyonu (A) alınır"
+    },
+    {
+      "input": "resolveConflicts('line1\\n<<<<<<< HEAD\\nold\\n=======\\nnew\\n>>>>>>> fix', 'incoming')",
+      "output": "line1\\nnew",
+      "explanation": "Normal satırlar korunur, conflict'te incoming (new) alınır"
+    }
+  ],
+  "constraints": [
+    "Bir metinde birden fazla conflict olabilir",
+    "Normal satırlar değiştirilmemeli",
+    "Conflict marker'ları çıktıdan tamamen kaldırılmalı",
+    "Strategy 'both' seçildiğinde current önce, incoming sonra yazılır"
+  ],
+  "starter_code": {
+    "python": "def parse_conflicts(text: str) -> list:\n    # Your code here\n    pass\n\ndef resolve_conflicts(text: str, strategy: str) -> str:\n    # Your code here\n    pass",
+    "javascript": "function parseConflicts(text) {\n  // Your code here\n}\n\nfunction resolveConflicts(text, strategy) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"text": "<<<<<<< HEAD\nA\n=======\nB\n>>>>>>> dev", "strategy": "current"},
+      "expected_output": "A"
+    },
+    {
+      "input": {"text": "<<<<<<< HEAD\nA\n=======\nB\n>>>>>>> dev", "strategy": "incoming"},
+      "expected_output": "B"
+    },
+    {
+      "input": {"text": "<<<<<<< HEAD\nA\n=======\nB\n>>>>>>> dev", "strategy": "both"},
+      "expected_output": "A\nB"
+    },
+    {
+      "input": {"text": "start\n<<<<<<< HEAD\nold\n=======\nnew\n>>>>>>> fix\nend", "strategy": "incoming"},
+      "expected_output": "start\nnew\nend"
+    },
+    {
+      "input": {"text": "no conflicts here", "strategy": "current"},
+      "expected_output": "no conflicts here"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"text": "<<<<<<< HEAD\nX\n=======\nY\n>>>>>>> a\nmiddle\n<<<<<<< HEAD\nP\n=======\nQ\n>>>>>>> b", "strategy": "current"},
+      "expected_output": "X\nmiddle\nP"
+    },
+    {
+      "input": {"fn": "parse", "text": "line\n<<<<<<< HEAD\nA\n=======\nB\n>>>>>>> x"},
+      "expected_output": [{"current": "A", "incoming": "B", "lineStart": 1}]
+    },
+    {
+      "input": {"text": "<<<<<<< HEAD\nmulti\nline\ncurrent\n=======\nmulti\nline\nincoming\n>>>>>>> dev", "strategy": "incoming"},
+      "expected_output": "multi\nline\nincoming"
+    }
+  ],
+  "hints": [
+    "Metni satırlara ayırıp <<<<<<< , ======= ve >>>>>>> marker'larını ara",
+    "Bir state machine kullan: 'normal', 'current', 'incoming' modları arasında geçiş yap",
+    "Strategy'ye göre sadece ilgili bölümün satırlarını sonuç listesine ekle"
+  ],
+  "solution": {
+    "python": "def parse_conflicts(text: str) -> list:\n    lines = text.split('\\n')\n    conflicts = []\n    i = 0\n    while i < len(lines):\n        if lines[i].startswith('<<<<<<<'):\n            start = i\n            current_lines = []\n            incoming_lines = []\n            i += 1\n            while i < len(lines) and not lines[i].startswith('======='):\n                current_lines.append(lines[i])\n                i += 1\n            i += 1  # skip =======\n            while i < len(lines) and not lines[i].startswith('>>>>>>>'):\n                incoming_lines.append(lines[i])\n                i += 1\n            conflicts.append({\n                'current': '\\n'.join(current_lines),\n                'incoming': '\\n'.join(incoming_lines),\n                'lineStart': start\n            })\n        i += 1\n    return conflicts\n\ndef resolve_conflicts(text: str, strategy: str) -> str:\n    lines = text.split('\\n')\n    result = []\n    mode = 'normal'\n    \n    for line in lines:\n        if line.startswith('<<<<<<<'):\n            mode = 'current'\n        elif line.startswith('=======') and mode == 'current':\n            mode = 'incoming'\n        elif line.startswith('>>>>>>>') and mode == 'incoming':\n            mode = 'normal'\n        elif mode == 'normal':\n            result.append(line)\n        elif mode == 'current' and strategy in ('current', 'both'):\n            result.append(line)\n        elif mode == 'incoming' and strategy in ('incoming', 'both'):\n            result.append(line)\n    \n    return '\\n'.join(result)",
+    "javascript": "function parseConflicts(text) {\n  const lines = text.split('\\n');\n  const conflicts = [];\n  let i = 0;\n  while (i < lines.length) {\n    if (lines[i].startsWith('<<<<<<<')) {\n      const start = i;\n      const currentLines = [];\n      const incomingLines = [];\n      i++;\n      while (i < lines.length && !lines[i].startsWith('=======')) {\n        currentLines.push(lines[i]);\n        i++;\n      }\n      i++;\n      while (i < lines.length && !lines[i].startsWith('>>>>>>>')) {\n        incomingLines.push(lines[i]);\n        i++;\n      }\n      conflicts.push({\n        current: currentLines.join('\\n'),\n        incoming: incomingLines.join('\\n'),\n        lineStart: start\n      });\n    }\n    i++;\n  }\n  return conflicts;\n}\n\nfunction resolveConflicts(text, strategy) {\n  const lines = text.split('\\n');\n  const result = [];\n  let mode = 'normal';\n\n  for (const line of lines) {\n    if (line.startsWith('<<<<<<<')) {\n      mode = 'current';\n    } else if (line.startsWith('=======') && mode === 'current') {\n      mode = 'incoming';\n    } else if (line.startsWith('>>>>>>>') && mode === 'incoming') {\n      mode = 'normal';\n    } else if (mode === 'normal') {\n      result.push(line);\n    } else if (mode === 'current' && (strategy === 'current' || strategy === 'both')) {\n      result.push(line);\n    } else if (mode === 'incoming' && (strategy === 'incoming' || strategy === 'both')) {\n      result.push(line);\n    }\n  }\n  return result.join('\\n');\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Git merge conflict'lerinin iç yapısını ve state machine ile metin parsing tekniğini öğrenirsin. Gerçek dünyada merge conflict çözümü en sık karşılaşılan Git becerisidir."
+}

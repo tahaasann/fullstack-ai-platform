@@ -1,0 +1,120 @@
+{
+  "title": "Schema Normalizer",
+  "description": "Denormalize veriyi normalize edilmiş forma (3NF) dönüştür",
+  "description_detail": "# Schema Normalizer\n\nDenormalize edilmiş düz veriyi, veritabanı normalizasyon kurallarına göre normalize edin.\n\n## İstenilen Fonksiyon: `normalize(data, entityName)`\n\nDenormalize flat data'yı normalized entities'e ayırır.\n\n## Örnek\nGiriş (denormalize):\n```javascript\n[\n  { orderId: 1, product: 'Laptop', category: 'Electronics', customerName: 'Ali', customerEmail: 'ali@test.com' },\n  { orderId: 2, product: 'Phone', category: 'Electronics', customerName: 'Ali', customerEmail: 'ali@test.com' },\n  { orderId: 3, product: 'Book', category: 'Education', customerName: 'Veli', customerEmail: 'veli@test.com' }\n]\n```\n\nÇıkış (normalize):\n```javascript\n{\n  customers: [\n    { id: 1, name: 'Ali', email: 'ali@test.com' },\n    { id: 2, name: 'Veli', email: 'veli@test.com' }\n  ],\n  categories: [\n    { id: 1, name: 'Electronics' },\n    { id: 2, name: 'Education' }\n  ],\n  orders: [\n    { id: 1, product: 'Laptop', categoryId: 1, customerId: 1 },\n    { id: 2, product: 'Phone', categoryId: 1, customerId: 1 },\n    { id: 3, product: 'Book', categoryId: 2, customerId: 2 }\n  ]\n}\n```",
+  "difficulty": "zor",
+  "category": "database",
+  "tags": ["normalization", "database", "3nf", "data-modeling"],
+  "examples": [
+    {
+      "input": "[{id:1, color:'red', colorHex:'#f00'}, {id:2, color:'red', colorHex:'#f00'}, {id:3, color:'blue', colorHex:'#00f'}]",
+      "output": "colors: [{id:1, name:'red', hex:'#f00'}, {id:2, name:'blue', hex:'#00f'}], items: [{id:1, colorId:1}, {id:2, colorId:1}, {id:3, colorId:2}]",
+      "explanation": "Tekrarlanan color verisi ayrı tabloya çıkarıldı"
+    }
+  ],
+  "constraints": [
+    "Tekrarlanan veri grupları ayrı entity'lere çıkarılmalı",
+    "Foreign key referansları oluşturulmalı",
+    "ID'ler 1'den başlayan auto-increment olmalı",
+    "Aynı değer setine sahip kayıtlar tek entity olmalı"
+  ],
+  "starter_code": {
+    "python": "def normalize(data: list, config: dict) -> dict:\n    # config: { 'extract': { 'customers': ['customerName', 'customerEmail'], 'categories': ['category'] } }\n    # Your code here\n    pass",
+    "javascript": "function normalize(data, config) {\n  // config: { extract: { customers: ['customerName', 'customerEmail'], categories: ['category'] } }\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {
+        "data": [{"id": 1, "color": "red"}, {"id": 2, "color": "red"}, {"id": 3, "color": "blue"}],
+        "config": {"extract": {"colors": ["color"]}}
+      },
+      "expected_output": {
+        "colors": [{"id": 1, "color": "red"}, {"id": 2, "color": "blue"}],
+        "items": [{"id": 1, "colorId": 1}, {"id": 2, "colorId": 1}, {"id": 3, "colorId": 2}]
+      }
+    },
+    {
+      "input": {
+        "data": [{"id": 1, "name": "A", "cat": "X"}, {"id": 2, "name": "B", "cat": "X"}, {"id": 3, "name": "C", "cat": "Y"}],
+        "config": {"extract": {"categories": ["cat"]}}
+      },
+      "expected_output": {
+        "categories": [{"id": 1, "cat": "X"}, {"id": 2, "cat": "Y"}],
+        "items": [{"id": 1, "name": "A", "categoryId": 1}, {"id": 2, "name": "B", "categoryId": 1}, {"id": 3, "name": "C", "categoryId": 2}]
+      }
+    },
+    {
+      "input": {
+        "data": [{"id": 1, "val": "a"}],
+        "config": {"extract": {}}
+      },
+      "expected_output": {
+        "items": [{"id": 1, "val": "a"}]
+      }
+    },
+    {
+      "input": {
+        "data": [],
+        "config": {"extract": {"tags": ["tag"]}}
+      },
+      "expected_output": {"tags": [], "items": []}
+    },
+    {
+      "input": {
+        "data": [{"id": 1, "a": "x", "b": "p"}, {"id": 2, "a": "y", "b": "q"}, {"id": 3, "a": "x", "b": "p"}],
+        "config": {"extract": {"groups": ["a", "b"]}}
+      },
+      "expected_output": {
+        "groups": [{"id": 1, "a": "x", "b": "p"}, {"id": 2, "a": "y", "b": "q"}],
+        "items": [{"id": 1, "groupId": 1}, {"id": 2, "groupId": 2}, {"id": 3, "groupId": 1}]
+      }
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {
+        "data": [{"id": 1, "x": "a", "y": "1"}, {"id": 2, "x": "a", "y": "2"}, {"id": 3, "x": "b", "y": "1"}],
+        "config": {"extract": {"xs": ["x"], "ys": ["y"]}}
+      },
+      "expected_output": {
+        "xs": [{"id": 1, "x": "a"}, {"id": 2, "x": "b"}],
+        "ys": [{"id": 1, "y": "1"}, {"id": 2, "y": "2"}],
+        "items": [{"id": 1, "xId": 1, "yId": 1}, {"id": 2, "xId": 1, "yId": 2}, {"id": 3, "xId": 2, "yId": 1}]
+      }
+    },
+    {
+      "input": {
+        "data": [{"id": 1, "tag": "js"}, {"id": 2, "tag": "py"}, {"id": 3, "tag": "js"}, {"id": 4, "tag": "go"}, {"id": 5, "tag": "py"}],
+        "config": {"extract": {"tags": ["tag"]}}
+      },
+      "expected_output": {
+        "tags": [{"id": 1, "tag": "js"}, {"id": 2, "tag": "py"}, {"id": 3, "tag": "go"}],
+        "items": [{"id": 1, "tagId": 1}, {"id": 2, "tagId": 2}, {"id": 3, "tagId": 1}, {"id": 4, "tagId": 3}, {"id": 5, "tagId": 2}]
+      }
+    },
+    {
+      "input": {
+        "data": [{"id": 1, "single": "only"}],
+        "config": {"extract": {"singles": ["single"]}}
+      },
+      "expected_output": {
+        "singles": [{"id": 1, "single": "only"}],
+        "items": [{"id": 1, "singleId": 1}]
+      }
+    }
+  ],
+  "hints": [
+    "Her extract grubu için: benzersiz değer kombinasyonlarını bul ve ID ata (Map/dict ile)",
+    "Foreign key adı: entity adının tekili + 'Id' (örn: categories -> categoryId)",
+    "Ana kayıttan çıkarılan alanları kaldırıp yerine foreign key ekle"
+  ],
+  "solution": {
+    "python": "def normalize(data: list, config: dict) -> dict:\n    extract = config.get('extract', {})\n    result = {}\n    \n    entity_maps = {}\n    for entity_name, fields in extract.items():\n        entity_maps[entity_name] = {}\n        result[entity_name] = []\n    \n    items = []\n    \n    for row in data:\n        item = dict(row)\n        \n        for entity_name, fields in extract.items():\n            values = tuple(row.get(f) for f in fields)\n            \n            if values not in entity_maps[entity_name]:\n                entity_id = len(entity_maps[entity_name]) + 1\n                entity_maps[entity_name][values] = entity_id\n                entity_record = {'id': entity_id}\n                for f in fields:\n                    entity_record[f] = row.get(f)\n                result[entity_name].append(entity_record)\n            \n            fk_name = entity_name.rstrip('s') + 'Id'\n            if entity_name.endswith('ies'):\n                fk_name = entity_name[:-3] + 'yId'\n            elif entity_name.endswith('ses'):\n                fk_name = entity_name[:-2] + 'Id'\n            elif entity_name.endswith('s'):\n                fk_name = entity_name[:-1] + 'Id'\n            \n            item[fk_name] = entity_maps[entity_name][values]\n            for f in fields:\n                item.pop(f, None)\n        \n        items.append(item)\n    \n    result['items'] = items\n    return result",
+    "javascript": "function normalize(data, config) {\n  const extract = config.extract || {};\n  const result = {};\n  const entityMaps = {};\n\n  for (const entityName of Object.keys(extract)) {\n    entityMaps[entityName] = new Map();\n    result[entityName] = [];\n  }\n\n  const items = [];\n\n  for (const row of data) {\n    const item = { ...row };\n\n    for (const [entityName, fields] of Object.entries(extract)) {\n      const key = fields.map(f => row[f]).join('||');\n\n      if (!entityMaps[entityName].has(key)) {\n        const id = entityMaps[entityName].size + 1;\n        entityMaps[entityName].set(key, id);\n        const record = { id };\n        for (const f of fields) record[f] = row[f];\n        result[entityName].push(record);\n      }\n\n      let fkName;\n      if (entityName.endsWith('ies')) fkName = entityName.slice(0, -3) + 'yId';\n      else if (entityName.endsWith('s')) fkName = entityName.slice(0, -1) + 'Id';\n      else fkName = entityName + 'Id';\n\n      item[fkName] = entityMaps[entityName].get(key);\n      for (const f of fields) delete item[f];\n    }\n\n    items.push(item);\n  }\n\n  result.items = items;\n  return result;\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n * m)",
+    "optimal_space": "O(n * m)"
+  },
+  "learn_after_solving": "Veritabanı normalizasyonunu (1NF, 2NF, 3NF), data redundancy elimination'ı ve entity-relationship modellemeyi öğrenirsin. Bu bilgi veritabanı tasarımı ve ORM schema tanımlamada kritiktir."
+}

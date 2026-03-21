@@ -1,0 +1,80 @@
+{
+  "title": "State Machine Reducer",
+  "description": "Finite state machine mantığını useReducer pattern'i ile implement et",
+  "description_detail": "# State Machine Reducer\n\nBir finite state machine (FSM) implement edin. State machine belirli state'ler arasında tanımlı transition'lar ile geçiş yapar.\n\n## İstenilen Fonksiyon: `createStateMachine(config)`\n\nConfig formatı:\n```javascript\n{\n  initial: 'idle',\n  states: {\n    idle: {\n      on: {\n        FETCH: 'loading'\n      }\n    },\n    loading: {\n      on: {\n        SUCCESS: 'success',\n        ERROR: 'error'\n      }\n    },\n    success: {\n      on: {\n        RESET: 'idle'\n      }\n    },\n    error: {\n      on: {\n        RETRY: 'loading',\n        RESET: 'idle'\n      }\n    }\n  }\n}\n```\n\n## Döndürülecek Obje\n```\n{\n  currentState: string,\n  send(event): string,        // Yeni state döndürür\n  canSend(event): boolean,    // Bu event gönderilebilir mi\n  getAvailableEvents(): string[]  // Mevcut state'teki eventler\n}\n```",
+  "difficulty": "orta",
+  "category": "react",
+  "tags": ["state-machine", "reducer", "design-pattern", "react"],
+  "examples": [
+    {
+      "input": "machine at 'idle', send('FETCH')",
+      "output": "currentState = 'loading'",
+      "explanation": "idle state'inden FETCH event'i ile loading'e geçiş"
+    },
+    {
+      "input": "machine at 'idle', send('SUCCESS')",
+      "output": "currentState = 'idle' (değişmez)",
+      "explanation": "idle state'inde SUCCESS tanımlı değil, state değişmez"
+    }
+  ],
+  "constraints": [
+    "Tanımsız event gönderildiğinde state değişmemeli",
+    "Tanımsız state'e geçiş yapılmamalı",
+    "send() yeni state'i döndürmeli ve internal state'i güncellemeli",
+    "Immutable config: config objesi değiştirilmemeli"
+  ],
+  "starter_code": {
+    "python": "def create_state_machine(config: dict):\n    # Your code here\n    pass",
+    "javascript": "function createStateMachine(config) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"config": {"initial": "idle", "states": {"idle": {"on": {"FETCH": "loading"}}, "loading": {"on": {"SUCCESS": "done"}}, "done": {"on": {"RESET": "idle"}}}}, "events": ["FETCH"]},
+      "expected_output": "loading"
+    },
+    {
+      "input": {"config": {"initial": "idle", "states": {"idle": {"on": {"FETCH": "loading"}}, "loading": {"on": {"SUCCESS": "done"}}, "done": {"on": {"RESET": "idle"}}}}, "events": ["FETCH", "SUCCESS"]},
+      "expected_output": "done"
+    },
+    {
+      "input": {"config": {"initial": "idle", "states": {"idle": {"on": {"FETCH": "loading"}}, "loading": {"on": {"SUCCESS": "done"}}, "done": {"on": {"RESET": "idle"}}}}, "events": ["FETCH", "SUCCESS", "RESET"]},
+      "expected_output": "idle"
+    },
+    {
+      "input": {"config": {"initial": "idle", "states": {"idle": {"on": {"FETCH": "loading"}}, "loading": {"on": {"SUCCESS": "done"}}, "done": {"on": {"RESET": "idle"}}}}, "events": ["INVALID"]},
+      "expected_output": "idle"
+    },
+    {
+      "input": {"config": {"initial": "off", "states": {"off": {"on": {"TOGGLE": "on"}}, "on": {"on": {"TOGGLE": "off"}}}}, "events": ["TOGGLE", "TOGGLE", "TOGGLE"]},
+      "expected_output": "on"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"config": {"initial": "a", "states": {"a": {"on": {"GO": "b"}}, "b": {"on": {"GO": "c"}}, "c": {"on": {"GO": "a"}}}}, "events": ["GO", "GO", "GO"]},
+      "expected_output": "a"
+    },
+    {
+      "input": {"fn": "canSend", "config": {"initial": "idle", "states": {"idle": {"on": {"FETCH": "loading"}}, "loading": {"on": {"DONE": "idle"}}}}, "event": "FETCH"},
+      "expected_output": true
+    },
+    {
+      "input": {"fn": "availableEvents", "config": {"initial": "idle", "states": {"idle": {"on": {"FETCH": "loading", "SKIP": "done"}}, "loading": {"on": {}}, "done": {"on": {}}}}},
+      "expected_output": ["FETCH", "SKIP"]
+    }
+  ],
+  "hints": [
+    "currentState bir closure değişkeni olarak tutulabilir. send() bu değişkeni günceller",
+    "send(event): config.states[currentState].on[event] varsa geçiş yap, yoksa mevcut state'i koru",
+    "canSend(event): mevcut state'in on objesinde event key'i var mı kontrol et"
+  ],
+  "solution": {
+    "python": "def create_state_machine(config: dict):\n    state = {'current': config['initial']}\n    \n    def send(event):\n        current = state['current']\n        transitions = config['states'].get(current, {}).get('on', {})\n        if event in transitions:\n            next_state = transitions[event]\n            if next_state in config['states']:\n                state['current'] = next_state\n        return state['current']\n    \n    def can_send(event):\n        transitions = config['states'].get(state['current'], {}).get('on', {})\n        return event in transitions\n    \n    def get_available_events():\n        transitions = config['states'].get(state['current'], {}).get('on', {})\n        return list(transitions.keys())\n    \n    def get_current():\n        return state['current']\n    \n    return {\n        'get_current_state': get_current,\n        'send': send,\n        'can_send': can_send,\n        'get_available_events': get_available_events\n    }",
+    "javascript": "function createStateMachine(config) {\n  let currentState = config.initial;\n\n  return {\n    get currentState() {\n      return currentState;\n    },\n    send(event) {\n      const transitions = config.states[currentState]?.on || {};\n      const nextState = transitions[event];\n      if (nextState && config.states[nextState]) {\n        currentState = nextState;\n      }\n      return currentState;\n    },\n    canSend(event) {\n      const transitions = config.states[currentState]?.on || {};\n      return event in transitions;\n    },\n    getAvailableEvents() {\n      return Object.keys(config.states[currentState]?.on || {});\n    }\n  };\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(1) per operation",
+    "optimal_space": "O(1)"
+  },
+  "learn_after_solving": "Finite state machine pattern'ini, predictable state management'ı ve reducer mantığını öğrenirsin. XState kütüphanesi bu pattern'in production versiyonudur ve karmaşık UI state yönetiminde standart haline gelmiştir."
+}

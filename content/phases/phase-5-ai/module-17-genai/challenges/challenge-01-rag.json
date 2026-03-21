@@ -1,0 +1,179 @@
+{
+  "id": "mod-17-genai/challenge-01",
+  "title": "RAG Pipeline Challenge: Knowledge Base Sistemi",
+  "difficulty": "advanced",
+  "estimated_minutes": 90,
+  "tags": ["rag", "embeddings", "vector-database", "langchain", "openai", "python"],
+  "prerequisites": ["mod-17-genai/lesson-01", "mod-17-genai/lesson-02"],
+  "description": "Sıfırdan bir RAG (Retrieval-Augmented Generation) pipeline oluştur: doküman yükleme, chunking, embedding, vector store, retrieval ve LLM ile cevap üretme. Production-grade bir knowledge base sistemi kur.",
+  "learning_objectives": [
+    "Document loading ve preprocessing pipeline oluşturma",
+    "Farklı chunking stratejilerini uygulama ve karşılaştırma",
+    "OpenAI embeddings ile text'i vektöre dönüştürme",
+    "Chroma vector database ile CRUD operasyonları",
+    "Semantic search ile ilgili dokümanları getirme",
+    "LLM ile kaynaklı cevap üretme",
+    "RAG kalitesini evaluation metric'leri ile ölçme"
+  ],
+  "setup": {
+    "requirements": [
+      "uv add openai langchain langchain-openai langchain-community chromadb tiktoken pydantic fastapi uvicorn  # 📌 2026 standardı (legacy: pip install ...)"
+    ],
+    "environment_variables": [
+      "OPENAI_API_KEY=sk-your-key-here"
+    ],
+    "initial_files": {
+      "docs/python_basics.md": "# Python Basics\n\n## Variables\nPython'da değişken tanımlamak için tip belirtmeye gerek yoktur.\n\n```python\nname = \"Ali\"\nage = 25\nis_student = True\n```\n\n## Data Types\nPython'da temel veri tipleri: int, float, str, bool, list, tuple, dict, set.\n\n## Functions\nFonksiyonlar `def` keyword'ü ile tanımlanır.\n\n```python\ndef greet(name):\n    return f\"Merhaba {name}\"\n```\n\n## Error Handling\nHata yakalama try/except bloğu ile yapılır.\n\n```python\ntry:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    print(\"Sıfıra bölme hatası\")\n```",
+      "docs/fastapi_guide.md": "# FastAPI Guide\n\n## Introduction\nFastAPI, Python için modern ve hızlı bir web framework'üdür.\n\n## Installation\n```bash\nuv add fastapi uvicorn\n```\n\n## Basic App\n```python\nfrom fastapi import FastAPI\napp = FastAPI()\n\n@app.get(\"/\")\ndef read_root():\n    return {\"message\": \"Hello World\"}\n```\n\n## Path Parameters\n```python\n@app.get(\"/users/{user_id}\")\ndef get_user(user_id: int):\n    return {\"user_id\": user_id}\n```\n\n## Request Body\nPydantic modelleri ile request validation yapılır.\n\n## Dependency Injection\nFastAPI güçlü bir dependency injection sistemi sunar.",
+      "docs/docker_intro.md": "# Docker Introduction\n\n## What is Docker?\nDocker, uygulamaları container'lar içinde çalıştıran bir platformdur.\n\n## Dockerfile\n```dockerfile\nFROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install uv && uv pip install --system -r requirements.txt\nCOPY . .\nCMD [\"python\", \"app.py\"]\n```\n\n## Docker Commands\n- `docker build -t myapp .` — Image oluştur\n- `docker run -p 8000:8000 myapp` — Container çalıştır\n- `docker ps` — Çalışan container'ları listele\n\n## Docker Compose\nBirden fazla container'ı birlikte yönetmek için docker-compose kullanılır."
+    }
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Document Loader",
+      "description": "docs/ klasöründeki tüm Markdown dosyalarını okuyan bir DocumentLoader class'ı oluştur.",
+      "requirements": [
+        "Markdown dosyalarını recursive olarak bul ve oku",
+        "Her doküman için metadata ekle: filename, file_path, char_count, word_count",
+        "Dosya okuma hatalarını graceful handle et",
+        "load() methodu Document listesi döndürsün"
+      ],
+      "hints": [
+        "pathlib.Path.glob('**/*.md') ile dosyaları bulabilirsin",
+        "langchain_core.documents.Document class'ını kullan"
+      ],
+      "expected_output": "3 doküman yüklendi, toplam ~2000 karakter"
+    },
+    {
+      "id": "task-2",
+      "title": "Smart Chunker",
+      "description": "Dokümanları akıllı şekilde chunk'layan bir SmartChunker class'ı oluştur.",
+      "requirements": [
+        "RecursiveCharacterTextSplitter kullan",
+        "chunk_size=500, chunk_overlap=50 başlangıç değerleri",
+        "Her chunk'a parent document metadata'sını ekle",
+        "Chunk index bilgisini metadata'ya ekle (chunk 1/5, 2/5, ...)",
+        "Çok kısa chunk'ları (<50 karakter) filtrele"
+      ],
+      "hints": [
+        "text_splitter.split_documents() kullanabilirsin",
+        "Metadata'yı doc.metadata dict'ine ekle"
+      ],
+      "expected_output": "3 doküman → ~15-20 chunk"
+    },
+    {
+      "id": "task-3",
+      "title": "Vector Store Manager",
+      "description": "Chroma vector database'i yöneten bir VectorStoreManager class'ı oluştur.",
+      "requirements": [
+        "OpenAI text-embedding-3-small modelini kullan",
+        "PersistentClient ile kalıcı storage",
+        "add_documents() — chunk'ları embed edip kaydet",
+        "search() — semantic search yap, top-k sonuç döndür",
+        "search_with_filter() — metadata filtreli search",
+        "delete_by_source() — belirli bir kaynağın dokümanlarını sil",
+        "get_stats() — toplam doküman sayısı ve collection bilgisi"
+      ],
+      "hints": [
+        "Chroma.from_documents() ile başlayabilirsin",
+        "Her dokümanın unique ID'si olmalı (hash kullan)"
+      ],
+      "expected_output": "Vector store'da ~15-20 chunk, semantic search çalışıyor"
+    },
+    {
+      "id": "task-4",
+      "title": "RAG Query Engine",
+      "description": "Retrieve + Generate pipeline'ını birleştiren bir RAGEngine class'ı oluştur.",
+      "requirements": [
+        "query() method'u: soru al → retrieve → generate → kaynaklı cevap döndür",
+        "System prompt'ta: sadece kaynaklardan cevapla, kaynak numarası göster",
+        "Temperature=0 kullan (deterministic cevaplar)",
+        "Her query'de token kullanımını ve maliyeti hesapla",
+        "Kaynaklarda bilgi yoksa 'Bu konuda bilgim yok' de",
+        "Response format: {answer, sources, tokens_used, cost, latency_ms}"
+      ],
+      "hints": [
+        "Context'i numbered list olarak format'la: [1] ..., [2] ...",
+        "time.time() ile latency ölç"
+      ],
+      "expected_output": "Sorulara kaynaklı ve doğru cevaplar"
+    },
+    {
+      "id": "task-5",
+      "title": "FastAPI Endpoint'leri",
+      "description": "RAG sistemini API olarak expose eden FastAPI uygulaması oluştur.",
+      "requirements": [
+        "POST /api/ingest — Markdown text ve metadata alıp index'le",
+        "POST /api/query — Soru al, RAG cevabı döndür",
+        "GET /api/stats — Sistem istatistikleri",
+        "DELETE /api/documents/{source} — Belirli kaynak dokümanlarını sil",
+        "Request/Response modelleri Pydantic ile tanımla",
+        "Error handling ve input validation"
+      ],
+      "hints": [
+        "Pydantic BaseModel ile request/response schema tanımla",
+        "HTTPException ile hata döndür"
+      ],
+      "expected_output": "API endpoint'leri çalışır durumda"
+    },
+    {
+      "id": "task-6",
+      "title": "Evaluation & Testing",
+      "description": "RAG pipeline'ının kalitesini test et ve ölçümle.",
+      "requirements": [
+        "5 test sorusu hazırla (cevabı bilinen)",
+        "Her soru için: doğru cevap, beklenen kaynaklar",
+        "Faithfulness kontrolü: cevap kaynakla tutarlı mı?",
+        "Relevancy kontrolü: getirilen dokümanlar ilgili mi?",
+        "Edge case: kaynakta olmayan soru sorulduğunda doğru davranıyor mu?",
+        "Sonuçları tablo formatında yazdır"
+      ],
+      "hints": [
+        "Test soruları: Python değişkenleri, FastAPI kurulumu, Docker Dockerfile, vs.",
+        "LLM ile otomatik evaluation yapabilirsin (LLM-as-judge)"
+      ],
+      "expected_output": "5/5 test sorusunda doğru davranış, evaluation raporu"
+    }
+  ],
+  "bonus_tasks": [
+    {
+      "id": "bonus-1",
+      "title": "Hybrid Search",
+      "description": "BM25 (keyword) + semantic search birleştir. EnsembleRetriever kullan."
+    },
+    {
+      "id": "bonus-2",
+      "title": "Query Rewriting",
+      "description": "Kullanıcının sorusunu LLM ile daha iyi hale getir (query transformation)."
+    },
+    {
+      "id": "bonus-3",
+      "title": "Streaming Response",
+      "description": "FastAPI'da streaming response ekle (SSE — Server-Sent Events)."
+    },
+    {
+      "id": "bonus-4",
+      "title": "Cost Dashboard",
+      "description": "Toplam token kullanımı, maliyet ve query istatistiklerini gösteren bir /dashboard endpoint'i ekle."
+    }
+  ],
+  "evaluation_criteria": {
+    "functionality": {
+      "weight": 40,
+      "description": "Tüm task'lar çalışıyor mu? RAG pipeline end-to-end doğru cevap veriyor mu?"
+    },
+    "code_quality": {
+      "weight": 25,
+      "description": "Clean code, type hints, error handling, modüler yapı"
+    },
+    "rag_quality": {
+      "weight": 20,
+      "description": "Retrieval kalitesi, cevap doğruluğu, kaynak tutarlılığı"
+    },
+    "production_readiness": {
+      "weight": 15,
+      "description": "Logging, error handling, cost tracking, input validation"
+    }
+  }
+}

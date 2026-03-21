@@ -1,0 +1,138 @@
+{
+  "id": "mod-06-css/quiz-01",
+  "title": "HTML5 & CSS3 Quiz",
+  "description": "Semantic HTML, erişilebilirlik, Flexbox, CSS Grid, Tailwind CSS ve responsive design konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Bir HTML sayfasında kaç tane <main> elemanı bulunmalıdır?",
+      "options": [
+        "Sınırsız sayıda olabilir",
+        "Yalnızca 1 tane",
+        "Her section için 1 tane",
+        "En az 2 tane (mobil ve desktop için)"
+      ],
+      "correct": 1,
+      "explanation": "Bir HTML sayfasında yalnızca 1 tane <main> elemanı olmalıdır. Bu eleman sayfanın birincil içeriğini tanımlar. Ekran okuyucular <main> elemanını kullanarak kullanıcıyı doğrudan ana içeriğe yönlendirir. Birden fazla <main> kullanmak hem HTML spesifikasyonuna aykırıdır hem de erişilebilirliği bozar.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "aria-hidden='true' attribute'u ne işe yarar?",
+      "options": [
+        "Elemanı CSS ile görünmez yapar (display: none)",
+        "Elemanı ekran okuyuculardan gizler ama görsel olarak görünür kalır",
+        "Elemanı DOM'dan tamamen kaldırır",
+        "Elemanı sadece mobil cihazlarda gizler"
+      ],
+      "correct": 1,
+      "explanation": "aria-hidden='true' elemanı ekran okuyuculardan gizler ancak görsel olarak sayfada görünür kalır. Dekoratif ikonlar, emoji'ler veya ekran okuyucunun okumasının gereksiz olduğu görsel elemanlar için kullanılır. display: none hem görsel hem erişilebilirlik açısından gizlerken, aria-hidden sadece yardımcı teknolojiler için gizler.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "flex: 1 kısayolu aşağıdakilerden hangisinin karşılığıdır?",
+      "options": [
+        "flex-grow: 1; flex-shrink: 1; flex-basis: auto;",
+        "flex-grow: 1; flex-shrink: 1; flex-basis: 0%;",
+        "flex-grow: 1; flex-shrink: 0; flex-basis: 100%;",
+        "flex-grow: 0; flex-shrink: 1; flex-basis: 1px;"
+      ],
+      "correct": 1,
+      "explanation": "flex: 1 kısayolu flex-grow: 1, flex-shrink: 1, flex-basis: 0% anlamına gelir. flex-basis: 0% olması önemlidir çünkü tüm elemanların içerik boyutundan bağımsız olarak kalan alanı eşit paylaşmasını sağlar. flex: auto ise flex-basis: auto kullanır ve içerik boyutuna göre dağıtım yapar.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "CSS Grid'de auto-fill ve auto-fit arasındaki temel fark nedir?",
+      "options": [
+        "auto-fill sadece Grid'de, auto-fit sadece Flexbox'ta çalışır",
+        "auto-fill boş sütunlar için yer ayırır, auto-fit boş sütunları daraltarak mevcut elemanları genişletir",
+        "auto-fill daha performanslıdır",
+        "Fark yoktur, ikisi de aynı şeydir"
+      ],
+      "correct": 1,
+      "explanation": "auto-fill, yeterli eleman olmasa bile boş sütunlar için grid track'ler oluşturur ve yer ayırır. auto-fit ise boş track'leri 0 genişliğe daraltır ve mevcut elemanların genişlemesine izin verir. Genellikle auto-fit tercih edilir çünkü elemanlar mevcut alana yayılır. repeat(auto-fit, minmax(250px, 1fr)) ile responsive grid oluşturulur.",
+      "difficulty": "zor",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Tailwind CSS'te 'md:grid-cols-3' ne anlama gelir?",
+      "options": [
+        "Her zaman 3 sütunlu grid oluşturur",
+        "768px ve üzeri ekranlarda 3 sütunlu grid uygular",
+        "Orta büyüklükteki elemanları 3 sütuna böler",
+        "Dark modda 3 sütunlu grid uygular"
+      ],
+      "correct": 1,
+      "explanation": "md: prefix'i Tailwind'de min-width: 768px media query'sine karşılık gelir. Mobile-first yaklaşımla, 768px ve üzeri ekranlarda grid-template-columns: repeat(3, 1fr) uygulanır. Mobil için varsayılan stil prefix olmadan yazılır (örn. grid-cols-1).",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "type": "code_completion",
+      "question": "Aşağıdaki CSS kodunda, elemanı hem yatay hem dikey olarak ortalamak için boşluğu doldurun:",
+      "code_template": ".center {\n  display: flex;\n  justify-content: center;\n  _____: center;\n  min-height: 100vh;\n}",
+      "correct_answers": ["align-items"],
+      "explanation": "Flexbox ile tam ortalama için justify-content: center (ana eksen - yatay) ve align-items: center (çapraz eksen - dikey) birlikte kullanılır. Bu, en yaygın ortalama tekniğidir ve neredeyse her projede kullanılır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "type": "code_completion",
+      "question": "Tailwind CSS'te bir butona hover durumunda arka plan rengini değiştirmek için boşluğu doldurun:",
+      "code_template": "<button class=\"bg-blue-500 _____:bg-blue-700 text-white px-4 py-2 rounded\">\n  Tıkla\n</button>",
+      "correct_answers": ["hover"],
+      "explanation": "Tailwind CSS'te state variant'ları prefix olarak eklenir. hover: prefix'i :hover pseudo-class'ına karşılık gelir. Benzer şekilde focus:, active:, disabled: gibi prefix'ler de kullanılır. Mobile-first responsive prefix'ler (sm:, md:, lg:) ile state prefix'leri birleştirilebilir: md:hover:bg-blue-700.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "true_false",
+      "question": "CSS animasyonlarında transform ve opacity özellikleri GPU ile hızlandırıldığı için, width ve height gibi özellikleri animate etmekten çok daha performanslıdır.",
+      "correct": true,
+      "explanation": "Doğru! transform ve opacity GPU tarafından compositor thread'inde işlenir ve layout recalculation tetiklemez. Bu yüzden 60fps animasyonlar için idealdir. width, height, margin, padding, top, left gibi özellikler ise layout'u değiştirir, reflow'a neden olur ve ana thread'de işlenir - bu da performans sorunlarına yol açar.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "order_steps",
+      "question": "Mobile-first responsive design yaklaşımında, CSS'i hangi sırayla yazmalısın?",
+      "steps": [
+        "Mobil (taban) stillerini prefix olmadan yaz",
+        "Tablet stiller için @media (min-width: 768px) ekle",
+        "Desktop stillerini @media (min-width: 1024px) ile ekle",
+        "Büyük ekran stillerini @media (min-width: 1440px) ile ekle"
+      ],
+      "correct_order": [0, 1, 2, 3],
+      "explanation": "Mobile-first yaklaşımda önce en küçük ekran (mobil) için taban stiller yazılır, sonra min-width media query'leri ile büyüyen ekranlar için stiller eklenir. Bu yaklaşım daha temiz CSS üretir çünkü mobil stiller genellikle daha basittir (tek sütun, az dekorasyon) ve büyük ekranlar için sadece ekleme yapılır.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q10",
+      "type": "explain_code",
+      "question": "Aşağıdaki CSS Grid kodu ne yapar? Her satırı açıkla.",
+      "code": ".dashboard {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\n  grid-auto-rows: minmax(150px, auto);\n  gap: 24px;\n}\n\n.widget-wide {\n  grid-column: span 2;\n}\n\n.widget-full {\n  grid-column: 1 / -1;\n}",
+      "correct_keywords": ["grid", "auto-fit", "minmax", "responsive", "span", "sütun", "1 / -1", "tüm sütunlar"],
+      "sample_answer": "Bu kod responsive bir dashboard grid layout'u oluşturur. display: grid ile grid container tanımlanır. grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) satırı, her biri en az 300px genişliğinde sütunlar oluşturur ve ekran genişliğine göre otomatik olarak sütun sayısını ayarlar. auto-fit sayesinde boş sütunlar daraltılır ve mevcut widget'lar genişler. grid-auto-rows: minmax(150px, auto) her satırın en az 150px yüksekliğinde olmasını, içerik fazlaysa otomatik büyümesini sağlar. gap: 24px elemanlar arası 24px boşluk bırakır. .widget-wide sınıfı ile bir widget 2 sütun kaplar. .widget-full sınıfı grid-column: 1 / -1 ile ilk çizgiden son çizgiye kadar tüm sütunları kaplar (tam genişlik).",
+      "difficulty": "zor",
+      "points": 15
+    }
+  ]
+}

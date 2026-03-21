@@ -1,0 +1,119 @@
+{
+  "id": "mod-05-terminal/quiz-01",
+  "title": "Terminal, Shell & VS Code Quiz",
+  "description": "Linux komutları, shell scripting, pipe/redirection ve VS Code araçlarını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 10,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "chmod 644 file.txt komutu dosyaya hangi izinleri verir?",
+      "options": [
+        "Owner: okuma, Group: yazma, Others: çalıştırma",
+        "Owner: okuma+yazma, Group: okuma, Others: okuma",
+        "Herkese tam yetki (okuma+yazma+çalıştırma)",
+        "Owner: çalıştırma, Group: okuma+yazma, Others: okuma+yazma"
+      ],
+      "correct": 1,
+      "explanation": "chmod'da r=4, w=2, x=1. 6=4+2=rw (owner: okuma+yazma), 4=r (group: okuma), 4=r (others: okuma). Sonuç: rw-r--r--. Config dosyaları için yaygın bir izin setidir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "cat access.log | grep '404' | wc -l komutu ne yapar?",
+      "options": [
+        "access.log dosyasını siler ve 404 satır oluşturur",
+        "access.log'daki 404 hata kodunu içeren satırların toplam sayısını verir",
+        "404 numaralı satırı gösterir",
+        "access.log'a 404 yazar"
+      ],
+      "correct": 1,
+      "explanation": "Pipe zinciri: cat dosyayı okur → grep '404' yalnızca 404 içeren satırları filtreler → wc -l filtrelenmiş satır sayısını döndürür. Bu, log analizi için klasik bir pattern'dır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "> ve >> redirection operatörleri arasındaki fark nedir?",
+      "options": [
+        "İkisi de aynı işi yapar",
+        "> dosyanın sonuna ekler, >> dosyanın üzerine yazar",
+        "> dosyanın üzerine yazar (mevcut içeriği siler), >> dosyanın sonuna ekler (append)",
+        "> stderr yönlendirir, >> stdout yönlendirir"
+      ],
+      "correct": 2,
+      "explanation": "> operatörü dosyanın mevcut içeriğini silerek yazar (overwrite). >> operatörü ise mevcut içeriğin sonuna ekler (append). Bu farkı bilmemek veri kaybına neden olabilir!",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "VS Code'da bir değişkeni tüm dosyada güvenli şekilde yeniden adlandırmak için hangi shortcut kullanılır?",
+      "options": [
+        "Ctrl+H (Find and Replace)",
+        "Ctrl+D (multi-select)",
+        "F2 (Rename Symbol)",
+        "Ctrl+Shift+L (select all occurrences)"
+      ],
+      "correct": 2,
+      "explanation": "F2 (Rename Symbol), semantic olarak doğru yeniden adlandırma yapar. Sadece aynı sembolün referanslarını değiştirir, aynı isimdeki farklı değişkenleri etkilemez. Ctrl+D ve Ctrl+Shift+L metin bazlı seçim yapar, semantic analiz yapmaz.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Aşağıdaki package manager'lardan hangisi disk alanı kullanımında en verimlidir?",
+      "options": [
+        "npm - çünkü Node.js ile birlikte gelir",
+        "yarn - çünkü parallel download yapar",
+        "pnpm - çünkü hardlink ile tek global store kullanır, paketleri kopyalamaz",
+        "Hepsi aynı disk alanını kullanır"
+      ],
+      "correct": 2,
+      "explanation": "pnpm, paketleri tek bir global store'da tutar ve projelerden hardlink ile bağlar. Aynı paketi 10 projede kullansan bile diskten sadece bir kopyası bulunur. npm ve yarn her projede ayrı kopya oluşturur.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "type": "true_false",
+      "question": "find . -name '*.log' -delete komutu, mevcut dizin ve alt dizinlerdeki tüm .log uzantılı dosyaları siler.",
+      "correct": true,
+      "explanation": "Doğru! find komutu -name ile dosya adı pattern'ı belirler, -delete flag'i eşleşen dosyaları siler. '.' (nokta) mevcut dizini ve tüm alt dizinleri recursive olarak tarar. Bu komutu dikkatli kullanmalısın çünkü silme geri alınamaz.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "type": "code_completion",
+      "question": "Bir bash script'te dosyanın var olup olmadığını kontrol etmek için hangi flag kullanılır? Boşluğu doldurun:",
+      "code_template": "if [ -_____ \"config.json\" ]; then\n    echo \"Config dosyası mevcut\"\nfi",
+      "correct_answers": ["f"],
+      "explanation": "-f flag'i dosyanın var olup olmadığını kontrol eder (regular file). -d dizin kontrolü, -e herhangi bir dosya/dizin kontrolü, -r okunabilirlik kontrolü yapar. Shell scripting'de dosya kontrolleri çok sık kullanılır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "order_steps",
+      "question": "VS Code'da bir Node.js uygulamasını debug etmek için doğru adım sırasını belirle:",
+      "steps": [
+        "launch.json dosyasını oluştur veya düzenle",
+        "Debug etmek istediğin satıra breakpoint koy (F9)",
+        "F5 ile debug oturumunu başlat",
+        "Variables ve Watch panellerinde değişkenleri incele",
+        "F10 (Step Over) veya F11 (Step Into) ile adım adım ilerle"
+      ],
+      "correct_order": [0, 1, 2, 3, 4],
+      "explanation": "Debug akışı: Önce launch.json ile debug konfigürasyonunu ayarla → breakpoint koy → debug başlat → program breakpoint'te durduğunda değişkenleri incele → step over/into ile adım adım ilerle.",
+      "difficulty": "orta",
+      "points": 15
+    }
+  ]
+}

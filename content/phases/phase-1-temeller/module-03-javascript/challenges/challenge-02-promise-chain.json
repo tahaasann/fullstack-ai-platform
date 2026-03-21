@@ -1,0 +1,80 @@
+{
+  "title": "Promise Chain Builder",
+  "description": "Async operasyonları compose eden promise chain builder implementasyonu",
+  "description_detail": "# Promise Chain Builder\n\nBirden fazla async fonksiyonu sıralı veya paralel olarak çalıştırabilen bir chain builder oluşturun.\n\n## İstenilen Fonksiyonlar\n\n### 1. `chainPromises(fns)`\nHer biri bir promise döndüren fonksiyon dizisini sırayla çalıştırır. Her fonksiyon öncekinin sonucunu alır.\n\n### 2. `parallelPromises(fns)`\nTüm fonksiyonları paralel çalıştırır, sonuçları dizi olarak döndürür.\n\n### 3. `retryPromise(fn, retries, delay)`\nBaşarısız olan promise'i belirtilen sayıda tekrar dener.\n\n## Örnek\n```javascript\nconst fns = [\n  () => Promise.resolve(1),\n  (prev) => Promise.resolve(prev + 10),\n  (prev) => Promise.resolve(prev * 2)\n];\nconst result = await chainPromises(fns); // 22\n```",
+  "difficulty": "orta",
+  "category": "javascript",
+  "tags": ["promises", "async", "composition", "javascript"],
+  "examples": [
+    {
+      "input": "chainPromises([() => 1, (x) => x + 10, (x) => x * 2])",
+      "output": "22",
+      "explanation": "1 -> 1+10=11 -> 11*2=22"
+    },
+    {
+      "input": "parallelPromises([() => 'a', () => 'b', () => 'c'])",
+      "output": "['a', 'b', 'c']",
+      "explanation": "Tüm fonksiyonlar paralel çalışır, sonuçlar sıralı döner"
+    }
+  ],
+  "constraints": [
+    "chainPromises sıralı çalışmalı, her fn öncekinin sonucunu parametre alır",
+    "parallelPromises tüm fn'leri aynı anda çalıştırmalı",
+    "retryPromise başarısız olunca delay ms bekleyip tekrar denemeli",
+    "Tüm fonksiyonlar Promise döndürür"
+  ],
+  "starter_code": {
+    "python": "import asyncio\n\nasync def chain_promises(fns):\n    # Your code here\n    pass\n\nasync def parallel_promises(fns):\n    # Your code here\n    pass\n\nasync def retry_promise(fn, retries=3, delay=0.1):\n    # Your code here\n    pass",
+    "javascript": "async function chainPromises(fns) {\n  // Your code here\n}\n\nasync function parallelPromises(fns) {\n  // Your code here\n}\n\nasync function retryPromise(fn, retries = 3, delay = 100) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "chain", "values": [1, 10, 2], "ops": ["init", "add", "multiply"]},
+      "expected_output": 22
+    },
+    {
+      "input": {"fn": "chain", "values": [5], "ops": ["init"]},
+      "expected_output": 5
+    },
+    {
+      "input": {"fn": "parallel", "values": ["a", "b", "c"]},
+      "expected_output": ["a", "b", "c"]
+    },
+    {
+      "input": {"fn": "parallel", "values": [1, 2, 3]},
+      "expected_output": [1, 2, 3]
+    },
+    {
+      "input": {"fn": "retry", "fail_count": 2, "retries": 3, "value": "success"},
+      "expected_output": "success"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "chain", "values": [0, 1, 1, 1], "ops": ["init", "add", "add", "add"]},
+      "expected_output": 3
+    },
+    {
+      "input": {"fn": "retry", "fail_count": 5, "retries": 3, "value": "fail"},
+      "expected_output": "ERROR"
+    },
+    {
+      "input": {"fn": "parallel", "values": []},
+      "expected_output": []
+    }
+  ],
+  "hints": [
+    "chainPromises için reduce kullanarak her promise'i bir öncekinin .then() zincirine ekle",
+    "parallelPromises için Promise.all() kullan",
+    "retryPromise için bir döngü içinde try/catch ile dene, catch'te retry sayısını azalt ve delay kadar bekle"
+  ],
+  "solution": {
+    "python": "import asyncio\n\nasync def chain_promises(fns):\n    result = None\n    for i, fn in enumerate(fns):\n        if i == 0:\n            result = await fn()\n        else:\n            result = await fn(result)\n    return result\n\nasync def parallel_promises(fns):\n    return await asyncio.gather(*[fn() for fn in fns])\n\nasync def retry_promise(fn, retries=3, delay=0.1):\n    for attempt in range(retries):\n        try:\n            return await fn()\n        except Exception:\n            if attempt == retries - 1:\n                raise\n            await asyncio.sleep(delay)",
+    "javascript": "async function chainPromises(fns) {\n  let result;\n  for (let i = 0; i < fns.length; i++) {\n    result = i === 0 ? await fns[i]() : await fns[i](result);\n  }\n  return result;\n}\n\nasync function parallelPromises(fns) {\n  return Promise.all(fns.map(fn => fn()));\n}\n\nasync function retryPromise(fn, retries = 3, delay = 100) {\n  for (let i = 0; i < retries; i++) {\n    try {\n      return await fn();\n    } catch (err) {\n      if (i === retries - 1) throw err;\n      await new Promise(resolve => setTimeout(resolve, delay));\n    }\n  }\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n) for chain, O(max) for parallel",
+    "optimal_space": "O(1)"
+  },
+  "learn_after_solving": "Promise composition, async/await pattern'leri, retry mekanizması ve paralel vs sıralı çalıştırma arasındaki farkı öğrenirsin. Bu pattern'ler API çağrıları, mikroservis iletişimi ve hata toleransı için kritiktir."
+}

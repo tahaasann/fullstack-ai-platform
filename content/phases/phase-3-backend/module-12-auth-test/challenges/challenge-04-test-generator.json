@@ -1,0 +1,75 @@
+{
+  "title": "Test Case Generator",
+  "description": "Fonksiyon imzalarından otomatik test case'leri oluştur",
+  "description_detail": "# Test Case Generator\n\nFonksiyon imzaları ve tipleri verildiğinde, otomatik test case'leri oluşturan bir fonksiyon yazın.\n\n## İstenilen Fonksiyon: `generateTestCases(signature)`\n\nSignature formatı:\n```javascript\n{\n  name: 'add',\n  params: [\n    { name: 'a', type: 'number' },\n    { name: 'b', type: 'number' }\n  ],\n  returns: 'number'\n}\n```\n\n## Üretilecek Test Kategorileri\n1. **Normal cases**: Tipik girişler\n2. **Edge cases**: Sınır değerler (0, boş string, boş array, null)\n3. **Error cases**: Hatalı girişler (yanlış tip)\n4. **Boundary cases**: Min/max değerler\n\n## Her Tip için Örnek Değerler\n- `number`: 0, 1, -1, MAX_SAFE_INTEGER, NaN, Infinity\n- `string`: '', 'a', 'hello world', uzun string\n- `array`: [], [1], [1,2,3], büyük array\n- `boolean`: true, false\n- `object`: {}, null, nested",
+  "difficulty": "zor",
+  "category": "testing",
+  "tags": ["testing", "test-generation", "automation", "tdd"],
+  "examples": [
+    {
+      "input": "{ name: 'add', params: [{name:'a', type:'number'}, {name:'b', type:'number'}], returns: 'number' }",
+      "output": "Normal: add(1, 2), Edge: add(0, 0), Boundary: add(MAX, MIN), Error: add('x', 1)",
+      "explanation": "Her kategori için uygun test değerleri üretildi"
+    }
+  ],
+  "constraints": [
+    "Her kategori için en az 2 test case üretilmeli",
+    "Test case'ler açıklayıcı isimler içermeli",
+    "Edge case'ler tipe göre değişmeli",
+    "Output formatı standart test framework'lerine uygun olmalı"
+  ],
+  "starter_code": {
+    "python": "def generate_test_cases(signature: dict) -> list:\n    # Your code here\n    pass\n\ndef get_edge_values(type_name: str) -> list:\n    # Your code here\n    pass",
+    "javascript": "function generateTestCases(signature) {\n  // Your code here\n}\n\nfunction getEdgeValues(typeName) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"name": "add", "params": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}], "returns": "number"},
+      "expected_output": {"min_count": 6, "has_categories": ["normal", "edge", "error"]}
+    },
+    {
+      "input": {"name": "greet", "params": [{"name": "name", "type": "string"}], "returns": "string"},
+      "expected_output": {"min_count": 6, "has_categories": ["normal", "edge", "error"]}
+    },
+    {
+      "input": {"name": "isEmpty", "params": [{"name": "arr", "type": "array"}], "returns": "boolean"},
+      "expected_output": {"min_count": 4, "has_categories": ["normal", "edge"]}
+    },
+    {
+      "input": {"fn": "edge_values", "type": "number"},
+      "expected_output": [0, 1, -1]
+    },
+    {
+      "input": {"fn": "edge_values", "type": "string"},
+      "expected_output": ["", "a"]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "edge_values", "type": "array"},
+      "expected_output": [[], [1]]
+    },
+    {
+      "input": {"fn": "edge_values", "type": "boolean"},
+      "expected_output": [true, false]
+    },
+    {
+      "input": {"name": "noop", "params": [], "returns": "void"},
+      "expected_output": {"min_count": 1, "has_categories": ["normal"]}
+    }
+  ],
+  "hints": [
+    "Her parametre tipi için tipik, sınır ve hatalı değer setleri tanımla",
+    "Parametrelerin kartezyen çarpımı ile kombinasyonlar oluştur (ama çok büyümemesi için sınırla)",
+    "Test case adını parametrelerden otomatik oluştur: 'should handle {param} as {value}'"
+  ],
+  "solution": {
+    "python": "def get_edge_values(type_name: str) -> list:\n    edge_map = {\n        'number': [0, 1, -1, 999999, -999999],\n        'string': ['', 'a', 'hello world', 'x' * 100],\n        'array': [[], [1], [1, 2, 3], list(range(100))],\n        'boolean': [True, False],\n        'object': [{}, {'key': 'value'}, None],\n    }\n    return edge_map.get(type_name, [None])\n\ndef get_error_values(type_name: str) -> list:\n    error_map = {\n        'number': ['string', None, [], True],\n        'string': [123, None, [], True],\n        'array': ['string', 123, None, {}],\n        'boolean': ['true', 0, None, 'yes'],\n        'object': ['string', 123, True],\n    }\n    return error_map.get(type_name, [None])\n\ndef generate_test_cases(signature: dict) -> list:\n    test_cases = []\n    fn_name = signature['name']\n    params = signature.get('params', [])\n    \n    if not params:\n        test_cases.append({\n            'category': 'normal',\n            'name': f'{fn_name} should execute without arguments',\n            'args': [],\n        })\n        return test_cases\n    \n    # Normal cases\n    normal_values = {'number': [1, 2, 42], 'string': ['hello', 'test'], 'array': [[1,2,3]], 'boolean': [True], 'object': [{'key': 'val'}]}\n    for i, param in enumerate(params):\n        vals = normal_values.get(param['type'], ['test'])\n        for val in vals[:2]:\n            args = []\n            for j, p in enumerate(params):\n                if j == i:\n                    args.append(val)\n                else:\n                    defaults = {'number': 1, 'string': 'test', 'array': [1], 'boolean': True, 'object': {}}\n                    args.append(defaults.get(p['type'], None))\n            test_cases.append({\n                'category': 'normal',\n                'name': f'{fn_name} with {param[\"name\"]}={repr(val)}',\n                'args': args,\n            })\n    \n    # Edge cases\n    for i, param in enumerate(params):\n        for val in get_edge_values(param['type'])[:3]:\n            args = []\n            for j, p in enumerate(params):\n                if j == i:\n                    args.append(val)\n                else:\n                    defaults = {'number': 1, 'string': 'test', 'array': [1], 'boolean': True, 'object': {}}\n                    args.append(defaults.get(p['type'], None))\n            test_cases.append({\n                'category': 'edge',\n                'name': f'{fn_name} edge case: {param[\"name\"]}={repr(val)}',\n                'args': args,\n            })\n    \n    # Error cases\n    for i, param in enumerate(params):\n        for val in get_error_values(param['type'])[:2]:\n            args = []\n            for j, p in enumerate(params):\n                if j == i:\n                    args.append(val)\n                else:\n                    defaults = {'number': 1, 'string': 'test', 'array': [1], 'boolean': True, 'object': {}}\n                    args.append(defaults.get(p['type'], None))\n            test_cases.append({\n                'category': 'error',\n                'name': f'{fn_name} error case: {param[\"name\"]}={repr(val)} (wrong type)',\n                'args': args,\n            })\n    \n    return test_cases",
+    "javascript": "function getEdgeValues(typeName) {\n  const map = {\n    number: [0, 1, -1, Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER],\n    string: ['', 'a', 'hello world', 'x'.repeat(100)],\n    array: [[], [1], [1,2,3], Array.from({length:100}, (_,i) => i)],\n    boolean: [true, false],\n    object: [{}, {key: 'value'}, null],\n  };\n  return map[typeName] || [null];\n}\n\nfunction getErrorValues(typeName) {\n  const map = {\n    number: ['string', null, [], true],\n    string: [123, null, [], true],\n    array: ['string', 123, null, {}],\n    boolean: ['true', 0, null],\n    object: ['string', 123, true],\n  };\n  return map[typeName] || [null];\n}\n\nfunction generateTestCases(signature) {\n  const { name: fnName, params = [] } = signature;\n  const testCases = [];\n  const defaults = { number: 1, string: 'test', array: [1], boolean: true, object: {} };\n\n  if (!params.length) {\n    return [{ category: 'normal', name: `${fnName} should execute without arguments`, args: [] }];\n  }\n\n  const normals = { number: [1,2,42], string: ['hello','test'], array: [[1,2,3]], boolean: [true], object: [{key:'val'}] };\n\n  for (let i = 0; i < params.length; i++) {\n    const vals = (normals[params[i].type] || ['test']).slice(0, 2);\n    for (const val of vals) {\n      const args = params.map((p, j) => j === i ? val : defaults[p.type]);\n      testCases.push({ category: 'normal', name: `${fnName} with ${params[i].name}=${JSON.stringify(val)}`, args });\n    }\n  }\n\n  for (let i = 0; i < params.length; i++) {\n    for (const val of getEdgeValues(params[i].type).slice(0, 3)) {\n      const args = params.map((p, j) => j === i ? val : defaults[p.type]);\n      testCases.push({ category: 'edge', name: `${fnName} edge: ${params[i].name}=${JSON.stringify(val)}`, args });\n    }\n  }\n\n  for (let i = 0; i < params.length; i++) {\n    for (const val of getErrorValues(params[i].type).slice(0, 2)) {\n      const args = params.map((p, j) => j === i ? val : defaults[p.type]);\n      testCases.push({ category: 'error', name: `${fnName} error: ${params[i].name}=${JSON.stringify(val)}`, args });\n    }\n  }\n\n  return testCases;\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(p * v) params * values per type",
+    "optimal_space": "O(p * v)"
+  },
+  "learn_after_solving": "Test case tasarım stratejilerini (boundary value analysis, equivalence partitioning, error guessing), property-based testing mantığını ve test otomasyonunu öğrenirsin. İyi test yazabilmek senior developer'ın temel becerisidir."
+}

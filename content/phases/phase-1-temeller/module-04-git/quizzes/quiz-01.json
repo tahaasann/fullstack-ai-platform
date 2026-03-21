@@ -1,0 +1,119 @@
+{
+  "id": "mod-04-git/quiz-01",
+  "title": "Git & GitHub Temelleri Quiz",
+  "description": "Git versiyon kontrol sistemi, branching, merging ve GitHub iş akışı konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 12,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "git add, git commit ve git push komutlarının doğru sırası ve işlevi hangisidir?",
+      "options": [
+        "add: remote'a gönderir, commit: staging'e ekler, push: kayıt oluşturur",
+        "add: staging area'ya ekler, commit: local repo'ya kaydeder, push: remote repo'ya gönderir",
+        "add: commit oluşturur, commit: branch oluşturur, push: merge yapar",
+        "add: dosyayı siler, commit: geri alır, push: yeniden oluşturur"
+      ],
+      "correct": 1,
+      "explanation": "Git iş akışı 3 aşamalıdır: Working Directory → (git add) → Staging Area → (git commit) → Local Repository → (git push) → Remote Repository. Her adım veriyi bir sonraki aşamaya taşır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Aşağıdaki komutlardan hangisi, son commit'i geri almadan değişiklikleri working directory'de tutar?",
+      "options": [
+        "git reset --hard HEAD~1",
+        "git reset --soft HEAD~1",
+        "git revert HEAD",
+        "git checkout HEAD~1"
+      ],
+      "correct": 1,
+      "explanation": "git reset --soft HEAD~1, son commit'i geri alır ama değişiklikleri staging area'da tutar. --hard ise hem commit'i hem değişiklikleri siler. git revert yeni bir commit oluşturarak geri alır. git checkout ise detached HEAD durumuna geçirir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Feature branch'ini main branch'e dahil etmek istiyorsun. git merge ve git rebase arasındaki temel fark nedir?",
+      "options": [
+        "merge sadece local'de çalışır, rebase sadece remote'da çalışır",
+        "merge yeni bir merge commit oluşturur, rebase commit geçmişini yeniden yazarak lineer bir history oluşturur",
+        "merge daha hızlıdır, rebase daha yavaştır",
+        "Aralarında fark yoktur, ikisi de aynı şeyi yapar"
+      ],
+      "correct": 1,
+      "explanation": "git merge iki branch'in tarihçesini birleştirerek yeni bir merge commit oluşturur. git rebase ise commit'leri hedef branch'in üzerine yeniden uygulayarak lineer bir history oluşturur. Rebase daha temiz bir geçmiş sağlar ama paylaşılan branch'lerde dikkatli kullanılmalıdır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Bir merge conflict oluştuğunda Git dosyada hangi işaretleri kullanır?",
+      "options": [
+        "<!-- START --> ve <!-- END -->",
+        "<<<<<<< HEAD, =======, >>>>>>> branch-name",
+        "*** BEGIN CONFLICT *** ve *** END CONFLICT ***",
+        "// CONFLICT_START ve // CONFLICT_END"
+      ],
+      "correct": 1,
+      "explanation": "Git merge conflict'lerde <<<<<<< HEAD (mevcut branch'teki değişiklik), ======= (ayırıcı) ve >>>>>>> branch-name (gelen branch'teki değişiklik) işaretlerini kullanır. Bu işaretleri kaldırıp doğru kodu seçerek conflict'i çözersin.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "GitHub'da bir Pull Request (PR) açmanın temel amacı nedir?",
+      "options": [
+        "Kodu otomatik olarak production'a deploy etmek",
+        "Remote repository'yi silmek ve yeniden oluşturmak",
+        "Kod değişikliklerini gözden geçirmek (code review) ve tartışarak main branch'e dahil etmek",
+        "Local repository'yi remote ile senkronize etmek"
+      ],
+      "correct": 2,
+      "explanation": "Pull Request, bir branch'teki değişiklikleri ana branch'e merge etmeden önce code review yapılmasını sağlar. Takım üyeleri kodu inceler, yorum yapar ve onaylar. Bu, kod kalitesini artırır ve hataları erken yakalar.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "type": "true_false",
+      "question": "git stash komutu, commit etmeye hazır olmadığın değişiklikleri geçici olarak kaydedip working directory'yi temizler.",
+      "correct": true,
+      "explanation": "Doğru! git stash, mevcut değişiklikleri geçici bir alana kaydeder ve working directory'yi son commit durumuna döndürür. Örneğin, acil bir bug fix için branch değiştirmen gerektiğinde stash kullanırsın. git stash pop ile değişiklikleri geri getirebilirsin.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "type": "code_completion",
+      "question": "Yeni bir branch oluşturup o branch'e geçmek için tek komut yaz:",
+      "code_template": "git _____ -b feature/login",
+      "correct_answers": ["checkout", "switch"],
+      "explanation": "git checkout -b branch-name veya git switch -c branch-name, yeni bir branch oluşturup o branch'e geçer. Bu, git branch feature/login && git checkout feature/login komutlarının kısayoludur.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "order_steps",
+      "question": "GitHub'da feature branch ile çalışırken doğru iş akışı sırasını belirle:",
+      "steps": [
+        "main branch'ten yeni bir feature branch oluştur",
+        "Kodda değişiklik yap ve commit'le",
+        "Feature branch'i remote'a push et",
+        "GitHub'da Pull Request aç",
+        "Code review sonrası PR'ı main branch'e merge et"
+      ],
+      "correct_order": [0, 1, 2, 3, 4],
+      "explanation": "GitHub Flow iş akışı: main'den branch oluştur → değişiklikleri commit et → remote'a push et → PR aç → review ve merge. Bu akış, takım çalışmasında standart bir iş akışıdır.",
+      "difficulty": "orta",
+      "points": 15
+    }
+  ]
+}

@@ -1,0 +1,268 @@
+{
+  "id": "cv-templates",
+  "title": "CV ve Resume Sablonlari",
+  "description": "ATS-uyumlu, senior seviye CV sablonlari. Recruiter'larin ve ATS sistemlerinin sevdigi formatta, olculebilir basarilarla dolu CV'ler olustur.",
+  "sections": [
+    {
+      "id": "cv-temel-kurallari",
+      "title": "CV Temel Kurallari",
+      "icon": "📋",
+      "content": "ATS (Applicant Tracking System) CV'ni insanlardan once okuyor. ATS'den gecemeyen CV, hic okunmuyor. Turkiye'deki buyuk sirketlerin %70'i, global sirketlerin %95'i ATS kullaniyor. CV'ni once makineye, sonra insana optimize et.",
+      "tips": [
+        "PDF formatinda gonder — Word dosyalari ATS'de bozulabiliyor",
+        "Tek sutunlu layout kullan — iki sutunlu tasarimlar ATS'yi sasirtiyor",
+        "Tablo, grafik, resim, ikon KULLANMA — ATS bunlari okuyamiyor",
+        "Header/footer'a onemli bilgi koyma — bazi ATS'ler header'i atliyor",
+        "Font: Arial, Calibri, Helvetica — fancy fontlar ATS'de bozuluyor",
+        "Font boyutu: basliklar 12-14pt, icerik 10-11pt",
+        "Sayfa sayisi: 1 sayfa (0-3 yil deneyim), 2 sayfa (3+ yil deneyim)",
+        "Dosya adi: 'Ad_Soyad_Full_Stack_Developer_CV.pdf' — generic 'CV.pdf' degil",
+        "Her is ilani icin CV'yi customize et — ayni CV'yi heryere gonderme",
+        "Is ilanindaki keyword'leri CV'ne aynen yaz — ATS exact match ariyor",
+        "Tarih formati tutarli olsun: 'Ocak 2023 - Devam Ediyor' veya 'Jan 2023 - Present'",
+        "Yazim hatasi = aninda red. Grammarly veya LanguageTool ile kontrol et"
+      ],
+      "examples": [
+        "YANLIS: 'Responsive web siteleri yaptim' — ATS keyword yakalayamaz",
+        "DOGRU: 'React, TypeScript ve Tailwind CSS ile responsive web uygulamalari gelistirdim' — 3 keyword yakalandi",
+        "YANLIS: Canva ile tasarlanmis renkli, iki sutunlu CV",
+        "DOGRU: Sade, tek sutunlu, keyword-yogun, metin tabanli CV",
+        "YANLIS: 'Cok iyi JavaScript biliyorum' — olculemez, subjektif",
+        "DOGRU: 'JavaScript/TypeScript ile 10+ production-ready proje gelistirdim' — olculebilir"
+      ],
+      "checklist": [
+        "PDF formatinda kaydedildi",
+        "Tek sutunlu layout kullanildi",
+        "Tablo/grafik/resim yok",
+        "Header/footer'da kritik bilgi yok",
+        "Standart font kullanildi (Arial/Calibri)",
+        "Dosya adi profesyonel formatta",
+        "Hedef pozisyonun keyword'leri CV'de var",
+        "Yazim hatasi kontrolu yapildi",
+        "1-2 sayfa sinirinda"
+      ]
+    },
+    {
+      "id": "full-stack-developer-cv",
+      "title": "Full Stack Developer CV",
+      "icon": "💻",
+      "content": "Full Stack Developer pozisyonlari icin ATS-uyumlu CV sablonu. Bu sablon hem Turkce hem Ingilizce versiyonu iceriyor. Ingilizce versiyon global ve remote pozisyonlar icin, Turkce versiyon Turkiye'deki sirketler icin kullan.",
+      "tips": [
+        "Summary bolumunu her basvuruya gore degistir — en onemli 3-4 cumle",
+        "Skills bolumunu is ilanindaki siralama ile esle",
+        "Her projeyi STAR formati ile yaz: Situation, Task, Action, Result",
+        "GitHub linkini mutlaka ekle — recruiter'lar koda bakiyor",
+        "Canli demo linki olan projeler oncelikli olsun"
+      ],
+      "examples": [
+        {
+          "language": "English",
+          "label": "Full Stack Developer CV - English Template",
+          "template": "FULL NAME\nFull Stack Developer\nCity, Turkey | email@gmail.com | +90 5XX XXX XX XX\nlinkedin.com/in/username | github.com/username | portfolio-url.com\n\n--- PROFESSIONAL SUMMARY ---\nFull Stack Developer with hands-on experience building 10+ production-ready web applications using React, TypeScript, Node.js, and Python. Skilled in designing scalable architectures, implementing CI/CD pipelines, and deploying containerized applications. Strong background in both frontend performance optimization and backend API design.\n\n--- TECHNICAL SKILLS ---\nFrontend: React, Next.js, TypeScript, JavaScript (ES6+), Tailwind CSS, Zustand, Redux, HTML5, CSS3\nBackend: Node.js, Express.js, Python, FastAPI, REST API, GraphQL, WebSocket\nDatabase: PostgreSQL, MongoDB, Redis, Prisma ORM, Drizzle ORM\nDevOps: Docker, GitHub Actions, CI/CD, Vercel, AWS (S3, EC2), Nginx\nTools: Git, VS Code, Postman, Figma, Linux, Jira\nAI/ML: LangChain, OpenAI API, RAG, Vector Databases (Pinecone, ChromaDB)\n\n--- PROJECTS ---\n\n[Project Name] | Full Stack Developer\nJan 2024 - Present | github.com/username/project | live-demo.com\n- Architected and developed a full-stack [description] application serving [X] users using React, TypeScript, and FastAPI\n- Designed PostgreSQL database schema with [X] tables and optimized queries reducing response time by 40%\n- Implemented JWT authentication with role-based access control for [X] user roles\n- Built CI/CD pipeline with GitHub Actions achieving 95%+ test coverage\n- Achieved 95+ Lighthouse performance score through code splitting, lazy loading, and image optimization\n- Deployed with Docker on AWS EC2 with Nginx reverse proxy handling [X] concurrent connections\n\n[Project Name] | Full Stack Developer\nSep 2023 - Dec 2023 | github.com/username/project\n- Developed a real-time [description] application using React, Node.js, and WebSocket\n- Implemented Redis caching layer reducing database queries by 60%\n- Created comprehensive API documentation with Swagger/OpenAPI\n- Wrote 50+ unit and integration tests using Jest and React Testing Library\n\n[AI Project Name] | AI Engineer / Full Stack Developer\nJun 2023 - Aug 2023 | github.com/username/project\n- Built an AI-powered [description] using LangChain, OpenAI API, and RAG architecture\n- Designed vector database schema with Pinecone for semantic search across [X] documents\n- Created responsive React frontend with real-time streaming responses\n- Implemented conversation memory and context management for multi-turn interactions\n\n--- EDUCATION ---\nBSc in Computer Engineering\nKaradeniz Technical University (KTU) | 2018 - 2022\n\n--- CERTIFICATIONS & CONTINUOUS LEARNING ---\n- [Relevant certification or course]\n- Active open-source contributor: [X] contributions in 2024\n- Technical blog: [X] articles on [topics]"
+        },
+        {
+          "language": "Turkish",
+          "label": "Full Stack Developer CV - Turkce Sablon",
+          "template": "AD SOYAD\nFull Stack Developer\nSehir, Turkiye | email@gmail.com | +90 5XX XXX XX XX\nlinkedin.com/in/username | github.com/username | portfolio-url.com\n\n--- PROFESYONEL OZET ---\nReact, TypeScript, Node.js ve Python ile 10+ production-ready web uygulamasi gelistirmis Full Stack Developer. Olceklenebilir mimari tasarimi, CI/CD pipeline kurulumu ve konteyner tabanli deployment konularinda deneyimli. Frontend performans optimizasyonu ve backend API tasariminda guclu altyapi.\n\n--- TEKNIK BECERILER ---\nFrontend: React, Next.js, TypeScript, JavaScript (ES6+), Tailwind CSS, Zustand, Redux\nBackend: Node.js, Express.js, Python, FastAPI, REST API, GraphQL, WebSocket\nVeritabani: PostgreSQL, MongoDB, Redis, Prisma ORM, Drizzle ORM\nDevOps: Docker, GitHub Actions, CI/CD, Vercel, AWS (S3, EC2), Nginx\nAraclar: Git, VS Code, Postman, Figma, Linux, Jira\nAI/ML: LangChain, OpenAI API, RAG, Vektor Veritabanlari (Pinecone, ChromaDB)\n\n--- PROJELER ---\n\n[Proje Adi] | Full Stack Developer\nOcak 2024 - Devam Ediyor | github.com/username/proje | canli-demo.com\n- React, TypeScript ve FastAPI kullanarak [X] kullaniciya hizmet veren full-stack [aciklama] uygulamasi tasarladim ve gelistirdim\n- [X] tablolu PostgreSQL veritabani semasi tasarladim, sorgu optimizasyonu ile yanit suresini %40 azalttim\n- JWT authentication ve role-based access control implementasyonu yaptim\n- GitHub Actions ile CI/CD pipeline kurdum, %95+ test coverage sagladim\n- Kod ayirma, lazy loading ve gorsel optimizasyonu ile 95+ Lighthouse performans skoru elde ettim\n\n[Proje Adi] | Full Stack Developer\nEylul 2023 - Aralik 2023 | github.com/username/proje\n- React, Node.js ve WebSocket ile gercek zamanli [aciklama] uygulamasi gelistirdim\n- Redis cache katmani ile veritabani sorgularini %60 azalttim\n- Swagger/OpenAPI ile kapsamli API dokumantasyonu olusturdm\n- Jest ve React Testing Library ile 50+ birim ve entegrasyon testi yazdim\n\n--- EGITIM ---\nBilgisayar Muhendisligi Lisans\nKaradeniz Teknik Universitesi (KTU) | 2018 - 2022\n\n--- SERTIFIKALAR & SUREKLI OGRENME ---\n- [Ilgili sertifika veya kurs]\n- Aktif acik kaynak katilimcisi: 2024'te [X] katki\n- Teknik blog: [konular] hakkinda [X] makale"
+        }
+      ],
+      "checklist": [
+        "Iletisim bilgileri eksiksiz (email, telefon, LinkedIn, GitHub, portfolio)",
+        "Profesyonel ozet hedef pozisyona ozel yazildi",
+        "Teknik beceriler kategorize edildi",
+        "Her projede olculebilir basarilar var",
+        "GitHub ve canli demo linkleri eklendi",
+        "Egitim bilgisi var",
+        "1-2 sayfa sinirinda"
+      ]
+    },
+    {
+      "id": "ai-engineer-cv",
+      "title": "AI Engineer CV",
+      "icon": "🤖",
+      "content": "AI Engineer pozisyonlari icin ozellestirilmis CV sablonu. AI/ML keyword'leri one cikarilmis, projeler AI odakli anlatilmis. Bu pozisyonlarda recruiter'lar ozellikle LLM deneyimi, RAG implementasyonu ve production AI sistemleri ariyor.",
+      "tips": [
+        "AI keyword'lerini one cikart: LangChain, RAG, LLM, vector database, embeddings, prompt engineering",
+        "Her AI projesinde kullanilan model, veri boyutu ve performans metrigini belirt",
+        "Research paper okuma ve uygulama deneyimini vurgula",
+        "Full stack becerilerini 'AI icin gerekli altyapi' olarak konumlandir",
+        "Kaggle, Hugging Face profili varsa ekle"
+      ],
+      "examples": [
+        {
+          "language": "English",
+          "label": "AI Engineer CV - English Template",
+          "template": "FULL NAME\nAI Engineer & Full Stack Developer\nCity, Turkey | email@gmail.com | +90 5XX XXX XX XX\nlinkedin.com/in/username | github.com/username | portfolio-url.com\n\n--- PROFESSIONAL SUMMARY ---\nAI Engineer with expertise in building production-ready AI applications using LangChain, RAG architectures, and large language models. Experienced in designing end-to-end AI pipelines from data ingestion to deployment. Strong full-stack development background enables building complete AI products with intuitive user interfaces.\n\n--- TECHNICAL SKILLS ---\nAI/ML: LangChain, LlamaIndex, OpenAI API, Hugging Face Transformers, RAG, Vector Databases (Pinecone, ChromaDB, Weaviate), Prompt Engineering, Fine-tuning, Embeddings\nBackend: Python, FastAPI, Node.js, Express.js, REST API, WebSocket, Celery\nFrontend: React, TypeScript, Next.js, Tailwind CSS, Streaming UI\nData: PostgreSQL, MongoDB, Redis, pandas, NumPy, data pipelines\nInfrastructure: Docker, AWS (S3, Lambda, SageMaker), GitHub Actions, CI/CD\nTools: Git, Jupyter, VS Code, Postman, Linux\n\n--- PROJECTS ---\n\n[AI Project Name] | AI Engineer\nFeb 2024 - Present | github.com/username/project | live-demo.com\n- Architected a RAG-based [description] system processing [X] documents with 92% retrieval accuracy\n- Implemented hybrid search combining BM25 and semantic search using Pinecone vector database\n- Designed multi-step agent pipeline with LangChain for complex query resolution\n- Built streaming response UI with React and Server-Sent Events for real-time AI interaction\n- Optimized token usage by 35% through intelligent chunking and prompt compression strategies\n- Deployed on AWS with auto-scaling handling [X] concurrent users\n\n[AI Project Name] | AI Engineer / Full Stack Developer\nOct 2023 - Jan 2024 | github.com/username/project\n- Developed multi-agent AI system using LangChain for [description]\n- Implemented conversation memory with sliding window and summary strategies\n- Created evaluation pipeline measuring response quality across [X] test cases\n- Built admin dashboard with React for monitoring AI system performance and costs\n\n[Full Stack Project] | Full Stack Developer\nJul 2023 - Sep 2023 | github.com/username/project\n- Developed full-stack [description] application with React, TypeScript, and FastAPI\n- Designed RESTful API with 20+ endpoints and comprehensive Swagger documentation\n- Implemented real-time features using WebSocket with Redis pub/sub\n- Achieved 95+ Lighthouse score and 98% test coverage\n\n--- EDUCATION ---\nBSc in Computer Engineering\nKaradeniz Technical University (KTU) | 2018 - 2022\nRelevant Coursework: Machine Learning, Data Structures, Algorithms, Database Systems\n\n--- CERTIFICATIONS & RESEARCH ---\n- [AI/ML certification or course]\n- Published [X] technical articles on AI engineering and LLM applications\n- Active contributor to open-source AI tools"
+        },
+        {
+          "language": "Turkish",
+          "label": "AI Engineer CV - Turkce Sablon",
+          "template": "AD SOYAD\nAI Engineer & Full Stack Developer\nSehir, Turkiye | email@gmail.com | +90 5XX XXX XX XX\nlinkedin.com/in/username | github.com/username | portfolio-url.com\n\n--- PROFESYONEL OZET ---\nLangChain, RAG mimarileri ve buyuk dil modelleri kullanarak production-ready AI uygulamalari gelistiren AI Engineer. Veri toplama asamasindan deployment'a kadar uctan uca AI pipeline tasarimi konusunda deneyimli. Guclu full-stack gelistirme altyapisi sayesinde kullanici dostu arayuzlere sahip eksiksiz AI urunleri olusturma kapasitesine sahip.\n\n--- TEKNIK BECERILER ---\nAI/ML: LangChain, LlamaIndex, OpenAI API, Hugging Face, RAG, Vektor Veritabanlari (Pinecone, ChromaDB), Prompt Engineering, Fine-tuning, Embeddings\nBackend: Python, FastAPI, Node.js, Express.js, REST API, WebSocket, Celery\nFrontend: React, TypeScript, Next.js, Tailwind CSS\nVeri: PostgreSQL, MongoDB, Redis, pandas, NumPy\nAltyapi: Docker, AWS (S3, Lambda), GitHub Actions, CI/CD\nAraclar: Git, Jupyter, VS Code, Postman, Linux\n\n--- PROJELER ---\n\n[AI Proje Adi] | AI Engineer\nSubat 2024 - Devam Ediyor | github.com/username/proje | canli-demo.com\n- [X] dokumani isleyen, %92 erisim dogrulugu ile RAG tabanli [aciklama] sistemi tasarladim\n- Pinecone vektor veritabani ile BM25 ve semantik aramayi birlestiren hibrit arama implementasyonu yaptim\n- LangChain ile karmasik sorgu cozumleme icin cok adimli ajan pipeline'i tasarladim\n- React ve Server-Sent Events ile gercek zamanli AI etkilesimi icin streaming yanit arayuzu gelistirdim\n- Akilli parca ayirma ve prompt sikistirma stratejileri ile token kullanimini %35 optimize ettim\n\n--- EGITIM ---\nBilgisayar Muhendisligi Lisans\nKaradeniz Teknik Universitesi (KTU) | 2018 - 2022\nIlgili Dersler: Makine Ogrenmesi, Veri Yapilari, Algoritmalar, Veritabani Sistemleri\n\n--- SERTIFIKALAR & ARASTIRMA ---\n- [AI/ML sertifikasi veya kurs]\n- AI muhendisligi ve LLM uygulamalari hakkinda [X] teknik makale yayinladi\n- Acik kaynakli AI araclarina aktif katilimci"
+        }
+      ],
+      "checklist": [
+        "AI/ML becerileri en uste yazildi",
+        "Her AI projesinde model, veri boyutu ve performans metrigi var",
+        "RAG, LangChain, vector database keyword'leri gecti",
+        "Full stack becerileri AI'yi destekleyici olarak konumlandirildi",
+        "GitHub ve demo linkleri eklendi",
+        "Ilgili dersler egitim bolumunde belirtildi"
+      ]
+    },
+    {
+      "id": "proje-bazli-deneyim-yazma",
+      "title": "Proje Bazli Deneyim Yazma",
+      "icon": "🏗️",
+      "content": "3.5 yillik is deneyimin yok ama 10+ production-ready projen var. Bu projeleri siradan 'kisisel proje' olarak degil, profesyonel is deneyimi gibi yazmalisin. Anahtar: projeleri freelance veya bagimsiz gelistirici olarak konumlandir. 'Ogrenci projesi' veya 'kisisel proje' ifadelerini ASLA kullanma.",
+      "tips": [
+        "Baslik olarak 'Independent Software Engineer' veya 'Freelance Full Stack Developer' kullan",
+        "'Kisisel proje' yerine 'bagimsiz olarak gelistirilen uygulama' de",
+        "Her projeye tarih araligy ver — kronolojik sureklilik gosterir",
+        "Projeleri is deneyimi formatinda yaz: Sirket adi yerine proje adi, pozisyon yerine rolu",
+        "Olculebilir sonuclar ekle: kullanici sayisi, performans metrikleri, kod kalitesi",
+        "Takim calismasi varsa belirt: code review, pair programming, open source katki",
+        "Karar verme sureclerini anlat: 'PostgreSQL'i MongoDB yerine sectim cunku...'",
+        "Trade-off analizlerini goster: 'SSR yerine CSR tercih ettim performans icin...'",
+        "Teknik zorluklar ve cozumlerini anlat — bu seniority gosterir"
+      ],
+      "examples": [
+        {
+          "label": "YANLIS - Ogrenci projesi gibi yazilmis",
+          "template": "Kisisel Projeler:\n- Todo uygulamasi yaptim (React)\n- E-ticaret sitesi yaptim (Node.js)\n- Chat uygulamasi yaptim (Socket.io)"
+        },
+        {
+          "label": "DOGRU - Profesyonel deneyim gibi yazilmis",
+          "template": "Independent Software Engineer | Self-Directed\nJan 2022 - Present\n\nAI-Powered Document Analysis Platform | Lead Developer\nFeb 2024 - Present | github.com/username/project | live-demo.com\n- Architected and developed a full-stack document analysis platform using React, TypeScript, FastAPI, and LangChain serving 50+ beta users\n- Designed RAG pipeline processing 1000+ documents with 92% retrieval accuracy using Pinecone vector database\n- Implemented role-based access control with JWT authentication supporting 3 user roles\n- Built CI/CD pipeline with GitHub Actions: automated testing, linting, Docker build, and Vercel deployment\n- Achieved 95+ Lighthouse performance score through code splitting and lazy loading optimization\n\nReal-Time Collaboration Platform | Full Stack Developer\nSep 2023 - Jan 2024 | github.com/username/project\n- Developed real-time collaboration tool using React, Node.js, WebSocket, and Redis pub/sub\n- Designed PostgreSQL schema with 15 tables handling complex relational data\n- Implemented Redis caching reducing API response time from 800ms to 120ms (85% improvement)\n- Wrote 80+ unit and integration tests achieving 96% code coverage"
+        },
+        {
+          "label": "Tarih araligi stratejisi",
+          "template": "DOGRU tarih kullanimi — sureklilik gosterir:\n\nIndependent Software Engineer\nOcak 2022 - Devam Ediyor (3+ yil)\n\n  Proje 1: Subat 2024 - Devam Ediyor\n  Proje 2: Eylul 2023 - Ocak 2024\n  Proje 3: Mayis 2023 - Agustos 2023\n  Proje 4: Ocak 2023 - Nisan 2023\n  ...\n\nBoylece 2022'den bu yana kesintisiz calistigin gorunur."
+        }
+      ],
+      "checklist": [
+        "'Kisisel proje' ifadesi hicbir yerde gecmiyor",
+        "'Independent Software Engineer' veya benzeri profesyonel baslik kullanildi",
+        "Her projenin tarih araligi var",
+        "Projeler kronolojik sirada ve sureklilik gosteriyor",
+        "Her projede olculebilir sonuclar var",
+        "Teknik karar verme surecleri anlatilmis",
+        "GitHub ve demo linkleri ekli"
+      ]
+    },
+    {
+      "id": "beceri-bolumu-stratejisi",
+      "title": "Beceri Bolumu Stratejisi",
+      "icon": "🎯",
+      "content": "Beceri bolumu ATS icin en kritik alan. ATS ilk olarak buraya bakiyor ve is ilanindaki keyword'lerle eslestiriyor. Yanlis siralama veya eksik keyword = elenme. Becerileri kategorize et, hedef pozisyona gore sirala ve seviye belirtme tuzagina dusme.",
+      "tips": [
+        "Becerileri her zaman kategorize et: Frontend, Backend, Database, DevOps, AI/ML, Tools",
+        "Hedef pozisyona gore kategori sirasini degistir: AI Engineer icin AI/ML en uste",
+        "Is ilanindaki EXACT keyword'leri kullan: ilan 'React.js' diyorsa 'ReactJS' yazma",
+        "Seviye belirtme (beginner/intermediate/advanced) — tartismali, cogu recruiter onerilmiyor",
+        "Yildiz sistemi veya progress bar KULLANMA — ATS okuyamiyor, subjektif",
+        "Her kategoride 5-8 teknoloji yaz — cok az yetersiz gorunur, cok fazla odaksiz gorunur",
+        "Soft skill YAZMA (takim calismasi, iletisim) — bunlar projelerden anlasilmali",
+        "Kullanmadigin teknolojiyi LISTELEME — mulakatta yakalanirsin",
+        "Yaninda kac yil/proje kullandigin bilgisini ekleme — bu summary veya projelerde anlatilir"
+      ],
+      "examples": [
+        {
+          "label": "Full Stack Developer icin ideal beceri bolumu",
+          "template": "TECHNICAL SKILLS\nFrontend: React, Next.js, TypeScript, JavaScript (ES6+), Tailwind CSS, Zustand, Redux, HTML5, CSS3\nBackend: Node.js, Express.js, Python, FastAPI, REST API, GraphQL, WebSocket\nDatabase: PostgreSQL, MongoDB, Redis, Prisma ORM, Drizzle ORM\nDevOps: Docker, GitHub Actions, CI/CD, Vercel, AWS (S3, EC2), Nginx\nTesting: Jest, React Testing Library, Pytest, Cypress\nTools: Git, VS Code, Postman, Figma, Linux, Jira\nAI/ML: LangChain, OpenAI API, RAG, Vector Databases"
+        },
+        {
+          "label": "AI Engineer icin ideal beceri bolumu",
+          "template": "TECHNICAL SKILLS\nAI/ML: LangChain, LlamaIndex, OpenAI API, Hugging Face, RAG, Prompt Engineering, Fine-tuning, Embeddings, Vector Databases (Pinecone, ChromaDB)\nBackend: Python, FastAPI, Node.js, Express.js, REST API, WebSocket, Celery\nFrontend: React, TypeScript, Next.js, Tailwind CSS\nData: PostgreSQL, MongoDB, Redis, pandas, NumPy, data pipelines\nInfrastructure: Docker, AWS (S3, Lambda, SageMaker), GitHub Actions, CI/CD\nTools: Git, Jupyter, VS Code, Postman, Linux"
+        },
+        {
+          "label": "YANLIS — seviye belirtme, soft skill, progress bar",
+          "template": "YANLIS ORNEKLER:\n- JavaScript ████████░░ %80 — ATS bunu okuyamaz\n- React (Advanced), Node.js (Intermediate) — subjektif, recruiter icin anlamsiz\n- Soft Skills: Takim calismasi, problem cozme, iletisim — bos kalip\n- Python (2 yil), React (1.5 yil) — yil belirtme beceri bolumunde gereksiz"
+        }
+      ],
+      "checklist": [
+        "Beceriler kategorize edildi (Frontend, Backend, vs.)",
+        "Hedef pozisyona gore kategori sirasi ayarlandi",
+        "Is ilanindaki exact keyword'ler kullanildi",
+        "Seviye/yildiz/progress bar yok",
+        "Soft skill yazilmamis",
+        "Her kategoride 5-8 teknoloji var",
+        "Kullanilmayan teknoloji listelenmemis"
+      ]
+    },
+    {
+      "id": "olculebilir-basarilar",
+      "title": "Olculebilir Basarilar",
+      "icon": "📊",
+      "content": "CV'deki en buyuk fark yaratici: sayilarla konusmak. 'Hizli web sitesi yaptim' hicbir sey anlatmaz. '95+ Lighthouse skoru elde ettim, sayfa yuklenme suresini 3.2s'den 0.8s'ye dusurdum' her seyi anlatir. Projelerde resmi is deneyimin olmasa bile olculebilir sonuclar uretebilirsin.",
+      "tips": [
+        "Her madde isaretinde en az bir sayi olsun",
+        "Performans metrikleri: Lighthouse skoru, yukleme suresi, API yanit suresi",
+        "Kod kalitesi: test coverage yuzdesi, test sayisi, 0 TypeScript hatasi",
+        "Olcek: kac tablo, kac endpoint, kac component, kac satir kod",
+        "Iyilestirme: '%40 daha hizli', '%60 daha az sorgu', '%85 iyilestirme'",
+        "Kullanici: 'X beta kullanici', 'X kullaniciya hizmet veren'",
+        "Otomasyon: 'CI/CD ile X dakikada deploy', 'otomatik test pipeline'",
+        "Sayilari abartma — mulakatta dogrulanabilir olmali",
+        "Sayin yoksa bile yaratabilirsin: GitHub star, fork, commit sayisi"
+      ],
+      "examples": [
+        {
+          "label": "ONCESI — sayisiz, genel ifadeler",
+          "template": "- Web sitesi yaptim\n- Veritabani kullandim\n- API yazdim\n- Performansi iyilestirdim\n- Test yazdim\n- Deploy ettim"
+        },
+        {
+          "label": "SONRASI — olculebilir, etkileyici basarilar",
+          "template": "- React ve TypeScript ile 95+ Lighthouse performans skoru elde eden e-ticaret platformu gelistirdim\n- 15 tablolu PostgreSQL semasi tasarladim, indeksleme ile sorgu suresini 800ms'den 120ms'ye dusurdum (%85 iyilestirme)\n- 25+ RESTful endpoint ile kapsamli API tasarladim, Swagger dokumantasyonu olusturdm\n- Redis cache katmani ile veritabani yukunu %60 azalttim\n- Jest ve React Testing Library ile 80+ test yazarak %96 kod kapsami sagladim\n- GitHub Actions ile CI/CD pipeline kurdum: her PR'da otomatik lint, test ve deployment (ortalama 3 dakika)\n- Docker ile konteynerize ederek gelistirme ortami kurulum suresini 2 saatten 5 dakikaya dusurdum"
+        },
+        {
+          "label": "Performans metrigi olustirma rehberi",
+          "template": "Lighthouse testi calistir ve skorlari not al:\n- Performance: 95+\n- Accessibility: 90+\n- Best Practices: 95+\n- SEO: 90+\n\nAPI yanit surelerini olc:\n- Basit GET: <100ms\n- Karmasik sorgu: <500ms\n- Cache'li yanit: <50ms\n\nTest coverage hesapla:\n- jest --coverage calistir\n- %90+ hedefle\n\nBundle size analizi:\n- npm run build ciktisini not al\n- 'Initial bundle: 150KB gzipped' gibi yaz\n\nGitHub istatistikleri:\n- Toplam commit sayisi\n- Satir sayisi (cloc ile)\n- PR ve code review sayisi"
+        }
+      ],
+      "checklist": [
+        "Her proje maddesinde en az bir sayi var",
+        "Performans metrikleri (Lighthouse, yanit suresi) olculmus",
+        "Iyilestirme yuzdeleri hesaplanmis",
+        "Test coverage yuzdesi belirtilmis",
+        "CI/CD suresi olculmus",
+        "Sayilar gercekci ve dogrulanabilir"
+      ]
+    },
+    {
+      "id": "senior-ipuclari",
+      "title": "Senior Ipuclari",
+      "icon": "👑",
+      "content": "Junior bir CV 'ne kullandim' anlatir. Senior bir CV 'neden sectim ve ne trade-off yaptim' anlatir. Yil sayisi seniority belirlemez — dusunce sekli belirler. CV'nde mimari kararlar, trade-off analizleri ve problem cozme sureci goruluyorsa, recruiter seni junior gibi degil, dusunebilen bir muhendis olarak degerlendirir.",
+      "tips": [
+        "Sadece teknoloji listesi degil, NEDEN o teknolojiyi sectigini anlat",
+        "Trade-off'lari goster: 'MongoDB yerine PostgreSQL sectim cunku iliskisel veri yogunlugu vardi'",
+        "Mimari kararlar belirt: 'Mikroservis yerine monolit tercih ettim cunku MVP asamasindaydi'",
+        "Problem-cozum formati kullan: 'X problemi vardi, Y yaklasimini denedim, Z sonucunu elde ettim'",
+        "Kod kalitesi vurgula: 'SOLID prensiplerine uygun', 'clean architecture', 'design pattern kullanimi'",
+        "Teknik liderlik goster: 'Proje mimarisini tasarladim', 'tech stack secimini yaptim'",
+        "Surekli ogrenme: 'Son 6 ayda X konusunda derinlestim' — stagnant degilsin",
+        "'Used React' yerine 'Architected React application with custom hook architecture for state management'",
+        "Proaktif iyilestirme: 'Mevcut sistemi analiz ettim ve X iyilestirmesini onerdim/uyguladim'"
+      ],
+      "examples": [
+        {
+          "label": "Junior CV vs Senior CV karsilastirmasi",
+          "template": "JUNIOR GIBI YAZILMIS:\n- React ile frontend gelistirdim\n- Node.js ile backend yazdim\n- PostgreSQL veritabani kullandim\n- Docker ile deploy ettim\n- Git ile versiyon kontrolu yaptim\n\nSENIOR GIBI YAZILMIS:\n- React ve TypeScript ile component-based mimari tasarladim; custom hook pattern ile state yonetimini merkezi hale getirdim, boilerplate kodu %40 azalttim\n- FastAPI ile RESTful API tasarladim; repository pattern ve dependency injection ile test edilebilir, bakim yapilabilir backend mimarisi kurdum\n- PostgreSQL secimini iliskisel veri yogunlugu ve ACID gereksinimi nedeniyle yaptim; indeksleme stratejisi ile sorgu performansini %85 iyilestirdim\n- Docker multi-stage build ile production image boyutunu 1.2GB'dan 180MB'a dusurdum; docker-compose ile gelistirme ortamini tek komutla ayaga kaldiracak sekilde yapilandirdim\n- Git flow stratejisi belirledim: feature branch, PR review sureci ve semantic versioning uyguladim"
+        },
+        {
+          "label": "Mimari karar ornekleri",
+          "template": "CV'de kullanilabilecek mimari karar cumlerleri:\n\n- 'SSR yerine CSR tercih ettim: icerik SEO-kritik degildi ve CSR ile daha iyi kullanici deneyimi sagladim'\n- 'Zustand'i Redux yerine sectim: global state karmasikligi dusuktu ve Zustand ile boilerplate %70 azaldi'\n- 'REST API yerine GraphQL kullandim: frontend'in farkli sayfalarda farkli veri alt kumeleri gerektirmesi over-fetching sorununa yol aciyordu'\n- 'Monorepo yapisini benimsedim: frontend ve backend arasinda tip paylasimi ve ortak utility kullanimi gerektigi icin'\n- 'WebSocket yerine Server-Sent Events tercih ettim: tek yonlu veri akisi yeterliydi ve SSE daha basit implementasyon sunuyordu'"
+        }
+      ],
+      "checklist": [
+        "Her projede en az bir mimari karar aciklanmis",
+        "Trade-off analizi yapilmis (neden X, neden Y degil)",
+        "Problem-cozum formati kullanilmis",
+        "Kod kalitesi pratikleri belirtilmis (SOLID, clean architecture)",
+        "Sadece 'kullandim' degil 'tasarladim/mimari kurdum' ifadeleri var",
+        "Surekli ogrenme ve gelisim vurgulanmis",
+        "Teknik liderlik gorunur"
+      ]
+    }
+  ]
+}

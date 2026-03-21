@@ -1,0 +1,80 @@
+{
+  "title": "URL Parser",
+  "description": "URL string'inden protocol, host, port, path ve query parametrelerini çıkar",
+  "description_detail": "# URL Parser\n\nBir URL string'i verildiğinde, bileşenlerine ayırın.\n\n## Döndürülecek Obje\n```\n{\n  protocol: string,       // 'http' veya 'https'\n  host: string,           // 'example.com'\n  port: number | null,    // 8080 veya null (default port)\n  path: string,           // '/api/users'\n  query: { [key]: string }, // { page: '1', limit: '10' }\n  fragment: string | null // 'section1'\n}\n```\n\n## Kurallar\n- Default port belirtilmemişse null döndür\n- Query parametreleri yoksa boş obje `{}` döndür\n- Fragment (#) yoksa null döndür\n- Path yoksa '/' döndür\n- URL decode yapmana gerek yok",
+  "difficulty": "kolay",
+  "category": "web",
+  "tags": ["url", "parsing", "web"],
+  "examples": [
+    {
+      "input": "https://example.com:8080/api/users?page=1&limit=10#top",
+      "output": "{'protocol': 'https', 'host': 'example.com', 'port': 8080, 'path': '/api/users', 'query': {'page': '1', 'limit': '10'}, 'fragment': 'top'}",
+      "explanation": "Tüm bileşenler mevcut"
+    },
+    {
+      "input": "http://localhost/",
+      "output": "{'protocol': 'http', 'host': 'localhost', 'port': null, 'path': '/', 'query': {}, 'fragment': null}",
+      "explanation": "Minimal URL - sadece protocol, host ve path"
+    }
+  ],
+  "constraints": [
+    "URL her zaman protocol ile başlar (http:// veya https://)",
+    "Port opsiyoneldir",
+    "Query string ? ile başlar, parametreler & ile ayrılır",
+    "Fragment # ile başlar"
+  ],
+  "starter_code": {
+    "python": "def parse_url(url: str) -> dict:\n    # Your code here\n    pass",
+    "javascript": "function parseUrl(url) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": "https://example.com/path",
+      "expected_output": {"protocol": "https", "host": "example.com", "port": null, "path": "/path", "query": {}, "fragment": null}
+    },
+    {
+      "input": "http://localhost:3000/api/v1/users?role=admin&active=true",
+      "expected_output": {"protocol": "http", "host": "localhost", "port": 3000, "path": "/api/v1/users", "query": {"role": "admin", "active": "true"}, "fragment": null}
+    },
+    {
+      "input": "https://blog.example.com/post/123#comments",
+      "expected_output": {"protocol": "https", "host": "blog.example.com", "port": null, "path": "/post/123", "query": {}, "fragment": "comments"}
+    },
+    {
+      "input": "http://192.168.1.1:8080/",
+      "expected_output": {"protocol": "http", "host": "192.168.1.1", "port": 8080, "path": "/", "query": {}, "fragment": null}
+    },
+    {
+      "input": "https://api.example.com/search?q=hello+world&lang=tr",
+      "expected_output": {"protocol": "https", "host": "api.example.com", "port": null, "path": "/search", "query": {"q": "hello+world", "lang": "tr"}, "fragment": null}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": "https://example.com",
+      "expected_output": {"protocol": "https", "host": "example.com", "port": null, "path": "/", "query": {}, "fragment": null}
+    },
+    {
+      "input": "http://test.co:443/a/b/c?x=1&y=2&z=3#frag",
+      "expected_output": {"protocol": "http", "host": "test.co", "port": 443, "path": "/a/b/c", "query": {"x": "1", "y": "2", "z": "3"}, "fragment": "frag"}
+    },
+    {
+      "input": "https://cdn.example.com:9090/static/image.png",
+      "expected_output": {"protocol": "https", "host": "cdn.example.com", "port": 9090, "path": "/static/image.png", "query": {}, "fragment": null}
+    }
+  ],
+  "hints": [
+    "Önce protocol'ü :// ile ayır, sonra kalan kısımdan host/port ve path/query/fragment ayır",
+    "Host ve port'u ayırmak için ilk / öncesindeki kısmı al, ':' varsa port var demektir",
+    "Query string'i ? ile, fragment'ı # ile ayır. Query parametrelerini & ile split edip = ile key/value çiftlerine dönüştür"
+  ],
+  "solution": {
+    "python": "def parse_url(url: str) -> dict:\n    protocol = url.split('://')[0]\n    rest = url.split('://')[1]\n    \n    # Fragment ayır\n    fragment = None\n    if '#' in rest:\n        rest, fragment = rest.split('#', 1)\n    \n    # Query ayır\n    query = {}\n    if '?' in rest:\n        rest, query_str = rest.split('?', 1)\n        for param in query_str.split('&'):\n            if '=' in param:\n                key, value = param.split('=', 1)\n                query[key] = value\n    \n    # Host/port ve path ayır\n    if '/' in rest:\n        host_part, path = rest.split('/', 1)\n        path = '/' + path\n    else:\n        host_part = rest\n        path = '/'\n    \n    # Port ayır\n    port = None\n    if ':' in host_part:\n        host, port_str = host_part.split(':', 1)\n        port = int(port_str)\n    else:\n        host = host_part\n    \n    return {\n        'protocol': protocol,\n        'host': host,\n        'port': port,\n        'path': path,\n        'query': query,\n        'fragment': fragment\n    }",
+    "javascript": "function parseUrl(url) {\n  const protocolEnd = url.indexOf('://');\n  const protocol = url.slice(0, protocolEnd);\n  let rest = url.slice(protocolEnd + 3);\n\n  let fragment = null;\n  const hashIdx = rest.indexOf('#');\n  if (hashIdx !== -1) {\n    fragment = rest.slice(hashIdx + 1);\n    rest = rest.slice(0, hashIdx);\n  }\n\n  let query = {};\n  const qIdx = rest.indexOf('?');\n  if (qIdx !== -1) {\n    const queryStr = rest.slice(qIdx + 1);\n    rest = rest.slice(0, qIdx);\n    queryStr.split('&').forEach(param => {\n      const eqIdx = param.indexOf('=');\n      if (eqIdx !== -1) {\n        query[param.slice(0, eqIdx)] = param.slice(eqIdx + 1);\n      }\n    });\n  }\n\n  let path = '/';\n  const slashIdx = rest.indexOf('/');\n  let hostPart = rest;\n  if (slashIdx !== -1) {\n    hostPart = rest.slice(0, slashIdx);\n    path = rest.slice(slashIdx);\n  }\n\n  let port = null;\n  let host = hostPart;\n  const colonIdx = hostPart.indexOf(':');\n  if (colonIdx !== -1) {\n    host = hostPart.slice(0, colonIdx);\n    port = parseInt(hostPart.slice(colonIdx + 1), 10);\n  }\n\n  return { protocol, host, port, path, query, fragment };\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "URL'lerin anatomisini ve her bileşenin (protocol, host, port, path, query, fragment) rolünü derinlemesine anlarsın. Bu web geliştirmede routing, API çağrıları ve link yönetimi için temel bilgidir."
+}

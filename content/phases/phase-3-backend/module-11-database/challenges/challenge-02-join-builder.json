@@ -1,0 +1,75 @@
+{
+  "title": "SQL JOIN Builder",
+  "description": "Tablo ilişkilerinden SQL JOIN sorguları oluştur",
+  "description_detail": "# SQL JOIN Builder\n\nTablo ilişkileri ve seçilecek kolonlar verildiğinde, doğru SQL JOIN sorgusunu oluşturun.\n\n## İstenilen Fonksiyon: `buildJoinQuery(config)`\n\nConfig formatı:\n```javascript\n{\n  select: ['users.name', 'orders.total'],\n  from: 'users',\n  joins: [\n    { type: 'INNER', table: 'orders', on: { left: 'users.id', right: 'orders.user_id' } },\n    { type: 'LEFT', table: 'payments', on: { left: 'orders.id', right: 'payments.order_id' } }\n  ],\n  where: [{ column: 'users.active', operator: '=', value: true }],\n  orderBy: [{ column: 'orders.total', direction: 'DESC' }],\n  limit: 10\n}\n```\n\n## Döndürülecek String\n```sql\nSELECT users.name, orders.total\nFROM users\nINNER JOIN orders ON users.id = orders.user_id\nLEFT JOIN payments ON orders.id = payments.order_id\nWHERE users.active = true\nORDER BY orders.total DESC\nLIMIT 10\n```",
+  "difficulty": "orta",
+  "category": "database",
+  "tags": ["sql", "join", "query-builder", "database"],
+  "examples": [
+    {
+      "input": "{ select: ['*'], from: 'users', joins: [{ type: 'INNER', table: 'orders', on: { left: 'users.id', right: 'orders.user_id' } }] }",
+      "output": "SELECT * FROM users INNER JOIN orders ON users.id = orders.user_id",
+      "explanation": "Basit INNER JOIN sorgusu"
+    }
+  ],
+  "constraints": [
+    "SELECT, FROM her zaman olmalı",
+    "JOIN, WHERE, ORDER BY, LIMIT opsiyonel",
+    "JOIN tipleri: INNER, LEFT, RIGHT, FULL",
+    "WHERE'da string değerler tek tırnak içinde olmalı"
+  ],
+  "starter_code": {
+    "python": "def build_join_query(config: dict) -> str:\n    # Your code here\n    pass",
+    "javascript": "function buildJoinQuery(config) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"select": ["*"], "from": "users"},
+      "expected_output": "SELECT * FROM users"
+    },
+    {
+      "input": {"select": ["users.name", "orders.total"], "from": "users", "joins": [{"type": "INNER", "table": "orders", "on": {"left": "users.id", "right": "orders.user_id"}}]},
+      "expected_output": "SELECT users.name, orders.total FROM users INNER JOIN orders ON users.id = orders.user_id"
+    },
+    {
+      "input": {"select": ["*"], "from": "products", "where": [{"column": "price", "operator": ">", "value": 100}]},
+      "expected_output": "SELECT * FROM products WHERE price > 100"
+    },
+    {
+      "input": {"select": ["name"], "from": "users", "orderBy": [{"column": "name", "direction": "ASC"}], "limit": 5},
+      "expected_output": "SELECT name FROM users ORDER BY name ASC LIMIT 5"
+    },
+    {
+      "input": {"select": ["u.name", "o.total"], "from": "users u", "joins": [{"type": "LEFT", "table": "orders o", "on": {"left": "u.id", "right": "o.user_id"}}], "where": [{"column": "u.active", "operator": "=", "value": true}]},
+      "expected_output": "SELECT u.name, o.total FROM users u LEFT JOIN orders o ON u.id = o.user_id WHERE u.active = true"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"select": ["*"], "from": "a", "joins": [{"type": "INNER", "table": "b", "on": {"left": "a.id", "right": "b.a_id"}}, {"type": "LEFT", "table": "c", "on": {"left": "b.id", "right": "c.b_id"}}]},
+      "expected_output": "SELECT * FROM a INNER JOIN b ON a.id = b.a_id LEFT JOIN c ON b.id = c.b_id"
+    },
+    {
+      "input": {"select": ["name"], "from": "users", "where": [{"column": "status", "operator": "=", "value": "active"}]},
+      "expected_output": "SELECT name FROM users WHERE status = 'active'"
+    },
+    {
+      "input": {"select": ["*"], "from": "items", "where": [{"column": "price", "operator": ">=", "value": 10}, {"column": "stock", "operator": ">", "value": 0}]},
+      "expected_output": "SELECT * FROM items WHERE price >= 10 AND stock > 0"
+    }
+  ],
+  "hints": [
+    "SQL sorgusunu parça parça oluştur: SELECT + FROM + JOINs + WHERE + ORDER BY + LIMIT",
+    "WHERE'da birden fazla koşul varsa AND ile birleştir",
+    "String değerler için isinstance(value, str) kontrol et ve tek tırnak ekle"
+  ],
+  "solution": {
+    "python": "def build_join_query(config: dict) -> str:\n    parts = []\n    \n    # SELECT\n    select_cols = ', '.join(config['select'])\n    parts.append(f'SELECT {select_cols}')\n    \n    # FROM\n    parts.append(f'FROM {config[\"from\"]}')\n    \n    # JOINs\n    for join in config.get('joins', []):\n        join_type = join['type']\n        table = join['table']\n        left = join['on']['left']\n        right = join['on']['right']\n        parts.append(f'{join_type} JOIN {table} ON {left} = {right}')\n    \n    # WHERE\n    conditions = config.get('where', [])\n    if conditions:\n        where_parts = []\n        for cond in conditions:\n            value = cond['value']\n            if isinstance(value, str):\n                value = f\"'{value}'\"\n            elif isinstance(value, bool):\n                value = str(value).lower()\n            where_parts.append(f\"{cond['column']} {cond['operator']} {value}\")\n        parts.append('WHERE ' + ' AND '.join(where_parts))\n    \n    # ORDER BY\n    order_by = config.get('orderBy', [])\n    if order_by:\n        order_parts = [f\"{o['column']} {o['direction']}\" for o in order_by]\n        parts.append('ORDER BY ' + ', '.join(order_parts))\n    \n    # LIMIT\n    if 'limit' in config:\n        parts.append(f'LIMIT {config[\"limit\"]}')\n    \n    return ' '.join(parts)",
+    "javascript": "function buildJoinQuery(config) {\n  const parts = [];\n\n  parts.push(`SELECT ${config.select.join(', ')}`);\n  parts.push(`FROM ${config.from}`);\n\n  if (config.joins) {\n    for (const join of config.joins) {\n      parts.push(`${join.type} JOIN ${join.table} ON ${join.on.left} = ${join.on.right}`);\n    }\n  }\n\n  if (config.where && config.where.length) {\n    const conditions = config.where.map(c => {\n      let val = c.value;\n      if (typeof val === 'string') val = `'${val}'`;\n      else if (typeof val === 'boolean') val = val.toString();\n      return `${c.column} ${c.operator} ${val}`;\n    });\n    parts.push(`WHERE ${conditions.join(' AND ')}`);\n  }\n\n  if (config.orderBy && config.orderBy.length) {\n    const orders = config.orderBy.map(o => `${o.column} ${o.direction}`);\n    parts.push(`ORDER BY ${orders.join(', ')}`);\n  }\n\n  if (config.limit !== undefined) {\n    parts.push(`LIMIT ${config.limit}`);\n  }\n\n  return parts.join(' ');\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "SQL JOIN mekanizmasını, query builder pattern'ini ve ORM'lerin iç çalışma mantığını öğrenirsin. Prisma, Drizzle ve Knex gibi query builder'lar tam bu mantıkla çalışır."
+}

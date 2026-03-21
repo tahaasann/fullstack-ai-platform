@@ -1,0 +1,80 @@
+{
+  "title": "Event Emitter",
+  "description": "Pub/Sub pattern implementasyonu ile custom event emitter",
+  "description_detail": "# Event Emitter\n\nNode.js EventEmitter benzeri bir pub/sub sistemi implement edin.\n\n## İstenilen Sınıf: `EventEmitter`\n\n### Methodlar\n- `on(event, listener)` — Event listener ekler\n- `off(event, listener)` — Belirli listener'ı kaldırır\n- `emit(event, ...args)` — Event'i tetikler, tüm listener'ları çağırır\n- `once(event, listener)` — Sadece bir kez çalışacak listener ekler\n- `listenerCount(event)` — Kayıtlı listener sayısını döndürür\n- `removeAllListeners(event?)` — Tüm listener'ları kaldırır\n\n## Örnek\n```javascript\nconst emitter = new EventEmitter();\nlet result = [];\n\nemitter.on('data', (x) => result.push(x));\nemitter.emit('data', 'hello');  // result = ['hello']\nemitter.emit('data', 'world');  // result = ['hello', 'world']\n```",
+  "difficulty": "orta",
+  "category": "nodejs",
+  "tags": ["event-emitter", "pub-sub", "design-pattern", "nodejs"],
+  "examples": [
+    {
+      "input": "on('click', handler), emit('click', 'button1')",
+      "output": "handler('button1') çağrılır",
+      "explanation": "Event emit edildiğinde kayıtlı handler çağrılır"
+    },
+    {
+      "input": "once('init', handler), emit('init'), emit('init')",
+      "output": "handler sadece 1 kez çağrılır",
+      "explanation": "once ile eklenen listener ilk emit'te otomatik kaldırılır"
+    }
+  ],
+  "constraints": [
+    "Listener'lar ekleme sırasına göre çağrılmalı",
+    "emit() listener sayısını döndürmeli (çağrılan)",
+    "off() ile sadece belirli listener kaldırılmalı",
+    "Aynı listener birden fazla kez eklenebilmeli"
+  ],
+  "starter_code": {
+    "python": "class EventEmitter:\n    def __init__(self):\n        # Your code here\n        pass\n    \n    def on(self, event, listener):\n        pass\n    \n    def off(self, event, listener):\n        pass\n    \n    def emit(self, event, *args):\n        pass\n    \n    def once(self, event, listener):\n        pass\n    \n    def listener_count(self, event):\n        pass\n    \n    def remove_all_listeners(self, event=None):\n        pass",
+    "javascript": "class EventEmitter {\n  constructor() {\n    // Your code here\n  }\n\n  on(event, listener) {}\n  off(event, listener) {}\n  emit(event, ...args) {}\n  once(event, listener) {}\n  listenerCount(event) {}\n  removeAllListeners(event) {}\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"ops": [["on", "test", "fn1"], ["emit", "test", "hello"]], "fn1_calls": 1},
+      "expected_output": {"fn1_received": ["hello"], "emit_result": 1}
+    },
+    {
+      "input": {"ops": [["on", "test", "fn1"], ["on", "test", "fn2"], ["emit", "test", "data"]]},
+      "expected_output": {"emit_result": 2}
+    },
+    {
+      "input": {"ops": [["once", "init", "fn1"], ["emit", "init"], ["emit", "init"]]},
+      "expected_output": {"fn1_call_count": 1}
+    },
+    {
+      "input": {"ops": [["on", "test", "fn1"], ["off", "test", "fn1"], ["emit", "test"]]},
+      "expected_output": {"emit_result": 0}
+    },
+    {
+      "input": {"ops": [["on", "a", "fn1"], ["on", "b", "fn2"], ["listenerCount", "a"]]},
+      "expected_output": {"count": 1}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"ops": [["on", "x", "fn1"], ["on", "x", "fn1"], ["listenerCount", "x"]]},
+      "expected_output": {"count": 2}
+    },
+    {
+      "input": {"ops": [["on", "a", "fn1"], ["on", "b", "fn2"], ["removeAll"], ["listenerCount", "a"], ["listenerCount", "b"]]},
+      "expected_output": {"count_a": 0, "count_b": 0}
+    },
+    {
+      "input": {"ops": [["emit", "nonexistent"]]},
+      "expected_output": {"emit_result": 0}
+    }
+  ],
+  "hints": [
+    "Bir Map/dict kullan: event_name -> listener array. on() push yapar, off() splice/remove yapar",
+    "once() için bir wrapper fonksiyon oluştur: çağrıldığında listener'ı çağır ve off() ile kendini kaldır",
+    "emit() ilgili event'in listener listesini kopyalayarak iterate et (modification-safe)"
+  ],
+  "solution": {
+    "python": "class EventEmitter:\n    def __init__(self):\n        self._events = {}\n    \n    def on(self, event, listener):\n        if event not in self._events:\n            self._events[event] = []\n        self._events[event].append(listener)\n        return self\n    \n    def off(self, event, listener):\n        if event in self._events:\n            try:\n                self._events[event].remove(listener)\n            except ValueError:\n                pass\n        return self\n    \n    def emit(self, event, *args):\n        if event not in self._events:\n            return 0\n        listeners = self._events[event][:]\n        for listener in listeners:\n            listener(*args)\n        return len(listeners)\n    \n    def once(self, event, listener):\n        def wrapper(*args):\n            self.off(event, wrapper)\n            listener(*args)\n        self.on(event, wrapper)\n        return self\n    \n    def listener_count(self, event):\n        return len(self._events.get(event, []))\n    \n    def remove_all_listeners(self, event=None):\n        if event is None:\n            self._events = {}\n        elif event in self._events:\n            del self._events[event]\n        return self",
+    "javascript": "class EventEmitter {\n  constructor() {\n    this._events = new Map();\n  }\n\n  on(event, listener) {\n    if (!this._events.has(event)) this._events.set(event, []);\n    this._events.get(event).push(listener);\n    return this;\n  }\n\n  off(event, listener) {\n    const listeners = this._events.get(event);\n    if (listeners) {\n      const idx = listeners.indexOf(listener);\n      if (idx !== -1) listeners.splice(idx, 1);\n    }\n    return this;\n  }\n\n  emit(event, ...args) {\n    const listeners = this._events.get(event);\n    if (!listeners) return 0;\n    const copy = [...listeners];\n    copy.forEach(fn => fn(...args));\n    return copy.length;\n  }\n\n  once(event, listener) {\n    const wrapper = (...args) => {\n      this.off(event, wrapper);\n      listener(...args);\n    };\n    this.on(event, wrapper);\n    return this;\n  }\n\n  listenerCount(event) {\n    return (this._events.get(event) || []).length;\n  }\n\n  removeAllListeners(event) {\n    if (event === undefined) {\n      this._events.clear();\n    } else {\n      this._events.delete(event);\n    }\n    return this;\n  }\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n) per emit",
+    "optimal_space": "O(n) total listeners"
+  },
+  "learn_after_solving": "Pub/Sub (Observer) design pattern'ini, event-driven architecture'ı ve loose coupling prensibini öğrenirsin. Bu pattern Node.js core'unda, React event sistemi ve mikroservis iletişiminde temeldir."
+}

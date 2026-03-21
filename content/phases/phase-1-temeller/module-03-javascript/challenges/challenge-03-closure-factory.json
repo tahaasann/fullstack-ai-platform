@@ -1,0 +1,80 @@
+{
+  "title": "Closure Factory",
+  "description": "Closure kullanarak fonksiyon fabrikaları oluştur",
+  "description_detail": "# Closure Factory\n\nClosure pattern'ini kullanarak çeşitli fonksiyon fabrikaları oluşturun.\n\n## İstenilen Fonksiyonlar\n\n### 1. `createCounter(initial = 0)`\nBir counter objesi döndürür: `{ increment, decrement, getCount, reset }`\n\n### 2. `createRateLimiter(maxCalls, timeWindow)`\nBelirli zaman aralığında maksimum çağrı sayısını sınırlayan bir fonksiyon döndürür.\nLimit aşılırsa `false`, değilse `true` döner.\n\n### 3. `createMemoize(fn)`\nSonuçları cache'leyen bir wrapper fonksiyon döndürür.\n\n## Örnek\n```javascript\nconst counter = createCounter(10);\ncounter.increment(); // 11\ncounter.increment(); // 12\ncounter.decrement(); // 11\ncounter.getCount();  // 11\ncounter.reset();     // 10\n```",
+  "difficulty": "orta",
+  "category": "javascript",
+  "tags": ["closures", "factory-pattern", "functional", "javascript"],
+  "examples": [
+    {
+      "input": "const c = createCounter(0); c.increment(); c.increment(); c.getCount()",
+      "output": "2",
+      "explanation": "Counter 0'dan başlar, 2 kez artırılır"
+    },
+    {
+      "input": "const memo = createMemoize(x => x * 2); memo(5); memo(5)",
+      "output": "10 (ikinci çağrı cache'den gelir)",
+      "explanation": "İlk çağrıda hesaplanır, ikincide cache'den döner"
+    }
+  ],
+  "constraints": [
+    "Her factory fonksiyonu closure kullanmalı (dış değişken referansı)",
+    "Counter'ın iç state'i dışarıdan erişilemez olmalı",
+    "Memoize fonksiyonu argümanları key olarak kullanmalı",
+    "RateLimiter zaman penceresi milisaniye cinsinden"
+  ],
+  "starter_code": {
+    "python": "def create_counter(initial=0):\n    # Your code here\n    pass\n\ndef create_memoize(fn):\n    # Your code here\n    pass\n\ndef create_rate_limiter(max_calls, time_window):\n    # Your code here\n    pass",
+    "javascript": "function createCounter(initial = 0) {\n  // Your code here\n}\n\nfunction createMemoize(fn) {\n  // Your code here\n}\n\nfunction createRateLimiter(maxCalls, timeWindow) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "counter", "initial": 0, "ops": ["increment", "increment", "getCount"]},
+      "expected_output": 2
+    },
+    {
+      "input": {"fn": "counter", "initial": 10, "ops": ["decrement", "decrement", "decrement", "getCount"]},
+      "expected_output": 7
+    },
+    {
+      "input": {"fn": "counter", "initial": 5, "ops": ["increment", "reset", "getCount"]},
+      "expected_output": 5
+    },
+    {
+      "input": {"fn": "memoize", "calls": [[1], [2], [1], [3]], "expected_cache_hits": 1},
+      "expected_output": [2, 4, 2, 6]
+    },
+    {
+      "input": {"fn": "memoize", "calls": [["hello"], ["hello"], ["world"]]},
+      "expected_output": ["hellohello", "hellohello", "worldworld"]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "counter", "initial": -5, "ops": ["increment", "increment", "getCount"]},
+      "expected_output": -3
+    },
+    {
+      "input": {"fn": "counter", "initial": 100, "ops": ["reset", "getCount"]},
+      "expected_output": 100
+    },
+    {
+      "input": {"fn": "memoize", "calls": [[0], [0], [0]], "expected_cache_hits": 2},
+      "expected_output": [0, 0, 0]
+    }
+  ],
+  "hints": [
+    "Closure: iç fonksiyon dış fonksiyonun değişkenlerine erişir. let count = initial; return { increment: () => ++count }",
+    "Memoize için bir Map/dict kullanarak argümanları key, sonuçları value olarak sakla",
+    "RateLimiter için çağrı zamanlarını bir dizide tut, timeWindow dışındakileri temizle"
+  ],
+  "solution": {
+    "python": "import time\n\ndef create_counter(initial=0):\n    count = initial\n    init = initial\n    \n    def increment():\n        nonlocal count\n        count += 1\n        return count\n    \n    def decrement():\n        nonlocal count\n        count -= 1\n        return count\n    \n    def get_count():\n        return count\n    \n    def reset():\n        nonlocal count\n        count = init\n        return count\n    \n    return {\n        'increment': increment,\n        'decrement': decrement,\n        'get_count': get_count,\n        'reset': reset\n    }\n\ndef create_memoize(fn):\n    cache = {}\n    \n    def memoized(*args):\n        key = str(args)\n        if key not in cache:\n            cache[key] = fn(*args)\n        return cache[key]\n    \n    return memoized\n\ndef create_rate_limiter(max_calls, time_window):\n    calls = []\n    \n    def limiter():\n        now = time.time() * 1000\n        nonlocal calls\n        calls = [t for t in calls if now - t < time_window]\n        if len(calls) >= max_calls:\n            return False\n        calls.append(now)\n        return True\n    \n    return limiter",
+    "javascript": "function createCounter(initial = 0) {\n  let count = initial;\n  return {\n    increment: () => ++count,\n    decrement: () => --count,\n    getCount: () => count,\n    reset: () => { count = initial; return count; }\n  };\n}\n\nfunction createMemoize(fn) {\n  const cache = new Map();\n  return function(...args) {\n    const key = JSON.stringify(args);\n    if (!cache.has(key)) {\n      cache.set(key, fn(...args));\n    }\n    return cache.get(key);\n  };\n}\n\nfunction createRateLimiter(maxCalls, timeWindow) {\n  const calls = [];\n  return function() {\n    const now = Date.now();\n    while (calls.length && now - calls[0] >= timeWindow) {\n      calls.shift();\n    }\n    if (calls.length >= maxCalls) return false;\n    calls.push(now);\n    return true;\n  };\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(1) per operation",
+    "optimal_space": "O(n) for memoize cache"
+  },
+  "learn_after_solving": "Closure'ların private state yönetimi, factory pattern ve encapsulation sağladığını derinlemesine anlarsın. Memoization, rate limiting ve counter gibi pratik kullanımları profesyonel JavaScript'te her yerde karşına çıkar."
+}

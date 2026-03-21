@@ -1,0 +1,464 @@
+{
+  "id": "mod-19-system-design/challenge-02",
+  "title": "DSA Pattern Mastery — Core Patterns",
+  "difficulty": "hard",
+  "estimated_minutes": 180,
+  "description": "Senior mindset: Pattern'i ogren, 100 problem cozmis gibi ol. Bu challenge'da mulakatlarda en cok cikan 7 temel pattern'i, her biri 2 problem ile ogreneceksin. Her problemi once kendin coz, sonra pattern'in diger problemlere nasil uygulandigini anla.",
+  "objectives": [
+    "Two Pointers pattern'ini iki farkli problemde uygulamak",
+    "Sliding Window ile substring/subarray problemlerini cozmek",
+    "Stack/Queue yapilarini algoritma problemlerinde kullanmak",
+    "HashMap/Set ile O(1) lookup gerektiren problemleri cozmek",
+    "Binary Search'u rotated array gibi ileri seviye problemlerde uygulamak",
+    "Linked List manipulasyonu yapabilmek",
+    "Tree traversal (BFS/DFS) ile agac problemlerini cozmek"
+  ],
+  "prerequisites": [
+    "mod-19-system-design/challenge-01"
+  ],
+  "problems": [
+    {
+      "id": "two-pointers-01",
+      "title": "Container With Most Water",
+      "pattern": "Two Pointers",
+      "difficulty": "orta",
+      "description": "Bir integer dizisi verilir. height[i] noktasindaki duvar yuksekligi temsil eder. Iki duvar ve x ekseni arasinda en fazla su tutabilecek container'i bul. En fazla su miktarini dondur.\n\nOrnek: height = [1,8,6,2,5,4,8,3,7] -> 49 (index 1 ve 8 arasinda, min(8,7) * 7 = 49)",
+      "starter_code": {
+        "python": "def max_area(height: list[int]) -> int:\n    \"\"\"\n    Two Pointers pattern:\n    - Sol ve sag pointer'i dizinin iki ucuna koy\n    - Her adimda alani hesapla\n    - Kisa olan duvarin pointer'ini iceri tasi\n    \n    Neden kisa olani tasiyoruz?\n    Cunku alan = min(sol, sag) * genislik\n    Uzun olani tasimak alani asla arttiramaz (min zaten kisa taraf)\n    Kisa olani tasimak belki daha uzun bir duvar bulur\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert max_area([1,8,6,2,5,4,8,3,7]) == 49\nassert max_area([1,1]) == 1\nassert max_area([4,3,2,1,4]) == 16\nassert max_area([1,2,1]) == 2\nprint(\"Container With Most Water: All tests passed!\")",
+        "javascript": "/**\n * Two Pointers pattern:\n * - Sol ve sag pointer'i dizinin iki ucuna koy\n * - Her adimda alani hesapla\n * - Kisa olan duvarin pointer'ini iceri tasi\n *\n * Neden kisa olani tasiyoruz?\n * Cunku alan = min(sol, sag) * genislik\n * Uzun olani tasimak alani asla arttiramaz\n */\nfunction maxArea(height) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(maxArea([1,8,6,2,5,4,8,3,7]) === 49);\nconsole.assert(maxArea([1,1]) === 1);\nconsole.assert(maxArea([4,3,2,1,4]) === 16);\nconsole.assert(maxArea([1,2,1]) === 2);\nconsole.log(\"Container With Most Water: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": [[1,8,6,2,5,4,8,3,7]], "expected": 49, "description": "Genel durum"},
+        {"input": [[1,1]], "expected": 1, "description": "Minimum boyut"},
+        {"input": [[4,3,2,1,4]], "expected": 16, "description": "Esit yukseklikte iki uc"},
+        {"input": [[1,2,1]], "expected": 2, "description": "Kucuk dizi"}
+      ],
+      "hints": [
+        "Brute force O(n^2): Her ikili kombinasyonu dene. Ama daha iyisini yapabilirsin.",
+        "Iki pointer ile O(n): left=0, right=len-1. Her adimda area = min(h[left], h[right]) * (right-left) hesapla.",
+        "Kisa olan taraftaki pointer'i iceri tasi. Cunku kisa duvar alani sinirliyor, onu degistirmek sansimizi arttirir."
+      ],
+      "solution_approach": "TWO POINTERS PATTERN: Bu pattern siralama veya iki uctan daraltma gerektiren problemlerde kullanilir. Burada sol ve sag pointer baslatip, her adimda kisa duvari iceri tasiyoruz. Neden? Cunku alan = min(h[l], h[r]) * (r-l). Genislik zaten azaliyor, tek sans yuksekligi artirmak. Uzun duvari tasimak min'i degistirmez ama kisa duvari tasimak daha uzun bir duvar bulabilir. Bu greedy yaklasim O(n) zamanda optimal cozumu verir.",
+      "solution_code": {
+        "python": "def max_area(height: list[int]) -> int:\n    left, right = 0, len(height) - 1\n    max_water = 0\n    while left < right:\n        width = right - left\n        h = min(height[left], height[right])\n        max_water = max(max_water, width * h)\n        if height[left] < height[right]:\n            left += 1\n        else:\n            right -= 1\n    return max_water",
+        "javascript": "function maxArea(height) {\n    let left = 0, right = height.length - 1;\n    let maxWater = 0;\n    while (left < right) {\n        const w = right - left;\n        const h = Math.min(height[left], height[right]);\n        maxWater = Math.max(maxWater, w * h);\n        if (height[left] < height[right]) left++;\n        else right--;\n    }\n    return maxWater;\n}"
+      },
+      "time_complexity": "O(n)",
+      "space_complexity": "O(1)",
+      "interview_tip": "Mulakatci 'neden kisa duvari tasiyorsun?' diye soracaktir. Matematiksel ispati bilmen gerekir: genislik zaten azalirken, min yuksekligi artirmak tek sanstir. Bu pattern'i 3Sum, Trapping Rain Water gibi problemlerde de kullanirsin."
+    },
+    {
+      "id": "two-pointers-02",
+      "title": "Remove Duplicates from Sorted Array",
+      "pattern": "Two Pointers",
+      "difficulty": "kolay",
+      "description": "Sirali bir integer dizisi verilir. Tekrar eden elemanlari in-place olarak kaldir ve benzersiz eleman sayisini dondur. Dizinin ilk k elemani benzersiz elemanlar olmali (k = benzersiz eleman sayisi). Ekstra array kullanma.\n\nOrnek: nums = [1,1,2] -> 2, nums ilk 2 eleman [1,2]",
+      "starter_code": {
+        "python": "def remove_duplicates(nums: list[int]) -> int:\n    \"\"\"\n    Two Pointers (slow/fast) pattern:\n    - slow: bir sonraki benzersiz elemanin yazilacagi pozisyon\n    - fast: diziyi tarayan pointer\n    - fast yeni bir deger bulunca slow pozisyonuna yaz\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nnums1 = [1,1,2]\nassert remove_duplicates(nums1) == 2\nassert nums1[:2] == [1,2]\n\nnums2 = [0,0,1,1,1,2,2,3,3,4]\nassert remove_duplicates(nums2) == 5\nassert nums2[:5] == [0,1,2,3,4]\n\nnums3 = [1]\nassert remove_duplicates(nums3) == 1\n\nnums4 = [1,2,3]\nassert remove_duplicates(nums4) == 3\nprint(\"Remove Duplicates: All tests passed!\")",
+        "javascript": "/**\n * Two Pointers (slow/fast) pattern:\n * - slow: benzersiz elemanin yazilacagi pozisyon\n * - fast: diziyi tarayan pointer\n */\nfunction removeDuplicates(nums) {\n    // TODO: Implement\n}\n\n// Test Cases\nlet nums1 = [1,1,2];\nconsole.assert(removeDuplicates(nums1) === 2);\nlet nums2 = [0,0,1,1,1,2,2,3,3,4];\nconsole.assert(removeDuplicates(nums2) === 5);\nconsole.log(\"Remove Duplicates: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": [[1,1,2]], "expected": 2, "description": "Basit tekrar"},
+        {"input": [[0,0,1,1,1,2,2,3,3,4]], "expected": 5, "description": "Coklu tekrar"},
+        {"input": [[1]], "expected": 1, "description": "Tek eleman"},
+        {"input": [[1,2,3]], "expected": 3, "description": "Tekrarsiz dizi"}
+      ],
+      "hints": [
+        "Dizi sirali oldugu icin tekrar eden elemanlar yan yana. Bunu avantaj olarak kullan.",
+        "slow pointer: bir sonraki benzersiz elemanin yazilacagi yer. fast pointer: diziyi tarar.",
+        "nums[fast] != nums[slow] oldugunda slow'u artir ve nums[slow] = nums[fast] yap."
+      ],
+      "solution_approach": "TWO POINTERS (SLOW/FAST) PATTERN: Bu varyant ayni dizi uzerinde in-place degisiklik yaparken kullanilir. slow pointer 'yazma pozisyonunu' tutar, fast pointer okuma yapar. Dizi sirali oldugu icin ayni degerler bitisik. fast yeni bir deger bulunca slow ilerler ve o pozisyona yazar. Bu pattern Remove Element, Move Zeroes gibi in-place array problemlerinin temelidir.",
+      "solution_code": {
+        "python": "def remove_duplicates(nums: list[int]) -> int:\n    if not nums:\n        return 0\n    slow = 0\n    for fast in range(1, len(nums)):\n        if nums[fast] != nums[slow]:\n            slow += 1\n            nums[slow] = nums[fast]\n    return slow + 1",
+        "javascript": "function removeDuplicates(nums) {\n    if (nums.length === 0) return 0;\n    let slow = 0;\n    for (let fast = 1; fast < nums.length; fast++) {\n        if (nums[fast] !== nums[slow]) {\n            slow++;\n            nums[slow] = nums[fast];\n        }\n    }\n    return slow + 1;\n}"
+      },
+      "time_complexity": "O(n)",
+      "space_complexity": "O(1)",
+      "interview_tip": "Bu problem 'in-place' anahtar kelimesiyle gelir. Mulakatci ekstra alan kullanmamani ister. slow/fast pointer pattern'i in-place array manipulasyonunun standart cozumudur. Sorted oldugunu fark etmek kritik — sorted olmasa HashMap gerekir."
+    },
+    {
+      "id": "sliding-window-01",
+      "title": "Longest Substring Without Repeating Characters",
+      "pattern": "Sliding Window",
+      "difficulty": "orta",
+      "description": "Bir string verilir. Tekrar eden karakter icermeyen en uzun alt stringin uzunlugunu bul.\n\nOrnek: s = 'abcabcbb' -> 3 ('abc')\nOrnek: s = 'bbbbb' -> 1 ('b')\nOrnek: s = 'pwwkew' -> 3 ('wke')",
+      "starter_code": {
+        "python": "def length_of_longest_substring(s: str) -> int:\n    \"\"\"\n    Sliding Window pattern:\n    - Bir 'pencere' (window) tut: [left, right]\n    - right'i genislet, yeni karakteri ekle\n    - Tekrar var mi kontrol et (set veya dict kullan)\n    - Tekrar varsa left'i daralt ta ki tekrar kalksin\n    - Her adimda max uzunlugu guncelle\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert length_of_longest_substring(\"abcabcbb\") == 3\nassert length_of_longest_substring(\"bbbbb\") == 1\nassert length_of_longest_substring(\"pwwkew\") == 3\nassert length_of_longest_substring(\"\") == 0\nassert length_of_longest_substring(\" \") == 1\nassert length_of_longest_substring(\"dvdf\") == 3\nprint(\"Longest Substring: All tests passed!\")",
+        "javascript": "/**\n * Sliding Window pattern:\n * - [left, right] penceresi tut\n * - right'i genislet, tekrar varsa left'i daralt\n * - Set veya Map ile karakter takibi yap\n */\nfunction lengthOfLongestSubstring(s) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(lengthOfLongestSubstring(\"abcabcbb\") === 3);\nconsole.assert(lengthOfLongestSubstring(\"bbbbb\") === 1);\nconsole.assert(lengthOfLongestSubstring(\"pwwkew\") === 3);\nconsole.assert(lengthOfLongestSubstring(\"\") === 0);\nconsole.assert(lengthOfLongestSubstring(\"dvdf\") === 3);\nconsole.log(\"Longest Substring: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": ["abcabcbb"], "expected": 3, "description": "Genel durum"},
+        {"input": ["bbbbb"], "expected": 1, "description": "Tum karakterler ayni"},
+        {"input": ["pwwkew"], "expected": 3, "description": "Ortada tekrar"},
+        {"input": [""], "expected": 0, "description": "Bos string"},
+        {"input": [" "], "expected": 1, "description": "Tek bosluk"},
+        {"input": ["dvdf"], "expected": 3, "description": "Bastan tekrar"}
+      ],
+      "hints": [
+        "Brute force: Her alt stringi kontrol et O(n^3). Ama sliding window ile O(n) yapabilirsin.",
+        "Bir Set kullanarak penceredeki karakterleri takip et. right'i genislettikce set'e ekle.",
+        "Tekrar eden karakter gelince left'i set'ten cikararak ilerlet ta ki tekrar kalmasin."
+      ],
+      "solution_approach": "SLIDING WINDOW PATTERN: Bu pattern bir dizi/string uzerinde belirli kosulu saglayan alt dizi/alt string bulmak icin kullanilir. Pencere [left, right] iki pointer ile tanimlanir. Right genisleme, left daraltma yapar. Burada Set ile penceredeki benzersiz karakterleri tutuyoruz. Tekrar olunca left ilerliyor. Bu pattern Maximum Sum Subarray, Minimum Size Subarray Sum gibi onlarca probleme uyar.",
+      "solution_code": {
+        "python": "def length_of_longest_substring(s: str) -> int:\n    char_set = set()\n    left = 0\n    max_len = 0\n    for right in range(len(s)):\n        while s[right] in char_set:\n            char_set.remove(s[left])\n            left += 1\n        char_set.add(s[right])\n        max_len = max(max_len, right - left + 1)\n    return max_len",
+        "javascript": "function lengthOfLongestSubstring(s) {\n    const charSet = new Set();\n    let left = 0, maxLen = 0;\n    for (let right = 0; right < s.length; right++) {\n        while (charSet.has(s[right])) {\n            charSet.delete(s[left]);\n            left++;\n        }\n        charSet.add(s[right]);\n        maxLen = Math.max(maxLen, right - left + 1);\n    }\n    return maxLen;\n}"
+      },
+      "time_complexity": "O(n)",
+      "space_complexity": "O(min(n, m)) — m karakter seti boyutu",
+      "interview_tip": "Mulakatci 'bunu O(n) yapabilir misin?' diye soracaktir. Sliding Window pattern'ini tanimlayip uygulaman gerekir. Alternatif olarak HashMap ile karakterin son pozisyonunu tutarak left'i direkt atlayabilirsin — bu daha optimize ama kavramsasi daha zor."
+    },
+    {
+      "id": "sliding-window-02",
+      "title": "Minimum Window Substring",
+      "pattern": "Sliding Window",
+      "difficulty": "zor",
+      "description": "Iki string verilir: s ve t. s icinde t'nin tum karakterlerini (tekrar sayilari dahil) iceren en kisa alt stringi bul. Boyle bir alt string yoksa bos string dondur.\n\nOrnek: s = 'ADOBECODEBANC', t = 'ABC' -> 'BANC'\nOrnek: s = 'a', t = 'a' -> 'a'\nOrnek: s = 'a', t = 'aa' -> '' (iki tane 'a' yok)",
+      "starter_code": {
+        "python": "from collections import Counter\n\ndef min_window(s: str, t: str) -> str:\n    \"\"\"\n    Sliding Window + HashMap pattern:\n    1. t'nin karakter frekanslarini say (need dict)\n    2. Pencereyi genislet (right ileri)\n    3. Tum karakterler karsilaninca pencereyi daralt (left ileri)\n    4. Daralirken minimum uzunlugu guncelle\n    \n    Trick: 'have' sayaci ile kac benzersiz karakterin\n    frekansini karsiladigini tut. have == len(need) ise\n    tum kosullar saglanmis demektir.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert min_window(\"ADOBECODEBANC\", \"ABC\") == \"BANC\"\nassert min_window(\"a\", \"a\") == \"a\"\nassert min_window(\"a\", \"aa\") == \"\"\nassert min_window(\"aa\", \"aa\") == \"aa\"\nassert min_window(\"abc\", \"b\") == \"b\"\nprint(\"Minimum Window Substring: All tests passed!\")",
+        "javascript": "/**\n * Sliding Window + HashMap pattern:\n * 1. t'nin karakter frekanslarini say\n * 2. Pencereyi genislet ve daralt\n * 3. Tum karakterler karsilaninca min uzunlugu guncelle\n */\nfunction minWindow(s, t) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(minWindow(\"ADOBECODEBANC\", \"ABC\") === \"BANC\");\nconsole.assert(minWindow(\"a\", \"a\") === \"a\");\nconsole.assert(minWindow(\"a\", \"aa\") === \"\");\nconsole.assert(minWindow(\"abc\", \"b\") === \"b\");\nconsole.log(\"Minimum Window Substring: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": ["ADOBECODEBANC", "ABC"], "expected": "BANC", "description": "Genel durum"},
+        {"input": ["a", "a"], "expected": "a", "description": "Tek karakter eslesme"},
+        {"input": ["a", "aa"], "expected": "", "description": "Yetersiz karakter"},
+        {"input": ["aa", "aa"], "expected": "aa", "description": "Tam eslesme"},
+        {"input": ["abc", "b"], "expected": "b", "description": "Ortada tek karakter"}
+      ],
+      "hints": [
+        "Oncelikle t'deki her karakterin kac kez gerektigini bir Counter/Map ile say.",
+        "have/need mantigi: need = len(Counter(t)), have sayaci kac benzersiz karakterin tam frekansini karsiladigini tutar.",
+        "have == need oldugunda kosul saglandi, simdi left'i daraltarak minimum pencereyi bul. Daraltirken have duserse dur."
+      ],
+      "solution_approach": "SLIDING WINDOW (ADVANCED) PATTERN: Bu problem sliding window'un en zor varyanti. Iki HashMap kullanilir: need (t'nin frekanslari) ve window (mevcut pencerenin frekanslari). have sayaci kac benzersiz karakterin frekansini karsiladigini tutar. Right genislettikce window guncellenir. have == need oldugunda pencere gecerli, left daraltilarak minimum bulunur. Bu pattern 'kosullu minimum/maximum alt dizi' problemlerinin sablonudur.",
+      "solution_code": {
+        "python": "from collections import Counter\n\ndef min_window(s: str, t: str) -> str:\n    if not s or not t or len(s) < len(t):\n        return \"\"\n    need = Counter(t)\n    window = {}\n    have, need_count = 0, len(need)\n    result = \"\"\n    result_len = float('inf')\n    left = 0\n    for right in range(len(s)):\n        c = s[right]\n        window[c] = window.get(c, 0) + 1\n        if c in need and window[c] == need[c]:\n            have += 1\n        while have == need_count:\n            if (right - left + 1) < result_len:\n                result_len = right - left + 1\n                result = s[left:right + 1]\n            window[s[left]] -= 1\n            if s[left] in need and window[s[left]] < need[s[left]]:\n                have -= 1\n            left += 1\n    return result",
+        "javascript": "function minWindow(s, t) {\n    if (!s || !t || s.length < t.length) return \"\";\n    const need = {};\n    for (const c of t) need[c] = (need[c] || 0) + 1;\n    const window = {};\n    let have = 0, needCount = Object.keys(need).length;\n    let result = \"\", resultLen = Infinity;\n    let left = 0;\n    for (let right = 0; right < s.length; right++) {\n        const c = s[right];\n        window[c] = (window[c] || 0) + 1;\n        if (c in need && window[c] === need[c]) have++;\n        while (have === needCount) {\n            if (right - left + 1 < resultLen) {\n                resultLen = right - left + 1;\n                result = s.slice(left, right + 1);\n            }\n            window[s[left]]--;\n            if (s[left] in need && window[s[left]] < need[s[left]]) have--;\n            left++;\n        }\n    }\n    return result;\n}"
+      },
+      "time_complexity": "O(n + m) — n = |s|, m = |t|",
+      "space_complexity": "O(m)",
+      "interview_tip": "Bu LeetCode Hard klasigi. Mulakatci have/need optimizasyonunu bilip bilmedigini test eder. Naive yaklasim her daraltmada tum frekanslari kontrol eder O(n*m), ama have sayaci ile O(n+m) yapilir. Bu pattern'i Permutation in String, Find All Anagrams problemlerinde de kullanirsin."
+    },
+    {
+      "id": "stack-queue-01",
+      "title": "Evaluate Reverse Polish Notation",
+      "pattern": "Stack",
+      "difficulty": "orta",
+      "description": "Reverse Polish Notation (postfix) formatinda bir aritmetik ifade verilir. Sonucu hesapla.\n\nGecerli operatorler: +, -, *, /\nBolme integer bolmedir (sifira dogru yuvarla).\n\nOrnek: tokens = ['2','1','+','3','*'] -> 9 ((2+1)*3)\nOrnek: tokens = ['4','13','5','/','+'] -> 6 (4+(13/5))",
+      "starter_code": {
+        "python": "def eval_rpn(tokens: list[str]) -> int:\n    \"\"\"\n    Stack pattern:\n    - Sayi gorursen stack'e push et\n    - Operator gorursen stack'ten iki sayi pop et\n    - Sonucu hesapla ve tekrar push et\n    - Sonda stack'te kalan tek eleman sonuctur\n    \n    DIKKAT: Bolmede sifira dogru yuvarla (int(a/b) veya trunc)\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert eval_rpn([\"2\",\"1\",\"+\",\"3\",\"*\"]) == 9\nassert eval_rpn([\"4\",\"13\",\"5\",\"/\",\"+\"]) == 6\nassert eval_rpn([\"10\",\"6\",\"9\",\"3\",\"+\",\"-11\",\"*\",\"/\",\"*\",\"17\",\"+\",\"5\",\"+\"]) == 22\nassert eval_rpn([\"3\",\"4\",\"-\"]) == -1\nprint(\"Evaluate RPN: All tests passed!\")",
+        "javascript": "/**\n * Stack pattern:\n * - Sayi -> push, Operator -> 2 pop + hesapla + push\n * - Bolme: Math.trunc kullan (sifira dogru yuvarla)\n */\nfunction evalRPN(tokens) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(evalRPN([\"2\",\"1\",\"+\",\"3\",\"*\"]) === 9);\nconsole.assert(evalRPN([\"4\",\"13\",\"5\",\"/\",\"+\"]) === 6);\nconsole.assert(evalRPN([\"3\",\"4\",\"-\"]) === -1);\nconsole.log(\"Evaluate RPN: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": [["2","1","+","3","*"]], "expected": 9, "description": "(2+1)*3"},
+        {"input": [["4","13","5","/","+"]], "expected": 6, "description": "4+(13/5)"},
+        {"input": [["10","6","9","3","+","-11","*","/","*","17","+","5","+"]], "expected": 22, "description": "Karmasik ifade"},
+        {"input": [["3","4","-"]], "expected": -1, "description": "Negatif sonuc"}
+      ],
+      "hints": [
+        "Stack'in temel kullanimi: LIFO. Sayi push, operator gelince pop-hesapla-push.",
+        "Operand sirasi onemli: ikinci pop edilen sayi soldaki operand. a = pop(), b = pop() -> sonuc = b op a",
+        "Python'da negatif bolme tricky: int(a/b) yerine int(a/b) kullanirsan -1//2 = -1 olur. Sifira dogru yuvarlamak icin int(a/b) kullan."
+      ],
+      "solution_approach": "STACK PATTERN: Stack LIFO (Last In First Out) ozelligi ile ifade degerlendirme problemlerinin dogal cozumudur. Her sayi stack'e gider, her operator son iki sayiyi isler. Bu pattern Calculator, Valid Parentheses, Decode String gibi tum 'ic ice' veya 'geriye donuk baglam' gerektiren problemlerde kullanilir. Stack gordugunde dusun: 'Bir seyi sonraya erteliyorum ve tam sirasinda isliyorum.'",
+      "solution_code": {
+        "python": "def eval_rpn(tokens: list[str]) -> int:\n    stack = []\n    ops = {'+', '-', '*', '/'}\n    for token in tokens:\n        if token in ops:\n            b = stack.pop()\n            a = stack.pop()\n            if token == '+': stack.append(a + b)\n            elif token == '-': stack.append(a - b)\n            elif token == '*': stack.append(a * b)\n            elif token == '/': stack.append(int(a / b))\n        else:\n            stack.append(int(token))\n    return stack[0]",
+        "javascript": "function evalRPN(tokens) {\n    const stack = [];\n    const ops = new Set(['+', '-', '*', '/']);\n    for (const token of tokens) {\n        if (ops.has(token)) {\n            const b = stack.pop();\n            const a = stack.pop();\n            if (token === '+') stack.push(a + b);\n            else if (token === '-') stack.push(a - b);\n            else if (token === '*') stack.push(a * b);\n            else stack.push(Math.trunc(a / b));\n        } else {\n            stack.push(parseInt(token));\n        }\n    }\n    return stack[0];\n}"
+      },
+      "time_complexity": "O(n)",
+      "space_complexity": "O(n)",
+      "interview_tip": "Bu problem stack'in klasik kullanimi. Mulakatci bolme operasyonundaki edge case'i (negatif sayilarda sifira dogru yuvarla) mutlaka sorar. Python'da // operatoru negative infinity'ye yuvarlar, int(a/b) ise sifira dogru. Bu farki bilmen gerekir."
+    },
+    {
+      "id": "stack-queue-02",
+      "title": "Daily Temperatures",
+      "pattern": "Stack (Monotonic)",
+      "difficulty": "orta",
+      "description": "Gunluk sicakliklarin bir dizisi verilir. Her gun icin kac gun sonra daha sicak bir gun gelecegini bul. Daha sicak gun gelmeyecekse 0 yaz.\n\nOrnek: temperatures = [73,74,75,71,69,72,76,73] -> [1,1,4,2,1,1,0,0]",
+      "starter_code": {
+        "python": "def daily_temperatures(temperatures: list[int]) -> list[int]:\n    \"\"\"\n    Monotonic Stack pattern:\n    - Stack'te INDEX'leri tut (sicakliklari degil)\n    - Yeni sicaklik stack'in tepesindeki gunden yuksekse:\n      pop et ve farki hesapla\n    - Bu sekilde her eleman stack'e bir kez girer, bir kez cikar -> O(n)\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert daily_temperatures([73,74,75,71,69,72,76,73]) == [1,1,4,2,1,1,0,0]\nassert daily_temperatures([30,40,50,60]) == [1,1,1,0]\nassert daily_temperatures([30,60,90]) == [1,1,0]\nassert daily_temperatures([90,80,70,60]) == [0,0,0,0]\nprint(\"Daily Temperatures: All tests passed!\")",
+        "javascript": "/**\n * Monotonic Stack pattern:\n * - Stack'te index'leri tut\n * - Yeni sicaklik > stack tepesi -> pop et, fark hesapla\n */\nfunction dailyTemperatures(temperatures) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(JSON.stringify(dailyTemperatures([73,74,75,71,69,72,76,73])) === JSON.stringify([1,1,4,2,1,1,0,0]));\nconsole.assert(JSON.stringify(dailyTemperatures([30,40,50,60])) === JSON.stringify([1,1,1,0]));\nconsole.assert(JSON.stringify(dailyTemperatures([90,80,70,60])) === JSON.stringify([0,0,0,0]));\nconsole.log(\"Daily Temperatures: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": [[73,74,75,71,69,72,76,73]], "expected": [1,1,4,2,1,1,0,0], "description": "Genel durum"},
+        {"input": [[30,40,50,60]], "expected": [1,1,1,0], "description": "Artan seri"},
+        {"input": [[30,60,90]], "expected": [1,1,0], "description": "Kisa artan seri"},
+        {"input": [[90,80,70,60]], "expected": [0,0,0,0], "description": "Azalan seri"}
+      ],
+      "hints": [
+        "Brute force O(n^2): Her gun icin sonraki tum gunlere bak. Daha iyisi var.",
+        "Monotonic Stack: Stack'te henuz 'daha sicak gun bulamayan' gunlerin index'lerini tut.",
+        "Yeni gun gelince stack'teki ondan dusuk sicakliklari pop et. Fark = yeni_index - pop_edilen_index."
+      ],
+      "solution_approach": "MONOTONIC STACK PATTERN: Bu pattern 'bir sonraki buyuk/kucuk eleman' problemlerinde kullanilir. Stack her zaman azalan (veya artan) sirayi korur. Yeni eleman gelince stack'in tepesinden kucukleri cikarir — onlarin 'bir sonraki buyugunun' bu eleman oldugu anlasilir. Her eleman bir kez push, bir kez pop edilir: O(n). Next Greater Element, Stock Span, Largest Rectangle gibi klasik problemlerin hepsi bu pattern'dir.",
+      "solution_code": {
+        "python": "def daily_temperatures(temperatures: list[int]) -> list[int]:\n    n = len(temperatures)\n    result = [0] * n\n    stack = []  # index'leri tutar\n    for i in range(n):\n        while stack and temperatures[i] > temperatures[stack[-1]]:\n            prev_idx = stack.pop()\n            result[prev_idx] = i - prev_idx\n        stack.append(i)\n    return result",
+        "javascript": "function dailyTemperatures(temperatures) {\n    const n = temperatures.length;\n    const result = new Array(n).fill(0);\n    const stack = [];\n    for (let i = 0; i < n; i++) {\n        while (stack.length && temperatures[i] > temperatures[stack[stack.length - 1]]) {\n            const prevIdx = stack.pop();\n            result[prevIdx] = i - prevIdx;\n        }\n        stack.push(i);\n    }\n    return result;\n}"
+      },
+      "time_complexity": "O(n)",
+      "space_complexity": "O(n)",
+      "interview_tip": "Monotonic Stack'i taniman cok onemli. Mulakatci 'O(n) yapabilir misin?' deyince stack'i dusunmelisin. Kilit soru: 'Stack'te ne tutuyorum?' Burada INDEX tutmak onemli, cunku hem sicakligi karsilastirmak hem gun farkini hesaplamak gerekiyor."
+    },
+    {
+      "id": "hashmap-01",
+      "title": "Group Anagrams",
+      "pattern": "HashMap",
+      "difficulty": "orta",
+      "description": "Bir string dizisi verilir. Anagram olan stringleri grupla.\n\nAnagram: Ayni harflerden olusan farkli kelimeler.\nOrnek: strs = ['eat','tea','tan','ate','nat','bat'] -> [['eat','tea','ate'],['tan','nat'],['bat']]",
+      "starter_code": {
+        "python": "from collections import defaultdict\n\ndef group_anagrams(strs: list[str]) -> list[list[str]]:\n    \"\"\"\n    HashMap pattern:\n    - Her string icin bir 'anahtar' (key) uret\n    - Ayni anahtara sahip stringler ayni gruba girer\n    \n    Key secenekleri:\n    1. sorted(string) -> tuple olarak key: O(n * k*log(k))\n    2. Karakter frekansi tuple'i: O(n * k) (daha hizli)\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nresult = group_anagrams([\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"])\nassert len(result) == 3\n# Her grup siralanmis olarak kontrol\nsorted_groups = sorted([sorted(g) for g in result])\nassert sorted_groups == [['ate','eat','tea'], ['bat'], ['nat','tan']]\n\nassert group_anagrams([\"\"]) == [[\"\"]]\nassert group_anagrams([\"a\"]) == [[\"a\"]]\nprint(\"Group Anagrams: All tests passed!\")",
+        "javascript": "/**\n * HashMap pattern:\n * - Her string icin key olustur (sorted veya frekans)\n * - Ayni key'e sahip stringler ayni grupta\n */\nfunction groupAnagrams(strs) {\n    // TODO: Implement\n}\n\n// Test Cases\nconst result = groupAnagrams([\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]);\nconsole.assert(result.length === 3);\nconsole.log(\"Group Anagrams: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": [["eat","tea","tan","ate","nat","bat"]], "expected_groups": 3, "description": "Genel durum"},
+        {"input": [[""]], "expected_groups": 1, "description": "Bos string"},
+        {"input": [["a"]], "expected_groups": 1, "description": "Tek karakter"}
+      ],
+      "hints": [
+        "Anagramlarin ortak noktasi nedir? Ayni harflere ayni sayida sahipler.",
+        "sorted('eat') == sorted('tea') == 'aet'. Sorted string'i key olarak kullanabilirsin.",
+        "Daha hizli: 26 boyutlu tuple (her harf kac kez gectigini tutan) key olarak kullan. sort O(klogk) yerine O(k)."
+      ],
+      "solution_approach": "HASHMAP GRUPLAMA PATTERN: HashMap'in en guclu kullanimi: ortak ozelligi olan elemanlari gruplamak. Anahtar (key) tasarimi kritik. Burada iki yaklasim var: (1) sorted string -> O(k*log(k)) per string, (2) karakter frekansi tuple -> O(k) per string. Gercek mulakatta ikisini de bilmen ve trade-off'u aciklaman beklenir. Bu pattern, ozellikle 'grupla', 'eslesenleri bul', 'benzerleri isle' ifadelerinde calisir.",
+      "solution_code": {
+        "python": "from collections import defaultdict\n\ndef group_anagrams(strs: list[str]) -> list[list[str]]:\n    groups = defaultdict(list)\n    for s in strs:\n        # Yaklasim 1: sorted key\n        # key = tuple(sorted(s))\n        # Yaklasim 2: frekans key (daha hizli)\n        count = [0] * 26\n        for c in s:\n            count[ord(c) - ord('a')] += 1\n        key = tuple(count)\n        groups[key].append(s)\n    return list(groups.values())",
+        "javascript": "function groupAnagrams(strs) {\n    const groups = new Map();\n    for (const s of strs) {\n        const count = new Array(26).fill(0);\n        for (const c of s) count[c.charCodeAt(0) - 97]++;\n        const key = count.join(',');\n        if (!groups.has(key)) groups.set(key, []);\n        groups.get(key).push(s);\n    }\n    return Array.from(groups.values());\n}"
+      },
+      "time_complexity": "O(n * k) — n = dizi uzunlugu, k = ortalama string uzunlugu",
+      "space_complexity": "O(n * k)",
+      "interview_tip": "Mulakatci key tasarimini soracaktir. sorted() basit ama O(k*log(k)). Frekans tuple O(k). Buyuk veri setlerinde bu fark onemli. Ayrica defaultdict yerine setdefault() kullanmak gibi alternatif Python idiom'larini da bil."
+    },
+    {
+      "id": "hashmap-02",
+      "title": "Longest Consecutive Sequence",
+      "pattern": "HashMap/Set",
+      "difficulty": "orta",
+      "description": "Siralanmamis bir integer dizisi verilir. En uzun ardisik (consecutive) eleman dizisinin uzunlugunu bul. Algoritman O(n) olmali.\n\nOrnek: nums = [100,4,200,1,3,2] -> 4 (dizisi: [1,2,3,4])\nOrnek: nums = [0,3,7,2,5,8,4,6,0,1] -> 9 (dizisi: [0,1,2,3,4,5,6,7,8])",
+      "starter_code": {
+        "python": "def longest_consecutive(nums: list[int]) -> int:\n    \"\"\"\n    Set + Akilli Baslangic Noktasi pattern:\n    - Tum elemanlari bir Set'e koy -> O(1) lookup\n    - Her eleman icin: eger num-1 set'te YOKSA,\n      bu sayi bir dizinin BASLANGICI demektir\n    - Baslangictan itibaren num+1, num+2... sayarak uzunlugu bul\n    \n    Neden O(n)? Her eleman en fazla bir kez dizinin\n    parcasi olarak ziyaret edilir.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert longest_consecutive([100,4,200,1,3,2]) == 4\nassert longest_consecutive([0,3,7,2,5,8,4,6,0,1]) == 9\nassert longest_consecutive([]) == 0\nassert longest_consecutive([1]) == 1\nassert longest_consecutive([1,2,0,1]) == 3\nprint(\"Longest Consecutive Sequence: All tests passed!\")",
+        "javascript": "/**\n * Set + Akilli Baslangic pattern:\n * - Set'e koy, num-1 yoksa baslangic, oradan say\n */\nfunction longestConsecutive(nums) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(longestConsecutive([100,4,200,1,3,2]) === 4);\nconsole.assert(longestConsecutive([0,3,7,2,5,8,4,6,0,1]) === 9);\nconsole.assert(longestConsecutive([]) === 0);\nconsole.assert(longestConsecutive([1]) === 1);\nconsole.log(\"Longest Consecutive Sequence: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": [[100,4,200,1,3,2]], "expected": 4, "description": "Genel durum"},
+        {"input": [[0,3,7,2,5,8,4,6,0,1]], "expected": 9, "description": "Uzun dizi"},
+        {"input": [[]], "expected": 0, "description": "Bos dizi"},
+        {"input": [[1]], "expected": 1, "description": "Tek eleman"},
+        {"input": [[1,2,0,1]], "expected": 3, "description": "Tekrar eden elemanlar"}
+      ],
+      "hints": [
+        "Siralama O(n log n) olur. O(n) icin farkli dusunmen gerekir.",
+        "Set'e koyarak O(1) lookup sagla. Ama her elemandan saymaya baslarsan worst case O(n^2) olur.",
+        "Sadece dizinin BASLANGIC noktasindan say: num-1 set'te yoksa bu bir baslangic. Bu garanti eder ki her eleman en fazla bir kez ziyaret edilir -> O(n)."
+      ],
+      "solution_approach": "SET + AKILLI BASLANGIC PATTERN: Bu problem Set'in O(1) lookup ozelligini kullanir. Kilit fikir: her elemanin dizisini saymak O(n^2) olur, ama SADECE baslangic noktalarindan (num-1 yoksa) saymak toplam O(n) yapar. Cunku tum diziler toplam n eleman kaplar. Bu 'akilli baslangic noktasi' teknigi mulakatlarda cok sevilen bir O(n) optimizasyon pattern'idir.",
+      "solution_code": {
+        "python": "def longest_consecutive(nums: list[int]) -> int:\n    num_set = set(nums)\n    max_len = 0\n    for num in num_set:\n        if num - 1 not in num_set:  # Dizinin baslangici\n            current = num\n            length = 1\n            while current + 1 in num_set:\n                current += 1\n                length += 1\n            max_len = max(max_len, length)\n    return max_len",
+        "javascript": "function longestConsecutive(nums) {\n    const numSet = new Set(nums);\n    let maxLen = 0;\n    for (const num of numSet) {\n        if (!numSet.has(num - 1)) {\n            let current = num;\n            let length = 1;\n            while (numSet.has(current + 1)) {\n                current++;\n                length++;\n            }\n            maxLen = Math.max(maxLen, length);\n        }\n    }\n    return maxLen;\n}"
+      },
+      "time_complexity": "O(n)",
+      "space_complexity": "O(n)",
+      "interview_tip": "Mulakatci O(n) zorunlulugunu belirtir. Siralama O(n log n) oldugu icin dislanir. Kilit: 'neden O(n)?' sorusuna cevap: 'Her eleman en fazla bir kez ic dongude ziyaret edilir, cunku sadece baslangic noktalarindan sayiyoruz.' Bu amortized analiz anlayisini gosterir."
+    },
+    {
+      "id": "binary-search-01",
+      "title": "Search in Rotated Sorted Array",
+      "pattern": "Binary Search (Modified)",
+      "difficulty": "orta",
+      "description": "Bir noktadan rotate edilmis sirali bir dizi verilir. Target degeri bul ve index'ini dondur, yoksa -1 dondur. O(log n) olmali.\n\nOrnek: nums = [4,5,6,7,0,1,2], target = 0 -> 4\nOrnek: nums = [4,5,6,7,0,1,2], target = 3 -> -1",
+      "starter_code": {
+        "python": "def search(nums: list[int], target: int) -> int:\n    \"\"\"\n    Modified Binary Search:\n    - mid'i bul\n    - Hangi YARI sirali? (left..mid mi, mid..right mi?)\n    - Sirali yarida target var mi kontrol et\n    - Varsa o yariya git, yoksa diger yariya\n    \n    Kilit gozlem: Rotated sorted array'de her zaman\n    EN AZ BIR yari tamamen siralidir.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert search([4,5,6,7,0,1,2], 0) == 4\nassert search([4,5,6,7,0,1,2], 3) == -1\nassert search([1], 0) == -1\nassert search([1], 1) == 0\nassert search([3,1], 1) == 1\nprint(\"Search in Rotated Array: All tests passed!\")",
+        "javascript": "/**\n * Modified Binary Search:\n * - mid bul, hangi yari sirali belirle, target o yarida mi kontrol et\n */\nfunction search(nums, target) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(search([4,5,6,7,0,1,2], 0) === 4);\nconsole.assert(search([4,5,6,7,0,1,2], 3) === -1);\nconsole.assert(search([1], 0) === -1);\nconsole.assert(search([3,1], 1) === 1);\nconsole.log(\"Search in Rotated Array: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": [[4,5,6,7,0,1,2], 0], "expected": 4, "description": "Genel durum, sag yarida"},
+        {"input": [[4,5,6,7,0,1,2], 3], "expected": -1, "description": "Target yok"},
+        {"input": [[1], 0], "expected": -1, "description": "Tek eleman, yok"},
+        {"input": [[1], 1], "expected": 0, "description": "Tek eleman, var"},
+        {"input": [[3,1], 1], "expected": 1, "description": "Iki eleman"}
+      ],
+      "hints": [
+        "Normal binary search yapamazsin cunku dizi tam sirali degil. Ama bir gozlem var...",
+        "Mid'i buldugunda, sol yari (left..mid) VEYA sag yari (mid..right) kesinlikle siralidir.",
+        "Sirali yaridaki min ve max'a bakarak target'in o yarida olup olmadigini belirle. Varsa o tarafa git, yoksa digeri."
+      ],
+      "solution_approach": "MODIFIED BINARY SEARCH PATTERN: Klasik binary search sirali dizide calisir. Rotated dizide kilit gozlem: her zaman en az bir yari siralidir. mid'i bulduktan sonra hangi yarinin sirali oldugunu nums[left] <= nums[mid] ile belirleriz. Sirali yaridaki aralikta target var mi kontrol ederiz. Bu pattern sorted ama 'bozuk' yapilardaki arama problemlerinin temelidir. 'O(log n) bul' gordugun anda binary search dusun.",
+      "solution_code": {
+        "python": "def search(nums: list[int], target: int) -> int:\n    left, right = 0, len(nums) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if nums[mid] == target:\n            return mid\n        # Sol yari sirali mi?\n        if nums[left] <= nums[mid]:\n            if nums[left] <= target < nums[mid]:\n                right = mid - 1\n            else:\n                left = mid + 1\n        else:  # Sag yari sirali\n            if nums[mid] < target <= nums[right]:\n                left = mid + 1\n            else:\n                right = mid - 1\n    return -1",
+        "javascript": "function search(nums, target) {\n    let left = 0, right = nums.length - 1;\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n        if (nums[mid] === target) return mid;\n        if (nums[left] <= nums[mid]) {\n            if (nums[left] <= target && target < nums[mid]) right = mid - 1;\n            else left = mid + 1;\n        } else {\n            if (nums[mid] < target && target <= nums[right]) left = mid + 1;\n            else right = mid - 1;\n        }\n    }\n    return -1;\n}"
+      },
+      "time_complexity": "O(log n)",
+      "space_complexity": "O(1)",
+      "interview_tip": "Bu problem binary search'un zor varyanti. Mulakatci '<=' mi '<' mi kullandigina dikkat eder. Edge case: [3,1] gibi 2 elemanli rotated dizi. nums[left] <= nums[mid] (esitlik dahil) kullanmak onemli, cunku left == mid olabilir. Bu detay bug'larin %90'ini olusturur."
+    },
+    {
+      "id": "binary-search-02",
+      "title": "Find Minimum in Rotated Sorted Array",
+      "pattern": "Binary Search (Modified)",
+      "difficulty": "orta",
+      "description": "Rotate edilmis sirali bir dizide (tekrarsiz) minimum elemani bul. O(log n) olmali.\n\nOrnek: nums = [3,4,5,1,2] -> 1\nOrnek: nums = [4,5,6,7,0,1,2] -> 0\nOrnek: nums = [11,13,15,17] -> 11 (rotate edilmemis)",
+      "starter_code": {
+        "python": "def find_min(nums: list[int]) -> int:\n    \"\"\"\n    Binary Search - Minimum Arama:\n    - Eger dizi rotate edilmemisse nums[left] < nums[right], cevap nums[left]\n    - mid'i bul:\n      - nums[mid] > nums[right] ise: minimum SAG tarafta (mid+1..right)\n      - Degilse: minimum SOL tarafta veya mid'in kendisi (left..mid)\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert find_min([3,4,5,1,2]) == 1\nassert find_min([4,5,6,7,0,1,2]) == 0\nassert find_min([11,13,15,17]) == 11\nassert find_min([2,1]) == 1\nassert find_min([1]) == 1\nprint(\"Find Minimum in Rotated Array: All tests passed!\")",
+        "javascript": "/**\n * Binary Search - Minimum Arama:\n * - nums[mid] > nums[right] ise min sag tarafta\n * - Degilse min sol tarafta veya mid\n */\nfunction findMin(nums) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(findMin([3,4,5,1,2]) === 1);\nconsole.assert(findMin([4,5,6,7,0,1,2]) === 0);\nconsole.assert(findMin([11,13,15,17]) === 11);\nconsole.assert(findMin([2,1]) === 1);\nconsole.log(\"Find Minimum in Rotated Array: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": [[3,4,5,1,2]], "expected": 1, "description": "Ortadan rotate"},
+        {"input": [[4,5,6,7,0,1,2]], "expected": 0, "description": "Genel durum"},
+        {"input": [[11,13,15,17]], "expected": 11, "description": "Rotate edilmemis"},
+        {"input": [[2,1]], "expected": 1, "description": "Iki eleman"},
+        {"input": [[1]], "expected": 1, "description": "Tek eleman"}
+      ],
+      "hints": [
+        "Minimum, rotation noktasidir — siralamanin kirildigi yer.",
+        "nums[mid] > nums[right] ise rotation noktasi sag tarafa, degilse sol tarafta veya mid'de.",
+        "left < right kosulu ile donguyu kur (left <= right degil). Sonunda left == right == minimum."
+      ],
+      "solution_approach": "BINARY SEARCH - INVARIANT PATTERN: Bu problemde binary search'un 'invariant' (degismez kosul) varyanti kullanilir. nums[mid] > nums[right] karsilastirmasi ile rotation noktasinin hangi tarafta oldugunu belirleriz. Bu karsilastirma her zaman dogru tarafi gosterir cunku rotation noktasinin sag tarafinda elemanlar nums[right]'tan kucuk veya esittir. left < right kosulu (esitlik yok) ile sonuc left'te kalir.",
+      "solution_code": {
+        "python": "def find_min(nums: list[int]) -> int:\n    left, right = 0, len(nums) - 1\n    while left < right:\n        mid = (left + right) // 2\n        if nums[mid] > nums[right]:\n            left = mid + 1\n        else:\n            right = mid\n    return nums[left]",
+        "javascript": "function findMin(nums) {\n    let left = 0, right = nums.length - 1;\n    while (left < right) {\n        const mid = Math.floor((left + right) / 2);\n        if (nums[mid] > nums[right]) left = mid + 1;\n        else right = mid;\n    }\n    return nums[left];\n}"
+      },
+      "time_complexity": "O(log n)",
+      "space_complexity": "O(1)",
+      "interview_tip": "left < right vs left <= right farki kritik. Bu problemde left < right kullaniyoruz cunku sonucu left'te bulmak istiyoruz. left <= right kullansak sonsuz dongu riski var (right = mid yuzunden). Binary search problemlerinde dongu kosulu ve mid guncelleme birlikte dusunulmeli."
+    },
+    {
+      "id": "linked-list-01",
+      "title": "Merge Two Sorted Lists",
+      "pattern": "Linked List",
+      "difficulty": "kolay",
+      "description": "Iki sirali linked list verilir. Bunlari sirali bir sekilde birlestir ve yeni listenin basini dondur.\n\nOrnek: l1 = [1,2,4], l2 = [1,3,4] -> [1,1,2,3,4,4]",
+      "starter_code": {
+        "python": "class ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef merge_two_lists(list1: ListNode, list2: ListNode) -> ListNode:\n    \"\"\"\n    Dummy Node + Merge pattern:\n    - Dummy node olustur (basa ekleme kolayligi)\n    - Iki listeyi karsilastirarak kucuk olani ekle\n    - Biri bitince digerin kalanini ekle\n    - dummy.next dondur\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Helper: list -> linked list\ndef to_linked(arr):\n    dummy = ListNode(0)\n    curr = dummy\n    for val in arr:\n        curr.next = ListNode(val)\n        curr = curr.next\n    return dummy.next\n\n# Helper: linked list -> list\ndef to_list(node):\n    result = []\n    while node:\n        result.append(node.val)\n        node = node.next\n    return result\n\n# Test Cases\nassert to_list(merge_two_lists(to_linked([1,2,4]), to_linked([1,3,4]))) == [1,1,2,3,4,4]\nassert to_list(merge_two_lists(to_linked([]), to_linked([]))) == []\nassert to_list(merge_two_lists(to_linked([]), to_linked([0]))) == [0]\nassert to_list(merge_two_lists(to_linked([5]), to_linked([1,2,3]))) == [1,2,3,5]\nprint(\"Merge Two Sorted Lists: All tests passed!\")",
+        "javascript": "class ListNode {\n    constructor(val = 0, next = null) {\n        this.val = val;\n        this.next = next;\n    }\n}\n\n/**\n * Dummy Node + Merge pattern:\n * - Dummy node ile baslangic kolayligi\n * - Iki listeyi karsilastirarak birlestir\n */\nfunction mergeTwoLists(list1, list2) {\n    // TODO: Implement\n}\n\n// Helper functions\nfunction toLinked(arr) {\n    const dummy = new ListNode(0);\n    let curr = dummy;\n    for (const val of arr) { curr.next = new ListNode(val); curr = curr.next; }\n    return dummy.next;\n}\nfunction toList(node) {\n    const result = [];\n    while (node) { result.push(node.val); node = node.next; }\n    return result;\n}\n\n// Test Cases\nconsole.assert(JSON.stringify(toList(mergeTwoLists(toLinked([1,2,4]), toLinked([1,3,4])))) === JSON.stringify([1,1,2,3,4,4]));\nconsole.assert(JSON.stringify(toList(mergeTwoLists(toLinked([]), toLinked([])))) === JSON.stringify([]));\nconsole.log(\"Merge Two Sorted Lists: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": [[1,2,4], [1,3,4]], "expected": [1,1,2,3,4,4], "description": "Genel durum"},
+        {"input": [[], []], "expected": [], "description": "Iki bos liste"},
+        {"input": [[], [0]], "expected": [0], "description": "Biri bos"},
+        {"input": [[5], [1,2,3]], "expected": [1,2,3,5], "description": "Farkli uzunluklar"}
+      ],
+      "hints": [
+        "Dummy node kullan — bas node'u ayri tutma derdinden kurtarir.",
+        "current pointer'i ile yeni listeyi insa et. Her adimda kucuk olan node'u ekle.",
+        "Bir liste bitince digerin kalanini direkt bagla (zaten sirali)."
+      ],
+      "solution_approach": "DUMMY NODE PATTERN: Linked list problemlerinde dummy (sentinel) node basa ekleme/silme edge case'lerini ortadan kaldirir. Bu problem merge sort'un merge adiminin linked list versiyonudur. Iki pointer (p1, p2) her iki listeyi yurur, kucuk olan current.next olur. Bu pattern Merge K Sorted Lists, Sort List gibi problemlerin temelidir.",
+      "solution_code": {
+        "python": "def merge_two_lists(list1: ListNode, list2: ListNode) -> ListNode:\n    dummy = ListNode(0)\n    current = dummy\n    while list1 and list2:\n        if list1.val <= list2.val:\n            current.next = list1\n            list1 = list1.next\n        else:\n            current.next = list2\n            list2 = list2.next\n        current = current.next\n    current.next = list1 if list1 else list2\n    return dummy.next",
+        "javascript": "function mergeTwoLists(list1, list2) {\n    const dummy = new ListNode(0);\n    let current = dummy;\n    while (list1 && list2) {\n        if (list1.val <= list2.val) {\n            current.next = list1;\n            list1 = list1.next;\n        } else {\n            current.next = list2;\n            list2 = list2.next;\n        }\n        current = current.next;\n    }\n    current.next = list1 || list2;\n    return dummy.next;\n}"
+      },
+      "time_complexity": "O(n + m)",
+      "space_complexity": "O(1) — yeni node olusturmuyoruz, mevcut node'lari yeniden bagliyoruz",
+      "interview_tip": "Mulakatci dummy node pattern'ini bilip bilmedigini test eder. Dummy kullanmadan yazarsan bas node icin ayri if kosulu gerekir — hata riski artar. Ayrica recursive cozum de sorulabilir ama stack overflow riski var."
+    },
+    {
+      "id": "linked-list-02",
+      "title": "Linked List Cycle Detection",
+      "pattern": "Linked List (Fast/Slow Pointer)",
+      "difficulty": "kolay",
+      "description": "Bir linked list verilir. Icinde cycle (dongu) var mi kontrol et.\n\nCycle: Son node'un next'i listedeki bir onceki node'a isaret ediyorsa dongu vardir.\n\nOrnek: head = [3,2,0,-4] (tail -> node 1) -> true\nOrnek: head = [1,2] (tail -> node 0) -> true\nOrnek: head = [1] (no cycle) -> false",
+      "starter_code": {
+        "python": "class ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef has_cycle(head: ListNode) -> bool:\n    \"\"\"\n    Floyd's Cycle Detection (Tortoise and Hare):\n    - slow pointer: her adimda 1 ileri\n    - fast pointer: her adimda 2 ileri\n    - Cycle varsa MUTLAKA bulusurlar\n    - Cycle yoksa fast None'a ulasir\n    \n    Neden bulusuyorlar?\n    Cycle'a girdikten sonra fast, slow'a her adimda 1 yaklasir.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\n# Cycle var\nnode1 = ListNode(3)\nnode2 = ListNode(2)\nnode3 = ListNode(0)\nnode4 = ListNode(-4)\nnode1.next = node2\nnode2.next = node3\nnode3.next = node4\nnode4.next = node2  # cycle!\nassert has_cycle(node1) == True\n\n# Cycle yok\nnode_a = ListNode(1)\nnode_b = ListNode(2)\nnode_a.next = node_b\nassert has_cycle(node_a) == False\n\n# Tek node, cycle yok\nassert has_cycle(ListNode(1)) == False\n\n# Bos liste\nassert has_cycle(None) == False\n\nprint(\"Linked List Cycle: All tests passed!\")",
+        "javascript": "class ListNode {\n    constructor(val = 0, next = null) {\n        this.val = val;\n        this.next = next;\n    }\n}\n\n/**\n * Floyd's Cycle Detection (Tortoise and Hare):\n * - slow: 1 adim, fast: 2 adim\n * - Bulusurlarsa cycle var\n */\nfunction hasCycle(head) {\n    // TODO: Implement\n}\n\n// Test Cases\nconst n1 = new ListNode(3);\nconst n2 = new ListNode(2);\nconst n3 = new ListNode(0);\nconst n4 = new ListNode(-4);\nn1.next = n2; n2.next = n3; n3.next = n4; n4.next = n2;\nconsole.assert(hasCycle(n1) === true);\nconsole.assert(hasCycle(null) === false);\nconsole.log(\"Linked List Cycle: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": "cycle at node 1", "expected": true, "description": "Cycle var"},
+        {"input": "no cycle", "expected": false, "description": "Cycle yok"},
+        {"input": "single node", "expected": false, "description": "Tek node"},
+        {"input": "null", "expected": false, "description": "Bos liste"}
+      ],
+      "hints": [
+        "Set ile O(n) space: Her node'u set'e ekle, tekrar gorursen cycle var. Ama O(1) space yapabilir misin?",
+        "Floyd's Algorithm: slow (1 adim) ve fast (2 adim) pointer kullan.",
+        "Fast null'a ulasirsa cycle yok. slow == fast olursa cycle var."
+      ],
+      "solution_approach": "FLOYD'S CYCLE DETECTION (TORTOISE AND HARE): Bu pattern linked list'te cycle bulmanin O(1) space cozumudur. Slow 1 adim, fast 2 adim atar. Cycle varsa fast, slow'u 'kovalar'. Cycle icinde fast her adimda 1 yaklasir, bu yuzden mutlaka bulusurlar. Bu pattern linked list'in ortasini bulmak, cycle baslangicini bulmak (Floyd's part 2), ve palindrom kontrolu gibi problemlerde de kullanilir.",
+      "solution_code": {
+        "python": "def has_cycle(head: ListNode) -> bool:\n    slow = fast = head\n    while fast and fast.next:\n        slow = slow.next\n        fast = fast.next.next\n        if slow == fast:\n            return True\n    return False",
+        "javascript": "function hasCycle(head) {\n    let slow = head, fast = head;\n    while (fast && fast.next) {\n        slow = slow.next;\n        fast = fast.next.next;\n        if (slow === fast) return true;\n    }\n    return false;\n}"
+      },
+      "time_complexity": "O(n)",
+      "space_complexity": "O(1)",
+      "interview_tip": "Mulakatci kesinlikle 'neden O(1) space?' diye sorar. Set cozumu O(n) space, Floyd O(1). Follow-up: 'Cycle'in baslangic node'unu bul' — slow ve fast bulustuktan sonra slow'u basa al, ikisi birer adim atsun, tekrar bulustugu yer cycle baslangici. Bu matematiksel ispati bilmen senior seviye gosterir."
+    },
+    {
+      "id": "tree-01",
+      "title": "Binary Tree Level Order Traversal",
+      "pattern": "Tree BFS",
+      "difficulty": "orta",
+      "description": "Bir binary tree verilir. Level order (seviye sirasi) traversal yap ve her seviyedeki degerleri ayri listeler olarak dondur.\n\nOrnek: root = [3,9,20,null,null,15,7] -> [[3],[9,20],[15,7]]",
+      "starter_code": {
+        "python": "from collections import deque\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef level_order(root: TreeNode) -> list[list[int]]:\n    \"\"\"\n    BFS + Level Ayirma pattern:\n    - Queue (deque) kullan\n    - Her iterasyonda queue'nun MEVCUT boyutunu al\n    - O kadar node'u isle -> bunlar ayni seviye\n    - Cocuklari queue'ya ekle -> bir sonraki seviye\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nroot1 = TreeNode(3,\n    TreeNode(9),\n    TreeNode(20, TreeNode(15), TreeNode(7))\n)\nassert level_order(root1) == [[3],[9,20],[15,7]]\n\nassert level_order(TreeNode(1)) == [[1]]\nassert level_order(None) == []\n\nroot2 = TreeNode(1, TreeNode(2, TreeNode(4), TreeNode(5)), TreeNode(3))\nassert level_order(root2) == [[1],[2,3],[4,5]]\nprint(\"Level Order Traversal: All tests passed!\")",
+        "javascript": "class TreeNode {\n    constructor(val = 0, left = null, right = null) {\n        this.val = val;\n        this.left = left;\n        this.right = right;\n    }\n}\n\n/**\n * BFS + Level Ayirma pattern:\n * - Queue kullan, her seviyeyi ayri isle\n */\nfunction levelOrder(root) {\n    // TODO: Implement\n}\n\n// Test Cases\nconst root1 = new TreeNode(3, new TreeNode(9), new TreeNode(20, new TreeNode(15), new TreeNode(7)));\nconsole.assert(JSON.stringify(levelOrder(root1)) === JSON.stringify([[3],[9,20],[15,7]]));\nconsole.assert(JSON.stringify(levelOrder(null)) === JSON.stringify([]));\nconsole.log(\"Level Order Traversal: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": "[3,9,20,null,null,15,7]", "expected": [[3],[9,20],[15,7]], "description": "Genel durum"},
+        {"input": "[1]", "expected": [[1]], "description": "Tek node"},
+        {"input": "null", "expected": [], "description": "Bos agac"},
+        {"input": "[1,2,3,4,5]", "expected": [[1],[2,3],[4,5]], "description": "Sol agirlikli"}
+      ],
+      "hints": [
+        "BFS = Queue. Her seviyeyi nasil ayirirsin?",
+        "Her dongu basinda queue.length al — bu o seviyedeki node sayisi.",
+        "O kadar node'u pop et, cocuklarini push et. Boylece seviyeler otomatik ayrilir."
+      ],
+      "solution_approach": "TREE BFS + LEVEL AYIRMA PATTERN: Agac BFS'inin en onemli teknigi seviye ayirma. Queue'nun mevcut boyutunu alarak o seviyedeki tum node'lari tek seferde isleriz. Bu pattern Zigzag Traversal, Right Side View, Average of Levels gibi onlarca agac problemine uyar. Kilit nokta: for dongusu len(queue) kadar doner, bu sirada eklenen cocuklar bir sonraki seviyeye aittir.",
+      "solution_code": {
+        "python": "from collections import deque\n\ndef level_order(root: TreeNode) -> list[list[int]]:\n    if not root:\n        return []\n    result = []\n    queue = deque([root])\n    while queue:\n        level_size = len(queue)\n        level = []\n        for _ in range(level_size):\n            node = queue.popleft()\n            level.append(node.val)\n            if node.left:\n                queue.append(node.left)\n            if node.right:\n                queue.append(node.right)\n        result.append(level)\n    return result",
+        "javascript": "function levelOrder(root) {\n    if (!root) return [];\n    const result = [];\n    const queue = [root];\n    while (queue.length) {\n        const levelSize = queue.length;\n        const level = [];\n        for (let i = 0; i < levelSize; i++) {\n            const node = queue.shift();\n            level.push(node.val);\n            if (node.left) queue.push(node.left);\n            if (node.right) queue.push(node.right);\n        }\n        result.push(level);\n    }\n    return result;\n}"
+      },
+      "time_complexity": "O(n)",
+      "space_complexity": "O(n) — queue en genis seviyeyi tutar",
+      "interview_tip": "Bu problem agac BFS'inin temel sablonudur. Mulakatci varyasyonlar sorar: 'Zigzag yapabilir misin?' (her seviyede yon degistir), 'Sadece sag taraftan gorunenleri ver' (her seviyenin son elemani). Sablonu bilirsen varyasyonlar kolay."
+    },
+    {
+      "id": "tree-02",
+      "title": "Validate Binary Search Tree",
+      "pattern": "Tree DFS",
+      "difficulty": "orta",
+      "description": "Bir binary tree'nin gecerli bir BST (Binary Search Tree) olup olmadigini kontrol et.\n\nBST kurallari:\n- Sol alt agactaki TUM degerler node'dan kucuk\n- Sag alt agactaki TUM degerler node'dan buyuk\n- Sol ve sag alt agaclar da BST olmali\n\nOrnek: root = [2,1,3] -> true\nOrnek: root = [5,1,4,null,null,3,6] -> false (4, 5'ten kucuk ama sag tarafta)",
+      "starter_code": {
+        "python": "class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef is_valid_bst(root: TreeNode) -> bool:\n    \"\"\"\n    DFS + Range Propagation pattern:\n    - Her node icin gecerli aralik [min_val, max_val] tut\n    - Sol cocuga giderken max_val = current.val\n    - Sag cocuga giderken min_val = current.val\n    - Node aralik disindaysa BST degil\n    \n    YAYGIN HATA: Sadece parent-child karsilastirmak yetmez!\n    Sol alt agactaki TUM degerler root'tan kucuk olmali.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert is_valid_bst(TreeNode(2, TreeNode(1), TreeNode(3))) == True\nassert is_valid_bst(TreeNode(5, TreeNode(1), TreeNode(4, TreeNode(3), TreeNode(6)))) == False\nassert is_valid_bst(TreeNode(1)) == True\nassert is_valid_bst(None) == True\n# Edge case: [5,4,6,null,null,3,7] -> False (3, sol tarafta olmali)\nassert is_valid_bst(TreeNode(5, TreeNode(4), TreeNode(6, TreeNode(3), TreeNode(7)))) == False\nprint(\"Validate BST: All tests passed!\")",
+        "javascript": "class TreeNode {\n    constructor(val = 0, left = null, right = null) {\n        this.val = val;\n        this.left = left;\n        this.right = right;\n    }\n}\n\n/**\n * DFS + Range Propagation pattern:\n * - Her node icin [min, max] aralik tut\n * - Sol: max = current, Sag: min = current\n */\nfunction isValidBST(root) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(isValidBST(new TreeNode(2, new TreeNode(1), new TreeNode(3))) === true);\nconsole.assert(isValidBST(new TreeNode(5, new TreeNode(1), new TreeNode(4, new TreeNode(3), new TreeNode(6)))) === false);\nconsole.assert(isValidBST(null) === true);\nconsole.log(\"Validate BST: All tests passed!\");"
+      },
+      "test_cases": [
+        {"input": "[2,1,3]", "expected": true, "description": "Gecerli BST"},
+        {"input": "[5,1,4,null,null,3,6]", "expected": false, "description": "4 sag tarafta ama 5'ten kucuk"},
+        {"input": "[1]", "expected": true, "description": "Tek node"},
+        {"input": "null", "expected": true, "description": "Bos agac"},
+        {"input": "[5,4,6,null,null,3,7]", "expected": false, "description": "3, 6'nin solunda ama 5'ten kucuk"}
+      ],
+      "hints": [
+        "Yanlis yaklasim: Sadece node.left.val < node.val ve node.right.val > node.val kontrol etmek. Bu alt agaclardaki tum degerleri kontrol etmez.",
+        "Dogru yaklasim: Her node'a bir [lower, upper] aralik gecindir. Baslangicta [-inf, +inf].",
+        "Sol cocuga: [lower, node.val], sag cocuga: [node.val, upper] gecir. Node aralik disindaysa False."
+      ],
+      "solution_approach": "DFS + RANGE PROPAGATION PATTERN: BST dogrulama'nin en yaygin hatasi sadece parent-child karsilastirmaktir. Dogru yaklasim her node'a gecerli aralik [lower, upper] gecirmektir. Root [-inf, +inf] ile baslar. Sol cocuga gidince upper = node.val olur (sol taraftaki her sey node'dan kucuk olmali). Sag cocuga gidince lower = node.val olur. Bu 'aralik yayilimi' pattern'i Trim BST, Range Sum BST gibi problemlerde de kullanilir.",
+      "solution_code": {
+        "python": "def is_valid_bst(root: TreeNode) -> bool:\n    def validate(node, lower=float('-inf'), upper=float('inf')):\n        if not node:\n            return True\n        if node.val <= lower or node.val >= upper:\n            return False\n        return (validate(node.left, lower, node.val) and\n                validate(node.right, node.val, upper))\n    return validate(root)",
+        "javascript": "function isValidBST(root) {\n    function validate(node, lower = -Infinity, upper = Infinity) {\n        if (!node) return true;\n        if (node.val <= lower || node.val >= upper) return false;\n        return validate(node.left, lower, node.val) &&\n               validate(node.right, node.val, upper);\n    }\n    return validate(root);\n}"
+      },
+      "time_complexity": "O(n)",
+      "space_complexity": "O(h) — h = agac yuksekligi (recursion stack)",
+      "interview_tip": "Mulakatci bu problemde 2 cozumu bilmeni ister: (1) Range propagation (yukaridaki), (2) Inorder traversal — BST'nin inorder traversal'i sirali olmali. Inorder yaklasim bazen daha sezgisel. Alternatif olarak onceki degeri tutup karsilastirabilirsin."
+    }
+  ],
+  "evaluation_criteria": [
+    {"criterion": "Two Pointers pattern'ini dogru uygulama", "points": 15},
+    {"criterion": "Sliding Window pattern'ini dogru uygulama", "points": 15},
+    {"criterion": "Stack/Monotonic Stack pattern'ini dogru uygulama", "points": 15},
+    {"criterion": "HashMap/Set ile gruplama ve arama", "points": 15},
+    {"criterion": "Binary Search varyasyonlarini dogru uygulama", "points": 10},
+    {"criterion": "Linked List manipulasyonu", "points": 10},
+    {"criterion": "Tree BFS/DFS traversal", "points": 10},
+    {"criterion": "Tum test case'ler gecmesi", "points": 10}
+  ],
+  "hints": [
+    "Her pattern'i once basit problemde (ilk soru), sonra zor problemde (ikinci soru) calis.",
+    "Cozumu ezberleme, PATTERN'i ezberle. Ayni pattern'in farkli problemlerde nasil uygulandigini anla.",
+    "Mulakatta: once brute force soyle, sonra optimize et. Bu dusunce surecini gosterir.",
+    "Her cozumde time/space complexity'yi kendin analiz et. Mulakatci mutlaka soracaktir."
+  ],
+  "tags": ["dsa", "patterns", "two-pointers", "sliding-window", "stack", "hashmap", "binary-search", "linked-list", "tree", "bfs", "dfs", "interview"]
+}

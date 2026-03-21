@@ -1,0 +1,108 @@
+{
+  "id": "mod-14-security/quiz-01",
+  "title": "Web Güvenliği & Networking Quiz",
+  "description": "OWASP Top 10, XSS, CSRF, SQL Injection, password hashing, TLS, SSH ve network güvenliği konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 20,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "SQL Injection saldırısını önlemenin en etkili yolu hangisidir?",
+      "options": [
+        "Input'u regex ile filtrelemek",
+        "Parameterized queries (prepared statements) kullanmak",
+        "Input'taki tırnak işaretlerini silmek",
+        "WAF (Web Application Firewall) kullanmak"
+      ],
+      "correct": 1,
+      "explanation": "Parameterized queries, kullanıcı girdisini SQL komutundan tamamen ayırır. Veritabanı motoru girdiyi ASLA SQL kodu olarak yorumlamaz, sadece veri olarak işler. Regex filtreleme ve karakter silme atlanabilir, WAF ek koruma katmanıdır ama tek başına yeterli değildir. ORM'ler de arka planda parameterized query kullanır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "question": "React uygulamalarında JSX içinde {userInput} kullanmak XSS'e karşı otomatik koruma sağlar, ancak dangerouslySetInnerHTML kullanmak bu korumayı devre dışı bırakır.",
+      "correct": true,
+      "explanation": "Doğru! React, JSX içindeki değişkenleri otomatik olarak HTML encode eder, bu sayede <script> gibi zararlı tag'ler düz metin olarak gösterilir. Ancak dangerouslySetInnerHTML, adından da anlaşılacağı gibi, bu korumayı bypass eder ve raw HTML render eder. Kullanmak zorundaysan DOMPurify ile sanitize et.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "explain_code",
+      "question": "Bu Express.js middleware'inde güvenlik açığı var mı? Varsa ne?",
+      "code": "app.get('/api/search', async (req, res) => {\n  const { q } = req.query;\n  const query = `SELECT * FROM products WHERE name LIKE '%${q}%'`;\n  const result = await db.query(query);\n  res.json(result.rows);\n});",
+      "correct": "Evet, SQL Injection açığı var. Kullanıcı girdisi (q) doğrudan SQL sorgusuna string interpolation ile ekleniyor. Saldırgan q parametresine ' OR 1=1 -- gönderirse tüm ürünleri görebilir, hatta '; DROP TABLE products; -- ile tabloyu silebilir. Çözüm: Parameterized query kullanmak: db.query('SELECT * FROM products WHERE name LIKE $1', [`%${q}%`])",
+      "explanation": "String interpolation/concatenation ile SQL sorgusu oluşturmak en yaygın ve en tehlikeli güvenlik hatalarından biridir. LIKE sorguları için bile parameterized query kullanılmalıdır. Wildcard karakterleri (%) parametre değerinin içine konulmalıdır.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "bcrypt'in şifre hash'leme için MD5 veya SHA-256'dan daha güvenli olmasının temel sebebi nedir?",
+      "options": [
+        "bcrypt daha uzun hash üretir",
+        "bcrypt kasıtlı olarak yavaş tasarlanmıştır ve otomatik salt ekler, bu sayede brute force saldırıları pratik olarak imkansız hale gelir",
+        "bcrypt şifreleme algoritmasıdır, MD5 ise hash algoritmasıdır",
+        "bcrypt sadece Node.js'te çalışır"
+      ],
+      "correct": 1,
+      "explanation": "bcrypt'in güvenliği iki temel özelliğinden gelir: (1) Adaptive cost factor - hesaplama kasıtlı olarak yavaştır ve salt rounds ile ayarlanabilir. 12 rounds ile bir hash ~250ms sürer, GPU ile bile saniyede sadece birkaç deneme yapılabilir. (2) Otomatik salt - aynı şifre her seferinde farklı hash üretir, rainbow table saldırılarını imkansız kılar. MD5/SHA-256 hızlı olmak için tasarlanmıştır - GPU'lar saniyede milyarlarca hash hesaplayabilir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "order_steps",
+      "question": "TLS 1.3 handshake adımlarını doğru sıraya koy:",
+      "steps": [
+        "Client, ClientHello mesajı gönderir (desteklenen cipher suite'ler ve key share)",
+        "Server, ServerHello + Certificate + Finished gönderir",
+        "Client, sertifikayı CA ile doğrular (domain, süre, imza kontrolü)",
+        "Client, Finished mesajı gönderir",
+        "Şifreli iletişim başlar (symmetric encryption - AES)"
+      ],
+      "correct_order": [0, 1, 2, 3, 4],
+      "explanation": "TLS 1.3 handshake 1-RTT'de tamamlanır: Client hello ve key share gönderir → Server hello, sertifika ve finished ile yanıt verir (tek pakette) → Client sertifikayı doğrular ve finished gönderir → Artık AES ile şifreli iletişim başlar. TLS 1.2'ye göre bir round-trip daha hızlıdır.",
+      "difficulty": "zor",
+      "points": 15
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "XSS (Cross-Site Scripting) ile CSRF (Cross-Site Request Forgery) arasındaki temel fark nedir?",
+      "options": [
+        "XSS sunucu tarafında, CSRF client tarafında çalışır",
+        "XSS zararlı kod enjeksiyonu yapar (kod siteye gömülür), CSRF kullanıcının tarayıcısını kullanarak yetkili istek gönderir",
+        "XSS sadece GET isteklerinde, CSRF sadece POST isteklerinde çalışır",
+        "Aralarında fark yoktur, ikisi de aynı saldırı türüdür"
+      ],
+      "correct": 1,
+      "explanation": "XSS: Saldırgan zararlı JavaScript kodunu web sayfasına enjekte eder, kod kurbanın tarayıcısında çalışarak cookie çalar, sayfa içeriğini değiştirir vb. CSRF: Saldırgan, kurbanın oturum açtığı siteye kurbanın tarayıcısı üzerinden yetkili istek göndertir (para transferi, şifre değiştirme). XSS'te kod enjeksiyonu var, CSRF'te istek sahteciliği var.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "type": "true_false",
+      "question": "TCP 3-way handshake şu sırayla gerçekleşir: SYN → SYN-ACK → ACK. Bu handshake tamamlandıktan sonra veri iletimi başlar. UDP ise handshake yapmadan doğrudan veri gönderir.",
+      "correct": true,
+      "explanation": "Doğru! TCP connection-oriented bir protokoldür ve her bağlantı 3-way handshake ile başlar: (1) Client SYN gönderir, (2) Server SYN-ACK ile yanıt verir, (3) Client ACK gönderir. Bu güvenilir ama yavaştır. UDP connectionless'tır - handshake yapmadan doğrudan veri gönderir. Bu yüzden UDP daha hızlıdır ama veri kaybı garantisi vermez.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "code_completion",
+      "question": "Express.js uygulamasına temel güvenlik header'larını ekleyen kodu tamamlayın:",
+      "code": "const express = require('express');\nconst ____ = require('____');\n\nconst app = express();\n\n// Tüm güvenlik header'larını tek satırda ekle\n// (HSTS, X-Content-Type-Options, X-Frame-Options, CSP, vb.)\napp.use(____());",
+      "correct": "helmet, helmet, helmet",
+      "explanation": "Helmet.js, Express uygulamalarına güvenlik HTTP header'larını ekleyen bir middleware'dir. app.use(helmet()) tek satırıyla: Strict-Transport-Security (HTTPS zorunlu), X-Content-Type-Options: nosniff (MIME sniffing engelleme), X-Frame-Options: DENY (clickjacking engelleme), Content-Security-Policy, Referrer-Policy ve daha fazla header otomatik eklenir. Her Express uygulamasının ilk middleware'i helmet olmalıdır.",
+      "difficulty": "kolay",
+      "points": 10
+    }
+  ]
+}

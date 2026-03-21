@@ -1,0 +1,139 @@
+{
+  "id": "mod-12-auth/quiz-01",
+  "title": "Authentication, Authorization & Testing Quiz",
+  "description": "Password hashing, JWT, OAuth 2.0, RBAC, test piramidi, TDD ve mocking konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 20,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Kullanıcı şifrelerini veritabanında saklamak için hangisi kullanılmalıdır?",
+      "options": [
+        "MD5 hash",
+        "SHA-256 hash",
+        "bcrypt veya Argon2 ile hash'leme",
+        "Base64 encoding"
+      ],
+      "correct": 2,
+      "explanation": "bcrypt ve Argon2, şifre hash'leme için özel tasarlanmış algoritmalardır. Otomatik salt ekler, GPU brute-force saldırılarına karşı dirençlidir ve hesaplama maliyeti ayarlanabilir. MD5 ve SHA-256 genel amaçlı hash fonksiyonlarıdır ve şifre saklamak için güvensizdir. Base64 ise şifreleme değil, encode'lamadır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "JWT access token en güvenli şekilde nerede saklanmalıdır?",
+      "options": [
+        "localStorage",
+        "sessionStorage",
+        "Bellekte (JavaScript değişkeni / React state)",
+        "URL query parametresinde"
+      ],
+      "correct": 2,
+      "explanation": "Bellekte (JavaScript değişkeni veya React state) saklamak en güvenlidir çünkü XSS saldırısıyla doğrudan erişilemez ve sayfa kapandığında yok olur. localStorage/sessionStorage XSS'e açıktır. URL parametresi server log'larında ve tarayıcı geçmişinde görünür.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "true_false",
+      "question": "JWT payload Base64 ile encode edilir, şifrelenmez. Bu nedenle herkes token'ı decode edip payload'daki veriyi okuyabilir, bu yüzden payload'a şifre veya kredi kartı bilgisi konulmamalıdır.",
+      "correct": true,
+      "explanation": "Doğru! JWT payload sadece Base64 encode edilir, şifrelenmez. jwt.io gibi sitelerde herkes decode edebilir. Signature, token'ın değiştirilmediğini doğrular ancak içeriği gizlemez. Payload'a sadece userId, role gibi hassas olmayan bilgiler konulmalı.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "HTTP 401 ve 403 status kodları arasındaki fark nedir?",
+      "options": [
+        "İkisi de aynı anlama gelir",
+        "401: Kimlik doğrulanmamış (token yok/geçersiz), 403: Yetkisiz (kimlik doğrulanmış ama erişim hakkı yok)",
+        "401: Sunucu hatası, 403: İstemci hatası",
+        "401: Sayfa bulunamadı, 403: Erişim engellendi"
+      ],
+      "correct": 1,
+      "explanation": "401 Unauthorized: Kullanıcının kimliği doğrulanmamış - token eksik veya geçersiz. 403 Forbidden: Kullanıcının kimliği doğrulanmış ancak bu kaynağa erişim yetkisi yok. Örneğin normal kullanıcı admin paneline erişmeye çalışınca 403 alır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "order_steps",
+      "question": "OAuth 2.0 Authorization Code Flow adımlarını doğru sıraya koy:",
+      "steps": [
+        "Kullanıcı 'Google ile Giriş Yap' butonuna tıklar",
+        "Uygulama kullanıcıyı Google'a yönlendirir",
+        "Kullanıcı Google'da oturum açar ve izin verir",
+        "Google, authorization code ile uygulamaya geri yönlendirir",
+        "Backend, code'u Google'a gönderip access token alır",
+        "Backend, token ile kullanıcı bilgilerini alır ve JWT oluşturur"
+      ],
+      "correct_order": [0, 1, 2, 3, 4, 5],
+      "explanation": "OAuth 2.0 Authorization Code Flow: Kullanıcı butona tıklar → Auth server'a yönlendirilir → Oturum açıp izin verir → Code ile geri yönlendirilir → Backend code'u token'a çevirir → Kullanıcı bilgileri alınır ve oturum başlatılır.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "TDD'nin Red-Green-Refactor döngüsündeki doğru sıralama hangisidir?",
+      "options": [
+        "Kodu yaz → Test yaz → Refactor et",
+        "Başarısız test yaz → Testi geçirecek en basit kodu yaz → Kodu temizle",
+        "Test yaz → Refactor et → Kodu yaz",
+        "Kodu yaz → Refactor et → Test yaz"
+      ],
+      "correct": 1,
+      "explanation": "TDD döngüsü: RED (başarısız test yaz - henüz kod yok), GREEN (testi geçirecek en basit kodu yaz - mükemmel olması gerekmez), REFACTOR (çalışan kodu temizle - testler hala geçmeli). Bu döngü sürekli tekrarlanır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Test piramidine göre hangi test türü en fazla yazılmalıdır?",
+      "options": [
+        "E2E testleri",
+        "Integration testleri",
+        "Unit testleri",
+        "Manuel testler"
+      ],
+      "correct": 2,
+      "explanation": "Test piramidine göre unit testler %70 oranıyla en fazla yazılmalıdır. En hızlı, en ucuz ve bakımı en kolay testlerdir. Integration testler %20, E2E testler %10 oranında olmalıdır. Piramit ters çevrilirse (ice cream cone anti-pattern) testler yavaş ve kırılgan olur.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "code_completion",
+      "question": "Jest/Vitest'te bir fonksiyonun hata fırlatıp fırlatmadığını test etmek için doğru assertion'ı tamamla:",
+      "code_template": "test('sıfıra bölmede hata fırlatır', () => {\n  _____(_____ divide(10, 0)).toThrow('Sıfıra bölünemez');\n});",
+      "correct_answers": ["expect(() =>", "expect( () =>"],
+      "explanation": "Hata fırlatan fonksiyonları test ederken expect() içine fonksiyonun kendisi değil, fonksiyonu çağıran bir arrow function geçirilir: expect(() => divide(10, 0)).toThrow(). Doğrudan expect(divide(10, 0)).toThrow() yazarsak fonksiyon hemen çalışır ve hata yakalanmaz.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "true_false",
+      "question": "%100 code coverage, koddaki tüm bug'ların yakalandığı anlamına gelir.",
+      "correct": false,
+      "explanation": "Yanlış! %100 coverage sadece tüm satırların/dalların en az bir kez çalıştırıldığı anlamına gelir. Edge case'ler, race condition'lar, integration sorunları ve mantık hataları coverage'da görünmeyebilir. %80 anlamlı coverage, %100 yüzeysel coverage'dan daha değerlidir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "explain_code",
+      "question": "Aşağıdaki test kodunu açıkla. Mock ne işe yarıyor ve neden kullanılıyor?",
+      "code": "vi.mock('./email-service');\nimport { sendEmail } from './email-service';\n\ntest('kayıt sonrası hoşgeldin emaili gönderilir', async () => {\n  sendEmail.mockResolvedValue(true);\n  \n  await registerUser('Ali', 'ali@ex.com', 'Pass123!');\n  \n  expect(sendEmail).toHaveBeenCalledWith(\n    'ali@ex.com', 'Hoşgeldin!', 'Merhaba Ali'\n  );\n  expect(sendEmail).toHaveBeenCalledTimes(1);\n});",
+      "correct_keywords": ["mock", "taklit", "izole", "dış bağımlılık", "email servisi", "sahte", "doğrulama", "assert", "haveBeenCalledWith"],
+      "sample_answer": "Bu test, kullanıcı kaydı sonrası hoşgeldin emaili gönderilip gönderilmediğini kontrol eder. vi.mock() ile email servisinin gerçek implementasyonu yerine sahte (mock) versiyonu kullanılır. mockResolvedValue(true) ile sendEmail çağrıldığında başarılı sonuç döndürmesi sağlanır. Böylece gerçek email göndermeden, fonksiyonun doğru parametrelerle çağrılıp çağrılmadığı kontrol edilir. Mock kullanılmasının nedeni: test hızını artırmak, dış bağımlılığı (email servisi) ortadan kaldırmak ve testi izole etmek.",
+      "difficulty": "zor",
+      "points": 15
+    }
+  ]
+}

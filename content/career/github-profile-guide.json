@@ -1,0 +1,173 @@
+{
+  "id": "github-profile-guide",
+  "title": "GitHub Profil & Portfolyo Rehberi",
+  "description": "GitHub profilini recruiter ve hiring manager'lar için optimize et. İlk izlenim 30 saniyede oluşur.",
+  "profile_setup": {
+    "bio_template": "Full Stack Developer & AI Engineer | React, TypeScript, Python, FastAPI | Building intelligent applications",
+    "bio_tips": [
+      "İki hedef rolü de yaz: Full Stack Developer & AI Engineer",
+      "En güçlü 4-5 teknolojini listele",
+      "Kısa ve öz ol — recruiter'lar 5 saniyede okuyor",
+      "Emoji kullanabilirsin ama abartma"
+    ],
+    "location": "Trabzon, Turkey (veya Remote)",
+    "website": "Portfolio siteni ekle (Project 1'den)",
+    "company": "@open-to-work veya şirket adı",
+    "profile_readme": {
+      "description": "GitHub profile README (username/username repo) ile profilini özelleştir",
+      "sections": [
+        "Kısa tanıtım: Kim olduğun, ne yaptığın (2-3 satır)",
+        "🔭 Currently working on: En son projen",
+        "🌱 Currently learning: Öğrendiğin teknolojiler",
+        "💬 Ask me about: Güçlü olduğun konular",
+        "📫 How to reach me: Email + LinkedIn",
+        "⚡ Fun fact: Kişisel bir detay"
+      ],
+      "widgets": [
+        {
+          "name": "GitHub Stats",
+          "url": "https://github-readme-stats.vercel.app/api?username=USERNAME&show_icons=true&theme=radical",
+          "description": "Genel GitHub istatistikleri"
+        },
+        {
+          "name": "Top Languages",
+          "url": "https://github-readme-stats.vercel.app/api/top-langs/?username=USERNAME&layout=compact&theme=radical",
+          "description": "En çok kullandığın diller"
+        },
+        {
+          "name": "GitHub Streak",
+          "url": "https://streak-stats.demolab.com/?user=USERNAME&theme=radical",
+          "description": "Kesintisiz commit serisi — tutarlılığını gösterir"
+        }
+      ]
+    }
+  },
+  "pinned_repos_strategy": {
+    "description": "GitHub profilinde 6 repo pinleyebilirsin. En etkileyici projeleri pinle.",
+    "recommended_order": [
+      {"priority": 1, "repo": "ml-pipeline-model-serving", "reason": "En etkileyici MLOps projesi — AI Engineer rolü için güçlü"},
+      {"priority": 1, "repo": "ai-code-review-tool", "reason": "Capstone proje — tüm becerileri gösterir (ikisinden birini seç)"},
+      {"priority": 2, "repo": "rag-document-qa-system", "reason": "RAG + Vector DB — AI trendinin merkezinde"},
+      {"priority": 3, "repo": "multi-agent-support-system", "reason": "Multi-agent AI — cutting edge"},
+      {"priority": 4, "repo": "ai-content-platform-llm", "reason": "LLM integration + fine-tuning"},
+      {"priority": 5, "repo": "analytics-dashboard-ai", "reason": "Full stack + data visualization"},
+      {"priority": 6, "repo": "personal-portfolio-nextjs", "reason": "Kişisel marka — profesyonellik göstergesi"}
+    ],
+    "tips": [
+      "AI Engineer pozisyonuna başvuruyorsan: Proje 9, 10, 7, 8 pinle",
+      "Full Stack pozisyonuna başvuruyorsan: Proje 10, 5, 2, 1 pinle",
+      "Her ikisi için: Proje 10, 9, 7, 5, 8, 1 pinle"
+    ]
+  },
+  "contribution_graph_strategy": {
+    "description": "Yeşil contribution graph, tutarlılığını ve aktifliğini gösterir. Recruiter'lar buna bakar.",
+    "daily_target": "Günde en az 3-5 anlamlı commit",
+    "tips": [
+      "Boş commit atma — anlamlı değişiklikler yap",
+      "Hafta sonları da commit at — tutarlılık gösterir",
+      "Her gün en az bir şey öğren ve commit et",
+      "Sadece kod değil: docs, tests, refactoring de commit sayılır",
+      "GitHub Actions workflow'ları da contribution olarak sayılır"
+    ],
+    "what_counts_as_commit": [
+      "Yeni feature geliştirme",
+      "Bug fix",
+      "Test yazma",
+      "Dokümantasyon güncelleme",
+      "Refactoring",
+      "CI/CD pipeline iyileştirme",
+      "README güncelleme",
+      "Code review sonrası düzeltmeler"
+    ]
+  },
+  "repo_best_practices": {
+    "readme_template": {
+      "sections": [
+        "# Proje Adı + tek satır açıklama",
+        "Badges: build status, tech stack, license (shields.io kullan)",
+        "## 📸 Screenshots / Demo GIF — Mutlaka ekle!",
+        "## ✨ Features (bullet list)",
+        "## 🛠 Tech Stack (tablo formatı)",
+        "## 🚀 Getting Started (prerequisites, kurulum, çalıştırma)",
+        "## 📐 Architecture (sistem diagram — draw.io veya ASCII)",
+        "## 📡 API Documentation (ana endpoint'ler)",
+        "## 🧠 What I Learned (bu projeden öğrendiklerin)",
+        "## 📄 License (MIT)"
+      ],
+      "tips": [
+        "README yoksa proje yoktur — recruiter README'yi 10 saniye okuyor",
+        "Screenshot/GIF mutlaka ekle — görsel proje 5x daha fazla tıklanır",
+        "Getting Started bölümü 3 adımda çalıştırılabilir olmalı",
+        "İngilizce yaz — global iş piyasasına açılırsın"
+      ]
+    },
+    "commit_conventions": {
+      "format": "Conventional Commits",
+      "types": {
+        "feat": "Yeni özellik ekleme",
+        "fix": "Bug düzeltme",
+        "docs": "Dokümantasyon değişikliği",
+        "style": "Kod formatı değişikliği (mantık değişmez)",
+        "refactor": "Kod yeniden yapılandırma (özellik/bug değil)",
+        "test": "Test ekleme veya düzeltme",
+        "chore": "Build, CI/CD, dependency güncelleme",
+        "perf": "Performans iyileştirme"
+      },
+      "examples": [
+        "feat: add user authentication with JWT tokens",
+        "fix: resolve WebSocket connection drop on idle timeout",
+        "docs: add API documentation with Swagger examples",
+        "refactor: extract data processing into service layer",
+        "test: add integration tests for payment flow",
+        "chore: upgrade React to v19 and update dependencies",
+        "perf: implement Redis caching reducing API latency by 80%"
+      ]
+    },
+    "branch_strategy": {
+      "branches": {
+        "main": "Production-ready kod (her zaman çalışır durumda)",
+        "develop": "Aktif geliştirme branch'i",
+        "feature/*": "Yeni özellikler: feature/add-auth, feature/dashboard-charts",
+        "fix/*": "Bug düzeltmeleri: fix/login-redirect, fix/cache-invalidation",
+        "docs/*": "Dokümantasyon: docs/api-endpoints, docs/architecture"
+      },
+      "workflow": "feature branch → PR to develop → code review → merge → develop → PR to main → release"
+    },
+    "issues_and_projects": {
+      "description": "GitHub Issues ve Projects kullanmak proje yönetimi becerini gösterir",
+      "tips": [
+        "Her milestone için Issue oluştur",
+        "Label kullan: enhancement, bug, documentation, good first issue",
+        "Issue'ları milestone'lara bağla",
+        "GitHub Projects board ile Kanban tarzı takip et",
+        "Issue kapatırken commit mesajında referans ver: 'fixes #12'"
+      ]
+    }
+  },
+  "common_mistakes": [
+    {
+      "mistake": "README yazmamak veya default README bırakmak",
+      "fix": "Her repo'ya detaylı README yaz — yukarıdaki template'i kullan"
+    },
+    {
+      "mistake": ".env dosyasını commit'lemek",
+      "fix": ".gitignore'a .env ekle, .env.example oluştur. Eğer yanlışlıkla commit'lediysen: git-filter-repo ile geçmişten sil"
+    },
+    {
+      "mistake": "'initial commit' veya 'update' gibi anlamsız commit mesajları",
+      "fix": "Conventional Commits kullan: feat:, fix:, docs: formatında"
+    },
+    {
+      "mistake": "Tek büyük commit ile tüm projeyi yüklemek",
+      "fix": "Her özellik için ayrı commit at. Proje geliştirme sürecini göster."
+    },
+    {
+      "mistake": "Sadece fork ve star, kendi proje yok",
+      "fix": "En az 6 kendi projen olsun. Fork'lar profilde pek görünmez."
+    },
+    {
+      "mistake": "Contribution graph boş",
+      "fix": "Her gün en az 1 commit. Tutarlılık > büyük patlamalar"
+    }
+  ]
+}

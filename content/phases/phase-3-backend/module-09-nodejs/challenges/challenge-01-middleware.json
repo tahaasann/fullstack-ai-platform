@@ -1,0 +1,70 @@
+{
+  "id": "challenge-middleware",
+  "title": "Custom Express Middleware Zinciri Yaz",
+  "difficulty": "orta",
+  "category": "nodejs",
+  "tags": ["express", "middleware", "rate-limiting", "logging", "authentication"],
+  "related_lesson": "mod-09-node/lesson-01",
+  "description_tr": "Express.js için 3 custom middleware yaz: (1) requestId ekleyen bir middleware, (2) basit bir in-memory rate limiter, (3) API key doğrulayan bir auth middleware.",
+  "description_detail": "Üç adet custom middleware yazacaksınız: (1) requestId middleware - her gelen isteğe benzersiz bir ID atar ve response header'ına ekler. (2) rateLimiter middleware - IP bazlı istek sayısını takip eder, belirlenen limit aşıldığında 429 status kodu döner. (3) apiKeyAuth middleware - request header'ından API key okur, geçerli key'ler listesiyle karşılaştırır, geçersizse 401 döner.",
+  "examples": [
+    {
+      "input": "GET /api/data (ilk istek, geçerli API key ile)",
+      "output": "200 OK\nHeaders: X-Request-Id: 550e8400-e29b-41d4-a716-446655440000\nBody: { \"data\": \"success\" }",
+      "explanation": "requestId middleware benzersiz bir ID atar, apiKeyAuth key'i doğrular, rateLimiter limiti kontrol eder ve istek başarılı olur."
+    },
+    {
+      "input": "GET /api/data (limit aşıldıktan sonra)",
+      "output": "429 Too Many Requests\n{ \"error\": \"Rate limit aşıldı. Lütfen daha sonra tekrar deneyin.\" }",
+      "explanation": "rateLimiter middleware, belirlenen pencere içinde maksimum istek sayısı aşıldığında 429 döner."
+    },
+    {
+      "input": "GET /api/data (API key olmadan)",
+      "output": "401 Unauthorized\n{ \"error\": \"API key gerekli\" }",
+      "explanation": "apiKeyAuth middleware, Authorization header'ında geçerli bir API key bulamazsa 401 döner."
+    }
+  ],
+  "constraints": [
+    "requestId middleware crypto.randomUUID() veya benzeri bir yöntemle benzersiz ID üretmeli",
+    "requestId hem req objesine (req.id) hem response header'ına (X-Request-Id) eklenmelidir",
+    "rateLimiter bir windowMs (pencere süresi) ve maxRequests (maksimum istek) parametresi almalıdır",
+    "rateLimiter IP bazlı olmalı ve pencere süresi dolduktan sonra sayacı sıfırlamalıdır",
+    "apiKeyAuth header'dan 'Authorization: Bearer <key>' veya 'X-API-Key: <key>' formatında key okumalıdır",
+    "Tüm middleware'ler next() ile zinciri devam ettirmeli veya hata durumunda response göndermelidir",
+    "Middleware'ler sırayla çalışmalıdır: requestId → rateLimiter → apiKeyAuth"
+  ],
+  "starter_code": {
+    "javascript": "const crypto = require('crypto');\n\n/**\n * Her isteğe benzersiz bir request ID atar.\n * req.id olarak erişilebilir ve X-Request-Id header'ında döner.\n */\nfunction requestId(req, res, next) {\n  // Middleware'i burada implement et\n}\n\n/**\n * IP bazlı rate limiting middleware factory.\n * \n * @param {Object} options\n * @param {number} options.windowMs - Pencere süresi (ms)\n * @param {number} options.maxRequests - Pencere başına max istek\n * @returns {Function} Express middleware\n */\nfunction rateLimiter({ windowMs = 60000, maxRequests = 10 } = {}) {\n  // Middleware factory'yi burada implement et\n}\n\n/**\n * API key doğrulama middleware'i.\n * \n * @param {string[]} validKeys - Geçerli API key'lerin listesi\n * @returns {Function} Express middleware\n */\nfunction apiKeyAuth(validKeys) {\n  // Middleware factory'yi burada implement et\n}\n\nmodule.exports = { requestId, rateLimiter, apiKeyAuth };"
+  },
+  "test_cases": [
+    {"input": {"test": "requestId_adds_header", "code": "requestId(req, res, next); // res should have X-Request-Id header"}, "expected": true},
+    {"input": {"test": "requestId_adds_to_req", "code": "requestId(req, res, next); // req.id should be defined"}, "expected": true},
+    {"input": {"test": "requestId_calls_next", "code": "requestId(req, res, next); // next() should be called"}, "expected": true},
+    {"input": {"test": "rateLimiter_allows_under_limit", "code": "limiter(req, res, next); // first request should pass"}, "expected": true},
+    {"input": {"test": "rateLimiter_blocks_over_limit", "code": "// 11th request with maxRequests=10 should return 429"}, "expected": 429},
+    {"input": {"test": "apiKeyAuth_valid_key", "code": "// request with valid API key should call next()"}, "expected": true},
+    {"input": {"test": "apiKeyAuth_invalid_key", "code": "// request with invalid API key should return 401"}, "expected": 401}
+  ],
+  "hidden_test_cases": [
+    {"input": {"test": "requestId_unique", "code": "// Two requests should have different IDs"}, "expected": true},
+    {"input": {"test": "rateLimiter_resets_after_window", "code": "// After windowMs, counter should reset"}, "expected": true},
+    {"input": {"test": "apiKeyAuth_no_header", "code": "// request with no auth header should return 401"}, "expected": 401},
+    {"input": {"test": "apiKeyAuth_bearer_format", "code": "// 'Authorization: Bearer valid-key' should work"}, "expected": true},
+    {"input": {"test": "apiKeyAuth_x_api_key_format", "code": "// 'X-API-Key: valid-key' should work"}, "expected": true},
+    {"input": {"test": "middleware_chain_order", "code": "// All three middleware should work in sequence"}, "expected": true}
+  ],
+  "hints": [
+    "requestId için crypto.randomUUID() kullan. res.set('X-Request-Id', id) ile header ekle ve req.id = id ile request objesine ata.",
+    "rateLimiter için bir Map kullan: key = IP adresi, value = { count, resetTime }. Her istekte count'u artır. resetTime geçtiyse sıfırla. maxRequests aşıldıysa 429 döndür.",
+    "apiKeyAuth için req.headers.authorization veya req.headers['x-api-key'] kontrol et. Bearer token formatında ise 'Bearer ' prefix'ini çıkar. validKeys.includes(key) ile doğrula."
+  ],
+  "solution": {
+    "javascript": "const crypto = require('crypto');\n\nfunction requestId(req, res, next) {\n  const id = crypto.randomUUID();\n  req.id = id;\n  res.set('X-Request-Id', id);\n  next();\n}\n\nfunction rateLimiter({ windowMs = 60000, maxRequests = 10 } = {}) {\n  const clients = new Map();\n\n  // Periyodik temizlik\n  setInterval(() => {\n    const now = Date.now();\n    for (const [key, value] of clients) {\n      if (now > value.resetTime) clients.delete(key);\n    }\n  }, windowMs);\n\n  return (req, res, next) => {\n    const ip = req.ip || req.connection.remoteAddress;\n    const now = Date.now();\n    const client = clients.get(ip);\n\n    if (!client || now > client.resetTime) {\n      clients.set(ip, { count: 1, resetTime: now + windowMs });\n      return next();\n    }\n\n    client.count++;\n\n    if (client.count > maxRequests) {\n      return res.status(429).json({\n        error: 'Rate limit aşıldı. Lütfen daha sonra tekrar deneyin.',\n      });\n    }\n\n    next();\n  };\n}\n\nfunction apiKeyAuth(validKeys) {\n  return (req, res, next) => {\n    let key = null;\n\n    const authHeader = req.headers.authorization;\n    if (authHeader && authHeader.startsWith('Bearer ')) {\n      key = authHeader.slice(7);\n    }\n\n    if (!key) {\n      key = req.headers['x-api-key'];\n    }\n\n    if (!key) {\n      return res.status(401).json({ error: 'API key gerekli' });\n    }\n\n    if (!validKeys.includes(key)) {\n      return res.status(401).json({ error: 'Geçersiz API key' });\n    }\n\n    next();\n  };\n}\n\nmodule.exports = { requestId, rateLimiter, apiKeyAuth };",
+    "explanation_tr": "requestId middleware: crypto.randomUUID() ile benzersiz ID üretir, req.id'ye atar ve response header'ına ekler. O(1) zaman ve alan.\n\nrateLimiter middleware (factory pattern): Closure ile bir Map tutar. IP bazlı istek sayısını izler. windowMs süresi dolunca sayacı sıfırlar. maxRequests aşıldığında 429 döner. setInterval ile süresi dolmuş kayıtları temizler. Zaman: O(1) lookup, Alan: O(n) - n aktif client sayısı.\n\napiKeyAuth middleware (factory pattern): Authorization header'ından Bearer token veya X-API-Key header'ından API key okur. validKeys listesiyle karşılaştırır. Geçersizse 401 döner. Zaman: O(n) - n valid key sayısı (Set kullanılarak O(1) yapılabilir)."
+  },
+  "complexity": {
+    "optimal_time": "O(1) per request (rateLimiter ve requestId)",
+    "optimal_space": "O(n) - n unique client IP sayısı (rateLimiter)"
+  },
+  "learn_after_solving": "Bu challenge ile Express middleware pattern'ını, factory pattern'ını ve closure kavramını pratikte uyguladın. requestId middleware'i distributed tracing'in temelidir - production'da her isteğe benzersiz ID atayarak log'larda request zincirini izleyebilirsin. rateLimiter, brute-force ve DDoS saldırılarına karşı temel korumadır. apiKeyAuth ise API güvenliğinin ilk katmanıdır. Production'da express-rate-limit ve passport.js gibi battle-tested kütüphaneleri tercih et, ama nasıl çalıştıklarını bilmek seni daha iyi bir mühendis yapar."
+}

@@ -1,0 +1,75 @@
+{
+  "title": "Index Advisor",
+  "description": "SQL sorgularını analiz ederek index önerileri yap",
+  "description_detail": "# Index Advisor\n\nSQL sorgularını analiz ederek hangi kolonlara index eklenmesi gerektiğini öneren bir fonksiyon yazın.\n\n## İstenilen Fonksiyon: `adviseIndexes(queries)`\n\nBir SQL sorgu listesi verildiğinde, performans için önerilen index'leri döndürür.\n\n## Index Önerilecek Durumlar\n1. **WHERE** clause'daki kolonlar\n2. **JOIN ON** koşullarındaki kolonlar\n3. **ORDER BY** kolonları\n4. **GROUP BY** kolonları\n5. Sık kullanılan kolon kombinasyonları → composite index\n\n## Döndürülecek Format\n```javascript\n[\n  {\n    table: 'users',\n    columns: ['email'],\n    type: 'single',\n    reason: 'Used in WHERE clause',\n    priority: 'high'\n  }\n]\n```",
+  "difficulty": "zor",
+  "category": "database",
+  "tags": ["sql", "indexing", "performance", "optimization"],
+  "examples": [
+    {
+      "input": "['SELECT * FROM users WHERE email = ?']",
+      "output": "[{table: 'users', columns: ['email'], type: 'single', reason: 'WHERE clause', priority: 'high'}]",
+      "explanation": "WHERE'da kullanılan kolon index'e ihtiyaç duyar"
+    }
+  ],
+  "constraints": [
+    "SQL syntax basitleştirilmiş (tam SQL parser gerekli değil)",
+    "Aynı kolon birden fazla sorguda geçiyorsa priority artmalı",
+    "Composite index: aynı sorguda WHERE+ORDER BY kombinasyonu",
+    "PRIMARY KEY zaten index'lidir, önerilmemeli"
+  ],
+  "starter_code": {
+    "python": "def advise_indexes(queries: list) -> list:\n    # Your code here\n    pass",
+    "javascript": "function adviseIndexes(queries) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": ["SELECT * FROM users WHERE email = 'test@test.com'"],
+      "expected_output": [{"table": "users", "columns": ["email"], "type": "single", "reason": "WHERE clause", "priority": "high"}]
+    },
+    {
+      "input": ["SELECT * FROM orders ORDER BY created_at DESC"],
+      "expected_output": [{"table": "orders", "columns": ["created_at"], "type": "single", "reason": "ORDER BY clause", "priority": "medium"}]
+    },
+    {
+      "input": ["SELECT * FROM users u JOIN orders o ON u.id = o.user_id"],
+      "expected_output": [{"table": "orders", "columns": ["user_id"], "type": "single", "reason": "JOIN condition", "priority": "high"}]
+    },
+    {
+      "input": ["SELECT * FROM users WHERE status = 'active' ORDER BY name"],
+      "expected_output": [{"table": "users", "columns": ["status", "name"], "type": "composite", "reason": "WHERE + ORDER BY", "priority": "high"}]
+    },
+    {
+      "input": ["SELECT * FROM logs GROUP BY user_id"],
+      "expected_output": [{"table": "logs", "columns": ["user_id"], "type": "single", "reason": "GROUP BY clause", "priority": "medium"}]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": ["SELECT * FROM users WHERE email = ?", "SELECT * FROM users WHERE email = ? AND status = ?"],
+      "expected_output": [{"table": "users", "columns": ["email", "status"], "type": "composite", "reason": "Frequently used together in WHERE", "priority": "high"}]
+    },
+    {
+      "input": ["SELECT id, name FROM users"],
+      "expected_output": []
+    },
+    {
+      "input": ["SELECT * FROM products WHERE category_id = ? AND price > ? ORDER BY price"],
+      "expected_output": [{"table": "products", "columns": ["category_id", "price"], "type": "composite", "reason": "WHERE + ORDER BY", "priority": "high"}]
+    }
+  ],
+  "hints": [
+    "SQL sorgusunu keyword'lere göre parse et: WHERE, JOIN ON, ORDER BY, GROUP BY bölümlerini ayır",
+    "Her bölümdeki kolon isimlerini çıkar, tablo adını FROM veya JOIN'den al",
+    "Aynı tabloda birden fazla kolon kullanılıyorsa composite index öner"
+  ],
+  "solution": {
+    "python": "import re\n\ndef advise_indexes(queries: list) -> list:\n    recommendations = []\n    column_usage = {}  # (table, col) -> count\n    \n    for query in queries:\n        query_upper = query.upper()\n        query_clean = query\n        \n        # Extract FROM table\n        from_match = re.search(r'FROM\\s+(\\w+)', query, re.IGNORECASE)\n        main_table = from_match.group(1) if from_match else None\n        \n        where_cols = []\n        orderby_cols = []\n        groupby_cols = []\n        join_cols = []\n        \n        # WHERE columns\n        where_match = re.search(r'WHERE\\s+(.+?)(?:ORDER|GROUP|LIMIT|JOIN|$)', query, re.IGNORECASE)\n        if where_match:\n            where_clause = where_match.group(1)\n            cols = re.findall(r'(\\w+)\\s*(?:=|>|<|>=|<=|!=|LIKE|IN)', where_clause, re.IGNORECASE)\n            where_cols = [c for c in cols if c.upper() not in ('AND', 'OR', 'NOT')]\n        \n        # ORDER BY columns\n        order_match = re.search(r'ORDER\\s+BY\\s+([\\w\\s,]+?)(?:LIMIT|$)', query, re.IGNORECASE)\n        if order_match:\n            parts = order_match.group(1).split(',')\n            for p in parts:\n                col = p.strip().split()[0]\n                if col.upper() not in ('ASC', 'DESC'):\n                    orderby_cols.append(col)\n        \n        # GROUP BY columns\n        group_match = re.search(r'GROUP\\s+BY\\s+([\\w\\s,]+?)(?:HAVING|ORDER|LIMIT|$)', query, re.IGNORECASE)\n        if group_match:\n            parts = group_match.group(1).split(',')\n            groupby_cols = [p.strip() for p in parts]\n        \n        # JOIN columns\n        join_matches = re.finditer(r'JOIN\\s+(\\w+)\\s+\\w*\\s*ON\\s+(\\w+\\.\\w+)\\s*=\\s*(\\w+\\.\\w+)', query, re.IGNORECASE)\n        for m in join_matches:\n            join_table = m.group(1)\n            right_col = m.group(3).split('.')[-1]\n            join_cols.append((join_table, right_col))\n        \n        # Build recommendations\n        if where_cols and orderby_cols and main_table:\n            combined = where_cols + orderby_cols\n            recommendations.append({\n                'table': main_table,\n                'columns': combined,\n                'type': 'composite',\n                'reason': 'WHERE + ORDER BY',\n                'priority': 'high'\n            })\n        else:\n            if where_cols and main_table:\n                if len(where_cols) > 1:\n                    recommendations.append({'table': main_table, 'columns': where_cols, 'type': 'composite', 'reason': 'WHERE clause', 'priority': 'high'})\n                else:\n                    recommendations.append({'table': main_table, 'columns': where_cols, 'type': 'single', 'reason': 'WHERE clause', 'priority': 'high'})\n            \n            if orderby_cols and main_table:\n                recommendations.append({'table': main_table, 'columns': orderby_cols, 'type': 'single', 'reason': 'ORDER BY clause', 'priority': 'medium'})\n        \n        if groupby_cols and main_table:\n            recommendations.append({'table': main_table, 'columns': groupby_cols, 'type': 'single', 'reason': 'GROUP BY clause', 'priority': 'medium'})\n        \n        for join_table, col in join_cols:\n            recommendations.append({'table': join_table, 'columns': [col], 'type': 'single', 'reason': 'JOIN condition', 'priority': 'high'})\n    \n    return recommendations",
+    "javascript": "function adviseIndexes(queries) {\n  const recommendations = [];\n\n  for (const query of queries) {\n    const fromMatch = query.match(/FROM\\s+(\\w+)/i);\n    const mainTable = fromMatch ? fromMatch[1] : null;\n\n    let whereCols = [];\n    let orderCols = [];\n    let groupCols = [];\n\n    const whereMatch = query.match(/WHERE\\s+(.+?)(?:ORDER|GROUP|LIMIT|JOIN|$)/i);\n    if (whereMatch) {\n      const cols = whereMatch[1].match(/(\\w+)\\s*(?:=|>|<|>=|<=|!=|LIKE|IN)/gi) || [];\n      whereCols = cols.map(c => c.replace(/\\s*(=|>|<|>=|<=|!=|LIKE|IN).*/i, '').trim())\n        .filter(c => !['AND','OR','NOT'].includes(c.toUpperCase()));\n    }\n\n    const orderMatch = query.match(/ORDER\\s+BY\\s+([\\w\\s,]+?)(?:LIMIT|$)/i);\n    if (orderMatch) {\n      orderCols = orderMatch[1].split(',').map(p => p.trim().split(/\\s+/)[0])\n        .filter(c => !['ASC','DESC'].includes(c.toUpperCase()));\n    }\n\n    const groupMatch = query.match(/GROUP\\s+BY\\s+([\\w\\s,]+?)(?:HAVING|ORDER|LIMIT|$)/i);\n    if (groupMatch) {\n      groupCols = groupMatch[1].split(',').map(p => p.trim());\n    }\n\n    const joinRegex = /JOIN\\s+(\\w+)\\s+\\w*\\s*ON\\s+(\\w+\\.\\w+)\\s*=\\s*(\\w+\\.\\w+)/gi;\n    let jm;\n    while ((jm = joinRegex.exec(query)) !== null) {\n      const col = jm[3].split('.').pop();\n      recommendations.push({ table: jm[1], columns: [col], type: 'single', reason: 'JOIN condition', priority: 'high' });\n    }\n\n    if (whereCols.length && orderCols.length && mainTable) {\n      recommendations.push({ table: mainTable, columns: [...whereCols, ...orderCols], type: 'composite', reason: 'WHERE + ORDER BY', priority: 'high' });\n    } else {\n      if (whereCols.length && mainTable) {\n        recommendations.push({ table: mainTable, columns: whereCols, type: whereCols.length > 1 ? 'composite' : 'single', reason: 'WHERE clause', priority: 'high' });\n      }\n      if (orderCols.length && mainTable) {\n        recommendations.push({ table: mainTable, columns: orderCols, type: 'single', reason: 'ORDER BY clause', priority: 'medium' });\n      }\n    }\n\n    if (groupCols.length && mainTable) {\n      recommendations.push({ table: mainTable, columns: groupCols, type: 'single', reason: 'GROUP BY clause', priority: 'medium' });\n    }\n  }\n\n  return recommendations;\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n * m) queries * query length",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Veritabanı indexleme stratejisini, EXPLAIN plan okumayı, composite index sıralama kurallarını ve query optimization mantığını öğrenirsin. Bu bilgi production veritabanı performans tuning'inde kritik öneme sahiptir."
+}

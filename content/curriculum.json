@@ -1,0 +1,3030 @@
+{
+  "title": "AI-Capable Full Stack Developer Eğitim Programı",
+  "description": "12 haftalık profesyonel seviye eğitim müfredatı",
+  "phases": [
+    {
+      "id": "phase-1-temeller",
+      "title": "Faz 1: Temeller",
+      "description": "İnternet, Python, JavaScript/TypeScript, Git ve geliştirme araçlarının profesyonel kullanımı",
+      "order_index": 1,
+      "estimated_weeks": "1-2",
+      "icon": "🏗️",
+      "modules": [
+        {
+          "id": "mod-01-internet",
+          "title": "Modül 1: İnternet & Web Temelleri",
+          "description": "TCP/IP, DNS, HTTP/HTTPS, tarayıcı çalışma prensibi ve web mimarisinin derinlemesine anlaşılması",
+          "order_index": 1,
+          "estimated_hours": 12,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-01-internet/lesson-01",
+              "title": "İnternet Nasıl Çalışır? TCP/IP ve Protokol Stack",
+              "description": "TCP/IP protokol stack, 5 katman, veri iletimi, IP adresleri ve port kavramı",
+              "order_index": 1,
+              "content_path": "phases/phase-1-temeller/module-01-internet/lesson-01-internet-nasil-calisir.md",
+              "estimated_minutes": 45,
+              "tags": [
+                "tcp/ip",
+                "networking",
+                "protocols",
+                "internet"
+              ]
+            },
+            {
+              "id": "mod-01-internet/lesson-02",
+              "title": "HTTP Protokolü Derinlemesine",
+              "description": "HTTP metodları, status code'lar, header'lar, request/response döngüsü, HTTPS ve TLS",
+              "order_index": 2,
+              "content_path": "phases/phase-1-temeller/module-01-internet/lesson-02-http-detayli.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "http",
+                "https",
+                "tls",
+                "status-codes",
+                "headers"
+              ]
+            },
+            {
+              "id": "mod-01-internet/lesson-03",
+              "title": "DNS, Tarayıcı ve Web Mimarisi",
+              "description": "DNS çözümleme, tarayıcı render pipeline, CDN, caching, WebSocket vs HTTP",
+              "order_index": 3,
+              "content_path": "phases/phase-1-temeller/module-01-internet/lesson-03-dns-ve-tarayici.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "dns",
+                "browser",
+                "rendering",
+                "cdn",
+                "caching",
+                "websocket"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-01-internet/quiz-01",
+              "title": "İnternet & Web Temelleri Quiz",
+              "description": "TCP/IP, HTTP, DNS ve web mimarisi konularını ne kadar anladın?",
+              "after_lesson_id": "mod-01-internet/lesson-03",
+              "passing_score": 70,
+              "content_path": "phases/phase-1-temeller/module-01-internet/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-http-status",
+              "title": "HTTP Status Code Eşleştirme",
+              "description": "Verilen senaryolar için doğru HTTP status code'unu döndür",
+              "difficulty": "kolay",
+              "category": "web",
+              "content_path": "phases/phase-1-temeller/module-01-internet/challenges/challenge-01-http-status.json",
+              "related_lesson_id": "mod-01-internet/lesson-02",
+              "order_index": 1,
+              "tags": [
+                "http",
+                "status-codes"
+              ]
+            },
+            {
+              "id": "challenge-dns-lookup",
+              "title": "DNS Lookup Simulator",
+              "description": "Verilen bir domain için recursive DNS çözümleme simülasyonu yap",
+              "difficulty": "kolay",
+              "category": "web",
+              "content_path": "phases/phase-1-temeller/module-01-internet/challenges/challenge-02-dns-lookup.json",
+              "related_lesson_id": "mod-01-internet/lesson-03",
+              "order_index": 2,
+              "tags": [
+                "dns",
+                "networking",
+                "recursion"
+              ]
+            },
+            {
+              "id": "challenge-http-parser",
+              "title": "HTTP Header Parser",
+              "description": "Ham HTTP request string'ini parse ederek yapılandırılmış objeye dönüştür",
+              "difficulty": "kolay",
+              "category": "web",
+              "content_path": "phases/phase-1-temeller/module-01-internet/challenges/challenge-03-http-parser.json",
+              "related_lesson_id": "mod-01-internet/lesson-02",
+              "order_index": 3,
+              "tags": [
+                "http",
+                "parsing",
+                "string-manipulation"
+              ]
+            },
+            {
+              "id": "challenge-url-parser",
+              "title": "URL Parser",
+              "description": "URL string'inden protocol, host, port, path ve query parametrelerini çıkar",
+              "difficulty": "kolay",
+              "category": "web",
+              "content_path": "phases/phase-1-temeller/module-01-internet/challenges/challenge-04-url-parser.json",
+              "related_lesson_id": "mod-01-internet/lesson-03",
+              "order_index": 4,
+              "tags": [
+                "url",
+                "parsing",
+                "web"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-02-python",
+          "title": "Modül 2: Python Profesyonel Kullanım",
+          "description": "Python'u profesyonel seviyede kullanma: virtual environment, OOP, decorators, generators, async",
+          "order_index": 2,
+          "estimated_hours": 16,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-02-python/lesson-01",
+              "title": "Python Ortamı ve Paket Yönetimi",
+              "description": "Virtual environment, uv, pip, poetry, pyproject.toml - profesyonel Python proje yapısı",
+              "order_index": 1,
+              "content_path": "phases/phase-1-temeller/module-02-python/lesson-01-python-ortami.md",
+              "estimated_minutes": 40,
+              "tags": [
+                "python",
+                "venv",
+                "uv",
+                "pip",
+                "poetry"
+              ]
+            },
+            {
+              "id": "mod-02-python/lesson-02",
+              "title": "Veri Tipleri, Type Hints ve OOP",
+              "description": "Python veri tipleri derinlemesine, type annotations, sınıflar, kalıtım, polimorfizm",
+              "order_index": 2,
+              "content_path": "phases/phase-1-temeller/module-02-python/lesson-02-tipler-ve-oop.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "python",
+                "types",
+                "oop",
+                "classes",
+                "inheritance"
+              ]
+            },
+            {
+              "id": "mod-02-python/lesson-03",
+              "title": "Decorators, Generators ve İleri Seviye Kalıplar",
+              "description": "Decorators, generators, context managers, comprehensions, error handling, asyncio",
+              "order_index": 3,
+              "content_path": "phases/phase-1-temeller/module-02-python/lesson-03-ileri-python.md",
+              "estimated_minutes": 60,
+              "tags": [
+                "python",
+                "decorators",
+                "generators",
+                "async",
+                "advanced"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-02-python/quiz-01",
+              "title": "Python Profesyonel Kullanım Quiz",
+              "description": "Python ortamı, OOP, decorators ve ileri seviye kalıpları test et",
+              "after_lesson_id": "mod-02-python/lesson-03",
+              "passing_score": 70,
+              "content_path": "phases/phase-1-temeller/module-02-python/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-python-decorators",
+              "title": "Custom Decorator Yaz",
+              "description": "Fonksiyon çalışma süresini ölçen ve cache yapan decorator'lar yaz",
+              "difficulty": "orta",
+              "category": "python",
+              "content_path": "phases/phase-1-temeller/module-02-python/challenges/challenge-01-decorators.json",
+              "related_lesson_id": "mod-02-python/lesson-03",
+              "order_index": 1,
+              "tags": [
+                "python",
+                "decorators",
+                "functions"
+              ]
+            },
+            {
+              "id": "challenge-generator-pipeline",
+              "title": "Generator Pipeline",
+              "description": "Generator'lar kullanarak veri işleme pipeline'ı oluştur",
+              "difficulty": "orta",
+              "category": "python",
+              "content_path": "phases/phase-1-temeller/module-02-python/challenges/challenge-02-generator.json",
+              "related_lesson_id": "mod-02-python/lesson-03",
+              "order_index": 2,
+              "tags": [
+                "python",
+                "generators",
+                "lazy-evaluation",
+                "pipeline"
+              ]
+            },
+            {
+              "id": "challenge-context-manager",
+              "title": "Custom Context Manager",
+              "description": "Kaynak yönetimi için custom context manager implementasyonu",
+              "difficulty": "orta",
+              "category": "python",
+              "content_path": "phases/phase-1-temeller/module-02-python/challenges/challenge-03-context-manager.json",
+              "related_lesson_id": "mod-02-python/lesson-03",
+              "order_index": 3,
+              "tags": [
+                "python",
+                "context-manager",
+                "resource-management"
+              ]
+            },
+            {
+              "id": "challenge-async-queue",
+              "title": "Async Task Queue",
+              "description": "Öncelik sırasına göre çalışan basit bir async task queue implementasyonu",
+              "difficulty": "orta",
+              "category": "python",
+              "content_path": "phases/phase-1-temeller/module-02-python/challenges/challenge-04-async-queue.json",
+              "related_lesson_id": "mod-02-python/lesson-03",
+              "order_index": 4,
+              "tags": [
+                "python",
+                "queue",
+                "priority",
+                "data-structures"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-03-javascript",
+          "title": "Modül 3: JavaScript & TypeScript",
+          "description": "JavaScript profesyonel kalıplar ve TypeScript zorunlu bilgisi",
+          "order_index": 3,
+          "estimated_hours": 20,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-03-js/lesson-01",
+              "title": "JavaScript Temelleri: Scope, Closures ve Event Loop",
+              "description": "Scope, closures, hoisting, this keyword, event loop, call stack, microtasks vs macrotasks",
+              "order_index": 1,
+              "content_path": "phases/phase-1-temeller/module-03-javascript/lesson-01-js-temeller.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "javascript",
+                "scope",
+                "closures",
+                "event-loop"
+              ]
+            },
+            {
+              "id": "mod-03-js/lesson-02",
+              "title": "Modern JavaScript: ES6+ ve Async Patterns",
+              "description": "Destructuring, spread/rest, promises, async/await, array methods, modules",
+              "order_index": 2,
+              "content_path": "phases/phase-1-temeller/module-03-javascript/lesson-02-modern-js.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "javascript",
+                "es6",
+                "async",
+                "promises",
+                "modules"
+              ]
+            },
+            {
+              "id": "mod-03-js/lesson-03",
+              "title": "TypeScript: Profesyonel Tip Sistemi",
+              "description": "Types, interfaces, generics, utility types, type guards, discriminated unions",
+              "order_index": 3,
+              "content_path": "phases/phase-1-temeller/module-03-javascript/lesson-03-typescript.md",
+              "estimated_minutes": 60,
+              "tags": [
+                "typescript",
+                "types",
+                "generics",
+                "interfaces"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-03-js/quiz-01",
+              "title": "JavaScript & TypeScript Quiz",
+              "description": "JS temelleri, modern JS ve TypeScript bilgini test et",
+              "after_lesson_id": "mod-03-js/lesson-03",
+              "passing_score": 70,
+              "content_path": "phases/phase-1-temeller/module-03-javascript/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-array-methods",
+              "title": "Array Method Zinciri",
+              "description": "Veri dönüştürme problemlerini array method'ları ile çöz",
+              "difficulty": "orta",
+              "category": "javascript",
+              "content_path": "phases/phase-1-temeller/module-03-javascript/challenges/challenge-01-arrays.json",
+              "related_lesson_id": "mod-03-js/lesson-02",
+              "order_index": 1,
+              "tags": [
+                "javascript",
+                "arrays",
+                "functional"
+              ]
+            },
+            {
+              "id": "challenge-promise-chain",
+              "title": "Promise Chain Builder",
+              "description": "Async operasyonları compose eden promise chain builder implementasyonu",
+              "difficulty": "orta",
+              "category": "javascript",
+              "content_path": "phases/phase-1-temeller/module-03-javascript/challenges/challenge-02-promise-chain.json",
+              "related_lesson_id": "mod-03-js/lesson-02",
+              "order_index": 2,
+              "tags": [
+                "javascript",
+                "promises",
+                "async"
+              ]
+            },
+            {
+              "id": "challenge-closure-factory",
+              "title": "Closure Factory",
+              "description": "Closure kullanarak fonksiyon fabrikaları oluştur",
+              "difficulty": "orta",
+              "category": "javascript",
+              "content_path": "phases/phase-1-temeller/module-03-javascript/challenges/challenge-03-closure-factory.json",
+              "related_lesson_id": "mod-03-js/lesson-01",
+              "order_index": 3,
+              "tags": [
+                "javascript",
+                "closures",
+                "factory-pattern"
+              ]
+            },
+            {
+              "id": "challenge-type-guard",
+              "title": "Runtime Type Checker",
+              "description": "Runtime'da tip kontrolü yapan type guard fonksiyonları implementasyonu",
+              "difficulty": "orta",
+              "category": "javascript",
+              "content_path": "phases/phase-1-temeller/module-03-javascript/challenges/challenge-04-type-guard.json",
+              "related_lesson_id": "mod-03-js/lesson-03",
+              "order_index": 4,
+              "tags": [
+                "typescript",
+                "type-checking",
+                "validation"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-04-git",
+          "title": "Modül 4: Git & GitHub Hakimiyeti",
+          "description": "Git, GitHub, branching stratejileri, PR workflow, conventional commits",
+          "order_index": 4,
+          "estimated_hours": 10,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-04-git/lesson-01",
+              "title": "Git Temelleri ve Günlük İş Akışı",
+              "description": "init, clone, add, commit, push, pull, fetch, stash, .gitignore - günlük workflow",
+              "order_index": 1,
+              "content_path": "phases/phase-1-temeller/module-04-git/lesson-01-git-temeller.md",
+              "estimated_minutes": 45,
+              "tags": [
+                "git",
+                "version-control",
+                "workflow"
+              ]
+            },
+            {
+              "id": "mod-04-git/lesson-02",
+              "title": "Branching, Merging ve Profesyonel Git Stratejileri",
+              "description": "Merge vs rebase, Git Flow vs GitHub Flow, interactive rebase, cherry-pick, bisect",
+              "order_index": 2,
+              "content_path": "phases/phase-1-temeller/module-04-git/lesson-02-branching.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "git",
+                "branching",
+                "merge",
+                "rebase"
+              ]
+            },
+            {
+              "id": "mod-04-git/lesson-03",
+              "title": "GitHub, PR Workflow ve Takım İş Birliği",
+              "description": "PR oluşturma, code review, GitHub Actions, conventional commits, branch protection",
+              "order_index": 3,
+              "content_path": "phases/phase-1-temeller/module-04-git/lesson-03-github.md",
+              "estimated_minutes": 45,
+              "tags": [
+                "github",
+                "pull-request",
+                "code-review",
+                "ci-cd"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-04-git/quiz-01",
+              "title": "Git & GitHub Quiz",
+              "description": "Git komutları, branching stratejileri ve GitHub workflow bilgini test et",
+              "after_lesson_id": "mod-04-git/lesson-03",
+              "passing_score": 70,
+              "content_path": "phases/phase-1-temeller/module-04-git/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-git-scenarios",
+              "title": "Git Senaryo Çözücü",
+              "description": "Verilen Git senaryoları için doğru komut dizisini bul",
+              "difficulty": "orta",
+              "category": "git",
+              "content_path": "phases/phase-1-temeller/module-04-git/challenges/challenge-01-scenarios.json",
+              "related_lesson_id": "mod-04-git/lesson-02",
+              "order_index": 1,
+              "tags": [
+                "git",
+                "branching",
+                "problem-solving"
+              ]
+            },
+            {
+              "id": "challenge-merge-conflict",
+              "title": "Merge Conflict Resolver",
+              "description": "Git merge conflict marker'larını parse et ve çöz",
+              "difficulty": "kolay",
+              "category": "git",
+              "content_path": "phases/phase-1-temeller/module-04-git/challenges/challenge-02-merge-conflict.json",
+              "related_lesson_id": "mod-04-git/lesson-02",
+              "order_index": 2,
+              "tags": [
+                "git",
+                "merge",
+                "parsing"
+              ]
+            },
+            {
+              "id": "challenge-commit-validator",
+              "title": "Commit Message Validator",
+              "description": "Conventional Commits formatına göre commit mesajlarını doğrula",
+              "difficulty": "orta",
+              "category": "git",
+              "content_path": "phases/phase-1-temeller/module-04-git/challenges/challenge-03-commit-validator.json",
+              "related_lesson_id": "mod-04-git/lesson-03",
+              "order_index": 3,
+              "tags": [
+                "git",
+                "conventional-commits",
+                "validation"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-05-terminal",
+          "title": "Modül 5: Terminal/CLI & VS Code",
+          "description": "Linux komutları, shell scripting, VS Code mastery, package managers",
+          "order_index": 5,
+          "estimated_hours": 8,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-05-terminal/lesson-01",
+              "title": "Terminal/CLI: Linux Komutları ve Shell Temelleri",
+              "description": "ls, cd, mkdir, rm, grep, find, chmod, pipe, yönlendirme, shell scripting temelleri",
+              "order_index": 1,
+              "content_path": "phases/phase-1-temeller/module-05-terminal/lesson-01-terminal.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "terminal",
+                "linux",
+                "bash",
+                "cli"
+              ]
+            },
+            {
+              "id": "mod-05-terminal/lesson-02",
+              "title": "VS Code Mastery ve Geliştirici Araçları",
+              "description": "VS Code shortcuts, extensions, debugging, settings, package managers (pnpm/npm/yarn)",
+              "order_index": 2,
+              "content_path": "phases/phase-1-temeller/module-05-terminal/lesson-02-vscode.md",
+              "estimated_minutes": 40,
+              "tags": [
+                "vscode",
+                "ide",
+                "pnpm",
+                "debugging"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-05-terminal/quiz-01",
+              "title": "Terminal & VS Code Quiz",
+              "description": "Linux komutları, shell ve VS Code bilgini test et",
+              "after_lesson_id": "mod-05-terminal/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-1-temeller/module-05-terminal/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-bash-script",
+              "title": "Bash Script Yaz",
+              "description": "Proje kurulumu otomatize eden bash script yaz",
+              "difficulty": "kolay",
+              "category": "terminal",
+              "content_path": "phases/phase-1-temeller/module-05-terminal/challenges/challenge-01-bash.json",
+              "related_lesson_id": "mod-05-terminal/lesson-01",
+              "order_index": 1,
+              "tags": [
+                "bash",
+                "scripting",
+                "automation"
+              ]
+            },
+            {
+              "id": "challenge-path-manipulator",
+              "title": "Path Manipulator",
+              "description": "Dosya yollarını çöz, normalize et ve bileşenlerini çıkar",
+              "difficulty": "kolay",
+              "category": "terminal",
+              "content_path": "phases/phase-1-temeller/module-05-terminal/challenges/challenge-02-path-manipulator.json",
+              "related_lesson_id": "mod-05-terminal/lesson-01",
+              "order_index": 2,
+              "tags": [
+                "path",
+                "filesystem",
+                "string-manipulation"
+              ]
+            },
+            {
+              "id": "challenge-file-tree",
+              "title": "File System Tree Builder",
+              "description": "Düz dosya yolu listesinden ağaç yapısı oluştur",
+              "difficulty": "orta",
+              "category": "terminal",
+              "content_path": "phases/phase-1-temeller/module-05-terminal/challenges/challenge-03-file-tree.json",
+              "related_lesson_id": "mod-05-terminal/lesson-01",
+              "order_index": 3,
+              "tags": [
+                "tree",
+                "filesystem",
+                "data-structures"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-2-frontend",
+      "title": "Faz 2: Frontend Geliştirme",
+      "description": "HTML5/CSS3, React + TypeScript, Tailwind CSS, component mimarisi ve API tüketimi",
+      "order_index": 2,
+      "estimated_weeks": "3-5",
+      "icon": "🎨",
+      "modules": [
+        {
+          "id": "mod-06-html-css",
+          "title": "Modül 6: HTML5 & CSS3 Modern Pratikler",
+          "description": "Semantic HTML, Flexbox, Grid, Tailwind, accessibility, responsive design",
+          "order_index": 6,
+          "estimated_hours": 16,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-06-css/lesson-01",
+              "title": "Semantic HTML5 ve Accessibility",
+              "description": "Semantic elementler, ARIA roles, SEO temelleri, form best practices",
+              "order_index": 1,
+              "content_path": "phases/phase-2-frontend/module-06-html-css/lesson-01-html-semantic.md",
+              "estimated_minutes": 45,
+              "tags": [
+                "html5",
+                "semantic",
+                "accessibility",
+                "seo"
+              ]
+            },
+            {
+              "id": "mod-06-css/lesson-02",
+              "title": "CSS Layout: Flexbox ve Grid Mastery",
+              "description": "Box model, Flexbox tüm özellikler, CSS Grid, responsive design, media queries",
+              "order_index": 2,
+              "content_path": "phases/phase-2-frontend/module-06-html-css/lesson-02-css-layout.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "css",
+                "flexbox",
+                "grid",
+                "responsive"
+              ]
+            },
+            {
+              "id": "mod-06-css/lesson-03",
+              "title": "Tailwind CSS ve Modern CSS Pratikleri",
+              "description": "Tailwind utility-first, custom properties, animasyonlar, CSS mimarisi karşılaştırma",
+              "order_index": 3,
+              "content_path": "phases/phase-2-frontend/module-06-html-css/lesson-03-tailwind.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "tailwind",
+                "css",
+                "animations",
+                "architecture"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-06-css/quiz-01",
+              "title": "HTML5 & CSS3 Quiz",
+              "description": "Semantic HTML, layout, Tailwind bilgini test et",
+              "after_lesson_id": "mod-06-css/lesson-03",
+              "passing_score": 70,
+              "content_path": "phases/phase-2-frontend/module-06-html-css/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-responsive-layout",
+              "title": "Responsive Layout Challenge",
+              "description": "Flexbox ve Grid ile responsive sayfa oluştur",
+              "difficulty": "orta",
+              "category": "css",
+              "content_path": "phases/phase-2-frontend/module-06-html-css/challenges/challenge-01-layout.json",
+              "related_lesson_id": "mod-06-css/lesson-02",
+              "order_index": 1,
+              "tags": [
+                "css",
+                "flexbox",
+                "grid",
+                "responsive"
+              ]
+            },
+            {
+              "id": "challenge-specificity",
+              "title": "CSS Specificity Calculator",
+              "description": "CSS seçicilerinin specificity değerini hesapla",
+              "difficulty": "orta",
+              "category": "css",
+              "content_path": "phases/phase-2-frontend/module-06-html-css/challenges/challenge-02-specificity.json",
+              "related_lesson_id": "mod-06-css/lesson-02",
+              "order_index": 2,
+              "tags": [
+                "css",
+                "specificity",
+                "selectors"
+              ]
+            },
+            {
+              "id": "challenge-accessibility",
+              "title": "Accessibility Checker",
+              "description": "HTML'i yaygın erişilebilirlik sorunları için doğrula",
+              "difficulty": "orta",
+              "category": "html",
+              "content_path": "phases/phase-2-frontend/module-06-html-css/challenges/challenge-03-accessibility.json",
+              "related_lesson_id": "mod-06-css/lesson-01",
+              "order_index": 3,
+              "tags": [
+                "accessibility",
+                "html",
+                "a11y"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-07-react",
+          "title": "Modül 7: React + TypeScript Derinlemesine",
+          "description": "Hooks, state management, Next.js, performance optimization",
+          "order_index": 7,
+          "estimated_hours": 24,
+          "prerequisites": [
+            "mod-03-javascript"
+          ],
+          "lessons": [
+            {
+              "id": "mod-07-react/lesson-01",
+              "title": "React Temelleri: JSX, Components ve Hooks",
+              "description": "JSX, fonksiyonel componentler, useState, useEffect, useRef, custom hooks",
+              "order_index": 1,
+              "content_path": "phases/phase-2-frontend/module-07-react/lesson-01-react-temeller.md",
+              "estimated_minutes": 60,
+              "tags": [
+                "react",
+                "hooks",
+                "jsx",
+                "components"
+              ]
+            },
+            {
+              "id": "mod-07-react/lesson-02",
+              "title": "State Management ve React Patterns",
+              "description": "useReducer, useContext, Zustand vs Redux, React Router, forms, performance",
+              "order_index": 2,
+              "content_path": "phases/phase-2-frontend/module-07-react/lesson-02-state-patterns.md",
+              "estimated_minutes": 60,
+              "tags": [
+                "react",
+                "state",
+                "zustand",
+                "router",
+                "performance"
+              ]
+            },
+            {
+              "id": "mod-07-react/lesson-03",
+              "title": "Next.js ve Production React",
+              "description": "Next.js App Router, SSR/SSG/ISR, Server Components, API Routes, deployment",
+              "order_index": 3,
+              "content_path": "phases/phase-2-frontend/module-07-react/lesson-03-nextjs.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "nextjs",
+                "ssr",
+                "server-components",
+                "deployment"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-07-react/quiz-01",
+              "title": "React & Next.js Quiz",
+              "description": "React hooks, state management ve Next.js bilgini test et",
+              "after_lesson_id": "mod-07-react/lesson-03",
+              "passing_score": 70,
+              "content_path": "phases/phase-2-frontend/module-07-react/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-react-hooks",
+              "title": "Custom Hook Yaz",
+              "description": "useLocalStorage ve useFetch custom hook'ları yaz",
+              "difficulty": "orta",
+              "category": "react",
+              "content_path": "phases/phase-2-frontend/module-07-react/challenges/challenge-01-hooks.json",
+              "related_lesson_id": "mod-07-react/lesson-01",
+              "order_index": 1,
+              "tags": [
+                "react",
+                "hooks",
+                "custom-hooks"
+              ]
+            },
+            {
+              "id": "challenge-use-debounce",
+              "title": "useDebounce Hook",
+              "description": "Debounce mantığını implement eden custom React hook",
+              "difficulty": "orta",
+              "category": "react",
+              "content_path": "phases/phase-2-frontend/module-07-react/challenges/challenge-02-use-debounce.json",
+              "related_lesson_id": "mod-07-react/lesson-01",
+              "order_index": 2,
+              "tags": [
+                "react",
+                "hooks",
+                "debounce",
+                "performance"
+              ]
+            },
+            {
+              "id": "challenge-state-machine",
+              "title": "State Machine Reducer",
+              "description": "Finite state machine mantığını useReducer pattern'i ile implement et",
+              "difficulty": "orta",
+              "category": "react",
+              "content_path": "phases/phase-2-frontend/module-07-react/challenges/challenge-03-state-machine.json",
+              "related_lesson_id": "mod-07-react/lesson-02",
+              "order_index": 3,
+              "tags": [
+                "react",
+                "state-machine",
+                "reducer"
+              ]
+            },
+            {
+              "id": "challenge-memo-optimizer",
+              "title": "Memo Optimizer",
+              "description": "Gereksiz re-render'ları tespit et ve düzelt",
+              "difficulty": "orta",
+              "category": "react",
+              "content_path": "phases/phase-2-frontend/module-07-react/challenges/challenge-04-memo-optimizer.json",
+              "related_lesson_id": "mod-07-react/lesson-02",
+              "order_index": 4,
+              "tags": [
+                "react",
+                "performance",
+                "memoization"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-08-component",
+          "title": "Modül 8: Component Mimarisi & API Tüketimi",
+          "description": "Design patterns, data fetching, error handling, WebSocket",
+          "order_index": 8,
+          "estimated_hours": 14,
+          "prerequisites": [
+            "mod-07-react"
+          ],
+          "lessons": [
+            {
+              "id": "mod-08-api/lesson-01",
+              "title": "Component Design Patterns",
+              "description": "Atomic Design, compound components, render props, HOC, error boundaries",
+              "order_index": 1,
+              "content_path": "phases/phase-2-frontend/module-08-component/lesson-01-patterns.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "react",
+                "patterns",
+                "atomic-design",
+                "composition"
+              ]
+            },
+            {
+              "id": "mod-08-api/lesson-02",
+              "title": "API Tüketimi ve Data Fetching",
+              "description": "fetch vs axios, TanStack Query, SWR, loading/error states, optimistic updates",
+              "order_index": 2,
+              "content_path": "phases/phase-2-frontend/module-08-component/lesson-02-api-fetching.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "api",
+                "fetch",
+                "tanstack-query",
+                "data-fetching"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-08-api/quiz-01",
+              "title": "Component & API Quiz",
+              "description": "Component patterns ve data fetching bilgini test et",
+              "after_lesson_id": "mod-08-api/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-2-frontend/module-08-component/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-data-fetching",
+              "title": "Data Fetching Hook",
+              "description": "Cache, retry ve error handling özellikli useFetch hook yaz",
+              "difficulty": "zor",
+              "category": "react",
+              "content_path": "phases/phase-2-frontend/module-08-component/challenges/challenge-01-fetch.json",
+              "related_lesson_id": "mod-08-api/lesson-02",
+              "order_index": 1,
+              "tags": [
+                "react",
+                "hooks",
+                "api",
+                "cache"
+              ]
+            },
+            {
+              "id": "challenge-infinite-scroll",
+              "title": "Infinite Scroll Hook",
+              "description": "Intersection Observer mantığı ile infinite scroll pagination implementasyonu",
+              "difficulty": "zor",
+              "category": "react",
+              "content_path": "phases/phase-2-frontend/module-08-component/challenges/challenge-02-infinite-scroll.json",
+              "related_lesson_id": "mod-08-api/lesson-02",
+              "order_index": 2,
+              "tags": [
+                "infinite-scroll",
+                "pagination",
+                "hooks"
+              ]
+            },
+            {
+              "id": "challenge-retry-fetcher",
+              "title": "Retry Fetcher with Exponential Backoff",
+              "description": "Exponential backoff ile hata durumunda otomatik tekrar deneyen fetch wrapper",
+              "difficulty": "zor",
+              "category": "react",
+              "content_path": "phases/phase-2-frontend/module-08-component/challenges/challenge-03-retry-fetcher.json",
+              "related_lesson_id": "mod-08-api/lesson-02",
+              "order_index": 3,
+              "tags": [
+                "fetch",
+                "retry",
+                "exponential-backoff"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-3-backend",
+      "title": "Faz 3: Backend Geliştirme",
+      "description": "Node.js/Express, REST API, veritabanı tasarımı, authentication ve testing",
+      "order_index": 3,
+      "estimated_weeks": "5-7",
+      "icon": "⚙️",
+      "modules": [
+        {
+          "id": "mod-09-nodejs",
+          "title": "Modül 9: Node.js + Express",
+          "description": "Backend development, middleware, validation, logging",
+          "order_index": 9,
+          "estimated_hours": 16,
+          "prerequisites": [
+            "mod-03-javascript"
+          ],
+          "lessons": [
+            {
+              "id": "mod-09-node/lesson-01",
+              "title": "Node.js Runtime ve Express Temelleri",
+              "description": "Node.js event loop, non-blocking I/O, Express routing, middleware",
+              "order_index": 1,
+              "content_path": "phases/phase-3-backend/module-09-nodejs/lesson-01-nodejs-express.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "nodejs",
+                "express",
+                "runtime",
+                "middleware"
+              ]
+            },
+            {
+              "id": "mod-09-node/lesson-02",
+              "title": "Express İleri Seviye ve Backend Patterns",
+              "description": "Input validation, file uploads, rate limiting, logging, error handling, config management",
+              "order_index": 2,
+              "content_path": "phases/phase-3-backend/module-09-nodejs/lesson-02-express-ileri.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "express",
+                "validation",
+                "logging",
+                "security"
+              ]
+            },
+            {
+              "id": "mod-09-nodejs/lesson-03-fastapi",
+              "title": "FastAPI ile Modern Python Backend",
+              "order_index": 3,
+              "content_path": "phases/phase-3-backend/module-09-nodejs/lesson-03-fastapi.md",
+              "estimated_minutes": 120,
+              "tags": [
+                "fastapi",
+                "python",
+                "pydantic",
+                "sqlalchemy",
+                "async",
+                "dependency-injection"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-09-node/quiz-01",
+              "title": "Node.js & Express Quiz",
+              "description": "Node.js runtime ve Express bilgini test et",
+              "after_lesson_id": "mod-09-node/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-3-backend/module-09-nodejs/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-middleware",
+              "title": "Custom Middleware Yaz",
+              "description": "Logging, auth ve rate limiting middleware'leri yaz",
+              "difficulty": "orta",
+              "category": "nodejs",
+              "content_path": "phases/phase-3-backend/module-09-nodejs/challenges/challenge-01-middleware.json",
+              "related_lesson_id": "mod-09-node/lesson-01",
+              "order_index": 1,
+              "tags": [
+                "express",
+                "middleware",
+                "backend"
+              ]
+            },
+            {
+              "id": "challenge-stream-processor",
+              "title": "Stream Processor",
+              "description": "Veriyi chunk'lar halinde işleyen stream processor implementasyonu",
+              "difficulty": "orta",
+              "category": "nodejs",
+              "content_path": "phases/phase-3-backend/module-09-nodejs/challenges/challenge-02-stream-processor.json",
+              "related_lesson_id": "mod-09-node/lesson-01",
+              "order_index": 2,
+              "tags": [
+                "streams",
+                "chunking",
+                "batch-processing"
+              ]
+            },
+            {
+              "id": "challenge-event-emitter",
+              "title": "Event Emitter",
+              "description": "Pub/Sub pattern implementasyonu ile custom event emitter",
+              "difficulty": "orta",
+              "category": "nodejs",
+              "content_path": "phases/phase-3-backend/module-09-nodejs/challenges/challenge-03-event-emitter.json",
+              "related_lesson_id": "mod-09-node/lesson-01",
+              "order_index": 3,
+              "tags": [
+                "event-emitter",
+                "pub-sub",
+                "design-pattern"
+              ]
+            },
+            {
+              "id": "challenge-cron-parser",
+              "title": "Cron Expression Parser",
+              "description": "Cron ifadelerini parse et ve belirli bir zamanın eşleşip eşleşmediğini kontrol et",
+              "difficulty": "zor",
+              "category": "nodejs",
+              "content_path": "phases/phase-3-backend/module-09-nodejs/challenges/challenge-04-cron-parser.json",
+              "related_lesson_id": "mod-09-node/lesson-02",
+              "order_index": 4,
+              "tags": [
+                "cron",
+                "parsing",
+                "scheduling"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-10-api",
+          "title": "Modül 10: REST API Tasarımı",
+          "description": "RESTful API, GraphQL, gRPC, Swagger documentation",
+          "order_index": 10,
+          "estimated_hours": 12,
+          "prerequisites": [
+            "mod-09-nodejs"
+          ],
+          "lessons": [
+            {
+              "id": "mod-10-api/lesson-01",
+              "title": "RESTful API Tasarım Prensipleri",
+              "description": "REST prensipleri, resource naming, versioning, pagination, error standardizasyonu",
+              "order_index": 1,
+              "content_path": "phases/phase-3-backend/module-10-api/lesson-01-rest-design.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "rest",
+                "api-design",
+                "pagination",
+                "versioning"
+              ]
+            },
+            {
+              "id": "mod-10-api/lesson-02",
+              "title": "GraphQL, gRPC ve API Dokümantasyonu",
+              "description": "GraphQL vs REST, gRPC basics, OpenAPI/Swagger, Postman/Bruno",
+              "order_index": 2,
+              "content_path": "phases/phase-3-backend/module-10-api/lesson-02-graphql-docs.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "graphql",
+                "grpc",
+                "swagger",
+                "api-docs"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-10-api/quiz-01",
+              "title": "API Tasarımı Quiz",
+              "description": "REST, GraphQL ve API dokümantasyon bilgini test et",
+              "after_lesson_id": "mod-10-api/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-3-backend/module-10-api/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-api-design",
+              "title": "REST API Tasarla",
+              "description": "Verilen senaryo için RESTful API endpoint'leri tasarla",
+              "difficulty": "orta",
+              "category": "api",
+              "content_path": "phases/phase-3-backend/module-10-api/challenges/challenge-01-design.json",
+              "related_lesson_id": "mod-10-api/lesson-01",
+              "order_index": 1,
+              "tags": [
+                "rest",
+                "api-design"
+              ]
+            },
+            {
+              "id": "challenge-query-parser",
+              "title": "Query Parameter Parser",
+              "description": "Karmaşık query string'leri parse ederek array ve nested object desteği sağla",
+              "difficulty": "orta",
+              "category": "api",
+              "content_path": "phases/phase-3-backend/module-10-api/challenges/challenge-02-query-parser.json",
+              "related_lesson_id": "mod-10-api/lesson-01",
+              "order_index": 2,
+              "tags": [
+                "query-string",
+                "parsing",
+                "api"
+              ]
+            },
+            {
+              "id": "challenge-rate-limiter",
+              "title": "API Rate Limiter",
+              "description": "Sliding window algoritması ile API rate limiter implementasyonu",
+              "difficulty": "zor",
+              "category": "api",
+              "content_path": "phases/phase-3-backend/module-10-api/challenges/challenge-03-rate-limiter.json",
+              "related_lesson_id": "mod-10-api/lesson-01",
+              "order_index": 3,
+              "tags": [
+                "rate-limiting",
+                "sliding-window",
+                "security"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-11-database",
+          "title": "Modül 11: Veritabanı Tasarımı",
+          "description": "PostgreSQL, MongoDB, Redis, ORM, SQL vs NoSQL",
+          "order_index": 11,
+          "estimated_hours": 16,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-11-db/lesson-01",
+              "title": "SQL ve PostgreSQL Derinlemesine",
+              "description": "SQL fundamentals, JOINs, subqueries, CTEs, Window Functions, indexing, EXPLAIN",
+              "order_index": 1,
+              "content_path": "phases/phase-3-backend/module-11-database/lesson-01-sql-postgres.md",
+              "estimated_minutes": 60,
+              "tags": [
+                "sql",
+                "postgresql",
+                "joins",
+                "indexing"
+              ]
+            },
+            {
+              "id": "mod-11-db/lesson-02",
+              "title": "NoSQL, Redis ve ORM Karşılaştırma",
+              "description": "MongoDB, Redis, Prisma vs Drizzle, SQL vs NoSQL karar matrisi, N+1 problemi",
+              "order_index": 2,
+              "content_path": "phases/phase-3-backend/module-11-database/lesson-02-nosql-orm.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "mongodb",
+                "redis",
+                "prisma",
+                "orm",
+                "nosql"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-11-db/quiz-01",
+              "title": "Veritabanı Tasarımı Quiz",
+              "description": "SQL, NoSQL ve ORM bilgini test et",
+              "after_lesson_id": "mod-11-db/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-3-backend/module-11-database/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-sql-queries",
+              "title": "SQL Query Challenge",
+              "description": "Karmaşık SQL sorguları yaz (JOIN, subquery, window function)",
+              "difficulty": "orta",
+              "category": "database",
+              "content_path": "phases/phase-3-backend/module-11-database/challenges/challenge-01-sql.json",
+              "related_lesson_id": "mod-11-db/lesson-01",
+              "order_index": 1,
+              "tags": [
+                "sql",
+                "joins",
+                "queries"
+              ]
+            },
+            {
+              "id": "challenge-join-builder",
+              "title": "SQL JOIN Builder",
+              "description": "Tablo ilişkilerinden SQL JOIN sorguları oluştur",
+              "difficulty": "orta",
+              "category": "database",
+              "content_path": "phases/phase-3-backend/module-11-database/challenges/challenge-02-join-builder.json",
+              "related_lesson_id": "mod-11-db/lesson-01",
+              "order_index": 2,
+              "tags": [
+                "sql",
+                "join",
+                "query-builder"
+              ]
+            },
+            {
+              "id": "challenge-schema-normalizer",
+              "title": "Schema Normalizer",
+              "description": "Denormalize veriyi normalize edilmiş forma (3NF) dönüştür",
+              "difficulty": "zor",
+              "category": "database",
+              "content_path": "phases/phase-3-backend/module-11-database/challenges/challenge-03-schema-normalizer.json",
+              "related_lesson_id": "mod-11-db/lesson-01",
+              "order_index": 3,
+              "tags": [
+                "normalization",
+                "database",
+                "3nf"
+              ]
+            },
+            {
+              "id": "challenge-index-advisor",
+              "title": "Index Advisor",
+              "description": "SQL sorgularını analiz ederek index önerileri yap",
+              "difficulty": "zor",
+              "category": "database",
+              "content_path": "phases/phase-3-backend/module-11-database/challenges/challenge-04-index-advisor.json",
+              "related_lesson_id": "mod-11-db/lesson-01",
+              "order_index": 4,
+              "tags": [
+                "sql",
+                "indexing",
+                "optimization"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-12-auth-test",
+          "title": "Modül 12: Authentication & Testing",
+          "description": "JWT, OAuth, RBAC, TDD, Jest, Cypress",
+          "order_index": 12,
+          "estimated_hours": 14,
+          "prerequisites": [
+            "mod-09-nodejs"
+          ],
+          "lessons": [
+            {
+              "id": "mod-12-auth/lesson-01",
+              "title": "Authentication ve Authorization",
+              "description": "Password hashing, JWT, OAuth 2.0, session vs token, RBAC",
+              "order_index": 1,
+              "content_path": "phases/phase-3-backend/module-12-auth-test/lesson-01-authentication.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "auth",
+                "jwt",
+                "oauth",
+                "security"
+              ]
+            },
+            {
+              "id": "mod-12-auth/lesson-02",
+              "title": "Testing: TDD, Unit, Integration ve E2E",
+              "description": "Testing pyramid, TDD, Jest/Vitest, Pytest, Cypress/Playwright, mocking",
+              "order_index": 2,
+              "content_path": "phases/phase-3-backend/module-12-auth-test/lesson-02-testing.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "testing",
+                "tdd",
+                "jest",
+                "cypress",
+                "e2e"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-12-auth/quiz-01",
+              "title": "Auth & Testing Quiz",
+              "description": "Authentication ve testing bilgini test et",
+              "after_lesson_id": "mod-12-auth/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-3-backend/module-12-auth-test/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-jwt-auth",
+              "title": "JWT Authentication Implementasyonu",
+              "description": "JWT token oluşturma, doğrulama ve refresh mekanizması yaz",
+              "difficulty": "orta",
+              "category": "auth",
+              "content_path": "phases/phase-3-backend/module-12-auth-test/challenges/challenge-01-jwt.json",
+              "related_lesson_id": "mod-12-auth/lesson-01",
+              "order_index": 1,
+              "tags": [
+                "jwt",
+                "auth",
+                "security"
+              ]
+            },
+            {
+              "id": "challenge-password-strength",
+              "title": "Password Strength Checker",
+              "description": "Kapsamlı parola güç puanlama sistemi",
+              "difficulty": "orta",
+              "category": "auth",
+              "content_path": "phases/phase-3-backend/module-12-auth-test/challenges/challenge-02-password-strength.json",
+              "related_lesson_id": "mod-12-auth/lesson-01",
+              "order_index": 2,
+              "tags": [
+                "security",
+                "password",
+                "validation"
+              ]
+            },
+            {
+              "id": "challenge-jwt-decoder",
+              "title": "JWT Decoder",
+              "description": "JWT token'larını decode et ve doğrula",
+              "difficulty": "orta",
+              "category": "auth",
+              "content_path": "phases/phase-3-backend/module-12-auth-test/challenges/challenge-03-jwt-decoder.json",
+              "related_lesson_id": "mod-12-auth/lesson-01",
+              "order_index": 3,
+              "tags": [
+                "jwt",
+                "auth",
+                "base64"
+              ]
+            },
+            {
+              "id": "challenge-test-generator",
+              "title": "Test Case Generator",
+              "description": "Fonksiyon imzalarından otomatik test case'leri oluştur",
+              "difficulty": "zor",
+              "category": "testing",
+              "content_path": "phases/phase-3-backend/module-12-auth-test/challenges/challenge-04-test-generator.json",
+              "related_lesson_id": "mod-12-auth/lesson-02",
+              "order_index": 4,
+              "tags": [
+                "testing",
+                "test-generation",
+                "tdd"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-4-devops",
+      "title": "Faz 4: DevOps, Cloud & Güvenlik",
+      "description": "Docker, Kubernetes, CI/CD, AWS, güvenlik ve networking temelleri",
+      "order_index": 4,
+      "estimated_weeks": "7-8",
+      "icon": "🚀",
+      "modules": [
+        {
+          "id": "mod-13-docker-cloud",
+          "title": "Modül 13: Docker, CI/CD & Cloud",
+          "description": "Docker, Kubernetes, GitHub Actions, AWS, Terraform",
+          "order_index": 13,
+          "estimated_hours": 18,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-13-devops/lesson-01",
+              "title": "Docker ve Containerization",
+              "description": "Docker temelleri, Dockerfile, multi-stage build, Docker Compose, networking, volumes",
+              "order_index": 1,
+              "content_path": "phases/phase-4-devops/module-13-docker-cloud/lesson-01-docker.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "docker",
+                "containers",
+                "dockerfile",
+                "compose"
+              ]
+            },
+            {
+              "id": "mod-13-devops/lesson-02",
+              "title": "CI/CD, Kubernetes ve Cloud",
+              "description": "GitHub Actions, K8s temelleri, AWS/GCP/Azure, Terraform, deployment stratejileri",
+              "order_index": 2,
+              "content_path": "phases/phase-4-devops/module-13-docker-cloud/lesson-02-cicd-cloud.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "cicd",
+                "kubernetes",
+                "aws",
+                "terraform",
+                "github-actions"
+              ]
+            },
+            {
+              "id": "mod-13-devops/lesson-03-deployment",
+              "title": "Uretim Ortamina Deployment",
+              "order_index": 3,
+              "content_path": "phases/phase-4-devops/module-13-docker-cloud/lesson-03-deployment.md",
+              "estimated_minutes": 120,
+              "tags": [
+                "vercel",
+                "railway",
+                "aws",
+                "ci-cd",
+                "deployment",
+                "production"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-13-devops/quiz-01",
+              "title": "Docker & Cloud Quiz",
+              "description": "Docker, CI/CD ve cloud bilgini test et",
+              "after_lesson_id": "mod-13-devops/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-4-devops/module-13-docker-cloud/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-dockerfile",
+              "title": "Dockerfile Yaz",
+              "description": "Multi-stage Dockerfile ve docker-compose.yml oluştur",
+              "difficulty": "orta",
+              "category": "devops",
+              "content_path": "phases/phase-4-devops/module-13-docker-cloud/challenges/challenge-01-docker.json",
+              "related_lesson_id": "mod-13-devops/lesson-01",
+              "order_index": 1,
+              "tags": [
+                "docker",
+                "dockerfile"
+              ]
+            },
+            {
+              "id": "mod-13-devops/challenge-compose",
+              "title": "Multi-Service Docker Compose",
+              "content_path": "phases/phase-4-devops/module-13-docker-cloud/challenges/challenge-02-compose.json",
+              "order_index": 2,
+              "difficulty": "zor"
+            },
+            {
+              "id": "mod-13-devops/challenge-cicd",
+              "title": "GitHub Actions CI/CD Pipeline",
+              "content_path": "phases/phase-4-devops/module-13-docker-cloud/challenges/challenge-03-cicd.json",
+              "order_index": 3,
+              "difficulty": "zor"
+            }
+          ]
+        },
+        {
+          "id": "mod-14-security",
+          "title": "Modül 14: Güvenlik & Networking",
+          "description": "OWASP Top 10, TLS, networking protocols, security headers",
+          "order_index": 14,
+          "estimated_hours": 12,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-14-sec/lesson-01",
+              "title": "Web Güvenliği: OWASP Top 10 ve Savunma",
+              "description": "SQL injection, XSS, CSRF, SSRF, CSP, security headers, input validation",
+              "order_index": 1,
+              "content_path": "phases/phase-4-devops/module-14-security/lesson-01-web-security.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "security",
+                "owasp",
+                "xss",
+                "csrf",
+                "csp"
+              ]
+            },
+            {
+              "id": "mod-14-sec/lesson-02",
+              "title": "Networking Temelleri ve Güvenli İletişim",
+              "description": "OSI model, TCP/UDP detay, TLS detaylı, DNS security, DevTools Network",
+              "order_index": 2,
+              "content_path": "phases/phase-4-devops/module-14-security/lesson-02-networking.md",
+              "estimated_minutes": 45,
+              "tags": [
+                "networking",
+                "tls",
+                "dns",
+                "security"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-14-sec/quiz-01",
+              "title": "Güvenlik & Networking Quiz",
+              "description": "Web güvenliği ve networking bilgini test et",
+              "after_lesson_id": "mod-14-sec/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-4-devops/module-14-security/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-security-audit",
+              "title": "Güvenlik Açığı Bul",
+              "description": "Verilen kod parçalarındaki güvenlik açıklarını tespit et",
+              "difficulty": "orta",
+              "category": "security",
+              "content_path": "phases/phase-4-devops/module-14-security/challenges/challenge-01-audit.json",
+              "related_lesson_id": "mod-14-sec/lesson-01",
+              "order_index": 1,
+              "tags": [
+                "security",
+                "owasp",
+                "audit"
+              ]
+            },
+            {
+              "id": "mod-14-security/challenge-xss-csrf",
+              "title": "XSS ve CSRF Guvenlik Aciklari",
+              "content_path": "phases/phase-4-devops/module-14-security/challenges/challenge-02-xss-csrf.json",
+              "order_index": 2,
+              "difficulty": "zor"
+            },
+            {
+              "id": "mod-14-security/challenge-auth-security",
+              "title": "Auth ve Rate Limiting Guvenlik",
+              "content_path": "phases/phase-4-devops/module-14-security/challenges/challenge-03-auth-security.json",
+              "order_index": 3,
+              "difficulty": "zor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-5-ai",
+      "title": "Faz 5: AI & Machine Learning",
+      "description": "ML temelleri, deep learning, LLM API'leri, RAG, AI agents, MLOps",
+      "order_index": 5,
+      "estimated_weeks": "8-10",
+      "icon": "🤖",
+      "modules": [
+        {
+          "id": "mod-15-ml-math",
+          "title": "Modül 15: AI/ML Matematik & Python ML",
+          "description": "Linear algebra, calculus, NumPy, Pandas, Scikit-learn",
+          "order_index": 15,
+          "estimated_hours": 20,
+          "prerequisites": [
+            "mod-02-python"
+          ],
+          "lessons": [
+            {
+              "id": "mod-15-ml/lesson-01",
+              "title": "AI/ML Matematik Temelleri",
+              "description": "Linear algebra, calculus, probability, optimization, gradient descent",
+              "order_index": 1,
+              "content_path": "phases/phase-5-ai/module-15-ml-math/lesson-01-ml-math.md",
+              "estimated_minutes": 60,
+              "tags": [
+                "math",
+                "linear-algebra",
+                "calculus",
+                "probability"
+              ]
+            },
+            {
+              "id": "mod-15-ml/lesson-02",
+              "title": "Python ML: NumPy, Pandas ve Scikit-learn",
+              "description": "NumPy arrays, Pandas DataFrame, Scikit-learn pipeline, model evaluation",
+              "order_index": 2,
+              "content_path": "phases/phase-5-ai/module-15-ml-math/lesson-02-python-ml.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "numpy",
+                "pandas",
+                "scikit-learn",
+                "ml"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-15-ml/quiz-01",
+              "title": "AI/ML Temelleri Quiz",
+              "description": "ML matematik ve Python ML bilgini test et",
+              "after_lesson_id": "mod-15-ml/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-5-ai/module-15-ml-math/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-ml-pipeline",
+              "title": "ML Pipeline Oluştur",
+              "description": "Scikit-learn ile veri yükleme, ön işleme ve model eğitimi pipeline'ı",
+              "difficulty": "orta",
+              "category": "ml",
+              "content_path": "phases/phase-5-ai/module-15-ml-math/challenges/challenge-01-pipeline.json",
+              "related_lesson_id": "mod-15-ml/lesson-02",
+              "order_index": 1,
+              "tags": [
+                "ml",
+                "scikit-learn",
+                "pipeline"
+              ]
+            },
+            {
+              "id": "mod-15-ml/challenge-data-analysis",
+              "title": "NumPy/Pandas Veri Analizi",
+              "content_path": "phases/phase-5-ai/module-15-ml-math/challenges/challenge-02-data-analysis.json",
+              "order_index": 2,
+              "difficulty": "orta"
+            }
+          ]
+        },
+        {
+          "id": "mod-16-deep-learning",
+          "title": "Modül 16: Deep Learning & Transformers",
+          "description": "Neural networks, CNN, RNN, Transformers, PyTorch",
+          "order_index": 16,
+          "estimated_hours": 18,
+          "prerequisites": [
+            "mod-15-ml-math"
+          ],
+          "lessons": [
+            {
+              "id": "mod-16-dl/lesson-01",
+              "title": "Neural Networks ve Deep Learning Temelleri",
+              "description": "Perceptron, activation functions, backpropagation, CNN, RNN/LSTM",
+              "order_index": 1,
+              "content_path": "phases/phase-5-ai/module-16-deep-learning/lesson-01-neural-networks.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "neural-networks",
+                "deep-learning",
+                "cnn",
+                "rnn"
+              ]
+            },
+            {
+              "id": "mod-16-dl/lesson-02",
+              "title": "Transformers ve Modern AI Mimarisi",
+              "description": "Attention mechanism, self-attention, transformer architecture, PyTorch, transfer learning",
+              "order_index": 2,
+              "content_path": "phases/phase-5-ai/module-16-deep-learning/lesson-02-transformers.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "transformers",
+                "attention",
+                "pytorch",
+                "transfer-learning"
+              ]
+            },
+            {
+              "id": "mod-16-dl/lesson-03-fine-tuning",
+              "title": "Fine-tuning ve Model Optimizasyonu",
+              "content_path": "phases/phase-5-ai/module-16-deep-learning/lesson-03-fine-tuning.md",
+              "order_index": 3,
+              "estimated_minutes": 120,
+              "tags": [
+                "fine-tuning",
+                "lora",
+                "qlora",
+                "peft",
+                "hugging-face",
+                "openai",
+                "transfer-learning"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-16-dl/quiz-01",
+              "title": "Deep Learning Quiz",
+              "description": "Neural network ve transformer bilgini test et",
+              "after_lesson_id": "mod-16-dl/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-5-ai/module-16-deep-learning/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-neural-net",
+              "title": "Basit Neural Network",
+              "description": "NumPy ile sıfırdan basit bir neural network yaz",
+              "difficulty": "zor",
+              "category": "dl",
+              "content_path": "phases/phase-5-ai/module-16-deep-learning/challenges/challenge-01-nn.json",
+              "related_lesson_id": "mod-16-dl/lesson-01",
+              "order_index": 1,
+              "tags": [
+                "neural-network",
+                "numpy",
+                "backpropagation"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mod-17-genai",
+          "title": "Modül 17: Generative AI, LLM & RAG",
+          "description": "OpenAI/Anthropic API, LangChain, RAG, AI Agents, fine-tuning",
+          "order_index": 17,
+          "estimated_hours": 24,
+          "prerequisites": [
+            "mod-16-deep-learning"
+          ],
+          "lessons": [
+            {
+              "id": "mod-17-ai/lesson-01",
+              "title": "LLM API'leri ve Prompt Engineering",
+              "description": "OpenAI, Anthropic, Gemini API, prompt patterns, function calling",
+              "order_index": 1,
+              "content_path": "phases/phase-5-ai/module-17-genai/lesson-01-llm-prompt.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "llm",
+                "openai",
+                "anthropic",
+                "prompt-engineering"
+              ]
+            },
+            {
+              "id": "mod-17-ai/lesson-02",
+              "title": "RAG, AI Agents ve LangChain",
+              "description": "RAG pipeline, vector databases, LangChain, AI agents, fine-tuning, MLOps",
+              "order_index": 2,
+              "content_path": "phases/phase-5-ai/module-17-genai/lesson-02-rag-agents.md",
+              "estimated_minutes": 60,
+              "tags": [
+                "rag",
+                "langchain",
+                "vector-db",
+                "agents",
+                "fine-tuning"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-17-ai/quiz-01",
+              "title": "Generative AI Quiz",
+              "description": "LLM, RAG ve AI agent bilgini test et",
+              "after_lesson_id": "mod-17-ai/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-5-ai/module-17-genai/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-rag-pipeline",
+              "title": "RAG Pipeline Tasarla",
+              "description": "Basit bir RAG sistemi için chunking, embedding ve retrieval pipeline'ı yaz",
+              "difficulty": "zor",
+              "category": "ai",
+              "content_path": "phases/phase-5-ai/module-17-genai/challenges/challenge-01-rag.json",
+              "related_lesson_id": "mod-17-ai/lesson-02",
+              "order_index": 1,
+              "tags": [
+                "rag",
+                "embeddings",
+                "vector-search"
+              ]
+            },
+            {
+              "id": "mod-17-genai/challenge-prompt",
+              "title": "Prompt Engineering Senaryolari",
+              "content_path": "phases/phase-5-ai/module-17-genai/challenges/challenge-02-prompt-engineering.json",
+              "order_index": 2,
+              "difficulty": "orta"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-6-kariyer",
+      "title": "Faz 6: Sistem Tasarımı & Kariyer",
+      "description": "Yazılım mimarisi, system design, DSA, mülakat hazırlığı ve kariyer stratejisi",
+      "order_index": 6,
+      "estimated_weeks": "10-12",
+      "icon": "🎯",
+      "modules": [
+        {
+          "id": "mod-18-architecture",
+          "title": "Modül 18: Yazılım Mimarisi & Design Patterns",
+          "description": "9 mimari pattern, GoF patterns, SOLID, Clean Code",
+          "order_index": 18,
+          "estimated_hours": 16,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-18-arch/lesson-01",
+              "title": "Yazılım Mimarisi Patterns",
+              "description": "Monolithic, Microservices, Event-Driven, Serverless, Hexagonal ve diğer mimari kalıplar",
+              "order_index": 1,
+              "content_path": "phases/phase-6-kariyer/module-18-architecture/lesson-01-architecture.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "architecture",
+                "microservices",
+                "patterns"
+              ]
+            },
+            {
+              "id": "mod-18-arch/lesson-02",
+              "title": "Design Patterns ve SOLID",
+              "description": "GoF patterns, SOLID prensipleri, Clean Code, DRY/KISS/YAGNI",
+              "order_index": 2,
+              "content_path": "phases/phase-6-kariyer/module-18-architecture/lesson-02-design-patterns.md",
+              "estimated_minutes": 55,
+              "tags": [
+                "design-patterns",
+                "solid",
+                "clean-code"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-18-arch/quiz-01",
+              "title": "Mimari & Patterns Quiz",
+              "description": "Yazılım mimarisi ve design pattern bilgini test et",
+              "after_lesson_id": "mod-18-arch/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-6-kariyer/module-18-architecture/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-patterns",
+              "title": "Design Pattern Uygula",
+              "description": "Verilen senaryolar için doğru design pattern'ı seç ve uygula",
+              "difficulty": "zor",
+              "category": "architecture",
+              "content_path": "phases/phase-6-kariyer/module-18-architecture/challenges/challenge-01-patterns.json",
+              "related_lesson_id": "mod-18-arch/lesson-02",
+              "order_index": 1,
+              "tags": [
+                "design-patterns",
+                "solid"
+              ]
+            },
+            {
+              "id": "mod-18-arch/challenge-patterns",
+              "title": "Design Pattern Implementasyonu",
+              "content_path": "phases/phase-6-kariyer/module-18-architecture/challenges/challenge-02-design-patterns.json",
+              "order_index": 2,
+              "difficulty": "zor"
+            }
+          ]
+        },
+        {
+          "id": "mod-19-system-design",
+          "title": "Modül 19: System Design & DSA",
+          "description": "System design, 12 klasik problem, DSA, problem çözme kalıpları",
+          "order_index": 19,
+          "estimated_hours": 24,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-19-sd/lesson-01",
+              "title": "System Design Temelleri",
+              "description": "Scalability, load balancing, caching, sharding, message queues, 12 klasik problem",
+              "order_index": 1,
+              "content_path": "phases/phase-6-kariyer/module-19-system-design/lesson-01-system-design.md",
+              "estimated_minutes": 60,
+              "tags": [
+                "system-design",
+                "scalability",
+                "caching",
+                "architecture"
+              ]
+            },
+            {
+              "id": "mod-19-sd/lesson-02",
+              "title": "Data Structures & Algorithms",
+              "description": "Temel veri yapıları, sorting, searching, graph, DP, 14 problem çözme kalıbı",
+              "order_index": 2,
+              "content_path": "phases/phase-6-kariyer/module-19-system-design/lesson-02-dsa.md",
+              "estimated_minutes": 60,
+              "tags": [
+                "dsa",
+                "algorithms",
+                "data-structures",
+                "leetcode"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-19-sd/quiz-01",
+              "title": "System Design & DSA Quiz",
+              "description": "System design ve algoritma bilgini test et",
+              "after_lesson_id": "mod-19-sd/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-6-kariyer/module-19-system-design/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "challenge-two-sum",
+              "title": "Klasik Algoritma Problemleri",
+              "description": "Two Sum, Valid Parentheses ve Binary Search implementasyonu",
+              "difficulty": "orta",
+              "category": "dsa",
+              "content_path": "phases/phase-6-kariyer/module-19-system-design/challenges/challenge-01-dsa.json",
+              "related_lesson_id": "mod-19-sd/lesson-02",
+              "order_index": 1,
+              "tags": [
+                "algorithms",
+                "leetcode",
+                "problem-solving"
+              ]
+            },
+            {
+              "id": "mod-19-system/challenge-dsa-patterns",
+              "title": "DSA Pattern Problemleri",
+              "content_path": "phases/phase-6-kariyer/module-19-system-design/challenges/challenge-02-dsa-patterns.json",
+              "order_index": 2,
+              "difficulty": "orta"
+            },
+            {
+              "id": "mod-19-system/challenge-dsa-advanced",
+              "title": "Ileri DSA Problemleri",
+              "content_path": "phases/phase-6-kariyer/module-19-system-design/challenges/challenge-03-dsa-advanced.json",
+              "order_index": 3,
+              "difficulty": "zor"
+            }
+          ]
+        },
+        {
+          "id": "mod-20-career",
+          "title": "Modül 20: Open Source, Mülakat & Kariyer",
+          "description": "Open source katkı, teknik mülakat, portfolio, CV, LinkedIn",
+          "order_index": 20,
+          "estimated_hours": 10,
+          "prerequisites": [],
+          "lessons": [
+            {
+              "id": "mod-20-career/lesson-01",
+              "title": "Teknik Mülakat Hazırlığı",
+              "description": "OA, phone screen, live coding, system design, behavioral, take-home, STAR format",
+              "order_index": 1,
+              "content_path": "phases/phase-6-kariyer/module-20-career/lesson-01-interview.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "interview",
+                "career",
+                "star-format",
+                "behavioral"
+              ]
+            },
+            {
+              "id": "mod-20-career/lesson-02",
+              "title": "Portfolio, CV ve Kariyer Stratejisi",
+              "description": "Portfolio projeleri, CV yazımı, LinkedIn, networking, open source katkı",
+              "order_index": 2,
+              "content_path": "phases/phase-6-kariyer/module-20-career/lesson-02-portfolio-cv.md",
+              "estimated_minutes": 45,
+              "tags": [
+                "portfolio",
+                "cv",
+                "linkedin",
+                "open-source"
+              ]
+            }
+          ],
+          "quizzes": [
+            {
+              "id": "mod-20-career/quiz-01",
+              "title": "Kariyer & Mülakat Quiz",
+              "description": "Mülakat hazırlığı ve kariyer stratejisi bilgini test et",
+              "after_lesson_id": "mod-20-career/lesson-02",
+              "passing_score": 70,
+              "content_path": "phases/phase-6-kariyer/module-20-career/quizzes/quiz-01.json",
+              "order_index": 1
+            }
+          ],
+          "challenges": [
+            {
+              "id": "mod-20-career/challenge-interview",
+              "title": "Mock Teknik Mulakat",
+              "content_path": "phases/phase-6-kariyer/module-20-career/challenges/challenge-01-interview-prep.json",
+              "order_index": 1,
+              "difficulty": "zor"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "project-01",
+      "title": "Kişisel Portfolio & Blog Sitesi",
+      "description": "React + TypeScript + Tailwind + Next.js ile kişisel portfolio",
+      "order_index": 1,
+      "difficulty": "orta",
+      "estimated_days": 7,
+      "content_path": "projects/project-01.json",
+      "required_phases": [
+        "phase-2-frontend"
+      ],
+      "tech_stack": [
+        "React",
+        "TypeScript",
+        "Tailwind",
+        "Next.js",
+        "MDX"
+      ],
+      "milestones": [
+        {
+          "id": "p01-m1",
+          "title": "Proje Altyapısı ve Tasarım Sistemi",
+          "description": "Her profesyonel proje sağlam bir temel ile başlar. Bu milestone'da Next.js projesini oluşturacak, geliştirme araçlarını kuracak ve tutarlı bir tasarım sistemi belirleyeceksin. Projenin ilk kurulumu, i",
+          "order_index": 1,
+          "checklist": [
+            "Next.js Projesi Oluşturma",
+            "Prettier ve Ek Lint Kuralları Kurulumu",
+            "Tasarım Sistemi Belirleme",
+            "Font ve Global Stil Kurulumu",
+            "Temel Component Yapısı Oluşturma",
+            "[Kontrol] tailwind.config.ts dosyasında syntax hatası olmamalı. pnpm run dev çalıştırıldığında hata vermemeli."
+          ]
+        },
+        {
+          "id": "p01-m2",
+          "title": "Ana Sayfalar ve MDX Blog Sistemi",
+          "description": "Bu milestone'da sitenin tüm ana sayfalarını oluşturacak ve MDX blog sistemini kuracaksın. Her sayfa, hem görsel açıdan etkileyici hem de semantik HTML açısından doğru olacak. Blog sistemi, static gene",
+          "order_index": 2,
+          "checklist": [
+            "Hero Section ve Ana Sayfa Tasarımı",
+            "MDX Altyapısını Kurma",
+            "Blog Listeleme ve Detay Sayfaları",
+            "Hakkımda ve Projeler Sayfaları",
+            "İletişim Formu",
+            "Örnek Blog Yazıları Oluşturma"
+          ]
+        },
+        {
+          "id": "p01-m3",
+          "title": "Portfolio Bölümü ve Responsive Tasarım",
+          "description": "Bu milestone'da portfolio bölümünü zenginleştirecek, mobil responsive tasarımı mükemmelleştirecek ve dark/light mode toggle'ını implement edeceksin. Bir web sitesinin profesyonel görünmesi, detaylara ",
+          "order_index": 3,
+          "checklist": [
+            "Dark/Light Mode Toggle Implementasyonu",
+            "Mobil Responsive Navigation",
+            "Beceri ve Deneyim Timeline Bölümü",
+            "Sayfa Geçiş Animasyonları"
+          ]
+        },
+        {
+          "id": "p01-m4",
+          "title": "SEO, Performans ve Erişilebilirlik",
+          "description": "Bu milestone'da sitenin SEO'sunu, performansını ve erişilebilirliğini production seviyesine çıkaracaksın. Lighthouse 95+ skor hedefi, Google'ın Core Web Vitals standartlarına uyum ve WCAG 2.1 AA erişi",
+          "order_index": 4,
+          "checklist": [
+            "SEO Meta Tag ve Open Graph Kurulumu",
+            "Sitemap ve Robots.txt Oluşturma",
+            "Image Optimizasyonu",
+            "Erişilebilirlik (Accessibility) Kontrolü",
+            "Lighthouse Audit ve Performans İyileştirme"
+          ]
+        },
+        {
+          "id": "p01-m5",
+          "title": "Deploy ve Son Rötuşlar",
+          "description": "Son milestone'da projeyi Vercel'e deploy edecek, custom domain bağlayacak ve final kontrolleri yapacaksın. Production deploy, bir projenin en önemli adımıdır — 'lokalde çalışıyor' yetmez, gerçek dünya",
+          "order_index": 5,
+          "checklist": [
+            "GitHub Repository Hazırlama",
+            "Vercel'e Deploy Etme",
+            "Production Kontrol Listesi",
+            "README.md ve Proje Dokümantasyonu"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-02",
+      "title": "Full Stack Proje Yönetim Uygulaması",
+      "description": "Trello/Jira benzeri kanban board",
+      "order_index": 2,
+      "difficulty": "zor",
+      "estimated_days": 14,
+      "content_path": "projects/project-02.json",
+      "required_phases": [
+        "phase-2-frontend",
+        "phase-3-backend"
+      ],
+      "tech_stack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "Express",
+        "PostgreSQL",
+        "Prisma",
+        "JWT"
+      ],
+      "milestones": [
+        {
+          "id": "p02-m1",
+          "title": "Proje Mimarisi ve Geliştirme Ortamı",
+          "description": "Full stack bir projenin en kritik aşaması, başlangıç mimarisinin doğru kurulmasıdır. Bu milestone'da monorepo yapısını, backend ve frontend projelerini, Docker Compose konfigürasyonunu ve veritabanı b",
+          "order_index": 1,
+          "checklist": [
+            "Monorepo Proje Yapısını Oluşturma",
+            "Docker Compose ile Geliştirme Ortamı",
+            "Express Server ve Temel Middleware Kurulumu",
+            "Prisma Kurulumu ve İlk Migration",
+            "Seed Data ve Prisma Studio",
+            "[Kontrol] server/ ve client/ klasörleri oluşturulmuş olmalı. pnpm run dev ile her ikisi de başlatılabilmeli."
+          ]
+        },
+        {
+          "id": "p02-m2",
+          "title": "Veritabanı Tasarımı ve CRUD Servisleri",
+          "description": "Bu milestone'da veritabanı ilişkilerini detaylandıracak, service layer pattern'ı ile business logic'i organize edecek ve temel CRUD operasyonlarını implement edeceksin. İyi tasarlanmış bir service lay",
+          "order_index": 2,
+          "checklist": [
+            "Board Service Layer Oluşturma",
+            "Input Validation ile Zod Entegrasyonu",
+            "Board Controller ve Route Tanımları",
+            "List ve Card Servisleri",
+            "Tutarlı API Response Formatı"
+          ]
+        },
+        {
+          "id": "p02-m3",
+          "title": "Authentication Sistemi",
+          "description": "Güvenli bir authentication sistemi, her web uygulamasının temel taşıdır. Bu milestone'da JWT tabanlı auth sistemi kuracak, password hashing, token management ve protected route'lar implement edeceksin",
+          "order_index": 3,
+          "checklist": [
+            "Kullanıcı Kayıt (Register) Endpoint'i",
+            "Authentication Middleware",
+            "Rate Limiting ve Güvenlik Katmanları",
+            "Auth Route'ları ve Controller",
+            "Frontend Auth Context ve Token Yönetimi"
+          ]
+        },
+        {
+          "id": "p02-m4",
+          "title": "Frontend CRUD ve Board Arayüzü",
+          "description": "Bu milestone'da React ile kanban board arayüzünü oluşturacaksın. Component mimarisi, state management (TanStack Query), routing ve API entegrasyonu bu aşamanın odak noktaları.",
+          "order_index": 4,
+          "checklist": [
+            "React Router ve Sayfa Yapısı",
+            "Board Listesi ve Oluşturma",
+            "Board Detay Sayfası - Kanban Görünümü",
+            "Kart Oluşturma ve Düzenleme",
+            "Loading, Error ve Empty State Yönetimi"
+          ]
+        },
+        {
+          "id": "p02-m5",
+          "title": "Drag & Drop Implementasyonu",
+          "description": "Kanban board'un en kritik özelliği, kartları sürükle-bırak ile listeler arasında taşımaktır. Bu milestone'da dnd-kit kütüphanesini kullanarak profesyonel drag & drop deneyimi implement edeceksin.",
+          "order_index": 5,
+          "checklist": [
+            "dnd-kit Kütüphanesi Kurulumu ve Temel Yapı",
+            "Sortable Card Component",
+            "Listeler Arası Kart Taşıma",
+            "Sıralama Persistance ve Edge Case Handling",
+            "Drag Animasyonları ve UX Polish"
+          ]
+        },
+        {
+          "id": "p02-m6",
+          "title": "Testing ve Kalite Güvencesi",
+          "description": "Test yazmak, kodun doğru çalıştığını garanti eder ve gelecekteki değişikliklerin mevcut işlevselliği bozmadığını doğrular. Bu milestone'da backend API testleri, frontend component testleri ve entegras",
+          "order_index": 6,
+          "checklist": [
+            "Backend Test Altyapısı ve İlk API Testleri",
+            "Board API Testleri",
+            "Frontend Component Testleri",
+            "CI Pipeline ve Test Otomasyonu",
+            "Test Coverage Raporu ve Eksik Testler",
+            "[Kontrol] pnpm test (client) ile tüm component testleri geçmeli. En az 3 component için test yazılmış olmalı."
+          ]
+        },
+        {
+          "id": "p02-m7",
+          "title": "Docker, Deployment ve Dokümantasyon",
+          "description": "Son milestone'da projeyi production-ready hale getireceksin. Docker multi-stage build ile optimize container image'lar oluşturacak, API dokümantasyonu yazacak ve deployment rehberi hazırlayacaksın.",
+          "order_index": 7,
+          "checklist": [
+            "Production Docker Image Oluşturma",
+            "API Dokümantasyonu (Swagger/OpenAPI)",
+            "Environment Yönetimi ve Güvenlik Son Kontrol",
+            "Profesyonel README ve Proje Dokümantasyonu",
+            "Final Review ve Production Checklist"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-03",
+      "title": "Gerçek Zamanlı Chat Uygulaması",
+      "description": "WebSocket tabanlı real-time chat",
+      "order_index": 3,
+      "difficulty": "zor",
+      "estimated_days": 10,
+      "content_path": "projects/project-03.json",
+      "required_phases": [
+        "phase-3-backend"
+      ],
+      "tech_stack": [
+        "React",
+        "Node.js",
+        "Socket.io",
+        "MongoDB",
+        "Redis"
+      ],
+      "milestones": [
+        {
+          "id": "p03-m1",
+          "title": "Proje Altyapısı ve Socket.io Kurulumu",
+          "description": "Real-time uygulamalar, geleneksel HTTP uygulamalarından farklı bir altyapı gerektirir. Bu milestone'da Socket.io server ve client kurulumunu yapacak, ilk WebSocket bağlantısını kuracak ve temel event ",
+          "order_index": 1,
+          "checklist": [
+            "Proje Yapısı ve Bağımlılıklar",
+            "MongoDB Model Tanımları",
+            "Socket.io Server Kurulumu",
+            "Temel Socket Event Handler'ları",
+            "Redis Entegrasyonu ve Socket.io Adapter",
+            "[Kontrol] MongoDB'ye bağlantı kurulmalı. Model'ler hatasız compile olmalı. Mongoose index'ler oluşturulmalı."
+          ]
+        },
+        {
+          "id": "p03-m2",
+          "title": "Chat Backend ve Mesaj Yönetimi",
+          "description": "Bu milestone'da chat backend servislerini detaylandıracaksın. Conversation CRUD, mesaj pagination, arama ve okundu bilgisi gibi özellikler implement edilecek.",
+          "order_index": 2,
+          "checklist": [
+            "Conversation Service ve API",
+            "Cursor-Based Mesaj Pagination",
+            "Mesaj Okundu Bilgisi (Read Receipts)",
+            "REST API Endpoint'leri",
+            "[Kontrol] İlk sayfa mesajlar dönmeli. Cursor ile sonraki sayfalar yüklenmeli. hasMore doğru çalışmalı."
+          ]
+        },
+        {
+          "id": "p03-m3",
+          "title": "Frontend Chat Arayüzü",
+          "description": "Bu milestone'da React ile profesyonel chat arayüzünü oluşturacaksın. Conversation listesi, mesaj görünümü, infinite scroll ve real-time güncellemeler implement edilecek.",
+          "order_index": 3,
+          "checklist": [
+            "Socket.io Client ve Global State",
+            "Conversation Listesi ve Chat Layout",
+            "Chat Window ve Mesaj Gönderme",
+            "Mesaj Bubble Component ve Stil",
+            "Infinite Scroll ile Mesaj Geçmişi"
+          ]
+        },
+        {
+          "id": "p03-m4",
+          "title": "AI Asistan Entegrasyonu",
+          "description": "Bu milestone'da OpenAI API entegrasyonu ile chat uygulamasına AI asistan ekleyeceksin. Kullanıcılar @ai komutuyla AI'dan yardım isteyebilecek ve yanıtlar streaming olarak gösterilecek.",
+          "order_index": 4,
+          "checklist": [
+            "OpenAI API Kurulumu ve Temel Entegrasyon",
+            "AI Socket Event Handler",
+            "Frontend AI Streaming UI",
+            "AI Rate Limiting ve Güvenlik"
+          ]
+        },
+        {
+          "id": "p03-m5",
+          "title": "Dosya Paylaşımı ve Medya",
+          "description": "Bu milestone'da chat uygulamasına dosya ve resim paylaşımı ekleyeceksin. Dosya yükleme, önizleme ve indirme özellikleri implement edilecek.",
+          "order_index": 5,
+          "checklist": [
+            "Dosya Yükleme API'si (Multer)",
+            "Chat'te Dosya Mesajı Gönderme",
+            "Resim Önizleme ve Dosya İndirme",
+            "Drag & Drop Dosya Yükleme"
+          ]
+        },
+        {
+          "id": "p03-m6",
+          "title": "Deploy, Test ve Final Polish",
+          "description": "Son milestone'da uygulamayı production-ready hale getireceksin. Docker Compose ile tüm servisleri containerize edecek, temel testleri yazacak ve deployment hazırlığı yapacaksın.",
+          "order_index": 6,
+          "checklist": [
+            "Docker Compose ile Tam Ortam",
+            "WebSocket ve API Testleri",
+            "Performance Monitoring ve Final Checklist",
+            "README ve Demo Hazırlığı",
+            "[Kontrol] README profesyonel görünmeli. Demo materyali hazır olmalı. Kurulum 3 adımda tamamlanabilmeli."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-04",
+      "title": "E-ticaret Backend API",
+      "description": "Production-ready e-commerce API",
+      "order_index": 4,
+      "difficulty": "zor",
+      "estimated_days": 14,
+      "content_path": "projects/project-04.json",
+      "required_phases": [
+        "phase-3-backend",
+        "phase-4-devops"
+      ],
+      "tech_stack": [
+        "Node.js",
+        "Express",
+        "PostgreSQL",
+        "Redis",
+        "Stripe",
+        "Docker"
+      ],
+      "milestones": [
+        {
+          "id": "p04-m1",
+          "title": "Proje Mimarisi ve Veritabanı Tasarımı",
+          "description": "E-ticaret API'sinin temelini oluşturacaksın. Layered architecture, veritabanı şeması ve temel CRUD endpoint'leri bu milestone'ın kapsamında. İyi tasarlanmış bir veritabanı şeması, projenin tüm yaşam d",
+          "order_index": 1,
+          "checklist": [
+            "Proje Yapısı ve Docker Ortamı",
+            "Prisma Schema Tasarımı",
+            "Ürün API'si (CRUD + Filtreleme + Pagination)",
+            "Redis ile Sepet Yönetimi",
+            "Auth Sistemi ve Role-Based Access Control"
+          ]
+        },
+        {
+          "id": "p04-m2",
+          "title": "Stripe Ödeme Entegrasyonu",
+          "description": "Stripe, modern e-ticaretin standart ödeme altyapısıdır. Bu milestone'da Stripe Checkout Session ile güvenli ödeme akışı, webhook'lar ile asenkron ödeme durumu güncelleme ve hata yönetimi implement ede",
+          "order_index": 2,
+          "checklist": [
+            "Stripe Kurulumu ve Checkout Session",
+            "Stripe Webhook Handler",
+            "Sipariş Yönetimi API",
+            "Stripe Test Modu ve Webhook Testi",
+            "Refund (İade) İşlemi"
+          ]
+        },
+        {
+          "id": "p04-m3",
+          "title": "Sipariş Akışı ve Stok Yönetimi",
+          "description": "Bu milestone'da sipariş oluşturma akışını tamamlayacak, stok yönetimini transaction-safe yapacak ve sipariş durumu state machine'ini implement edeceksin.",
+          "order_index": 3,
+          "checklist": [
+            "Transaction-Safe Sipariş Oluşturma",
+            "Sipariş Geçmişi ve Detay API",
+            "Stok Alarm ve Bildirim Sistemi"
+          ]
+        },
+        {
+          "id": "p04-m4",
+          "title": "Fraud Detection ML Modeli",
+          "description": "Bu milestone'da Python ile basit bir fraud detection modeli eğitecek ve bunu Flask/FastAPI microservice olarak deploy edeceksin. Model, sipariş verilerini analiz ederek şüpheli işlemleri tespit edecek",
+          "order_index": 4,
+          "checklist": [
+            "Fraud Detection Veri Seti Hazırlama",
+            "Model Eğitimi ve Değerlendirme",
+            "Flask API ile Model Servisi",
+            "Node.js API ile Fraud Detection Entegrasyonu"
+          ]
+        },
+        {
+          "id": "p04-m5",
+          "title": "CI/CD Pipeline ve Testing",
+          "description": "Bu milestone'da GitHub Actions ile CI/CD pipeline kuracak ve kapsamlı test suite yazacaksın. Her git push'ta testler otomatik çalışır, lint kontrolleri yapılır ve Docker image build edilir.",
+          "order_index": 5,
+          "checklist": [
+            "API Test Suite",
+            "GitHub Actions CI Pipeline",
+            "Swagger API Dokümantasyonu ve Final"
+          ]
+        },
+        {
+          "id": "p04-m6",
+          "title": "Performans Optimizasyonu ve Production Hazırlık",
+          "description": "Son milestone'da API performansını optimize edecek, caching stratejisi uygulayacak ve production deployment hazırlığı yapacaksın.",
+          "order_index": 6,
+          "checklist": [
+            "Redis Caching Stratejisi",
+            "Production Docker ve Final Checklist"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-05",
+      "title": "Analytics Dashboard",
+      "description": "Multi-source data aggregation dashboard",
+      "order_index": 5,
+      "difficulty": "orta",
+      "estimated_days": 10,
+      "content_path": "projects/project-05.json",
+      "required_phases": [
+        "phase-2-frontend",
+        "phase-3-backend"
+      ],
+      "tech_stack": [
+        "React",
+        "TypeScript",
+        "TanStack Query",
+        "Recharts",
+        "Node.js"
+      ],
+      "milestones": [
+        {
+          "id": "p05-m1",
+          "title": "Proje Altyapısı ve Veri Mimarisi",
+          "description": "Dashboard projesinin temellerini atıyoruz. Veri modelleme, API yapısı ve frontend scaffolding bu milestone'da yapılacak.",
+          "order_index": 1,
+          "checklist": [
+            "Monorepo Proje Yapısı",
+            "PostgreSQL Time-Series Schema",
+            "Express API ve Aggregation Endpoint'leri",
+            "React Dashboard Scaffolding"
+          ]
+        },
+        {
+          "id": "p05-m2",
+          "title": "Veri Toplama ve Redis Cache",
+          "description": "Birden fazla kaynaktan veri toplama pipeline'ı ve Redis cache katmanı oluşturuyoruz.",
+          "order_index": 2,
+          "checklist": [
+            "Veri Simülasyonu ve Seed",
+            "Redis Cache Katmanı",
+            "Multi-Source Data Aggregation API"
+          ]
+        },
+        {
+          "id": "p05-m3",
+          "title": "İnteraktif Dashboard Frontend",
+          "description": "Recharts ile profesyonel, interaktif grafikler oluşturuyoruz. Line, area, bar, pie chart'lar ve filtreleme sistemi.",
+          "order_index": 3,
+          "checklist": [
+            "useMetrics Custom Hook",
+            "Multi-Chart Dashboard Layout",
+            "Advanced Chart Features"
+          ]
+        },
+        {
+          "id": "p05-m4",
+          "title": "AI Anomali Tespiti",
+          "description": "Machine learning ile metriklerdeki anormallikleri otomatik tespit eden sistem oluşturuyoruz.",
+          "order_index": 4,
+          "checklist": [
+            "İstatistiksel Anomali Tespiti (Z-Score)",
+            "Isolation Forest ile ML Anomali Tespiti",
+            "Anomali Görselleştirme ve Alert",
+            "Model Performans Değerlendirme"
+          ]
+        },
+        {
+          "id": "p05-m5",
+          "title": "Export, Alert Sistemi ve Heatmap",
+          "description": "Dashboard'a CSV/PDF export, email alert sistemi ve heatmap/cohort analiz gibi advanced vizualizasyonlar ekliyoruz.",
+          "order_index": 5,
+          "checklist": [
+            "CSV ve PDF Export",
+            "Heatmap Vizualizasyonu"
+          ]
+        },
+        {
+          "id": "p05-m6",
+          "title": "Docker, Test ve Production Hazırlık",
+          "description": "Dashboard'u Docker ile containerize edip, testler yazıp production'a hazırlıyoruz.",
+          "order_index": 6,
+          "checklist": [
+            "Docker Compose Setup",
+            "Performance Optimization"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-06",
+      "title": "AI-Powered Blog Platform",
+      "description": "AI content suggestions ile blog platformu",
+      "order_index": 6,
+      "difficulty": "zor",
+      "estimated_days": 12,
+      "content_path": "projects/project-06.json",
+      "required_phases": [
+        "phase-5-ai"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "TypeScript",
+        "PostgreSQL",
+        "OpenAI API"
+      ],
+      "milestones": [
+        {
+          "id": "p06-m1",
+          "title": "Proje Altyapısı & AI Provider Abstraction Layer",
+          "description": "Bu milestone'da projenin temellerini atıyoruz. En kritik kısım AI Provider Abstraction Layer — bu pattern sayesinde OpenAI, Anthropic veya herhangi bir LLM provider'ı tek bir arayüz arkasında soyutlay",
+          "checklist": [
+            "Monorepo Proje Yapısı ve Docker Compose",
+            "FastAPI Backend Temel Yapısı",
+            "Veritabanı Şeması ve Migration'lar",
+            "AI Provider Abstraction Layer (Strategy Pattern)",
+            "Next.js Frontend Temel Yapısı"
+          ]
+        },
+        {
+          "id": "p06-m2",
+          "title": "İçerik Yönetimi & Rich Text Editor",
+          "description": "Bu milestone'da TipTap ile profesyonel bir zengin metin editörü oluşturacağız ve içerik CRUD işlemlerini, versiyonlama sistemini ve içerik yönetim arayüzünü geliştireceğiz. TipTap, ProseMirror üzerine",
+          "checklist": [
+            "TipTap Rich Text Editör Kurulumu",
+            "İçerik CRUD API Endpoint'leri",
+            "İçerik Versiyonlama ve Diff View",
+            "İçerik Listesi ve Yönetim Dashboard'u",
+            "İçerik Dışa Aktarma (Markdown, HTML, PDF)"
+          ]
+        },
+        {
+          "id": "p06-m3",
+          "title": "AI İçerik Üretimi & Prompt Engineering",
+          "description": "Bu milestone'da projenin AI kalbini oluşturuyoruz. Kullanıcının bir konu, ton ve içerik türü seçerek AI ile içerik üretmesini sağlayacağız. Prompt engineering burada kritik — iyi bir prompt ile vasat ",
+          "checklist": [
+            "Prompt Template Sistemi",
+            "Streaming Content Generation API",
+            "Frontend Streaming UI",
+            "Prompt Injection Koruması",
+            "Token Yönetimi ve Maliyet Takibi"
+          ]
+        },
+        {
+          "id": "p06-m4",
+          "title": "Fine-tuning & Stil Adaptasyonu",
+          "description": "Bu milestone'da platformun en güçlü özelliğini geliştiriyoruz: kullanıcının yazım stilini öğrenme ve o stilde içerik üretme. Kullanıcı kendi yazılarını yükleyecek, sistem bu yazılardan stil profili çı",
+          "checklist": [
+            "Yazım Örnekleri Toplama ve Analiz",
+            "Few-shot Learning ile Stil Adaptasyonu",
+            "OpenAI Fine-tuning Pipeline",
+            "Model Evaluation ve Kalite Ölçümü",
+            "Fine-tuning Yönetim Arayüzü"
+          ]
+        },
+        {
+          "id": "p06-m5",
+          "title": "SEO & Arama Sistemi",
+          "description": "Bu milestone'da içerik platformunun keşfedilebilirlik katmanını oluşturuyoruz. SEO analizi ve optimizasyon önerileri, otomatik etiketleme (auto-tagging), embedding tabanlı semantik arama ve hybrid sea",
+          "checklist": [
+            "Embedding Pipeline ve pgvector Kurulumu",
+            "Hybrid Search (Full-text + Semantic)",
+            "Auto-tagging Sistemi",
+            "SEO Analiz ve Optimizasyon Önerileri",
+            "İlgili İçerik Önerileri"
+          ]
+        },
+        {
+          "id": "p06-m6",
+          "title": "Analytics Dashboard & Production Deployment",
+          "description": "Son milestone'da platformun analytics dashboard'unu ve production deployment altyapısını oluşturuyoruz. Kullanıcıların içerik performansını takip edebileceği metrikler (görüntüleme, etkileşim, AI kull",
+          "checklist": [
+            "Analytics Event Tracking Sistemi",
+            "Analytics Dashboard UI",
+            "Backend Analytics Aggregation API",
+            "Docker Multi-Stage Build ve Production Config",
+            "CI/CD Pipeline ve Monitoring",
+            "Performance Optimizasyon ve Son Dokunuşlar"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-07",
+      "title": "RAG Document Q&A System",
+      "description": "Döküman yükle, soru sor, kaynak göster",
+      "order_index": 7,
+      "difficulty": "expert",
+      "estimated_days": 14,
+      "content_path": "projects/project-07.json",
+      "required_phases": [
+        "phase-5-ai"
+      ],
+      "tech_stack": [
+        "React",
+        "FastAPI",
+        "LangChain",
+        "ChromaDB",
+        "OpenAI"
+      ],
+      "milestones": [
+        {
+          "id": "m1",
+          "title": "RAG Architecture & Project Setup",
+          "description": "",
+          "checklist": [
+            "RAG Kavramını Derinlemesine Anlama",
+            "Proje Yapısını Oluşturma",
+            "Konfigürasyon ve Environment Yönetimi",
+            "Temel RAG Pipeline'ı — İlk End-to-End Demo"
+          ]
+        },
+        {
+          "id": "m2",
+          "title": "Document Processing Pipeline",
+          "description": "",
+          "checklist": [
+            "PDF İşleme — PyPDF2 ile Metin Çıkarma",
+            "DOCX İşleme — python-docx ile",
+            "Text Cleaning Pipeline",
+            "Document Processor Factory ve Unified Interface",
+            "Metadata Enrichment ve Document Registry"
+          ]
+        },
+        {
+          "id": "m3",
+          "title": "Chunking Strategies — Karşılaştırmalı Analiz",
+          "description": "",
+          "checklist": [
+            "Fixed-Size Chunking — Baseline",
+            "Recursive Character Text Splitting — Production Standardı",
+            "Semantic Chunking — Embedding Tabanlı Bölme",
+            "Chunking Factory ve Strateji Karşılaştırması"
+          ]
+        },
+        {
+          "id": "m4",
+          "title": "Embedding & Vector Store",
+          "description": "",
+          "checklist": [
+            "OpenAI Embedding Service",
+            "HuggingFace Embedding Alternatifi",
+            "ChromaDB Vector Store Yönetimi",
+            "End-to-End Ingestion Pipeline"
+          ]
+        },
+        {
+          "id": "m5",
+          "title": "Retrieval System — Dense, Sparse, Hybrid",
+          "description": "",
+          "checklist": [
+            "Dense Retriever — Embedding Tabanlı Arama",
+            "Sparse Retriever — BM25 ile Keyword Arama",
+            "Hybrid Retriever — Reciprocal Rank Fusion",
+            "Cross-Encoder Re-Ranking",
+            "Retrieval Debugger — Transparency Tool"
+          ]
+        },
+        {
+          "id": "m6",
+          "title": "Generation & Conversation",
+          "description": "",
+          "checklist": [
+            "LLM Client ve Prompt Templates",
+            "LLM Client ile Cevap Üretme",
+            "Conversational Memory — Multi-Turn QA",
+            "RAG Pipeline Orchestrator — Her Şeyi Birleştir"
+          ]
+        },
+        {
+          "id": "m7",
+          "title": "Evaluation & Optimization",
+          "description": "",
+          "checklist": [
+            "Evaluation Dataset Oluşturma",
+            "RAGAS ile RAG Evaluation",
+            "Chunk Size Optimization",
+            "Retrieval Quality Metrics"
+          ]
+        },
+        {
+          "id": "m8",
+          "title": "Production — API, Caching, Monitoring, Docker",
+          "description": "",
+          "checklist": [
+            "FastAPI REST API",
+            "Redis Semantic Cache",
+            "Monitoring ve Structured Logging",
+            "Docker ile Containerization",
+            "Performance Testing ve p95 Optimizasyonu"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-08",
+      "title": "AI Customer Support Chatbot",
+      "description": "Bağlam-farkında AI müşteri destek botu",
+      "order_index": 8,
+      "difficulty": "expert",
+      "estimated_days": 12,
+      "content_path": "projects/project-08.json",
+      "required_phases": [
+        "phase-5-ai"
+      ],
+      "tech_stack": [
+        "React",
+        "Node.js",
+        "LangChain",
+        "PostgreSQL",
+        "WebSocket"
+      ],
+      "milestones": [
+        {
+          "id": "p08-m1",
+          "title": "Proje Altyapisi & Agent Mimari Tasarimi",
+          "description": "Monorepo yapisini kur, temel servisleri ayaga kaldir, LangGraph ile ilk agent graph'ini olustur.",
+          "checklist": [
+            "Monorepo & Docker Compose Setup",
+            "LangGraph Agent Graph Tasarimi",
+            "Router Agent Implementation",
+            "Temel API Endpoints"
+          ]
+        },
+        {
+          "id": "p08-m2",
+          "title": "Temel Agent'lar & LangGraph Workflow",
+          "description": "FAQ Agent ve Tech Support Agent'i implement et. Her agent'in kendi prompt'u, tool'lari ve davranis kurallari olacak.",
+          "checklist": [
+            "FAQ Agent — Knowledge Base Lookup",
+            "Tech Support Agent — Step-by-Step Troubleshooting",
+            "Agent Gecis Mantigi (Conditional Edges)",
+            "Conversation State Management"
+          ]
+        },
+        {
+          "id": "p08-m3",
+          "title": "Knowledge Base & RAG Entegrasyonu",
+          "description": "Agent'larin dogru bilgiye erismesi icin RAG pipeline kur. Dogrudan FAQ veritabani + vektorel arama.",
+          "checklist": [
+            "Document Processing Pipeline",
+            "Hybrid Retrieval (Dense + Sparse)",
+            "Citation & Source Tracking"
+          ]
+        },
+        {
+          "id": "p08-m4",
+          "title": "Multi-turn Conversation & Memory Yonetimi",
+          "description": "Uzun konusmalarda context'i verimli yonet. Conversation summarization ve sliding window memory implement et.",
+          "checklist": [
+            "Sliding Window + Summary Memory",
+            "Redis Session Store",
+            "Context-Aware Agent Handoff"
+          ]
+        },
+        {
+          "id": "p08-m5",
+          "title": "Human Handoff & Escalation Sistemi",
+          "description": "AI agent cozemediginde insana aktarma mekanizmasi. Tam context transferi ile sifirsiz gecis.",
+          "checklist": [
+            "Escalation Karar Mantigi",
+            "Context Transfer & Queue",
+            "Real-time Agent Dashboard"
+          ]
+        },
+        {
+          "id": "p08-m6",
+          "title": "Analytics Dashboard & Production Deployment",
+          "description": "Agent performans metrikleri, konusma analitikleri ve production-ready deployment.",
+          "checklist": [
+            "Agent Performance Metrics",
+            "Conversation Analytics",
+            "WebSocket Integration",
+            "Docker & Production Hardening"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-09",
+      "title": "Multi-tenant SaaS Starter Kit",
+      "description": "SaaS mimarisi, billing, multi-tenancy",
+      "order_index": 9,
+      "difficulty": "expert",
+      "estimated_days": 18,
+      "content_path": "projects/project-09.json",
+      "required_phases": [
+        "phase-3-backend",
+        "phase-4-devops"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "TypeScript",
+        "PostgreSQL",
+        "Prisma",
+        "Stripe"
+      ],
+      "milestones": [
+        {
+          "id": "p09-m1",
+          "title": "Proje Altyapisi & Veri Pipeline Tasarimi",
+          "description": "Proje yapisini kur, veritabani semaalarini olustur, veri yukleme ve temizleme pipeline'ini implement et.",
+          "checklist": [
+            "Proje Yapisi & Docker Setup",
+            "Veri Ingestion Pipeline",
+            "Data Validation & Cleaning",
+            "Dataset Versioning"
+          ]
+        },
+        {
+          "id": "p09-m2",
+          "title": "Feature Engineering & Feature Store",
+          "description": "Reusable feature'lar olustur, feature store pattern'ini implement et, online ve offline serving ayir.",
+          "checklist": [
+            "Feature Transformer Pipeline",
+            "Feature Store Implementation",
+            "Feature Importance & Selection"
+          ]
+        },
+        {
+          "id": "p09-m3",
+          "title": "Model Training Pipeline & MLflow Entegrasyonu",
+          "description": "Celery ile asenkron model training, MLflow ile experiment tracking ve model karsilastirma.",
+          "checklist": [
+            "Celery Training Worker",
+            "MLflow Experiment Tracking",
+            "Hyperparameter Optimization",
+            "Model Registry & Versioning"
+          ]
+        },
+        {
+          "id": "p09-m4",
+          "title": "Model Serving & API Gateway",
+          "description": "Egitilmis modeli real-time inference icin API olarak sun. Batch prediction destegi ekle.",
+          "checklist": [
+            "Real-time Inference API",
+            "Model Caching & Warmup",
+            "Batch Prediction Endpoint",
+            "A/B Testing Framework"
+          ]
+        },
+        {
+          "id": "p09-m5",
+          "title": "Monitoring, Drift Detection & Auto-retraining",
+          "description": "Model performansini surekli izle. Data ve model drift tespit et. Gerektiginde otomatik retraining tetikle.",
+          "checklist": [
+            "Prediction Logging & Monitoring",
+            "Data Drift Detection",
+            "Model Performance Degradation",
+            "Auto-retraining Pipeline"
+          ]
+        },
+        {
+          "id": "p09-m6",
+          "title": "Frontend Dashboard & Production Deployment",
+          "description": "ML pipeline'ini yoneten dashboard, experiment comparison ve Docker deployment.",
+          "checklist": [
+            "ML Dashboard — Training & Experiments",
+            "Monitoring Dashboard",
+            "Docker & Production Config",
+            "Model Card & Documentation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-10",
+      "title": "AI Code Review & Analysis Tool (Capstone)",
+      "description": "Tüm becerilerin birleşimi - GitHub PR analiz aracı",
+      "order_index": 10,
+      "difficulty": "expert",
+      "estimated_days": 21,
+      "content_path": "projects/project-10.json",
+      "required_phases": [
+        "phase-5-ai",
+        "phase-6-kariyer"
+      ],
+      "tech_stack": [
+        "Next.js",
+        "FastAPI",
+        "GitHub API",
+        "Anthropic API",
+        "LangChain",
+        "Docker"
+      ],
+      "milestones": [
+        {
+          "id": "p10-m1",
+          "title": "Proje Altyapisi & GitHub API Entegrasyonu",
+          "description": "Projeyi kur, GitHub OAuth ve webhook entegrasyonunu implement et.",
+          "checklist": [
+            "Monorepo & Tech Stack Setup",
+            "GitHub OAuth Entegrasyonu",
+            "Webhook Setup & Validation",
+            "PR Diff Parsing"
+          ]
+        },
+        {
+          "id": "p10-m2",
+          "title": "Code Parsing & Metrik Hesaplama",
+          "description": "Kodu analiz et: complexity, readability metrikleri hesapla, pattern tespiti yap.",
+          "checklist": [
+            "Language Detection & Parser Setup",
+            "Complexity Metrics",
+            "Code Pattern Detection",
+            "Scoring Algorithm"
+          ]
+        },
+        {
+          "id": "p10-m3",
+          "title": "AI-Powered Code Review Engine",
+          "description": "Anthropic Claude API ile akilli kod incelemesi. Multi-file analiz, structured output, actionable feedback.",
+          "checklist": [
+            "Review Prompt Engineering",
+            "Multi-file Context Management",
+            "Review Quality & Confidence Scoring",
+            "GitHub PR Comment Integration"
+          ]
+        },
+        {
+          "id": "p10-m4",
+          "title": "Guvenlik Analizi & OWASP Taramasi",
+          "description": "OWASP top 10 pattern'lerini tespit eden guvenlik analiz modulu.",
+          "checklist": [
+            "OWASP Pattern Tanima",
+            "AI-Enhanced Security Review",
+            "Security Report & Severity"
+          ]
+        },
+        {
+          "id": "p10-m5",
+          "title": "Frontend Dashboard & Review UI",
+          "description": "Next.js ile review sonuclarini gosteren, trend analizi yapan kapsamli dashboard.",
+          "checklist": [
+            "Repository & PR Management",
+            "Code Review Visualization",
+            "Analytics & Trends",
+            "Notification & Integration"
+          ]
+        },
+        {
+          "id": "p10-m6",
+          "title": "Custom Rules & Configuration",
+          "description": "Takim bazli ozellesstirilebilir review kurallari ve konfigurrasyon sistemi.",
+          "checklist": [
+            "Rule Engine",
+            "Configuration File (.codereview.yml)"
+          ]
+        },
+        {
+          "id": "p10-m7",
+          "title": "CI/CD Entegrasyonu & GitHub Actions",
+          "description": "GitHub Actions ile CI pipeline entegrasyonu, status check ve auto-merge kurallari.",
+          "checklist": [
+            "GitHub Status Check",
+            "GitHub Actions Workflow",
+            "Auto-merge Rules"
+          ]
+        },
+        {
+          "id": "p10-m8",
+          "title": "Production Deployment & Monitoring",
+          "description": "Docker deployment, monitoring, error tracking ve production hardening.",
+          "checklist": [
+            "Production Docker Setup",
+            "Monitoring & Alerting",
+            "Error Tracking & Logging",
+            "Performance Optimization"
+          ]
+        }
+      ]
+    }
+  ]
+}

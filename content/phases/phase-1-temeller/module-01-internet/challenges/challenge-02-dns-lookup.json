@@ -1,0 +1,85 @@
+{
+  "title": "DNS Lookup Simulator",
+  "description": "Verilen bir domain için recursive DNS çözümleme simülasyonu yap",
+  "description_detail": "# DNS Lookup Simulator\n\nBir DNS kayıt tablosu ve domain adı verildiğinde, recursive DNS çözümleme sürecini simüle edin.\n\n## Kurallar\n- DNS kayıt tablosu bir obje olarak verilir: `{ domain: { type: 'A'|'CNAME', value: string } }`\n- `A` kaydı doğrudan IP adresine işaret eder\n- `CNAME` kaydı başka bir domain'e yönlendirir (takip edilmeli)\n- CNAME zincirleri maksimum 10 adım takip edilmeli (döngü koruması)\n- Bulunamazsa `'NXDOMAIN'` döndür\n- Sonuç olarak `{ ip: string, path: string[] }` döndür\n  - `ip`: Son bulunan IP adresi\n  - `path`: Çözümleme sırasında takip edilen domain'ler\n\n## Örnek\n```\nrecords = {\n  'blog.example.com': { type: 'CNAME', value: 'www.example.com' },\n  'www.example.com': { type: 'CNAME', value: 'cdn.example.com' },\n  'cdn.example.com': { type: 'A', value: '93.184.216.34' }\n}\ndomain = 'blog.example.com'\n\nSonuç: { ip: '93.184.216.34', path: ['blog.example.com', 'www.example.com', 'cdn.example.com'] }\n```",
+  "difficulty": "kolay",
+  "category": "web",
+  "tags": ["dns", "networking", "recursion"],
+  "examples": [
+    {
+      "input": "records = {'example.com': {'type': 'A', 'value': '93.184.216.34'}}, domain = 'example.com'",
+      "output": "{'ip': '93.184.216.34', 'path': ['example.com']}",
+      "explanation": "Doğrudan A kaydı bulundu, tek adımda çözümlendi"
+    },
+    {
+      "input": "records = {'blog.example.com': {'type': 'CNAME', 'value': 'www.example.com'}, 'www.example.com': {'type': 'A', 'value': '1.2.3.4'}}, domain = 'blog.example.com'",
+      "output": "{'ip': '1.2.3.4', 'path': ['blog.example.com', 'www.example.com']}",
+      "explanation": "CNAME takip edildi, sonra A kaydı bulundu"
+    },
+    {
+      "input": "records = {'example.com': {'type': 'A', 'value': '1.2.3.4'}}, domain = 'unknown.com'",
+      "output": "NXDOMAIN",
+      "explanation": "Domain kayıt tablosunda bulunamadı"
+    }
+  ],
+  "constraints": [
+    "CNAME zincirleri maksimum 10 adım olabilir",
+    "Döngüsel CNAME referansları tespit edilmeli",
+    "Bulunamayan domain'ler için 'NXDOMAIN' döndür",
+    "Kayıt tablosu en fazla 100 kayıt içerir"
+  ],
+  "starter_code": {
+    "python": "def dns_lookup(records: dict, domain: str):\n    # Your code here\n    pass",
+    "javascript": "function dnsLookup(records, domain) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"records": {"example.com": {"type": "A", "value": "93.184.216.34"}}, "domain": "example.com"},
+      "expected_output": {"ip": "93.184.216.34", "path": ["example.com"]}
+    },
+    {
+      "input": {"records": {"www.example.com": {"type": "CNAME", "value": "example.com"}, "example.com": {"type": "A", "value": "1.2.3.4"}}, "domain": "www.example.com"},
+      "expected_output": {"ip": "1.2.3.4", "path": ["www.example.com", "example.com"]}
+    },
+    {
+      "input": {"records": {"example.com": {"type": "A", "value": "1.2.3.4"}}, "domain": "notfound.com"},
+      "expected_output": "NXDOMAIN"
+    },
+    {
+      "input": {"records": {"a.com": {"type": "CNAME", "value": "b.com"}, "b.com": {"type": "CNAME", "value": "c.com"}, "c.com": {"type": "A", "value": "10.0.0.1"}}, "domain": "a.com"},
+      "expected_output": {"ip": "10.0.0.1", "path": ["a.com", "b.com", "c.com"]}
+    },
+    {
+      "input": {"records": {"loop.com": {"type": "CNAME", "value": "loop2.com"}, "loop2.com": {"type": "CNAME", "value": "loop.com"}}, "domain": "loop.com"},
+      "expected_output": "NXDOMAIN"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"records": {"a.io": {"type": "CNAME", "value": "b.io"}, "b.io": {"type": "CNAME", "value": "c.io"}, "c.io": {"type": "CNAME", "value": "d.io"}, "d.io": {"type": "A", "value": "192.168.1.1"}}, "domain": "a.io"},
+      "expected_output": {"ip": "192.168.1.1", "path": ["a.io", "b.io", "c.io", "d.io"]}
+    },
+    {
+      "input": {"records": {"x.com": {"type": "CNAME", "value": "y.com"}}, "domain": "x.com"},
+      "expected_output": "NXDOMAIN"
+    },
+    {
+      "input": {"records": {"solo.dev": {"type": "A", "value": "127.0.0.1"}}, "domain": "solo.dev"},
+      "expected_output": {"ip": "127.0.0.1", "path": ["solo.dev"]}
+    }
+  ],
+  "hints": [
+    "Bir while döngüsü ile domain'i kayıt tablosunda ara, CNAME ise value'yu yeni domain yap",
+    "Ziyaret edilen domain'leri bir set/liste ile takip ederek döngü tespiti yap",
+    "Her adımda path listesine mevcut domain'i ekle; A kaydı bulunca ip ve path döndür, bulunamazsa veya döngü varsa NXDOMAIN döndür"
+  ],
+  "solution": {
+    "python": "def dns_lookup(records: dict, domain: str):\n    path = []\n    visited = set()\n    current = domain\n    \n    while current and len(path) < 10:\n        if current in visited:\n            return 'NXDOMAIN'\n        visited.add(current)\n        \n        if current not in records:\n            return 'NXDOMAIN'\n        \n        path.append(current)\n        record = records[current]\n        \n        if record['type'] == 'A':\n            return {'ip': record['value'], 'path': path}\n        elif record['type'] == 'CNAME':\n            current = record['value']\n    \n    return 'NXDOMAIN'",
+    "javascript": "function dnsLookup(records, domain) {\n  const path = [];\n  const visited = new Set();\n  let current = domain;\n\n  while (current && path.length < 10) {\n    if (visited.has(current)) return 'NXDOMAIN';\n    visited.add(current);\n\n    if (!(current in records)) return 'NXDOMAIN';\n\n    path.push(current);\n    const record = records[current];\n\n    if (record.type === 'A') {\n      return { ip: record.value, path };\n    } else if (record.type === 'CNAME') {\n      current = record.value;\n    }\n  }\n\n  return 'NXDOMAIN';\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "DNS çözümleme sürecinin recursive yapısını, CNAME zincirlerini ve döngü koruması mantığını öğrenirsin. Gerçek DNS sistemlerinde TTL, caching ve birden fazla kayıt tipi de bulunur."
+}

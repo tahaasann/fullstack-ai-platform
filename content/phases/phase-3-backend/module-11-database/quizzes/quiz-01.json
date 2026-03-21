@@ -1,0 +1,138 @@
+{
+  "id": "mod-11-db/quiz-01",
+  "title": "Database Temelleri: SQL, NoSQL ve ORM Quiz",
+  "description": "SQL sorguları, JOIN'ler, indexing, MongoDB, Redis ve ORM konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 20,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "LEFT JOIN ile INNER JOIN arasındaki temel fark nedir?",
+      "options": [
+        "LEFT JOIN daha hızlıdır",
+        "LEFT JOIN sol tablodaki tüm satırları korur, eşleşme yoksa NULL döner; INNER JOIN sadece eşleşen satırları getirir",
+        "INNER JOIN sadece sağ tablodaki satırları getirir",
+        "LEFT JOIN yalnızca NULL olan satırları getirir"
+      ],
+      "correct": 1,
+      "explanation": "LEFT JOIN, sol tablodaki TÜM satırları getirir. Sağ tabloda eşleşme yoksa ilgili sütunlar NULL döner. INNER JOIN ise yalnızca her iki tabloda da eşleşme bulunan satırları döndürür.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "question": "PostgreSQL'de EXPLAIN ANALYZE komutu, bir sorgunun gerçek çalışma planını ve süresini gösterir; Seq Scan genellikle index eklenmesi gerektiğine işaret eder.",
+      "correct": true,
+      "explanation": "Doğru! EXPLAIN ANALYZE sorguyu gerçekten çalıştırır ve execution plan'ı süreleriyle birlikte gösterir. Sequential Scan (Seq Scan), tablonun tamamının tarandığını gösterir ve genellikle uygun bir index eklenerek Index Scan'e dönüştürülebilir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "ACID prensiplerinden 'Atomicity' ne anlama gelir?",
+      "options": [
+        "Verinin şifrelenmesi",
+        "Transaction ya tamamen uygulanır ya da hiç uygulanmaz",
+        "Eş zamanlı transaction'ların birbirini etkilememesi",
+        "Commit edilen verinin kalıcı olması"
+      ],
+      "correct": 1,
+      "explanation": "Atomicity (Bölünmezlik), bir transaction'daki tüm işlemlerin tek bir birim olarak ele alınmasıdır. Ya hepsi başarılı olur (COMMIT) ya da hiçbiri uygulanmaz (ROLLBACK). Banka havalesi örneği: gönderenin hesabından düşme ve alıcıya ekleme ya ikisi birden olur ya hiçbiri.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "code_completion",
+      "question": "PostgreSQL'de her departmandaki en yüksek maaşlı çalışanı bulmak için kullanılan window function'ı tamamla:",
+      "code_template": "SELECT * FROM (\n  SELECT name, department, salary,\n    _____(_____ BY department ORDER BY salary DESC) AS rn\n  FROM employees\n) ranked\nWHERE rn = 1;",
+      "correct_answers": ["ROW_NUMBER() OVER(PARTITION", "ROW_NUMBER() OVER (PARTITION"],
+      "explanation": "ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) her departman içinde maaşa göre azalan sırada satır numarası atar. rn = 1 filtresi ile her departmandan en yüksek maaşlı çalışan seçilir.",
+      "difficulty": "zor",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "MongoDB'de N+1 query probleminin en etkili çözümü hangisidir?",
+      "options": [
+        "Her sorguyu setTimeout ile geciktirmek",
+        "Mongoose populate veya aggregation $lookup ile eager loading yapmak",
+        "Veritabanı bağlantı sayısını artırmak",
+        "Index eklemek"
+      ],
+      "correct": 1,
+      "explanation": "N+1 problemi, ilişkili verileri tek tek sorgulamaktan kaynaklanır. Mongoose populate() veya aggregation pipeline'daki $lookup ile tüm ilişkili veriyi tek seferde getirebilirsin. Bu, N+1 sorguyu 2 sorguya indirir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Redis'te bir verinin 1 saat sonra otomatik silinmesi için hangi komut kullanılır?",
+      "options": [
+        "SET key value DELETE 3600",
+        "SET key value EX 3600",
+        "SET key value TIMEOUT 1h",
+        "SET key value AUTO_DELETE 3600"
+      ],
+      "correct": 1,
+      "explanation": "SET key value EX 3600 komutu, key'e value atar ve 3600 saniye (1 saat) sonra otomatik silinmesini sağlar. EX saniye cinsinden, PX milisaniye cinsinden TTL (Time To Live) ayarlar.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "type": "order_steps",
+      "question": "Cache-Aside (Lazy Loading) pattern'inde veri okuma adımlarını doğru sıraya koy:",
+      "steps": [
+        "Cache'te ara (Redis GET)",
+        "Cache hit ise direkt döndür",
+        "Cache miss ise veritabanından sorgula",
+        "Sonucu cache'e yaz (Redis SET + TTL)",
+        "Sonucu istemciye döndür"
+      ],
+      "correct_order": [0, 1, 2, 3, 4],
+      "explanation": "Cache-Aside pattern: Önce cache'e bakılır. Varsa (hit) direkt döndürülür. Yoksa (miss) veritabanından alınır, cache'e yazılır ve sonuç döndürülür. Bu pattern lazy loading olarak adlandırılır çünkü veri ancak istendiğinde cache'lenir.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q8",
+      "type": "true_false",
+      "question": "CAP teoremine göre dağıtık bir sistem aynı anda Consistency, Availability ve Partition Tolerance özelliklerinin üçünü de garanti edebilir.",
+      "correct": false,
+      "explanation": "Yanlış! CAP teoremine göre dağıtık bir sistem aynı anda en fazla üç özellikten ikisini garanti edebilir. Dağıtık sistemlerde Partition Tolerance (P) zorunlu olduğu için seçim CP (tutarlılık + bölünme toleransı) veya AP (erişilebilirlik + bölünme toleransı) arasında yapılır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "PostgreSQL'de JSONB verisi üzerinde hızlı arama yapmak için hangi index türü kullanılmalıdır?",
+      "options": [
+        "B-tree Index",
+        "Hash Index",
+        "GIN (Generalized Inverted Index)",
+        "BRIN Index"
+      ],
+      "correct": 2,
+      "explanation": "GIN (Generalized Inverted Index), JSONB, array ve full-text search gibi çok değerli (multi-valued) veri tipleri için tasarlanmıştır. JSONB sütunlarında @>, ?, ?| gibi operatörlerle yapılan sorguları dramatik şekilde hızlandırır.",
+      "difficulty": "zor",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "explain_code",
+      "question": "Aşağıdaki SQL sorgusu ne yapar? Her bölümü açıkla.",
+      "code": "WITH monthly_revenue AS (\n  SELECT\n    DATE_TRUNC('month', created_at) AS month,\n    SUM(total_amount) AS revenue\n  FROM orders\n  WHERE status = 'completed'\n  GROUP BY DATE_TRUNC('month', created_at)\n)\nSELECT\n  month,\n  revenue,\n  LAG(revenue) OVER (ORDER BY month) AS prev_month,\n  ROUND((revenue - LAG(revenue) OVER (ORDER BY month)) / LAG(revenue) OVER (ORDER BY month) * 100, 2) AS growth_pct\nFROM monthly_revenue\nORDER BY month DESC;",
+      "correct_keywords": ["CTE", "WITH", "aggregation", "SUM", "GROUP BY", "window function", "LAG", "aylık gelir", "büyüme oranı", "DATE_TRUNC"],
+      "sample_answer": "Bu sorgu aylık gelir trendini ve büyüme oranını hesaplar. WITH (CTE) ile monthly_revenue adlı geçici sonuç kümesi oluşturulur: tamamlanmış siparişlerin aylık toplam gelirleri hesaplanır. Ana sorguda LAG() window function'ı ile bir önceki ayın geliri alınır ve büyüme yüzdesi hesaplanır. Sonuç en yeni aydan eskiye sıralanır.",
+      "difficulty": "zor",
+      "points": 15
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "title": "Accessibility Checker",
+  "description": "HTML'i yaygın erişilebilirlik sorunları için doğrula",
+  "description_detail": "# Accessibility Checker\n\nHTML string'i verildiğinde, yaygın erişilebilirlik (a11y) sorunlarını tespit edin.\n\n## Kontrol Edilecek Kurallar\n\n1. **img-alt**: Her `<img>` tag'ında `alt` attribute'u olmalı\n2. **button-text**: Her `<button>` tag'ında metin içeriği olmalı\n3. **input-label**: Her `<input>` (hidden hariç) bir `<label>` ile eşleşmeli veya `aria-label` olmalı\n4. **heading-order**: Heading'ler sıralı olmalı (h1 sonrası h3 olamaz)\n5. **link-text**: `<a>` tag'larında metin olmalı (\"click here\" gibi genel metinler uyarı)\n6. **lang-attr**: `<html>` tag'ında `lang` attribute'u olmalı\n\n## Döndürülecek Format\n```\n[\n  { rule: string, element: string, message: string, severity: 'error'|'warning' }\n]\n```",
+  "difficulty": "orta",
+  "category": "html",
+  "tags": ["accessibility", "html", "a11y", "validation"],
+  "examples": [
+    {
+      "input": "<img src='photo.jpg'>",
+      "output": "[{'rule': 'img-alt', 'element': 'img', 'message': 'Image missing alt attribute', 'severity': 'error'}]",
+      "explanation": "img tag'ında alt attribute eksik"
+    },
+    {
+      "input": "<html><img src='x.jpg' alt='Photo'></html>",
+      "output": "[{'rule': 'lang-attr', 'element': 'html', 'message': 'html element missing lang attribute', 'severity': 'error'}]",
+      "explanation": "img doğru ama html'de lang eksik"
+    }
+  ],
+  "constraints": [
+    "HTML basit parsing yapılabilir (tam parser gerekli değil)",
+    "Self-closing tag'lar desteklenmeli (<img />, <input />)",
+    "Severity: eksik alt, label, lang = error; genel link metni = warning",
+    "input type='hidden' kontrol dışı"
+  ],
+  "starter_code": {
+    "python": "def check_accessibility(html: str) -> list:\n    # Your code here\n    pass",
+    "javascript": "function checkAccessibility(html) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": "<img src='photo.jpg'>",
+      "expected_output": [{"rule": "img-alt", "element": "img", "message": "Image missing alt attribute", "severity": "error"}]
+    },
+    {
+      "input": "<img src='photo.jpg' alt='A photo'>",
+      "expected_output": []
+    },
+    {
+      "input": "<button></button>",
+      "expected_output": [{"rule": "button-text", "element": "button", "message": "Button has no text content", "severity": "error"}]
+    },
+    {
+      "input": "<button>Submit</button>",
+      "expected_output": []
+    },
+    {
+      "input": "<html><body><h1>Title</h1><h3>Skip</h3></body></html>",
+      "expected_output": [{"rule": "lang-attr", "element": "html", "message": "html element missing lang attribute", "severity": "error"}, {"rule": "heading-order", "element": "h3", "message": "Heading level skipped: h1 to h3", "severity": "error"}]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": "<html lang='tr'><body><img src='x.jpg' alt='test'><button>OK</button></body></html>",
+      "expected_output": []
+    },
+    {
+      "input": "<a href='/page'>click here</a>",
+      "expected_output": [{"rule": "link-text", "element": "a", "message": "Link has generic text: click here", "severity": "warning"}]
+    },
+    {
+      "input": "<input type='text'><input type='hidden'>",
+      "expected_output": [{"rule": "input-label", "element": "input", "message": "Input missing associated label or aria-label", "severity": "error"}]
+    }
+  ],
+  "hints": [
+    "Regex ile tag'ları ve attribute'ları çıkar: /<(\\w+)([^>]*)>/g",
+    "Her kural için ayrı bir kontrol fonksiyonu yaz, sonuçları birleştir",
+    "Heading sırası için son heading seviyesini takip et, fark > 1 ise hata"
+  ],
+  "solution": {
+    "python": "import re\n\ndef check_accessibility(html: str) -> list:\n    issues = []\n    \n    # img-alt check\n    img_tags = re.finditer(r'<img\\b([^>]*)/?>', html, re.IGNORECASE)\n    for match in img_tags:\n        attrs = match.group(1)\n        if 'alt=' not in attrs and 'alt =' not in attrs:\n            issues.append({'rule': 'img-alt', 'element': 'img', 'message': 'Image missing alt attribute', 'severity': 'error'})\n    \n    # button-text check\n    button_matches = re.finditer(r'<button\\b[^>]*>(.*?)</button>', html, re.IGNORECASE | re.DOTALL)\n    for match in button_matches:\n        content = match.group(1).strip()\n        content_text = re.sub(r'<[^>]+>', '', content).strip()\n        if not content_text:\n            issues.append({'rule': 'button-text', 'element': 'button', 'message': 'Button has no text content', 'severity': 'error'})\n    \n    # input-label check\n    input_tags = re.finditer(r'<input\\b([^>]*)/?>', html, re.IGNORECASE)\n    for match in input_tags:\n        attrs = match.group(1)\n        if 'type=\"hidden\"' in attrs or \"type='hidden'\" in attrs:\n            continue\n        if 'aria-label' not in attrs:\n            id_match = re.search(r'id=[\"\\']([^\"\\']*)[\"\\']', attrs)\n            if id_match:\n                input_id = id_match.group(1)\n                if f'for=\"{input_id}\"' not in html and f\"for='{input_id}'\" not in html:\n                    issues.append({'rule': 'input-label', 'element': 'input', 'message': 'Input missing associated label or aria-label', 'severity': 'error'})\n            else:\n                issues.append({'rule': 'input-label', 'element': 'input', 'message': 'Input missing associated label or aria-label', 'severity': 'error'})\n    \n    # heading-order check\n    headings = re.findall(r'<(h[1-6])\\b', html, re.IGNORECASE)\n    last_level = 0\n    for h in headings:\n        level = int(h[1])\n        if last_level > 0 and level > last_level + 1:\n            issues.append({'rule': 'heading-order', 'element': h.lower(), 'message': f'Heading level skipped: h{last_level} to h{level}', 'severity': 'error'})\n        last_level = level\n    \n    # link-text check\n    generic_texts = {'click here', 'here', 'read more', 'more', 'link'}\n    link_matches = re.finditer(r'<a\\b[^>]*>(.*?)</a>', html, re.IGNORECASE | re.DOTALL)\n    for match in link_matches:\n        text = re.sub(r'<[^>]+>', '', match.group(1)).strip().lower()\n        if text in generic_texts:\n            issues.append({'rule': 'link-text', 'element': 'a', 'message': f'Link has generic text: {text}', 'severity': 'warning'})\n    \n    # lang-attr check\n    html_tag = re.search(r'<html\\b([^>]*)>', html, re.IGNORECASE)\n    if html_tag:\n        if 'lang=' not in html_tag.group(1):\n            issues.append({'rule': 'lang-attr', 'element': 'html', 'message': 'html element missing lang attribute', 'severity': 'error'})\n    \n    return issues",
+    "javascript": "function checkAccessibility(html) {\n  const issues = [];\n\n  // img-alt\n  const imgRegex = /<img\\b([^>]*)\\/?>/gi;\n  let m;\n  while ((m = imgRegex.exec(html)) !== null) {\n    if (!m[1].includes('alt=')) {\n      issues.push({ rule: 'img-alt', element: 'img', message: 'Image missing alt attribute', severity: 'error' });\n    }\n  }\n\n  // button-text\n  const btnRegex = /<button\\b[^>]*>(.*?)<\\/button>/gis;\n  while ((m = btnRegex.exec(html)) !== null) {\n    const text = m[1].replace(/<[^>]+>/g, '').trim();\n    if (!text) {\n      issues.push({ rule: 'button-text', element: 'button', message: 'Button has no text content', severity: 'error' });\n    }\n  }\n\n  // input-label\n  const inputRegex = /<input\\b([^>]*)\\/?>/gi;\n  while ((m = inputRegex.exec(html)) !== null) {\n    const attrs = m[1];\n    if (/type=[\"']hidden[\"']/i.test(attrs)) continue;\n    if (!attrs.includes('aria-label')) {\n      const idMatch = attrs.match(/id=[\"']([^\"']*)[\"']/);\n      if (!idMatch || (!html.includes(`for=\"${idMatch[1]}\"`) && !html.includes(`for='${idMatch[1]}'`))) {\n        issues.push({ rule: 'input-label', element: 'input', message: 'Input missing associated label or aria-label', severity: 'error' });\n      }\n    }\n  }\n\n  // heading-order\n  const headings = [...html.matchAll(/<(h[1-6])\\b/gi)];\n  let lastLevel = 0;\n  for (const h of headings) {\n    const level = parseInt(h[1][1]);\n    if (lastLevel > 0 && level > lastLevel + 1) {\n      issues.push({ rule: 'heading-order', element: h[1].toLowerCase(), message: `Heading level skipped: h${lastLevel} to h${level}`, severity: 'error' });\n    }\n    lastLevel = level;\n  }\n\n  // link-text\n  const genericTexts = new Set(['click here', 'here', 'read more', 'more', 'link']);\n  const linkRegex = /<a\\b[^>]*>(.*?)<\\/a>/gis;\n  while ((m = linkRegex.exec(html)) !== null) {\n    const text = m[1].replace(/<[^>]+>/g, '').trim().toLowerCase();\n    if (genericTexts.has(text)) {\n      issues.push({ rule: 'link-text', element: 'a', message: `Link has generic text: ${text}`, severity: 'warning' });\n    }\n  }\n\n  // lang-attr\n  const htmlTag = html.match(/<html\\b([^>]*)>/i);\n  if (htmlTag && !htmlTag[1].includes('lang=')) {\n    issues.push({ rule: 'lang-attr', element: 'html', message: 'html element missing lang attribute', severity: 'error' });\n  }\n\n  return issues;\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Web erişilebilirlik standartlarını (WCAG), ARIA attribute'larını ve semantic HTML'in önemini öğrenirsin. Erişilebilirlik hem etik hem de yasal bir gerekliliktir ve iş mülakatlarında sıkça sorulur."
+}

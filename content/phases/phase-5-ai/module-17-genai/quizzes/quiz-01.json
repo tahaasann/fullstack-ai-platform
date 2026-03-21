@@ -1,0 +1,134 @@
+{
+  "id": "mod-17-genai/quiz-01",
+  "title": "LLM API'leri, Prompt Engineering, RAG ve AI Agents Quiz",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "difficulty": "kolay",
+      "question": "Temperature parametresi 0 olarak ayarlandığında LLM nasıl davranır?",
+      "options": [
+        "Her seferinde farklı ve yaratıcı cevaplar üretir",
+        "Her seferinde aynı (deterministic) cevap üretir",
+        "Daha uzun cevaplar üretir",
+        "Daha kısa cevaplar üretir"
+      ],
+      "correct": 1,
+      "explanation": "Temperature=0, modelin her zaman en yüksek olasılıklı token'ı seçmesini sağlar. Bu da her seferinde aynı output'u (deterministic) üretir. Production'da classification ve extraction gibi görevlerde kullanılır."
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "difficulty": "kolay",
+      "question": "LLM function calling'de, LLM doğrudan harici API'leri çağırır ve sonucu kullanıcıya döndürür.",
+      "correct": false,
+      "explanation": "LLM hiçbir zaman gerçek API çağırmaz. Sadece hangi function'ın hangi parametrelerle çağrılması gerektiğini JSON olarak döndürür. Developer bu bilgiyi alıp gerçek function'ı çağırır ve sonucu tekrar LLM'e gönderir."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "RAG (Retrieval-Augmented Generation) pipeline'ında doğru sıralama hangisidir?",
+      "options": [
+        "Generate → Retrieve → Augment → Respond",
+        "Retrieve → Generate → Augment → Respond",
+        "Augment → Retrieve → Generate → Respond",
+        "Retrieve → Augment → Generate → Respond"
+      ],
+      "correct": 3,
+      "explanation": "RAG pipeline: 1) Retrieve — vector DB'den ilgili dokümanları getir, 2) Augment — bu dokümanları prompt'a context olarak ekle, 3) Generate — LLM bu context ile cevap üretir."
+    },
+    {
+      "id": "q4",
+      "type": "explain_code",
+      "difficulty": "orta",
+      "question": "Aşağıdaki kodun ne yaptığını açıklayın:\n\n```python\nresults = collection.query(\n    query_texts=[\"container teknolojileri\"],\n    n_results=3,\n    where={\"category\": \"devops\"}\n)\n```",
+      "expected_points": [
+        "Chroma vector database'inde semantic search yapıyor",
+        "query_texts ile verilen sorguyu embedding'e dönüştürüp benzer dokümanları arıyor",
+        "n_results=3 ile en benzer 3 sonucu getiriyor",
+        "where filtresi ile sadece category'si 'devops' olan dokümanlar arasında arıyor"
+      ],
+      "explanation": "Bu kod, Chroma vector database'inde metadata filtreli bir semantic search yapıyor. 'container teknolojileri' query'si embed edilerek, sadece devops kategorisindeki dokümanlar arasından en benzer 3 sonuç getirilir."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "Chain-of-Thought (CoT) prompting'in temel amacı nedir?",
+      "options": [
+        "Modelin daha kısa cevap vermesini sağlamak",
+        "Modelin maliyetini düşürmek",
+        "Modelin adım adım düşünerek daha doğru sonuca ulaşmasını sağlamak",
+        "Modelin daha hızlı cevap vermesini sağlamak"
+      ],
+      "correct": 2,
+      "explanation": "Chain-of-Thought, modelden cevabı vermeden önce adım adım düşünmesini isteme tekniğidir. Özellikle matematik, mantık ve karmaşık reasoning gerektiren görevlerde dramatik şekilde daha doğru sonuç verir."
+    },
+    {
+      "id": "q6",
+      "type": "true_false",
+      "difficulty": "orta",
+      "question": "Türkçe metinler, İngilizce metinlere göre genellikle daha az token üretir, bu nedenle API maliyeti daha düşüktür.",
+      "correct": false,
+      "explanation": "Tam tersi! Türkçe ve diğer Latin-dışı diller İngilizce'ye göre 2-3x daha fazla token üretir. Bu da daha yüksek API maliyeti, context window'un daha hızlı dolması ve daha yavaş response anlamına gelir."
+    },
+    {
+      "id": "q7",
+      "type": "code_completion",
+      "difficulty": "zor",
+      "question": "Aşağıdaki RAG pipeline kodundaki eksik kısmı tamamlayın:\n\n```python\ndef rag_query(question, vectorstore, llm):\n    # 1. Retrieve relevant documents\n    retriever = vectorstore.as_retriever(search_kwargs={\"k\": 3})\n    docs = retriever.invoke(question)\n    \n    # 2. Build context from retrieved docs\n    context = \"\\n\".join([doc.page_content for doc in docs])\n    \n    # 3. Generate answer with context\n    prompt = f\"Context: {context}\\n\\nQuestion: {question}\\n\\nAnswer:\"\n    _______________\n```",
+      "correct": "return llm.invoke(prompt)",
+      "alternatives": [
+        "return llm.invoke(prompt).content",
+        "answer = llm.invoke(prompt)\nreturn answer",
+        "response = llm.invoke(prompt)\nreturn response.content"
+      ],
+      "explanation": "Son adımda LLM'e context ve soruyu içeren prompt gönderilip cevap alınır. llm.invoke(prompt) LangChain'de standart çağrı yöntemidir."
+    },
+    {
+      "id": "q8",
+      "type": "order_steps",
+      "difficulty": "zor",
+      "question": "Bir RAG sisteminin indexing (offline) pipeline'ındaki adımları doğru sıraya koyun:",
+      "steps": [
+        "Embedding modeli ile her chunk'ı vektöre dönüştür",
+        "Dokümanları yükle (load)",
+        "Vektörleri metadata ile birlikte vector database'e kaydet",
+        "Dokümanları anlamlı parçalara böl (chunking)"
+      ],
+      "correct": [1, 3, 0, 2],
+      "explanation": "RAG indexing pipeline: 1) Load — dokümanları yükle, 2) Chunk — anlamlı parçalara böl, 3) Embed — her chunk'ı vektöre dönüştür, 4) Store — vektörleri vector DB'ye kaydet."
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "difficulty": "zor",
+      "question": "Aşağıdakilerden hangisi bir AI Agent'ın normal LLM çağrısından farkını EN İYİ açıklar?",
+      "options": [
+        "Agent daha büyük bir model kullanır",
+        "Agent tek seferde daha fazla token üretir",
+        "Agent think-act-observe döngüsünde araçlar kullanarak otonom problem çözer",
+        "Agent fine-tuned bir model gerektirir"
+      ],
+      "correct": 2,
+      "explanation": "AI Agent'ın temel farkı, think-act-observe döngüsünde çalışmasıdır. Agent problemi analiz eder (think), araç kullanır (act), sonucu gözlemler (observe) ve gerekirse tekrarlar. Bu otonom problem çözme yeteneği, tek seferlik LLM çağrısından farklıdır."
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "Chunking'de overlap (örtüşme) kullanmanın temel amacı nedir?",
+      "options": [
+        "Token sayısını artırarak LLM'in daha iyi çalışmasını sağlamak",
+        "Vector database'deki storage alanını optimize etmek",
+        "Chunk sınırlarında bölünen bilginin kaybolmasını engellemek",
+        "Embedding oluşturma süresini hızlandırmak"
+      ],
+      "correct": 2,
+      "explanation": "Overlap olmadan, bir cümle iki chunk arasında bölünebilir ve anlam kaybolur. Chunk overlap (%10-15 önerilir), sınır bölgelerindeki bilginin her iki chunk'ta da bulunmasını sağlayarak retrieval kalitesini artırır."
+    }
+  ]
+}

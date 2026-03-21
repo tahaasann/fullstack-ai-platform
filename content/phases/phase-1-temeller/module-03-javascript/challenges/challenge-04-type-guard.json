@@ -1,0 +1,84 @@
+{
+  "title": "Runtime Type Checker",
+  "description": "Runtime'da tip kontrolü yapan type guard fonksiyonları implementasyonu",
+  "description_detail": "# Runtime Type Checker\n\nRuntime'da veri tiplerini kontrol eden ve doğrulayan bir type checker sistemi oluşturun.\n\n## İstenilen Fonksiyonlar\n\n### 1. `createValidator(schema)`\nBir schema objesine göre veriyi doğrulayan fonksiyon döndürür.\n\nSchema formatı:\n```javascript\n{\n  name: 'string',\n  age: 'number',\n  email: 'string',\n  active: 'boolean',\n  tags: 'array',\n  metadata: 'object'\n}\n```\n\n### 2. `validate(data, schema)`\nVeriyi schema'ya göre doğrular. Hataları detaylı döndürür.\n\nSonuç: `{ valid: boolean, errors: string[] }`\n\n### 3. `deepTypeCheck(value)`\nBir değerin detaylı tipini döndürür: 'string', 'number', 'boolean', 'null', 'undefined', 'array', 'object', 'function', 'date', 'regexp'",
+  "difficulty": "orta",
+  "category": "javascript",
+  "tags": ["typescript", "type-checking", "validation", "javascript"],
+  "examples": [
+    {
+      "input": "validate({name: 'Ali', age: 25}, {name: 'string', age: 'number'})",
+      "output": "{'valid': true, 'errors': []}",
+      "explanation": "Tüm alanlar doğru tipte"
+    },
+    {
+      "input": "validate({name: 123, age: 'yirmi'}, {name: 'string', age: 'number'})",
+      "output": "{'valid': false, 'errors': ['name: expected string but got number', 'age: expected number but got string']}",
+      "explanation": "name ve age yanlış tipte"
+    }
+  ],
+  "constraints": [
+    "Desteklenen tipler: string, number, boolean, array, object, null, undefined, function",
+    "Eksik alanlar hata olarak raporlanmalı",
+    "null ve undefined ayrı tipler olarak ele alınmalı",
+    "Array ve object ayrımı yapılmalı (typeof [] === 'object' tuzağı)"
+  ],
+  "starter_code": {
+    "python": "def validate(data: dict, schema: dict) -> dict:\n    # Your code here\n    pass\n\ndef deep_type_check(value) -> str:\n    # Your code here\n    pass\n\ndef create_validator(schema: dict):\n    # Your code here\n    pass",
+    "javascript": "function validate(data, schema) {\n  // Your code here\n}\n\nfunction deepTypeCheck(value) {\n  // Your code here\n}\n\nfunction createValidator(schema) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"data": {"name": "Ali", "age": 25}, "schema": {"name": "string", "age": "number"}},
+      "expected_output": {"valid": true, "errors": []}
+    },
+    {
+      "input": {"data": {"name": 123}, "schema": {"name": "string"}},
+      "expected_output": {"valid": false, "errors": ["name: expected string but got number"]}
+    },
+    {
+      "input": {"data": {"items": [1, 2]}, "schema": {"items": "array"}},
+      "expected_output": {"valid": true, "errors": []}
+    },
+    {
+      "input": {"data": {}, "schema": {"required_field": "string"}},
+      "expected_output": {"valid": false, "errors": ["required_field: missing field"]}
+    },
+    {
+      "input": {"data": {"flag": "yes"}, "schema": {"flag": "boolean"}},
+      "expected_output": {"valid": false, "errors": ["flag: expected boolean but got string"]}
+    },
+    {
+      "input": {"fn": "deepTypeCheck", "value": [1, 2, 3]},
+      "expected_output": "array"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "deepTypeCheck", "value": null},
+      "expected_output": "null"
+    },
+    {
+      "input": {"data": {"a": null}, "schema": {"a": "null"}},
+      "expected_output": {"valid": true, "errors": []}
+    },
+    {
+      "input": {"data": {"x": {"nested": true}}, "schema": {"x": "object"}},
+      "expected_output": {"valid": true, "errors": []}
+    }
+  ],
+  "hints": [
+    "JavaScript'te typeof null === 'object' ve typeof [] === 'object' tuzaklarına dikkat et",
+    "Array kontrolü için Array.isArray() kullan, null kontrolü için value === null",
+    "Schema'daki her key için data'da kontrol yap: yoksa 'missing field', tipi yanlışsa hata mesajı ekle"
+  ],
+  "solution": {
+    "python": "def deep_type_check(value) -> str:\n    if value is None:\n        return 'null'\n    if isinstance(value, bool):\n        return 'boolean'\n    if isinstance(value, int) or isinstance(value, float):\n        return 'number'\n    if isinstance(value, str):\n        return 'string'\n    if isinstance(value, list):\n        return 'array'\n    if isinstance(value, dict):\n        return 'object'\n    if callable(value):\n        return 'function'\n    return 'unknown'\n\ndef validate(data: dict, schema: dict) -> dict:\n    errors = []\n    for key, expected_type in schema.items():\n        if key not in data:\n            errors.append(f\"{key}: missing field\")\n        else:\n            actual_type = deep_type_check(data[key])\n            if actual_type != expected_type:\n                errors.append(f\"{key}: expected {expected_type} but got {actual_type}\")\n    return {'valid': len(errors) == 0, 'errors': errors}\n\ndef create_validator(schema: dict):\n    def validator(data):\n        return validate(data, schema)\n    return validator",
+    "javascript": "function deepTypeCheck(value) {\n  if (value === null) return 'null';\n  if (value === undefined) return 'undefined';\n  if (Array.isArray(value)) return 'array';\n  if (value instanceof Date) return 'date';\n  if (value instanceof RegExp) return 'regexp';\n  return typeof value;\n}\n\nfunction validate(data, schema) {\n  const errors = [];\n  for (const [key, expectedType] of Object.entries(schema)) {\n    if (!(key in data)) {\n      errors.push(`${key}: missing field`);\n    } else {\n      const actualType = deepTypeCheck(data[key]);\n      if (actualType !== expectedType) {\n        errors.push(`${key}: expected ${expectedType} but got ${actualType}`);\n      }\n    }\n  }\n  return { valid: errors.length === 0, errors };\n}\n\nfunction createValidator(schema) {\n  return (data) => validate(data, schema);\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n) where n = schema field count",
+    "optimal_space": "O(n) for error list"
+  },
+  "learn_after_solving": "JavaScript'in dinamik tip sisteminin tuzaklarını, runtime type checking'in neden gerekli olduğunu ve validation pattern'ini anlarsın. TypeScript compile-time'da kontrol eder ama runtime'da bu tür guard'lar hala gereklidir."
+}

@@ -1,0 +1,81 @@
+{
+  "id": "challenge-interview-prep",
+  "title": "Teknik Mulakat Simulasyonu",
+  "difficulty": "zor",
+  "category": "career",
+  "tags": ["interview", "whiteboard", "system-design", "behavioral", "star-method"],
+  "related_lesson": "mod-20-career/lesson-01",
+  "description_tr": "Teknik mulakatin 3 asamasini simule et: whiteboard coding, system design ve behavioral sorular. Her asamada senior seviyesinde yanitlar ver.",
+  "description_detail": "Gercek bir teknik mulakatta karsilasacaginiz 3 farkli soru tipini cevaplayin. Whiteboard coding'de optimum cozumu yazin ve complexity analizi yapin. System design'da olceklenebilir bir sistem tasarlayin. Behavioral'da STAR formatinda guclu cevaplar verin.",
+  "examples": [
+    {
+      "input": "question_type = 'whiteboard', problem = 'Two Sum'",
+      "output": "{'solution': '...', 'time_complexity': 'O(n)', 'space_complexity': 'O(n)', 'approach': 'Hash Map'}",
+      "explanation": "Cozumu yazin, complexity'yi analiz edin ve yaklasimi aciklayin."
+    }
+  ],
+  "constraints": [
+    "Whiteboard: Brute force'dan optimum cozume ilerleyin, her adimin complexity'sini belirtin",
+    "System Design: Trafik tahmini, API tasarimi, veritabani secimi, olceklendirme stratejisi icersin",
+    "Behavioral: STAR formati kullanin (Situation, Task, Action, Result)",
+    "Her cevabi mulakatta sozel anlatir gibi aciklayici yazin"
+  ],
+  "starter_code": {
+    "python": "from typing import List, Dict, Any\n\n# === BOLUM 1: WHITEBOARD CODING ===\n# Problem: Verilen bir string'deki en uzun tekrarsiz alt-string'in uzunlugunu bulun.\n# Ornek: \"abcabcbb\" -> 3 (\"abc\")\n# Ornek: \"bbbbb\" -> 1 (\"b\")\n# Ornek: \"pwwkew\" -> 3 (\"wke\")\n\ndef longest_unique_substring(s: str) -> int:\n    \"\"\"\n    Sliding window teknigi ile en uzun tekrarsiz alt-string'i bul.\n    \n    Mulakatta soyle anlatirsin:\n    1. Brute force: Her alt-string'i kontrol et -> O(n^3)\n    2. Optimize: Sliding window + HashSet -> O(n)\n    3. En optimal: Sliding window + HashMap (son pozisyon) -> O(n)\n    \n    Complexity'yi yazin ve trade-off'lari aciklayin.\n    \"\"\"\n    pass\n\ndef explain_approach() -> dict:\n    \"\"\"Cozum yaklasiminizi dict olarak dondurun.\"\"\"\n    return {\n        'brute_force': {'description': '...', 'time': '...', 'space': '...'},\n        'optimal': {'description': '...', 'time': '...', 'space': '...'},\n        'why_optimal': '...'\n    }\n\n\n# === BOLUM 2: SYSTEM DESIGN ===\n# Problem: Bir URL Shortener servisi tasarlayin (bit.ly gibi)\n# Gunluk 100M yeni URL, 1B okuma\n\ndef design_url_shortener() -> dict:\n    \"\"\"\n    URL Shortener system design'i.\n    Su basliklari icerecek bir dict dondur:\n    \n    - requirements: Fonksiyonel ve non-fonksiyonel gereksinimler\n    - capacity_estimation: Trafik, depolama ve bant genisligi tahmini\n    - api_design: REST API endpoint'leri\n    - database_schema: Tablo/collection yapisi ve DB secimi (neden?)\n    - short_url_algorithm: Kisa URL olusturma algoritmasi\n    - architecture: Sistem bilesenleri (load balancer, cache, DB, vb.)\n    - scaling: Olceklendirme stratejisi (sharding, caching, CDN)\n    \"\"\"\n    pass\n\n\n# === BOLUM 3: BEHAVIORAL ===\n# STAR formati: Situation, Task, Action, Result\n\ndef behavioral_answers() -> list:\n    \"\"\"\n    3 klasik behavioral soruya STAR formatinda cevap sablonu dondur.\n    Her cevap icin:\n    - question: Soru\n    - situation: Durum/baglam\n    - task: Gorev/hedef\n    - action: Aldigin aksiyonlar (spesifik)\n    - result: Olculebilir sonuc\n    - lesson: Ogrenilen ders\n    \n    Sorular:\n    1. 'Zor bir teknik problemi nasil cozdugunuzden bahsedin'\n    2. 'Bir takim uyesiyle fikir ayriligi yasadiginiz bir durumu anlatin'\n    3. 'Tight deadline altinda nasil teslim ettiniz'\n    \"\"\"\n    pass",
+    "javascript": "// === BOLUM 1: WHITEBOARD CODING ===\n// En uzun tekrarsiz alt-string uzunlugunu bul\n// \"abcabcbb\" -> 3, \"bbbbb\" -> 1, \"pwwkew\" -> 3\n\nfunction longestUniqueSubstring(s) {\n    /**\n     * Sliding window teknigi:\n     * 1. Brute force: O(n^3)\n     * 2. Sliding window + Set: O(n)\n     * 3. Sliding window + Map: O(n)\n     */\n}\n\nfunction explainApproach() {\n    return {\n        brute_force: { description: '...', time: '...', space: '...' },\n        optimal: { description: '...', time: '...', space: '...' },\n        why_optimal: '...'\n    };\n}\n\n// === BOLUM 2: SYSTEM DESIGN ===\nfunction designUrlShortener() {\n    /** URL Shortener system design dict'i dondur */\n}\n\n// === BOLUM 3: BEHAVIORAL ===\nfunction behavioralAnswers() {\n    /** 3 STAR formatinda cevap sablonu dondur */\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"s": "abcabcbb"},
+      "expected": 3,
+      "description": "Whiteboard: 'abcabcbb' icin en uzun tekrarsiz alt-string 'abc' (uzunluk 3)"
+    },
+    {
+      "input": {"check": "system_design_completeness"},
+      "expected": "all_sections_present",
+      "description": "System Design: Tum gerekli bolumleri (requirements, API, DB, scaling) icermeli"
+    },
+    {
+      "input": {"check": "behavioral_star_format"},
+      "expected": "all_star_fields_present",
+      "description": "Behavioral: Her cevap STAR formatinin 4 bolumunu icermeli"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"s": ""},
+      "expected": 0,
+      "description": "Whiteboard: Bos string icin 0 donmeli"
+    },
+    {
+      "input": {"s": "abcdefghij"},
+      "expected": 10,
+      "description": "Whiteboard: Tamamen unique string icin string uzunlugu donmeli"
+    },
+    {
+      "input": {"check": "system_design_has_scaling"},
+      "expected": "has_cache_and_sharding",
+      "description": "System Design: Cache (Redis) ve DB sharding stratejisi icermeli"
+    },
+    {
+      "input": {"check": "behavioral_has_metrics"},
+      "expected": "results_are_measurable",
+      "description": "Behavioral: Result kisminda olculebilir metrikler olmali (%, sure, sayi)"
+    }
+  ],
+  "hints": [
+    "Whiteboard - Sliding Window: Iki pointer (left, right) kullan. right ilerlerken karakteri Set'e ekle. Tekrar varsa left'i ilerlet ve Set'ten cikar. maxLen = max(maxLen, right - left + 1). HashMap versiyonunda son pozisyonu saklayarak left'i dogrudan atlayabilirsin.",
+    "System Design - URL kisa kodu icin Base62 encoding kullan (a-z, A-Z, 0-9). 7 karakterle 62^7 = 3.5 trilyon unique URL. Auto-increment ID -> Base62 donusumu en basit ve collision-free yontem. Cache icin Redis kullan (read-heavy: 10:1 read/write ratio).",
+    "Behavioral - STAR'da en onemli kisim Action: NE yaptigini degil, NASIL ve NEDEN yaptigini anlat. Result kisminda somut rakamlar ver: '%30 performans artisi', '2 gun erken teslim', 'sifir production bug'. Lesson kisminda buyumeyi goster."
+  ],
+  "solution": {
+    "python": "from typing import List, Dict, Any\n\ndef longest_unique_substring(s: str) -> int:\n    char_index = {}\n    max_len = 0\n    left = 0\n    for right, char in enumerate(s):\n        if char in char_index and char_index[char] >= left:\n            left = char_index[char] + 1\n        char_index[char] = right\n        max_len = max(max_len, right - left + 1)\n    return max_len\n\ndef explain_approach() -> dict:\n    return {\n        'brute_force': {\n            'description': 'Her alt-string icin tekrar kontrolu',\n            'time': 'O(n^3)',\n            'space': 'O(min(n, m))'\n        },\n        'optimal': {\n            'description': 'Sliding window + HashMap ile son pozisyon takibi',\n            'time': 'O(n)',\n            'space': 'O(min(n, m))'\n        },\n        'why_optimal': 'HashMap ile tekrar eden karakterin son pozisyonunu bildigimiz icin left pointer'i dogrudan atlatabiliriz. Set versiyonunda left'i tek tek ilerletmek gerekirdi.'\n    }\n\ndef design_url_shortener() -> dict:\n    return {\n        'requirements': {\n            'functional': ['URL kisaltma (long -> short)', 'URL yonlendirme (short -> long)', 'Ozel alias destegi', 'Analytics (tiklanma sayisi)'],\n            'non_functional': ['Yuksek erisilebilirlik (99.99%)', 'Dusuk gecikme (<100ms redirect)', 'Kisaltilmis URL tahmin edilememeli']\n        },\n        'capacity_estimation': {\n            'daily_writes': '100M',\n            'daily_reads': '1B (10:1 read/write)',\n            'storage_per_url': '500 bytes',\n            'storage_5_years': '100M * 365 * 5 * 500B = ~91 TB',\n            'read_qps': '~11,500 QPS',\n            'write_qps': '~1,150 QPS'\n        },\n        'api_design': {\n            'POST /api/urls': {'body': '{\"long_url\": \"...\", \"custom_alias\": \"...\"}', 'response': '{\"short_url\": \"...\"}'},\n            'GET /:short_code': {'response': '301 Redirect to original URL'},\n            'GET /api/urls/:short_code/stats': {'response': '{\"clicks\": 1234, \"created_at\": \"...\"}'}\n        },\n        'database_schema': {\n            'table': 'urls',\n            'columns': ['id BIGINT PK', 'short_code VARCHAR(7) UNIQUE INDEX', 'long_url TEXT', 'created_at TIMESTAMP', 'expires_at TIMESTAMP', 'click_count INT DEFAULT 0'],\n            'db_choice': 'PostgreSQL (ACID gerekli) + Redis (cache)'\n        },\n        'short_url_algorithm': {\n            'method': 'Base62 encoding of auto-increment ID',\n            'charset': 'a-z, A-Z, 0-9 (62 karakter)',\n            'length': '7 karakter = 62^7 = 3.5 trilyon unique URL',\n            'collision': 'Auto-increment ID kullanildigi icin collision yok'\n        },\n        'architecture': ['Client -> Load Balancer (Nginx)', 'Load Balancer -> App Servers (stateless, horizontal scale)', 'App Server -> Redis Cache (read-through)', 'App Server -> PostgreSQL (master-slave replication)', 'Analytics -> Kafka -> Analytics DB'],\n        'scaling': {\n            'caching': 'Redis ile hot URL'leri cache'le (%80 trafik %20 URL'den gelir - Pareto)',\n            'database': 'Range-based sharding (short_code'un ilk karakterine gore)',\n            'cdn': 'Statik redirect'ler icin CDN kullan',\n            'rate_limiting': 'IP bazli rate limiting ile abuse onle'\n        }\n    }\n\ndef behavioral_answers() -> list:\n    return [\n        {\n            'question': 'Zor bir teknik problemi nasil cozdugunuzden bahsedin',\n            'situation': 'E-ticaret projesinde siparis isleme servisi yogun saatlerde %15 timeout veriyor, musteriler siparis kaybediyordu.',\n            'task': 'Root cause'u bulup 2 sprint icinde cozmem gerekiyordu, is kaybi devam ediyordu.',\n            'action': 'APM tool ile profiling yaptim, N+1 query problemi tespit ettim. Eager loading ekledim, kritik sorgulari optimize ettim, Redis cache katmani ekledim. Load test ile dogruladim.',\n            'result': 'Timeout orani %15'ten %0.1'e dustu, ortalama response time 2.3s'den 180ms'ye indi. Aylik 50K TL kaybi onledik.',\n            'lesson': 'Once olc, sonra optimize et. Profiling olmadan tahmine dayali optimizasyon zaman kaybi.'\n        },\n        {\n            'question': 'Bir takim uyesiyle fikir ayriligi yasadiginiz bir durumu anlatin',\n            'situation': 'Backend arkadasi monolith mimaride kalmayi savunuyordu, ben microservice'e gecisi oneriyordum.',\n            'task': 'Teknik karari vermek ve takimi ikna etmek gerekiyordu.',\n            'action': 'Her iki yaklasimin artilari/eksilerini belgeleyen bir RFC yazdim. Kucuk bir pilot proje ile microservice'in avantajini gosterdim. Ortak bir toplanti duzeneledim.',\n            'result': 'Hibrit yaklasimda karar kildik: core servisler microservice, geri kalan monolith. 6 ay icinde deploy suresi %60 azaldi.',\n            'lesson': 'Teknik tartismalarda veri ve prototip, fikir ve egoya her zaman ustun gelir.'\n        },\n        {\n            'question': 'Tight deadline altinda nasil teslim ettiniz',\n            'situation': '2 haftalik bir feature'i 5 gunde teslim etmem gerekti, buyuk bir musterinin demo'su vardi.',\n            'task': 'Tam kapsamli ozeligi kisa surede, kaliteden odun vermeden teslim etmek.',\n            'action': 'Scope'u 3 seviyeye ayirdim: must-have, nice-to-have, future. Must-have'lara odaklandim. Gunluk 2 kez commit+deploy dongusu kurdum. Nice-to-have'lari demo sonrasina planlayip stakeholder'lara ilettim.',\n            'result': 'Demo basariyla gerceklesti, musteri sozlesmeyi imzaladi (yillik 200K TL). Kalan ozellikler sonraki sprintte tamamlandi.',\n            'lesson': 'Deadline baskisinda scope management en onemli beceri. Her seyi yapmak yerine dogru seyleri yapmak gerekir.'\n        }\n    ]",
+    "javascript": "function longestUniqueSubstring(s) {\n    const charIndex = new Map();\n    let maxLen = 0, left = 0;\n    for (let right = 0; right < s.length; right++) {\n        if (charIndex.has(s[right]) && charIndex.get(s[right]) >= left) {\n            left = charIndex.get(s[right]) + 1;\n        }\n        charIndex.set(s[right], right);\n        maxLen = Math.max(maxLen, right - left + 1);\n    }\n    return maxLen;\n}\n\nfunction explainApproach() {\n    return {\n        brute_force: { description: 'Check all substrings', time: 'O(n^3)', space: 'O(min(n,m))' },\n        optimal: { description: 'Sliding window + HashMap', time: 'O(n)', space: 'O(min(n,m))' },\n        why_optimal: 'HashMap tracks last position, allowing left pointer to jump directly.'\n    };\n}\n\nfunction designUrlShortener() {\n    return {\n        requirements: { functional: ['URL shortening', 'URL redirect', 'Custom alias', 'Analytics'], non_functional: ['99.99% availability', '<100ms redirect'] },\n        capacity_estimation: { daily_writes: '100M', daily_reads: '1B', storage_5_years: '~91 TB' },\n        api_design: { 'POST /api/urls': 'Create short URL', 'GET /:code': '301 Redirect', 'GET /api/urls/:code/stats': 'Analytics' },\n        database_schema: { table: 'urls', columns: ['id BIGINT PK', 'short_code VARCHAR(7) UNIQUE', 'long_url TEXT', 'click_count INT'], db: 'PostgreSQL + Redis' },\n        short_url_algorithm: { method: 'Base62 of auto-increment ID', length: 7, capacity: '3.5 trillion' },\n        architecture: ['LB -> App Servers -> Redis Cache -> PostgreSQL'],\n        scaling: { cache: 'Redis for hot URLs', db: 'Sharding by short_code prefix', cdn: 'For static redirects' }\n    };\n}\n\nfunction behavioralAnswers() {\n    return [\n        { question: 'Zor teknik problem', situation: 'Timeout sorunu', task: '2 sprint icinde coz', action: 'Profiling + N+1 fix + cache', result: 'Timeout %15 -> %0.1', lesson: 'Once olc sonra optimize et' },\n        { question: 'Fikir ayriligi', situation: 'Monolith vs microservice', task: 'Teknik karar ver', action: 'RFC yazdi + pilot proje', result: 'Hibrit yaklasim, deploy %60 hizlandi', lesson: 'Veri ego'ya ustun gelir' },\n        { question: 'Tight deadline', situation: '2 hafta -> 5 gun', task: 'Demo icin teslim et', action: 'Scope 3 seviye, must-have odak', result: 'Demo basarili, 200K TL sozlesme', lesson: 'Scope management kritik' }\n    ];\n}",
+    "explanation_tr": "Teknik mulakatin 3 asamasini deneyimledin: 1) Whiteboard'da sliding window ile O(n) cozum yazip complexity analizi yaptin. 2) System design'da URL shortener'in tum bilesenlerini (API, DB, cache, scaling) tasarladin. 3) Behavioral'da STAR formatiyla olculebilir sonuclar iceren cevaplar hazirladdin. Bu 3 beceri senior pozisyon mulakatlari icin sahip olunmasi gereken temel yetkinliklerdir."
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(min(n, m))"
+  },
+  "learn_after_solving": "Teknik mulakatin 3 sacayagini pratikte deneyimledin: algoritma cozumu (brute force'dan optimale), system design (end-to-end mimari) ve behavioral (STAR formati). Bu challenge'i tekrar tekrar yapmak mulakat basari oranini dogrudan artirır."
+}

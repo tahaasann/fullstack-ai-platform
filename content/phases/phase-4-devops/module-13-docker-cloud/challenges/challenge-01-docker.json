@@ -1,0 +1,105 @@
+{
+  "id": "challenge-docker-compose",
+  "title": "Multi-Stage Dockerfile ve Docker Compose ile Full-Stack Setup",
+  "difficulty": "orta",
+  "category": "devops",
+  "tags": ["docker", "dockerfile", "docker-compose", "multi-stage-build", "postgresql", "node.js", "nginx"],
+  "related_lesson": "mod-13-docker/lesson-01",
+  "description_tr": "Node.js (Express) API uygulaması için multi-stage Dockerfile ve PostgreSQL veritabanı ile birlikte çalışan docker-compose.yml dosyası yazın. Health check, volume mount, environment variable yönetimi ve production best practice'leri uygulayın.",
+  "description_detail": "İki dosya oluşturacaksınız: (1) Multi-stage Dockerfile - builder stage'de TypeScript derleme ve dependency yükleme, production stage'de sadece compiled output ve production dependency'ler. Non-root user, health check ve tini init process kullanın. (2) docker-compose.yml - API servisi (Dockerfile'dan build), PostgreSQL servisi (official image), Redis cache servisi. Her servis için health check, proper volume mount ve environment variable yönetimi.",
+  "examples": [
+    {
+      "input": "docker compose up -d --build",
+      "output": "Creating network myapp_default\nCreating myapp-db    ... done\nCreating myapp-cache ... done\nCreating myapp-api   ... done\n\nAll services healthy",
+      "explanation": "docker compose tüm servisleri dependency sırasına göre başlatır. DB ve cache hazır olunca API ayağa kalkar."
+    },
+    {
+      "input": "docker images myapp-api",
+      "output": "REPOSITORY   TAG       SIZE\nmyapp-api    latest    ~150MB",
+      "explanation": "Multi-stage build sayesinde image boyutu ~150MB. Single-stage olsaydı ~800MB+ olurdu."
+    },
+    {
+      "input": "docker compose exec api whoami",
+      "output": "node",
+      "explanation": "Container non-root 'node' kullanıcısı ile çalışıyor. Güvenlik best practice."
+    }
+  ],
+  "constraints": [
+    "Dockerfile MUST be multi-stage: builder stage + production stage",
+    "Base image: node:20-alpine kullanılmalı",
+    "Production stage'de non-root user (node) kullanılmalı",
+    "Layer caching optimize edilmeli: package*.json önce kopyalanmalı",
+    "Health check tanımlanmalı (HEALTHCHECK instruction)",
+    "docker-compose.yml'da PostgreSQL servisi olmalı (postgres:16-alpine)",
+    "docker-compose.yml'da Redis servisi olmalı (redis:7-alpine)",
+    "PostgreSQL verileri named volume ile persist edilmeli",
+    "API servisi depends_on + condition: service_healthy kullanmalı",
+    "Environment variable'lar için .env desteği olmalı",
+    ".dockerignore dosyası oluşturulmalı (node_modules, .git, .env dahil)"
+  ],
+  "starter_code": {
+    "javascript": "// ============================================\n// DOSYA 1: Dockerfile\n// ============================================\n// Multi-stage build ile production-ready Node.js image\n//\n// Stage 1 (builder):\n//   - node:20-alpine base image\n//   - WORKDIR /app\n//   - package.json pnpm-lock.yaml kopyala → corepack enable && pnpm install --frozen-lockfile\n//   - tsconfig.json ve src/ kopyala → pnpm build\n//   - pnpm install --frozen-lockfile --prod (production deps ayrı)\n//\n// Stage 2 (production):\n//   - node:20-alpine base image\n//   - tini yükle (init process)\n//   - WORKDIR /app\n//   - builder'dan dist/, node_modules/, package.json kopyala\n//   - USER node\n//   - HEALTHCHECK ekle\n//   - ENTRYPOINT [\"tini\", \"--\"]\n//   - CMD [\"node\", \"dist/server.js\"]\n//\n// ============================================\n\n// ============================================\n// DOSYA 2: docker-compose.yml\n// ============================================\n// version: '3.8'\n//\n// services:\n//   api:\n//     build: .\n//     ports: 3000:3000\n//     environment: NODE_ENV, DATABASE_URL, REDIS_URL\n//     depends_on: db (healthy), cache (started)\n//     healthcheck: wget http://localhost:3000/health\n//     restart: unless-stopped\n//\n//   db:\n//     image: postgres:16-alpine\n//     environment: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB\n//     volumes: postgres_data:/var/lib/postgresql/data\n//     healthcheck: pg_isready\n//     restart: unless-stopped\n//\n//   cache:\n//     image: redis:7-alpine\n//     command: redis-server --appendonly yes\n//     volumes: redis_data:/data\n//     healthcheck: redis-cli ping\n//     restart: unless-stopped\n//\n// volumes:\n//   postgres_data:\n//   redis_data:\n//\n// ============================================\n\n// ============================================\n// DOSYA 3: .dockerignore\n// ============================================\n// node_modules, .git, .env, dist, coverage,\n// Dockerfile, docker-compose*, .dockerignore,\n// *.md, .vscode, .idea, __tests__\n// ============================================"
+  },
+  "test_cases": [
+    {
+      "input": {"test": "dockerfile_multi_stage", "code": "Check Dockerfile has FROM ... AS builder and second FROM"},
+      "expected": "Dockerfile contains at least 2 FROM instructions (multi-stage)"
+    },
+    {
+      "input": {"test": "dockerfile_non_root", "code": "Check Dockerfile has USER instruction"},
+      "expected": "Dockerfile contains USER node or USER 1001"
+    },
+    {
+      "input": {"test": "dockerfile_healthcheck", "code": "Check Dockerfile has HEALTHCHECK"},
+      "expected": "Dockerfile contains HEALTHCHECK instruction"
+    },
+    {
+      "input": {"test": "compose_services", "code": "Parse docker-compose.yml services"},
+      "expected": "Contains api, db, and cache services"
+    },
+    {
+      "input": {"test": "compose_volumes", "code": "Check docker-compose.yml volumes"},
+      "expected": "Named volumes defined for postgres_data and redis_data"
+    },
+    {
+      "input": {"test": "compose_healthcheck", "code": "Check healthcheck in all services"},
+      "expected": "All three services have healthcheck defined"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"test": "layer_caching_order", "code": "Check COPY order in Dockerfile"},
+      "expected": "package*.json is copied BEFORE COPY . . (layer caching optimization)"
+    },
+    {
+      "input": {"test": "compose_depends_on_healthy", "code": "Check depends_on conditions"},
+      "expected": "API depends_on db with condition: service_healthy"
+    },
+    {
+      "input": {"test": "compose_env_not_hardcoded", "code": "Check sensitive env vars"},
+      "expected": "Sensitive values use ${} syntax or env_file, not hardcoded"
+    },
+    {
+      "input": {"test": "dockerignore_exists", "code": "Check .dockerignore file"},
+      "expected": ".dockerignore includes node_modules, .git, .env"
+    },
+    {
+      "input": {"test": "compose_restart_policy", "code": "Check restart policy"},
+      "expected": "Services have restart: unless-stopped or always"
+    }
+  ],
+  "hints": [
+    "Dockerfile multi-stage: İlk stage 'FROM node:20-alpine AS builder' ile başlar. İkinci stage 'FROM node:20-alpine' ile başlar. 'COPY --from=builder /app/dist ./dist' ile sadece build output kopyalanır. Builder stage'de devDependencies dahil tüm deps yüklenir (TypeScript compiler için), production stage'de sadece production deps alınır.",
+    "docker-compose.yml depends_on: 'depends_on: db: condition: service_healthy' yazımı ile DB'nin healthcheck'inin geçmesini beklersin. PostgreSQL healthcheck: 'test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]'. Redis healthcheck: 'test: [\"CMD\", \"redis-cli\", \"ping\"]'.",
+    "Environment variables: Hassas değerleri docker-compose.yml'a hardcode etme! '${POSTGRES_PASSWORD}' syntax'ı ile .env dosyasından oku. DATABASE_URL'de host olarak 'db' (service name) kullan, 'localhost' değil! Docker Compose aynı network'teki servislere service name ile erişir."
+  ],
+  "solution": {
+    "javascript": "// ============ Dockerfile ============\n\n// # Stage 1: Builder\n// FROM node:20-alpine AS builder\n// WORKDIR /app\n// COPY package.json pnpm-lock.yaml ./\n// RUN corepack enable && pnpm install --frozen-lockfile\n// COPY tsconfig.json ./\n// COPY src/ ./src/\n// RUN pnpm build\n// RUN pnpm install --frozen-lockfile --prod && pnpm store prune\n//\n// # Stage 2: Production\n// FROM node:20-alpine\n// RUN apk add --no-cache tini\n// WORKDIR /app\n// COPY --from=builder --chown=node:node /app/dist ./dist\n// COPY --from=builder --chown=node:node /app/node_modules ./node_modules\n// COPY --from=builder --chown=node:node /app/package.json ./\n// USER node\n// EXPOSE 3000\n// HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \\\n//   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1\n// ENTRYPOINT [\"/sbin/tini\", \"--\"]\n// CMD [\"node\", \"dist/server.js\"]\n\n// ============ docker-compose.yml ============\n\n// version: '3.8'\n//\n// services:\n//   api:\n//     build:\n//       context: .\n//       dockerfile: Dockerfile\n//     container_name: myapp-api\n//     ports:\n//       - \"3000:3000\"\n//     environment:\n//       - NODE_ENV=production\n//       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}\n//       - REDIS_URL=redis://cache:6379\n//       - JWT_SECRET=${JWT_SECRET}\n//     depends_on:\n//       db:\n//         condition: service_healthy\n//       cache:\n//         condition: service_started\n//     healthcheck:\n//       test: [\"CMD\", \"wget\", \"--no-verbose\", \"--tries=1\", \"--spider\", \"http://localhost:3000/health\"]\n//       interval: 30s\n//       timeout: 5s\n//       retries: 3\n//       start_period: 10s\n//     restart: unless-stopped\n//\n//   db:\n//     image: postgres:16-alpine\n//     container_name: myapp-db\n//     environment:\n//       - POSTGRES_USER=${POSTGRES_USER:-admin}\n//       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}\n//       - POSTGRES_DB=${POSTGRES_DB:-myapp}\n//     volumes:\n//       - postgres_data:/var/lib/postgresql/data\n//       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro\n//     healthcheck:\n//       test: [\"CMD-SHELL\", \"pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-myapp}\"]\n//       interval: 10s\n//       timeout: 5s\n//       retries: 5\n//     restart: unless-stopped\n//\n//   cache:\n//     image: redis:7-alpine\n//     container_name: myapp-cache\n//     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru\n//     volumes:\n//       - redis_data:/data\n//     healthcheck:\n//       test: [\"CMD\", \"redis-cli\", \"ping\"]\n//       interval: 10s\n//       timeout: 3s\n//       retries: 3\n//     restart: unless-stopped\n//\n// volumes:\n//   postgres_data:\n//     driver: local\n//   redis_data:\n//     driver: local\n\n// ============ .dockerignore ============\n\n// node_modules\n// npm-debug.log*\n// dist\n// build\n// coverage\n// .git\n// .gitignore\n// .vscode\n// .idea\n// Dockerfile*\n// docker-compose*\n// .dockerignore\n// .env\n// .env.*\n// __tests__\n// *.test.js\n// *.test.ts\n// *.spec.js\n// *.spec.ts\n// jest.config.*\n// README.md\n// docs/\n// *.md",
+    "explanation_tr": "Dockerfile: İki stage'den oluşur. Builder stage'de TypeScript derlenir ve tüm dependency'ler yüklenir. Production stage'de sadece compiled JS output (dist/), production node_modules ve package.json kopyalanır. tini init process olarak kullanılır (proper signal handling ve zombie process cleanup). Non-root 'node' kullanıcısı güvenlik için zorunludur.\n\ndocker-compose.yml: Üç servis tanımlar. API servisi Dockerfile'dan build edilir, DB ve cache'e depends_on ile bağlıdır. PostgreSQL verileri named volume (postgres_data) ile persist edilir. Redis append-only file ve memory limit ile yapılandırılır. Tüm servislerde healthcheck tanımlıdır.\n\n.dockerignore: node_modules, .git, .env gibi build context'e dahil edilmemesi gereken dosyaları listeler. Bu dosya olmazsa COPY . . komutu gereksiz dosyaları image'a kopyalar, build süresi ve image boyutu artar."
+  },
+  "complexity": {
+    "optimal_time": "N/A (infrastructure configuration)",
+    "optimal_space": "Image size: ~150MB (multi-stage) vs ~800MB (single-stage)"
+  },
+  "learn_after_solving": "Bu challenge ile production-ready Docker setup'ının temellerini uyguladın. Multi-stage build, layer caching, non-root user, health check, Docker Compose orchestration ve proper volume management kavramlarını pratik ettin. Gerçek projede bu temel üzerine: nginx reverse proxy, SSL termination, log aggregation, monitoring (Prometheus/Grafana), CI/CD pipeline entegrasyonu ve Kubernetes migration eklenmelidir."
+}

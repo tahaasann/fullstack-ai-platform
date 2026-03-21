@@ -1,0 +1,75 @@
+{
+  "title": "useDebounce Hook",
+  "description": "Debounce mantığını implement eden custom React hook",
+  "description_detail": "# useDebounce Hook\n\nKullanıcı girişi gibi sık tetiklenen olayları geciktiren bir debounce hook'u yazın.\n\n## İstenilen Fonksiyonlar\n\n### 1. `useDebounce(value, delay)`\nVerilen değer değiştiğinde, belirtilen delay süresi sonunda debounced değeri günceller.\n\n### 2. `useDebouncedCallback(callback, delay)`\nVerilen callback'i debounce eden bir wrapper fonksiyon döndürür.\n\n### 3. `debounce(fn, delay)` (Saf fonksiyon)\nFramework bağımsız debounce implementasyonu.\n\n## Örnek\n```javascript\nfunction SearchComponent() {\n  const [query, setQuery] = useState('');\n  const debouncedQuery = useDebounce(query, 300);\n  \n  useEffect(() => {\n    if (debouncedQuery) searchAPI(debouncedQuery);\n  }, [debouncedQuery]);\n}\n```\n\n## Not\nBu challenge'da asıl odak saf `debounce` fonksiyonudur. React hook versiyonu kavramsal olarak açıklanmıştır.",
+  "difficulty": "orta",
+  "category": "react",
+  "tags": ["react", "hooks", "debounce", "performance"],
+  "examples": [
+    {
+      "input": "debounce(fn, 300): fn('a'), fn('ab'), fn('abc') hızlıca çağrılır",
+      "output": "fn sadece 1 kez 'abc' ile çağrılır",
+      "explanation": "Her yeni çağrı önceki timer'ı iptal eder, sadece son çağrı 300ms sonra çalışır"
+    }
+  ],
+  "constraints": [
+    "Her yeni çağrıda önceki timer iptal edilmeli",
+    "Son çağrıdan delay ms sonra fonksiyon çalışmalı",
+    "cancel() ile bekleyen çağrı iptal edilebilmeli",
+    "flush() ile bekleyen çağrı hemen çalıştırılabilmeli"
+  ],
+  "starter_code": {
+    "python": "def debounce(fn, delay_ms):\n    \"\"\"Returns a debounced version of fn with cancel() and flush() methods\"\"\"\n    # Your code here\n    pass",
+    "javascript": "function debounce(fn, delay) {\n  // Your code here\n  // Return debounced function with cancel() and flush() methods\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"calls": [{"args": ["a"], "at": 0}, {"args": ["b"], "at": 50}, {"args": ["c"], "at": 100}], "delay": 200},
+      "expected_output": {"call_count": 1, "last_args": ["c"], "called_at": 300}
+    },
+    {
+      "input": {"calls": [{"args": [1], "at": 0}], "delay": 100},
+      "expected_output": {"call_count": 1, "last_args": [1], "called_at": 100}
+    },
+    {
+      "input": {"calls": [{"args": ["x"], "at": 0}, {"args": ["y"], "at": 500}], "delay": 200},
+      "expected_output": {"call_count": 2, "calls": [["x"], ["y"]]}
+    },
+    {
+      "input": {"calls": [{"args": ["a"], "at": 0}], "delay": 100, "cancel_at": 50},
+      "expected_output": {"call_count": 0}
+    },
+    {
+      "input": {"calls": [{"args": ["flush_me"], "at": 0}], "delay": 1000, "flush_at": 10},
+      "expected_output": {"call_count": 1, "last_args": ["flush_me"], "called_at": 10}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"calls": [{"args": [1], "at": 0}, {"args": [2], "at": 10}, {"args": [3], "at": 20}, {"args": [4], "at": 30}], "delay": 50},
+      "expected_output": {"call_count": 1, "last_args": [4]}
+    },
+    {
+      "input": {"calls": [], "delay": 100},
+      "expected_output": {"call_count": 0}
+    },
+    {
+      "input": {"calls": [{"args": ["a"], "at": 0}, {"args": ["b"], "at": 200}, {"args": ["c"], "at": 400}], "delay": 100},
+      "expected_output": {"call_count": 3}
+    }
+  ],
+  "hints": [
+    "Bir timer ID'si sakla. Her çağrıda clearTimeout ile öncekini iptal et, yeni setTimeout başlat",
+    "cancel() fonksiyonu clearTimeout yapmalı, flush() ise varsa timer'ı iptal edip fonksiyonu hemen çağırmalı",
+    "Son çağrının argümanlarını saklayarak flush() doğru argümanlarla çağrı yapabilir"
+  ],
+  "solution": {
+    "python": "import threading\n\ndef debounce(fn, delay_ms):\n    timer = [None]\n    last_args = [None]\n    last_kwargs = [None]\n    \n    def debounced(*args, **kwargs):\n        last_args[0] = args\n        last_kwargs[0] = kwargs\n        if timer[0] is not None:\n            timer[0].cancel()\n        timer[0] = threading.Timer(delay_ms / 1000.0, lambda: fn(*last_args[0], **last_kwargs[0]))\n        timer[0].start()\n    \n    def cancel():\n        if timer[0] is not None:\n            timer[0].cancel()\n            timer[0] = None\n    \n    def flush():\n        if timer[0] is not None:\n            timer[0].cancel()\n            timer[0] = None\n            if last_args[0] is not None:\n                fn(*last_args[0], **last_kwargs[0])\n    \n    debounced.cancel = cancel\n    debounced.flush = flush\n    return debounced",
+    "javascript": "function debounce(fn, delay) {\n  let timer = null;\n  let lastArgs = null;\n\n  function debounced(...args) {\n    lastArgs = args;\n    if (timer) clearTimeout(timer);\n    timer = setTimeout(() => {\n      timer = null;\n      fn(...lastArgs);\n    }, delay);\n  }\n\n  debounced.cancel = function() {\n    if (timer) {\n      clearTimeout(timer);\n      timer = null;\n    }\n  };\n\n  debounced.flush = function() {\n    if (timer) {\n      clearTimeout(timer);\n      timer = null;\n      if (lastArgs) fn(...lastArgs);\n    }\n  };\n\n  return debounced;\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(1) per call",
+    "optimal_space": "O(1)"
+  },
+  "learn_after_solving": "Debounce pattern'ini, timer yönetimini ve React hook lifecycle'ını öğrenirsin. Debounce arama kutuları, form validation ve pencere resize event'lerinde performans için zorunludur."
+}

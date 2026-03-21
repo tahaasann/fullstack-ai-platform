@@ -1,0 +1,75 @@
+{
+  "title": "Infinite Scroll Hook",
+  "description": "Intersection Observer mantığı ile infinite scroll pagination implementasyonu",
+  "description_detail": "# Infinite Scroll Hook\n\nSayfa sonuna yaklaştığında yeni veri yükleyen bir infinite scroll sistemi implement edin.\n\n## İstenilen Fonksiyon: `createPaginator(fetchFn, options)`\n\n### Parametreler\n- `fetchFn(page, pageSize)`: Veri çeken fonksiyon, `{ data: T[], hasMore: boolean }` döndürür\n- `options`: `{ pageSize: number, threshold: number }`\n\n### Döndürülecek Obje\n```\n{\n  items: T[],           // Tüm yüklenen öğeler\n  loading: boolean,     // Yükleniyor mu\n  hasMore: boolean,     // Daha fazla veri var mı\n  error: Error | null,  // Hata varsa\n  loadMore(): void,     // Sonraki sayfayı yükle\n  reset(): void,        // Başa dön\n  currentPage: number   // Mevcut sayfa\n}\n```\n\n## Not\nBu challenge'da Intersection Observer yerine manuel `loadMore()` çağrısı kullanılır.",
+  "difficulty": "zor",
+  "category": "react",
+  "tags": ["infinite-scroll", "pagination", "hooks", "performance"],
+  "examples": [
+    {
+      "input": "createPaginator(fetch, {pageSize: 10}), loadMore() x 3",
+      "output": "items: 30 öğe, currentPage: 3",
+      "explanation": "Her loadMore çağrısı bir sonraki sayfayı yükler ve items'a ekler"
+    }
+  ],
+  "constraints": [
+    "loadMore() yüklenme sırasında tekrar çağrılmamalı (duplicate prevention)",
+    "hasMore false ise loadMore çağrılmamalı",
+    "reset() tüm state'i başlangıç durumuna döndürmeli",
+    "Hata durumunda mevcut items korunmalı"
+  ],
+  "starter_code": {
+    "python": "def create_paginator(fetch_fn, page_size=10):\n    # Your code here\n    pass",
+    "javascript": "function createPaginator(fetchFn, options = {}) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"pages": [[1,2,3], [4,5,6], [7,8,9]], "pageSize": 3, "loadCount": 1},
+      "expected_output": {"items": [1,2,3], "currentPage": 1, "hasMore": true}
+    },
+    {
+      "input": {"pages": [[1,2,3], [4,5,6], [7,8,9]], "pageSize": 3, "loadCount": 3},
+      "expected_output": {"items": [1,2,3,4,5,6,7,8,9], "currentPage": 3, "hasMore": false}
+    },
+    {
+      "input": {"pages": [[1,2,3]], "pageSize": 3, "loadCount": 1},
+      "expected_output": {"items": [1,2,3], "currentPage": 1, "hasMore": false}
+    },
+    {
+      "input": {"pages": [[], []], "pageSize": 10, "loadCount": 1},
+      "expected_output": {"items": [], "currentPage": 1, "hasMore": false}
+    },
+    {
+      "input": {"pages": [[1,2], [3,4]], "pageSize": 2, "loadCount": 2, "then_reset": true},
+      "expected_output": {"items": [], "currentPage": 0, "hasMore": true}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"pages": [[1],[2],[3],[4],[5]], "pageSize": 1, "loadCount": 5},
+      "expected_output": {"items": [1,2,3,4,5], "currentPage": 5, "hasMore": false}
+    },
+    {
+      "input": {"pages": [[1,2,3], [4,5,6]], "pageSize": 3, "loadCount": 1, "error_on_page": 2},
+      "expected_output": {"items": [1,2,3], "error": true, "hasMore": true}
+    },
+    {
+      "input": {"pages": [["a","b"],["c"]], "pageSize": 2, "loadCount": 2},
+      "expected_output": {"items": ["a","b","c"], "currentPage": 2, "hasMore": false}
+    }
+  ],
+  "hints": [
+    "Bir state objesi tut: items=[], page=0, loading=false, hasMore=true, error=null",
+    "loadMore: loading true ise veya hasMore false ise erken dön. Aksi halde page++ ve fetchFn çağır",
+    "hasMore kontrolü: dönen data.length < pageSize ise false yap"
+  ],
+  "solution": {
+    "python": "def create_paginator(fetch_fn, page_size=10):\n    state = {\n        'items': [],\n        'loading': False,\n        'has_more': True,\n        'error': None,\n        'current_page': 0\n    }\n    \n    def load_more():\n        if state['loading'] or not state['has_more']:\n            return\n        \n        state['loading'] = True\n        state['error'] = None\n        \n        try:\n            next_page = state['current_page'] + 1\n            result = fetch_fn(next_page, page_size)\n            data = result.get('data', [])\n            state['items'].extend(data)\n            state['current_page'] = next_page\n            state['has_more'] = result.get('has_more', len(data) >= page_size)\n        except Exception as e:\n            state['error'] = str(e)\n        finally:\n            state['loading'] = False\n    \n    def reset():\n        state['items'] = []\n        state['loading'] = False\n        state['has_more'] = True\n        state['error'] = None\n        state['current_page'] = 0\n    \n    return {\n        'get_state': lambda: dict(state),\n        'load_more': load_more,\n        'reset': reset\n    }",
+    "javascript": "function createPaginator(fetchFn, options = {}) {\n  const pageSize = options.pageSize || 10;\n  let items = [];\n  let loading = false;\n  let hasMore = true;\n  let error = null;\n  let currentPage = 0;\n\n  async function loadMore() {\n    if (loading || !hasMore) return;\n\n    loading = true;\n    error = null;\n\n    try {\n      const nextPage = currentPage + 1;\n      const result = await fetchFn(nextPage, pageSize);\n      const data = result.data || [];\n      items = [...items, ...data];\n      currentPage = nextPage;\n      hasMore = result.hasMore !== undefined ? result.hasMore : data.length >= pageSize;\n    } catch (e) {\n      error = e;\n    } finally {\n      loading = false;\n    }\n  }\n\n  function reset() {\n    items = [];\n    loading = false;\n    hasMore = true;\n    error = null;\n    currentPage = 0;\n  }\n\n  return {\n    get items() { return items; },\n    get loading() { return loading; },\n    get hasMore() { return hasMore; },\n    get error() { return error; },\n    get currentPage() { return currentPage; },\n    loadMore,\n    reset\n  };\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(1) per loadMore call",
+    "optimal_space": "O(n) total items"
+  },
+  "learn_after_solving": "Infinite scroll pattern'ini, cursor-based pagination mantığını, race condition prevention'ı ve state management'ı öğrenirsin. Bu pattern sosyal medya feed'leri, arama sonuçları ve e-ticaret listeleme sayfalarında standart kullanımdır."
+}

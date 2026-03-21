@@ -1,0 +1,909 @@
+{
+  "id": "project-07",
+  "title": "RAG Döküman Soru-Cevap Sistemi",
+  "difficulty": "Zor",
+  "estimated_days": 14,
+  "target_roles": [
+    "AI Engineer",
+    "LLM Engineer"
+  ],
+  "brief": "Bu projede, PDF/DOCX/TXT dökümanları yükleyip bu dökümanlara doğal dilde soru sorabileceğin tam kapsamlı bir RAG (Retrieval-Augmented Generation) sistemi inşa edeceksin. React + TypeScript frontend, FastAPI backend, LangChain orchestration, ChromaDB vector store ve OpenAI embeddings kullanarak enterprise-grade bir soru-cevap platformu oluşturacaksın. Semantic chunking, hybrid retrieval (dense + sparse), cross-encoder reranking, conversational memory ve source citation gibi production RAG pipeline'larının tüm bileşenlerini öğreneceksin. Bu proje, günümüzde her AI şirketinin ihtiyaç duyduğu temel altyapıyı temsil ediyor — ChatGPT, Notion AI, Glean gibi ürünlerin arkasındaki teknoloji RAG'dir.",
+  "architecture": {
+    "overview": "Frontend (React + TypeScript) → API Gateway (FastAPI) → Document Processing Pipeline → Chunking Engine → Embedding Service → Vector Store (ChromaDB) → Retrieval Engine (Hybrid Search + Reranker) → LLM Chain (LangChain + OpenAI) → Response with Citations",
+    "diagram": "┌──────────┐     ┌──────────┐     ┌──────────────┐\n│  React   │────▶│ FastAPI  │────▶│  Document    │\n│  Chat UI │◀────│ Gateway  │     │  Processor   │\n└──────────┘     └────┬─────┘     └──────┬───────┘\n                      │                  │\n                 ┌────▼─────┐      ┌─────▼────────┐\n                 │ LangChain│      │  Chunking    │\n                 │ RAG Chain│      │  Engine      │\n                 └────┬─────┘      └─────┬────────┘\n                      │                  │\n                 ┌────▼─────┐      ┌─────▼────────┐\n                 │  OpenAI  │      │  Embedding   │\n                 │  LLM     │      │  Service     │\n                 └──────────┘      └─────┬────────┘\n                                         │\n                 ┌───────────┐     ┌─────▼────────┐\n                 │PostgreSQL │     │  ChromaDB    │\n                 │ Metadata  │     │  Vector Store│\n                 └───────────┘     └──────────────┘",
+    "decisions": [
+      {
+        "decision": "Neden LangChain?",
+        "reasoning": "RAG pipeline'ın tüm bileşenlerini (document loading, chunking, embedding, retrieval, chain) tek bir framework altında birleştirir. Abstraction seviyesi hızlı geliştirme sağlar ve farklı LLM/embedding provider'lara geçişi kolaylaştırır.",
+        "alternatives": "LlamaIndex, Haystack, Custom pipeline",
+        "when_to_choose_alternative": "LlamaIndex: Daha opinionated RAG framework istiyorsan, özellikle complex document parsing ve indexing için. Haystack: Production-ready pipeline builder istiyorsan. Custom: Tam kontrol ve minimum dependency istiyorsan, ancak development süresi 3-5x artar."
+      },
+      {
+        "decision": "Neden ChromaDB?",
+        "reasoning": "Lightweight, embedded çalışabilir, Python-native, collection management destekler, metadata filtering güçlü. Development'ta in-memory, production'da persistent mode ile çalışır.",
+        "alternatives": "Pinecone, Weaviate, Qdrant, pgvector, Milvus",
+        "when_to_choose_alternative": "Pinecone: Managed service istiyorsan, scaling düşünmek istemiyorsan. Qdrant: High-performance ve advanced filtering gerekiyorsa. pgvector: Zaten PostgreSQL kullanıyorsan ve ayrı vector DB istemiyorsan. Weaviate: GraphQL API ve multi-modal search gerekiyorsa."
+      },
+      {
+        "decision": "Neden Hybrid Retrieval (Dense + Sparse)?",
+        "reasoning": "Dense retrieval (embedding similarity) semantik anlam yakalar ama exact keyword match'lerde zayıf kalır. Sparse retrieval (BM25) keyword matching'de güçlü ama semantik benzerliği anlamaz. İkisini birleştirmek recall'u %15-25 artırır.",
+        "alternatives": "Sadece dense retrieval, sadece sparse retrieval, ColBERT",
+        "when_to_choose_alternative": "Sadece dense: Basit use case ve hızlı MVP. ColBERT: Late interaction ile daha iyi relevance ama daha fazla compute. Sadece sparse: Teknik dökümanlar ve exact term matching kritikse."
+      },
+      {
+        "decision": "Neden Cross-Encoder Reranking?",
+        "reasoning": "Bi-encoder (embedding) retrieval hızlı ama rough ranking verir. Cross-encoder query-document pair'ini birlikte encode ederek çok daha accurate relevance score üretir. İlk 20 sonucu rerank ederek top-5 kalitesini dramatik artırır.",
+        "alternatives": "Cohere Rerank API, LLM-based reranking, reciprocal rank fusion",
+        "when_to_choose_alternative": "Cohere Rerank: Managed API istiyorsan. LLM-based: En yüksek kalite ama en yavaş ve pahalı. Reciprocal rank fusion: Birden fazla retrieval source'u birleştirirken."
+      },
+      {
+        "decision": "Neden FastAPI?",
+        "reasoning": "Async support ile yüksek concurrency, automatic OpenAPI docs, Pydantic validation, streaming response desteği, Python ML ekosistemiyle doğal entegrasyon.",
+        "alternatives": "Flask, Django, Express + Python microservice",
+        "when_to_choose_alternative": "Flask: Minimal setup istiyorsan. Django: Admin panel ve ORM gerekiyorsa. Express: Frontend team Node.js biliyorsa, Python'u sadece ML service olarak kullan."
+      }
+    ]
+  },
+  "what_you_learn": {
+    "technical": [
+      "PDF, DOCX, TXT dosya parsing ve text extraction",
+      "Semantic chunking stratejileri (fixed-size, sentence-based, recursive, hierarchical)",
+      "OpenAI ve open-source embedding modelleri kullanımı",
+      "ChromaDB ile vector store yönetimi",
+      "BM25 sparse retrieval implementasyonu",
+      "Cross-encoder reranking pipeline",
+      "LangChain ile RAG chain oluşturma",
+      "Conversational memory ve multi-turn Q&A",
+      "FastAPI streaming response (SSE)",
+      "React ile real-time chat interface"
+    ],
+    "architectural": [
+      "RAG pipeline mimarisi ve veri akışı tasarımı",
+      "Document processing pipeline pattern",
+      "Retrieval-generation ayrımı ve orchestration",
+      "Embedding cache ve index stratejileri",
+      "Multi-collection document management",
+      "Async processing queue (background tasks)"
+    ],
+    "ai_specific": [
+      "Embedding space ve semantic similarity kavramları",
+      "Chunking stratejisi seçiminin retrieval kalitesine etkisi",
+      "Hybrid search (dense + sparse) fusion teknikleri",
+      "Cross-encoder vs bi-encoder trade-off",
+      "Prompt engineering: context injection ve instruction tuning",
+      "Hallucination azaltma teknikleri (grounding, citation)",
+      "Relevance scoring ve confidence estimation",
+      "Feedback loop ile retrieval kalitesi iyileştirme"
+    ],
+    "soft_skills": [
+      "AI ürün tasarımında kullanıcı beklentisi yönetimi",
+      "LLM maliyet optimizasyonu ve token budget planlama",
+      "RAG sistemlerinin limitasyonlarını stakeholder'lara açıklama",
+      "AI ethics: Hallucination riski ve güvenilirlik iletişimi"
+    ]
+  },
+  "requirements": {
+    "functional": [
+      "PDF, DOCX, TXT dosya yükleme ve işleme",
+      "Birden fazla chunking stratejisi (fixed-size, sentence-based, hierarchical) seçimi",
+      "Döküman koleksiyon yönetimi (oluşturma, silme, listeleme)",
+      "Doğal dilde soru sorma ve cevap alma",
+      "Multi-turn conversational Q&A (önceki soruları hatırlama)",
+      "Kaynak gösterimi (döküman adı, sayfa numarası, ilgili paragraf)",
+      "Relevance score ve confidence gösterimi",
+      "Cevap feedback sistemi (thumbs up/down)",
+      "Sorgu geçmişi ve analytics dashboard",
+      "Streaming cevap (token token gösterme)"
+    ],
+    "non_functional": [
+      "Döküman işleme: 100 sayfa PDF < 30 saniye",
+      "Soru yanıt süresi (first token): < 2 saniye",
+      "Embedding üretimi: 1000 chunk < 60 saniye",
+      "Eşzamanlı 10 kullanıcı desteği",
+      "Vector store 100K+ chunk destekli"
+    ],
+    "ai_requirements": [
+      "Retrieval precision@5 > %80",
+      "Cevaplarda hallucination oranı < %5",
+      "Cross-encoder reranking ile retrieval kalitesi %20+ artış",
+      "Hybrid retrieval ile sadece dense'e göre recall %15+ artış",
+      "Confidence score kalibrasyonu (düşük güven = gerçekten bilmiyor)"
+    ]
+  },
+  "tech_stack": [
+    "React",
+    "TypeScript",
+    "FastAPI",
+    "Python",
+    "LangChain",
+    "ChromaDB",
+    "OpenAI",
+    "PostgreSQL"
+  ],
+  "evaluation_criteria": [
+    {
+      "criterion": "RAG Pipeline doğruluğu",
+      "weight": 25,
+      "description": "Chunking, embedding, retrieval, generation zinciri doğru çalışıyor, cevaplar kaynağa sadık"
+    },
+    {
+      "criterion": "Retrieval kalitesi",
+      "weight": 20,
+      "description": "Hybrid search ve reranking ile ilgili chunk'lar doğru getiriliyor, precision yüksek"
+    },
+    {
+      "criterion": "Chunking stratejisi",
+      "weight": 10,
+      "description": "Birden fazla strateji implemente edilmiş, karşılaştırma yapılmış, doğru strateji seçilmiş"
+    },
+    {
+      "criterion": "Conversational memory",
+      "weight": 10,
+      "description": "Multi-turn sorularda bağlam korunuyor, anaphora resolution çalışıyor"
+    },
+    {
+      "criterion": "Source citation",
+      "weight": 10,
+      "description": "Cevaplarda sayfa numarası ve ilgili paragraf doğru gösteriliyor"
+    },
+    {
+      "criterion": "Frontend UX",
+      "weight": 10,
+      "description": "Chat interface profesyonel, streaming çalışıyor, döküman yönetimi kolay"
+    },
+    {
+      "criterion": "Kod kalitesi ve test",
+      "weight": 10,
+      "description": "Type safety, modüler yapı, retrieval testleri, error handling"
+    },
+    {
+      "criterion": "Production readiness",
+      "weight": 5,
+      "description": "Docker, environment config, logging, monitoring, caching"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "p07-m1",
+      "title": "Proje Altyapısı & Döküman İşleme Pipeline",
+      "overview": "Projenin temelini atıyoruz: FastAPI backend, React frontend scaffolding, dosya yükleme sistemi ve PDF/DOCX/TXT dosyalarından text extraction pipeline'ı oluşturacağız.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "FastAPI project structure",
+        "File upload handling",
+        "PDF/DOCX parsing",
+        "Text extraction pipeline",
+        "PostgreSQL metadata storage"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Proje Yapısı ve Geliştirme Ortamı",
+          "why": "RAG sistemi birden fazla servis içeriyor: FastAPI backend, React frontend, ChromaDB, PostgreSQL. Doğru proje yapısı ve dependency management başlangıçta kurulmazsa sonradan refactoring çok pahalı olur.",
+          "instructions": "Monorepo yapısında backend/ ve frontend/ klasörleri oluştur. Backend için Python 3.13+ ile virtual environment kur. FastAPI, uvicorn, python-multipart, langchain, chromadb, openai, pypdf, python-docx, sqlalchemy, alembic, pydantic-settings paketlerini kur. Frontend için Vite + React + TypeScript projesi oluştur. .env dosyasında OPENAI_API_KEY, DATABASE_URL, CHROMA_PERSIST_DIR tanımla. Backend'de config.py ile environment değişkenlerini yönet.",
+          "code_snippet": "# backend/app/core/config.py\nfrom pydantic_settings import BaseSettings\nfrom functools import lru_cache\n\nclass Settings(BaseSettings):\n    app_name: str = \"RAG Document QA\"\n    openai_api_key: str\n    database_url: str = \"postgresql://user:pass@localhost:5432/ragdb\"\n    chroma_persist_dir: str = \"./chroma_data\"\n    upload_dir: str = \"./uploads\"\n    max_file_size_mb: int = 50\n    chunk_size: int = 512\n    chunk_overlap: int = 50\n    embedding_model: str = \"text-embedding-3-small\"\n    llm_model: str = \"gpt-4o-mini\"\n    reranker_model: str = \"cross-encoder/ms-marco-MiniLM-L-6-v2\"\n    \n    class Config:\n        env_file = \".env\"\n\n@lru_cache()\ndef get_settings() -> Settings:\n    return Settings()\n\n# backend/app/main.py\nfrom fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI(title=\"RAG Document QA API\")\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"http://localhost:5173\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n\n@app.get(\"/health\")\nasync def health():\n    return {\"status\": \"healthy\"}",
+          "checkpoint": "Backend 'uvicorn app.main:app --reload' ile başlıyor mu? /health endpoint'i 200 dönüyor mu? Frontend 'pnpm run dev' ile açılıyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\npydantic-settings ile config yönetimi production'da standart. lru_cache ile Settings objesi sadece bir kez oluşturulur — her request'te .env okumaz. OPENAI_API_KEY'i asla koda yazma, her zaman environment variable kullan.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior developer proje başlatırken ilk iş olarak 'bu sistemin failure mode'ları ne?' diye düşünür. RAG'de 3 kritik failure noktası var: 1) Döküman parsing hatası (corrupt PDF), 2) Embedding service down (OpenAI rate limit), 3) LLM hallucination. Her biri için graceful degradation planı olmalı. Senior ayrıca cost estimation yapar — 1M token embedding = ~$0.02, 1M token GPT-4o-mini = ~$0.15. Bu rakamları bilmeden ürün tasarlamak mümkün değil."
+        },
+        {
+          "step": 2,
+          "title": "PostgreSQL Metadata Schema ve Alembic Migrations",
+          "why": "Vector store chunk'ları tutar ama döküman metadata'sı (dosya adı, yükleme tarihi, boyut, işlem durumu, koleksiyon bilgisi) relational database'de saklanmalı. Bu ayrım RAG mimarisinin temelidir — her şeyi vector store'a koymaya çalışma.",
+          "instructions": "SQLAlchemy modelleri oluştur: Document (id, filename, file_type, file_size, page_count, collection_id, status, created_at), Collection (id, name, description, document_count, created_at), ChatSession (id, collection_id, created_at), ChatMessage (id, session_id, role, content, sources, created_at), QueryFeedback (id, message_id, rating, comment, created_at). Alembic ile migration oluştur ve çalıştır.",
+          "code_snippet": "# backend/app/models/document.py\nfrom sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Enum, Text, JSON\nfrom sqlalchemy.orm import relationship\nfrom datetime import datetime\nimport enum\nfrom app.core.database import Base\n\nclass ProcessingStatus(str, enum.Enum):\n    PENDING = \"pending\"\n    PROCESSING = \"processing\"\n    COMPLETED = \"completed\"\n    FAILED = \"failed\"\n\nclass Document(Base):\n    __tablename__ = \"documents\"\n    \n    id = Column(String, primary_key=True)  # UUID\n    filename = Column(String(500), nullable=False)\n    file_type = Column(String(20), nullable=False)  # pdf, docx, txt\n    file_size = Column(Integer, nullable=False)  # bytes\n    page_count = Column(Integer, default=0)\n    chunk_count = Column(Integer, default=0)\n    collection_id = Column(String, ForeignKey(\"collections.id\"), nullable=False)\n    status = Column(Enum(ProcessingStatus), default=ProcessingStatus.PENDING)\n    error_message = Column(Text, nullable=True)\n    processing_time_ms = Column(Integer, nullable=True)\n    created_at = Column(DateTime, default=datetime.utcnow)\n    \n    collection = relationship(\"Collection\", back_populates=\"documents\")\n\nclass Collection(Base):\n    __tablename__ = \"collections\"\n    \n    id = Column(String, primary_key=True)\n    name = Column(String(200), nullable=False, unique=True)\n    description = Column(Text, nullable=True)\n    created_at = Column(DateTime, default=datetime.utcnow)\n    \n    documents = relationship(\"Document\", back_populates=\"collection\")\n\nclass ChatMessage(Base):\n    __tablename__ = \"chat_messages\"\n    \n    id = Column(String, primary_key=True)\n    session_id = Column(String, ForeignKey(\"chat_sessions.id\"), nullable=False)\n    role = Column(String(20), nullable=False)  # user, assistant\n    content = Column(Text, nullable=False)\n    sources = Column(JSON, nullable=True)  # [{doc_id, page, chunk_text, score}]\n    confidence = Column(Integer, nullable=True)  # 0-100\n    created_at = Column(DateTime, default=datetime.utcnow)",
+          "checkpoint": "Alembic migration başarıyla çalıştırıp tabloları oluşturdun mu? psql ile tabloları listeleyebiliyor musun?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nDocument status field'ı (PENDING -> PROCESSING -> COMPLETED/FAILED) state machine pattern'idir. Büyük dosyalar asenkron işlenir, kullanıcı dosya yükleyip beklerken status'u takip eder. Bu pattern her file processing sisteminde kullanılır. Sources JSON field'ı denormalized tutulur — join yapmadan cevap ile kaynakları birlikte döndürmek için.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior metadata schema tasarlarken 'query pattern'ları düşünür: 1) Koleksiyondaki tüm dökümanlar (Collection -> Documents), 2) Bir cevaptaki kaynaklar (ChatMessage -> sources), 3) Kullanıcı feedback'i (QueryFeedback -> ChatMessage). Bu pattern'lar index stratejisini belirler. Senior ayrıca 'soft delete' kullanır — döküman silindiğinde chunk'lar vector store'dan da temizlenmeli, bu iki sistemin senkronizasyonunu gerektirir."
+        },
+        {
+          "step": 3,
+          "title": "Dosya Yükleme API ve Validasyon",
+          "why": "Dosya yükleme basit görünür ama güvenlik ve validasyon katmanları olmadan production'a alınamaz. Dosya boyutu, tipi, virus kontrolü ve concurrent upload yönetimi gerekir.",
+          "instructions": "POST /api/documents/upload endpoint'i oluştur. Multipart form data ile dosya al. Dosya tipini (pdf/docx/txt) ve boyutunu (max 50MB) valide et. Dosyayı disk'e kaydet ve Document kaydını DB'ye ekle. Status'u PENDING olarak set et. Collection ID parametresi al — koleksiyon yoksa oluştur.",
+          "code_snippet": "# backend/app/api/documents.py\nfrom fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks\nfrom uuid import uuid4\nimport aiofiles\nimport os\n\nrouter = APIRouter(prefix=\"/api/documents\", tags=[\"documents\"])\n\nALLOWED_TYPES = {\n    \"application/pdf\": \"pdf\",\n    \"application/vnd.openxmlformats-officedocument.wordprocessingml.document\": \"docx\",\n    \"text/plain\": \"txt\",\n}\nMAX_SIZE = 50 * 1024 * 1024  # 50MB\n\n@router.post(\"/upload\")\nasync def upload_document(\n    background_tasks: BackgroundTasks,\n    file: UploadFile = File(...),\n    collection_id: str = Form(...),\n    db: Session = Depends(get_db),\n):\n    # Validate file type\n    if file.content_type not in ALLOWED_TYPES:\n        raise HTTPException(400, f\"Desteklenmeyen dosya tipi: {file.content_type}\")\n    \n    # Validate file size\n    content = await file.read()\n    if len(content) > MAX_SIZE:\n        raise HTTPException(400, f\"Dosya boyutu {MAX_SIZE // 1024 // 1024}MB'ı aşamaz\")\n    \n    # Save file to disk\n    doc_id = str(uuid4())\n    file_ext = ALLOWED_TYPES[file.content_type]\n    file_path = os.path.join(settings.upload_dir, f\"{doc_id}.{file_ext}\")\n    \n    async with aiofiles.open(file_path, \"wb\") as f:\n        await f.write(content)\n    \n    # Create DB record\n    document = Document(\n        id=doc_id,\n        filename=file.filename,\n        file_type=file_ext,\n        file_size=len(content),\n        collection_id=collection_id,\n        status=ProcessingStatus.PENDING,\n    )\n    db.add(document)\n    db.commit()\n    \n    # Trigger async processing\n    background_tasks.add_task(process_document, doc_id, file_path)\n    \n    return {\"id\": doc_id, \"status\": \"pending\", \"message\": \"Döküman işleme kuyruğuna eklendi\"}",
+          "checkpoint": "Postman veya curl ile PDF/DOCX/TXT yükleyebiliyor musun? Yanlış dosya tipi gönderince 400 alıyor musun? DB'de Document kaydı oluşturuluyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nBackgroundTasks ile dosya işleme asenkron yapılır — kullanıcı dosya yükledikten sonra response beklemez. await file.read() tüm dosyayı memory'ye alır, çok büyük dosyalar için streaming upload (chunks) kullanılmalı. content_type client tarafından gönderilir, güvenilir değildir — production'da python-magic ile dosya tipini doğrulamalısın.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior file upload'da security checklist uygular: 1) File extension whitelist (content_type yetmez, magic bytes kontrol et), 2) Filename sanitization (path traversal engelle), 3) Virus scan (ClamAV), 4) Rate limiting (bir kullanıcı dakikada max 5 dosya), 5) Disk quota (koleksiyon başına max 1GB). Production'da dosyalar disk yerine S3/GCS'e yüklenir — bu scaling ve backup sorunlarını çözer."
+        },
+        {
+          "step": 4,
+          "title": "PDF/DOCX/TXT Text Extraction",
+          "why": "Her dosya formatının kendine özgü zorlukları ve yapıları vardır. PDF'lerde tablo, resim, multi-column layout; DOCX'te stiller, başlıklar, listeler; TXT'de encoding sorunları. Doğru text extraction tüm RAG pipeline'ının kalitesini belirler — garbage in, garbage out.",
+          "instructions": "Her dosya tipi için ayrı extractor sınıfı oluştur. PDFExtractor: pypdf ile sayfa sayfa text çıkar, sayfa numarasını metadata'ya ekle. DOCXExtractor: python-docx ile paragraph ve tablo text'ini çıkar, heading level'ları koru. TXTExtractor: encoding detect et (chardet), satır satır oku. Tüm extractor'ları DocumentProcessor sınıfında birleştir.",
+          "code_snippet": "# backend/app/services/extractors.py\nfrom pypdf import PdfReader\nfrom docx import Document as DocxDocument\nimport chardet\nfrom dataclasses import dataclass\nfrom typing import List\n\n@dataclass\nclass ExtractedPage:\n    content: str\n    page_number: int\n    metadata: dict  # heading, source, etc.\n\nclass PDFExtractor:\n    def extract(self, file_path: str) -> List[ExtractedPage]:\n        reader = PdfReader(file_path)\n        pages = []\n        for i, page in enumerate(reader.pages):\n            text = page.extract_text() or \"\"\n            text = self._clean_text(text)\n            if text.strip():\n                pages.append(ExtractedPage(\n                    content=text,\n                    page_number=i + 1,\n                    metadata={\"source_type\": \"pdf\", \"has_images\": len(page.images) > 0}\n                ))\n        return pages\n    \n    def _clean_text(self, text: str) -> str:\n        import re\n        text = re.sub(r'\\s+', ' ', text)\n        text = re.sub(r'[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f]', '', text)\n        return text.strip()\n\nclass DOCXExtractor:\n    def extract(self, file_path: str) -> List[ExtractedPage]:\n        doc = DocxDocument(file_path)\n        pages = []\n        current_page = []\n        current_heading = \"\"\n        \n        for para in doc.paragraphs:\n            if para.style.name.startswith('Heading'):\n                if current_page:\n                    pages.append(ExtractedPage(\n                        content=\"\\n\".join(current_page),\n                        page_number=len(pages) + 1,\n                        metadata={\"heading\": current_heading, \"source_type\": \"docx\"}\n                    ))\n                    current_page = []\n                current_heading = para.text\n            current_page.append(para.text)\n        \n        if current_page:\n            pages.append(ExtractedPage(\n                content=\"\\n\".join(current_page),\n                page_number=len(pages) + 1,\n                metadata={\"heading\": current_heading, \"source_type\": \"docx\"}\n            ))\n        \n        for table in doc.tables:\n            table_text = self._extract_table(table)\n            if table_text:\n                pages.append(ExtractedPage(\n                    content=table_text,\n                    page_number=len(pages) + 1,\n                    metadata={\"type\": \"table\", \"source_type\": \"docx\"}\n                ))\n        return pages\n    \n    def _extract_table(self, table) -> str:\n        rows = []\n        for row in table.rows:\n            cells = [cell.text.strip() for cell in row.cells]\n            rows.append(\" | \".join(cells))\n        return \"\\n\".join(rows)\n\nclass TXTExtractor:\n    def extract(self, file_path: str) -> List[ExtractedPage]:\n        with open(file_path, 'rb') as f:\n            raw = f.read()\n        detected = chardet.detect(raw)\n        encoding = detected['encoding'] or 'utf-8'\n        text = raw.decode(encoding, errors='replace')\n        \n        lines = text.split('\\n')\n        pages = []\n        chunk = []\n        for i, line in enumerate(lines):\n            chunk.append(line)\n            if len(chunk) >= 100:\n                pages.append(ExtractedPage(\n                    content=\"\\n\".join(chunk),\n                    page_number=len(pages) + 1,\n                    metadata={\"encoding\": encoding, \"source_type\": \"txt\"}\n                ))\n                chunk = []\n        if chunk:\n            pages.append(ExtractedPage(\n                content=\"\\n\".join(chunk),\n                page_number=len(pages) + 1,\n                metadata={\"encoding\": encoding, \"source_type\": \"txt\"}\n            ))\n        return pages\n\ndef get_extractor(file_type: str):\n    extractors = {\"pdf\": PDFExtractor(), \"docx\": DOCXExtractor(), \"txt\": TXTExtractor()}\n    if file_type not in extractors:\n        raise ValueError(f\"Desteklenmeyen dosya tipi: {file_type}\")\n    return extractors[file_type]",
+          "checkpoint": "3 farklı formatta (PDF, DOCX, TXT) dosya yükleyip text extraction'ın doğru çalıştığını doğrula. Sayfa numaraları doğru mu? Türkçe karakterler bozuluyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nExtractedPage dataclass'ında page_number metadata'sı RAG için kritik — cevaplarda 'Sayfa 15'te belirtildiği gibi...' demek için gerekli. PDF text extraction mükemmel değildir: scanned PDF'lerde OCR gerekir (Tesseract), multi-column layout'larda metin karışıyor. chardet ile encoding detection TXT dosyaları için zorunlu — Türkçe dosyalar ISO-8859-9 veya Windows-1254 olabilir.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior text extraction'ı 'data quality pipeline' olarak görür. Production'da extraction sonrası quality check'ler eklenir: 1) Extracted text uzunluğu vs dosya boyutu oranı (çok düşükse sorunlu), 2) Language detection (yanlış dilde döküman yüklenmiş mi?), 3) Garbled text detection (encoding hatası var mı?), 4) PII detection (kişisel veri var mı, maskelemek gerekir mi?). Bu check'ler döküman processing pipeline'ının kalitesini garanti altına alır."
+        },
+        {
+          "step": 5,
+          "title": "Document Processing Pipeline Orchestration",
+          "why": "Text extraction sonrası dökümanın durumunu (status) güncellemek, hataları yakalamak ve retry mekanizması kurmak gerekiyor. Production'da dosya işleme pipeline'ı robust olmalı — bir dosya hata verdiğinde tüm sistem durmamalı.",
+          "instructions": "process_document fonksiyonunu implement et. Status'u PROCESSING'e çevir, extract et, başarılı ise COMPLETED'e çevir ve page_count'u güncelle, hata varsa FAILED'e çevir ve error_message'ı kaydet. İşleme süresini ölç. GET /api/documents/{id}/status endpoint'i ekle. GET /api/collections/{id}/documents ile koleksiyondaki dökümanları listele.",
+          "code_snippet": "# backend/app/services/processor.py\nimport time\nimport logging\nfrom app.services.extractors import get_extractor, ExtractedPage\nfrom app.models.document import Document, ProcessingStatus\n\nlogger = logging.getLogger(__name__)\n\nasync def process_document(doc_id: str, file_path: str):\n    db = get_db_session()\n    start_time = time.time()\n    \n    try:\n        doc = db.query(Document).filter(Document.id == doc_id).first()\n        doc.status = ProcessingStatus.PROCESSING\n        db.commit()\n        \n        logger.info(f\"Processing document: {doc.filename} ({doc.file_type})\")\n        \n        extractor = get_extractor(doc.file_type)\n        pages: list[ExtractedPage] = extractor.extract(file_path)\n        \n        if not pages:\n            raise ValueError(\"Döküman boş veya okunamıyor\")\n        \n        elapsed_ms = int((time.time() - start_time) * 1000)\n        doc.page_count = len(pages)\n        doc.status = ProcessingStatus.COMPLETED\n        doc.processing_time_ms = elapsed_ms\n        db.commit()\n        \n        logger.info(f\"Document processed: {doc.filename}, {len(pages)} pages, {elapsed_ms}ms\")\n        return pages\n        \n    except Exception as e:\n        logger.error(f\"Document processing failed: {doc_id} - {str(e)}\")\n        doc = db.query(Document).filter(Document.id == doc_id).first()\n        doc.status = ProcessingStatus.FAILED\n        doc.error_message = str(e)[:500]\n        db.commit()\n        raise\n    finally:\n        db.close()\n\n@router.get(\"/{doc_id}/status\")\nasync def get_document_status(doc_id: str, db: Session = Depends(get_db)):\n    doc = db.query(Document).filter(Document.id == doc_id).first()\n    if not doc:\n        raise HTTPException(404, \"Döküman bulunamadı\")\n    return {\n        \"id\": doc.id,\n        \"filename\": doc.filename,\n        \"status\": doc.status,\n        \"page_count\": doc.page_count,\n        \"processing_time_ms\": doc.processing_time_ms,\n        \"error_message\": doc.error_message,\n    }",
+          "checkpoint": "PDF yükledikten sonra /status endpoint'i ile işleme durumunu takip edebiliyor musun? PENDING -> PROCESSING -> COMPLETED geçişi oluyor mu? Hata durumunda FAILED status'u ve error_message kaydediliyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nState machine pattern (PENDING -> PROCESSING -> COMPLETED/FAILED) distributed sistemlerin temelidir. Her state değişikliği DB'ye commit edilmeli. error_message[:500] ile hata mesajını kes — DB'ye stack trace yığınlamasın. time.time() ile işleme süresini ölçmek optimizasyon için kritik — hangi dosyalar yavaş işleniyor?",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior production pipeline'ında retry ve dead letter queue ekler. Bir dosya network hatası yüzünden FAILED olduysa otomatik 3 kez retry edilir (exponential backoff ile). 3 retry sonrası hâlâ başarısızsa dead letter queue'ye düşer ve ops ekibine alert gider. Ayrıca idempotency sağlanır — aynı dosya 2 kez process edilirse duplicate chunk oluşmamalı. Bu pattern'lar AWS Step Functions veya Celery ile implement edilir."
+        }
+      ],
+      "must_note": "📝 Bu Milestone'dan Çıkarılacak En Önemli Dersler:\n1. RAG'de 'garbage in, garbage out' — text extraction kalitesi tüm sistemi belirler\n2. Dosya processing ASENKRON olmalı — kullanıcıyı bekletme\n3. Status tracking (state machine) her async pipeline'da ZORUNLU\n4. Metadata'yı (sayfa numarası, heading) extraction sırasında yakala, sonra yakalamak çok zor\n5. Factory pattern ile extractor seçimi — yeni format eklemek tek sınıf yazmak kadar kolay olmalı",
+      "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior'lar döküman işleme pipeline'ını 'data ingestion' problemi olarak görür. Bu problem her yerde aynıdır: 1) Input validation, 2) Transformation, 3) Quality check, 4) Storage, 5) Status tracking. ETL (Extract-Transform-Load) terminolojisi burada da geçerlidir. Senior ayrıca 'observability' ekler — her döküman için extraction kalite skoru hesaplanır (text/dosya boyutu oranı, language confidence, encoding confidence). Düşük kaliteli extraction'lar otomatik flaglenir."
+    },
+    {
+      "id": "p07-m2",
+      "title": "Chunking Stratejileri & Embedding Üretimi",
+      "overview": "RAG'in en kritik adımı: dökümanları anlamlı parçalara (chunk) bölme ve bu parçaların vektör temsillerini (embedding) oluşturma. Farklı chunking stratejilerini implement edip karşılaştıracağız.",
+      "estimated_hours": 12,
+      "concepts_covered": [
+        "Text chunking strategies",
+        "Embedding models",
+        "Token counting",
+        "Chunk overlap",
+        "Semantic similarity"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Fixed-Size Chunking",
+          "why": "En basit ve en yaygın chunking yöntemi. Token sayısına göre sabit boyutta parçalar oluşturur. Basitliği nedeniyle baseline olarak kullanılır ve diğer stratejilerin karşılaştırılacağı referans noktasıdır.",
+          "instructions": "FixedSizeChunker sınıfı oluştur. tiktoken ile token sayımı yap (OpenAI modelleriyle uyumlu). chunk_size=512, chunk_overlap=50 token varsayılan değerler. Her chunk'a metadata ekle: doc_id, page_number, chunk_index, start_char, end_char. Overlap'in neden gerekli olduğunu anlatan yorum ekle.",
+          "code_snippet": "# backend/app/services/chunkers/fixed_size.py\nimport tiktoken\nfrom dataclasses import dataclass, field\nfrom typing import List\n\n@dataclass\nclass Chunk:\n    content: str\n    metadata: dict = field(default_factory=dict)\n    token_count: int = 0\n\nclass FixedSizeChunker:\n    def __init__(self, chunk_size: int = 512, chunk_overlap: int = 50, model: str = \"text-embedding-3-small\"):\n        self.chunk_size = chunk_size\n        self.chunk_overlap = chunk_overlap\n        self.tokenizer = tiktoken.encoding_for_model(model)\n    \n    def chunk(self, pages: list, doc_id: str) -> List[Chunk]:\n        chunks = []\n        \n        for page in pages:\n            tokens = self.tokenizer.encode(page.content)\n            \n            start = 0\n            while start < len(tokens):\n                end = min(start + self.chunk_size, len(tokens))\n                chunk_tokens = tokens[start:end]\n                chunk_text = self.tokenizer.decode(chunk_tokens)\n                \n                chunks.append(Chunk(\n                    content=chunk_text,\n                    metadata={\n                        \"doc_id\": doc_id,\n                        \"page_number\": page.page_number,\n                        \"chunk_index\": len(chunks),\n                        \"chunk_strategy\": \"fixed_size\",\n                        \"token_count\": len(chunk_tokens),\n                        **page.metadata\n                    },\n                    token_count=len(chunk_tokens)\n                ))\n                \n                # Overlap sayesinde cümle sınırında bölünen metin\n                # en az bir chunk'ta tam olarak yer alır\n                start += self.chunk_size - self.chunk_overlap\n        \n        return chunks",
+          "checkpoint": "1000 tokenlik bir metni chunk_size=512, overlap=50 ile bölüp 3 chunk oluşuyor mu? Overlap bölgelerinde text tekrar ediyor mu (beklenen davranış)?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\ntiktoken kullan, len(text) değil! Token sayısı ve karakter sayısı farklıdır — Türkçe metinlerde 1 kelime 2-4 token olabilir. Overlap olmadan chunking yaparsan cümleler ortasından kesilir ve retrieval kalitesi düşer. chunk_size seçimi trade-off: küçük chunk = daha precise retrieval ama bağlam kaybı, büyük chunk = daha fazla context ama noise.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior chunk_size'ı döküman tipine göre ayarlar: Teknik döküman (API docs) için 256-512 token (kısa, precise bilgi parçaları), legal döküman için 1024+ token (uzun paragraflar bağlam gerektirir), Q&A için 512 token (orta). Senior ayrıca 'chunk_size tuning' yapar: farklı chunk_size'larla retrieval precision ölçer ve optimal değeri bulur. Bu hyperparameter tuning LLM fine-tuning kadar önemlidir."
+        },
+        {
+          "step": 2,
+          "title": "Sentence-Based Chunking",
+          "why": "Fixed-size chunking cümleleri ortasından keser. Sentence-based chunking cümle sınırlarını koruyarak daha anlamlı parçalar oluşturur. Bu özellikle Q&A sistemlerinde cevap kalitesini artırır çünkü cevaplar genellikle tam cümlelerdir.",
+          "instructions": "SentenceChunker sınıfı oluştur. spaCy veya nltk ile cümleleri ayır. Cümleleri gruplayarak chunk_size'ı aşmayacak şekilde chunk'lar oluştur. Bir cümle tek başına chunk_size'dan büyükse fixed-size'a fallback yap.",
+          "code_snippet": "# backend/app/services/chunkers/sentence.py\nimport re\nfrom typing import List\nimport tiktoken\n\nclass SentenceChunker:\n    def __init__(self, chunk_size: int = 512, chunk_overlap_sentences: int = 1):\n        self.chunk_size = chunk_size\n        self.overlap_sentences = chunk_overlap_sentences\n        self.tokenizer = tiktoken.encoding_for_model(\"text-embedding-3-small\")\n    \n    def _split_sentences(self, text: str) -> List[str]:\n        pattern = r'(?<=[.!?])\\s+(?=[A-ZÇĞIÖŞÜA-Za-z])'\n        sentences = re.split(pattern, text)\n        merged = []\n        buffer = \"\"\n        for s in sentences:\n            if len(self.tokenizer.encode(buffer + \" \" + s)) < 50 and buffer:\n                buffer += \" \" + s\n            else:\n                if buffer:\n                    merged.append(buffer.strip())\n                buffer = s\n        if buffer:\n            merged.append(buffer.strip())\n        return merged\n    \n    def chunk(self, pages: list, doc_id: str) -> List[Chunk]:\n        chunks = []\n        \n        for page in pages:\n            sentences = self._split_sentences(page.content)\n            current_sentences = []\n            current_tokens = 0\n            \n            for sentence in sentences:\n                sentence_tokens = len(self.tokenizer.encode(sentence))\n                \n                if current_tokens + sentence_tokens > self.chunk_size and current_sentences:\n                    chunks.append(Chunk(\n                        content=\" \".join(current_sentences),\n                        metadata={\n                            \"doc_id\": doc_id,\n                            \"page_number\": page.page_number,\n                            \"chunk_index\": len(chunks),\n                            \"chunk_strategy\": \"sentence\",\n                            \"sentence_count\": len(current_sentences),\n                            \"token_count\": current_tokens,\n                        },\n                        token_count=current_tokens\n                    ))\n                    \n                    current_sentences = current_sentences[-self.overlap_sentences:]\n                    current_tokens = sum(len(self.tokenizer.encode(s)) for s in current_sentences)\n                \n                current_sentences.append(sentence)\n                current_tokens += sentence_tokens\n            \n            if current_sentences:\n                chunks.append(Chunk(\n                    content=\" \".join(current_sentences),\n                    metadata={\n                        \"doc_id\": doc_id,\n                        \"page_number\": page.page_number,\n                        \"chunk_index\": len(chunks),\n                        \"chunk_strategy\": \"sentence\",\n                        \"sentence_count\": len(current_sentences),\n                        \"token_count\": current_tokens,\n                    },\n                    token_count=current_tokens\n                ))\n        \n        return chunks",
+          "checkpoint": "Aynı dökümanı fixed-size ve sentence chunking ile karşılaştır. Sentence chunking cümleleri ortasından kesiyor mu? Chunk sayıları ve ortalama token sayıları ne?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nCümle bölme dile bağlıdır! Türkçe'de 'Dr.', 'Prof.', 'vb.' gibi kısaltmalar yanlış cümle sonu olarak algılanabilir. Production'da spaCy'nin Türkçe modeli (tr_core_news_sm) daha doğru sonuç verir. Sentence overlap'ı cümle sayısı üzerinden yap, token üzerinden değil — böylece anlamlı birimler korunur.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior 'recursive character text splitter' stratejisini de bilir — LangChain'in varsayılan stratejisi budur. Önce paragraf sınırlarından (\\n\\n), sonra cümle sınırlarından (. ! ?), sonra kelime sınırlarından ( ) böler. Bu hiyerarşik yaklaşım her seviyede daha doğal bölünme sağlar. Senior ayrıca 'semantic chunking' dener — embedding similarity'ye göre cümleleri gruplar: benzer cümleler aynı chunk'ta kalır."
+        },
+        {
+          "step": 3,
+          "title": "Hierarchical Chunking (Parent-Child)",
+          "why": "Bazen kısa bir chunk (256 token) retrieval için en ilgili parçayı bulur ama LLM'e yeterli context sağlamaz. Hierarchical chunking'de küçük child chunk retrieval için, büyük parent chunk LLM context olarak kullanılır. Bu RAG'in en gelişmiş ve en etkili chunking stratejisidir.",
+          "instructions": "HierarchicalChunker sınıfı oluştur. Parent chunk: 1024 token (LLM context için). Child chunk: 256 token (retrieval için). Her child chunk hangi parent'a ait olduğunu metadata'da tutsun. Retrieval sırasında child bulunur, LLM'e parent gönderilir.",
+          "code_snippet": "# backend/app/services/chunkers/hierarchical.py\nfrom typing import List, Dict\nimport tiktoken\n\nclass HierarchicalChunker:\n    def __init__(\n        self,\n        parent_chunk_size: int = 1024,\n        child_chunk_size: int = 256,\n        child_overlap: int = 30\n    ):\n        self.parent_size = parent_chunk_size\n        self.child_size = child_chunk_size\n        self.child_overlap = child_overlap\n        self.tokenizer = tiktoken.encoding_for_model(\"text-embedding-3-small\")\n    \n    def chunk(self, pages: list, doc_id: str) -> Dict[str, List[Chunk]]:\n        parents = []\n        children = []\n        \n        full_text = \"\\n\\n\".join([p.content for p in pages])\n        tokens = self.tokenizer.encode(full_text)\n        \n        parent_start = 0\n        parent_idx = 0\n        while parent_start < len(tokens):\n            parent_end = min(parent_start + self.parent_size, len(tokens))\n            parent_tokens = tokens[parent_start:parent_end]\n            parent_text = self.tokenizer.decode(parent_tokens)\n            parent_id = f\"{doc_id}_parent_{parent_idx}\"\n            \n            parents.append(Chunk(\n                content=parent_text,\n                metadata={\n                    \"doc_id\": doc_id,\n                    \"chunk_id\": parent_id,\n                    \"chunk_type\": \"parent\",\n                    \"chunk_index\": parent_idx,\n                    \"token_count\": len(parent_tokens),\n                    \"chunk_strategy\": \"hierarchical\",\n                }\n            ))\n            \n            child_start = 0\n            child_idx = 0\n            while child_start < len(parent_tokens):\n                child_end = min(child_start + self.child_size, len(parent_tokens))\n                child_tokens = parent_tokens[child_start:child_end]\n                child_text = self.tokenizer.decode(child_tokens)\n                \n                children.append(Chunk(\n                    content=child_text,\n                    metadata={\n                        \"doc_id\": doc_id,\n                        \"parent_id\": parent_id,\n                        \"chunk_type\": \"child\",\n                        \"chunk_index\": child_idx,\n                        \"parent_index\": parent_idx,\n                        \"token_count\": len(child_tokens),\n                        \"chunk_strategy\": \"hierarchical\",\n                    }\n                ))\n                \n                child_start += self.child_size - self.child_overlap\n                child_idx += 1\n            \n            parent_start += self.parent_size\n            parent_idx += 1\n        \n        return {\"parents\": parents, \"children\": children}\n    \n    def get_parent_for_child(self, child_chunk: Chunk, parents: List[Chunk]) -> Chunk:\n        parent_id = child_chunk.metadata.get(\"parent_id\")\n        for parent in parents:\n            if parent.metadata.get(\"chunk_id\") == parent_id:\n                return parent\n        return child_chunk",
+          "checkpoint": "1000 tokenlik bir metinde hierarchical chunking ile kaç parent ve kaç child chunk oluşuyor? Child'ın parent_id'si doğru parent'ı gösteriyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nHierarchical chunking RAG'in 'secret weapon'ıdır. Child chunk retrieval precision'ı artırır (küçük, fokuslu parçalar), parent chunk LLM context'ini zenginleştirir (geniş bağlam). parent_id metadata'sı kritik — retrieval sırasında child bulunur, ama LLM'e parent gönderilir. Bu pattern'ı anlamadan production RAG yapılamaz.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior hierarchical chunking'i 'small-to-big retrieval' olarak adlandırır. LlamaIndex bu pattern'ı native destekler. Senior bir adım daha ileri gider: 'sentence window retrieval' — her cümle ayrı embed edilir (maximum precision), ama LLM'e o cümlenin etrafındaki 3-5 cümle (window) gönderilir. Bu approach hierarchical chunking'den bile daha iyi sonuç verebilir. Ancak embedding sayısı arttığından maliyet artar — trade-off her zaman var."
+        },
+        {
+          "step": 4,
+          "title": "Embedding Üretimi ve Batch Processing",
+          "why": "Embedding, text'in anlamsal temsilini sabit boyutlu bir vektöre dönüştürür. Bu vektörler arasındaki kosinüs benzerlik, metinlerin anlamsal yakınlığını ölçer. Doğru embedding modeli ve batch processing stratejisi RAG kalitesini ve maliyetini doğrudan etkiler.",
+          "instructions": "EmbeddingService sınıfı oluştur. OpenAI text-embedding-3-small modeli kullan. Batch processing: API rate limit'e takılmamak için chunk'ları 100'lük batch'ler halinde embed et. Rate limiting ve retry logic ekle. Embedding boyutunu (dimension) logla. Embedding cache: aynı text tekrar embed edilmesin.",
+          "code_snippet": "# backend/app/services/embedding.py\nfrom openai import OpenAI\nimport hashlib\nimport time\nimport logging\nfrom typing import List\n\nlogger = logging.getLogger(__name__)\n\nclass EmbeddingService:\n    def __init__(self, model: str = \"text-embedding-3-small\", batch_size: int = 100):\n        self.client = OpenAI()\n        self.model = model\n        self.batch_size = batch_size\n        self._cache: dict[str, list[float]] = {}\n    \n    def _text_hash(self, text: str) -> str:\n        return hashlib.md5(text.encode()).hexdigest()\n    \n    def embed_texts(self, texts: List[str]) -> List[List[float]]:\n        all_embeddings = [None] * len(texts)\n        texts_to_embed = []\n        \n        for i, text in enumerate(texts):\n            cache_key = self._text_hash(text)\n            if cache_key in self._cache:\n                all_embeddings[i] = self._cache[cache_key]\n            else:\n                texts_to_embed.append((i, text))\n        \n        cache_hits = len(texts) - len(texts_to_embed)\n        if cache_hits > 0:\n            logger.info(f\"Embedding cache: {cache_hits}/{len(texts)} hits\")\n        \n        for batch_start in range(0, len(texts_to_embed), self.batch_size):\n            batch = texts_to_embed[batch_start:batch_start + self.batch_size]\n            batch_texts = [t[1] for t in batch]\n            \n            try:\n                response = self.client.embeddings.create(\n                    model=self.model,\n                    input=batch_texts\n                )\n                \n                for j, embedding_data in enumerate(response.data):\n                    original_idx = batch[j][0]\n                    embedding = embedding_data.embedding\n                    all_embeddings[original_idx] = embedding\n                    \n                    cache_key = self._text_hash(batch_texts[j])\n                    self._cache[cache_key] = embedding\n                \n                logger.info(f\"Embedded batch {batch_start//self.batch_size + 1}, \"\n                           f\"dimension={len(response.data[0].embedding)}, \"\n                           f\"tokens={response.usage.total_tokens}\")\n                \n            except Exception as e:\n                if \"rate_limit\" in str(e).lower():\n                    logger.warning(\"Rate limited, waiting 10s...\")\n                    time.sleep(10)\n                    return self.embed_texts(texts)\n                raise\n            \n            if batch_start + self.batch_size < len(texts_to_embed):\n                time.sleep(0.5)\n        \n        return all_embeddings\n    \n    def embed_query(self, query: str) -> List[float]:\n        response = self.client.embeddings.create(\n            model=self.model,\n            input=query\n        )\n        return response.data[0].embedding",
+          "checkpoint": "100 chunk'ı batch olarak embed edebiliyor musun? Cache çalışıyor mu (aynı chunk ikinci kez API'ye gitmiyor mu)? Embedding dimension'ı nedir?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\ntext-embedding-3-small 1536 boyutlu vektör üretir ve $0.02/1M token. Daha iyi alternatif: text-embedding-3-large (3072 boyut, $0.13/1M token). Batch processing zorunlu — 1000 chunk'ı teker teker embed etmek 1000 API call, batch ile 10 call. Embedding cache production'da Redis'e taşınmalı. embed_query ve embed_texts farklı fonksiyonlar olmalı — bazı embedding modelleri query ve document için farklı prefix kullanır.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior embedding model seçiminde 'MTEB leaderboard'a bakar — farklı modellerin farklı task'larda (retrieval, classification, clustering) performansını karşılaştırır. Open-source alternatifler: BGE-M3 (multilingual, ücretsiz), E5-large-v2, GTE-large. Senior ayrıca embedding dimension reduction uygulayabilir (PCA veya Matryoshka) — 1536'dan 512'ye düşürmek storage'ı %66 azaltır, performans kaybı minimal olur. Cost-performance trade-off her zaman düşünülür."
+        },
+        {
+          "step": 5,
+          "title": "Chunking Stratejileri Karşılaştırma Framework'ü",
+          "why": "Hangi chunking stratejisi senin dökümanlarında en iyi çalışıyor? Bunu ölçmeden bilmek imkansız. Sistematik karşılaştırma framework'ü oluşturmak data-driven karar vermeyi sağlar.",
+          "instructions": "ChunkingEvaluator sınıfı oluştur. Her strateji için: chunk sayısı, ortalama token, retrieval precision@5 hesapla. Test soruları ve beklenen chunk'lar ile ground truth oluştur. Sonuçları tablo olarak logla.",
+          "code_snippet": "# backend/app/services/chunking_evaluator.py\nfrom typing import List, Dict\nimport numpy as np\n\nclass ChunkingEvaluator:\n    def __init__(self, embedding_service: EmbeddingService):\n        self.embedding_service = embedding_service\n    \n    def evaluate_strategy(\n        self,\n        chunks: List[Chunk],\n        test_queries: List[Dict],\n    ) -> Dict:\n        token_counts = [c.token_count for c in chunks]\n        stats = {\n            \"total_chunks\": len(chunks),\n            \"avg_tokens\": np.mean(token_counts),\n            \"std_tokens\": np.std(token_counts),\n            \"min_tokens\": min(token_counts),\n            \"max_tokens\": max(token_counts),\n        }\n        \n        chunk_texts = [c.content for c in chunks]\n        chunk_embeddings = self.embedding_service.embed_texts(chunk_texts)\n        \n        precisions = []\n        for test in test_queries:\n            query_embedding = self.embedding_service.embed_query(test[\"query\"])\n            \n            similarities = [\n                np.dot(query_embedding, ce) / (np.linalg.norm(query_embedding) * np.linalg.norm(ce))\n                for ce in chunk_embeddings\n            ]\n            \n            top_indices = np.argsort(similarities)[-5:][::-1]\n            top_chunks = [chunks[i] for i in top_indices]\n            \n            hits = sum(\n                1 for c in top_chunks\n                if c.metadata.get(\"doc_id\") in test[\"expected_doc_ids\"]\n            )\n            precisions.append(hits / 5)\n        \n        stats[\"precision_at_5\"] = np.mean(precisions)\n        return stats\n    \n    def compare_strategies(self, pages, doc_id, test_queries) -> None:\n        from app.services.chunkers.fixed_size import FixedSizeChunker\n        from app.services.chunkers.sentence import SentenceChunker\n        from app.services.chunkers.hierarchical import HierarchicalChunker\n        \n        strategies = {\n            \"fixed_512\": FixedSizeChunker(chunk_size=512),\n            \"fixed_256\": FixedSizeChunker(chunk_size=256),\n            \"sentence\": SentenceChunker(chunk_size=512),\n            \"hierarchical\": HierarchicalChunker(),\n        }\n        \n        results = {}\n        for name, chunker in strategies.items():\n            if name == \"hierarchical\":\n                result = chunker.chunk(pages, doc_id)\n                chunks = result[\"children\"]\n            else:\n                chunks = chunker.chunk(pages, doc_id)\n            \n            results[name] = self.evaluate_strategy(chunks, test_queries)\n            print(f\"\\n{'='*50}\")\n            print(f\"Strategy: {name}\")\n            print(f\"  Chunks: {results[name]['total_chunks']}\")\n            print(f\"  Avg tokens: {results[name]['avg_tokens']:.0f}\")\n            print(f\"  Precision@5: {results[name]['precision_at_5']:.2%}\")",
+          "checkpoint": "En az 3 farklı stratejiyi aynı döküman üzerinde karşılaştırdın mı? Precision@5 sonuçları arasında anlamlı fark var mı? Hangi strateji senin döküman tipin için en iyi?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nChunking stratejisi seçimi DENEYSEL olmalı — teori ile değil, ölçümle karar ver. Ground truth oluşturmak zahmetli ama zorunlu: 10-20 test sorusu ve beklenen chunk'lar yaz. Bu test seti projenin gelecekteki her değişikliğinde regression testi olarak kullanılacak. Precision@5: top-5 sonuç içinde kaç tanesi doğru.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior 'chunking is the most underrated part of RAG' der ve haklıdır. Production'da chunking stratejisi değiştirmek tüm embedding'leri yeniden üretmeyi gerektirir — pahalı ve zamanlı. Senior bu yüzden erken aşamada sistematik deney yapar. Ayrıca 'document type aware chunking' uygular: farklı döküman tipleri (teknik doc, hukuk, akademik) için farklı strateji seçilir. Metadata-driven chunking de önemli: heading'lere göre bölme (her bölüm bir chunk) bazı döküman tiplerinde tüm stratejilerden iyi çalışır."
+        }
+      ],
+      "must_note": "📝 Bu Milestone'dan Çıkarılacak En Önemli Dersler:\n1. Chunking RAG'in kalitesini EN ÇOK etkileyen parametredir — embedding modeli bile ikinci sırada\n2. tiktoken ile token say, karakter sayma yanıltıcı (özellikle Türkçe'de)\n3. Overlap olmadan chunking YAPMA — cümleler kesilir, anlam bozulur\n4. Hierarchical chunking en gelişmiş: child retrieval, parent context\n5. Embedding batch processing ve cache ZORUNLU — yoksa maliyet ve süre patlar\n6. Strateji seçimini veriye dayanarak yap — kişisel tercih değil, precision ölçümü",
+      "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior chunking'i 'information retrieval unit design' olarak görür. Her chunk bir 'retrieval unit'tir — kullanıcının sorusuna cevap verebilecek en küçük anlamlı metin parçası. Senior şu soruyu sorar: 'Bu chunk başına cevap verebilir mi?' Eğer bir chunk bilgiyi anlatmaya başlıyor ama bitirmiyorsa, o chunk kötü tasarlanmıştır. LlamaIndex'in 'auto-merging retrieval' pattern'ı bunu otomatize eder — birden fazla child aynı parent'tan seçildiyse, otomatik olarak parent'a yükselir."
+    },
+    {
+      "id": "p07-m3",
+      "title": "Vector Store & Retrieval Engine",
+      "overview": "ChromaDB ile vector store oluşturma, similarity search, BM25 sparse retrieval, hybrid retrieval (dense + sparse fusion) ve cross-encoder reranking pipeline'ı implement edeceğiz.",
+      "estimated_hours": 12,
+      "concepts_covered": [
+        "ChromaDB operations",
+        "Cosine similarity search",
+        "BM25 sparse retrieval",
+        "Hybrid search fusion",
+        "Cross-encoder reranking"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "ChromaDB Collection Yönetimi",
+          "why": "ChromaDB vector store olarak chunk embedding'lerini saklayıp similarity search yapacak. Collection yönetimi (oluşturma, silme, listeleme) ve metadata filtering RAG'in retrieval katmanının temelidir.",
+          "instructions": "VectorStoreService sınıfı oluştur. ChromaDB client'ını persistent mode'da başlat. Her döküman koleksiyonu için ayrı ChromaDB collection oluştur. Chunk'ları embedding'leriyle birlikte collection'a ekle. Metadata filtering (doc_id, page_number) destekle. Collection silme (döküman silindiğinde chunk'ları da sil).",
+          "code_snippet": "# backend/app/services/vector_store.py\nimport chromadb\nfrom chromadb.config import Settings as ChromaSettings\nfrom typing import List, Optional, Dict\n\nclass VectorStoreService:\n    def __init__(self, persist_dir: str = \"./chroma_data\"):\n        self.client = chromadb.PersistentClient(\n            path=persist_dir,\n            settings=ChromaSettings(anonymized_telemetry=False)\n        )\n    \n    def get_or_create_collection(self, collection_name: str):\n        return self.client.get_or_create_collection(\n            name=collection_name,\n            metadata={\"hnsw:space\": \"cosine\"}\n        )\n    \n    def add_chunks(self, collection_name: str, chunks: List[Dict]):\n        collection = self.get_or_create_collection(collection_name)\n        collection.add(\n            ids=[c[\"id\"] for c in chunks],\n            documents=[c[\"text\"] for c in chunks],\n            embeddings=[c[\"embedding\"] for c in chunks],\n            metadatas=[c[\"metadata\"] for c in chunks],\n        )\n    \n    def search(\n        self,\n        collection_name: str,\n        query_embedding: List[float],\n        n_results: int = 10,\n        where: Optional[Dict] = None,\n    ) -> List[Dict]:\n        collection = self.get_or_create_collection(collection_name)\n        results = collection.query(\n            query_embeddings=[query_embedding],\n            n_results=n_results,\n            where=where,\n            include=[\"documents\", \"metadatas\", \"distances\"]\n        )\n        \n        formatted = []\n        for i in range(len(results[\"ids\"][0])):\n            formatted.append({\n                \"id\": results[\"ids\"][0][i],\n                \"text\": results[\"documents\"][0][i],\n                \"metadata\": results[\"metadatas\"][0][i],\n                \"distance\": results[\"distances\"][0][i],\n                \"score\": 1 - results[\"distances\"][0][i],\n            })\n        return formatted\n    \n    def delete_document_chunks(self, collection_name: str, doc_id: str):\n        collection = self.get_or_create_collection(collection_name)\n        collection.delete(where={\"doc_id\": doc_id})\n    \n    def get_collection_stats(self, collection_name: str) -> Dict:\n        collection = self.get_or_create_collection(collection_name)\n        return {\"name\": collection_name, \"count\": collection.count()}",
+          "checkpoint": "100 chunk'ı ChromaDB'ye ekleyip similarity search yapabiliyor musun? Sonuçlar cosine similarity sırasına göre sıralanmış mı? Metadata filter (doc_id) çalışıyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nChromaDB'de hnsw:space cosine kullan — text similarity için en uygun metrik. Distance vs similarity: ChromaDB distance döndürür (0=aynı), similarity = 1-distance. Döküman silindiğinde delete_document_chunks ile vector store'u da temizle — orphan chunk'lar retrieval kalitesini düşürür.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior vector store seçiminde scaling'i düşünür: ChromaDB tek makine limiti ~5M vektör. Daha fazlası için Qdrant (distributed mode) veya Pinecone (managed). Senior ayrıca HNSW algoritmasının trade-off'larını bilir: ef_construction yüksek = daha iyi recall ama daha yavaş index oluşturma, M yüksek = daha iyi recall ama daha fazla memory. Bu parametreleri tune etmek büyük veri setlerinde önemli."
+        },
+        {
+          "step": 2,
+          "title": "BM25 Sparse Retrieval",
+          "why": "Dense retrieval (embedding similarity) semantik anlamı yakalar ama exact keyword match'te zayıftır. Örneğin 'ISO 27001' arayan kullanıcı, embedding'de yakın ama farklı bir standart bulabilir. BM25 keyword bazlı retrieval ile exact match'leri yakalar.",
+          "instructions": "rank_bm25 kütüphanesini kur. BM25Retriever sınıfı oluştur. Chunk text'lerini tokenize et (Türkçe için basit whitespace + lowercase). Query'yi BM25 ile score'la ve top-N döndür.",
+          "code_snippet": "# backend/app/services/retrieval/bm25.py\nfrom rank_bm25 import BM25Okapi\nimport re\nfrom typing import List, Dict\n\nclass BM25Retriever:\n    def __init__(self):\n        self.bm25 = None\n        self.chunks = []\n    \n    def _tokenize(self, text: str) -> List[str]:\n        text = text.lower()\n        text = re.sub(r'[^a-zçğıöşüa-z0-9\\s]', ' ', text)\n        tokens = text.split()\n        stop_words = {'ve', 'bir', 'bu', 'da', 'de', 'ile', 'için', 'olan', 'the', 'and', 'is', 'of', 'to', 'in'}\n        return [t for t in tokens if t not in stop_words and len(t) > 1]\n    \n    def index(self, chunks: List[Dict]):\n        self.chunks = chunks\n        tokenized_corpus = [self._tokenize(c[\"text\"]) for c in chunks]\n        self.bm25 = BM25Okapi(tokenized_corpus)\n    \n    def search(self, query: str, n_results: int = 10) -> List[Dict]:\n        if not self.bm25:\n            return []\n        \n        tokenized_query = self._tokenize(query)\n        scores = self.bm25.get_scores(tokenized_query)\n        top_indices = scores.argsort()[-n_results:][::-1]\n        \n        results = []\n        for idx in top_indices:\n            if scores[idx] > 0:\n                results.append({\n                    \"id\": self.chunks[idx].get(\"id\"),\n                    \"text\": self.chunks[idx][\"text\"],\n                    \"metadata\": self.chunks[idx].get(\"metadata\", {}),\n                    \"bm25_score\": float(scores[idx]),\n                })\n        return results",
+          "checkpoint": "Exact keyword içeren bir sorguyu BM25 ile arayıp doğru chunk'ı buluyor musun? Aynı sorguyu dense retrieval ile karşılaştır — BM25 keyword'ü daha iyi buluyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nBM25 tokenization dile bağlıdır! Türkçe için morphological analysis (Zemberek) daha iyi sonuç verir ama basit whitespace split çoğu durumda yeterli. Stop word listesini Türkçe için genişlet. BM25 score'ları normalize değildir — dense score'larla birleştirirken normalization gerekir.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior BM25'i 'first-stage retrieval' olarak kullanır. Production RAG pipeline'larında 2-stage retrieval yaygındır: 1) BM25 ile hızlı 100 sonuç getir (milisaniye), 2) Dense retrieval ile 100'den 20'ye indir, 3) Reranker ile 20'den 5'e indir. Bu cascade approach hem hızlı hem accurate. Elasticsearch/OpenSearch production'da BM25 için standart seçimdir — bellek içi BM25 scaling sorunları yaratır."
+        },
+        {
+          "step": 3,
+          "title": "Hybrid Retrieval (Dense + Sparse Fusion)",
+          "why": "Dense ve sparse retrieval birbirini tamamlar: dense semantik anlamı, sparse exact keyword'leri yakalar. İkisini akıllı şekilde birleştirmek (fusion) her ikisinden de daha iyi sonuç verir. Araştırmalarda hybrid retrieval'ın recall'u %15-25 artırdığı gösterilmiştir.",
+          "instructions": "HybridRetriever sınıfı oluştur. Dense ve sparse sonuçları alıp Reciprocal Rank Fusion (RRF) ile birleştir. alpha parametresi ile dense vs sparse ağırlığını ayarla. Normalize edilmiş final score üret.",
+          "code_snippet": "# backend/app/services/retrieval/hybrid.py\nfrom typing import List, Dict\nfrom collections import defaultdict\n\nclass HybridRetriever:\n    def __init__(\n        self,\n        vector_store: VectorStoreService,\n        bm25_retriever: BM25Retriever,\n        embedding_service: EmbeddingService,\n        alpha: float = 0.7,\n    ):\n        self.vector_store = vector_store\n        self.bm25 = bm25_retriever\n        self.embedding_service = embedding_service\n        self.alpha = alpha\n    \n    def search(\n        self,\n        query: str,\n        collection_name: str,\n        n_results: int = 10,\n        n_candidates: int = 20,\n    ) -> List[Dict]:\n        # Dense retrieval\n        query_embedding = self.embedding_service.embed_query(query)\n        dense_results = self.vector_store.search(\n            collection_name, query_embedding, n_results=n_candidates\n        )\n        \n        # Sparse retrieval (BM25)\n        sparse_results = self.bm25.search(query, n_results=n_candidates)\n        \n        # Reciprocal Rank Fusion\n        k = 60\n        fusion_scores = defaultdict(lambda: {\"score\": 0.0, \"data\": None})\n        \n        for rank, result in enumerate(dense_results):\n            chunk_id = result[\"id\"]\n            rrf_score = self.alpha * (1.0 / (k + rank + 1))\n            fusion_scores[chunk_id][\"score\"] += rrf_score\n            fusion_scores[chunk_id][\"data\"] = result\n            fusion_scores[chunk_id][\"dense_rank\"] = rank + 1\n        \n        for rank, result in enumerate(sparse_results):\n            chunk_id = result[\"id\"]\n            rrf_score = (1 - self.alpha) * (1.0 / (k + rank + 1))\n            fusion_scores[chunk_id][\"score\"] += rrf_score\n            if fusion_scores[chunk_id][\"data\"] is None:\n                fusion_scores[chunk_id][\"data\"] = result\n            fusion_scores[chunk_id][\"sparse_rank\"] = rank + 1\n        \n        sorted_results = sorted(\n            fusion_scores.items(),\n            key=lambda x: x[1][\"score\"],\n            reverse=True\n        )[:n_results]\n        \n        final_results = []\n        for chunk_id, info in sorted_results:\n            result = info[\"data\"]\n            result[\"hybrid_score\"] = info[\"score\"]\n            result[\"dense_rank\"] = info.get(\"dense_rank\", None)\n            result[\"sparse_rank\"] = info.get(\"sparse_rank\", None)\n            result[\"found_by\"] = []\n            if \"dense_rank\" in info:\n                result[\"found_by\"].append(\"dense\")\n            if \"sparse_rank\" in info:\n                result[\"found_by\"].append(\"sparse\")\n            final_results.append(result)\n        \n        return final_results",
+          "checkpoint": "Hybrid retrieval'ı sadece dense ve sadece sparse ile karşılaştır. Precision@5 artış gösteriyor mu? Bazı sonuçların sadece sparse, bazılarının sadece dense tarafından bulunduğunu gör.",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nRRF (Reciprocal Rank Fusion) en basit ve en etkili fusion yöntemidir — score normalization gerekmez, rank bazlı çalışır. alpha=0.7 (dense ağırlıklı) çoğu RAG use case'i için iyi başlangıç. found_by field'ı debug için çok değerli — hangi retriever'ın ne bulduğunu gösterir. k=60 orijinal RRF paper'ındaki standart değer.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior alpha parametresini domain'e göre ayarlar: Teknik dökümanlarda (exact term'ler önemli) alpha=0.5, genel metin (anlamsal arama) alpha=0.8. Senior ayrıca 'Learned Sparse Retrieval' (SPLADE) bilir — BM25'in ML versiyonu, query ve document term'lerini expand eder. Elasticsearch'ün ELSER modeli bunu production'da sağlar. RRF alternatifi: Convex Combination (alpha * dense_score + (1-alpha) * sparse_score) — ama score normalization gerektirir."
+        },
+        {
+          "step": 4,
+          "title": "Cross-Encoder Reranking",
+          "why": "Bi-encoder (embedding) retrieval hızlıdır ama query ve document'ı ayrı encode ettiğinden ince anlam farklarını kaçırır. Cross-encoder query-document pair'ini birlikte encode ederek çok daha accurate relevance score üretir. Top-20'yi rerank ederek top-5 kalitesini dramatik artırır.",
+          "instructions": "sentence-transformers kütüphanesini kur. CrossEncoderReranker sınıfı oluştur. cross-encoder/ms-marco-MiniLM-L-6-v2 modelini kullan. Hybrid retrieval sonuçlarını rerank et. Score threshold altındaki sonuçları filtrele.",
+          "code_snippet": "# backend/app/services/retrieval/reranker.py\nfrom sentence_transformers import CrossEncoder\nfrom typing import List, Dict\nimport logging\n\nlogger = logging.getLogger(__name__)\n\nclass CrossEncoderReranker:\n    def __init__(self, model_name: str = \"cross-encoder/ms-marco-MiniLM-L-6-v2\"):\n        self.model = CrossEncoder(model_name, max_length=512)\n        logger.info(f\"Cross-encoder model loaded: {model_name}\")\n    \n    def rerank(\n        self,\n        query: str,\n        results: List[Dict],\n        top_k: int = 5,\n        score_threshold: float = 0.0,\n    ) -> List[Dict]:\n        if not results:\n            return []\n        \n        pairs = [(query, r[\"text\"]) for r in results]\n        scores = self.model.predict(pairs)\n        \n        for i, score in enumerate(scores):\n            results[i][\"rerank_score\"] = float(score)\n            results[i][\"original_rank\"] = i + 1\n        \n        reranked = sorted(results, key=lambda x: x[\"rerank_score\"], reverse=True)\n        reranked = [r for r in reranked if r[\"rerank_score\"] >= score_threshold]\n        reranked = reranked[:top_k]\n        \n        for r in reranked:\n            rank_change = r[\"original_rank\"] - (reranked.index(r) + 1)\n            if abs(rank_change) >= 2:\n                logger.info(\n                    f\"Significant rerank: '{r['text'][:50]}...' \"\n                    f\"moved from #{r['original_rank']} to #{reranked.index(r) + 1}\"\n                )\n        \n        return reranked\n\nclass RetrievalPipeline:\n    def __init__(self, hybrid_retriever: HybridRetriever, reranker: CrossEncoderReranker):\n        self.hybrid = hybrid_retriever\n        self.reranker = reranker\n    \n    def retrieve(\n        self, query: str, collection_name: str, top_k: int = 5, rerank_candidates: int = 20,\n    ) -> List[Dict]:\n        candidates = self.hybrid.search(query, collection_name, n_results=rerank_candidates)\n        reranked = self.reranker.rerank(query, candidates, top_k=top_k)\n        return reranked",
+          "checkpoint": "Reranking öncesi ve sonrası top-5 sonuçları karşılaştır. Sıralama değişti mi? Daha ilgili sonuçlar üste çıktı mı? Cross-encoder inference süresi ne kadar (20 chunk için)?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nCross-encoder bi-encoder'dan 100x yavaş — bu yüzden tüm corpus'a değil, sadece top-20 adaya uygulanır. ms-marco-MiniLM-L-6-v2 hafif ve hızlı, production için yeterli. Score threshold kullan: rerank_score < 0 olan sonuçları atmayı düşün (irrelevant). original_rank vs final_rank karşılaştırması reranking'in etkisini ölçer.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior reranking latency budget'ını bilir: 20 chunk'ı rerank etmek ~50-100ms (GPU), ~200-500ms (CPU). Production'da GPU inference önemli. Cohere Rerank API managed alternatif ($1/1K query). Senior ayrıca 'listwise reranking' bilir — LLM'e tüm sonuçları verip 'en ilgili 5'ini sırala' demek. GPT-4 ile yapılan listwise reranking cross-encoder'dan bile iyi sonuç verebilir ama 10x daha pahalı ve yavaş."
+        },
+        {
+          "step": 5,
+          "title": "Retrieval Kalite Metrikleri ve Logging",
+          "why": "Retrieval kalitesini ölçmeden RAG'in ne kadar iyi çalıştığını bilmek imkansız. Her query için retrieval metrikleri loglayarak sistemin güçlü ve zayıf yönlerini anlayacağız.",
+          "instructions": "RetrievalMetrics sınıfı oluştur. Her query için: retrieval latency, rerank latency, top-1 score, score distribution, retrieval source (dense/sparse/both) logla. PostgreSQL'e query_analytics tablosu ekle.",
+          "code_snippet": "# backend/app/services/retrieval/metrics.py\nimport time\nfrom typing import List, Dict\nfrom dataclasses import dataclass, asdict\n\n@dataclass\nclass RetrievalMetrics:\n    query: str\n    collection_name: str\n    retrieval_latency_ms: float\n    rerank_latency_ms: float\n    total_latency_ms: float\n    num_candidates: int\n    num_results: int\n    top_score: float\n    avg_score: float\n    min_score: float\n    score_spread: float\n    dense_only_count: int\n    sparse_only_count: int\n    both_count: int\n\nclass MetricsCollector:\n    def __init__(self, db_session):\n        self.db = db_session\n    \n    def measure_retrieval(\n        self, pipeline: RetrievalPipeline, query: str, collection_name: str, top_k: int = 5,\n    ) -> tuple:\n        t0 = time.time()\n        candidates = pipeline.hybrid.search(query, collection_name, n_results=20)\n        retrieval_time = (time.time() - t0) * 1000\n        \n        t1 = time.time()\n        results = pipeline.reranker.rerank(query, candidates, top_k=top_k)\n        rerank_time = (time.time() - t1) * 1000\n        \n        scores = [r.get(\"rerank_score\", 0) for r in results]\n        found_by = [set(r.get(\"found_by\", [])) for r in candidates]\n        \n        metrics = RetrievalMetrics(\n            query=query,\n            collection_name=collection_name,\n            retrieval_latency_ms=round(retrieval_time, 1),\n            rerank_latency_ms=round(rerank_time, 1),\n            total_latency_ms=round(retrieval_time + rerank_time, 1),\n            num_candidates=len(candidates),\n            num_results=len(results),\n            top_score=max(scores) if scores else 0,\n            avg_score=sum(scores) / len(scores) if scores else 0,\n            min_score=min(scores) if scores else 0,\n            score_spread=(max(scores) - min(scores)) if scores else 0,\n            dense_only_count=sum(1 for f in found_by if f == {\"dense\"}),\n            sparse_only_count=sum(1 for f in found_by if f == {\"sparse\"}),\n            both_count=sum(1 for f in found_by if f == {\"dense\", \"sparse\"}),\n        )\n        \n        self._save_metrics(metrics)\n        return results, metrics",
+          "checkpoint": "Her query için retrieval metrikleri loglanıyor mu? score_spread düşükse ne anlama geliyor? Ortalama total_latency ne kadar?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nscore_spread retrieval kalitesinin en önemli göstergesi: yüksek spread = sistem ilgili ve ilgisiz sonuçları iyi ayırt ediyor. Düşük spread = ya tüm sonuçlar iyi ya tüm sonuçlar kötü. Retrieval latency budget: toplam 500ms'i geçmemeli. dense_only vs sparse_only oranı hybrid retrieval'ın değerini gösterir.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior 'retrieval observability' kurar: her query için latency, score distribution, source breakdown loglanır ve Grafana/Datadog'da dashboard oluşturulur. Senior P50/P95/P99 latency'leri takip eder — ortalama yanlış bilgi verir. Ayrıca 'retrieval drift' dedektörü kurar: zaman içinde ortalama top-score düşüyorsa, yeni eklenen dökümanlar mevcut embedding space'e uymuyor olabilir."
+        }
+      ],
+      "must_note": "📝 Bu Milestone'dan Çıkarılacak En Önemli Dersler:\n1. Hybrid retrieval (dense + sparse) TEK BAŞINA dense'den %15-25 daha iyi recall sağlar\n2. Cross-encoder reranking top-5 kalitesini dramatik artırır ama yavaş — sadece top-20'ye uygula\n3. RRF fusion en basit ve en etkili fusion yöntemi — score normalization gerekmez\n4. ChromaDB'de cosine similarity kullan (hnsw:space=cosine)\n5. Retrieval metrikleri LOGLA — ölçemediğini iyileştiremezsin\n6. score_spread düşükse retrieval kalitesi kötüdür — chunking veya embedding'i gözden geçir",
+      "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior retrieval pipeline'ını 'funnel' olarak tasarlar: geniş bir havuzdan (BM25 1000 sonuç) -> orta havuz (dense retrieval 100 sonuç) -> dar havuz (reranker 5 sonuç). Her aşama precision'ı artırır ama latency ekler. Senior 'retrieval-augmented retrieval' da uygulayabilir — LLM'e önceki sorgu ve cevabı verip query'yi genişletmesini ister (query expansion). Bu multi-hop reasoning gerektiren sorularda retrieval kalitesini artırır."
+    },
+    {
+      "id": "p07-m4",
+      "title": "LLM Entegrasyonu & Conversational RAG",
+      "overview": "LangChain ile RAG chain oluşturma, prompt template tasarımı, conversational memory (multi-turn Q&A), streaming response ve hallucination azaltma tekniklerini implement edeceğiz.",
+      "estimated_hours": 12,
+      "concepts_covered": [
+        "LangChain RAG chain",
+        "Prompt engineering",
+        "Conversational memory",
+        "Streaming SSE",
+        "Hallucination prevention"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "RAG Prompt Template Tasarımı",
+          "why": "Prompt template RAG'in beynidir — retrieval ile bulunan context'i LLM'e nasıl sunduğun cevap kalitesini doğrudan belirler. Kötü prompt = hallucination, iyi prompt = grounded cevap.",
+          "instructions": "RAG için system prompt ve user prompt template'leri oluştur. System prompt'ta: rol tanımı, cevaplama kuralları (sadece context'ten cevap ver, bilmiyorsan söyle), citation formatı. User prompt'ta: context chunks, soru, önceki konuşma (varsa). Prompt'u Türkçe ve İngilizce dökümanlara uyumlu yaz.",
+          "code_snippet": "# backend/app/services/llm/prompts.py\nfrom langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate\n\nRAG_SYSTEM_PROMPT = \"\"\"Sen bir döküman analiz asistanısın. Kullanıcının sorularını SADECE verilen kaynak dökümanlara dayanarak cevaplamalısın.\n\nKURALLAR:\n1. SADECE aşağıdaki kaynak metinlerde bulunan bilgileri kullan. Kendi bilgini EKLEME.\n2. Her iddiayı kaynak göstererek destekle. Format: [Kaynak: döküman_adı, Sayfa: X]\n3. Eğer kaynak metinlerde sorunun cevabı YOKSA, açıkça \"Bu bilgi mevcut dökümanlarda bulunamadı\" de.\n4. Birden fazla kaynak aynı konuyu ele alıyorsa, hepsine referans ver.\n5. Cevabın emin olmadığın kısımlarını belirt: \"Bu kısım kesin olmamakla birlikte...\"\n6. Teknik terimleri açıkla, jargon kullanma.\n\nCEVAP FORMATI:\n- Kısa ve öz cevap ver (gereksiz uzatma)\n- Madde işaretleri kullan (uygun olduğunda)\n- Her paragrafın sonunda kaynak göster\n- Cevabın sonunda kullanılan kaynakların listesini ver\"\"\"\n\nRAG_USER_PROMPT = \"\"\"KAYNAK METİNLER:\n{context}\n\n---\n\nKULLANICININ SORUSU: {question}\n\nLütfen yukarıdaki kaynak metinlere dayanarak soruyu cevapla. Kaynak göstermeyi unutma.\"\"\"\n\nCONVERSATIONAL_USER_PROMPT = \"\"\"KAYNAK METİNLER:\n{context}\n\n---\n\nÖNCEKİ KONUŞMA:\n{chat_history}\n\n---\n\nKULLANICININ YENİ SORUSU: {question}\n\nÖnceki konuşma bağlamını da dikkate alarak, kaynak metinlere dayanarak soruyu cevapla.\"\"\"\n\ndef build_rag_prompt(with_history: bool = False) -> ChatPromptTemplate:\n    if with_history:\n        return ChatPromptTemplate.from_messages([\n            SystemMessagePromptTemplate.from_template(RAG_SYSTEM_PROMPT),\n            HumanMessagePromptTemplate.from_template(CONVERSATIONAL_USER_PROMPT),\n        ])\n    return ChatPromptTemplate.from_messages([\n        SystemMessagePromptTemplate.from_template(RAG_SYSTEM_PROMPT),\n        HumanMessagePromptTemplate.from_template(RAG_USER_PROMPT),\n    ])\n\ndef format_context(retrieved_chunks: list) -> str:\n    context_parts = []\n    for i, chunk in enumerate(retrieved_chunks, 1):\n        doc_name = chunk[\"metadata\"].get(\"filename\", \"Bilinmeyen\")\n        page = chunk[\"metadata\"].get(\"page_number\", \"?\")\n        context_parts.append(\n            f\"[Kaynak {i}: {doc_name}, Sayfa {page}]\\n{chunk['text']}\\n\"\n        )\n    return \"\\n---\\n\".join(context_parts)",
+          "checkpoint": "Prompt template'i manual olarak test et: 3 chunk ve bir soru ile LLM'e gönder. Cevap kaynak gösteriyor mu? Kaynakta olmayan bilgi ekliyor mu (hallucination)?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nSystem prompt'taki 'SADECE kaynak metinleri kullan' ifadesi hallucination'ı önlemenin ilk savunma hattı. 'Bilmiyorsan söyle' kuralı çok önemli — LLM'ler varsayılan olarak cevap uydurmaya meyillidir. Context format'ında [Kaynak X] numaralandırması LLM'in citation yapmasını kolaylaştırır. Prompt iteratif geliştirilir — ilk versiyon mükemmel olmaz, test et ve iyileştir.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior prompt engineering'de 'few-shot examples' ekler: system prompt'a 2-3 örnek soru-cevap koymak LLM'in cevap formatını anlamasını sağlar. Senior ayrıca 'chain of thought' (CoT) prompt kullanabilir: LLM'den önce ilgili kaynakları listelemesini, sonra cevap vermesini ister. Bu 'retrieval-then-generate' pattern'ı hallucination'ı azaltır. Production'da prompt versiyonlama (prompt registry) yapılır — hangi prompt versiyonunun daha iyi cevap verdiğini A/B test ile ölçersin."
+        },
+        {
+          "step": 2,
+          "title": "LangChain RAG Chain Implementasyonu",
+          "why": "LangChain'in chain abstraction'ı retrieval, context formatting ve LLM generation adımlarını tek bir pipeline'da birleştirir. Bu modüler yaklaşım her adımın bağımsız test edilmesini ve değiştirilmesini sağlar.",
+          "instructions": "RAGChain sınıfı oluştur. RetrievalPipeline'dan chunk'ları al, context'e format et, prompt template'e yerleştir, OpenAI'a gönder, cevabı parse et. Citation'ları ayrıştır. Confidence score hesapla.",
+          "code_snippet": "# backend/app/services/llm/rag_chain.py\nfrom langchain_openai import ChatOpenAI\nfrom langchain_core.messages import HumanMessage, SystemMessage\nfrom typing import List, Dict, Optional\nimport re\nimport logging\n\nlogger = logging.getLogger(__name__)\n\nclass RAGChain:\n    def __init__(\n        self,\n        retrieval_pipeline: RetrievalPipeline,\n        model: str = \"gpt-4o-mini\",\n        temperature: float = 0.1,\n    ):\n        self.retrieval = retrieval_pipeline\n        self.llm = ChatOpenAI(model=model, temperature=temperature)\n    \n    async def answer(\n        self,\n        question: str,\n        collection_name: str,\n        chat_history: Optional[List[Dict]] = None,\n        top_k: int = 5,\n    ) -> Dict:\n        retrieved = self.retrieval.retrieve(\n            query=question, collection_name=collection_name, top_k=top_k,\n        )\n        \n        if not retrieved:\n            return {\n                \"answer\": \"Bu koleksiyonda sorunuzla ilgili bilgi bulunamadı.\",\n                \"sources\": [], \"confidence\": 0,\n            }\n        \n        context = format_context(retrieved)\n        \n        if chat_history:\n            history_str = self._format_history(chat_history)\n            prompt = build_rag_prompt(with_history=True)\n            messages = prompt.format_messages(\n                context=context, chat_history=history_str, question=question,\n            )\n        else:\n            prompt = build_rag_prompt(with_history=False)\n            messages = prompt.format_messages(context=context, question=question)\n        \n        response = await self.llm.ainvoke(messages)\n        answer_text = response.content\n        citations = self._extract_citations(answer_text, retrieved)\n        confidence = self._calculate_confidence(retrieved, answer_text)\n        \n        return {\n            \"answer\": answer_text,\n            \"sources\": citations,\n            \"confidence\": confidence,\n            \"retrieved_chunks\": [\n                {\"text\": r[\"text\"][:200], \"score\": r.get(\"rerank_score\", 0), \"metadata\": r[\"metadata\"]}\n                for r in retrieved\n            ],\n        }\n    \n    def _format_history(self, history: List[Dict]) -> str:\n        lines = []\n        for msg in history[-6:]:\n            role = \"Kullanıcı\" if msg[\"role\"] == \"user\" else \"Asistan\"\n            lines.append(f\"{role}: {msg['content']}\")\n        return \"\\n\".join(lines)\n    \n    def _extract_citations(self, answer: str, retrieved: List[Dict]) -> List[Dict]:\n        citations = []\n        pattern = r'\\[Kaynak[:\\s]*(\\d+)'\n        matches = re.findall(pattern, answer)\n        for match in set(matches):\n            idx = int(match) - 1\n            if 0 <= idx < len(retrieved):\n                chunk = retrieved[idx]\n                citations.append({\n                    \"source_index\": idx + 1,\n                    \"document\": chunk[\"metadata\"].get(\"filename\", \"?\"),\n                    \"page\": chunk[\"metadata\"].get(\"page_number\", \"?\"),\n                    \"text_preview\": chunk[\"text\"][:150],\n                    \"relevance_score\": chunk.get(\"rerank_score\", 0),\n                })\n        return citations\n    \n    def _calculate_confidence(self, retrieved: List[Dict], answer: str) -> int:\n        if not retrieved:\n            return 0\n        \n        top_score = max(r.get(\"rerank_score\", 0) for r in retrieved)\n        score_factor = min(40, int(top_score * 40))\n        \n        scores = [r.get(\"rerank_score\", 0) for r in retrieved]\n        spread = max(scores) - min(scores) if len(scores) > 1 else 0\n        spread_factor = min(20, int(spread * 30))\n        \n        not_found_penalty = -30 if \"bulunamadı\" in answer.lower() else 0\n        \n        citation_count = len(re.findall(r'\\[Kaynak', answer))\n        citation_factor = min(20, citation_count * 5)\n        \n        length_factor = min(20, len(answer) // 20)\n        \n        confidence = max(0, min(100,\n            score_factor + spread_factor + not_found_penalty + citation_factor + length_factor\n        ))\n        return confidence",
+          "checkpoint": "Bir döküman yükle, soru sor, cevap kaynak gösteriyor mu? Confidence score makul mu? Citation parse doğru çalışıyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\ntemperature=0.1 kullan, 0.7 değil! RAG'de yaratıcılık istemiyoruz, kaynağa sadık cevap istiyoruz. Chat history'yi son 3 turla sınırla — çok uzun history token maliyetini artırır ve LLM'in dikkatini dağıtır. Confidence score heuristic-based — production'da kalibrasyon gerekir.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior LLM chain'inde 'guardrails' ekler: 1) Input guardrail: prompt injection tespiti, 2) Output guardrail: PII tespiti (cevap kişisel veri içeriyorsa maskele), 3) Relevance guardrail: cevap context'ten mi üretildi kontrol et. Senior ayrıca 'LLM judge' pattern'ı uygulayabilir — başka bir LLM call'ı ile cevap kalitesini değerlendir. Bu pahalı ama high-stakes uygulamalarda gerekli."
+        },
+        {
+          "step": 3,
+          "title": "Conversational Memory ve Multi-Turn Q&A",
+          "why": "Kullanıcılar genellikle tek soru sormaz — takip sorusu sorar: 'Bunu daha detaylı açıklar mısın?', 'Önceki sorumdaki konu hakkında...'. Conversational memory olmadan her soru bağımsız işlenir ve bağlam kaybolur.",
+          "instructions": "ConversationManager sınıfı oluştur. Chat session'ları PostgreSQL'de sakla. Her yeni soruda önceki mesajları context'e ekle. 'Condensed question' tekniği uygula — LLM'e önceki konuşma + yeni soruyu verip bağımsız (standalone) soru oluşturmasını iste. Bu standalone soru retrieval için kullanılır.",
+          "code_snippet": "# backend/app/services/llm/conversation.py\nfrom typing import List, Dict, Optional\nfrom uuid import uuid4\n\nCONDENSE_PROMPT = \"\"\"Aşağıdaki konuşma geçmişi ve yeni soruyu okuyarak, yeni soruyu BAĞIMSIZ bir soru haline getir.\nYani önceki konuşmaya bakmadan anlaşılabilecek şekilde yeniden yaz.\nEğer yeni soru zaten bağımsızsa, olduğu gibi bırak.\n\nKONUŞMA GEÇMİŞİ:\n{chat_history}\n\nYENİ SORU: {question}\n\nBAĞIMSIZ SORU:\"\"\"\n\nclass ConversationManager:\n    def __init__(self, rag_chain: RAGChain, db_session):\n        self.rag_chain = rag_chain\n        self.db = db_session\n        self.llm = ChatOpenAI(model=\"gpt-4o-mini\", temperature=0)\n    \n    async def ask(\n        self,\n        question: str,\n        session_id: Optional[str] = None,\n        collection_name: str = \"default\",\n    ) -> Dict:\n        if not session_id:\n            session_id = str(uuid4())\n            self._create_session(session_id, collection_name)\n        \n        history = self._get_history(session_id)\n        \n        if history:\n            standalone_question = await self._condense_question(question, history)\n        else:\n            standalone_question = question\n        \n        result = await self.rag_chain.answer(\n            question=standalone_question,\n            collection_name=collection_name,\n            chat_history=history,\n        )\n        \n        self._save_message(session_id, \"user\", question)\n        self._save_message(\n            session_id, \"assistant\", result[\"answer\"],\n            sources=result[\"sources\"], confidence=result[\"confidence\"],\n        )\n        \n        return {\n            \"session_id\": session_id,\n            \"original_question\": question,\n            \"standalone_question\": standalone_question,\n            **result,\n        }\n    \n    async def _condense_question(self, question: str, history: List[Dict]) -> str:\n        history_str = \"\\n\".join(\n            f\"{'Kullanıcı' if m['role'] == 'user' else 'Asistan'}: {m['content']}\"\n            for m in history[-6:]\n        )\n        response = await self.llm.ainvoke([\n            HumanMessage(content=CONDENSE_PROMPT.format(\n                chat_history=history_str, question=question,\n            ))\n        ])\n        return response.content.strip()\n    \n    def _get_history(self, session_id: str) -> List[Dict]:\n        messages = self.db.query(ChatMessage)\\\n            .filter(ChatMessage.session_id == session_id)\\\n            .order_by(ChatMessage.created_at).all()\n        return [{\"role\": m.role, \"content\": m.content} for m in messages]\n    \n    def _save_message(self, session_id, role, content, sources=None, confidence=None):\n        msg = ChatMessage(\n            id=str(uuid4()), session_id=session_id,\n            role=role, content=content,\n            sources=sources, confidence=confidence,\n        )\n        self.db.add(msg)\n        self.db.commit()",
+          "checkpoint": "3 turlu bir konuşma yap: 1) 'X nedir?', 2) 'Daha detaylı açıkla', 3) 'Bununla Y arasındaki fark ne?'. Standalone soru doğru oluşturuluyor mu? Bağlam korunuyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nCondensed question tekniği RAG'de conversational memory'nin EN ÖNEMLİ pattern'idir. 'Daha detaylı açıkla' gibi bir soru, önceki bağlam olmadan retrieval'da hiç bir şey bulamaz. Standalone soruya çevirmek retrieval kalitesini korur. History'yi 6 mesajla sınırla (3 tur) — fazlası token israfı. Condensed question için ayrı bir LLM call yapılır — bu maliyet artırır ama kaliteyi dramatik artırır.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior 'conversation boundaries' tasarlar: 1) Max turns (10 tur sonra yeni session öner), 2) Topic drift detection (konu değiştiğinde eski history'yi temizle), 3) Memory summarization (uzun history'yi özetle, tam tutma). LangChain'in ConversationSummaryBufferMemory bunu destekler. Senior ayrıca 'rephrase + retrieve + generate + verify' pattern'larını karşılaştırır — verify adımında LLM üretilen cevabı context'e karşı doğrular."
+        },
+        {
+          "step": 4,
+          "title": "Streaming Response (Server-Sent Events)",
+          "why": "LLM cevapları 5-15 saniye sürebilir. Kullanıcının tüm cevabı beklemesi kötü UX. Streaming ile token token göstermek (ChatGPT gibi) kullanıcı deneyimini dramatik iyileştirir.",
+          "instructions": "FastAPI'de SSE (Server-Sent Events) endpoint oluştur. LangChain streaming callback'lerini kullan. Frontend'de EventSource API ile stream'i dinle. Her token geldiğinde UI'a ekle.",
+          "code_snippet": "# backend/app/api/chat.py\nfrom fastapi import APIRouter\nfrom fastapi.responses import StreamingResponse\nimport json\nimport asyncio\n\nrouter = APIRouter(prefix=\"/api/chat\", tags=[\"chat\"])\n\n@router.post(\"/stream\")\nasync def stream_answer(\n    request: ChatRequest,\n    conversation: ConversationManager = Depends(get_conversation),\n):\n    async def event_generator():\n        standalone_q = await conversation._condense_question(\n            request.question,\n            conversation._get_history(request.session_id) if request.session_id else []\n        ) if request.session_id else request.question\n        \n        retrieved = conversation.rag_chain.retrieval.retrieve(\n            query=standalone_q, collection_name=request.collection_name,\n        )\n        \n        sources = [\n            {\n                \"document\": r[\"metadata\"].get(\"filename\", \"?\"),\n                \"page\": r[\"metadata\"].get(\"page_number\", \"?\"),\n                \"score\": r.get(\"rerank_score\", 0),\n                \"preview\": r[\"text\"][:100],\n            }\n            for r in retrieved\n        ]\n        yield f\"data: {json.dumps({'type': 'sources', 'data': sources})}\\n\\n\"\n        \n        context = format_context(retrieved)\n        prompt = build_rag_prompt().format_messages(\n            context=context, question=standalone_q\n        )\n        \n        full_answer = \"\"\n        async for chunk in conversation.rag_chain.llm.astream(prompt):\n            token = chunk.content\n            if token:\n                full_answer += token\n                yield f\"data: {json.dumps({'type': 'token', 'data': token})}\\n\\n\"\n        \n        confidence = conversation.rag_chain._calculate_confidence(retrieved, full_answer)\n        yield f\"data: {json.dumps({'type': 'done', 'data': {'confidence': confidence}})}\\n\\n\"\n        \n        conversation._save_message(request.session_id, \"user\", request.question)\n        conversation._save_message(\n            request.session_id, \"assistant\", full_answer,\n            sources=sources, confidence=confidence\n        )\n    \n    return StreamingResponse(\n        event_generator(),\n        media_type=\"text/event-stream\",\n        headers={\"Cache-Control\": \"no-cache\", \"Connection\": \"keep-alive\"}\n    )",
+          "checkpoint": "Soru sorduğunda cevap token token ekranda beliriyor mu? Sources ilk başta gelip sidebar'da gösteriliyor mu? Stream bittiğinde confidence gösteriliyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nSSE (Server-Sent Events) WebSocket'ten basit ama tek yönlü — server'dan client'a. RAG için yeterli çünkü client sadece soru gönderir, cevabı dinler. 3 event tipi tasarla: 'sources' (retrieval sonuçları), 'token' (LLM tokenleri), 'done' (bitiş ve metadata). Cache-Control: no-cache header'ı zorunlu — proxy'ler SSE'yi cache'lememeli.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior streaming'de 'time to first token' (TTFT) optimize eder: retrieval + reranking süresini azaltmak TTFT'yi düşürür. Senior ayrıca 'structured streaming' uygular — LLM output'unu parse ederken citation'ları real-time çıkarır. Production'da streaming bağlantı kopabilir — client reconnection ve partial response recovery mekanizması gerekir."
+        }
+      ],
+      "must_note": "📝 Bu Milestone'dan Çıkarılacak En Önemli Dersler:\n1. temperature=0.1 kullan RAG'de — yaratıcılık istemiyoruz, doğruluk istiyoruz\n2. Condensed question ZORUNLU — 'Bunu açıkla' gibi sorular retrieval'da hiç bir şey bulamaz\n3. System prompt'ta 'bilmiyorsan söyle' kuralı hallucination'ın ilk savunması\n4. Streaming UX'i 10x iyileştirir — tüm cevabı beklettirme\n5. Confidence score heuristic-based başlat, sonra kalibre et\n6. Chat history'yi sınırla — uzun history = yüksek maliyet + düşük kalite",
+      "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior RAG chain'inde 'routing' ekler: farklı soru tipleri farklı stratejiler gerektirir. 'Özetle' sorusu tüm dökümanın chunk'larını gerektirir (map-reduce), 'X nedir?' sorusu tek chunk yeter, karşılaştırma sorusu birden fazla döküman gerektirir. LangChain'in RouterChain pattern'ı bunu implement eder. Senior ayrıca 'self-RAG' pattern'ını bilir — LLM önce 'retrieval gerekli mi?' diye karar verir, sonra retrieve eder, sonra 'cevap ilgili mi?' diye kontrol eder."
+    },
+    {
+      "id": "p07-m5",
+      "title": "Gelişmiş Özellikler",
+      "overview": "Multi-document Q&A, source citation ile sayfa numarası gösterimi, confidence scoring kalibrasyonu ve kullanıcı feedback loop'u ile retrieval kalitesini sürekli iyileştirme mekanizmalarını implement edeceğiz.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "Multi-document retrieval",
+        "Citation extraction",
+        "Confidence calibration",
+        "Feedback loop",
+        "Query analytics"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Multi-Document Retrieval ve Cross-Document Q&A",
+          "why": "Gerçek dünyada kullanıcılar tek döküman değil, bir koleksiyondaki tüm dökümanları sorgulamak ister. Multi-document retrieval chunk'ları birden fazla dökümandan getirir ve LLM'in bunları sentezlemesini gerektirir.",
+          "instructions": "Collection bazlı retrieval'ı implement et — soru koleksiyondaki TÜM dökümanlarda aranır. Sonuçları döküman bazında grupla. LLM'e her dökümanın adını ve ilgili chunk'larını ver. Cross-document comparison prompt'u ekle.",
+          "code_snippet": "# backend/app/services/llm/multi_doc.py\nfrom typing import List, Dict\nfrom collections import defaultdict\n\nclass MultiDocumentRAG:\n    def __init__(self, rag_chain: RAGChain):\n        self.rag_chain = rag_chain\n    \n    async def cross_document_answer(\n        self, question: str, collection_name: str,\n        top_k_per_doc: int = 3, max_docs: int = 5,\n    ) -> Dict:\n        all_results = self.rag_chain.retrieval.retrieve(\n            query=question, collection_name=collection_name,\n            top_k=top_k_per_doc * max_docs,\n        )\n        \n        doc_groups = defaultdict(list)\n        for result in all_results:\n            doc_name = result[\"metadata\"].get(\"filename\", \"unknown\")\n            doc_groups[doc_name].append(result)\n        \n        diverse_results = []\n        for doc_name, chunks in doc_groups.items():\n            sorted_chunks = sorted(chunks, key=lambda x: x.get(\"rerank_score\", 0), reverse=True)\n            diverse_results.extend(sorted_chunks[:top_k_per_doc])\n        \n        context_parts = []\n        for doc_name, chunks in doc_groups.items():\n            doc_context = f\"\\n=== DÖKÜMAN: {doc_name} ===\\n\"\n            for chunk in chunks[:top_k_per_doc]:\n                page = chunk[\"metadata\"].get(\"page_number\", \"?\")\n                doc_context += f\"[Sayfa {page}]\\n{chunk['text']}\\n---\\n\"\n            context_parts.append(doc_context)\n        \n        formatted_context = \"\\n\\n\".join(context_parts)\n        prompt = build_rag_prompt().format_messages(\n            context=formatted_context, question=question,\n        )\n        response = await self.rag_chain.llm.ainvoke(prompt)\n        \n        return {\n            \"answer\": response.content,\n            \"documents_used\": list(doc_groups.keys()),\n            \"total_sources\": len(diverse_results),\n            \"per_document_sources\": {doc: len(chunks) for doc, chunks in doc_groups.items()},\n        }",
+          "checkpoint": "3 farklı döküman yükle ve koleksiyonu sorgula. Cevap birden fazla dökümandan bilgi içeriyor mu? Her dökümanın adı kaynak olarak gösteriliyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nMulti-document retrieval'da 'diversity' önemli: Top-10 sonucun hepsi aynı dökümandan gelirse, diğer dökümanlar görünmez. top_k_per_doc ile her dökümandan en az birkaç chunk al. Context format'ında döküman sınırları (=== DÖKÜMAN ===) LLM'in hangi bilginin hangi dökümandan geldiğini anlamasını sağlar.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior multi-document Q&A'da 'map-reduce' pattern'ı kullanır: Her döküman için ayrı cevap üret (map), sonra tüm cevapları birleştir (reduce). Bu pattern uzun döküman koleksiyonlarında context window limitini aşar. LangChain'in MapReduceDocumentsChain bunu implement eder. Senior ayrıca 'document routing' yapar: soru hangi dökümana yönlendirilmeli? Metadata-based routing ile ilgisiz dökümanları erken eler."
+        },
+        {
+          "step": 2,
+          "title": "Source Citation Engine",
+          "why": "RAG'in en önemli farkı LLM'in kaynak gösterebilmesi. Ama 'Kaynak 1' yazmak yetmez — kullanıcının doğru dökümanın doğru sayfasına gidebilmesi gerekir. Detaylı citation güvenilirlik ve doğrulanabilirlik sağlar.",
+          "instructions": "CitationEngine sınıfı oluştur. LLM cevabındaki citation referanslarını parse et. Her citation için: döküman adı, sayfa numarası, ilgili text parçası, relevance score. Citation'ları clickable link olarak frontend'e gönder.",
+          "code_snippet": "# backend/app/services/citation.py\nimport re\nfrom typing import List, Dict\nfrom dataclasses import dataclass\n\n@dataclass\nclass Citation:\n    source_index: int\n    document_name: str\n    page_number: int\n    cited_text: str\n    chunk_text: str\n    relevance_score: float\n    start_char: int\n    end_char: int\n\nclass CitationEngine:\n    def extract_citations(\n        self, answer: str, retrieved_chunks: List[Dict],\n    ) -> List[Citation]:\n        citations = []\n        patterns = [\n            r'\\[Kaynak:\\s*(.+?),\\s*Sayfa:\\s*(\\d+)\\]',\n            r'\\[Kaynak\\s*(\\d+)\\]',\n        ]\n        \n        for pattern in patterns:\n            for match in re.finditer(pattern, answer):\n                if len(match.groups()) == 2:\n                    doc_name = match.group(1)\n                    page = int(match.group(2))\n                    chunk = self._find_matching_chunk(retrieved_chunks, doc_name, page)\n                elif len(match.groups()) == 1:\n                    idx = int(match.group(1)) - 1\n                    if 0 <= idx < len(retrieved_chunks):\n                        chunk = retrieved_chunks[idx]\n                        doc_name = chunk[\"metadata\"].get(\"filename\", \"?\")\n                        page = chunk[\"metadata\"].get(\"page_number\", 0)\n                    else:\n                        continue\n                else:\n                    continue\n                \n                if chunk:\n                    citations.append(Citation(\n                        source_index=len(citations) + 1,\n                        document_name=doc_name,\n                        page_number=page,\n                        cited_text=self._extract_surrounding_text(answer, match.start(), 100),\n                        chunk_text=chunk[\"text\"],\n                        relevance_score=chunk.get(\"rerank_score\", 0),\n                        start_char=match.start(),\n                        end_char=match.end(),\n                    ))\n        return citations\n    \n    def _find_matching_chunk(self, chunks, doc_name, page):\n        for chunk in chunks:\n            if (chunk[\"metadata\"].get(\"filename\", \"\") == doc_name and\n                chunk[\"metadata\"].get(\"page_number\", 0) == page):\n                return chunk\n        return None\n    \n    def _extract_surrounding_text(self, text, position, radius):\n        start = max(0, position - radius)\n        end = min(len(text), position + radius)\n        return text[start:end].strip()\n    \n    def format_citations_for_frontend(self, citations: List[Citation]) -> List[Dict]:\n        return [\n            {\n                \"index\": c.source_index, \"document\": c.document_name,\n                \"page\": c.page_number, \"preview\": c.chunk_text[:200],\n                \"score\": round(c.relevance_score, 3), \"highlight_text\": c.cited_text,\n            }\n            for c in citations\n        ]",
+          "checkpoint": "Cevaptaki citation'lar doğru dökümana ve sayfaya işaret ediyor mu? Frontend'de citation'a tıklanınca ilgili text highlight ediliyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nCitation doğruluğu RAG'in güvenilirliğini belirler. LLM bazen yanlış citation üretebilir (halüsinasyon: var olmayan Sayfa 42'ye referans). _find_matching_chunk ile citation'ları retrieved chunk'larla doğrula — eşleşmeyen citation'ları işaretle. Frontend'de citation'lar clickable olmalı.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior 'citation grounding' uygular: LLM'in ürettiği her iddia için, o iddianın hangi chunk'tan geldiği otomatik doğrulanır. Eğer LLM retrieved chunk'larda olmayan bir şey söylüyorsa, bu hallucination'dır ve warning ile işaretlenir. Microsoft'un GroundedBot pattern'ı bunu implement eder."
+        },
+        {
+          "step": 3,
+          "title": "Confidence Scoring Kalibrasyonu",
+          "why": "Heuristic confidence score başlangıç için yeterli ama kalibre edilmemiş: %80 confidence gösteren cevapların gerçekten %80'i doğru mu? Kalibrasyon ile confidence score'un gerçek doğruluk oranını yansıtmasını sağlayacağız.",
+          "instructions": "Feedback verileriyle confidence kalibrasyonu yap. Kullanıcı feedback'lerini (thumbs up/down) topla. Her confidence bin'i (0-20, 20-40, ...) için doğru cevap oranını hesapla. Kalibrasyon eğrisi çiz. ECE (Expected Calibration Error) hesapla.",
+          "code_snippet": "# backend/app/services/confidence_calibrator.py\nfrom typing import List, Dict\nimport numpy as np\n\nclass ConfidenceCalibrator:\n    def __init__(self):\n        self.calibration_map = {}\n    \n    def calibrate(self, feedback_data: List[Dict]) -> Dict:\n        bins = {}\n        for item in feedback_data:\n            bin_key = (item[\"confidence\"] // 10) * 10\n            if bin_key not in bins:\n                bins[bin_key] = {\"total\": 0, \"correct\": 0}\n            bins[bin_key][\"total\"] += 1\n            if item[\"is_correct\"]:\n                bins[bin_key][\"correct\"] += 1\n        \n        calibration = {}\n        for bin_key, counts in sorted(bins.items()):\n            accuracy = counts[\"correct\"] / counts[\"total\"] if counts[\"total\"] > 0 else 0\n            calibration[bin_key] = {\n                \"predicted_confidence\": bin_key + 5,\n                \"actual_accuracy\": round(accuracy * 100, 1),\n                \"sample_count\": counts[\"total\"],\n                \"gap\": round((bin_key + 5) - (accuracy * 100), 1),\n            }\n        \n        self.calibration_map = calibration\n        \n        total_samples = sum(c[\"sample_count\"] for c in calibration.values())\n        ece = sum(\n            c[\"sample_count\"] / total_samples * abs(c[\"gap\"])\n            for c in calibration.values() if c[\"sample_count\"] > 0\n        )\n        \n        return {\n            \"calibration\": calibration,\n            \"ece\": round(ece, 2),\n            \"total_feedback\": len(feedback_data),\n        }\n    \n    def adjust_confidence(self, raw_confidence: int) -> int:\n        if not self.calibration_map:\n            return raw_confidence\n        bin_key = (raw_confidence // 10) * 10\n        if bin_key in self.calibration_map:\n            return int(self.calibration_map[bin_key][\"actual_accuracy\"])\n        return raw_confidence",
+          "checkpoint": "En az 50 feedback topladıktan sonra kalibrasyon çalıştır. ECE değeri ne? Kalibrasyon öncesi ve sonrası confidence score'ları karşılaştır.",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nECE (Expected Calibration Error) confidence kalibrasyonunun standart metriği — düşük ECE = iyi kalibre edilmiş. Minimum 50 feedback toplamadan kalibrasyon yapma (istatistiksel olarak anlamlı değil). Kalibrasyon periyodik tekrarlanmalı — yeni dökümanlar eklendikçe dağılım değişir.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior 'uncertainty quantification' konusuna derinleşir: LLM token-level log probability'lerini kullanarak daha granüler confidence hesaplayabilir. Düşük probability token'lar = LLM emin değil. Senior ayrıca 'abstention' mekanizması ekler: confidence çok düşükse, LLM cevap vermek yerine 'Bu soruyu güvenle cevaplayamıyorum' der. Bu 'knowing what you don't know' pattern'ı enterprise RAG'de kritik."
+        },
+        {
+          "step": 4,
+          "title": "Feedback Loop ve Retrieval İyileştirme",
+          "why": "Kullanıcı feedback'i RAG sisteminin sürekli iyileşmesini sağlar. Negatif feedback alan cevapları analiz ederek retrieval ve generation kalitesini artıracağız. Bu closed-loop optimization production AI sistemlerinin temelidir.",
+          "instructions": "Thumbs up/down feedback endpoint'i oluştur. Negatif feedback'li sorguları analiz et: retrieval mi kötü (yanlış chunk'lar) yoksa generation mi kötü (doğru chunk ama yanlış cevap)? Query analytics dashboard'u oluştur.",
+          "code_snippet": "# backend/app/services/feedback.py\nfrom typing import List, Dict, Optional\nfrom datetime import datetime, timedelta\n\nclass FeedbackAnalyzer:\n    def __init__(self, db_session):\n        self.db = db_session\n    \n    async def submit_feedback(\n        self, message_id: str, rating: str, comment: Optional[str] = None,\n    ) -> Dict:\n        feedback = QueryFeedback(\n            id=str(uuid4()), message_id=message_id,\n            rating=rating, comment=comment,\n        )\n        self.db.add(feedback)\n        self.db.commit()\n        \n        if rating == \"negative\":\n            return await self._analyze_negative(message_id)\n        return {\"status\": \"recorded\"}\n    \n    async def _analyze_negative(self, message_id: str) -> Dict:\n        message = self.db.query(ChatMessage).filter(ChatMessage.id == message_id).first()\n        if not message or not message.sources:\n            return {\"analysis\": \"insufficient_data\"}\n        \n        sources = message.sources\n        avg_score = sum(s.get(\"score\", 0) for s in sources) / len(sources) if sources else 0\n        \n        if avg_score < 0.3:\n            cause = \"retrieval_failure\"\n            suggestion = \"Chunking stratejisini veya embedding modelini gözden geçir\"\n        elif avg_score < 0.6:\n            cause = \"partial_retrieval\"\n            suggestion = \"Hybrid retrieval alpha değerini ayarla veya daha fazla chunk getir\"\n        else:\n            cause = \"generation_failure\"\n            suggestion = \"Prompt template'i iyileştir veya temperature'ı düşür\"\n        \n        return {\n            \"analysis\": cause,\n            \"avg_retrieval_score\": round(avg_score, 3),\n            \"suggestion\": suggestion,\n        }\n    \n    def get_analytics(self, days: int = 30) -> Dict:\n        since = datetime.utcnow() - timedelta(days=days)\n        total_queries = self.db.query(ChatMessage)\\\n            .filter(ChatMessage.role == \"user\", ChatMessage.created_at >= since).count()\n        feedbacks = self.db.query(QueryFeedback)\\\n            .filter(QueryFeedback.created_at >= since).all()\n        positive = sum(1 for f in feedbacks if f.rating == \"positive\")\n        negative = sum(1 for f in feedbacks if f.rating == \"negative\")\n        \n        return {\n            \"period_days\": days,\n            \"total_queries\": total_queries,\n            \"feedback_count\": len(feedbacks),\n            \"feedback_rate\": f\"{len(feedbacks) / max(total_queries, 1) * 100:.1f}%\",\n            \"satisfaction_rate\": f\"{positive / max(len(feedbacks), 1) * 100:.1f}%\",\n            \"positive\": positive,\n            \"negative\": negative,\n        }",
+          "checkpoint": "Thumbs down verdikten sonra root cause analizi doğru mu? Analytics dashboard sorgu istatistiklerini gösteriyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nFeedback loop olmadan RAG sistemi statiktir — iyileşmez. Root cause classification (retrieval vs generation failure) ÇOK önemli: iki farklı problem, iki farklı çözüm gerektirir. avg_score < 0.3 = retrieval problemi, avg_score > 0.6 = generation problemi. Feedback rate %5-10 civarında normal.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior feedback loop'u 'RLHF-lite' olarak görür. Production'da negatif feedback'li query-chunk pair'lerini hard negative olarak embedding fine-tuning'de kullanır. Bu 'active learning' pattern'idir. Senior ayrıca 'query clustering' yapar: benzer soruları gruplar ve en çok sorulan ama en kötü cevaplanan soruları öncelikli iyileştirir. Pareto prensibi: soruların %20'si problemlerin %80'ini oluşturur."
+        }
+      ],
+      "must_note": "📝 Bu Milestone'dan Çıkarılacak En Önemli Dersler:\n1. Multi-document retrieval'da diversity sağla — tüm sonuçlar aynı dökümandan gelmesin\n2. Citation doğrulama ZORUNLU — LLM halüsinatif citation üretebilir\n3. Confidence kalibrasyonu yapılmadan kullanıcıya gösterilen confidence YANILTICI olabilir\n4. Feedback loop RAG'in continuous improvement mekanizması — OLMADAN sistem statik kalır\n5. Root cause analysis: retrieval failure vs generation failure AYRI problemler",
+      "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior gelişmiş RAG özelliklerinde 'evaluation-driven development' uygular: her feature'dan önce evaluation metriği tanımlanır, feature sonrası metrik ölçülür. RAGAS framework'ü standart metrikler sunar: faithfulness, answer relevancy, context precision, context recall. Senior bu metrikleri CI/CD pipeline'ına entegre eder — yeni deployment öncesi RAG kalitesi otomatik test edilir."
+    },
+    {
+      "id": "p07-m6",
+      "title": "Frontend UI & Production Optimization",
+      "overview": "React ile profesyonel chat interface oluşturma, streaming gösterimi, döküman yönetim sayfası, caching, Docker ile deployment ve monitoring/logging altyapısı kurma.",
+      "estimated_hours": 12,
+      "concepts_covered": [
+        "React chat UI",
+        "SSE consumption",
+        "Document management UI",
+        "Docker deployment",
+        "Caching",
+        "Monitoring"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Chat Interface ve Streaming UI",
+          "why": "ChatGPT benzeri bir arayüz kullanıcıların en aşina olduğu Q&A deneyimi. Streaming token gösterimi, citation sidebar ve confidence gösterimi profesyonel bir AI ürünü izlenimi yaratır.",
+          "instructions": "ChatPage component'i oluştur. EventSource API ile streaming cevapları dinle. Token geldiğinde animasyonlu göster (typing effect). Citation'ları sağ sidebar'da listele. Confidence bar ekle. Thumbs up/down butonları ekle.",
+          "code_snippet": "// frontend/src/components/ChatInterface.tsx\nimport { useState, useRef, useEffect } from 'react';\n\ninterface Message {\n  id: string;\n  role: 'user' | 'assistant';\n  content: string;\n  sources?: Source[];\n  confidence?: number;\n  isStreaming?: boolean;\n}\n\nexport function ChatInterface({ collectionId }: { collectionId: string }) {\n  const [messages, setMessages] = useState<Message[]>([]);\n  const [input, setInput] = useState('');\n  const [isLoading, setIsLoading] = useState(false);\n  const [sessionId, setSessionId] = useState<string | null>(null);\n  const messagesEndRef = useRef<HTMLDivElement>(null);\n\n  const handleSubmit = async (e: React.FormEvent) => {\n    e.preventDefault();\n    if (!input.trim() || isLoading) return;\n\n    const userMessage: Message = { id: crypto.randomUUID(), role: 'user', content: input };\n    setMessages(prev => [...prev, userMessage]);\n    setInput('');\n    setIsLoading(true);\n\n    const assistantId = crypto.randomUUID();\n    setMessages(prev => [...prev, {\n      id: assistantId, role: 'assistant', content: '', isStreaming: true\n    }]);\n\n    try {\n      const response = await fetch('/api/chat/stream', {\n        method: 'POST',\n        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify({\n          question: input, collection_name: collectionId, session_id: sessionId,\n        }),\n      });\n\n      const reader = response.body!.getReader();\n      const decoder = new TextDecoder();\n      let buffer = '';\n\n      while (true) {\n        const { done, value } = await reader.read();\n        if (done) break;\n        buffer += decoder.decode(value, { stream: true });\n        const lines = buffer.split('\\n\\n');\n        buffer = lines.pop() || '';\n\n        for (const line of lines) {\n          if (!line.startsWith('data: ')) continue;\n          const data = JSON.parse(line.slice(6));\n          if (data.type === 'sources') {\n            setMessages(prev => prev.map(m =>\n              m.id === assistantId ? { ...m, sources: data.data } : m\n            ));\n          } else if (data.type === 'token') {\n            setMessages(prev => prev.map(m =>\n              m.id === assistantId ? { ...m, content: m.content + data.data } : m\n            ));\n          } else if (data.type === 'done') {\n            setMessages(prev => prev.map(m =>\n              m.id === assistantId ? { ...m, isStreaming: false, confidence: data.data.confidence } : m\n            ));\n            if (data.data.session_id) setSessionId(data.data.session_id);\n          }\n        }\n      }\n    } finally {\n      setIsLoading(false);\n    }\n  };\n\n  useEffect(() => {\n    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });\n  }, [messages]);\n\n  return (\n    <div className=\"flex h-screen\">\n      <div className=\"flex-1 flex flex-col\">\n        <div className=\"flex-1 overflow-y-auto p-6 space-y-4\">\n          {messages.map(msg => (\n            <MessageBubble key={msg.id} message={msg} />\n          ))}\n          <div ref={messagesEndRef} />\n        </div>\n        <form onSubmit={handleSubmit} className=\"p-4 border-t\">\n          <div className=\"flex gap-2\">\n            <input value={input} onChange={e => setInput(e.target.value)}\n              placeholder=\"Döküman hakkında soru sorun...\"\n              className=\"flex-1 px-4 py-2 border rounded-lg\" disabled={isLoading} />\n            <button type=\"submit\" disabled={isLoading}\n              className=\"px-6 py-2 bg-blue-600 text-white rounded-lg\">Gönder</button>\n          </div>\n        </form>\n      </div>\n      <SourcesSidebar messages={messages} />\n    </div>\n  );\n}",
+          "checkpoint": "Chat arayüzü çalışıyor mu? Soru sorduğunda cevap token token ekranda beliriyor mu? Sources sidebar'da kaynaklar listeleniyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nReadableStream API ile SSE okuma modern yaklaşımdır (EventSource yerine fetch + reader). Buffer management önemli: SSE mesajları parçalı gelebilir, \\n\\n ile split et. isStreaming flag'i ile cursor animasyonu göster. messagesEndRef ile auto-scroll zorunlu.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior chat UI'da 'optimistic updates' uygular: kullanıcı mesajı anında gösterilir, server'dan confirmation beklenmez. Senior ayrıca 'message editing' ve 'regenerate' butonları ekler. Production'da markdown rendering (react-markdown) ve code highlighting (highlight.js) zorunlu — LLM sık sık code block ve liste döndürür."
+        },
+        {
+          "step": 2,
+          "title": "Döküman Yönetim Sayfası",
+          "why": "Kullanıcıların dökümanlarını yüklemesi, koleksiyonlarını yönetmesi, işleme durumunu takip etmesi için ayrı bir yönetim sayfası gerekir.",
+          "instructions": "DocumentsPage component'i oluştur. Drag & drop dosya yükleme. Koleksiyon oluşturma/silme. Her dökümanın işleme durumunu göster. Chunk istatistiklerini göster. Döküman silme.",
+          "code_snippet": "// frontend/src/pages/DocumentsPage.tsx\nimport { useCallback, useState, useEffect } from 'react';\nimport { useDropzone } from 'react-dropzone';\n\nexport function DocumentsPage() {\n  const [collections, setCollections] = useState<Collection[]>([]);\n  const [selectedCollection, setSelectedCollection] = useState<string | null>(null);\n  const [documents, setDocuments] = useState<Document[]>([]);\n  const [uploading, setUploading] = useState(false);\n\n  const onDrop = useCallback(async (acceptedFiles: File[]) => {\n    if (!selectedCollection) return;\n    setUploading(true);\n    for (const file of acceptedFiles) {\n      const formData = new FormData();\n      formData.append('file', file);\n      formData.append('collection_id', selectedCollection);\n      try {\n        const res = await fetch('/api/documents/upload', { method: 'POST', body: formData });\n        const data = await res.json();\n        pollDocumentStatus(data.id);\n      } catch (err) {\n        console.error('Upload failed:', err);\n      }\n    }\n    setUploading(false);\n  }, [selectedCollection]);\n\n  const { getRootProps, getInputProps, isDragActive } = useDropzone({\n    onDrop,\n    accept: {\n      'application/pdf': ['.pdf'],\n      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],\n      'text/plain': ['.txt'],\n    },\n    maxSize: 50 * 1024 * 1024,\n  });\n\n  const pollDocumentStatus = async (docId: string) => {\n    const interval = setInterval(async () => {\n      const res = await fetch(`/api/documents/${docId}/status`);\n      const data = await res.json();\n      setDocuments(prev => prev.map(d => d.id === docId ? { ...d, ...data } : d));\n      if (data.status === 'completed' || data.status === 'failed') clearInterval(interval);\n    }, 2000);\n  };\n\n  return (\n    <div className=\"p-6\">\n      <h1 className=\"text-2xl font-bold mb-6\">Döküman Yönetimi</h1>\n      <CollectionSelector collections={collections} selected={selectedCollection}\n        onSelect={setSelectedCollection} onCreate={handleCreateCollection} />\n      <div {...getRootProps()}\n        className={`border-2 border-dashed rounded-xl p-10 text-center mt-4\n          ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}>\n        <input {...getInputProps()} />\n        <p className=\"text-gray-500\">\n          {isDragActive ? 'Dosyaları bırakın...' : 'PDF, DOCX veya TXT dosyalarını sürükleyin'}\n        </p>\n        <p className=\"text-sm text-gray-400 mt-1\">Maksimum 50MB</p>\n      </div>\n      <div className=\"mt-6 space-y-3\">\n        {documents.map(doc => (\n          <DocumentCard key={doc.id} document={doc} onDelete={handleDelete} />\n        ))}\n      </div>\n    </div>\n  );\n}\n\nfunction StatusBadge({ status }: { status: string }) {\n  const styles: Record<string, string> = {\n    pending: 'bg-yellow-100 text-yellow-800',\n    processing: 'bg-blue-100 text-blue-800 animate-pulse',\n    completed: 'bg-green-100 text-green-800',\n    failed: 'bg-red-100 text-red-800',\n  };\n  return <span className={`px-2 py-1 rounded text-xs ${styles[status]}`}>{status}</span>;\n}",
+          "checkpoint": "Drag & drop ile dosya yüklenebiliyor mu? Status badge'ı doğru renkte gösteriliyor mu? Processing sırasında pulse animasyonu var mı?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nreact-dropzone dosya yükleme için standart kütüphane — drag & drop ve file type validation sağlar. Status polling 2 saniyelik interval yeterli. clearInterval ile completed/failed durumunda polling'i durdur. animate-pulse CSS animasyonu processing durumunu kullanıcıya iletmenin en basit yolu.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior dosya yükleme UX'inde progress bar ekler (XHR upload progress event), batch upload desteği sağlar, ve upload queue yönetimi yapar. Production'da WebSocket ile status update almak polling'den daha verimli. Senior ayrıca 'resumable upload' implement edebilir (tus.io protokolü) — büyük dosyalar bağlantı koparsa kaldığı yerden devam eder."
+        },
+        {
+          "step": 3,
+          "title": "Caching ve Performance Optimization",
+          "why": "RAG pipeline'ında en pahalı işlemler: embedding üretimi ve LLM inference. Akıllı caching ile aynı veya benzer sorularda bu maliyetleri ortadan kaldırabiliriz.",
+          "instructions": "3 seviye cache implement et: 1) Embedding cache (aynı text tekrar embed edilmesin), 2) Retrieval cache (aynı soru için tekrar search yapılmasın), 3) Response cache (aynı soru-collection pair'i için LLM tekrar çağrılmasın). TTL ve cache invalidation stratejisi tanımla.",
+          "code_snippet": "# backend/app/services/cache.py\nimport hashlib\nimport json\nfrom typing import Optional, Any\nfrom datetime import datetime, timedelta\nfrom functools import wraps\n\nclass RAGCache:\n    def __init__(self):\n        self._cache = {}  # Production'da Redis kullan\n    \n    def _make_key(self, prefix: str, *args) -> str:\n        content = json.dumps(args, sort_keys=True, default=str)\n        return f\"{prefix}:{hashlib.md5(content.encode()).hexdigest()}\"\n    \n    def get(self, key: str) -> Optional[Any]:\n        if key in self._cache:\n            entry = self._cache[key]\n            if entry[\"expires_at\"] > datetime.utcnow():\n                return entry[\"value\"]\n            del self._cache[key]\n        return None\n    \n    def set(self, key: str, value: Any, ttl_seconds: int = 3600):\n        self._cache[key] = {\n            \"value\": value,\n            \"expires_at\": datetime.utcnow() + timedelta(seconds=ttl_seconds),\n        }\n    \n    def invalidate_collection(self, collection_name: str):\n        keys_to_delete = [k for k in self._cache if collection_name in k]\n        for key in keys_to_delete:\n            del self._cache[key]\n\ndef cached_retrieval(cache: RAGCache, ttl: int = 1800):\n    def decorator(func):\n        @wraps(func)\n        async def wrapper(self, query, collection_name, **kwargs):\n            cache_key = cache._make_key(\"retrieval\", query, collection_name)\n            cached = cache.get(cache_key)\n            if cached:\n                return cached\n            result = await func(self, query, collection_name, **kwargs)\n            cache.set(cache_key, result, ttl)\n            return result\n        return wrapper\n    return decorator\n\nclass SemanticCache:\n    def __init__(self, embedding_service, similarity_threshold=0.95):\n        self.embedding_service = embedding_service\n        self.threshold = similarity_threshold\n        self.entries = []\n    \n    async def get_similar(self, query: str) -> Optional[dict]:\n        query_emb = self.embedding_service.embed_query(query)\n        for emb, cached_query, response in self.entries:\n            similarity = np.dot(query_emb, emb) / (\n                np.linalg.norm(query_emb) * np.linalg.norm(emb)\n            )\n            if similarity > self.threshold:\n                return {\"cached_query\": cached_query, \"response\": response}\n        return None",
+          "checkpoint": "Aynı soruyu 2 kez sor — ikincisi cache'ten mi geliyor? Yeni döküman ekleyince cache invalidate ediliyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\n3 seviye cache: embedding > retrieval > response. Her seviye farklı TTL: embedding (sonsuz, text değişmedikçe), retrieval (30dk, döküman değişebilir), response (5dk). Cache invalidation ZORUNLU: yeni döküman eklendiğinde retrieval cache temizlenmeli. Semantic cache güçlü ama tehlikeli: threshold çok düşükse yanlış cevap döndürür.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior production'da Redis ile distributed cache kurar. Senior ayrıca 'cache warming' stratejisi uygular: en sık sorulan 100 soruyu önceden cache'e doldurur. Cost-benefit analizi yapar: 1000 sorgu/gün, cache hit %60, GPT-4o-mini $0.15/1K token = günde ~$5 tasarruf. Semantic cache için Faiss veya Annoy kullanılır — in-memory vector search."
+        },
+        {
+          "step": 4,
+          "title": "Docker Deployment ve Monitoring",
+          "why": "RAG sistemi 5 servis içeriyor: FastAPI, React, ChromaDB, PostgreSQL ve opsiyonel Redis. Docker Compose ile hepsini tek komutla ayağa kaldırmak development ve deployment'ı standardize eder.",
+          "instructions": "docker-compose.yml oluştur. Backend Dockerfile: Python 3.13, uv pip install, uvicorn. Frontend Dockerfile: Node build, Nginx serve. ChromaDB: official image. PostgreSQL: volume ile persist. Health check'ler ekle. Logging ve monitoring middleware ekle.",
+          "code_snippet": "# docker-compose.yml\nservices:\n  frontend:\n    build: ./frontend\n    ports: ['3000:80']\n    depends_on: [backend]\n    \n  backend:\n    build: ./backend\n    ports: ['8000:8000']\n    environment:\n      DATABASE_URL: postgresql://raguser:ragpass@db:5432/ragdb\n      CHROMA_HOST: chromadb\n      CHROMA_PORT: 8001\n      OPENAI_API_KEY: ${OPENAI_API_KEY}\n    depends_on:\n      db: { condition: service_healthy }\n      chromadb: { condition: service_started }\n    healthcheck:\n      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']\n      interval: 15s\n      timeout: 5s\n      retries: 3\n    volumes:\n      - uploads:/app/uploads\n    \n  db:\n    image: postgres:16-alpine\n    volumes: ['pgdata:/var/lib/postgresql/data']\n    environment:\n      POSTGRES_DB: ragdb\n      POSTGRES_USER: raguser\n      POSTGRES_PASSWORD: ragpass\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U raguser -d ragdb']\n      interval: 5s\n    \n  chromadb:\n    image: chromadb/chroma:latest\n    ports: ['8001:8000']\n    volumes: ['chromadata:/chroma/chroma']\n    environment:\n      ANONYMIZED_TELEMETRY: 'false'\n\nvolumes:\n  pgdata:\n  chromadata:\n  uploads:\n\n---\n# backend/Dockerfile\nFROM python:3.13-slim\nCOPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv\nWORKDIR /app\nCOPY requirements.txt .\nRUN uv pip install --system --no-cache-dir -r requirements.txt\nRUN python -c \"from sentence_transformers import CrossEncoder; CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')\"\nCOPY . .\nCMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]\n\n---\n# backend/app/middleware/logging.py\nimport time\nimport logging\nimport json\nfrom fastapi import Request\n\nlogger = logging.getLogger(\"rag_api\")\n\nasync def logging_middleware(request: Request, call_next):\n    start = time.time()\n    response = await call_next(request)\n    duration_ms = (time.time() - start) * 1000\n    \n    log_data = {\n        \"method\": request.method,\n        \"path\": request.url.path,\n        \"status\": response.status_code,\n        \"duration_ms\": round(duration_ms, 1),\n        \"timestamp\": time.strftime(\"%Y-%m-%dT%H:%M:%S\"),\n    }\n    \n    if duration_ms > 5000:\n        logger.warning(json.dumps({**log_data, \"alert\": \"slow_request\"}))\n    else:\n        logger.info(json.dumps(log_data))\n    \n    response.headers[\"X-Response-Time\"] = f\"{duration_ms:.1f}ms\"\n    return response",
+          "checkpoint": "docker-compose up ile tüm servisler başlıyor mu? Frontend'den backend'e API call'lar çalışıyor mu? Health check'ler geçiyor mu?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nCross-encoder modelini Dockerfile'da önceden indir (RUN python -c ...) — runtime'da inmeye çalışırsa ilk request çok yavaş olur. OPENAI_API_KEY'i docker-compose.yml'a YAZMA, ${OPENAI_API_KEY} ile environment'tan al. Structured JSON logging production'da zorunlu. X-Response-Time header'ı debug için çok değerli.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior production deployment'ta Kubernetes veya AWS ECS kullanır. Senior ayrıca observability stack kurar: 1) Metrics: Prometheus + Grafana (request rate, latency P95, error rate), 2) Logs: ELK stack (structured JSON loglar), 3) Traces: Jaeger/OpenTelemetry (RAG pipeline'daki her adımın süresini takip et). LLM-specific monitoring için LangSmith veya Langfuse kullanılır — her LLM call'ın prompt'u, cevabı, token sayısı ve maliyeti izlenir."
+        },
+        {
+          "step": 5,
+          "title": "End-to-End Test ve Quality Assurance",
+          "why": "RAG sistemi birçok bileşenden oluşur — herhangi birindeki hata tüm zinciri etkiler. Sistematik test suite'i ile her bileşeni ve bileşenler arası entegrasyonu test etmek gerekir.",
+          "instructions": "3 seviye test yaz: 1) Unit test: chunker'lar, embedding service, citation parser, 2) Integration test: retrieval pipeline end-to-end, 3) RAG quality test: bilinen soru-cevap çiftleriyle sistem kalitesini ölç. pytest ve pytest-asyncio kullan.",
+          "code_snippet": "# backend/tests/test_rag_quality.py\nimport pytest\n\nclass TestRAGQuality:\n    QUALITY_TESTS = [\n        {\n            \"question\": \"Projede hangi teknolojiler kullanılıyor?\",\n            \"expected_keywords\": [\"React\", \"TypeScript\", \"FastAPI\"],\n            \"should_cite\": True,\n        },\n        {\n            \"question\": \"Bu dökümanda bahsedilmeyen bir konu nedir?\",\n            \"expected_in_answer\": \"bulunamadı\",\n            \"should_have_low_confidence\": True,\n        },\n    ]\n    \n    @pytest.fixture\n    def rag_chain(self):\n        # Setup RAG chain with test documents\n        pass\n    \n    @pytest.mark.asyncio\n    async def test_answer_contains_keywords(self, rag_chain):\n        for test in self.QUALITY_TESTS:\n            if \"expected_keywords\" not in test:\n                continue\n            result = await rag_chain.answer(test[\"question\"], \"test_collection\")\n            answer = result[\"answer\"].lower()\n            for keyword in test[\"expected_keywords\"]:\n                assert keyword.lower() in answer, \\\n                    f\"'{keyword}' cevapda bulunamadı: {answer[:200]}\"\n    \n    @pytest.mark.asyncio\n    async def test_citations_present(self, rag_chain):\n        for test in self.QUALITY_TESTS:\n            if not test.get(\"should_cite\"):\n                continue\n            result = await rag_chain.answer(test[\"question\"], \"test_collection\")\n            assert len(result[\"sources\"]) > 0, \"Cevap kaynak içermeli\"\n    \n    @pytest.mark.asyncio\n    async def test_low_confidence_for_unknown(self, rag_chain):\n        for test in self.QUALITY_TESTS:\n            if not test.get(\"should_have_low_confidence\"):\n                continue\n            result = await rag_chain.answer(test[\"question\"], \"test_collection\")\n            assert result[\"confidence\"] < 30, \\\n                f\"Bilinmeyen soru için confidence düşük olmalı: {result['confidence']}\"\n    \n    @pytest.mark.asyncio\n    async def test_no_hallucination(self, rag_chain):\n        result = await rag_chain.answer(\n            \"Bu dökümanın yazarı kimdir?\", \"test_collection\"\n        )\n        if result[\"confidence\"] < 30:\n            assert \"bulunamadı\" in result[\"answer\"].lower() or \\\n                   \"belirtilmemiş\" in result[\"answer\"].lower()\n\nclass TestChunking:\n    def test_fixed_size_chunker_overlap(self):\n        chunker = FixedSizeChunker(chunk_size=100, chunk_overlap=20)\n        text = \"a \" * 250\n        pages = [ExtractedPage(content=text, page_number=1, metadata={})]\n        chunks = chunker.chunk(pages, \"test\")\n        assert len(chunks) >= 3\n        for i in range(len(chunks) - 1):\n            end_of_current = chunks[i].content[-50:]\n            start_of_next = chunks[i + 1].content[:50]\n            assert any(w in start_of_next for w in end_of_current.split())",
+          "checkpoint": "Tüm testler geçiyor mu? RAG quality testleri beklenen sonuçları veriyor mu? Hallucination testi başarılı mı (bilmediğini söylüyor mu)?",
+          "must_note": "📝 Bunu Kesinlikle Not Al:\nRAG quality testleri CI/CD'de ZORUNLU — her deployment öncesi kalite kontrol. Ground truth oluşturmak zahmetli ama projenin en değerli asset'i. Hallucination testi: bilinçli olarak kaynakta olmayan bir soru sor ve LLM'in 'bilmiyorum' demesini bekle. En az 20 soru-cevap çifti ile quality test suite oluştur.",
+          "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior RAG evaluation için RAGAS framework kullanır: faithfulness, answer_relevancy, context_recall, context_precision. Bu metrikler otomatik hesaplanır (LLM-as-judge pattern'ı ile). Senior CI/CD'de 'RAG regression test' kurar: yeni model veya prompt değişikliğinde kalite düşerse deployment engellenir. Bu 'ML testing' disiplininin RAG'e uygulanmasıdır."
+        }
+      ],
+      "must_note": "📝 Bu Milestone'dan Çıkarılacak En Önemli Dersler:\n1. Chat UI'da streaming ZORUNLU — 10 saniye beklettirme\n2. Drag & drop dosya yükleme + status polling standart pattern\n3. 3 seviye cache: embedding (sonsuz TTL) > retrieval (30dk) > response (5dk)\n4. Cache invalidation: yeni döküman = retrieval cache temizle\n5. Docker'da ML modelini build sırasında indir, runtime'da değil\n6. Structured JSON logging production'da zorunlu\n7. RAG quality test suite = projenin en değerli asset'i",
+      "senior_learns": "🎩 Senior/CTO Böyle Öğrenir:\nSenior production RAG'de 'cost dashboard' kurar: her sorgunun maliyetini hesaplar (embedding + LLM tokens + compute). Günlük/haftalık maliyet trendi izlenir. Senior ayrıca 'model routing' uygulayabilir: basit sorular GPT-4o-mini'ye, karmaşık sorular GPT-4o'ya yönlendirilir — maliyet %50 düşer, kalite korunur. LLM gateway (LiteLLM, Portkey) bu routing'i kolaylaştırır. Senior'un son sorusu: 'Bu RAG sistemi production'da güvenilir mi?' — cevap observability, testing ve feedback loop ile verilir."
+    },
+    {
+      "id": "p07-deployment",
+      "title": "Deployment ve Portfolio Showcase",
+      "estimated_hours": 4,
+      "steps": [
+        {
+          "title": "Production Build",
+          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "code_snippet": "pnpm build && pnpm test"
+        },
+        {
+          "title": "Deploy",
+          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et"
+        },
+        {
+          "title": "Profesyonel README",
+          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz"
+        },
+        {
+          "title": "Demo Video (Opsiyonel)",
+          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla"
+        }
+      ],
+      "checkpoint": "Proje canli URL'den erisilebilir, README profesyonel, screenshot'lar ekli, GitHub repo public"
+    }
+  ],
+  "interview_prep": {
+    "questions": [
+      "RAG nedir, nasıl çalışır? LLM fine-tuning'den farkı ne? Hangi durumda hangisini tercih edersin?",
+      "Chunking stratejisi retrieval kalitesini nasıl etkiler? Fixed-size vs sentence-based vs hierarchical chunking arasındaki trade-off'ları açıkla.",
+      "Hybrid retrieval (dense + sparse) neden tek başına dense retrieval'dan daha iyi? RRF nasıl çalışır?",
+      "Cross-encoder reranking nedir? Bi-encoder'dan farkı ne? Neden tüm corpus'a değil sadece top-N adaya uygulanır?",
+      "RAG'de hallucination nasıl önlenir? Prompt engineering, retrieval kalitesi ve post-processing açısından anlat.",
+      "Conversational RAG'de 'condensed question' tekniği neden gerekli? Örnekle açıkla.",
+      "Embedding modeli seçerken hangi kriterleri değerlendirirsin? MTEB leaderboard nedir?",
+      "RAG sistemlerinde confidence scoring nasıl yapılır? Kalibrasyon neden önemli?",
+      "Vector database seçimi: ChromaDB vs Pinecone vs pgvector — hangi durumda hangisi?",
+      "Production RAG'de monitoring ve evaluation için hangi metrikleri takip edersin?"
+    ],
+    "talking_points": [
+      "Hybrid retrieval (dense + sparse RRF fusion) ile sadece dense retrieval'a göre recall'u %20 artırdım",
+      "Cross-encoder reranking ile top-5 precision'ı %35 iyileştirdim — 200ms ekstra latency karşılığında",
+      "3 farklı chunking stratejisi implement edip sistematik karşılaştırma yaptım — hierarchical chunking %15 daha iyi precision verdi",
+      "Conversational memory'de condensed question tekniği ile multi-turn Q&A bağlam kaybını önledim",
+      "Streaming SSE ile time-to-first-token'ı 500ms'e düşürdüm",
+      "3 seviyeli cache (embedding/retrieval/response) ile %60 cache hit oranı ve %40 maliyet tasarrufu sağladım",
+      "Feedback loop ile retrieval hatalarını tespit edip root cause analizi yaptım (retrieval vs generation failure)",
+      "Confidence scoring kalibrasyon sistemi kurdum — ECE %8'e düşürdüm",
+      "Citation engine ile her cevabı kaynak döküman ve sayfa numarasıyla destekledim",
+      "Docker Compose ile 4 servisi (FastAPI, React, ChromaDB, PostgreSQL) tek komutla deploy ettim"
+    ]
+  },
+  "resources": [
+    {
+      "title": "LangChain RAG Tutorial",
+      "url": "https://python.langchain.com/docs/tutorials/rag/",
+      "why": "LangChain'in resmi RAG rehberi — temel kavramlar ve kod örnekleri"
+    },
+    {
+      "title": "ChromaDB Documentation",
+      "url": "https://docs.trychroma.com/",
+      "why": "ChromaDB API referansı, collection yönetimi ve query örnekleri"
+    },
+    {
+      "title": "OpenAI Embeddings Guide",
+      "url": "https://platform.openai.com/docs/guides/embeddings",
+      "why": "OpenAI embedding modelleri, best practices ve maliyet bilgisi"
+    },
+    {
+      "title": "MTEB Leaderboard",
+      "url": "https://huggingface.co/spaces/mteb/leaderboard",
+      "why": "Embedding model karşılaştırması — hangi model hangi task'ta en iyi?"
+    },
+    {
+      "title": "Chunking Strategies for RAG",
+      "url": "https://www.pinecone.io/learn/chunking-strategies/",
+      "why": "Farklı chunking stratejileri, trade-off'lar ve öneriler"
+    },
+    {
+      "title": "Sentence Transformers Cross-Encoders",
+      "url": "https://www.sbert.net/docs/cross_encoder/pretrained_models.html",
+      "why": "Cross-encoder modelleri ve reranking implementasyonu"
+    },
+    {
+      "title": "RAGAS: RAG Evaluation Framework",
+      "url": "https://docs.ragas.io/",
+      "why": "RAG kalite metrikleri: faithfulness, relevancy, precision, recall"
+    },
+    {
+      "title": "LangSmith LLM Observability",
+      "url": "https://docs.smith.langchain.com/",
+      "why": "LLM call monitoring, prompt tracking ve evaluation"
+    },
+    {
+      "title": "BM25 Algorithm Explained",
+      "url": "https://www.elastic.co/blog/practical-bm25-part-2-the-bm25-algorithm-and-its-variables",
+      "why": "BM25 sparse retrieval algoritmasının detaylı açıklaması"
+    },
+    {
+      "title": "Building RAG Applications (Anthropic)",
+      "url": "https://docs.anthropic.com/en/docs/build-with-claude/retrieval-augmented-generation",
+      "why": "RAG best practices ve production önerileri"
+    }
+  ],
+  "cv_guidance": {
+    "project_title_for_cv": "RAG Document Q&A System with Hybrid Retrieval & Cross-Encoder Reranking",
+    "bullet_points": {
+      "Full Stack Developer": [
+        "Developed enterprise-grade document Q&A platform using React.js, TypeScript, and FastAPI with real-time streaming responses via Server-Sent Events",
+        "Built document processing pipeline supporting PDF, DOCX, and TXT formats with semantic chunking, processing 100-page documents in under 30 seconds",
+        "Implemented PostgreSQL metadata storage with ChromaDB vector store managing 100K+ document chunks with sub-2-second query response times",
+        "Designed responsive chat interface with multi-turn conversation support, source citations, and relevance scoring for enterprise document search"
+      ],
+      "AI Engineer": [
+        "Architected production RAG pipeline using LangChain with hybrid retrieval (dense embeddings + BM25 sparse search), improving recall by 20% over dense-only retrieval",
+        "Implemented cross-encoder reranking pipeline that improved retrieval precision@5 from 65% to 85%, reducing hallucination rate below 5%",
+        "Built multi-strategy semantic chunking engine (fixed-size, sentence-based, recursive, hierarchical) with configurable overlap, optimizing retrieval quality per document type",
+        "Designed conversational memory system with context-aware query reformulation, enabling accurate multi-turn Q&A with anaphora resolution across 10+ turn conversations"
+      ]
+    },
+    "skills_gained": {
+      "Frontend": [
+        "React.js",
+        "TypeScript",
+        "Server-Sent Events (SSE)",
+        "Chat Interface Design"
+      ],
+      "Backend": [
+        "FastAPI",
+        "Python",
+        "PostgreSQL",
+        "REST API",
+        "Streaming Response"
+      ],
+      "AI/ML": [
+        "LangChain",
+        "RAG Pipeline",
+        "OpenAI Embeddings",
+        "ChromaDB",
+        "Vector Database",
+        "BM25",
+        "Cross-Encoder Reranking",
+        "Semantic Chunking",
+        "Prompt Engineering",
+        "Hallucination Detection"
+      ],
+      "DevOps": [
+        "Docker",
+        "Docker Compose",
+        "pgvector",
+        "Background Task Processing"
+      ]
+    },
+    "ats_keywords": [
+      "RAG",
+      "Retrieval-Augmented Generation",
+      "LangChain",
+      "Vector Database",
+      "ChromaDB",
+      "pgvector",
+      "OpenAI",
+      "Embeddings",
+      "Semantic Search",
+      "BM25",
+      "Hybrid Retrieval",
+      "Cross-Encoder Reranking",
+      "Document Processing",
+      "NLP",
+      "Natural Language Processing",
+      "React.js",
+      "TypeScript",
+      "FastAPI",
+      "Python",
+      "PostgreSQL",
+      "Docker",
+      "Conversational AI",
+      "Prompt Engineering",
+      "Chunking Strategy"
+    ],
+    "cv_placement": "AI Engineer pozisyonlarina basvururken en guclu projelerinizden biri olarak gosterin. RAG her AI sirketinin temel ihtiyaci — bu projeyi 'Projects' bolumunde ust siralarda tutun. Full Stack Developer pozisyonlarinda da document processing ve real-time streaming deneyimi olarak degerli. Tarih: '2025 – 2026'.",
+    "metrics_you_can_claim": [
+      "100K+ chunk destekleyen production-ready RAG pipeline gelistirdim",
+      "Hybrid retrieval (dense + sparse) ile recall'u %20 artirdim",
+      "Cross-encoder reranking ile precision@5'i %85'e cikardim",
+      "Hallucination oranini %5'in altina dusurdum",
+      "100 sayfalik PDF'leri 30 saniyenin altinda isleme kapasitesi",
+      "First token response time < 2 saniye ile real-time streaming Q&A",
+      "4 farkli chunking stratejisi implement edip karsilastirmali analiz yaptim"
+    ]
+  },
+  "github_guidance": {
+    "repo_name": "rag-document-qa-system",
+    "repo_description": "Production RAG document Q&A system with hybrid retrieval (BM25 + semantic), cross-encoder reranking, and multi-turn conversation — FastAPI, LangChain, ChromaDB, React",
+    "topics": [
+      "rag",
+      "langchain",
+      "chromadb",
+      "openai",
+      "embeddings",
+      "bm25",
+      "cross-encoder",
+      "vector-database",
+      "fastapi",
+      "react",
+      "typescript",
+      "document-processing",
+      "semantic-search",
+      "retrieval-augmented-generation",
+      "postgresql",
+      "docker"
+    ],
+    "when_to_create": "Milestone 1'in 2. adimini (Document Processing Pipeline) bitirdiginde repo'yu olustur. Ilk commit proje yapisi + document upload endpoint'i olmali.",
+    "pin_on_profile": true,
+    "pin_priority": 2,
+    "readme_sections": [
+      "# RAG Document Q&A System — Hybrid retrieval with cross-encoder reranking",
+      "Badges: build status, tech stack (FastAPI, LangChain, ChromaDB), license (shields.io)",
+      "## 📸 Screenshots / Demo GIF — document upload, Q&A chat with citations, retrieval comparison",
+      "## ✨ Features (hybrid retrieval BM25+dense, cross-encoder reranking, multi-strategy chunking, multi-turn conversation, source citations, streaming responses)",
+      "## 🛠 Tech Stack (table: Frontend: React, TypeScript | Backend: FastAPI, Python, PostgreSQL | AI/ML: LangChain, OpenAI Embeddings, ChromaDB, BM25, Cross-Encoder | DevOps: Docker, Docker Compose)",
+      "## 🚀 Getting Started (prerequisites, pnpm install, docker compose up, env vars for OpenAI API key)",
+      "## 📐 Architecture (ASCII diagram: document pipeline → chunking → embedding → vector store → hybrid retrieval → reranking → LLM → response)",
+      "## 📡 API Documentation (POST /api/documents/upload, POST /api/query, GET /api/conversations/{id})",
+      "## 🧠 What I Learned (RAG pipeline design, hybrid retrieval superiority, cross-encoder vs bi-encoder trade-offs, chunking strategy impact, hallucination reduction)",
+      "## 📄 License (MIT)"
+    ],
+    "commit_convention": "Conventional Commits: feat:, fix:, docs:, refactor:, test:, chore:",
+    "commit_examples": [
+      "feat: implement hybrid search with BM25 + semantic retrieval",
+      "feat: add cross-encoder reranking pipeline with sentence-transformers",
+      "feat: build multi-strategy chunking engine (fixed, sentence, recursive, hierarchical)",
+      "fix: resolve context window overflow in multi-turn conversations with summarization",
+      "feat: add retrieval evaluation metrics (precision@k, recall@k, MRR)"
+    ],
+    "branch_strategy": "main (production) + develop (active) + feature/* + fix/* + docs/*",
+    "daily_commit_target": "Günde en az 3-5 anlamlı commit. Contribution graph'ın yeşil kalması önemli.",
+    "pro_tips": [
+      "README'de hybrid retrieval vs dense-only karsilastirma tablosu koy (precision, recall, MRR) — bu somut veri recruiter'i etkiler.",
+      "Chunking stratejilerini ayri branch'lerde gelistir ve her birinin benchmark sonuclarini commit mesajinda belirt.",
+      "Demo GIF'te mutlaka source citation ve confidence score gorunmeli — RAG projesinin en etkileyici kismi budur.",
+      "Evaluation metrics (precision@k, recall@k, MRR) icin ayri bir /evaluation klasoru olustur ve sonuclari README'ye ekle — bu seni diger adaylardan ayirir."
+    ]
+  },
+  "cover_letter_guidance": {
+    "project_highlight": "Built an enterprise-grade RAG document Q&A system with hybrid retrieval (dense + BM25), cross-encoder reranking, and conversational memory using FastAPI, LangChain, ChromaDB, and OpenAI, improving retrieval recall by 20% over dense-only search with source citation and confidence scoring.",
+    "skills_demonstrated": [
+      "Python",
+      "FastAPI",
+      "React",
+      "TypeScript",
+      "LangChain",
+      "ChromaDB",
+      "OpenAI API",
+      "RAG Pipeline",
+      "Embeddings",
+      "BM25",
+      "Cross-Encoder Reranking",
+      "PostgreSQL"
+    ],
+    "talking_points": [
+      "Implemented hybrid retrieval pipeline combining dense embeddings with BM25 sparse search, improving recall by 15-25% over single-method approaches",
+      "Built cross-encoder reranking stage that dramatically improved top-5 result quality from initial candidate set of 20 documents",
+      "Designed semantic chunking engine supporting PDF, DOCX, and TXT with metadata-enriched chunks for precise source citation",
+      "Developed conversational memory with sliding window and summarization for multi-turn Q&A sessions across large document collections",
+      "Integrated confidence scoring and hallucination detection to ensure grounded, verifiable responses with inline citations"
+    ]
+  },
+  "ai_workflow": {
+    "planning": {
+      "model": "Claude Opus 4.6",
+      "prompt_template": "I'm building a RAG document Q&A system using React + TypeScript frontend, FastAPI backend, LangChain for orchestration, ChromaDB vector store, OpenAI embeddings, and PostgreSQL for metadata. Help me design the system architecture considering: document processing pipeline (PDF/DOCX/TXT parsing), semantic chunking strategies, hybrid retrieval (dense embeddings + BM25 sparse), cross-encoder reranking, conversational memory with sliding window, source citation tracking, and confidence scoring for hallucination detection.",
+      "when_to_use": "Her milestone'un basinda kullan — RAG pipeline tasarimi, chunking stratejisi ve retrieval mimarisi planlamak icin"
+    },
+    "code_review": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "Review this RAG pipeline code (FastAPI + LangChain + ChromaDB + OpenAI) for: document parsing robustness, chunk size and overlap optimization, embedding model usage efficiency, hybrid retrieval implementation (dense + BM25), reranking pipeline correctness, LangChain chain composition, conversational memory management, citation accuracy, hallucination detection logic, and FastAPI streaming response with SSE.",
+      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle chunking kalitesi, retrieval dogrulugu ve citation mantigi icin"
+    },
+    "debugging": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "I'm getting this error in my RAG Q&A system (FastAPI + LangChain + ChromaDB + OpenAI): [error]. The relevant code is: [code]. Document type: [type]. Query: [query]. I'm trying to [goal].",
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle ChromaDB embedding hatalari, LangChain chain sorunlari, PDF parsing hatalari ve retrieval kalitesi dusuk oldugunda"
+    },
+    "research": {
+      "model": "Gemini 2.5 Pro",
+      "prompt_template": "Explain [concept] with practical examples for a RAG document Q&A system. Topics I need help with: semantic chunking strategies (recursive, sentence-based, hierarchical), OpenAI embedding models comparison, ChromaDB collection management and metadata filtering, BM25 algorithm implementation, cross-encoder reranking with sentence-transformers, Reciprocal Rank Fusion, LangChain ConversationalRetrievalChain, evaluation metrics (precision@k, recall@k, MRR), and hallucination detection techniques.",
+      "when_to_use": "Yeni bir RAG konsepti ogrenirken kullan — ozellikle chunking, embedding, retrieval ve evaluation metrikleri icin"
+    }
+  },
+  "deployment_guide": {
+    "recommended_stack": {
+      "frontend": "Vercel",
+      "backend": "Railway (FastAPI)",
+      "vector_store": "ChromaDB (Railway'de persistent volume ile)",
+      "ai": "OpenAI API (embeddings + LLM)"
+    },
+    "steps": [
+      {
+        "title": "OpenAI API Key Olustur",
+        "commands": [
+          "# platform.openai.com > API Keys"
+        ],
+        "instructions": "Embedding ve chat completion icin. Budget limit ayarla"
+      },
+      {
+        "title": "Backend + ChromaDB Deploy (Railway)",
+        "commands": [
+          "railway login",
+          "railway init",
+          "railway up"
+        ],
+        "instructions": "Persistent volume ekle ChromaDB verileri icin. Env vars: OPENAI_API_KEY, CHROMA_PERSIST_DIR=/data/chroma"
+      },
+      {
+        "title": "Frontend Deploy (Vercel)",
+        "commands": [
+          "pnpm dlx vercel --yes"
+        ],
+        "instructions": "VITE_API_URL env var'ini Railway URL'ine ayarla"
+      },
+      {
+        "title": "Test Dokumanlari Yukle",
+        "instructions": "Canli demoda gostermek icin ornek PDF/DOCX yukle ve soru-cevap test et"
+      }
+    ],
+    "env_vars": [
+      "OPENAI_API_KEY",
+      "CHROMA_PERSIST_DIR",
+      "VITE_API_URL"
+    ],
+    "estimated_time": "35 dakika",
+    "cost": "~$2-10/ay (OpenAI embedding + completion kullanima gore)",
+    "demo_checklist": [
+      "Dokuman yukleme (PDF/DOCX/TXT) calisiyor",
+      "Soru sorma ve dogru yanit alma",
+      "Kaynak citation'lar gorunuyor",
+      "Hybrid search (dense + BM25) calisiyor",
+      "Conversational memory coklu tur soru-cevap",
+      "Streaming response"
+    ]
+  },
+  "portfolio_showcase": {
+    "readme_must_haves": [
+      "Proje aciklamasi ve motivasyon (2-3 cumle)",
+      "Canli demo linki (Vercel/Railway badge ile)",
+      "Teknoloji stack badge'leri",
+      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Mimari diyagram (ASCII veya draw.io)",
+      "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
+      "API dokumantasyonu (/docs linki veya Postman collection)",
+      "Ogrenilenler ve kararlar bolumu"
+    ],
+    "screenshot_suggestions": [
+      "Dashboard/Anasayfa",
+      "Ana ozellik ekrani",
+      "Mobile gorunum"
+    ],
+    "live_demo_url_template": "https://rag-qa-system.vercel.app",
+    "github_repo_template": "https://github.com/USERNAME/rag-document-qa"
+  }
+}

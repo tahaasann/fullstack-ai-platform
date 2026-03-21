@@ -1,0 +1,779 @@
+{
+  "id": "project-03",
+  "title": "Gerçek Zamanlı Chat Uygulaması + AI Asistan",
+  "difficulty": "Orta",
+  "estimated_days": 12,
+  "tech_stack": [
+    "React",
+    "TypeScript",
+    "Node.js",
+    "Socket.io",
+    "MongoDB",
+    "Redis",
+    "OpenAI API"
+  ],
+  "brief": "Bu projede, WhatsApp/Slack benzeri gerçek zamanlı chat uygulaması geliştirecek ve bir AI asistan entegre edeceksin. Kullanıcılar anlık mesajlaşabilecek, gruplara katılabilecek ve AI asistandan yardım isteyebilecek. WebSocket teknolojisi ile milisaniye seviyesinde mesaj iletimi sağlanacak.\n\nSocket.io kullanarak bi-directional real-time iletişim kuracaksın. Bu, HTTP'nin request-response modelinden farklı olarak, server'ın da client'a spontan mesaj gönderebildiği bir mimaridir. Online durum göstergeleri (presence), yazıyor bildirimi (typing indicator) ve okundu bilgisi (read receipts) gibi gerçek zamanlı özellikler implement edilecek.\n\nMongoDB, chat mesajları için ideal bir veritabanıdır çünkü mesajlar döküman yapısında saklanır ve zaman bazlı sorgular hızlıdır. Redis ise pub/sub mekanizması ile çoklu server instance'ları arasında mesaj dağıtımı ve oturum yönetimi için kullanılacak. Bu mimari, horizontal scaling'e hazır bir yapı oluşturur.\n\nAI asistan entegrasyonu ile OpenAI API kullanarak akıllı bir chatbot oluşturacaksın. Kullanıcılar @ai komutuyla AI'dan kod yardımı, çeviri veya bilgi sorgulaması yapabilecek. Streaming response ile AI yanıtları gerçek zamanlı olarak gösterilecek.",
+  "target_roles": [
+    "Full Stack Developer",
+    "AI Engineer"
+  ],
+  "architecture": {
+    "overview": "Event-driven mimari ile WebSocket tabanlı real-time iletişim. Socket.io server, client'lar arasında mesaj yönlendirmesini yapar. MongoDB chat geçmişini saklar, Redis pub/sub ile multi-instance mesaj dağıtımı ve cache sağlar. OpenAI API ile AI asistan entegrasyonu yapılır.",
+    "diagram": "┌─────────────────────────────────────────────────────────┐\n│                      Client Layer                       │\n│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │\n│  │  React App  │  │  React App  │  │    React App    │  │\n│  │  (User A)   │  │  (User B)   │  │   (User C)      │  │\n│  └──────┬──────┘  └──────┬──────┘  └───────┬─────────┘  │\n│         │   WebSocket    │                 │            │\n└─────────┼────────────────┼─────────────────┼────────────┘\n          │                │                 │\n┌─────────┴────────────────┴─────────────────┴────────────┐\n│                  Socket.io Server                        │\n│  ┌──────────┐  ┌──────────────┐  ┌───────────────────┐  │\n│  │  Rooms   │  │   Message    │  │    AI Service     │  │\n│  │ Manager  │  │   Handler    │  │  (OpenAI API)     │  │\n│  └────┬─────┘  └──────┬───────┘  └────────┬──────────┘  │\n│       │               │                   │             │\n│  ┌────┴───────────────┴───────────────────┴──────────┐  │\n│  │              Redis (Pub/Sub + Cache)               │  │\n│  └───────────────────────┬───────────────────────────┘  │\n│                          │                              │\n│  ┌───────────────────────┴───────────────────────────┐  │\n│  │              MongoDB (Message Store)               │  │\n│  └───────────────────────────────────────────────────┘  │\n└─────────────────────────────────────────────────────────┘",
+    "decisions": [
+      {
+        "decision": "Neden Socket.io?",
+        "reasoning": "Socket.io, WebSocket üzerine inşa edilmiş yüksek seviye bir kütüphanedir. Otomatik reconnection, room management, acknowledgments ve fallback mekanizması (WebSocket yoksa long-polling) sağlar. Raw WebSocket'e göre çok daha fazla özellik sunar.",
+        "alternatives": "Raw WebSocket, Server-Sent Events (SSE), WebRTC, Pusher",
+        "when_to_choose_alternative": "Raw WebSocket: Minimum overhead ve tam kontrol isteniyorsa. SSE: Sadece server-to-client iletişim yeterliyse (notification gibi). WebRTC: Peer-to-peer iletişim (video call) gerekiyorsa. Pusher: Managed servis tercih ediliyorsa."
+      },
+      {
+        "decision": "Neden MongoDB?",
+        "reasoning": "Chat mesajları döküman yapısında saklanır ve şema esnekliği gerektirir (metin, dosya, resim, konum gibi farklı mesaj tipleri). Zaman bazlı sorgular ve cursor-based pagination için MongoDB'nin TTL index ve capped collection özellikleri idealdir. Yatay ölçeklendirme (sharding) kolaydır.",
+        "alternatives": "PostgreSQL, Cassandra, Firebase Firestore",
+        "when_to_choose_alternative": "PostgreSQL: İlişkisel veri ve ACID transaction öncelikliyse. Cassandra: Çok yüksek yazma throughput gerekiyorsa (milyon mesaj/saniye). Firebase: Hızlı prototip ve real-time sync built-in isteniyorsa."
+      },
+      {
+        "decision": "Neden Redis?",
+        "reasoning": "Redis pub/sub, Socket.io'nun çoklu server instance'ları arasında mesaj dağıtımını sağlar (Socket.io adapter). Ayrıca online kullanıcı listesi, typing indicator gibi geçici verilerin hızlı saklanması ve TTL ile otomatik temizlenmesi için idealdir.",
+        "alternatives": "RabbitMQ, Kafka, In-memory Map",
+        "when_to_choose_alternative": "RabbitMQ: Mesaj kuyruğu ve guaranteed delivery gerekiyorsa. Kafka: Event streaming ve log aggregation gerekiyorsa. In-memory: Tek instance ve basit demo uygulamalarında."
+      },
+      {
+        "decision": "Neden OpenAI API?",
+        "reasoning": "OpenAI'ın GPT modelleri, en gelişmiş dil anlama ve üretme yeteneklerini sunar. Streaming response desteği, chat uygulamalarında doğal bir deneyim sağlar. Function calling ile yapılandırılmış çıktı alınabilir.",
+        "alternatives": "Anthropic Claude API, Google Gemini, Ollama (local LLM)",
+        "when_to_choose_alternative": "Anthropic Claude: Daha uzun bağlam penceresi ve güvenlik odaklı yaklaşım. Google Gemini: Multimodal (görsel + metin) özellikler. Ollama: Veri gizliliği için yerel model çalıştırma."
+      }
+    ]
+  },
+  "what_you_learn": {
+    "technical": [
+      "WebSocket ve Socket.io ile real-time iletişim",
+      "MongoDB ile döküman tabanlı veritabanı tasarımı",
+      "Redis pub/sub ve caching",
+      "OpenAI API entegrasyonu ve streaming response",
+      "Online presence (kullanıcı durumu) yönetimi",
+      "Room-based mesajlaşma mimarisi",
+      "Dosya yükleme ve paylaşım (multer + cloud storage)",
+      "Message pagination (cursor-based)",
+      "TypeScript ile event-driven programlama",
+      "React ile real-time UI güncellemeleri"
+    ],
+    "architectural": [
+      "Event-driven architecture",
+      "Pub/Sub pattern",
+      "Horizontal scaling ile WebSocket",
+      "CQRS (Command Query Responsibility Segregation) temelleri",
+      "Message queue pattern"
+    ],
+    "soft_skills": [
+      "Real-time sistem tasarımı düşüncesi",
+      "AI prompt engineering ve context management",
+      "Concurrent state yönetimi",
+      "UX tasarımı (real-time etkileşimler)"
+    ]
+  },
+  "requirements": {
+    "functional": [
+      "Kullanıcı kayıt ve giriş sistemi",
+      "Birebir (1:1) mesajlaşma",
+      "Grup chat oluşturma ve yönetme",
+      "Gerçek zamanlı mesaj iletimi (< 100ms latency)",
+      "Online/offline durum göstergesi",
+      "Yazıyor... bildirimi (typing indicator)",
+      "Mesaj okundu bilgisi (read receipts)",
+      "Mesaj geçmişi (infinite scroll ile pagination)",
+      "@ai komutu ile AI asistan erişimi",
+      "AI yanıtlarının streaming olarak gösterilmesi",
+      "Dosya paylaşımı (resim, PDF)"
+    ],
+    "non_functional": [
+      "Mesaj iletim süresi < 100ms (same region)",
+      "Eşzamanlı 100+ bağlantı desteği",
+      "Mesaj geçmişi cursor-based pagination (sayfa başına 50 mesaj)",
+      "MongoDB index'leri ile sorgu süresi < 50ms",
+      "Redis TTL ile geçici verilerin otomatik temizlenmesi",
+      "Socket.io reconnection (bağlantı koptuğunda otomatik yeniden bağlanma)",
+      "AI response streaming (token-by-token gösterim)",
+      "Rate limiting: AI endpoint 10 istek/dakika per user"
+    ]
+  },
+  "evaluation_criteria": [
+    {
+      "criterion": "Real-time İletişim",
+      "weight": 25,
+      "description": "WebSocket bağlantı yönetimi, mesaj iletim hızı, reconnection, presence yönetimi"
+    },
+    {
+      "criterion": "Backend Mimarisi",
+      "weight": 20,
+      "description": "MongoDB şema tasarımı, Redis kullanımı, event handling, error recovery"
+    },
+    {
+      "criterion": "AI Entegrasyonu",
+      "weight": 20,
+      "description": "OpenAI API kullanımı, streaming response, prompt engineering, context yönetimi"
+    },
+    {
+      "criterion": "Frontend UX",
+      "weight": 20,
+      "description": "Chat UI kalitesi, real-time güncellemeler, responsive tasarım, keyboard navigation"
+    },
+    {
+      "criterion": "Kod Kalitesi ve DevOps",
+      "weight": 15,
+      "description": "TypeScript kullanımı, test coverage, Docker setup, dokümantasyon"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "p03-m1",
+      "title": "Proje Altyapısı ve Socket.io Kurulumu",
+      "overview": "Real-time uygulamalar, geleneksel HTTP uygulamalarından farklı bir altyapı gerektirir. Bu milestone'da Socket.io server ve client kurulumunu yapacak, ilk WebSocket bağlantısını kuracak ve temel event yapısını oluşturacaksın.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "WebSocket",
+        "Socket.io",
+        "Event-driven architecture",
+        "MongoDB setup",
+        "Redis setup"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Proje Yapısı ve Bağımlılıklar",
+          "why": "Real-time uygulama, hem HTTP server hem de WebSocket server gerektirir. Express ve Socket.io aynı HTTP server üzerinde çalışabilir. MongoDB ve Redis bağlantıları uygulama başlangıcında kurulur ve tüm yaşam döngüsü boyunca paylaşılır.",
+          "instructions": "Monorepo yapısını oluştur. Backend için Express + Socket.io, frontend için React + Vite kur.",
+          "code_snippet": "mkdir realtime-chat && cd realtime-chat\n\n# Backend\nmkdir -p server/src/{controllers,services,models,middleware,events,utils}\ncd server && pnpm init\npnpm install express socket.io mongoose cors helmet dotenv jsonwebtoken bcrypt\npnpm install openai\npnpm install -D typescript @types/express @types/node ts-node-dev @types/bcrypt @types/jsonwebtoken\npnpm dlx tsc --init\ncd ..\n\n# Frontend\npnpm create vite@latest client -- --template react-ts\ncd client\npnpm install socket.io-client axios react-router-dom zustand\ncd ..\n\n# Docker Compose\ncat > docker-compose.yml << 'EOF'\nservices:\n  mongo:\n    image: mongo:7\n    ports:\n      - '27017:27017'\n    volumes:\n      - mongodata:/data/db\n  redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'\nvolumes:\n  mongodata:\nEOF",
+          "deep_dive": "Mongoose, MongoDB için ODM (Object Data Modeling) kütüphanesidir — Prisma'nın MongoDB versiyonu gibi düşünülebilir. Schema tanımı, validation ve middleware (pre/post hooks) sağlar. Zustand, React state management için minimal bir kütüphanedir — Redux'ın karmaşıklığı olmadan global state yönetimi sağlar. Socket.io client ve server ayrı paketlerdir: socket.io (server) ve socket.io-client (client).",
+          "checkpoint": "docker-compose up ile MongoDB ve Redis başlamalı. Backend pnpm run dev ile başlamalı. Frontend Vite dev server çalışmalı."
+        },
+        {
+          "step": 2,
+          "title": "MongoDB Model Tanımları",
+          "why": "Chat uygulamasının veri modeli, kullanıcılar, konuşmalar (conversations) ve mesajlardan oluşur. MongoDB'nin döküman yapısı, farklı mesaj tiplerini (metin, dosya, AI yanıtı) esnek şekilde saklamaya olanak tanır. İndeksler, mesaj sorgulama performansını belirler.",
+          "instructions": "Mongoose ile User, Conversation ve Message modellerini tanımla.",
+          "code_snippet": "// server/src/models/user.model.ts\nimport mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IUser extends Document {\n  email: string;\n  name: string;\n  password: string;\n  avatar?: string;\n  isOnline: boolean;\n  lastSeen: Date;\n}\n\nconst userSchema = new Schema<IUser>({\n  email: { type: String, required: true, unique: true, lowercase: true },\n  name: { type: String, required: true, minlength: 2 },\n  password: { type: String, required: true, select: false },\n  avatar: String,\n  isOnline: { type: Boolean, default: false },\n  lastSeen: { type: Date, default: Date.now },\n}, { timestamps: true });\n\nexport const User = mongoose.model<IUser>('User', userSchema);\n\n// server/src/models/conversation.model.ts\nexport interface IConversation extends Document {\n  type: 'direct' | 'group';\n  name?: string;\n  participants: mongoose.Types.ObjectId[];\n  lastMessage?: mongoose.Types.ObjectId;\n  lastActivity: Date;\n}\n\nconst conversationSchema = new Schema<IConversation>({\n  type: { type: String, enum: ['direct', 'group'], required: true },\n  name: String,\n  participants: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],\n  lastMessage: { type: Schema.Types.ObjectId, ref: 'Message' },\n  lastActivity: { type: Date, default: Date.now },\n}, { timestamps: true });\n\nconversationSchema.index({ participants: 1 });\nconversationSchema.index({ lastActivity: -1 });\n\nexport const Conversation = mongoose.model<IConversation>('Conversation', conversationSchema);\n\n// server/src/models/message.model.ts\nexport interface IMessage extends Document {\n  conversationId: mongoose.Types.ObjectId;\n  sender: mongoose.Types.ObjectId;\n  content: string;\n  type: 'text' | 'image' | 'file' | 'ai_response';\n  readBy: mongoose.Types.ObjectId[];\n  metadata?: Record<string, any>;\n}\n\nconst messageSchema = new Schema<IMessage>({\n  conversationId: { type: Schema.Types.ObjectId, ref: 'Conversation', required: true, index: true },\n  sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },\n  content: { type: String, required: true },\n  type: { type: String, enum: ['text', 'image', 'file', 'ai_response'], default: 'text' },\n  readBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],\n  metadata: Schema.Types.Mixed,\n}, { timestamps: true });\n\nmessageSchema.index({ conversationId: 1, createdAt: -1 });\n\nexport const Message = mongoose.model<IMessage>('Message', messageSchema);",
+          "deep_dive": "select: false ile password alanı varsayılan sorgularda döndürülmez — güvenlik için kritik. Compound index { conversationId: 1, createdAt: -1 } ile bir konuşmanın mesajlarını son mesajdan başlayarak hızlıca sorgulayabilirsin (chat scroll). timestamps: true, createdAt ve updatedAt alanlarını otomatik ekler. Schema.Types.Mixed, JSONB gibi esnek veri saklama sağlar — farklı mesaj tiplerinin metadata'sı burada tutulur.",
+          "checkpoint": "MongoDB'ye bağlantı kurulmalı. Model'ler hatasız compile olmalı. Mongoose index'ler oluşturulmalı."
+        },
+        {
+          "step": 3,
+          "title": "Socket.io Server Kurulumu",
+          "why": "Socket.io server, WebSocket bağlantılarını yönetir, event'leri dinler ve yönlendirir. Express HTTP server ile aynı port üzerinde çalışır. CORS, authentication middleware ve error handling konfigürasyonu, güvenli real-time iletişimin temelini oluşturur.",
+          "instructions": "Express + Socket.io server'ını oluştur. JWT ile WebSocket authentication middleware'ini ekle.",
+          "code_snippet": "// server/src/index.ts\nimport express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\nimport cors from 'cors';\nimport mongoose from 'mongoose';\nimport { config } from './utils/config';\nimport { setupSocketHandlers } from './events/socket-handler';\nimport authRoutes from './routes/auth.routes';\n\nconst app = express();\nconst httpServer = createServer(app);\n\nconst io = new Server(httpServer, {\n  cors: {\n    origin: config.clientUrl,\n    methods: ['GET', 'POST'],\n    credentials: true,\n  },\n  pingTimeout: 60000,\n  pingInterval: 25000,\n});\n\n// Express middleware\napp.use(cors({ origin: config.clientUrl, credentials: true }));\napp.use(express.json());\n\n// REST routes\napp.use('/api/auth', authRoutes);\n\n// Socket.io authentication middleware\nio.use(async (socket, next) => {\n  try {\n    const token = socket.handshake.auth.token;\n    if (!token) return next(new Error('Authentication required'));\n\n    const jwt = require('jsonwebtoken');\n    const payload = jwt.verify(token, config.jwtSecret);\n    socket.data.userId = payload.userId;\n    next();\n  } catch (error) {\n    next(new Error('Invalid token'));\n  }\n});\n\n// Socket event handlers\nsetupSocketHandlers(io);\n\n// Database connection\nmongoose.connect(config.mongoUri)\n  .then(() => console.log('MongoDB connected'))\n  .catch((err) => console.error('MongoDB error:', err));\n\nhttpServer.listen(config.port, () => {\n  console.log(`Server running on port ${config.port}`);\n});\n\nexport { io };",
+          "deep_dive": "createServer(app) ile Express uygulaması HTTP server'a sarılır — Socket.io bu HTTP server üzerinden WebSocket upgrade yapar. io.use() middleware, her yeni socket bağlantısından önce çalışır — JWT doğrulaması burada yapılır. socket.handshake.auth, client'ın bağlantı sırasında gönderdiği auth bilgisini içerir. pingTimeout ve pingInterval, bağlantının canlı olduğunu kontrol eder — timeout olursa bağlantı kapatılır.",
+          "checkpoint": "Server başladığında MongoDB ve Socket.io bağlantısı kurulmalı. Client socket bağlantısı auth ile başarılı olmalı. Token olmadan bağlantı reddedilmeli."
+        },
+        {
+          "step": 4,
+          "title": "Temel Socket Event Handler'ları",
+          "why": "Socket event handler'ları, real-time iletişimin kalbidir. Her kullanıcı aksiyonu (mesaj gönderme, yazıyor bildirimi, odaya katılma) bir event olarak modellenir. Event-driven mimari, loosely coupled ve extensible bir yapı sağlar.",
+          "instructions": "Mesaj gönderme, odaya katılma ve presence event'lerini implement et.",
+          "code_snippet": "// server/src/events/socket-handler.ts\nimport { Server, Socket } from 'socket.io';\nimport { Message } from '../models/message.model';\nimport { Conversation } from '../models/conversation.model';\nimport { User } from '../models/user.model';\n\nexport function setupSocketHandlers(io: Server) {\n  io.on('connection', async (socket: Socket) => {\n    const userId = socket.data.userId;\n    console.log(`User connected: ${userId}`);\n\n    // Kullanıcıyı online yap\n    await User.findByIdAndUpdate(userId, { isOnline: true });\n    \n    // Kullanıcının konuşma odalarına katıl\n    const conversations = await Conversation.find({ participants: userId });\n    conversations.forEach((conv) => {\n      socket.join(conv.id);\n    });\n\n    // Online durumunu bildir\n    socket.broadcast.emit('user:online', { userId });\n\n    // Mesaj gönderme\n    socket.on('message:send', async (data, callback) => {\n      try {\n        const { conversationId, content, type = 'text' } = data;\n\n        const message = await Message.create({\n          conversationId,\n          sender: userId,\n          content,\n          type,\n          readBy: [userId],\n        });\n\n        await Conversation.findByIdAndUpdate(conversationId, {\n          lastMessage: message.id,\n          lastActivity: new Date(),\n        });\n\n        const populated = await message.populate('sender', 'name avatar');\n\n        // Odadaki herkese gönder\n        io.to(conversationId).emit('message:received', populated);\n\n        // Başarı callback\n        callback({ status: 'ok', messageId: message.id });\n      } catch (error) {\n        callback({ status: 'error', message: 'Mesaj gönderilemedi' });\n      }\n    });\n\n    // Yazıyor bildirimi\n    socket.on('typing:start', (data) => {\n      socket.to(data.conversationId).emit('typing:update', {\n        userId,\n        conversationId: data.conversationId,\n        isTyping: true,\n      });\n    });\n\n    socket.on('typing:stop', (data) => {\n      socket.to(data.conversationId).emit('typing:update', {\n        userId,\n        conversationId: data.conversationId,\n        isTyping: false,\n      });\n    });\n\n    // Mesaj okundu\n    socket.on('message:read', async (data) => {\n      await Message.updateMany(\n        {\n          conversationId: data.conversationId,\n          sender: { $ne: userId },\n          readBy: { $nin: [userId] },\n        },\n        { $addToSet: { readBy: userId } }\n      );\n\n      socket.to(data.conversationId).emit('message:read:update', {\n        conversationId: data.conversationId,\n        userId,\n      });\n    });\n\n    // Bağlantı kopma\n    socket.on('disconnect', async () => {\n      await User.findByIdAndUpdate(userId, {\n        isOnline: false,\n        lastSeen: new Date(),\n      });\n      socket.broadcast.emit('user:offline', { userId });\n      console.log(`User disconnected: ${userId}`);\n    });\n  });\n}",
+          "deep_dive": "socket.join(conv.id) ile kullanıcı, tüm konuşma odalarına katılır — io.to(roomId).emit() ile odadaki herkese mesaj gönderilir. socket.broadcast.emit, mesajı gönderen hariç herkese iletir. callback pattern'ı (acknowledgment), mesajın server'a ulaştığını client'a bildirmek için kullanılır — WhatsApp'taki tek/çift tik mekanizması. $addToSet MongoDB operatörü, array'e duplicate eklemeden eleman ekler — readBy'da aynı kullanıcı iki kez olmaz.",
+          "checkpoint": "İki client arasında mesaj gönderimi çalışmalı. Typing indicator görünmeli. Online/offline durumu güncellenlemeli."
+        },
+        {
+          "step": 5,
+          "title": "Redis Entegrasyonu ve Socket.io Adapter",
+          "why": "Tek bir Socket.io instance'ı ile başlıyoruz ama production'da horizontal scaling gerekecek. Redis adapter, birden fazla Socket.io server instance'ının aynı room'lara emit yapabilmesini sağlar. Ayrıca Redis, typing indicator gibi geçici verilerin cache'lenmesi için idealdir.",
+          "instructions": "Redis'i Socket.io adapter olarak kur ve geçici verileri Redis'te sakla.",
+          "code_snippet": "pnpm install @socket.io/redis-adapter ioredis\n\n// server/src/utils/redis.ts\nimport Redis from 'ioredis';\nimport { config } from './config';\n\nexport const redis = new Redis(config.redisUrl);\nexport const pubClient = new Redis(config.redisUrl);\nexport const subClient = pubClient.duplicate();\n\n// Kullanıcı online durumu Redis'te sakla\nexport async function setUserOnline(userId: string, socketId: string) {\n  await redis.hset('online_users', userId, socketId);\n}\n\nexport async function setUserOffline(userId: string) {\n  await redis.hdel('online_users', userId);\n}\n\nexport async function getOnlineUsers(): Promise<string[]> {\n  const users = await redis.hkeys('online_users');\n  return users;\n}\n\n// Typing indicator (3 saniyelik TTL)\nexport async function setTyping(userId: string, conversationId: string) {\n  const key = `typing:${conversationId}:${userId}`;\n  await redis.set(key, '1', 'EX', 3);\n}\n\n// server/src/index.ts'e ekle:\nimport { createAdapter } from '@socket.io/redis-adapter';\nimport { pubClient, subClient } from './utils/redis';\n\n// Socket.io Redis adapter\nio.adapter(createAdapter(pubClient, subClient));",
+          "deep_dive": "Redis adapter, Socket.io'nun pub/sub mekanizmasını Redis üzerinden yapar. Server A'daki bir client mesaj gönderdiğinde, Redis pub/sub ile Server B'deki client'lara da iletilir — bu horizontal scaling'in temelidir. hset/hdel (Hash Set) ile online kullanıcılar key-value olarak saklanır. TTL (Time To Live) ile typing indicator otomatik sona erer — kullanıcı yazmayı bıraksa bile 3 saniye sonra temizlenir.",
+          "checkpoint": "Redis bağlantısı kurulmalı. Online kullanıcı listesi Redis'te saklanmalı. Socket.io adapter çoklu instance'ta çalışmalı."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Socket.io io.use() middleware, her yeni bağlantıda auth doğrulaması yapar — JWT token handshake.auth'ta gönderilir.\n- socket.join(roomId) ile kullanıcı odaya katılır, io.to(roomId).emit() ile odadaki herkese mesaj gönderilir.\n- callback (acknowledgment) pattern'ı ile mesajın server'a ulaştığı doğrulanır.\n- Redis adapter, horizontal scaling için şart — çoklu Socket.io instance'ı aynı room'lara emit yapabilir.\n- MongoDB compound index { conversationId: 1, createdAt: -1 } mesaj sorgulama performansı için kritik.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar WebSocket uygulamalarında 'connection lifecycle' düşünür: bağlantı kurma, authentication, room management, heartbeat, reconnection, graceful disconnect. Her aşamada neler olabilir ve hata durumunda ne yapılacağı planlanır. Ayrıca 'message delivery guarantees' konusu önemlidir: at-most-once (kayıp olabilir), at-least-once (duplicate olabilir), exactly-once (en zor). Chat uygulamalarında at-least-once + client-side deduplication yaygın yaklaşımdır."
+    },
+    {
+      "id": "p03-m2",
+      "title": "Chat Backend ve Mesaj Yönetimi",
+      "overview": "Bu milestone'da chat backend servislerini detaylandıracaksın. Conversation CRUD, mesaj pagination, arama ve okundu bilgisi gibi özellikler implement edilecek.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "Cursor-based pagination",
+        "MongoDB aggregation",
+        "Message search",
+        "Read receipts"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Conversation Service ve API",
+          "why": "Conversation (konuşma) modeli, chat uygulamasının merkezi yapısıdır. Birebir ve grup konuşmaları farklı logic gerektirir. Birebir konuşmalarda aynı iki kullanıcı arasında duplicate conversation oluşturulmamalıdır.",
+          "instructions": "Conversation service'ini oluştur. Direct ve group conversation oluşturma, listeleme API'larını implement et.",
+          "code_snippet": "// server/src/services/conversation.service.ts\nimport { Conversation } from '../models/conversation.model';\nimport { User } from '../models/user.model';\nimport mongoose from 'mongoose';\n\nexport class ConversationService {\n  async getOrCreateDirect(userId: string, targetUserId: string) {\n    // Mevcut konuşmayı bul\n    let conversation = await Conversation.findOne({\n      type: 'direct',\n      participants: { $all: [userId, targetUserId], $size: 2 },\n    }).populate('participants', 'name avatar isOnline lastSeen')\n      .populate('lastMessage');\n\n    if (!conversation) {\n      conversation = await Conversation.create({\n        type: 'direct',\n        participants: [userId, targetUserId],\n      });\n      conversation = await conversation.populate('participants', 'name avatar isOnline lastSeen');\n    }\n\n    return conversation;\n  }\n\n  async createGroup(userId: string, name: string, participantIds: string[]) {\n    const allParticipants = [...new Set([userId, ...participantIds])];\n    \n    const conversation = await Conversation.create({\n      type: 'group',\n      name,\n      participants: allParticipants,\n    });\n\n    return conversation.populate('participants', 'name avatar isOnline lastSeen');\n  }\n\n  async getUserConversations(userId: string) {\n    return Conversation.find({ participants: userId })\n      .populate('participants', 'name avatar isOnline lastSeen')\n      .populate('lastMessage')\n      .sort({ lastActivity: -1 })\n      .lean();\n  }\n}",
+          "deep_dive": "$all ile her iki participant'ın da dizide olmasını, $size: 2 ile sadece iki kişilik (direct) konuşma olmasını garanti ederiz. populate, MongoDB'de JOIN benzeri işlem yapar — participant ID'lerini kullanıcı bilgileriyle doldurur. lean() ile Mongoose document yerine plain JavaScript object döndürülür — %5-10x daha hızlı okuma sağlar, ama model metodları kullanılamaz.",
+          "checkpoint": "Direct conversation oluşturma çalışmalı. Aynı iki kullanıcı arası duplicate olmamalı. Group conversation oluşturulabilmeli."
+        },
+        {
+          "step": 2,
+          "title": "Cursor-Based Mesaj Pagination",
+          "why": "Offset pagination (SKIP/LIMIT) büyük veri setlerinde performans sorunlarına neden olur — 10000. sayfaya atlamak, 10000 kayıt skip etmeyi gerektirir. Cursor-based pagination, son görülen mesajın ID'sini referans alarak bir sonraki sayfa verilerini getirir. Chat uygulamalarında infinite scroll için idealdir.",
+          "instructions": "Cursor-based pagination ile mesaj geçmişi sorgulama implement et.",
+          "code_snippet": "// server/src/services/message.service.ts\nimport { Message } from '../models/message.model';\nimport mongoose from 'mongoose';\n\nexport class MessageService {\n  async getMessages(\n    conversationId: string,\n    cursor?: string,\n    limit: number = 50\n  ) {\n    const query: any = { conversationId };\n\n    if (cursor) {\n      // Cursor'dan önceki mesajları getir (daha eski)\n      query.createdAt = { $lt: new Date(cursor) };\n    }\n\n    const messages = await Message.find(query)\n      .sort({ createdAt: -1 })\n      .limit(limit + 1) // Bir fazla getir (sonraki sayfa var mı kontrol)\n      .populate('sender', 'name avatar')\n      .lean();\n\n    const hasMore = messages.length > limit;\n    if (hasMore) messages.pop(); // Fazla olan elemanı çıkar\n\n    return {\n      messages: messages.reverse(), // Kronolojik sıra\n      hasMore,\n      nextCursor: hasMore ? messages[0]?.createdAt?.toISOString() : null,\n    };\n  }\n\n  async searchMessages(conversationId: string, query: string) {\n    return Message.find({\n      conversationId,\n      content: { $regex: query, $options: 'i' },\n    })\n      .sort({ createdAt: -1 })\n      .limit(20)\n      .populate('sender', 'name avatar')\n      .lean();\n  }\n}",
+          "deep_dive": "limit + 1 pattern'ı: 51 kayıt isteyip 50 döndürüyoruz — eğer 51 kayıt gelirse, daha fazla veri var demektir (hasMore: true). nextCursor, döndürülen ilk mesajın (en eski) tarihidir — sonraki sayfa bunu kullanarak devam eder. reverse() ile mesajlar kronolojik sıraya çevrilir (yukarıdan aşağıya yeni). $regex ile basit metin arama yapılır — production'da MongoDB Atlas Search veya Elasticsearch kullanılmalı.",
+          "checkpoint": "İlk sayfa mesajlar dönmeli. Cursor ile sonraki sayfalar yüklenmeli. hasMore doğru çalışmalı."
+        },
+        {
+          "step": 3,
+          "title": "Mesaj Okundu Bilgisi (Read Receipts)",
+          "why": "Okundu bilgisi, modern mesajlaşma uygulamalarının standart özelliğidir. Kullanıcı bir konuşmayı açtığında, o konuşmadaki okunmamış mesajlar 'okundu' olarak işaretlenir ve karşı tarafa bildirim gönderilir. Bu, MongoDB'de array update ve Socket.io event broadcasting gerektirir.",
+          "instructions": "Read receipts mekanizmasını backend ve Socket event olarak implement et.",
+          "code_snippet": "// server/src/services/message.service.ts - ek metod\nasync markAsRead(conversationId: string, userId: string) {\n  const result = await Message.updateMany(\n    {\n      conversationId,\n      sender: { $ne: userId },\n      readBy: { $nin: [userId] },\n    },\n    { $addToSet: { readBy: userId } }\n  );\n\n  return result.modifiedCount;\n}\n\nasync getUnreadCount(userId: string, conversationId: string): Promise<number> {\n  return Message.countDocuments({\n    conversationId,\n    sender: { $ne: userId },\n    readBy: { $nin: [userId] },\n  });\n}\n\nasync getUnreadCounts(userId: string): Promise<Record<string, number>> {\n  const conversations = await Conversation.find({ participants: userId }).lean();\n  const counts: Record<string, number> = {};\n\n  for (const conv of conversations) {\n    counts[conv._id.toString()] = await this.getUnreadCount(userId, conv._id.toString());\n  }\n\n  return counts;\n}",
+          "deep_dive": "$ne (not equal) ile kendi mesajlarını hariç tutar — kendi mesajını okumak anlamsız. $nin (not in) ile zaten okunmuş mesajları hariç tutar. $addToSet ile duplicate eklemeyi önler. updateMany ile bir konuşmadaki tüm okunmamış mesajlar tek sorguda güncellenir. countDocuments, sorgu koşuluna uyan kayıt sayısını döndürür — count() deprecated.",
+          "checkpoint": "Konuşma açıldığında okunmamış mesajlar 'okundu' işaretlenmeli. Karşı tarafa okundu bildirimi Socket event olarak gitmeli. Okunmamış mesaj sayısı doğru hesaplanmalı."
+        },
+        {
+          "step": 4,
+          "title": "REST API Endpoint'leri",
+          "why": "Chat uygulamasında Socket.io real-time iletişim için kullanılırken, REST API geçmiş veri sorgulama, kullanıcı arama ve profil güncelleme gibi request-response ihtiyaçları için kullanılır. İki protokol birbirini tamamlar.",
+          "instructions": "Conversation ve message REST endpoint'lerini oluştur.",
+          "code_snippet": "// server/src/routes/conversation.routes.ts\nimport { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { ConversationService } from '../services/conversation.service';\nimport { MessageService } from '../services/message.service';\n\nconst router = Router();\nconst conversationService = new ConversationService();\nconst messageService = new MessageService();\n\nrouter.use(authenticate);\n\n// Konuşma listesi\nrouter.get('/', async (req, res, next) => {\n  try {\n    const conversations = await conversationService.getUserConversations(req.userId!);\n    const unreadCounts = await messageService.getUnreadCounts(req.userId!);\n\n    const enriched = conversations.map((conv: any) => ({\n      ...conv,\n      unreadCount: unreadCounts[conv._id.toString()] || 0,\n    }));\n\n    res.json({ status: 'success', data: enriched });\n  } catch (error) {\n    next(error);\n  }\n});\n\n// Mesaj geçmişi (cursor-based pagination)\nrouter.get('/:id/messages', async (req, res, next) => {\n  try {\n    const { cursor, limit } = req.query;\n    const result = await messageService.getMessages(\n      req.params.id,\n      cursor as string,\n      parseInt(limit as string) || 50\n    );\n    res.json({ status: 'success', data: result });\n  } catch (error) {\n    next(error);\n  }\n});\n\n// Mesaj arama\nrouter.get('/:id/search', async (req, res, next) => {\n  try {\n    const messages = await messageService.searchMessages(\n      req.params.id,\n      req.query.q as string\n    );\n    res.json({ status: 'success', data: messages });\n  } catch (error) {\n    next(error);\n  }\n});\n\nexport default router;",
+          "deep_dive": "Conversation listesine unread count eklenmesi, client'ın her konuşma için ayrı istek yapmasını önler. Bu 'enrichment' pattern'ı, API response'unu kullanılabilir hale getirir. cursor query parameter'ı opsiyoneldir — ilk yüklemede cursor gönderilmez, sonraki sayfalarda gönderilir. REST ve WebSocket'in birlikte kullanımı yaygın bir pattern'dır: REST = CRUD, WebSocket = real-time events.",
+          "checkpoint": "GET /api/conversations ile konuşma listesi ve okunmamış sayıları dönmeli. Mesaj pagination cursor ile çalışmalı. Mesaj arama sonuç döndürmeli."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Cursor-based pagination: limit+1 pattern'ı ile hasMore kontrolü, offset pagination'dan çok daha performanslı.\n- $addToSet: MongoDB'de array'e duplicate eklemeden eleman ekler — readBy için ideal.\n- lean(): Mongoose document yerine plain JS object döndürür — okuma performansını 5-10x artırır.\n- REST + WebSocket birlikte: REST geçmiş veri sorgulama, WebSocket real-time events.\n- Direct conversation duplicate kontrolü: $all + $size ile aynı iki kullanıcı arası tek konuşma garanti edilir.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar chat uygulamasında 'eventual consistency' kabul eder. Read receipt'lerin hemen güncellenememesi (network gecikme) normal karşılanır. Önemli olan 'at-least-once delivery' — mesaj en az bir kez iletilmeli. Client-side message deduplication (messageId ile) duplicate mesajları önler. Ayrıca 'message ordering' konusu önemlidir: server timestamp ile sıralama, client clock'ların farklı olması durumunda bile doğru sıra sağlar."
+    },
+    {
+      "id": "p03-m3",
+      "title": "Frontend Chat Arayüzü",
+      "overview": "Bu milestone'da React ile profesyonel chat arayüzünü oluşturacaksın. Conversation listesi, mesaj görünümü, infinite scroll ve real-time güncellemeler implement edilecek.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "Socket.io client",
+        "Zustand state management",
+        "Infinite scroll",
+        "Virtual scrolling",
+        "Real-time UI updates"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Socket.io Client ve Global State",
+          "why": "Socket.io client bağlantısı, uygulamanın her yerinden erişilebilir olmalıdır. Zustand ile global socket state yönetimi yapılır. Bağlantı durumu (connected, disconnected, reconnecting) kullanıcıya gösterilir.",
+          "instructions": "Socket.io client kurulumu yap ve Zustand store oluştur.",
+          "code_snippet": "// client/src/stores/socket-store.ts\nimport { create } from 'zustand';\nimport { io, Socket } from 'socket.io-client';\n\ninterface SocketStore {\n  socket: Socket | null;\n  isConnected: boolean;\n  connect: (token: string) => void;\n  disconnect: () => void;\n}\n\nexport const useSocketStore = create<SocketStore>((set, get) => ({\n  socket: null,\n  isConnected: false,\n\n  connect: (token: string) => {\n    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {\n      auth: { token },\n      reconnection: true,\n      reconnectionAttempts: 10,\n      reconnectionDelay: 1000,\n    });\n\n    socket.on('connect', () => {\n      set({ isConnected: true });\n      console.log('Socket connected');\n    });\n\n    socket.on('disconnect', () => {\n      set({ isConnected: false });\n      console.log('Socket disconnected');\n    });\n\n    socket.on('connect_error', (error) => {\n      console.error('Connection error:', error.message);\n    });\n\n    set({ socket });\n  },\n\n  disconnect: () => {\n    get().socket?.disconnect();\n    set({ socket: null, isConnected: false });\n  },\n}));\n\n// client/src/stores/chat-store.ts\nimport { create } from 'zustand';\n\ninterface ChatStore {\n  conversations: any[];\n  activeConversation: string | null;\n  messages: Record<string, any[]>;\n  typingUsers: Record<string, string[]>;\n  setConversations: (conversations: any[]) => void;\n  setActiveConversation: (id: string | null) => void;\n  addMessage: (conversationId: string, message: any) => void;\n  setMessages: (conversationId: string, messages: any[]) => void;\n  setTyping: (conversationId: string, userId: string, isTyping: boolean) => void;\n}\n\nexport const useChatStore = create<ChatStore>((set, get) => ({\n  conversations: [],\n  activeConversation: null,\n  messages: {},\n  typingUsers: {},\n\n  setConversations: (conversations) => set({ conversations }),\n  setActiveConversation: (id) => set({ activeConversation: id }),\n\n  addMessage: (conversationId, message) => {\n    set((state) => ({\n      messages: {\n        ...state.messages,\n        [conversationId]: [\n          ...(state.messages[conversationId] || []),\n          message,\n        ],\n      },\n    }));\n  },\n\n  setMessages: (conversationId, messages) => {\n    set((state) => ({\n      messages: { ...state.messages, [conversationId]: messages },\n    }));\n  },\n\n  setTyping: (conversationId, userId, isTyping) => {\n    set((state) => {\n      const current = state.typingUsers[conversationId] || [];\n      const updated = isTyping\n        ? [...new Set([...current, userId])]\n        : current.filter((id) => id !== userId);\n      return {\n        typingUsers: { ...state.typingUsers, [conversationId]: updated },\n      };\n    });\n  },\n}));",
+          "deep_dive": "Zustand, Redux'a göre çok daha az boilerplate gerektirir — store tanımı tek fonksiyon. reconnectionDelay: 1000 ile bağlantı koptuğunda 1 saniye sonra yeniden denenir. messages Record<string, any[]> ile her conversation'ın mesajları ayrı ayrı saklanır. Set ile typing users'da duplicate önlenir. Zustand'ın get() fonksiyonu, store'a subscribe olmadan anlık değeri okur.",
+          "checkpoint": "Login sonrası socket bağlantısı otomatik kurulmalı. Bağlantı durumu UI'da gösterilmeli. Bağlantı koptuğunda otomatik reconnection yapmalı."
+        },
+        {
+          "step": 2,
+          "title": "Conversation Listesi ve Chat Layout",
+          "why": "Chat layout, sol panelde konuşma listesi ve sağ panelde aktif konuşma mesajları şeklinde organize edilir. Bu 'master-detail' layout, kullanıcının konuşmalar arasında hızla geçiş yapmasını sağlar. Responsive tasarımda mobilde sadece bir panel gösterilir.",
+          "instructions": "Chat layout'u ve konuşma listesi component'ini oluştur.",
+          "code_snippet": "// client/src/pages/chat.tsx\nimport { useEffect } from 'react';\nimport { useSocketStore } from '../stores/socket-store';\nimport { useChatStore } from '../stores/chat-store';\nimport { ConversationList } from '../components/conversation-list';\nimport { ChatWindow } from '../components/chat-window';\nimport { api } from '../lib/api';\n\nexport function ChatPage() {\n  const { socket } = useSocketStore();\n  const { activeConversation, setConversations, addMessage, setTyping } = useChatStore();\n\n  useEffect(() => {\n    // Konuşma listesini yükle\n    api.get('/conversations').then(({ data }) => {\n      setConversations(data.data);\n    });\n  }, []);\n\n  useEffect(() => {\n    if (!socket) return;\n\n    // Real-time event listener'lar\n    socket.on('message:received', (message) => {\n      addMessage(message.conversationId, message);\n    });\n\n    socket.on('typing:update', ({ userId, conversationId, isTyping }) => {\n      setTyping(conversationId, userId, isTyping);\n    });\n\n    return () => {\n      socket.off('message:received');\n      socket.off('typing:update');\n    };\n  }, [socket]);\n\n  return (\n    <div className=\"flex h-screen\">\n      <div className=\"w-80 border-r border-gray-200 dark:border-gray-800\">\n        <ConversationList />\n      </div>\n      <div className=\"flex-1\">\n        {activeConversation ? (\n          <ChatWindow conversationId={activeConversation} />\n        ) : (\n          <div className=\"flex h-full items-center justify-center text-gray-400\">\n            Bir konuşma seçin\n          </div>\n        )}\n      </div>\n    </div>\n  );\n}",
+          "deep_dive": "useEffect cleanup (return fonksiyonu) ile event listener'lar temizlenir — memory leak önlenir. socket.off ile listener kaldırılır. Event listener'lar socket değiştiğinde yeniden bağlanır. Master-detail layout, flex ile oluşturulur: sol panel sabit genişlik (w-80 = 320px), sağ panel kalan alanı kaplar (flex-1).",
+          "checkpoint": "Sol panelde konuşma listesi görünmeli. Konuşmaya tıklayınca sağ panel açılmalı. Real-time mesaj geldiğinde liste ve chat güncellenmeli."
+        },
+        {
+          "step": 3,
+          "title": "Chat Window ve Mesaj Gönderme",
+          "why": "Chat window, mesaj görüntüleme, gönderme ve typing indicator gibi temel etkileşimleri içerir. Mesaj input'u, enter ile gönderme ve shift+enter ile yeni satır oluşturma desteği sunar. Otomatik scroll, yeni mesaj geldiğinde en alta kaydırır.",
+          "instructions": "Chat window component'ini implement et.",
+          "code_snippet": "// client/src/components/chat-window.tsx\nimport { useState, useEffect, useRef, useCallback } from 'react';\nimport { useSocketStore } from '../stores/socket-store';\nimport { useChatStore } from '../stores/chat-store';\nimport { api } from '../lib/api';\nimport { MessageBubble } from './message-bubble';\n\nexport function ChatWindow({ conversationId }: { conversationId: string }) {\n  const [input, setInput] = useState('');\n  const [isLoading, setIsLoading] = useState(false);\n  const messagesEndRef = useRef<HTMLDivElement>(null);\n  const { socket } = useSocketStore();\n  const { messages, typingUsers, setMessages, addMessage } = useChatStore();\n\n  const conversationMessages = messages[conversationId] || [];\n  const typing = typingUsers[conversationId] || [];\n\n  useEffect(() => {\n    // Mesaj geçmişini yükle\n    setIsLoading(true);\n    api.get(`/conversations/${conversationId}/messages`)\n      .then(({ data }) => setMessages(conversationId, data.data.messages))\n      .finally(() => setIsLoading(false));\n\n    // Mesajları okundu olarak işaretle\n    socket?.emit('message:read', { conversationId });\n  }, [conversationId]);\n\n  useEffect(() => {\n    // Yeni mesajda otomatik scroll\n    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });\n  }, [conversationMessages.length]);\n\n  const sendMessage = useCallback(() => {\n    if (!input.trim() || !socket) return;\n\n    socket.emit('message:send', {\n      conversationId,\n      content: input.trim(),\n      type: 'text',\n    }, (response: any) => {\n      if (response.status !== 'ok') {\n        console.error('Mesaj gönderilemedi');\n      }\n    });\n\n    setInput('');\n    socket.emit('typing:stop', { conversationId });\n  }, [input, socket, conversationId]);\n\n  const handleTyping = useCallback(() => {\n    socket?.emit('typing:start', { conversationId });\n  }, [socket, conversationId]);\n\n  return (\n    <div className=\"flex h-full flex-col\">\n      {/* Header */}\n      <div className=\"border-b px-4 py-3\">\n        <h2 className=\"font-semibold\">Konuşma</h2>\n      </div>\n\n      {/* Messages */}\n      <div className=\"flex-1 overflow-y-auto p-4 space-y-3\">\n        {isLoading ? (\n          <div className=\"text-center text-gray-400\">Yükleniyor...</div>\n        ) : (\n          conversationMessages.map((msg: any) => (\n            <MessageBubble key={msg._id} message={msg} />\n          ))\n        )}\n\n        {typing.length > 0 && (\n          <div className=\"text-sm text-gray-400 italic\">\n            {typing.length === 1 ? 'Yazıyor...' : `${typing.length} kişi yazıyor...`}\n          </div>\n        )}\n\n        <div ref={messagesEndRef} />\n      </div>\n\n      {/* Input */}\n      <div className=\"border-t p-4\">\n        <div className=\"flex gap-2\">\n          <textarea\n            value={input}\n            onChange={(e) => {\n              setInput(e.target.value);\n              handleTyping();\n            }}\n            onKeyDown={(e) => {\n              if (e.key === 'Enter' && !e.shiftKey) {\n                e.preventDefault();\n                sendMessage();\n              }\n            }}\n            placeholder=\"Mesajınızı yazın... (@ai ile AI asistanı kullanın)\"\n            className=\"flex-1 resize-none rounded-lg border p-2 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800\"\n            rows={1}\n          />\n          <button\n            onClick={sendMessage}\n            disabled={!input.trim()}\n            className=\"rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50\"\n          >\n            Gönder\n          </button>\n        </div>\n      </div>\n    </div>\n  );\n}",
+          "deep_dive": "useCallback ile fonksiyonlar memoize edilir — gereksiz re-render önlenir. scrollIntoView({ behavior: 'smooth' }) ile yeni mesajda yumuşak scroll yapılır. Typing event throttle edilmeli (her keystroke'da değil) — bu, useCallback ve debounce ile yapılır. Acknowledgment callback ile mesaj gönderme başarısı doğrulanır. messagesEndRef, mesaj listesinin en altına bir invisible div koyarak scroll target sağlar.",
+          "checkpoint": "Mesajlar kronolojik sırada görünmeli. Mesaj gönderme çalışmalı. Typing indicator görünmeli. Yeni mesajda otomatik scroll çalışmalı."
+        },
+        {
+          "step": 4,
+          "title": "Mesaj Bubble Component ve Stil",
+          "why": "Mesaj baloncuğu (bubble), chat UI'ın en temel yapı taşıdır. Kendi mesajın sağda mavi, karşıdaki mesajlar solda gri olarak gösterilir. Zaman damgası, okundu bilgisi ve kullanıcı avatarı gösterilir.",
+          "instructions": "MessageBubble component'ini oluştur. Farklı mesaj tiplerini (text, AI, file) destekle.",
+          "code_snippet": "// client/src/components/message-bubble.tsx\nimport { useAuth } from '../contexts/auth-context';\n\nexport function MessageBubble({ message }: { message: any }) {\n  const { user } = useAuth();\n  const isOwn = message.sender._id === user?.id || message.sender === user?.id;\n  const isAI = message.type === 'ai_response';\n\n  return (\n    <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>\n      <div className=\"flex max-w-[70%] gap-2\">\n        {!isOwn && (\n          <div className=\"flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-sm font-medium text-gray-600\">\n            {isAI ? 'AI' : message.sender.name?.[0]?.toUpperCase()}\n          </div>\n        )}\n\n        <div>\n          {!isOwn && (\n            <p className=\"mb-1 text-xs text-gray-500\">\n              {isAI ? 'AI Asistan' : message.sender.name}\n            </p>\n          )}\n\n          <div\n            className={`rounded-2xl px-4 py-2 ${\n              isOwn\n                ? 'bg-blue-600 text-white'\n                : isAI\n                ? 'border border-purple-200 bg-purple-50 text-gray-800 dark:border-purple-800 dark:bg-purple-900/20 dark:text-gray-200'\n                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'\n            }`}\n          >\n            <p className=\"whitespace-pre-wrap text-sm\">{message.content}</p>\n          </div>\n\n          <div className={`mt-1 flex items-center gap-1 text-xs text-gray-400 ${isOwn ? 'justify-end' : ''}`}>\n            <span>\n              {new Date(message.createdAt).toLocaleTimeString('tr-TR', {\n                hour: '2-digit',\n                minute: '2-digit',\n              })}\n            </span>\n            {isOwn && (\n              <span>\n                {message.readBy?.length > 1 ? '✓✓' : '✓'}\n              </span>\n            )}\n          </div>\n        </div>\n      </div>\n    </div>\n  );\n}",
+          "deep_dive": "max-w-[70%] ile mesaj baloncuğu ekranın %70'inden fazla genişlemez — uzun mesajlar alt satıra geçer. whitespace-pre-wrap ile satır sonları korunur. readBy array'inin uzunluğu 1'den fazlaysa çift tik gösterilir (karşı taraf okumuş). AI mesajları farklı renk (mor) ile ayırt edilir. flex-shrink-0 ile avatar sıkışmaz — mesaj uzadığında bile sabit kalır.",
+          "checkpoint": "Kendi mesajlar sağda mavi, karşıdakiler solda gri görünmeli. AI mesajları mor arka planlı olmalı. Zaman damgası ve okundu tikler görünmeli."
+        },
+        {
+          "step": 5,
+          "title": "Infinite Scroll ile Mesaj Geçmişi",
+          "why": "Chat uygulamalarında tüm mesaj geçmişi tek seferde yüklenmez — kullanıcı yukarı kaydırdıkça eski mesajlar yüklenir. Bu 'infinite scroll' pattern'ı, performansı korurken tüm geçmişe erişimi sağlar. IntersectionObserver ile scroll pozisyonu izlenir.",
+          "instructions": "Yukarı scroll ile eski mesajların yüklenmesini implement et.",
+          "code_snippet": "// client/src/hooks/use-infinite-messages.ts\nimport { useState, useCallback, useRef, useEffect } from 'react';\nimport { api } from '../lib/api';\nimport { useChatStore } from '../stores/chat-store';\n\nexport function useInfiniteMessages(conversationId: string) {\n  const [hasMore, setHasMore] = useState(true);\n  const [isLoadingMore, setIsLoadingMore] = useState(false);\n  const cursorRef = useRef<string | null>(null);\n  const { messages, setMessages } = useChatStore();\n  const observerRef = useRef<HTMLDivElement>(null);\n\n  const loadMore = useCallback(async () => {\n    if (isLoadingMore || !hasMore) return;\n\n    setIsLoadingMore(true);\n    try {\n      const params = cursorRef.current\n        ? `?cursor=${cursorRef.current}&limit=50`\n        : '?limit=50';\n\n      const { data } = await api.get(\n        `/conversations/${conversationId}/messages${params}`\n      );\n\n      const newMessages = data.data.messages;\n      const existing = messages[conversationId] || [];\n\n      setMessages(conversationId, [...newMessages, ...existing]);\n      setHasMore(data.data.hasMore);\n      cursorRef.current = data.data.nextCursor;\n    } catch (error) {\n      console.error('Mesaj yükleme hatası:', error);\n    } finally {\n      setIsLoadingMore(false);\n    }\n  }, [conversationId, isLoadingMore, hasMore]);\n\n  // IntersectionObserver ile scroll izleme\n  useEffect(() => {\n    const observer = new IntersectionObserver(\n      (entries) => {\n        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {\n          loadMore();\n        }\n      },\n      { threshold: 0.1 }\n    );\n\n    if (observerRef.current) {\n      observer.observe(observerRef.current);\n    }\n\n    return () => observer.disconnect();\n  }, [loadMore, hasMore, isLoadingMore]);\n\n  return { isLoadingMore, hasMore, observerRef, loadMore };\n}",
+          "deep_dive": "IntersectionObserver, scroll event listener'dan daha performanslıdır — debounce gerekmez ve tarayıcı optimize eder. threshold: 0.1 ile element %10 görünür olduğunda trigger edilir. Yeni mesajlar mevcut mesajların BAŞINA eklenir ([...newMessages, ...existing]) çünkü eski mesajlar üstte gösterilir. cursorRef ile cursor değeri re-render'lar arasında korunur (state değişikliği tetiklemeden).",
+          "checkpoint": "Yukarı scroll yapıldığında eski mesajlar yüklenmeli. Yükleme sırasında spinner gösterilmeli. Tüm mesajlar yüklendiğinde daha fazla yükleme yapılmamalı."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Zustand: Redux'a göre çok daha az boilerplate, global state için minimal çözüm.\n- scrollIntoView({ behavior: 'smooth' }) ile yeni mesajda otomatik kaydırma.\n- IntersectionObserver: scroll event listener'dan daha performanslı — infinite scroll için ideal.\n- useCallback ile fonksiyon memoization — gereksiz re-render önlenir.\n- Master-detail layout: sol panel konuşmalar, sağ panel mesajlar — responsive'de sadece biri görünür.\n- Socket event cleanup: useEffect return'da socket.off() ile listener'ları temizle.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar chat UI'da 'virtual scrolling' düşünür. Binlerce mesaj DOM'da olursa performans düşer. react-virtuoso veya @tanstack/virtual ile sadece görünür mesajlar render edilir. Ayrıca 'scroll restoration' önemlidir: eski mesajlar yüklendiğinde scroll pozisyonu korunmalı (yukarı zıplamamalı). Bu, scrollHeight farkını hesaplayıp scrollTop ayarlayarak yapılır."
+    },
+    {
+      "id": "p03-m4",
+      "title": "AI Asistan Entegrasyonu",
+      "overview": "Bu milestone'da OpenAI API entegrasyonu ile chat uygulamasına AI asistan ekleyeceksin. Kullanıcılar @ai komutuyla AI'dan yardım isteyebilecek ve yanıtlar streaming olarak gösterilecek.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "OpenAI API",
+        "Streaming response",
+        "Prompt engineering",
+        "Context management",
+        "Rate limiting"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "OpenAI API Kurulumu ve Temel Entegrasyon",
+          "why": "OpenAI API, AI asistanın beynini oluşturur. API key yönetimi, model seçimi ve temel chat completion çağrısı, AI entegrasyonunun ilk adımıdır. Streaming response, kullanıcıya token-by-token yanıt göstererek bekleme süresini azaltır.",
+          "instructions": "OpenAI API istemcisini kur ve temel chat completion fonksiyonunu oluştur.",
+          "code_snippet": "// server/src/services/ai.service.ts\nimport OpenAI from 'openai';\nimport { config } from '../utils/config';\n\nconst openai = new OpenAI({ apiKey: config.openaiApiKey });\n\nconst SYSTEM_PROMPT = `Sen yardımsever bir AI asistansın. Chat uygulamasında kullanıcılara yardım ediyorsun.\nKurallar:\n- Kısa ve öz cevaplar ver (maksimum 500 kelime)\n- Kod sorularında syntax highlighting için markdown kullan\n- Türkçe cevap ver (teknik terimler İngilizce kalabilir)\n- Zararlı veya uygunsuz içerik üretme\n- Emin olmadığın konularda bunu belirt`;\n\nexport class AIService {\n  async generateResponse(userMessage: string, conversationHistory: any[] = []) {\n    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [\n      { role: 'system', content: SYSTEM_PROMPT },\n      ...conversationHistory.slice(-10).map((msg) => ({\n        role: msg.type === 'ai_response' ? 'assistant' as const : 'user' as const,\n        content: msg.content,\n      })),\n      { role: 'user', content: userMessage },\n    ];\n\n    const completion = await openai.chat.completions.create({\n      model: 'gpt-4o-mini',\n      messages,\n      max_tokens: 1000,\n      temperature: 0.7,\n    });\n\n    return completion.choices[0].message.content || 'Yanıt oluşturulamadı.';\n  }\n\n  async generateStreamingResponse(\n    userMessage: string,\n    conversationHistory: any[] = [],\n    onToken: (token: string) => void\n  ) {\n    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [\n      { role: 'system', content: SYSTEM_PROMPT },\n      ...conversationHistory.slice(-10).map((msg) => ({\n        role: msg.type === 'ai_response' ? 'assistant' as const : 'user' as const,\n        content: msg.content,\n      })),\n      { role: 'user', content: userMessage },\n    ];\n\n    const stream = await openai.chat.completions.create({\n      model: 'gpt-4o-mini',\n      messages,\n      max_tokens: 1000,\n      temperature: 0.7,\n      stream: true,\n    });\n\n    let fullResponse = '';\n\n    for await (const chunk of stream) {\n      const token = chunk.choices[0]?.delta?.content || '';\n      if (token) {\n        fullResponse += token;\n        onToken(token);\n      }\n    }\n\n    return fullResponse;\n  }\n}",
+          "deep_dive": "gpt-4o-mini, hız ve maliyet açısından chat uygulamaları için idealdir. temperature: 0.7, yaratıcılık ve tutarlılık arasında denge sağlar (0 = deterministik, 1 = çok yaratıcı). conversationHistory.slice(-10) ile son 10 mesaj context olarak gönderilir — token limitini aşmamak için. Streaming response, for await...of ile async iterator olarak okunur — her token geldiğinde onToken callback'i tetiklenir.",
+          "checkpoint": "AI service'e mesaj gönderildiğinde yanıt dönmeli. Streaming modda token'lar tek tek gelmeli. System prompt kurallarına uymalı."
+        },
+        {
+          "step": 2,
+          "title": "AI Socket Event Handler",
+          "why": "AI yanıtları, Socket.io üzerinden real-time olarak client'a streaming edilir. Kullanıcı @ai yazdığında, mesaj önce normal olarak kaydedilir, sonra AI yanıtı streaming olarak gönderilir. Bu, ChatGPT benzeri bir deneyim sağlar.",
+          "instructions": "Socket event handler'ına AI mesaj işleme logic'ini ekle.",
+          "code_snippet": "// server/src/events/ai-handler.ts\nimport { Socket, Server } from 'socket.io';\nimport { AIService } from '../services/ai.service';\nimport { Message } from '../models/message.model';\nimport { Conversation } from '../models/conversation.model';\n\nconst aiService = new AIService();\n\nexport function setupAIHandler(io: Server, socket: Socket) {\n  socket.on('ai:ask', async (data, callback) => {\n    const { conversationId, question } = data;\n    const userId = socket.data.userId;\n\n    try {\n      // Kullanıcı mesajını kaydet\n      const userMessage = await Message.create({\n        conversationId,\n        sender: userId,\n        content: question,\n        type: 'text',\n        readBy: [userId],\n      });\n\n      io.to(conversationId).emit('message:received',\n        await userMessage.populate('sender', 'name avatar')\n      );\n\n      // Son mesajları context olarak al\n      const history = await Message.find({ conversationId })\n        .sort({ createdAt: -1 })\n        .limit(10)\n        .lean();\n\n      // AI yanıtı için placeholder mesaj oluştur\n      const aiMessage = await Message.create({\n        conversationId,\n        sender: userId,\n        content: '',\n        type: 'ai_response',\n        readBy: [userId],\n      });\n\n      // Streaming başladı bildirimi\n      io.to(conversationId).emit('ai:stream:start', {\n        messageId: aiMessage.id,\n        conversationId,\n      });\n\n      // Streaming yanıt\n      const fullResponse = await aiService.generateStreamingResponse(\n        question,\n        history.reverse(),\n        (token) => {\n          io.to(conversationId).emit('ai:stream:token', {\n            messageId: aiMessage.id,\n            token,\n          });\n        }\n      );\n\n      // Final mesajı güncelle\n      await Message.findByIdAndUpdate(aiMessage.id, { content: fullResponse });\n\n      io.to(conversationId).emit('ai:stream:end', {\n        messageId: aiMessage.id,\n        fullContent: fullResponse,\n      });\n\n      await Conversation.findByIdAndUpdate(conversationId, {\n        lastMessage: aiMessage.id,\n        lastActivity: new Date(),\n      });\n\n      callback({ status: 'ok' });\n    } catch (error) {\n      console.error('AI error:', error);\n      callback({ status: 'error', message: 'AI yanıt veremedi' });\n    }\n  });\n}",
+          "deep_dive": "Streaming pattern: önce boş bir AI mesajı oluşturulur (placeholder), sonra token'lar tek tek emit edilir, son olarak tam yanıt veritabanına kaydedilir. Bu, ChatGPT'nin 'yazıyor' efektini replike eder. ai:stream:start ile client streaming moduna girer, ai:stream:token ile her token eklenir, ai:stream:end ile streaming tamamlanır. Context olarak son 10 mesaj gönderilir — AI konuşmanın bağlamını anlar.",
+          "checkpoint": "@ai komutuyla soru sorulduğunda AI yanıtı streaming olarak gelmeli. Token'lar tek tek gösterilmeli. Streaming bitince tam yanıt veritabanında olmalı."
+        },
+        {
+          "step": 3,
+          "title": "Frontend AI Streaming UI",
+          "why": "AI yanıtlarının streaming gösterimi, kullanıcıya anında geri bildirim sağlar ve bekleme süresini algısal olarak azaltır. Token-by-token rendering, ChatGPT benzeri bir deneyim yaratır.",
+          "instructions": "Frontend'de AI streaming mesajlarını render eden component'i implement et.",
+          "code_snippet": "// client/src/hooks/use-ai-stream.ts\nimport { useEffect, useState } from 'react';\nimport { useSocketStore } from '../stores/socket-store';\nimport { useChatStore } from '../stores/chat-store';\n\nexport function useAIStream() {\n  const { socket } = useSocketStore();\n  const [streamingMessages, setStreamingMessages] = useState<Record<string, string>>({});\n\n  useEffect(() => {\n    if (!socket) return;\n\n    socket.on('ai:stream:start', ({ messageId }) => {\n      setStreamingMessages((prev) => ({ ...prev, [messageId]: '' }));\n    });\n\n    socket.on('ai:stream:token', ({ messageId, token }) => {\n      setStreamingMessages((prev) => ({\n        ...prev,\n        [messageId]: (prev[messageId] || '') + token,\n      }));\n    });\n\n    socket.on('ai:stream:end', ({ messageId }) => {\n      setStreamingMessages((prev) => {\n        const next = { ...prev };\n        delete next[messageId];\n        return next;\n      });\n    });\n\n    return () => {\n      socket.off('ai:stream:start');\n      socket.off('ai:stream:token');\n      socket.off('ai:stream:end');\n    };\n  }, [socket]);\n\n  return { streamingMessages };\n}\n\n// Streaming mesaj gösterimi için component\n// client/src/components/streaming-message.tsx\nexport function StreamingMessage({ content }: { content: string }) {\n  return (\n    <div className=\"rounded-2xl border border-purple-200 bg-purple-50 px-4 py-2 dark:border-purple-800 dark:bg-purple-900/20\">\n      <p className=\"mb-1 text-xs text-purple-600\">AI Asistan</p>\n      <p className=\"whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200\">\n        {content}\n        <span className=\"inline-block h-4 w-1 animate-pulse bg-purple-500\" />\n      </p>\n    </div>\n  );\n}",
+          "deep_dive": "streamingMessages state'i, aktif streaming mesajlarını messageId bazında izler. Her token geldiğinde ilgili mesajın content'i güncellenir. Streaming bittiğinde mesaj normal message listesine taşınır (store'dan silinir). Blinking cursor (animate-pulse) efekti, AI'ın hala yazdığını gösterir. State update'ler React'in batching mekanizmasıyla optimize edilir — her token render tetiklemez.",
+          "checkpoint": "AI yanıtları karakter karakter gösterilmeli. Streaming sırasında blinking cursor görünmeli. Streaming bitince normal mesaj olarak kalmalı."
+        },
+        {
+          "step": 4,
+          "title": "AI Rate Limiting ve Güvenlik",
+          "why": "AI API çağrıları maliyetlidir. Rate limiting ile kullanıcı başına istek sayısını sınırlamak, bütçe kontrolü ve kötüye kullanımı önleme açısından kritiktir. Prompt injection saldırılarına karşı da önlem alınmalıdır.",
+          "instructions": "AI endpoint'ine rate limiting ve güvenlik katmanları ekle.",
+          "code_snippet": "// server/src/middleware/ai-rate-limit.ts\nimport { redis } from '../utils/redis';\nimport { Socket } from 'socket.io';\n\nconst AI_RATE_LIMIT = 10; // Dakikada 10 istek\nconst AI_RATE_WINDOW = 60; // 60 saniye\n\nexport async function checkAIRateLimit(userId: string): Promise<boolean> {\n  const key = `ai_rate:${userId}`;\n  const current = await redis.incr(key);\n\n  if (current === 1) {\n    await redis.expire(key, AI_RATE_WINDOW);\n  }\n\n  return current <= AI_RATE_LIMIT;\n}\n\n// server/src/utils/prompt-guard.ts\nconst BLOCKED_PATTERNS = [\n  /ignore.*previous.*instructions/i,\n  /forget.*system.*prompt/i,\n  /you.*are.*now/i,\n  /act.*as.*if/i,\n];\n\nexport function sanitizeUserInput(input: string): string {\n  // Prompt injection kalıplarını kontrol et\n  for (const pattern of BLOCKED_PATTERNS) {\n    if (pattern.test(input)) {\n      return '[Güvenlik: Bu tür komutlar engellenmiştir]';\n    }\n  }\n\n  // Maksimum uzunluk sınırı\n  if (input.length > 2000) {\n    return input.slice(0, 2000) + '... [kısaltıldı]';\n  }\n\n  return input;\n}",
+          "deep_dive": "Redis INCR + EXPIRE ile sliding window rate limiting yapılır: ilk istekte sayaç 1 olur ve TTL ayarlanır, sonraki isteklerde sadece artırılır. TTL sona erince sayaç sıfırlanır. Prompt injection, kullanıcının system prompt'u override etmeye çalışmasıdır — 'ignore previous instructions' gibi kalıplar engellenir. Bu, defense-in-depth'in AI katmanıdır. Girdi uzunluğu sınırı, token maliyetini kontrol eder.",
+          "checkpoint": "Dakikada 10'dan fazla AI isteği engellenMeli. Prompt injection denemeleri filtrelenmeli. Uzun mesajlar kısaltılmalı."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Streaming pattern: placeholder mesaj oluştur -> token'ları emit et -> final içerik kaydet.\n- OpenAI streaming: stream: true ile for await...of async iterator kullanılır.\n- conversationHistory.slice(-10): Son 10 mesaj context olarak gönderilir — token limitini aşmamak için.\n- Rate limiting: Redis INCR + EXPIRE ile sliding window — AI API maliyetini kontrol et.\n- Prompt injection koruması: Zararlı kalıpları filtrele, girdi uzunluğunu sınırla.\n- temperature: 0.7 — yaratıcılık ve tutarlılık dengesi.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar AI entegrasyonunda 'cost estimation' yapar: gpt-4o-mini ~$0.15/1M input token, context window boyutu ve ortalama kullanım ile aylık maliyet hesaplanır. Ayrıca 'graceful degradation' uygulanır: AI servisi çöktüğünde chat uygulaması hala çalışmalı — AI sadece ek bir özellik, core işlevsellik olmadan da uygulama kullanılabilir olmalı."
+    },
+    {
+      "id": "p03-m5",
+      "title": "Dosya Paylaşımı ve Medya",
+      "overview": "Bu milestone'da chat uygulamasına dosya ve resim paylaşımı ekleyeceksin. Dosya yükleme, önizleme ve indirme özellikleri implement edilecek.",
+      "estimated_hours": 6,
+      "concepts_covered": [
+        "Multer file upload",
+        "Cloud storage",
+        "Image preview",
+        "File type validation"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Dosya Yükleme API'si (Multer)",
+          "why": "Dosya paylaşımı, modern mesajlaşma uygulamalarının standart özelliğidir. Multer, Express'te dosya yükleme işlemlerini yöneten middleware'dir. Dosya boyutu limiti, tip kontrolü ve güvenlik validasyonu sunucu tarafında yapılmalıdır.",
+          "instructions": "Multer ile dosya yükleme endpoint'ini oluştur.",
+          "code_snippet": "pnpm install multer\npnpm install -D @types/multer\n\n// server/src/middleware/upload.ts\nimport multer from 'multer';\nimport path from 'path';\nimport { AppError } from './error-handler';\n\nconst ALLOWED_TYPES = [\n  'image/jpeg', 'image/png', 'image/gif', 'image/webp',\n  'application/pdf',\n  'text/plain', 'text/csv',\n];\n\nconst MAX_SIZE = 10 * 1024 * 1024; // 10MB\n\nconst storage = multer.diskStorage({\n  destination: './uploads',\n  filename: (req, file, cb) => {\n    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);\n    cb(null, uniqueSuffix + path.extname(file.originalname));\n  },\n});\n\nexport const upload = multer({\n  storage,\n  limits: { fileSize: MAX_SIZE },\n  fileFilter: (req, file, cb) => {\n    if (ALLOWED_TYPES.includes(file.mimetype)) {\n      cb(null, true);\n    } else {\n      cb(new AppError('Desteklenmeyen dosya tipi', 400) as any);\n    }\n  },\n});\n\n// server/src/routes/upload.routes.ts\nimport { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { upload } from '../middleware/upload';\n\nconst router = Router();\n\nrouter.post('/', authenticate, upload.single('file'), async (req, res) => {\n  if (!req.file) {\n    return res.status(400).json({ status: 'error', message: 'Dosya gerekli' });\n  }\n\n  const fileUrl = `/uploads/${req.file.filename}`;\n\n  res.json({\n    status: 'success',\n    data: {\n      url: fileUrl,\n      originalName: req.file.originalname,\n      size: req.file.size,\n      mimetype: req.file.mimetype,\n    },\n  });\n});\n\nexport default router;",
+          "deep_dive": "Dosya ismi olarak timestamp + random sayı kullanılır — orijinal isim güvenlik riski oluşturabilir (path traversal). MIME type kontrolü, client'ın gönderdiği Content-Type'a güvenmek yerine dosya içeriğini analiz eden magic-number kontrolü ile güçlendirilmeli (file-type kütüphanesi). Production'da dosyalar S3/Cloudflare R2 gibi object storage'da saklanır — local disk ölçeklenebilir değildir.",
+          "checkpoint": "Dosya yükleme endpoint'i çalışmalı. 10MB üstü dosyalar reddedilmeli. Desteklenmeyen tipler reddedilmeli."
+        },
+        {
+          "step": 2,
+          "title": "Chat'te Dosya Mesajı Gönderme",
+          "why": "Dosya yüklendikten sonra, dosya URL'i ile chat mesajı oluşturulur. Frontend'de dosya önizleme (resim thumbnail, PDF simgesi) gösterilir. Bu, dosya yükleme ve mesajlaşma sistemlerinin entegrasyonunu sağlar.",
+          "instructions": "Dosya mesajı gönderme ve frontend'de gösterim implement et.",
+          "code_snippet": "// Frontend - dosya gönderme\n// client/src/components/file-upload-button.tsx\nimport { useRef } from 'react';\nimport { api } from '../lib/api';\nimport { useSocketStore } from '../stores/socket-store';\n\nexport function FileUploadButton({ conversationId }: { conversationId: string }) {\n  const fileInputRef = useRef<HTMLInputElement>(null);\n  const { socket } = useSocketStore();\n\n  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {\n    const file = e.target.files?.[0];\n    if (!file) return;\n\n    const formData = new FormData();\n    formData.append('file', file);\n\n    try {\n      const { data } = await api.post('/upload', formData, {\n        headers: { 'Content-Type': 'multipart/form-data' },\n      });\n\n      // Dosya mesajı gönder\n      socket?.emit('message:send', {\n        conversationId,\n        content: data.data.url,\n        type: file.type.startsWith('image/') ? 'image' : 'file',\n        metadata: {\n          originalName: data.data.originalName,\n          size: data.data.size,\n          mimetype: data.data.mimetype,\n        },\n      });\n    } catch (error) {\n      console.error('Dosya yükleme hatası:', error);\n    }\n  };\n\n  return (\n    <>\n      <button\n        onClick={() => fileInputRef.current?.click()}\n        className=\"rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700\"\n        title=\"Dosya ekle\"\n      >\n        <svg className=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13\" />\n        </svg>\n      </button>\n      <input\n        ref={fileInputRef}\n        type=\"file\"\n        onChange={handleFileSelect}\n        accept=\"image/*,.pdf,.txt,.csv\"\n        className=\"hidden\"\n      />\n    </>\n  );\n}",
+          "deep_dive": "FormData ile multipart/form-data formatında dosya gönderilir — JSON'da binary veri taşınamaz. file.type.startsWith('image/') ile dosya tipine göre mesaj tipi belirlenir. accept attribute'u, dosya seçim dialogunda gösterilen tipleri filtreler — ama server-side validation yerine geçmez. metadata alanı, dosya bilgilerini (orijinal isim, boyut) mesajla birlikte saklar.",
+          "checkpoint": "Dosya seçilip yüklenebilmeli. Resim mesajları inline önizleme göstermeli. PDF/dosya mesajları indirme linki göstermeli."
+        },
+        {
+          "step": 3,
+          "title": "Resim Önizleme ve Dosya İndirme",
+          "why": "Resimlerin inline gösterilmesi ve dosyaların indirilebilir olması, kullanıcı deneyimini önemli ölçüde artırır. Resim optimize edilmeli (boyut ve kalite), dosya indirme güvenli olmalıdır.",
+          "instructions": "Mesaj balonunda dosya tipine göre farklı gösterimler implement et.",
+          "code_snippet": "// client/src/components/file-message.tsx\nexport function FileMessage({ message }: { message: any }) {\n  const isImage = message.type === 'image';\n  const metadata = message.metadata || {};\n\n  if (isImage) {\n    return (\n      <div className=\"max-w-sm\">\n        <img\n          src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${message.content}`}\n          alt=\"Paylaşılan resim\"\n          className=\"rounded-lg cursor-pointer hover:opacity-90 transition-opacity\"\n          loading=\"lazy\"\n          onClick={() => window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${message.content}`, '_blank')}\n        />\n      </div>\n    );\n  }\n\n  return (\n    <a\n      href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${message.content}`}\n      download={metadata.originalName}\n      className=\"flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700\"\n    >\n      <div className=\"flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600\">\n        <svg className=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z\" />\n        </svg>\n      </div>\n      <div>\n        <p className=\"text-sm font-medium\">{metadata.originalName || 'Dosya'}</p>\n        <p className=\"text-xs text-gray-500\">\n          {metadata.size ? `${(metadata.size / 1024).toFixed(1)} KB` : ''}\n        </p>\n      </div>\n    </a>\n  );\n}",
+          "deep_dive": "loading='lazy' ile resimler viewport'a girene kadar yüklenmez — özellikle mesaj geçmişinde çok sayıda resim olduğunda performansı artırır. download attribute'u, linke tıklandığında dosyayı indirmeyi tetikler (navigate etmek yerine). Dosya boyutu KB cinsinden gösterilir — UX için önemli. Production'da resimler CDN üzerinden serve edilmeli ve thumbnail/preview versiyonları oluşturulmalı.",
+          "checkpoint": "Resim mesajları inline gösterilmeli. Resme tıklanınca tam boyut açılmalı. Dosya mesajlarında indirme butonu çalışmalı."
+        },
+        {
+          "step": 4,
+          "title": "Drag & Drop Dosya Yükleme",
+          "why": "Drag & drop, dosya paylaşımı için en doğal etkileşim yöntemidir. Kullanıcı dosyayı masaüstünden sürükleyip chat penceresine bırakabilir. Bu, dosya paylaşım deneyimini modernleştirir ve hızlandırır.",
+          "instructions": "Chat penceresine drag & drop dosya yükleme ekle.",
+          "code_snippet": "// client/src/hooks/use-drag-drop.ts\nimport { useState, useCallback, DragEvent } from 'react';\n\nexport function useDragDrop(onFileDrop: (file: File) => void) {\n  const [isDragging, setIsDragging] = useState(false);\n\n  const handleDragEnter = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n    setIsDragging(true);\n  }, []);\n\n  const handleDragLeave = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n    setIsDragging(false);\n  }, []);\n\n  const handleDragOver = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n  }, []);\n\n  const handleDrop = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n    setIsDragging(false);\n\n    const file = e.dataTransfer.files[0];\n    if (file) onFileDrop(file);\n  }, [onFileDrop]);\n\n  return {\n    isDragging,\n    dragHandlers: {\n      onDragEnter: handleDragEnter,\n      onDragLeave: handleDragLeave,\n      onDragOver: handleDragOver,\n      onDrop: handleDrop,\n    },\n  };\n}",
+          "deep_dive": "preventDefault() her drag event'inde çağrılmalıdır — yoksa tarayıcı varsayılan davranışı (dosyayı açma) uygular. stopPropagation() ile event üst element'lere yayılmaz. isDragging state'i ile drop zone highlight gösterilir. DragEvent tiplendirilmesi, TypeScript ile type safety sağlar. Birden fazla dosya desteği için dataTransfer.files iterasyonu yapılabilir.",
+          "checkpoint": "Dosya sürüklendiğinde chat penceresi highlight olmalı. Dosya bırakıldığında yükleme başlamalı. Yükleme sonrası mesaj gönderilmeli."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Multer: Express dosya yükleme middleware'i. diskStorage ile dosya ismi kontrol edilir.\n- MIME type kontrolü server-side ZORUNLU — client tarafı bypass edilebilir.\n- FormData ile multipart/form-data gönderimi — JSON'da binary veri taşınamaz.\n- loading='lazy': Resimler viewport'a girene kadar yüklenmez — performans optimizasyonu.\n- Production'da: Object storage (S3/R2) + CDN + thumbnail üretimi.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar dosya yüklemede security-first düşünür: MIME type magic-number kontrolü (dosya uzantısına güvenme), virus scanning (ClamAV), dosya ismi sanitization (path traversal önleme), ve storage isolation (kullanıcı başına ayrı bucket). Ayrıca dosya boyutuna göre upload stratejisi değişir: küçük dosyalar (<5MB) direkt upload, büyük dosyalar multipart upload veya pre-signed URL ile client-to-storage direkt upload."
+    },
+    {
+      "id": "p03-m6",
+      "title": "Deploy, Test ve Final Polish",
+      "overview": "Son milestone'da uygulamayı production-ready hale getireceksin. Docker Compose ile tüm servisleri containerize edecek, temel testleri yazacak ve deployment hazırlığı yapacaksın.",
+      "estimated_hours": 6,
+      "concepts_covered": [
+        "Docker Compose",
+        "WebSocket testing",
+        "Production deployment",
+        "Performance monitoring"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Docker Compose ile Tam Ortam",
+          "why": "Production deployment için tüm servislerin (API, MongoDB, Redis) containerize edilmesi gerekir. Docker Compose, multi-container uygulamaları tek komutla yönetir.",
+          "instructions": "Production-ready Docker Compose konfigürasyonu oluştur.",
+          "code_snippet": "# docker-compose.prod.yml\nservices:\n  server:\n    build: ./server\n    ports:\n      - '3001:3001'\n    environment:\n      - NODE_ENV=production\n      - MONGO_URI=mongodb://mongo:27017/chatapp\n      - REDIS_URL=redis://redis:6379\n      - JWT_SECRET=${JWT_SECRET}\n      - OPENAI_API_KEY=${OPENAI_API_KEY}\n    depends_on:\n      - mongo\n      - redis\n    restart: unless-stopped\n\n  mongo:\n    image: mongo:7\n    volumes:\n      - mongodata:/data/db\n    restart: unless-stopped\n\n  redis:\n    image: redis:7-alpine\n    restart: unless-stopped\n\n  client:\n    build: ./client\n    ports:\n      - '80:80'\n    depends_on:\n      - server\n    restart: unless-stopped\n\nvolumes:\n  mongodata:",
+          "deep_dive": "restart: unless-stopped ile container crash olursa otomatik yeniden başlatılır — ama manuel durdurmada restart olmaz. Environment variable'lar .env dosyasından ${VAR} ile inject edilir. Production'da MongoDB replica set ve Redis Sentinel ile yüksek erişilebilirlik sağlanır. Client build, Nginx ile static dosya olarak serve edilir.",
+          "checkpoint": "docker-compose -f docker-compose.prod.yml up ile tüm servisler başlamalı. Chat uygulaması çalışmalı. Tüm özellikler test edilmeli."
+        },
+        {
+          "step": 2,
+          "title": "WebSocket ve API Testleri",
+          "why": "Real-time uygulamalarda test yazmak, geleneksel REST API testlerinden farklıdır. Socket.io client'ını test ortamında kullanarak event'leri simüle edebilirsin.",
+          "instructions": "Socket.io ve REST API testlerini yaz.",
+          "code_snippet": "// server/tests/socket.test.ts\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\nimport { io as Client } from 'socket.io-client';\n\ndescribe('Socket.io Events', () => {\n  let io: Server;\n  let clientSocket: any;\n  let httpServer: any;\n\n  beforeAll((done) => {\n    httpServer = createServer();\n    io = new Server(httpServer);\n    httpServer.listen(() => {\n      const port = (httpServer.address() as any).port;\n      clientSocket = Client(`http://localhost:${port}`, {\n        auth: { token: 'test-token' },\n      });\n      clientSocket.on('connect', done);\n    });\n  });\n\n  afterAll(() => {\n    io.close();\n    clientSocket.close();\n  });\n\n  it('should receive message after sending', (done) => {\n    io.on('connection', (socket) => {\n      socket.on('message:send', (data, callback) => {\n        socket.emit('message:received', {\n          ...data,\n          id: 'test-id',\n          sender: { name: 'Test User' },\n          createdAt: new Date(),\n        });\n        callback({ status: 'ok' });\n      });\n    });\n\n    clientSocket.on('message:received', (message: any) => {\n      expect(message.content).toBe('Hello!');\n      done();\n    });\n\n    clientSocket.emit('message:send', {\n      conversationId: 'conv-1',\n      content: 'Hello!',\n      type: 'text',\n    }, () => {});\n  });\n});",
+          "deep_dive": "Socket.io testlerinde done callback kullanılır çünkü event-driven testler asenkrondur — assertion event callback'i içinde yapılır ve done() ile test tamamlanır. Test server'ı random port'ta çalışır (çakışma önlenir). beforeAll/afterAll ile server lifecycle yönetilir. Production'da socket.io-client ile load testing yapılabilir (artillery gibi araçlarla).",
+          "checkpoint": "Socket.io event testleri geçmeli. Mesaj gönderme ve alma simüle edilebilmeli. API testleri (auth, conversations) geçmeli."
+        },
+        {
+          "step": 3,
+          "title": "Performance Monitoring ve Final Checklist",
+          "why": "Real-time uygulamalar performans açısından hassastır. Bağlantı sayısı, mesaj latency'si ve memory kullanımı izlenmelidir. Production checklist, deployment öncesi son kontrol listesidir.",
+          "instructions": "Basit monitoring ve production checklist uygula.",
+          "code_snippet": "// server/src/utils/monitoring.ts\nimport { Server } from 'socket.io';\n\nexport function setupMonitoring(io: Server) {\n  // Bağlı kullanıcı sayısı\n  setInterval(() => {\n    const connectedSockets = io.sockets.sockets.size;\n    console.log(`[Monitor] Connected clients: ${connectedSockets}`);\n  }, 30000);\n\n  // Health check endpoint\n  return {\n    getStats: () => ({\n      connectedClients: io.sockets.sockets.size,\n      uptime: process.uptime(),\n      memoryUsage: process.memoryUsage(),\n    }),\n  };\n}\n\n// Production Checklist:\n// [x] Socket.io CORS konfigüre\n// [x] JWT authentication middleware\n// [x] Rate limiting (AI endpoint)\n// [x] Dosya yükleme boyut ve tip kontrolü\n// [x] MongoDB index'ler oluşturuldu\n// [x] Redis bağlantı kontrolü\n// [x] Error handling tüm event'lerde\n// [x] Reconnection mekanizması\n// [x] Docker Compose çalışıyor\n// [x] Environment variables güvenli",
+          "deep_dive": "process.memoryUsage() ile heap used, heap total ve RSS (Resident Set Size) izlenir. Memory leak'i tespit etmek için bu metriklerin zamanla artmaması beklenir. Socket.io sockets.size, anlık bağlı client sayısını verir. Production'da bu metrikler Prometheus/Grafana'ya gönderilir.",
+          "checkpoint": "Health check endpoint çalışmalı. Monitoring metrikleri loglanmalı. Tüm checklist maddeleri tamamlanmalı."
+        },
+        {
+          "step": 4,
+          "title": "README ve Demo Hazırlığı",
+          "why": "Profesyonel README ve demo GIF/video, projenin etkisini artırır. Real-time özellikler görsel demo ile çok daha iyi anlaşılır.",
+          "instructions": "README yaz ve demo materyali hazırla.",
+          "code_snippet": "# README yapısı:\n# Real-time Chat + AI Assistant\n## Demo GIF (iki pencerede chat + AI yanıtı)\n## Özellikler\n  - Real-time mesajlaşma (Socket.io)\n  - AI asistan (@ai komutu)\n  - Streaming AI yanıtları\n  - Dosya paylaşımı\n  - Typing indicator ve online durum\n## Teknoloji Stack'i\n## Mimari Diyagramı\n## Hızlı Başlangıç\n## API ve Socket Event Dokümantasyonu\n## Ekran Görüntüleri",
+          "deep_dive": "Real-time uygulamaların demo'su, statik screenshot'tan çok daha etkilidir. İki tarayıcı penceresi yan yana açılıp mesajlaşma gösterilir. AI streaming yanıtı özellikle etkileyicidir. OBS veya LICEcap ile GIF oluşturulabilir. README'de Socket event tablosu (event adı, payload, açıklama) API dokümantasyonu yerine geçer.",
+          "checkpoint": "README profesyonel görünmeli. Demo materyali hazır olmalı. Kurulum 3 adımda tamamlanabilmeli."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Docker Compose production: restart: unless-stopped, environment injection, volume persistence.\n- Socket.io testi: done callback ile async event test, random port ile izolasyon.\n- Memory monitoring: process.memoryUsage() ile heap izleme — leak tespiti.\n- Demo materyali: Real-time uygulama = GIF/video demo çok daha etkili.\n- Socket event dokümantasyonu: event name, payload, response formatı tablosu.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar real-time uygulamalarda 'connection state machine' düşünür: connected -> disconnected -> reconnecting -> connected. Her state'te UI farklı davranır. Ayrıca 'offline-first' yaklaşımı: mesajlar local storage'a yazılır, bağlantı gelince sync edilir. Message ordering ve conflict resolution (aynı anda iki kişi aynı şeyi düzenlerse ne olur) konuları da düşünülür. Production'da WebSocket bağlantıları sticky session ile load balancer arkasında yönetilir."
+    },
+    {
+      "id": "p03-deployment",
+      "title": "Deployment ve Portfolio Showcase",
+      "estimated_hours": 4,
+      "steps": [
+        {
+          "title": "Production Build",
+          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "code_snippet": "pnpm build && pnpm test"
+        },
+        {
+          "title": "Deploy",
+          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et"
+        },
+        {
+          "title": "Profesyonel README",
+          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz"
+        },
+        {
+          "title": "Demo Video (Opsiyonel)",
+          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla"
+        }
+      ],
+      "checkpoint": "Proje canli URL'den erisilebilir, README profesyonel, screenshot'lar ekli, GitHub repo public"
+    }
+  ],
+  "interview_prep": {
+    "questions": [
+      "WebSocket ve HTTP arasındaki fark nedir? WebSocket ne zaman kullanılır?",
+      "Socket.io'nun raw WebSocket'e göre avantajları nelerdir?",
+      "MongoDB'yi chat uygulaması için neden tercih ettin? PostgreSQL kullansan nasıl tasarlardın?",
+      "Redis pub/sub ne işe yarar? Chat uygulamasında nasıl kullandın?",
+      "Cursor-based pagination nedir? Offset pagination'dan farkı ne?",
+      "AI streaming response nasıl çalışır? Token-by-token rendering nasıl implement ettin?",
+      "Chat uygulamasını horizontal scale etmek istesen ne yaparsın?",
+      "Prompt injection nedir ve nasıl önlenir?"
+    ],
+    "talking_points": [
+      "WhatsApp/Slack benzeri real-time chat uygulaması geliştirdim: Socket.io, MongoDB, Redis mimarisi.",
+      "AI asistan entegre ettim: OpenAI API ile streaming response, @ai komutuyla erişim.",
+      "Online presence, typing indicator ve read receipts implement ettim — gerçek mesajlaşma UX'i.",
+      "MongoDB cursor-based pagination ile mesaj geçmişi, Redis pub/sub ile multi-instance desteği.",
+      "Dosya paylaşımı: drag & drop upload, resim önizleme, dosya indirme.",
+      "Docker Compose ile containerized deployment, Redis adapter ile horizontal scaling hazırlığı."
+    ]
+  },
+  "resources": [
+    {
+      "title": "Socket.io Documentation",
+      "url": "https://socket.io/docs/v4/",
+      "why": "Socket.io'nun resmi dokümantasyonu. Event handling, rooms, namespaces ve adapter kullanımı."
+    },
+    {
+      "title": "MongoDB University - Free Courses",
+      "url": "https://learn.mongodb.com/",
+      "why": "MongoDB'nin ücretsiz eğitim platformu. Schema design, indexing ve aggregation konuları."
+    },
+    {
+      "title": "OpenAI API Documentation",
+      "url": "https://platform.openai.com/docs",
+      "why": "Chat Completions API, streaming, function calling ve best practices."
+    },
+    {
+      "title": "Redis Documentation",
+      "url": "https://redis.io/docs/",
+      "why": "Redis veri yapıları, pub/sub, caching stratejileri ve best practices."
+    }
+  ],
+  "cv_guidance": {
+    "project_title_for_cv": "Real-Time Chat Application with AI Assistant Integration",
+    "bullet_points": {
+      "Full Stack Developer": [
+        "Built a real-time chat application using React.js, TypeScript, Node.js, and Socket.IO supporting 100+ concurrent WebSocket connections with sub-50ms message delivery",
+        "Implemented room-based messaging system with presence detection, typing indicators, read receipts, and file sharing, handling 1K+ messages per minute",
+        "Designed scalable architecture with Redis Pub/Sub for multi-instance message distribution and MongoDB for persistent chat history with cursor-based pagination",
+        "Developed responsive UI with Tailwind CSS featuring real-time message rendering, emoji support, and mobile-optimized layout across 3+ breakpoints"
+      ],
+      "AI Engineer": [
+        "Integrated OpenAI API with streaming response support, enabling real-time AI assistant responses within chat interface with < 200ms time-to-first-token",
+        "Implemented context-aware AI chatbot with conversation memory, supporting code assistance, translation, and knowledge queries via @ai command trigger",
+        "Built rate limiting and token management system for AI API calls, optimizing cost by 40% through intelligent context windowing and response caching",
+        "Designed event-driven architecture with Socket.IO for bi-directional AI response streaming, providing real-time character-by-character output display"
+      ]
+    },
+    "skills_gained": {
+      "Frontend": [
+        "React.js",
+        "TypeScript",
+        "Tailwind CSS",
+        "WebSocket Client",
+        "Real-Time UI Updates"
+      ],
+      "Backend": [
+        "Node.js",
+        "Express.js",
+        "Socket.IO",
+        "WebSocket Protocol",
+        "Event-Driven Architecture"
+      ],
+      "Database": [
+        "MongoDB",
+        "Redis",
+        "Pub/Sub Pattern",
+        "Cursor-Based Pagination"
+      ],
+      "AI/ML": [
+        "OpenAI API",
+        "Streaming Responses",
+        "Prompt Engineering",
+        "Context Management"
+      ],
+      "DevOps": [
+        "Docker",
+        "Multi-Instance Scaling",
+        "Redis Adapter"
+      ]
+    },
+    "ats_keywords": [
+      "React.js",
+      "TypeScript",
+      "Node.js",
+      "Socket.IO",
+      "WebSocket",
+      "MongoDB",
+      "Redis",
+      "OpenAI API",
+      "Real-Time",
+      "Chat Application",
+      "Pub/Sub",
+      "Docker",
+      "Tailwind CSS",
+      "REST API",
+      "Event-Driven Architecture",
+      "Streaming"
+    ],
+    "cv_placement": "Full Stack Developer pozisyonlarinda ilk siraya koy — real-time ozellikler cok talep gorur. AI Engineer pozisyonlarinda da guclu bir proje cunku OpenAI entegrasyonu ve streaming response iceriyor. Chat uygulamasi recruiter'larin kolayca anlayabilecegi bir projedir — herkes WhatsApp/Slack kullanir.",
+    "metrics_you_can_claim": [
+      "100+ eszamanli WebSocket baglantisi destegi",
+      "Mesaj iletim suresi < 50ms (ayni sunucu icinde)",
+      "Redis Pub/Sub ile multi-instance mesaj dagitimi",
+      "OpenAI API streaming ile < 200ms ilk token suresi",
+      "MongoDB cursor-based pagination ile verimli mesaj yuklemesi",
+      "1K+ mesaj/dakika isleme kapasitesi",
+      "AI API maliyet optimizasyonu — context windowing ile %40 tasarruf"
+    ]
+  },
+  "github_guidance": {
+    "repo_name": "realtime-chat-websocket",
+    "repo_description": "Real-time chat app with AI assistant — React, TypeScript, Socket.IO, MongoDB, Redis pub/sub, OpenAI API streaming",
+    "topics": [
+      "react",
+      "typescript",
+      "socketio",
+      "websocket",
+      "mongodb",
+      "redis",
+      "openai",
+      "chat",
+      "real-time",
+      "nodejs",
+      "ai-assistant"
+    ],
+    "when_to_create": "Projeye başladığın ilk gün repo'yu oluştur. İlk commit: Socket.IO server + client boilerplate + basit echo mesajlaşma testi. Real-time bağlantının çalıştığını gösteren minimal setup.",
+    "pin_on_profile": false,
+    "readme_sections": [
+      "# Realtime Chat + AI Assistant + one-line description",
+      "Badges: build status, tech stack (React, Socket.IO, MongoDB, Redis), license (shields.io)",
+      "## 📸 Screenshots / Demo GIF",
+      "## ✨ Features (bullet list)",
+      "## 🛠 Tech Stack (table: Frontend | Backend | Database | AI/ML | DevOps)",
+      "## 🚀 Getting Started (prerequisites, pnpm install, docker compose up, env vars)",
+      "## 📐 Architecture (ASCII diagram or visual)",
+      "## 📡 API Documentation (main endpoints, example request/response)",
+      "## 🧠 What I Learned (3-5 concepts learned from this project)",
+      "## 📄 License (MIT)"
+    ],
+    "commit_convention": "Conventional Commits: feat:, fix:, docs:, refactor:, test:, chore:",
+    "commit_examples": [
+      "feat: implement real-time messaging with Socket.IO rooms",
+      "feat: add AI assistant with OpenAI streaming responses via @ai command",
+      "fix: resolve message ordering race condition in concurrent WebSocket events",
+      "docs: add WebSocket event flow diagram to README",
+      "refactor: migrate from polling to Redis pub/sub for multi-instance sync",
+      "test: add Socket.IO integration tests for room join/leave events",
+      "chore: configure MongoDB replica set for change streams support"
+    ],
+    "branch_strategy": "main (production) + develop (active) + feature/* + fix/* + docs/*",
+    "daily_commit_target": "Günde en az 3-5 anlamlı commit. Contribution graph'ın yeşil kalması önemli.",
+    "pro_tips": [
+      "Her milestone bittiğinde git tag ekle: v0.1.0, v0.2.0...",
+      "README'ye mutlaka screenshot/GIF ekle — görsel proje daha çok dikkat çeker",
+      "Issues oluştur ve kapat — proje yönetimi becerini gösterir",
+      "GitHub Projects board kullan — Kanban tarzı iş takibi",
+      "Chat demosunu GIF olarak kaydet — real-time mesajlaşma ve AI yanıtları çok etkileyici görünür",
+      "WebSocket event akışını diagram olarak README'ye ekle — teknik derinliğini gösterir"
+    ]
+  },
+  "cover_letter_guidance": {
+    "project_highlight": "Built a real-time chat application with AI assistant integration using React, Node.js, Socket.io, MongoDB, and Redis, supporting 1000+ concurrent WebSocket connections with sub-50ms message delivery, presence detection, and OpenAI-powered streaming AI responses.",
+    "skills_demonstrated": [
+      "React",
+      "TypeScript",
+      "Node.js",
+      "Socket.io",
+      "MongoDB",
+      "Redis",
+      "OpenAI API",
+      "WebSocket",
+      "Real-time Architecture"
+    ],
+    "talking_points": [
+      "Engineered real-time messaging system using Socket.io handling 1000+ concurrent connections with automatic reconnection and heartbeat monitoring",
+      "Integrated OpenAI API with streaming responses for an in-chat AI assistant accessible via @ai commands",
+      "Implemented Redis pub/sub for horizontal scaling across multiple server instances with session management",
+      "Built presence detection system with typing indicators, read receipts, and online/offline status updates in real-time",
+      "Designed MongoDB document schema optimized for time-series chat data with cursor-based pagination"
+    ]
+  },
+  "ai_workflow": {
+    "planning": {
+      "model": "Claude Opus 4.6",
+      "prompt_template": "I'm building a real-time chat application with AI assistant using React + TypeScript, Node.js + Socket.io, MongoDB, Redis pub/sub, and OpenAI API. Help me design the system architecture considering: WebSocket event flow (message, typing, presence, read receipts), MongoDB schema for messages and conversations, Redis pub/sub for multi-instance scaling, room management, AI assistant integration with streaming responses, and Socket.io adapter configuration.",
+      "when_to_use": "Her milestone'un basinda kullan — WebSocket event yapisi, MongoDB semasi ve AI entegrasyon akisi planlamak icin"
+    },
+    "code_review": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "Review this Socket.io + Node.js + MongoDB code for: WebSocket event handling best practices, room management and namespace usage, MongoDB query optimization for chat messages, Redis pub/sub integration, memory leak prevention in Socket connections, error handling for disconnections, OpenAI API streaming implementation, and React state management for real-time updates.",
+      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle Socket.io event handler'lari, MongoDB aggregation pipeline'lari ve AI streaming icin"
+    },
+    "debugging": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "I'm getting this error in my real-time chat app (React + Socket.io + MongoDB + Redis + OpenAI): [error]. The relevant code is: [code]. Socket event flow: [flow]. I'm trying to [goal].",
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle WebSocket baglanti sorunlari, Redis pub/sub hatalari ve OpenAI streaming kesintileri icin"
+    },
+    "research": {
+      "model": "Gemini 2.5 Pro",
+      "prompt_template": "Explain [concept] with practical examples for a real-time chat app with AI. Topics I need help with: Socket.io rooms and namespaces, Redis pub/sub adapter for Socket.io, MongoDB TTL indexes and capped collections, cursor-based pagination, OpenAI streaming API with Server-Sent Events, typing indicators implementation, and online presence tracking patterns.",
+      "when_to_use": "Yeni bir konsept ogrenirken kullan — ozellikle WebSocket patterns, MongoDB chat semasi ve OpenAI streaming icin"
+    }
+  },
+  "deployment_guide": {
+    "recommended_stack": {
+      "frontend": "Vercel",
+      "backend": "Railway",
+      "database": "MongoDB Atlas (ucretsiz M0 cluster)",
+      "cache": "Upstash Redis (serverless)",
+      "ai": "OpenAI API"
+    },
+    "steps": [
+      {
+        "title": "MongoDB Atlas Cluster",
+        "commands": [
+          "# mongodb.com/atlas > Create Cluster > M0 Free"
+        ],
+        "instructions": "IP whitelist'e 0.0.0.0/0 ekle (Railway icin). Database user olustur"
+      },
+      {
+        "title": "Upstash Redis",
+        "commands": [
+          "# upstash.com > Create Database > Global"
+        ],
+        "instructions": "REST API veya ioredis ile baglan. Ucretsiz: 10K komut/gun"
+      },
+      {
+        "title": "Backend Deploy (Railway)",
+        "commands": [
+          "railway up"
+        ],
+        "instructions": "Env vars: MONGODB_URI, REDIS_URL, OPENAI_API_KEY, JWT_SECRET, CORS_ORIGIN"
+      },
+      {
+        "title": "Frontend Deploy (Vercel)",
+        "commands": [
+          "pnpm dlx vercel"
+        ],
+        "instructions": "VITE_API_URL ve VITE_WS_URL ayarla"
+      }
+    ],
+    "env_vars": [
+      "MONGODB_URI",
+      "REDIS_URL",
+      "OPENAI_API_KEY",
+      "JWT_SECRET",
+      "CORS_ORIGIN",
+      "VITE_API_URL",
+      "VITE_WS_URL"
+    ],
+    "estimated_time": "45 dakika",
+    "cost": "~$0-5/ay (OpenAI kullanima gore)",
+    "demo_checklist": [
+      "WebSocket baglantisi calisiyor",
+      "Mesaj gonderme/alma",
+      "AI asistan yanit veriyor",
+      "Dosya paylasimi",
+      "Online/offline durumu"
+    ]
+  },
+  "portfolio_showcase": {
+    "readme_must_haves": [
+      "Proje aciklamasi ve motivasyon (2-3 cumle)",
+      "Canli demo linki (Vercel/Railway badge ile)",
+      "Teknoloji stack badge'leri",
+      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Mimari diyagram (ASCII veya draw.io)",
+      "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
+      "API dokumantasyonu (/docs linki veya Postman collection)",
+      "Ogrenilenler ve kararlar bolumu"
+    ],
+    "screenshot_suggestions": [
+      "Dashboard/Anasayfa",
+      "Ana ozellik ekrani",
+      "Mobile gorunum"
+    ],
+    "live_demo_url_template": "https://realtime-chat.vercel.app",
+    "github_repo_template": "https://github.com/USERNAME/realtime-chat-ai"
+  }
+}

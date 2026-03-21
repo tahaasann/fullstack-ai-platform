@@ -1,0 +1,107 @@
+{
+  "id": "challenge-hooks",
+  "title": "Custom Hook Yaz",
+  "difficulty": "orta",
+  "category": "react",
+  "tags": ["hooks", "custom-hooks", "localStorage", "fetch", "typescript"],
+  "related_lesson": "mod-07-react/lesson-01",
+  "description_tr": "İki adet custom React hook yazacaksın: (1) useLocalStorage - localStorage ile senkronize state yöneten hook, (2) useFetch - generic data fetching hook (loading, error, refetch destekli).",
+  "description_detail": "İki adet custom hook yazacaksınız: (1) useLocalStorage<T>(key, initialValue) - localStorage'dan veri okur, state olarak tutar ve değiştiğinde localStorage'a yazar. Sayfa yenilendiğinde veri korunmalıdır. (2) useFetch<T>(url) - verilen URL'den veri çeker, loading/error/data state'lerini yönetir ve refetch fonksiyonu sunar. URL değiştiğinde otomatik yeniden fetch yapmalıdır.",
+  "examples": [
+    {
+      "input": "const [name, setName] = useLocalStorage<string>('name', 'Ahmet');\nconsole.log(name);",
+      "output": "Ahmet",
+      "explanation": "İlk çağrıda localStorage'da 'name' key'i yoksa initialValue ('Ahmet') kullanılır ve localStorage'a yazılır."
+    },
+    {
+      "input": "const [name, setName] = useLocalStorage<string>('name', 'Ahmet');\nsetName('Mehmet');\n// Sayfa yenilendikten sonra:\nconst [name2] = useLocalStorage<string>('name', 'Ahmet');\nconsole.log(name2);",
+      "output": "Mehmet",
+      "explanation": "setName çağrıldığında hem state güncellenir hem localStorage'a yazılır. Sayfa yenilendiğinde localStorage'dan 'Mehmet' okunur."
+    },
+    {
+      "input": "const { data, loading, error, refetch } = useFetch<User[]>('https://api.example.com/users');\nconsole.log(loading);",
+      "output": "true",
+      "explanation": "useFetch çağrıldığında ilk olarak loading true olur, fetch tamamlandığında data dolar ve loading false olur."
+    }
+  ],
+  "constraints": [
+    "useLocalStorage hook'u generic tip desteği sağlamalıdır (useLocalStorage<T>)",
+    "useLocalStorage localStorage'da JSON.parse/stringify kullanmalıdır",
+    "useLocalStorage lazy initialization kullanmalıdır (useState(() => ...))",
+    "useFetch hook'u loading, error, data ve refetch döndürmelidir",
+    "useFetch URL değiştiğinde otomatik yeniden fetch yapmalıdır",
+    "useFetch race condition'ı önlemek için cleanup kullanmalıdır",
+    "Her iki hook da TypeScript ile tip güvenli olmalıdır"
+  ],
+  "starter_code": {
+    "python": "# Python'da React hooks kavramı yoktur, ancak benzer pattern'ler uygulanabilir.\n# Bu challenge'ın Python versiyonunda observable state ve caching pattern'lerini implement edin.\n\nimport json\nimport os\n\nclass LocalStorage:\n    \"\"\"Dosya tabanlı basit bir localStorage implementasyonu.\"\"\"\n    \n    def __init__(self, filepath: str = 'storage.json'):\n        self.filepath = filepath\n        self._data: dict = {}\n        self._load()\n    \n    def _load(self):\n        if os.path.exists(self.filepath):\n            with open(self.filepath, 'r') as f:\n                self._data = json.load(f)\n    \n    def _save(self):\n        with open(self.filepath, 'w') as f:\n            json.dump(self._data, f)\n    \n    def get_item(self, key: str, default=None):\n        \"\"\"localStorage.getItem karşılığı\"\"\"\n        # Implement et\n        pass\n    \n    def set_item(self, key: str, value) -> None:\n        \"\"\"localStorage.setItem karşılığı\"\"\"\n        # Implement et\n        pass\n    \n    def remove_item(self, key: str) -> None:\n        \"\"\"localStorage.removeItem karşılığı\"\"\"\n        # Implement et\n        pass\n\n\nclass FetchResult:\n    \"\"\"useFetch hook'unun döndürdüğü sonucu temsil eder.\"\"\"\n    \n    def __init__(self):\n        self.data = None\n        self.loading = True\n        self.error = None\n    \n    def __repr__(self):\n        return f'FetchResult(data={self.data}, loading={self.loading}, error={self.error})'\n\n\ndef fetch_data(url: str) -> FetchResult:\n    \"\"\"Senkron fetch implementasyonu (requests veya urllib ile).\"\"\"\n    # Implement et\n    pass",
+    "javascript": "import { useState, useEffect, useCallback } from 'react';\n\n/**\n * useLocalStorage - localStorage ile senkronize state hook'u.\n * \n * Kullanım:\n *   const [name, setName] = useLocalStorage<string>('name', 'Ahmet');\n *   setName('Mehmet'); // Hem state güncellenir hem localStorage'a yazılır\n * \n * @param key - localStorage key'i\n * @param initialValue - varsayılan değer (localStorage boşsa kullanılır)\n * @returns [storedValue, setValue] - useState benzeri tuple\n */\nfunction useLocalStorage(key, initialValue) {\n    // Hook'u burada implement et\n}\n\n\n/**\n * useFetch - Generic data fetching hook'u.\n * \n * Kullanım:\n *   const { data, loading, error, refetch } = useFetch('/api/users');\n * \n * @param url - Fetch yapılacak URL\n * @returns { data, loading, error, refetch }\n */\nfunction useFetch(url) {\n    // Hook'u burada implement et\n}\n\nexport { useLocalStorage, useFetch };"
+  },
+  "test_cases": [
+    {
+      "input": {"test": "localStorage_initial_value", "code": "const [value] = useLocalStorage('test-key-1', 'initial');\nresult = value;"},
+      "expected": "initial"
+    },
+    {
+      "input": {"test": "localStorage_set_and_get", "code": "const [value, setValue] = useLocalStorage('test-key-2', 'old');\nsetValue('new');\nresult = value;"},
+      "expected": "new"
+    },
+    {
+      "input": {"test": "localStorage_persists", "code": "window.localStorage.setItem('test-key-3', JSON.stringify('persisted'));\nconst [value] = useLocalStorage('test-key-3', 'default');\nresult = value;"},
+      "expected": "persisted"
+    },
+    {
+      "input": {"test": "localStorage_object", "code": "const [user, setUser] = useLocalStorage('user', { name: 'Ali', age: 25 });\nresult = user.name;"},
+      "expected": "Ali"
+    },
+    {
+      "input": {"test": "localStorage_updater_function", "code": "const [count, setCount] = useLocalStorage('count', 0);\nsetCount(prev => prev + 1);\nresult = count;"},
+      "expected": 1
+    },
+    {
+      "input": {"test": "fetch_loading_initial", "code": "const { loading } = useFetch('/api/test');\nresult = loading;"},
+      "expected": true
+    },
+    {
+      "input": {"test": "fetch_data_success", "code": "// Mock fetch returns { users: ['Ali', 'Veli'] }\nconst { data, loading } = useFetch('/api/users');\n// After fetch completes:\nresult = data;"},
+      "expected": {"users": ["Ali", "Veli"]}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"test": "localStorage_array", "code": "const [items, setItems] = useLocalStorage('items', []);\nsetItems(prev => [...prev, 'item1']);\nresult = items.length;"},
+      "expected": 1
+    },
+    {
+      "input": {"test": "localStorage_writes_to_storage", "code": "const [val, setVal] = useLocalStorage('written', 'hello');\nresult = JSON.parse(window.localStorage.getItem('written'));"},
+      "expected": "hello"
+    },
+    {
+      "input": {"test": "fetch_error_handling", "code": "// Mock fetch throws error\nconst { error, loading } = useFetch('/api/not-found');\n// After fetch fails:\nresult = error !== null;"},
+      "expected": true
+    },
+    {
+      "input": {"test": "fetch_refetch_function", "code": "const { refetch } = useFetch('/api/data');\nresult = typeof refetch === 'function';"},
+      "expected": true
+    },
+    {
+      "input": {"test": "fetch_url_change_refetches", "code": "// When URL changes, useFetch should re-fetch automatically\nconst { data: data1 } = useFetch('/api/users/1');\n// Change URL to /api/users/2\nconst { data: data2 } = useFetch('/api/users/2');\nresult = data1 !== data2;"},
+      "expected": true
+    }
+  ],
+  "hints": [
+    "useLocalStorage için useState'e lazy initialization ver: useState(() => { try { const item = localStorage.getItem(key); return item ? JSON.parse(item) : initialValue; } catch { return initialValue; } }). Bu sayede localStorage okuması sadece ilk render'da yapılır.",
+    "useFetch için useEffect içinde cancelled flag kullan: let cancelled = false; ve cleanup'ta cancelled = true; yap. Bu, URL hızla değiştiğinde eski fetch sonucunun state'e yazılmasını engeller (race condition).",
+    "Tam çözüm ipucu: useLocalStorage'da setValue fonksiyonunda hem setState yap hem localStorage.setItem çağır. Updater function desteği için: const valueToStore = value instanceof Function ? value(storedValue) : value; useFetch'te data, loading, error state'lerini ayrı useState ile tut, fetchData fonksiyonunu useCallback ile sarmalayıp useEffect dependency'sine ekle."
+  ],
+  "solution": {
+    "python": "import json\nimport os\nimport urllib.request\nimport urllib.error\n\n\nclass LocalStorage:\n    def __init__(self, filepath: str = 'storage.json'):\n        self.filepath = filepath\n        self._data: dict = {}\n        self._load()\n\n    def _load(self):\n        if os.path.exists(self.filepath):\n            with open(self.filepath, 'r') as f:\n                self._data = json.load(f)\n\n    def _save(self):\n        with open(self.filepath, 'w') as f:\n            json.dump(self._data, f)\n\n    def get_item(self, key: str, default=None):\n        return self._data.get(key, default)\n\n    def set_item(self, key: str, value) -> None:\n        self._data[key] = value\n        self._save()\n\n    def remove_item(self, key: str) -> None:\n        if key in self._data:\n            del self._data[key]\n            self._save()\n\n\nclass FetchResult:\n    def __init__(self):\n        self.data = None\n        self.loading = True\n        self.error = None\n\n    def __repr__(self):\n        return f'FetchResult(data={self.data}, loading={self.loading}, error={self.error})'\n\n\ndef fetch_data(url: str) -> FetchResult:\n    result = FetchResult()\n    try:\n        req = urllib.request.Request(url)\n        with urllib.request.urlopen(req) as response:\n            data = json.loads(response.read().decode())\n            result.data = data\n            result.loading = False\n    except urllib.error.HTTPError as e:\n        result.error = f'HTTP {e.code}: {e.reason}'\n        result.loading = False\n    except Exception as e:\n        result.error = str(e)\n        result.loading = False\n    return result",
+    "javascript": "import { useState, useEffect, useCallback } from 'react';\n\nfunction useLocalStorage(key, initialValue) {\n    const [storedValue, setStoredValue] = useState(() => {\n        try {\n            const item = window.localStorage.getItem(key);\n            return item ? JSON.parse(item) : initialValue;\n        } catch {\n            return initialValue;\n        }\n    });\n\n    const setValue = useCallback(\n        (value) => {\n            setStoredValue((prev) => {\n                const valueToStore = value instanceof Function ? value(prev) : value;\n                try {\n                    window.localStorage.setItem(key, JSON.stringify(valueToStore));\n                } catch (error) {\n                    console.error('localStorage write error:', error);\n                }\n                return valueToStore;\n            });\n        },\n        [key]\n    );\n\n    return [storedValue, setValue];\n}\n\nfunction useFetch(url) {\n    const [data, setData] = useState(null);\n    const [loading, setLoading] = useState(true);\n    const [error, setError] = useState(null);\n\n    const fetchData = useCallback(async () => {\n        let cancelled = false;\n        setLoading(true);\n        setError(null);\n\n        try {\n            const res = await fetch(url);\n            if (!res.ok) throw new Error(`HTTP ${res.status}`);\n            const json = await res.json();\n            if (!cancelled) {\n                setData(json);\n            }\n        } catch (err) {\n            if (!cancelled) {\n                setError(err instanceof Error ? err.message : 'Bir hata olustu');\n            }\n        } finally {\n            if (!cancelled) {\n                setLoading(false);\n            }\n        }\n\n        return () => { cancelled = true; };\n    }, [url]);\n\n    useEffect(() => {\n        const cleanup = fetchData();\n        return () => { cleanup.then(fn => fn && fn()); };\n    }, [fetchData]);\n\n    return { data, loading, error, refetch: fetchData };\n}\n\nexport { useLocalStorage, useFetch };",
+    "explanation_tr": "useLocalStorage hook'u: useState'e lazy initializer fonksiyon geçirir - bu fonksiyon sadece ilk render'da çalışır ve localStorage'dan veriyi okur. setValue fonksiyonu hem React state'ini güncelller hem de localStorage'a yazar. Updater function desteği (prev => prev + 1) için value'nun Function olup olmadığı kontrol edilir.\n\nuseFetch hook'u: data, loading ve error için ayrı state'ler tutar. fetchData fonksiyonu useCallback ile sarmalanır (url dependency ile). useEffect içinde fetchData çağrılır ve cleanup fonksiyonu ile cancelled flag true yapılarak race condition önlenir. URL değiştiğinde useCallback yeni referans oluşturur -> useEffect tekrar çalışır -> yeni URL fetch edilir.\n\nZaman karmaşıklığı: useLocalStorage O(1) (localStorage read/write), useFetch O(1) (network call async).\nAlan karmaşıklığı: useLocalStorage O(n) (stored data size), useFetch O(n) (response data size)."
+  },
+  "complexity": {
+    "optimal_time": "O(1) per hook call",
+    "optimal_space": "O(n) - stored/fetched data size"
+  },
+  "learn_after_solving": "Bu challenge ile React custom hook pattern'ını, localStorage entegrasyonunu ve data fetching best practice'lerini öğrendin. useLocalStorage hook'u form verilerini, kullanıcı tercihlerini (tema, dil) ve oturum bilgilerini persist etmek için production'da yaygın kullanılır. useFetch hook'u ise TanStack Query (React Query) gibi kütüphanelerin temelini oluşturur. Production'da doğrudan useFetch yazmak yerine TanStack Query kullan - caching, deduplication, retry, pagination gibi ileri özellikleri hazır sunar."
+}

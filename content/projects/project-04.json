@@ -1,0 +1,795 @@
+{
+  "id": "project-04",
+  "title": "E-ticaret Backend API + Fraud Detection",
+  "difficulty": "Orta-Zor",
+  "estimated_days": 14,
+  "tech_stack": [
+    "Node.js",
+    "Express",
+    "TypeScript",
+    "PostgreSQL",
+    "Prisma",
+    "Redis",
+    "Stripe",
+    "Docker",
+    "GitHub Actions",
+    "Python",
+    "scikit-learn"
+  ],
+  "brief": "Bu projede, production-ready bir e-ticaret backend API'si geliştirecek ve makine öğrenmesi ile sahte sipariş tespiti (fraud detection) sistemi kuracaksın. Bu proje, tam bir backend developer pozisyonu için gerekli tüm becerileri bir arada kullanmayı gerektirir.\n\nÜrün kataloğu, alışveriş sepeti, sipariş yönetimi ve Stripe ödeme entegrasyonu ile tam bir e-ticaret altyapısı kuracaksın. Stripe, dünyanın en yaygın kullanılan ödeme altyapısıdır ve gerçek dünyada e-ticaret projelerinde standart haline gelmiştir. Webhook'lar ile ödeme durumu güncellemelerini real-time olarak yakalayacaksın.\n\nFraud detection (dolandırıcılık tespiti) bölümünde, Python ve scikit-learn ile basit bir makine öğrenmesi modeli eğiteceksin. Model, sipariş verilerini analiz ederek şüpheli işlemleri tespit edecek. Bu, AI Engineer pozisyonları için kritik bir beceridir çünkü ML modellerini production sistemlere entegre etmeyi gösterir.\n\nAyrıca CI/CD pipeline (GitHub Actions), Docker containerization, API dokümantasyonu ve kapsamlı test suite ile DevOps becerilerini de geliştireceksin. Bu proje, tek başına bile güçlü bir portfolio parçası olacak niteliktedir.",
+  "target_roles": [
+    "Full Stack Developer",
+    "Backend Developer",
+    "AI Engineer"
+  ],
+  "architecture": {
+    "overview": "Layered architecture: Controller -> Service -> Repository katmanları. PostgreSQL ile ilişkisel veri modeli (ürünler, siparişler, kullanıcılar). Redis ile sepet yönetimi ve cache. Stripe ödeme entegrasyonu webhook'lar ile. Python microservice ile fraud detection ML modeli. Docker Compose ile tüm servislerin orchestration'ı.",
+    "diagram": "┌──────────────────────────────────────────────────────────────┐\n│                       API Gateway                            │\n│                    (Express + Rate Limit)                     │\n├──────────────────────────────────────────────────────────────┤\n│          ┌──────────────┐     ┌──────────────┐               │\n│          │  Product API │     │   Order API  │               │\n│          └──────┬───────┘     └──────┬───────┘               │\n│                 │                    │                        │\n│  ┌──────────────┴──────────────┬─────┴──────────────┐        │\n│  │       Cart Service          │   Payment Service  │        │\n│  │        (Redis)              │     (Stripe)       │        │\n│  └──────────────┬──────────────┘─────┬──────────────┘        │\n│                 │                    │                        │\n│  ┌──────────────┴────────────────────┴──────────────┐        │\n│  │              PostgreSQL (Prisma ORM)              │        │\n│  │    Users | Products | Orders | OrderItems         │        │\n│  └──────────────────────┬───────────────────────────┘        │\n│                         │                                    │\n│  ┌──────────────────────┴───────────────────────────┐        │\n│  │         Fraud Detection Service (Python)          │        │\n│  │         scikit-learn ML Model                     │        │\n│  └──────────────────────────────────────────────────┘        │\n└──────────────────────────────────────────────────────────────┘\n\n  Stripe Webhook Flow:\n  Client -> Stripe Checkout -> Stripe -> Webhook -> API -> DB Update",
+    "decisions": [
+      {
+        "decision": "Neden Stripe?",
+        "reasoning": "Stripe, PCI DSS uyumlu ödeme altyapısıdır — hassas kart bilgileri Stripe'ın sunucularında işlenir, senin server'ına asla ulaşmaz. Checkout Session ile tam bir ödeme akışı, Webhook'lar ile asenkron ödeme durumu güncellemesi sağlar. Developer experience açısından en iyi ödeme API'sidir.",
+        "alternatives": "PayPal, Iyzico, PayTR, Paddle",
+        "when_to_choose_alternative": "Iyzico/PayTR: Türkiye'ye özel ödeme yöntemleri (havale, kapıda ödeme). PayPal: Global marketplace. Paddle: SaaS abonelik yönetimi (tax compliance dahil)."
+      },
+      {
+        "decision": "Neden Redis ile Sepet Yönetimi?",
+        "reasoning": "Sepet verisi geçicidir — kullanıcı checkout yapmadan sepeti terk edebilir. Redis'in TTL özelliği ile sepetler otomatik temizlenir. In-memory yapısı sayesinde sepet işlemleri (ekleme, çıkarma, güncelleme) milisaniye seviyesinde tamamlanır. PostgreSQL'e yazma yükünü azaltır.",
+        "alternatives": "PostgreSQL'de sepet tablosu, Session storage, localStorage (client-side)",
+        "when_to_choose_alternative": "PostgreSQL: Sepet verisi kalıcı olmalıysa (terk edilmiş sepet e-postası). localStorage: Basit SPA'larda, auth gerektirmeyen sepet. Session: Küçük ölçekli uygulamalarda."
+      },
+      {
+        "decision": "Neden Python ML Microservice?",
+        "reasoning": "scikit-learn ve Python'un ML ekosistemi, Node.js'e göre çok daha zengindir. Fraud detection modeli ayrı bir microservice olarak çalıştırılır — Node.js API ile HTTP üzerinden iletişim kurar. Bu, separation of concerns prensibine uyar ve her servisi bağımsız ölçeklendirme imkanı verir.",
+        "alternatives": "TensorFlow.js (Node.js'te ML), Cloud ML servisleri (AWS SageMaker), Rule-based fraud detection",
+        "when_to_choose_alternative": "TensorFlow.js: Basit modeller ve tek dil ekosistemi isteniyorsa. AWS SageMaker: Enterprise-grade, managed ML. Rule-based: İlk aşama, ML öncesi hızlı çözüm."
+      },
+      {
+        "decision": "Neden PostgreSQL (MongoDB yerine)?",
+        "reasoning": "E-ticaret verileri ilişkiseldir: Ürün -> Kategori, Sipariş -> Sipariş Kalemleri -> Ürün, Kullanıcı -> Sipariş. ACID transaction'lar, ödeme işlemlerinde veri tutarlılığı için kritiktir. Stok güncellemesi ve sipariş oluşturma atomik olmalıdır.",
+        "alternatives": "MongoDB, MySQL, CockroachDB",
+        "when_to_choose_alternative": "MongoDB: Ürün varyasyonları çok değişkense (schema-less avantajı). CockroachDB: Global dağıtık veritabanı gerekiyorsa. MySQL: Mevcut MySQL altyapısı varsa."
+      }
+    ]
+  },
+  "what_you_learn": {
+    "technical": [
+      "RESTful API tasarımı (ürün, sepet, sipariş, ödeme)",
+      "Stripe ödeme entegrasyonu (Checkout Session, Webhook)",
+      "PostgreSQL ile ilişkisel veritabanı tasarımı",
+      "Prisma ORM ile type-safe database işlemleri",
+      "Redis ile sepet yönetimi ve caching",
+      "JWT authentication ve role-based authorization",
+      "Python ile ML model eğitimi (scikit-learn)",
+      "ML modelini production'a deploy etme (Flask/FastAPI)",
+      "Docker multi-service orchestration",
+      "GitHub Actions CI/CD pipeline",
+      "Webhook güvenliği (signature verification)",
+      "Rate limiting ve API güvenliği"
+    ],
+    "architectural": [
+      "Layered architecture (Controller-Service-Repository)",
+      "Microservice communication (HTTP)",
+      "Event-driven order processing",
+      "Idempotent API design",
+      "Database transaction management",
+      "Cache invalidation strategy"
+    ],
+    "soft_skills": [
+      "API dokümantasyonu yazma (OpenAPI/Swagger)",
+      "Stripe dashboard kullanımı ve debug",
+      "ML model evaluation ve metrik yorumlama",
+      "Production incident response düşüncesi",
+      "Technical decision documentation"
+    ]
+  },
+  "requirements": {
+    "functional": [
+      "Ürün CRUD: Oluşturma, listeleme (pagination, filtreleme, arama), detay",
+      "Kategori yönetimi: Ürün kategorileri ve filtreleme",
+      "Sepet yönetimi: Ürün ekleme, çıkarma, miktar güncelleme (Redis)",
+      "Sipariş oluşturma: Sepetten sipariş oluştur, stok kontrolü",
+      "Stripe ödeme: Checkout Session oluşturma, ödeme sonucu yönetimi",
+      "Webhook handler: Stripe event'lerini işleme (payment_intent.succeeded vb.)",
+      "Sipariş durumu: pending -> paid -> processing -> shipped -> delivered",
+      "Kullanıcı sipariş geçmişi",
+      "Admin panel API: Ürün yönetimi, sipariş durumu güncelleme",
+      "Fraud detection: Sipariş risk skoru hesaplama"
+    ],
+    "non_functional": [
+      "API response time p95 < 200ms",
+      "Sepet işlemleri < 50ms (Redis)",
+      "Stripe webhook idempotent processing",
+      "Database transaction ile stok tutarlılığı",
+      "Rate limiting: 100 req/min genel, 10 req/min ödeme",
+      "Input validation tüm endpoint'lerde (Zod)",
+      "RBAC: Admin ve customer rolleri",
+      "Docker ile containerized deployment",
+      "CI/CD: Test -> Lint -> Build -> Deploy",
+      "Minimum %70 test coverage"
+    ]
+  },
+  "evaluation_criteria": [
+    {
+      "criterion": "API Tasarımı ve Backend Kalitesi",
+      "weight": 25,
+      "description": "RESTful prensiplere uyum, tutarlı response format, error handling, validation, pagination"
+    },
+    {
+      "criterion": "Ödeme Entegrasyonu",
+      "weight": 20,
+      "description": "Stripe Checkout Session, webhook handling, idempotency, error recovery"
+    },
+    {
+      "criterion": "Veritabanı ve Veri Yönetimi",
+      "weight": 15,
+      "description": "Schema tasarımı, migration, index kullanımı, transaction management, Redis cache"
+    },
+    {
+      "criterion": "Fraud Detection ML",
+      "weight": 15,
+      "description": "Model eğitimi, feature engineering, API entegrasyonu, model evaluation"
+    },
+    {
+      "criterion": "Testing",
+      "weight": 10,
+      "description": "Unit testler, integration testler, Stripe mock testleri, %70+ coverage"
+    },
+    {
+      "criterion": "DevOps ve CI/CD",
+      "weight": 15,
+      "description": "Docker Compose, GitHub Actions, environment management, dokümantasyon"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "p04-m1",
+      "title": "Proje Mimarisi ve Veritabanı Tasarımı",
+      "overview": "E-ticaret API'sinin temelini oluşturacaksın. Layered architecture, veritabanı şeması ve temel CRUD endpoint'leri bu milestone'ın kapsamında. İyi tasarlanmış bir veritabanı şeması, projenin tüm yaşam döngüsünü etkiler.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "Layered architecture",
+        "Prisma schema design",
+        "Database relations",
+        "Seed data",
+        "Docker Compose"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Proje Yapısı ve Docker Ortamı",
+          "why": "E-ticaret uygulaması birden fazla servis gerektirir: API server, PostgreSQL, Redis ve ileride fraud detection microservice. Docker Compose ile tüm servisler tek komutla yönetilir. Layered architecture ile kodun her katmanı net sorumluluğa sahip olur.",
+          "instructions": "Proje klasör yapısını oluştur ve Docker Compose konfigürasyonunu yaz.",
+          "code_snippet": "mkdir ecommerce-api && cd ecommerce-api\nmkdir -p src/{controllers,services,repositories,middleware,routes,validators,utils,types}\nmkdir -p tests/{unit,integration}\nmkdir -p fraud-detection\n\npnpm init\npnpm install express cors helmet morgan dotenv stripe\npnpm install @prisma/client ioredis zod jsonwebtoken bcrypt\npnpm install -D typescript @types/express @types/cors @types/morgan @types/jsonwebtoken @types/bcrypt\npnpm install -D ts-node-dev prisma jest ts-jest @types/jest supertest @types/supertest\npnpm dlx tsc --init\npnpm dlx prisma init\n\n# docker-compose.yml\ncat > docker-compose.yml << 'YAML'\nservices:\n  db:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_USER: ecomuser\n      POSTGRES_PASSWORD: ecompass\n      POSTGRES_DB: ecommerce\n    ports:\n      - '5432:5432'\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U ecomuser -d ecommerce']\n      interval: 5s\n      timeout: 5s\n      retries: 5\n\n  redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'\n\n  fraud-service:\n    build: ./fraud-detection\n    ports:\n      - '5000:5000'\n    depends_on:\n      - db\n\nvolumes:\n  pgdata:\nYAML",
+          "deep_dive": "Layered architecture: Controller (HTTP layer) -> Service (business logic) -> Repository (data access). Bu katmanlar birbirinden bağımsızdır — service test ederken database mock'lanabilir. fraud-service ayrı bir container'da çalışır ve HTTP ile API'ye bağlanır — microservice pattern'ı. healthcheck ile DB hazır olana kadar API bekler.",
+          "checkpoint": "docker-compose up ile PostgreSQL ve Redis başlamalı. TypeScript compile hatasız olmalı. Prisma init başarılı olmalı."
+        },
+        {
+          "step": 2,
+          "title": "Prisma Schema Tasarımı",
+          "why": "E-ticaret veritabanı şeması, ürünler, kategoriler, kullanıcılar, siparişler ve ödeme bilgilerini kapsar. İlişkiler doğru tanımlanmalı: bir sipariş birden fazla ürün içerebilir (many-to-many, OrderItem junction table ile). ACID transaction ile stok ve sipariş tutarlılığı sağlanır.",
+          "instructions": "Prisma schema'sını tasarla. Tüm modelleri ve ilişkileri tanımla.",
+          "code_snippet": "// prisma/schema.prisma\ngenerator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nenum Role {\n  CUSTOMER\n  ADMIN\n}\n\nenum OrderStatus {\n  PENDING\n  PAID\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n  REFUNDED\n}\n\nmodel User {\n  id        String   @id @default(cuid())\n  email     String   @unique\n  name      String\n  password  String\n  role      Role     @default(CUSTOMER)\n  address   String?\n  phone     String?\n  orders    Order[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"users\")\n}\n\nmodel Category {\n  id       String    @id @default(cuid())\n  name     String    @unique\n  slug     String    @unique\n  products Product[]\n\n  @@map(\"categories\")\n}\n\nmodel Product {\n  id          String      @id @default(cuid())\n  name        String\n  slug        String      @unique\n  description String\n  price       Decimal     @db.Decimal(10, 2)\n  comparePrice Decimal?   @db.Decimal(10, 2)\n  stock       Int         @default(0)\n  images      String[]    @default([])\n  categoryId  String\n  category    Category    @relation(fields: [categoryId], references: [id])\n  isActive    Boolean     @default(true)\n  orderItems  OrderItem[]\n  createdAt   DateTime    @default(now())\n  updatedAt   DateTime    @updatedAt\n\n  @@index([categoryId])\n  @@index([price])\n  @@index([isActive, createdAt(sort: Desc)])\n  @@map(\"products\")\n}\n\nmodel Order {\n  id              String      @id @default(cuid())\n  userId          String\n  user            User        @relation(fields: [userId], references: [id])\n  status          OrderStatus @default(PENDING)\n  totalAmount     Decimal     @db.Decimal(10, 2)\n  shippingAddress String\n  stripeSessionId String?     @unique\n  stripePaymentId String?     @unique\n  fraudScore      Float?      @default(0)\n  items           OrderItem[]\n  createdAt       DateTime    @default(now())\n  updatedAt       DateTime    @updatedAt\n\n  @@index([userId])\n  @@index([status])\n  @@index([createdAt(sort: Desc)])\n  @@map(\"orders\")\n}\n\nmodel OrderItem {\n  id        String  @id @default(cuid())\n  orderId   String\n  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)\n  productId String\n  product   Product @relation(fields: [productId], references: [id])\n  quantity  Int\n  unitPrice Decimal @db.Decimal(10, 2)\n\n  @@map(\"order_items\")\n}",
+          "deep_dive": "Decimal(10,2) ile para değerleri hassas şekilde saklanır — Float kullanma, yuvarlama hataları oluşur. OrderItem junction table'ı, Order ve Product arasındaki many-to-many ilişkiyi modellerken unitPrice'ı da saklar — çünkü ürün fiyatı değişebilir ama sipariş anındaki fiyat korunmalıdır. Compound index [isActive, createdAt] ile aktif ürünleri yeniden eskiye sorgulama hızlanır. slug alanları SEO-friendly URL'ler içindir.",
+          "checkpoint": "pnpm dlx prisma migrate dev --name init başarılı olmalı. Tüm tablolar ve ilişkiler doğru oluşturulmalı. Prisma Studio'da şema görüntülenebilmeli."
+        },
+        {
+          "step": 3,
+          "title": "Ürün API'si (CRUD + Filtreleme + Pagination)",
+          "why": "Ürün API'si, e-ticaretin en temel bileşenidir. Ürün listeleme, filtreleme (kategori, fiyat aralığı), arama ve sayfalama (pagination) özellikleri, gerçek dünya e-ticaret sitelerinin standart gereksinimlerdir.",
+          "instructions": "Product service, controller ve route dosyalarını oluştur. Gelişmiş filtreleme ve cursor-based pagination ekle.",
+          "code_snippet": "// src/services/product.service.ts\nimport { PrismaClient, Prisma } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\ninterface ProductFilter {\n  categoryId?: string;\n  minPrice?: number;\n  maxPrice?: number;\n  search?: string;\n  isActive?: boolean;\n}\n\ninterface PaginationParams {\n  page: number;\n  limit: number;\n  sortBy: string;\n  sortOrder: 'asc' | 'desc';\n}\n\nexport class ProductService {\n  async getAll(filter: ProductFilter, pagination: PaginationParams) {\n    const where: Prisma.ProductWhereInput = {\n      isActive: filter.isActive ?? true,\n    };\n\n    if (filter.categoryId) where.categoryId = filter.categoryId;\n    if (filter.minPrice || filter.maxPrice) {\n      where.price = {};\n      if (filter.minPrice) where.price.gte = filter.minPrice;\n      if (filter.maxPrice) where.price.lte = filter.maxPrice;\n    }\n    if (filter.search) {\n      where.OR = [\n        { name: { contains: filter.search, mode: 'insensitive' } },\n        { description: { contains: filter.search, mode: 'insensitive' } },\n      ];\n    }\n\n    const [products, total] = await Promise.all([\n      prisma.product.findMany({\n        where,\n        include: { category: { select: { name: true, slug: true } } },\n        orderBy: { [pagination.sortBy]: pagination.sortOrder },\n        skip: (pagination.page - 1) * pagination.limit,\n        take: pagination.limit,\n      }),\n      prisma.product.count({ where }),\n    ]);\n\n    return {\n      products,\n      meta: {\n        page: pagination.page,\n        limit: pagination.limit,\n        total,\n        totalPages: Math.ceil(total / pagination.limit),\n      },\n    };\n  }\n\n  async getBySlug(slug: string) {\n    return prisma.product.findUnique({\n      where: { slug },\n      include: { category: true },\n    });\n  }\n\n  async create(data: Prisma.ProductCreateInput) {\n    return prisma.product.create({ data, include: { category: true } });\n  }\n\n  async updateStock(productId: string, quantity: number) {\n    return prisma.product.update({\n      where: { id: productId },\n      data: { stock: { decrement: quantity } },\n    });\n  }\n}",
+          "deep_dive": "Promise.all ile ürün listesi ve toplam sayı paralel sorgulanır — sıralı sorgudan 2x daha hızlı. mode: 'insensitive' ile büyük/küçük harf duyarsız arama yapılır. Prisma.ProductWhereInput tip güvenliği sağlar — yanlış alan adı TypeScript hatasına neden olur. decrement ile atomik stok güncelleme yapılır — race condition önlenir. skip/take ile offset pagination kullanılır (ürün listesi için cursor-based gerekmez çünkü sayfa numarasına göre navigasyon yapılır).",
+          "checkpoint": "Ürün listeleme, filtreleme ve arama çalışmalı. Pagination meta bilgileri doğru olmalı. Admin ürün CRUD endpoint'leri çalışmalı."
+        },
+        {
+          "step": 4,
+          "title": "Redis ile Sepet Yönetimi",
+          "why": "Sepet, e-ticaretin en yoğun kullanılan özelliğidir. Her kullanıcı aksiyonu (ekleme, çıkarma, miktar güncelleme) hızlı olmalıdır. Redis'in in-memory yapısı ile sepet işlemleri milisaniye seviyesinde tamamlanır. TTL ile sepetler 7 gün sonra otomatik silinir.",
+          "instructions": "Redis ile sepet service'ini oluştur.",
+          "code_snippet": "// src/services/cart.service.ts\nimport Redis from 'ioredis';\nimport { ProductService } from './product.service';\n\nconst redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');\nconst productService = new ProductService();\nconst CART_TTL = 60 * 60 * 24 * 7; // 7 gün\n\ninterface CartItem {\n  productId: string;\n  quantity: number;\n  name: string;\n  price: number;\n  image?: string;\n}\n\nexport class CartService {\n  private getCartKey(userId: string) {\n    return `cart:${userId}`;\n  }\n\n  async getCart(userId: string): Promise<CartItem[]> {\n    const cart = await redis.hgetall(this.getCartKey(userId));\n    return Object.values(cart).map((item) => JSON.parse(item));\n  }\n\n  async addItem(userId: string, productId: string, quantity: number = 1) {\n    const product = await productService.getById(productId);\n    if (!product) throw new Error('Ürün bulunamadı');\n    if (product.stock < quantity) throw new Error('Yetersiz stok');\n\n    const key = this.getCartKey(userId);\n    const existing = await redis.hget(key, productId);\n\n    let item: CartItem;\n    if (existing) {\n      item = JSON.parse(existing);\n      item.quantity += quantity;\n    } else {\n      item = {\n        productId: product.id,\n        quantity,\n        name: product.name,\n        price: Number(product.price),\n        image: product.images[0],\n      };\n    }\n\n    await redis.hset(key, productId, JSON.stringify(item));\n    await redis.expire(key, CART_TTL);\n\n    return this.getCart(userId);\n  }\n\n  async removeItem(userId: string, productId: string) {\n    await redis.hdel(this.getCartKey(userId), productId);\n    return this.getCart(userId);\n  }\n\n  async updateQuantity(userId: string, productId: string, quantity: number) {\n    if (quantity <= 0) return this.removeItem(userId, productId);\n\n    const key = this.getCartKey(userId);\n    const existing = await redis.hget(key, productId);\n    if (!existing) throw new Error('Ürün sepette bulunamadı');\n\n    const item: CartItem = JSON.parse(existing);\n    item.quantity = quantity;\n\n    await redis.hset(key, productId, JSON.stringify(item));\n    await redis.expire(key, CART_TTL);\n\n    return this.getCart(userId);\n  }\n\n  async clearCart(userId: string) {\n    await redis.del(this.getCartKey(userId));\n  }\n\n  async getCartTotal(userId: string): Promise<number> {\n    const items = await this.getCart(userId);\n    return items.reduce((total, item) => total + item.price * item.quantity, 0);\n  }\n}",
+          "deep_dive": "Redis Hash (hset/hget/hgetall) ile her sepet bir Hash, her ürün bir field olarak saklanır. Bu yapı, tek ürüne erişim O(1) zaman karmaşıklığındadır. expire ile her işlemde TTL yenilenir — aktif sepetler silinmez, terk edilen sepetler 7 gün sonra otomatik temizlenir. Sepete ürün eklerken stok kontrolü yapılır. Fiyat sepete eklenirken kaydedilir — ürün fiyatı sonradan değişse bile sepet fiyatı korunur.",
+          "checkpoint": "Sepete ürün ekleme, çıkarma ve miktar güncelleme çalışmalı. Redis'te sepet verisi 7 gün TTL ile saklanmalı. Sepet toplamı doğru hesaplanmalı."
+        },
+        {
+          "step": 5,
+          "title": "Auth Sistemi ve Role-Based Access Control",
+          "why": "E-ticaret uygulamasında iki rol vardır: müşteri ve admin. Müşteriler sipariş verebilir, adminler ürün ve sipariş yönetimi yapabilir. RBAC (Role-Based Access Control), her endpoint'in hangi rollerle erişilebileceğini belirler.",
+          "instructions": "JWT auth ile RBAC middleware'ini implement et.",
+          "code_snippet": "// src/middleware/authorize.ts\nimport { Request, Response, NextFunction } from 'express';\nimport { Role } from '@prisma/client';\nimport { AppError } from './error-handler';\n\nexport function authorize(...roles: Role[]) {\n  return (req: Request, res: Response, next: NextFunction) => {\n    if (!req.userId || !req.userRole) {\n      throw new AppError('Authentication gerekli', 401);\n    }\n\n    if (!roles.includes(req.userRole as Role)) {\n      throw new AppError('Bu işlem için yetkiniz yok', 403);\n    }\n\n    next();\n  };\n}\n\n// Route'ta kullanım:\n// router.post('/products', authenticate, authorize('ADMIN'), productController.create);\n// router.get('/products', productController.getAll); // Herkese açık\n// router.post('/orders', authenticate, orderController.create); // Authenticated users",
+          "deep_dive": "authorize middleware'i, authenticate'den sonra çalışır ve rolü kontrol eder. 401 (Unauthorized) ile 403 (Forbidden) farkı: 401 = kim olduğunu bilmiyorum, 403 = biliyorum ama izni yok. Spread operator (...roles) ile birden fazla rol kabul edilir: authorize('ADMIN', 'MANAGER'). Ürün listeleme public, ürün oluşturma admin-only, sipariş oluşturma authenticated-only.",
+          "checkpoint": "Admin endpoint'lerine customer erişimi 403 dönmeli. Auth olmadan korumalı endpoint'ler 401 dönmeli. Public endpoint'ler auth olmadan çalışmalı."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Decimal(10,2) ile para sakla — ASLA Float kullanma (yuvarlama hataları).\n- OrderItem'da unitPrice sakla — ürün fiyatı değişse bile sipariş fiyatı korunmalı.\n- Redis Hash ile sepet: O(1) erişim, TTL ile otomatik temizlik.\n- Promise.all ile paralel sorgu — count ve findMany'yi aynı anda çalıştır.\n- RBAC: 401 = kim olduğunu bilmiyorum, 403 = biliyorum ama izni yok.\n- Compound index [isActive, createdAt]: Aktif ürünleri tarih sırasına göre hızlı sorgulama.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar e-ticaret veritabanı tasarlarken 'audit trail' düşünür: fiyat değişikliği geçmişi, stok hareketleri, sipariş durumu değişiklik logu. Ayrıca 'soft delete' (isActive/deletedAt) kullanılır — ürün silinse bile eski siparişlerde referans korunur. Para hesaplamalarında en küçük birim (kuruş) integer olarak saklanır — 19.99 TL = 1999 kuruş. Bu, floating point hataları tamamen ortadan kaldırır."
+    },
+    {
+      "id": "p04-m2",
+      "title": "Stripe Ödeme Entegrasyonu",
+      "overview": "Stripe, modern e-ticaretin standart ödeme altyapısıdır. Bu milestone'da Stripe Checkout Session ile güvenli ödeme akışı, webhook'lar ile asenkron ödeme durumu güncelleme ve hata yönetimi implement edeceksin.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "Stripe Checkout Session",
+        "Webhooks",
+        "Idempotency",
+        "Payment lifecycle",
+        "Error handling"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Stripe Kurulumu ve Checkout Session",
+          "why": "Stripe Checkout Session, PCI uyumlu ödeme sayfası sağlar. Kart bilgileri Stripe'ın sunucularında işlenir — senin API'ına hassas veri asla ulaşmaz. Bu, güvenlik ve yasal uyumluluk açısından kritiktir.",
+          "instructions": "Stripe SDK'yı kur ve Checkout Session oluşturma servisini yaz.",
+          "code_snippet": "// src/services/payment.service.ts\nimport Stripe from 'stripe';\nimport { PrismaClient } from '@prisma/client';\nimport { CartService } from './cart.service';\nimport { AppError } from '../middleware/error-handler';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {\n  apiVersion: '2025-12-18.acacia',\n});\nconst prisma = new PrismaClient();\nconst cartService = new CartService();\n\nexport class PaymentService {\n  async createCheckoutSession(userId: string, shippingAddress: string) {\n    const cartItems = await cartService.getCart(userId);\n\n    if (cartItems.length === 0) {\n      throw new AppError('Sepetiniz boş', 400);\n    }\n\n    // Stok kontrolü\n    for (const item of cartItems) {\n      const product = await prisma.product.findUnique({\n        where: { id: item.productId },\n      });\n      if (!product || product.stock < item.quantity) {\n        throw new AppError(`${item.name} için yeterli stok yok`, 400);\n      }\n    }\n\n    // Sipariş oluştur (PENDING durumunda)\n    const totalAmount = cartItems.reduce(\n      (sum, item) => sum + item.price * item.quantity,\n      0\n    );\n\n    const order = await prisma.order.create({\n      data: {\n        userId,\n        totalAmount,\n        shippingAddress,\n        status: 'PENDING',\n        items: {\n          create: cartItems.map((item) => ({\n            productId: item.productId,\n            quantity: item.quantity,\n            unitPrice: item.price,\n          })),\n        },\n      },\n      include: { items: true },\n    });\n\n    // Stripe Checkout Session\n    const session = await stripe.checkout.sessions.create({\n      payment_method_types: ['card'],\n      mode: 'payment',\n      client_reference_id: order.id,\n      customer_email: (await prisma.user.findUnique({ where: { id: userId } }))?.email,\n      line_items: cartItems.map((item) => ({\n        price_data: {\n          currency: 'try',\n          product_data: {\n            name: item.name,\n            images: item.image ? [item.image] : [],\n          },\n          unit_amount: Math.round(item.price * 100), // kuruş cinsinden\n        },\n        quantity: item.quantity,\n      })),\n      success_url: `${process.env.CLIENT_URL}/orders/${order.id}?success=true`,\n      cancel_url: `${process.env.CLIENT_URL}/cart?cancelled=true`,\n      metadata: { orderId: order.id },\n    });\n\n    // Sipariş'e Stripe session ID'yi kaydet\n    await prisma.order.update({\n      where: { id: order.id },\n      data: { stripeSessionId: session.id },\n    });\n\n    return { sessionUrl: session.url, orderId: order.id };\n  }\n}",
+          "deep_dive": "unit_amount kuruş cinsindendir — 19.99 TL = 1999. Math.round ile yuvarlama hataları önlenir. client_reference_id ile Stripe ödemeyi siparişle eşleştirir. success_url ve cancel_url, ödeme sonrası yönlendirme URL'leridir. metadata, webhook'ta sipariş bilgisine erişim sağlar. Sipariş önce PENDING olarak oluşturulur, ödeme tamamlanınca PAID'e güncellenir — bu 'optimistic order creation' pattern'ıdır.",
+          "checkpoint": "Checkout Session oluşturulmalı ve Stripe sayfasına yönlendirmeli. Test modda kart bilgileri ile ödeme yapılabilmeli."
+        },
+        {
+          "step": 2,
+          "title": "Stripe Webhook Handler",
+          "why": "Webhook'lar, Stripe'ın ödeme durumu değişikliklerini API'na bildirme mekanizmasıdır. Client redirect güvenilir değildir (kullanıcı sayfayı kapatabilir), bu yüzden Stripe doğrudan server'a bildirim gönderir. Webhook signature verification, sahte webhook'ları engeller.",
+          "instructions": "Stripe webhook endpoint'ini oluştur. Ödeme başarılı ve başarısız event'lerini handle et.",
+          "code_snippet": "// src/controllers/webhook.controller.ts\nimport { Request, Response } from 'express';\nimport Stripe from 'stripe';\nimport { PrismaClient } from '@prisma/client';\nimport { CartService } from '../services/cart.service';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);\nconst prisma = new PrismaClient();\nconst cartService = new CartService();\n\nexport async function handleStripeWebhook(req: Request, res: Response) {\n  const sig = req.headers['stripe-signature'] as string;\n  let event: Stripe.Event;\n\n  try {\n    event = stripe.webhooks.constructEvent(\n      req.body, // raw body (JSON.parse yapılmamış)\n      sig,\n      process.env.STRIPE_WEBHOOK_SECRET!\n    );\n  } catch (err) {\n    console.error('Webhook signature verification failed:', err);\n    return res.status(400).send('Webhook Error');\n  }\n\n  switch (event.type) {\n    case 'checkout.session.completed': {\n      const session = event.data.object as Stripe.Checkout.Session;\n      const orderId = session.metadata?.orderId;\n\n      if (!orderId) break;\n\n      // Idempotency check\n      const order = await prisma.order.findUnique({ where: { id: orderId } });\n      if (!order || order.status !== 'PENDING') break;\n\n      // Transaction: sipariş güncelle + stok düş + sepet temizle\n      await prisma.$transaction(async (tx) => {\n        // Sipariş durumunu güncelle\n        await tx.order.update({\n          where: { id: orderId },\n          data: {\n            status: 'PAID',\n            stripePaymentId: session.payment_intent as string,\n          },\n        });\n\n        // Stok güncelle\n        const items = await tx.orderItem.findMany({ where: { orderId } });\n        for (const item of items) {\n          await tx.product.update({\n            where: { id: item.productId },\n            data: { stock: { decrement: item.quantity } },\n          });\n        }\n      });\n\n      // Sepeti temizle (transaction dışında - kritik değil)\n      await cartService.clearCart(order.userId);\n\n      console.log(`Order ${orderId} paid successfully`);\n      break;\n    }\n\n    case 'checkout.session.expired': {\n      const session = event.data.object as Stripe.Checkout.Session;\n      const orderId = session.metadata?.orderId;\n\n      if (orderId) {\n        await prisma.order.update({\n          where: { id: orderId },\n          data: { status: 'CANCELLED' },\n        });\n      }\n      break;\n    }\n  }\n\n  res.json({ received: true });\n}\n\n// IMPORTANT: Webhook route raw body gerektirir\n// app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), handleStripeWebhook);",
+          "deep_dive": "constructEvent ile Stripe'ın gönderdiği webhook'un gerçekten Stripe'dan geldiği doğrulanır — signature verification. Raw body gerekir çünkü JSON.parse sonrası signature doğrulaması başarısız olur (body değişmiş olur). Idempotency: aynı webhook birden fazla kez gelebilir (Stripe retry yapar) — order.status !== 'PENDING' kontrolü ile duplicate processing önlenir. Transaction ile stok ve sipariş güncelleme atomiktir — ya ikisi de olur, ya hiçbiri.",
+          "checkpoint": "Stripe CLI ile webhook test edilebilmeli (stripe listen --forward-to). Ödeme sonrası sipariş PAID olmalı. Stok düşmeli. Sepet temizlenmeli."
+        },
+        {
+          "step": 3,
+          "title": "Sipariş Yönetimi API",
+          "why": "Sipariş yönetimi, müşteriler için sipariş geçmişi ve durumu takip, adminler için sipariş durumu güncelleme ve filtreleme sağlar. Sipariş durumu state machine mantığında çalışır: geçerli geçişler tanımlanır.",
+          "instructions": "Order service ve API endpoint'lerini oluştur.",
+          "code_snippet": "// src/services/order.service.ts\nimport { PrismaClient, OrderStatus } from '@prisma/client';\nimport { AppError } from '../middleware/error-handler';\n\nconst prisma = new PrismaClient();\n\n// Geçerli durum geçişleri\nconst VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {\n  PENDING: ['PAID', 'CANCELLED'],\n  PAID: ['PROCESSING', 'REFUNDED'],\n  PROCESSING: ['SHIPPED', 'REFUNDED'],\n  SHIPPED: ['DELIVERED'],\n  DELIVERED: ['REFUNDED'],\n  CANCELLED: [],\n  REFUNDED: [],\n};\n\nexport class OrderService {\n  async getUserOrders(userId: string, page: number = 1, limit: number = 10) {\n    const [orders, total] = await Promise.all([\n      prisma.order.findMany({\n        where: { userId },\n        include: {\n          items: { include: { product: { select: { name: true, images: true } } } },\n        },\n        orderBy: { createdAt: 'desc' },\n        skip: (page - 1) * limit,\n        take: limit,\n      }),\n      prisma.order.count({ where: { userId } }),\n    ]);\n\n    return { orders, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };\n  }\n\n  async updateStatus(orderId: string, newStatus: OrderStatus) {\n    const order = await prisma.order.findUnique({ where: { id: orderId } });\n    if (!order) throw new AppError('Sipariş bulunamadı', 404);\n\n    const allowedTransitions = VALID_TRANSITIONS[order.status];\n    if (!allowedTransitions.includes(newStatus)) {\n      throw new AppError(\n        `Sipariş durumu ${order.status} iken ${newStatus} olarak güncellenemez`,\n        400\n      );\n    }\n\n    return prisma.order.update({\n      where: { id: orderId },\n      data: { status: newStatus },\n    });\n  }\n}",
+          "deep_dive": "State machine pattern ile geçerli durum geçişleri tanımlanır: PENDING'den SHIPPED'a atlanamazdır — önce PAID, sonra PROCESSING olmalıdır. Bu, iş kurallarını enforce eder ve geçersiz durum geçişlerini engeller. includes ile ilişkili ürün bilgileri tek sorguda getirilir — sipariş listesinde ürün isimleri ve görselleri gösterilir.",
+          "checkpoint": "Müşteri kendi siparişlerini görebilmeli. Admin sipariş durumunu güncelleyebilmeli. Geçersiz durum geçişleri 400 dönmeli."
+        },
+        {
+          "step": 4,
+          "title": "Stripe Test Modu ve Webhook Testi",
+          "why": "Stripe test modu ile gerçek para ödemeden tüm ödeme akışını test edebilirsin. Stripe CLI ile local webhook testing yapılır. Test kartları ile farklı senaryolar (başarılı, reddedilen, 3D Secure) simüle edilir.",
+          "instructions": "Stripe test modunda ödeme akışını test et. Stripe CLI ile webhook forwarding kur.",
+          "code_snippet": "# Stripe CLI kurulumu ve webhook testi\n# https://stripe.com/docs/stripe-cli\n\n# Stripe CLI ile login\nstripe login\n\n# Webhook'ları local server'a yönlendir\nstripe listen --forward-to localhost:3001/api/webhooks/stripe\n\n# Test kartları:\n# Başarılı: 4242 4242 4242 4242\n# Reddedilen: 4000 0000 0000 0002\n# 3D Secure: 4000 0025 0000 3155\n# Yetersiz bakiye: 4000 0000 0000 9995\n\n# Manuel webhook trigger\nstripe trigger checkout.session.completed\n\n# Stripe Dashboard: https://dashboard.stripe.com/test/\n# Webhook logları, ödeme detayları, event'ler burada görünür",
+          "deep_dive": "Stripe test modu, production ile aynı API'yi kullanır ama gerçek para işlemez. Test secret key (sk_test_) ile çalışır. stripe listen komutu, Stripe'ın webhook event'lerini local development server'a forward eder — ngrok'a gerek kalmaz. webhook signing secret, CLI'dan alınır ve .env'ye eklenir. Farklı test kartları farklı senaryoları simüle eder — edge case'leri test etmek için kullanılır.",
+          "checkpoint": "Stripe CLI ile webhook'lar local server'a ulaşmalı. Test kartı ile ödeme yapıldığında sipariş PAID olmalı. Reddedilen kart ile uygun hata mesajı dönmeli."
+        },
+        {
+          "step": 5,
+          "title": "Refund (İade) İşlemi",
+          "why": "İade işlemi, e-ticaretin zorunlu özelliğidir. Stripe refund API ile ödeme geri alınır, stok güncellenir ve sipariş durumu REFUNDED olarak işaretlenir. Bu işlem de transaction ile atomik yapılmalıdır.",
+          "instructions": "Stripe refund işlemini implement et.",
+          "code_snippet": "// src/services/payment.service.ts - refund metodu\nasync refundOrder(orderId: string) {\n  const order = await prisma.order.findUnique({\n    where: { id: orderId },\n    include: { items: true },\n  });\n\n  if (!order) throw new AppError('Sipariş bulunamadı', 404);\n  if (!order.stripePaymentId) throw new AppError('Ödeme bilgisi bulunamadı', 400);\n  if (order.status === 'REFUNDED') throw new AppError('Sipariş zaten iade edildi', 400);\n\n  // Stripe refund\n  const refund = await stripe.refunds.create({\n    payment_intent: order.stripePaymentId,\n  });\n\n  // Transaction: durum güncelle + stok geri ekle\n  await prisma.$transaction(async (tx) => {\n    await tx.order.update({\n      where: { id: orderId },\n      data: { status: 'REFUNDED' },\n    });\n\n    for (const item of order.items) {\n      await tx.product.update({\n        where: { id: item.productId },\n        data: { stock: { increment: item.quantity } },\n      });\n    }\n  });\n\n  return { refundId: refund.id, status: refund.status };\n}",
+          "deep_dive": "Stripe refund, payment_intent ID ile oluşturulur. Full refund varsayılandır, kısmi iade için amount parametresi eklenir. Transaction ile sipariş durumu ve stok atomik güncellenir — biri başarısız olursa diğeri de geri alınır. Refund sonrası stok increment ile geri eklenir. Stripe refund durumu 'succeeded', 'pending' veya 'failed' olabilir — failed durumunda retry mekanizması gerekir.",
+          "checkpoint": "Admin iade başlatabilmeli. Stripe'ta refund görünmeli. Stok geri eklenmeli. Sipariş REFUNDED olmalı."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Stripe Checkout Session: Kart bilgileri senin server'ına ASLA ulaşmaz — PCI uyumlu.\n- unit_amount kuruş cinsinden: 19.99 TL = 1999.\n- Webhook signature verification ZORUNLU — sahte webhook'ları engeller.\n- Idempotency: Aynı webhook birden fazla kez gelebilir — duplicate check yap.\n- express.raw() webhook route'ta ZORUNLU — JSON.parse signature'ı bozar.\n- State machine: VALID_TRANSITIONS ile geçerli sipariş durumu geçişleri enforce et.\n- Transaction ile stok ve sipariş atomik güncelle.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar ödeme sistemlerinde 'idempotency key' kullanır. Stripe'ın Idempotency-Key header'ı, aynı isteğin tekrarlanması durumunda duplicate ödeme oluşmasını önler. Ayrıca 'webhook retry' politikası bilinir: Stripe başarısız webhook'ları üstel artışla (exponential backoff) tekrar dener — endpoint'in 200 dönmesi zorunludur. Payment intent lifecycle (requires_payment_method -> requires_confirmation -> requires_action -> processing -> succeeded) tam olarak anlaşılmalıdır."
+    },
+    {
+      "id": "p04-m3",
+      "title": "Sipariş Akışı ve Stok Yönetimi",
+      "overview": "Bu milestone'da sipariş oluşturma akışını tamamlayacak, stok yönetimini transaction-safe yapacak ve sipariş durumu state machine'ini implement edeceksin.",
+      "estimated_hours": 6,
+      "concepts_covered": [
+        "Database transactions",
+        "Stock management",
+        "Order state machine",
+        "Concurrency control"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Transaction-Safe Sipariş Oluşturma",
+          "why": "Sipariş oluşturma, birden fazla veritabanı işlemi içerir: sipariş kaydı, sipariş kalemleri, stok güncelleme. Bu işlemler atomik olmalıdır — biri başarısız olursa hepsi geri alınmalıdır. Aksi halde stok düşer ama sipariş oluşmaz gibi tutarsızlıklar oluşur.",
+          "instructions": "Prisma transaction ile atomik sipariş oluşturma implement et.",
+          "code_snippet": "// src/services/order.service.ts - createOrder metodu\nasync createOrder(userId: string, shippingAddress: string) {\n  const cartItems = await this.cartService.getCart(userId);\n  if (cartItems.length === 0) throw new AppError('Sepetiniz boş', 400);\n\n  // Transaction ile atomik sipariş oluşturma\n  const order = await prisma.$transaction(async (tx) => {\n    // 1. Stok kontrolü ve kilitleme (SELECT FOR UPDATE)\n    for (const item of cartItems) {\n      const product = await tx.product.findUnique({\n        where: { id: item.productId },\n      });\n\n      if (!product) {\n        throw new AppError(`Ürün bulunamadı: ${item.name}`, 404);\n      }\n\n      if (product.stock < item.quantity) {\n        throw new AppError(\n          `${item.name} için yeterli stok yok (Stok: ${product.stock}, İstenen: ${item.quantity})`,\n          400\n        );\n      }\n    }\n\n    // 2. Toplam hesapla\n    const totalAmount = cartItems.reduce(\n      (sum, item) => sum + item.price * item.quantity, 0\n    );\n\n    // 3. Sipariş oluştur\n    const newOrder = await tx.order.create({\n      data: {\n        userId,\n        totalAmount,\n        shippingAddress,\n        status: 'PENDING',\n        items: {\n          create: cartItems.map((item) => ({\n            productId: item.productId,\n            quantity: item.quantity,\n            unitPrice: item.price,\n          })),\n        },\n      },\n      include: { items: { include: { product: true } } },\n    });\n\n    return newOrder;\n  }, {\n    isolationLevel: Prisma.TransactionIsolationLevel.Serializable,\n  });\n\n  return order;\n}",
+          "deep_dive": "Serializable isolation level, en yüksek izolasyon seviyesidir — concurrent transaction'lar sıralı çalışıyormuş gibi davranır. Bu, iki kullanıcının aynı anda son ürünü sipariş etme durumunda race condition'ı önler. Stok düşürme ödeme sonrası (webhook'ta) yapılır, sipariş oluşturma sırasında sadece kontrol edilir. Bu 'optimistic approach', sepetten checkout arası stok değişikliğini yakalar.",
+          "checkpoint": "Aynı anda iki sipariş isteğinde race condition olmamalı. Stok yetersizse net hata mesajı dönmeli. Transaction hatasında hiçbir veri değişmemeli."
+        },
+        {
+          "step": 2,
+          "title": "Sipariş Geçmişi ve Detay API",
+          "why": "Kullanıcıların sipariş geçmişini görüntülemesi ve sipariş detayına erişmesi standart e-ticaret gereksinimidir. Admin panel için tüm siparişleri filtreleme ve sıralama özelliği gerekir.",
+          "instructions": "Kullanıcı ve admin sipariş endpoint'lerini oluştur.",
+          "code_snippet": "// src/routes/order.routes.ts\nimport { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { authorize } from '../middleware/authorize';\nimport { OrderService } from '../services/order.service';\n\nconst router = Router();\nconst orderService = new OrderService();\n\n// Kullanıcı sipariş geçmişi\nrouter.get('/my-orders', authenticate, async (req, res, next) => {\n  try {\n    const page = parseInt(req.query.page as string) || 1;\n    const result = await orderService.getUserOrders(req.userId!, page);\n    res.json({ status: 'success', data: result });\n  } catch (error) { next(error); }\n});\n\n// Sipariş detayı\nrouter.get('/:id', authenticate, async (req, res, next) => {\n  try {\n    const order = await orderService.getOrderById(req.params.id, req.userId!);\n    res.json({ status: 'success', data: order });\n  } catch (error) { next(error); }\n});\n\n// Admin: Tüm siparişler\nrouter.get('/', authenticate, authorize('ADMIN'), async (req, res, next) => {\n  try {\n    const { page, status, sortBy } = req.query;\n    const result = await orderService.getAllOrders({\n      page: parseInt(page as string) || 1,\n      status: status as string,\n      sortBy: (sortBy as string) || 'createdAt',\n    });\n    res.json({ status: 'success', data: result });\n  } catch (error) { next(error); }\n});\n\n// Admin: Sipariş durumu güncelle\nrouter.patch('/:id/status', authenticate, authorize('ADMIN'), async (req, res, next) => {\n  try {\n    const order = await orderService.updateStatus(req.params.id, req.body.status);\n    res.json({ status: 'success', data: order });\n  } catch (error) { next(error); }\n});\n\nexport default router;",
+          "deep_dive": "getOrderById'de userId kontrolü ile kullanıcı sadece kendi siparisini görebilir (IDOR koruması). Admin getAllOrders'da userId filtresi yok — tüm siparişleri görebilir. PATCH /orders/:id/status ile kısmi güncelleme — PUT tüm kaynağı günceller, PATCH sadece belirtilen alanları.",
+          "checkpoint": "Kullanıcı kendi siparişlerini görebilmeli ama başkasıninkini görememeli. Admin tüm siparişleri filtreleyebilmeli. Sipariş durumu güncellenebilmeli."
+        },
+        {
+          "step": 3,
+          "title": "Stok Alarm ve Bildirim Sistemi",
+          "why": "Stok düştüğünde admin'e bildirim gönderilmesi, operasyonel verimlilik açısından önemlidir. Belirli bir eşiğin altına düşen ürünler izlenir ve uyarı üretilir.",
+          "instructions": "Stok alarm mekanizması oluştur.",
+          "code_snippet": "// src/services/stock.service.ts\nimport { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\nconst LOW_STOCK_THRESHOLD = 5;\n\nexport class StockService {\n  async checkLowStock() {\n    const lowStockProducts = await prisma.product.findMany({\n      where: {\n        isActive: true,\n        stock: { lte: LOW_STOCK_THRESHOLD },\n      },\n      select: { id: true, name: true, stock: true, slug: true },\n      orderBy: { stock: 'asc' },\n    });\n\n    return lowStockProducts;\n  }\n\n  async getStockReport() {\n    const [totalProducts, outOfStock, lowStock, totalValue] = await Promise.all([\n      prisma.product.count({ where: { isActive: true } }),\n      prisma.product.count({ where: { isActive: true, stock: 0 } }),\n      prisma.product.count({ where: { isActive: true, stock: { lte: LOW_STOCK_THRESHOLD, gt: 0 } } }),\n      prisma.product.aggregate({\n        where: { isActive: true },\n        _sum: { price: true },\n      }),\n    ]);\n\n    return {\n      totalProducts,\n      outOfStock,\n      lowStock,\n      inStock: totalProducts - outOfStock,\n    };\n  }\n}",
+          "deep_dive": "lte (less than or equal) ile stok eşik değerinin altındaki ürünler bulunur. aggregate ile toplam stok değeri hesaplanır. Promise.all ile 4 sorgu paralel çalıştırılır. Bu tür raporlama sorguları cron job ile periyodik çalıştırılır veya admin dashboard'da gösterilir.",
+          "checkpoint": "Düşük stoklu ürünler listelenebilmeli. Stok raporu toplu istatistikler dönmeli. Stok sıfıra düştüğünde ürün tükendi olarak işaretlenmeli."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Serializable isolation: En yüksek izolasyon — concurrent sipariş race condition önlenir.\n- Stok düşürme webhook'ta yapılır (ödeme onayı sonrası), sipariş oluşturmada sadece kontrol.\n- IDOR koruması: userId kontrolü ile kullanıcı sadece kendi verilerine erişir.\n- PATCH vs PUT: PATCH kısmi güncelleme, PUT tüm kaynak güncelleme.\n- aggregate ile toplu istatistik sorguları — count, sum, avg.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar e-ticaret'te 'inventory reservation' pattern'ı kullanır: sipariş oluşturulduğunda stok geçici olarak reserve edilir (düşürülmez), ödeme tamamlanınca confirm edilir, belirli sürede ödeme yapılmazsa release edilir. Bu, 'stok var ama checkout'ta bitiyor' sorununu çözer. Ayrıca 'eventually consistent' yaklaşım: stok sayısı cache'de tutulur, periyodik olarak DB ile sync edilir — yüksek traffic altında performans sağlar."
+    },
+    {
+      "id": "p04-m4",
+      "title": "Fraud Detection ML Modeli",
+      "overview": "Bu milestone'da Python ile basit bir fraud detection modeli eğitecek ve bunu Flask/FastAPI microservice olarak deploy edeceksin. Model, sipariş verilerini analiz ederek şüpheli işlemleri tespit edecek.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "Feature engineering",
+        "scikit-learn",
+        "Classification",
+        "Model evaluation",
+        "Flask API"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Fraud Detection Veri Seti Hazırlama",
+          "why": "ML modeli veriyle eğitilir. Feature engineering (özellik mühendisliği), ham veriden model'in öğrenebileceği anlamlı özellikler çıkarmaktır. E-ticaret fraud detection'da sipariş tutarı, sipariş sıklığı, adres tutarsızlığı gibi özellikler kullanılır.",
+          "instructions": "Fraud detection için sentetik veri seti oluştur ve feature engineering yap.",
+          "code_snippet": "# fraud-detection/generate_data.py\nimport pandas as pd\nimport numpy as np\nfrom datetime import datetime, timedelta\n\nnp.random.seed(42)\nN = 5000\n\n# Sentetik sipariş verisi oluştur\ndata = {\n    'order_amount': np.concatenate([\n        np.random.normal(150, 50, int(N * 0.95)),  # Normal siparişler\n        np.random.normal(800, 200, int(N * 0.05)),  # Fraud siparişler (yüksek tutarlı)\n    ]),\n    'items_count': np.concatenate([\n        np.random.randint(1, 5, int(N * 0.95)),\n        np.random.randint(5, 20, int(N * 0.05)),\n    ]),\n    'hour_of_day': np.concatenate([\n        np.random.normal(14, 4, int(N * 0.95)).clip(0, 23).astype(int),\n        np.random.choice([2, 3, 4, 5], int(N * 0.05)),  # Gece saatleri\n    ]),\n    'is_new_customer': np.concatenate([\n        np.random.choice([0, 1], int(N * 0.95), p=[0.7, 0.3]),\n        np.random.choice([0, 1], int(N * 0.05), p=[0.2, 0.8]),\n    ]),\n    'shipping_billing_match': np.concatenate([\n        np.random.choice([0, 1], int(N * 0.95), p=[0.1, 0.9]),\n        np.random.choice([0, 1], int(N * 0.05), p=[0.7, 0.3]),\n    ]),\n    'previous_orders': np.concatenate([\n        np.random.poisson(5, int(N * 0.95)),\n        np.random.poisson(0.5, int(N * 0.05)),\n    ]),\n    'is_fraud': np.concatenate([\n        np.zeros(int(N * 0.95)),\n        np.ones(int(N * 0.05)),\n    ]),\n}\n\ndf = pd.DataFrame(data)\ndf['order_amount'] = df['order_amount'].clip(10, 2000).round(2)\ndf = df.sample(frac=1).reset_index(drop=True)  # Shuffle\n\ndf.to_csv('fraud_data.csv', index=False)\nprint(f'Dataset: {len(df)} rows, {df[\"is_fraud\"].sum():.0f} fraud cases ({df[\"is_fraud\"].mean()*100:.1f}%)')",
+          "deep_dive": "Fraud detection'da class imbalance yaygındır: gerçek dünyada fraud oranı %1-5'tir. Sentetik veride %5 fraud oluşturduk. Feature'lar domain knowledge'a dayanır: yüksek tutar, gece saatleri, yeni müşteri, adres uyumsuzluğu fraud göstergeleridir. np.random.seed(42) ile reproducible sonuçlar sağlanır. clip ile outlier'lar sınırlandırılır. Shuffle ile fraud ve normal siparişler karışık sırada olur.",
+          "checkpoint": "CSV dosyası 5000 satır, 7 feature ve 1 target sütunuyla oluşturulmalı. Fraud oranı ~%5 olmalı."
+        },
+        {
+          "step": 2,
+          "title": "Model Eğitimi ve Değerlendirme",
+          "why": "scikit-learn ile Random Forest classifier eğiteceğiz. Model evaluation (precision, recall, F1-score) fraud detection'da özellikle önemlidir çünkü false positive (normal siparişi fraud olarak işaretleme) müşteri kaybına, false negative (fraud'u kaçırma) maddi kayba neden olur.",
+          "instructions": "scikit-learn ile model eğit ve değerlendir.",
+          "code_snippet": "# fraud-detection/train_model.py\nimport pandas as pd\nimport numpy as np\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import classification_report, confusion_matrix\nfrom sklearn.preprocessing import StandardScaler\nimport joblib\n\n# Veri yükle\ndf = pd.read_csv('fraud_data.csv')\n\n# Feature ve target ayır\nX = df.drop('is_fraud', axis=1)\ny = df['is_fraud']\n\n# Train/test split\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.2, random_state=42, stratify=y\n)\n\n# Feature scaling\nscaler = StandardScaler()\nX_train_scaled = scaler.fit_transform(X_train)\nX_test_scaled = scaler.transform(X_test)\n\n# Model eğitimi\nmodel = RandomForestClassifier(\n    n_estimators=100,\n    max_depth=10,\n    class_weight='balanced',  # Imbalanced data için\n    random_state=42,\n)\nmodel.fit(X_train_scaled, y_train)\n\n# Değerlendirme\ny_pred = model.predict(X_test_scaled)\nprint('Classification Report:')\nprint(classification_report(y_test, y_pred, target_names=['Normal', 'Fraud']))\n\nprint('Confusion Matrix:')\nprint(confusion_matrix(y_test, y_pred))\n\n# Feature importance\nfor name, importance in sorted(\n    zip(X.columns, model.feature_importances_), key=lambda x: -x[1]\n):\n    print(f'  {name}: {importance:.4f}')\n\n# Model ve scaler kaydet\njoblib.dump(model, 'fraud_model.joblib')\njoblib.dump(scaler, 'fraud_scaler.joblib')\nprint('Model kaydedildi.')",
+          "deep_dive": "class_weight='balanced' ile azınlık sınıfı (fraud) daha fazla ağırlık alır — model fraud case'leri öğrenmekte zorlanmaz. stratify=y ile train/test split'te fraud oranı korunur. StandardScaler, feature'ları aynı ölçeğe getirir — Random Forest bunu gerektirmez ama production'da farklı modeller denenebilir. classification_report, precision (doğru fraud tahminleri / tüm fraud tahminleri) ve recall (yakalanan fraud / toplam fraud) gösterir.",
+          "checkpoint": "Model F1-score > 0.80 olmalı. Confusion matrix'te false negative düşük olmalı. Feature importance sıralaması mantıklı olmalı."
+        },
+        {
+          "step": 3,
+          "title": "Flask API ile Model Servisi",
+          "why": "Eğitilmiş ML modeli, Flask (veya FastAPI) ile HTTP API olarak serve edilir. Node.js API, sipariş oluşturulduğunda bu servise HTTP isteği yaparak fraud score alır. Bu microservice yaklaşımı, ML modelini bağımsız ölçeklendirme ve güncelleme imkanı verir.",
+          "instructions": "Flask ile fraud detection API'sini oluştur.",
+          "code_snippet": "# fraud-detection/app.py\nfrom flask import Flask, request, jsonify\nimport joblib\nimport numpy as np\n\napp = Flask(__name__)\n\n# Model ve scaler yükle\nmodel = joblib.load('fraud_model.joblib')\nscaler = joblib.load('fraud_scaler.joblib')\n\n@app.route('/predict', methods=['POST'])\ndef predict():\n    data = request.json\n\n    features = np.array([[\n        data.get('order_amount', 0),\n        data.get('items_count', 0),\n        data.get('hour_of_day', 12),\n        data.get('is_new_customer', 0),\n        data.get('shipping_billing_match', 1),\n        data.get('previous_orders', 0),\n    ]])\n\n    features_scaled = scaler.transform(features)\n    probability = model.predict_proba(features_scaled)[0][1]\n\n    return jsonify({\n        'fraud_score': round(float(probability), 4),\n        'is_suspicious': probability > 0.5,\n        'risk_level': 'high' if probability > 0.7 else 'medium' if probability > 0.3 else 'low',\n    })\n\n@app.route('/health', methods=['GET'])\ndef health():\n    return jsonify({'status': 'ok'})\n\nif __name__ == '__main__':\n    app.run(host='0.0.0.0', port=5000)\n\n# fraud-detection/requirements.txt\n# flask==3.1.0\n# scikit-learn==1.6.1\n# joblib==1.4.2\n# numpy==2.2.0\n\n# fraud-detection/Dockerfile\n# FROM python:3.13-slim\n# WORKDIR /app\n# COPY requirements.txt .\n# COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv\n# RUN uv pip install --system --no-cache-dir -r requirements.txt\n# COPY . .\n# CMD [\"python\", \"app.py\"]",
+          "deep_dive": "predict_proba fraud olma olasılığını 0-1 arası döndürür — predict sadece 0/1 döndürür. Olasılık bazlı yaklaşım, farklı eşik değerleri ile hassasiyet ayarlamaya olanak tanır. risk_level kategorilendirmesi, iş kurallarıyla entegre edilir: high risk siparişler manuel review'a alınır. Docker slim image ile container boyutu minimize edilir. /health endpoint, Docker healthcheck ve load balancer için kullanılır.",
+          "checkpoint": "Flask API başladığında /health 200 dönmeli. /predict endpoint'ine sipariş verileri gönderildiğinde fraud score dönmeli. Docker container'da çalışmalı."
+        },
+        {
+          "step": 4,
+          "title": "Node.js API ile Fraud Detection Entegrasyonu",
+          "why": "Fraud detection servisi, sipariş akışına entegre edilir. Her sipariş oluşturulduğunda veya ödeme yapıldığında, fraud score hesaplanır ve sipariş kaydına eklenir. Yüksek risk skorlu siparişler otomatik olarak manuel review'a alınabilir.",
+          "instructions": "Node.js API'den fraud detection servisini çağır ve sipariş akışına entegre et.",
+          "code_snippet": "// src/services/fraud.service.ts\nimport axios from 'axios';\n\nconst FRAUD_SERVICE_URL = process.env.FRAUD_SERVICE_URL || 'http://localhost:5000';\n\ninterface FraudResult {\n  fraud_score: number;\n  is_suspicious: boolean;\n  risk_level: 'low' | 'medium' | 'high';\n}\n\nexport class FraudService {\n  async analyzeOrder(orderData: {\n    orderAmount: number;\n    itemsCount: number;\n    isNewCustomer: boolean;\n    shippingBillingMatch: boolean;\n    previousOrders: number;\n  }): Promise<FraudResult> {\n    try {\n      const { data } = await axios.post(`${FRAUD_SERVICE_URL}/predict`, {\n        order_amount: orderData.orderAmount,\n        items_count: orderData.itemsCount,\n        hour_of_day: new Date().getHours(),\n        is_new_customer: orderData.isNewCustomer ? 1 : 0,\n        shipping_billing_match: orderData.shippingBillingMatch ? 1 : 0,\n        previous_orders: orderData.previousOrders,\n      });\n\n      return data;\n    } catch (error) {\n      console.error('Fraud service error:', error);\n      // Fraud servisi çöktüğünde siparişi engelleme\n      return { fraud_score: 0, is_suspicious: false, risk_level: 'low' };\n    }\n  }\n}\n\n// Sipariş akışında kullanım:\n// const fraudResult = await fraudService.analyzeOrder({...});\n// await prisma.order.update({ where: { id: orderId }, data: { fraudScore: fraudResult.fraud_score } });\n// if (fraudResult.risk_level === 'high') { /* Manuel review'a al */ }",
+          "deep_dive": "Graceful degradation: Fraud servisi çöktüğünde sipariş engellenmez — default olarak low risk kabul edilir. Bu, 'fail open' stratejisidir (güvenlik vs kullanılabilirlik trade-off). axios timeout eklenebilir (3 saniye) — fraud servisi yavaş yanıt verirse sipariş akışı tıkanmaz. Fraud score veritabanına kaydedilir — geçmiş verilerde analiz yapılabilir. High risk siparişler admin dashboard'da ayrı görünür.",
+          "checkpoint": "Sipariş oluşturulduğunda fraud score hesaplanmalı. Score veritabanına kaydedilmeli. Fraud servisi çöktüğünde sipariş akışı devam etmeli."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- class_weight='balanced': Imbalanced data için azınlık sınıfına daha fazla ağırlık verir.\n- predict_proba: 0-1 arası olasılık döndürür — eşik değeri ile hassasiyet ayarlanır.\n- Graceful degradation: ML servisi çöktüğünde ana uygulama çalışmaya devam etmeli.\n- Feature engineering: Domain knowledge'a dayalı özellik çıkarma — ML'in en kritik aşaması.\n- Model kaydetme: joblib ile model + scaler birlikte kaydedilir.\n- Confusion matrix: False positive (müşteri kaybı) vs false negative (maddi kayıp) trade-off.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar ML model deployment'ta 'model versioning' ve 'A/B testing' düşünür. Yeni model yayınlandığında, trafiğin %10'u yeni modele, %90'ı eski modele yönlendirilir ve performans karşılaştırılır. Model monitoring ile prediction drift (modelin zamanla kötüleşmesi) izlenir. Ayrıca 'feature store' kavramı: feature'lar merkezi bir yerden yönetilir, birden fazla model aynı feature'ları kullanabilir."
+    },
+    {
+      "id": "p04-m5",
+      "title": "CI/CD Pipeline ve Testing",
+      "overview": "Bu milestone'da GitHub Actions ile CI/CD pipeline kuracak ve kapsamlı test suite yazacaksın. Her git push'ta testler otomatik çalışır, lint kontrolleri yapılır ve Docker image build edilir.",
+      "estimated_hours": 6,
+      "concepts_covered": [
+        "GitHub Actions",
+        "Jest testing",
+        "Stripe mocking",
+        "Docker build",
+        "Code quality"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "API Test Suite",
+          "why": "E-ticaret API'sinde testler kritiktir: ödeme, stok ve sipariş logic'inde hata kabul edilemez. Stripe mock'ları ile ödeme testleri, transaction testleri ile veri tutarlılığı doğrulanır.",
+          "instructions": "Jest + Supertest ile kapsamlı API testleri yaz.",
+          "code_snippet": "// tests/integration/product.test.ts\nimport request from 'supertest';\nimport app from '../../src/app';\nimport { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\nlet adminToken: string;\n\nbeforeAll(async () => {\n  // Admin kullanıcı oluştur ve token al\n  const res = await request(app).post('/api/auth/register').send({\n    email: 'admin@test.com', name: 'Admin', password: 'Admin123!', role: 'ADMIN'\n  });\n  adminToken = res.body.data.accessToken;\n});\n\nbeforeEach(async () => {\n  await prisma.orderItem.deleteMany();\n  await prisma.order.deleteMany();\n  await prisma.product.deleteMany();\n  await prisma.category.deleteMany();\n});\n\ndescribe('Product API', () => {\n  let categoryId: string;\n\n  beforeEach(async () => {\n    const category = await prisma.category.create({\n      data: { name: 'Elektronik', slug: 'elektronik' },\n    });\n    categoryId = category.id;\n  });\n\n  it('should create a product (admin only)', async () => {\n    const res = await request(app)\n      .post('/api/products')\n      .set('Authorization', `Bearer ${adminToken}`)\n      .send({\n        name: 'Test Laptop', slug: 'test-laptop',\n        description: 'Harika laptop', price: 15999.99,\n        stock: 10, categoryId,\n      });\n\n    expect(res.status).toBe(201);\n    expect(res.body.data.name).toBe('Test Laptop');\n    expect(res.body.data.price).toBe('15999.99');\n  });\n\n  it('should list products with pagination', async () => {\n    // 15 ürün oluştur\n    for (let i = 0; i < 15; i++) {\n      await prisma.product.create({\n        data: {\n          name: `Ürün ${i}`, slug: `urun-${i}`,\n          description: 'Test', price: 100 + i,\n          stock: 10, categoryId,\n        },\n      });\n    }\n\n    const res = await request(app)\n      .get('/api/products?page=1&limit=10');\n\n    expect(res.status).toBe(200);\n    expect(res.body.data.products).toHaveLength(10);\n    expect(res.body.data.meta.total).toBe(15);\n    expect(res.body.data.meta.totalPages).toBe(2);\n  });\n\n  it('should filter products by category and price', async () => {\n    await prisma.product.createMany({\n      data: [\n        { name: 'Ucuz', slug: 'ucuz', description: 'T', price: 50, stock: 5, categoryId },\n        { name: 'Pahalı', slug: 'pahali', description: 'T', price: 500, stock: 5, categoryId },\n      ],\n    });\n\n    const res = await request(app)\n      .get(`/api/products?minPrice=100&maxPrice=1000&categoryId=${categoryId}`);\n\n    expect(res.status).toBe(200);\n    expect(res.body.data.products).toHaveLength(1);\n    expect(res.body.data.products[0].name).toBe('Pahalı');\n  });\n});",
+          "deep_dive": "beforeEach'te ilişkili tablolar sırayla temizlenir (foreign key constraint'ler nedeniyle). Decimal değerler Prisma'da string olarak döner ('15999.99'), number olarak değil — assertion'da buna dikkat et. createMany ile toplu veri oluşturma, test setup'ını hızlandırır. Pagination testi, meta bilgilerinin doğruluğunu doğrular.",
+          "checkpoint": "Tüm product testleri geçmeli. Pagination, filtreleme ve RBAC testleri geçmeli. Test veritabanı izole olmalı."
+        },
+        {
+          "step": 2,
+          "title": "GitHub Actions CI Pipeline",
+          "why": "CI pipeline, her push ve PR'da otomatik kalite kontrol sağlar. Lint, test, build aşamaları sırayla çalışır. Başarısız PR main'e merge edilemez.",
+          "instructions": "GitHub Actions workflow dosyası oluştur.",
+          "code_snippet": "# .github/workflows/ci.yml\nname: CI Pipeline\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]\n\njobs:\n  lint-and-test:\n    runs-on: ubuntu-latest\n    services:\n      postgres:\n        image: postgres:16-alpine\n        env:\n          POSTGRES_USER: test\n          POSTGRES_PASSWORD: test\n          POSTGRES_DB: ecommerce_test\n        ports: ['5432:5432']\n        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5\n      redis:\n        image: redis:7-alpine\n        ports: ['6379:6379']\n\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n          cache: pnpm\n\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm dlx prisma migrate deploy\n        env:\n          DATABASE_URL: postgresql://test:test@localhost:5432/ecommerce_test\n\n      - name: Lint\n        run: pnpm run lint\n\n      - name: Test\n        run: pnpm test -- --coverage\n        env:\n          DATABASE_URL: postgresql://test:test@localhost:5432/ecommerce_test\n          REDIS_URL: redis://localhost:6379\n          JWT_SECRET: test-secret\n          STRIPE_SECRET_KEY: sk_test_fake\n\n  docker-build:\n    runs-on: ubuntu-latest\n    needs: lint-and-test\n    steps:\n      - uses: actions/checkout@v4\n      - name: Build Docker image\n        run: docker build -t ecommerce-api .",
+          "deep_dive": "needs: lint-and-test ile docker-build, testler geçtikten sonra çalışır. Service containers (postgres, redis) CI ortamında gerçek veritabanı ve cache sağlar. pnpm install --frozen-lockfile, reproducible install yapar. prisma migrate deploy, migration'ları interaktif olmadan uygular. Coverage raporu ile test kapsamı kontrol edilir.",
+          "checkpoint": "GitHub'a push yapıldığında CI tetiklenmeli. Lint ve testler geçmeli. Docker build başarılı olmalı."
+        },
+        {
+          "step": 3,
+          "title": "Swagger API Dokümantasyonu ve Final",
+          "why": "API dokümantasyonu, projenin profesyonel kalitesinin göstergesidir. Swagger ile interaktif dokümantasyon oluşturulur.",
+          "instructions": "Swagger dokümantasyonu ve README hazırla.",
+          "code_snippet": "// README yapısı:\n# E-commerce API + Fraud Detection\n## Demo / Screenshots\n## Özellikler\n  - Ürün kataloğu (filtreleme, arama, pagination)\n  - Redis sepet yönetimi\n  - Stripe ödeme entegrasyonu\n  - Sipariş durumu state machine\n  - ML fraud detection (scikit-learn)\n  - JWT auth + RBAC\n## Mimari Diyagramı\n## Teknoloji Stack'i\n## Hızlı Başlangıç (docker-compose up)\n## API Endpoint Tablosu\n## Stripe Test Kartları\n## Fraud Detection Model Metrikleri\n## CI/CD Pipeline\n## Test Coverage",
+          "deep_dive": "API endpoint tablosu, her endpoint için method, path, auth requirement, request/response format listeler. Stripe test kartları README'de olmalı — reviewer'ın test etmesini kolaylaştırır. Model metrikleri (precision, recall, F1) README'de gösterilir — ML yetkinliğini kanıtlar.",
+          "checkpoint": "Swagger UI çalışmalı. README eksiksiz olmalı. docker-compose up ile proje 3 dakikada çalışmalı."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- CI'da service containers: Gerçek PostgreSQL ve Redis ile test — mock'lamadan daha güvenilir.\n- pnpm install --frozen-lockfile: reproducible install — CI'da pnpm install yerine kullan.\n- needs ile job bağımlılığı: testler geçmeden build çalışmaz.\n- Decimal assertion: Prisma string olarak döndürür ('15999.99'), number değil.\n- README'de Stripe test kartları: Reviewer'ın test etmesini kolaylaştır.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar CI pipeline'ı 'fast feedback loop' için optimize eder: önce lint (saniyeler), sonra unit test (dakikalar), en son integration test (dakikalar). Paralel job'lar ile toplam süre azaltılır. 'Cache warming' (node_modules cache, Docker layer cache) ile tekrarlayan build'ler hızlanır. Branch protection rules ile main'e direkt push engellenir, PR + CI geçiş zorunlu."
+    },
+    {
+      "id": "p04-m6",
+      "title": "Performans Optimizasyonu ve Production Hazırlık",
+      "overview": "Son milestone'da API performansını optimize edecek, caching stratejisi uygulayacak ve production deployment hazırlığı yapacaksın.",
+      "estimated_hours": 4,
+      "concepts_covered": [
+        "Redis caching",
+        "Query optimization",
+        "Production deployment",
+        "Monitoring"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Redis Caching Stratejisi",
+          "why": "Sık sorgulanan veriler (ürün listesi, kategori listesi) Redis cache'te tutularak veritabanı yükü azaltılır. Cache invalidation (cache'i geçersiz kılma) stratejisi, verinin tutarlılığını garanti eder.",
+          "instructions": "Ürün ve kategori sorguları için Redis cache ekle.",
+          "code_snippet": "// src/utils/cache.ts\nimport Redis from 'ioredis';\n\nconst redis = new Redis(process.env.REDIS_URL!);\nconst DEFAULT_TTL = 300; // 5 dakika\n\nexport async function getCached<T>(key: string, fetcher: () => Promise<T>, ttl = DEFAULT_TTL): Promise<T> {\n  const cached = await redis.get(key);\n  if (cached) return JSON.parse(cached);\n\n  const data = await fetcher();\n  await redis.set(key, JSON.stringify(data), 'EX', ttl);\n  return data;\n}\n\nexport async function invalidateCache(pattern: string) {\n  const keys = await redis.keys(pattern);\n  if (keys.length > 0) {\n    await redis.del(...keys);\n  }\n}\n\n// Kullanım:\n// const products = await getCached('products:page:1', () => productService.getAll({}, { page: 1, limit: 20 }));\n// Ürün güncellendiğinde: await invalidateCache('products:*');",
+          "deep_dive": "Cache-aside pattern: önce cache'e bak, yoksa DB'den al ve cache'e yaz. TTL ile cache otomatik geçersiz olur — stale data riski azalır. invalidateCache ile ürün güncellendiğinde tüm ürün cache'leri temizlenir. Production'da keys komutu yerine SCAN kullanılmalı — keys büyük dataset'lerde blocking'dir. Write-through pattern: DB'ye yazarken cache'i de güncelle (daha tutarlı ama daha karmaşık).",
+          "checkpoint": "Aynı sorgu tekrarlandığında Redis'ten okunmalı (latency düşmeli). Ürün güncellendiğinde cache temizlenmeli."
+        },
+        {
+          "step": 2,
+          "title": "Production Docker ve Final Checklist",
+          "why": "Production deployment için tüm kontroller yapılır. Multi-stage Docker build, environment yönetimi, güvenlik kontrolleri ve performans metrikleri son kez gözden geçirilir.",
+          "instructions": "Production checklist'i uygula ve tüm maddeleri doğrula.",
+          "code_snippet": "# Production Checklist:\n# API\n# [x] Tüm endpoint'ler çalışıyor\n# [x] Input validation (Zod)\n# [x] Rate limiting\n# [x] CORS konfigüre\n# [x] Error handling\n# [x] Consistent response format\n\n# Ödeme\n# [x] Stripe Checkout Session\n# [x] Webhook signature verification\n# [x] Idempotent processing\n# [x] Refund mekanizması\n\n# Güvenlik\n# [x] JWT auth + RBAC\n# [x] Password hashing (bcrypt)\n# [x] Helmet security headers\n# [x] SQL injection koruması (Prisma)\n# [x] No sensitive data in logs\n\n# ML\n# [x] Model eğitildi ve değerlendirildi\n# [x] Flask API çalışıyor\n# [x] Graceful degradation\n\n# DevOps\n# [x] Docker Compose çalışıyor\n# [x] CI/CD pipeline\n# [x] Test coverage %70+\n# [x] API documentation\n# [x] README eksiksiz",
+          "deep_dive": "Production'a çıkmadan önce load testing (artillery, k6) ile API'nin performans limitlerini belirle. Health check endpoint ile monitoring araçları (Uptime Robot, Better Stack) entegre et. Structured logging (JSON format) ile log aggregation (ELK stack) kurulabilir. Error tracking (Sentry) ile production hataları real-time izlenir.",
+          "checkpoint": "Tüm checklist maddeleri tamamlanmalı. docker-compose up ile sıfırdan çalışmalı. Stripe test ödeme akışı sorunsuz olmalı."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Cache-aside pattern: Önce cache, yoksa DB, sonra cache'e yaz.\n- Cache invalidation: Veri değiştiğinde ilgili cache temizlenmeli — stale data en büyük risk.\n- Production'da redis keys komutu yerine SCAN kullan — keys blocking'dir.\n- Load testing: Production'dan önce performans limitlerini bil.\n- Structured logging: JSON format ile log aggregation araçlarına entegre et.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar 'cache stampede' sorununu bilir: cache expire olduğunda aynı anda binlerce request DB'ye gider. Çözüm: mutex/lock ile sadece bir request DB'ye gider, diğerleri bekler. Ayrıca 'cache warming' stratejisi: deploy sonrası sık kullanılan veriler önceden cache'e yüklenir. E-ticaret'te 'flash sale' gibi yüksek traffic anları için önceden kapasite planlaması yapılır."
+    },
+    {
+      "id": "p04-deployment",
+      "title": "Deployment ve Portfolio Showcase",
+      "estimated_hours": 4,
+      "steps": [
+        {
+          "title": "Production Build",
+          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "code_snippet": "pnpm build && pnpm test"
+        },
+        {
+          "title": "Deploy",
+          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et"
+        },
+        {
+          "title": "Profesyonel README",
+          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz"
+        },
+        {
+          "title": "Demo Video (Opsiyonel)",
+          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla"
+        }
+      ],
+      "checkpoint": "Proje canli URL'den erisilebilir, README profesyonel, screenshot'lar ekli, GitHub repo public"
+    }
+  ],
+  "interview_prep": {
+    "questions": [
+      "Stripe ödeme entegrasyonunu nasıl yaptın? Webhook güvenliğini nasıl sağladın?",
+      "Database transaction neden önemli? E-ticaret'te hangi senaryolarda kullandın?",
+      "Redis'i nerede kullandın? Cache invalidation stratejin ne?",
+      "Fraud detection modelin nasıl çalışıyor? Feature engineering sürecini anlat.",
+      "ML modelini production'a nasıl deploy ettin? Model çöktüğünde ne oluyor?",
+      "Rate limiting neden gerekli? Farklı endpoint'ler için farklı limitler nasıl uyguladın?",
+      "RBAC (Role-Based Access Control) nasıl implement ettin?",
+      "Sipariş durumu state machine'ini açıkla. Geçersiz geçişleri nasıl önlüyorsun?"
+    ],
+    "talking_points": [
+      "Production-ready e-ticaret API'si: ürün kataloğu, Redis sepet, Stripe ödeme, sipariş yönetimi.",
+      "Stripe Checkout Session ile PCI uyumlu ödeme. Webhook signature verification ile güvenli event processing.",
+      "PostgreSQL transaction ile atomik stok ve sipariş yönetimi — race condition yok.",
+      "scikit-learn ile fraud detection modeli eğittim: Random Forest, F1-score 0.80+.",
+      "ML modelini Flask microservice olarak deploy ettim. Graceful degradation ile ana uygulama korunuyor.",
+      "GitHub Actions CI/CD: lint -> test -> build -> Docker. %70+ test coverage.",
+      "Redis ile sepet yönetimi (TTL) ve API response caching."
+    ]
+  },
+  "resources": [
+    {
+      "title": "Stripe Documentation",
+      "url": "https://stripe.com/docs",
+      "why": "Stripe ödeme entegrasyonu, Checkout Session, Webhook ve test modu hakkında resmi dokümantasyon."
+    },
+    {
+      "title": "Prisma Documentation",
+      "url": "https://www.prisma.io/docs",
+      "why": "Prisma ORM, schema tasarımı, migration, transaction ve advanced query."
+    },
+    {
+      "title": "scikit-learn Documentation",
+      "url": "https://scikit-learn.org/stable/",
+      "why": "ML model eğitimi, evaluation metrikleri ve pipeline oluşturma."
+    },
+    {
+      "title": "Redis Documentation",
+      "url": "https://redis.io/docs/",
+      "why": "Redis veri yapıları, caching stratejileri ve pub/sub."
+    },
+    {
+      "title": "GitHub Actions Documentation",
+      "url": "https://docs.github.com/en/actions",
+      "why": "CI/CD pipeline oluşturma, workflow syntax ve service containers."
+    }
+  ],
+  "cv_guidance": {
+    "project_title_for_cv": "E-Commerce Backend API with ML-Based Fraud Detection",
+    "bullet_points": {
+      "Full Stack Developer": [
+        "Developed a production-ready e-commerce REST API using Node.js, Express.js, TypeScript, and PostgreSQL with Prisma ORM, handling product catalog, cart, and order management across 15+ endpoints",
+        "Integrated Stripe payment processing with webhook-based order lifecycle management, supporting checkout sessions, refunds, and real-time payment status updates",
+        "Implemented Redis-based shopping cart with TTL auto-expiration, reducing database write load by 60% and achieving sub-10ms cart operations",
+        "Containerized microservice architecture with Docker Compose (4 services) and automated CI/CD pipeline via GitHub Actions with test, lint, and deploy stages"
+      ],
+      "AI Engineer": [
+        "Built ML-based fraud detection microservice using Python, Flask, and scikit-learn, analyzing 8+ transaction features to flag suspicious orders with F1-score 0.80+",
+        "Engineered feature pipeline extracting behavioral signals (order velocity, amount deviation, time-of-day patterns) from transaction data for real-time fraud scoring",
+        "Implemented model evaluation framework tracking precision, recall, F1-score, and false positive rate, achieving < 3% false positive rate in production",
+        "Designed inter-service communication between Node.js API and Python ML service via REST, enabling real-time fraud scoring on every checkout with < 100ms latency"
+      ]
+    },
+    "skills_gained": {
+      "Frontend": [
+        "API Testing (Postman/Thunder Client)"
+      ],
+      "Backend": [
+        "Node.js",
+        "Express.js",
+        "TypeScript",
+        "REST API Design",
+        "Prisma ORM",
+        "Stripe API",
+        "Webhook Handling",
+        "Rate Limiting",
+        "Input Validation"
+      ],
+      "Database": [
+        "PostgreSQL",
+        "Redis",
+        "Relational Data Modeling",
+        "Database Migrations",
+        "Caching Strategies"
+      ],
+      "AI/ML": [
+        "scikit-learn",
+        "Random Forest",
+        "Feature Engineering",
+        "Model Evaluation",
+        "Fraud Detection",
+        "Python",
+        "Flask"
+      ],
+      "DevOps": [
+        "Docker",
+        "Docker Compose",
+        "GitHub Actions CI/CD",
+        "Multi-Service Architecture",
+        "Environment Management"
+      ]
+    },
+    "ats_keywords": [
+      "Node.js",
+      "Express.js",
+      "TypeScript",
+      "PostgreSQL",
+      "Prisma ORM",
+      "Redis",
+      "Stripe API",
+      "Docker",
+      "Docker Compose",
+      "GitHub Actions",
+      "CI/CD",
+      "REST API",
+      "Python",
+      "Flask",
+      "scikit-learn",
+      "Machine Learning",
+      "Fraud Detection",
+      "Microservices",
+      "Webhooks",
+      "JWT Authentication"
+    ],
+    "cv_placement": "Backend Developer ve AI Engineer pozisyonlari icin CV'deki en guclu proje. Birinci siraya koy. E-ticaret API + ML fraud detection kombinasyonu hem backend hem AI becerilerini tek projede gosteriyor. Stripe entegrasyonu recruiter'larin cok deger verdigi bir beceri — odeme sistemleri her sirkette var.",
+    "metrics_you_can_claim": [
+      "15+ RESTful API endpoint tasarimi ve implementasyonu",
+      "Stripe odeme entegrasyonu ile tam checkout akisi",
+      "Redis ile sepet islemleri < 10ms response suresi",
+      "Redis cache ile veritabani yazma yukunu %60 azaltma",
+      "ML fraud detection ile F1-score 0.80+",
+      "False positive orani < %3",
+      "Docker Compose ile 4 servisin orchestration'i",
+      "GitHub Actions CI/CD pipeline ile otomatik test ve deployment",
+      "8+ feature ile fraud scoring pipeline"
+    ]
+  },
+  "github_guidance": {
+    "repo_name": "ecommerce-api-fraud-detection",
+    "repo_description": "E-commerce REST API with ML fraud detection — Node.js, Express, TypeScript, PostgreSQL, Stripe, Redis, Python, scikit-learn, Docker",
+    "topics": [
+      "nodejs",
+      "express",
+      "typescript",
+      "postgresql",
+      "prisma",
+      "redis",
+      "stripe",
+      "docker",
+      "python",
+      "scikit-learn",
+      "machine-learning",
+      "fraud-detection",
+      "ecommerce",
+      "rest-api"
+    ],
+    "when_to_create": "Projeye başladığın ilk gün repo'yu oluştur. İlk commit: Express + TypeScript boilerplate + Prisma konfigürasyonu + Docker Compose (PostgreSQL + Redis). Layered architecture klasör yapısını hemen kur.",
+    "pin_on_profile": false,
+    "readme_sections": [
+      "# E-commerce API + Fraud Detection + one-line description",
+      "Badges: build status, tech stack (Node.js, PostgreSQL, Stripe, Python), license (shields.io)",
+      "## 📸 Screenshots / Demo GIF",
+      "## ✨ Features (bullet list)",
+      "## 🛠 Tech Stack (table: Frontend | Backend | AI/ML | DevOps)",
+      "## 🚀 Getting Started (prerequisites, pnpm install, docker compose up, env vars)",
+      "## 📐 Architecture (ASCII diagram or visual)",
+      "## 📡 API Documentation (main endpoints, example request/response)",
+      "## 🧠 What I Learned (3-5 concepts learned from this project)",
+      "## 📄 License (MIT)"
+    ],
+    "commit_convention": "Conventional Commits: feat:, fix:, docs:, refactor:, test:, chore:",
+    "commit_examples": [
+      "feat: integrate Stripe checkout with webhook payment confirmation",
+      "feat: add ML fraud detection microservice with Random Forest classifier",
+      "fix: resolve Redis cart expiration race condition on concurrent updates",
+      "docs: add Stripe webhook setup guide and API endpoint documentation",
+      "refactor: extract payment service layer from order controller",
+      "test: add e2e tests for complete checkout flow with Stripe mock",
+      "chore: configure GitHub Actions CI pipeline with Docker build and test stages"
+    ],
+    "branch_strategy": "main (production) + develop (active) + feature/* + fix/* + docs/*",
+    "daily_commit_target": "Günde en az 3-5 anlamlı commit. Contribution graph'ın yeşil kalması önemli.",
+    "pro_tips": [
+      "Her milestone bittiğinde git tag ekle: v0.1.0, v0.2.0...",
+      "README'ye mutlaka screenshot/GIF ekle — görsel proje daha çok dikkat çeker",
+      "Issues oluştur ve kapat — proje yönetimi becerini gösterir",
+      "GitHub Projects board kullan — Kanban tarzı iş takibi",
+      "Stripe test mode kullanarak gerçek ödeme akışı demo et — Stripe dashboard screenshot'ı çok etkili",
+      "Fraud detection model performans metriklerini (precision, recall, F1) README'ye ekle"
+    ]
+  },
+  "cover_letter_guidance": {
+    "project_highlight": "Developed a production-ready e-commerce backend API with Stripe payment integration and ML-based fraud detection, featuring a Node.js/Express REST API, PostgreSQL database, Redis cart management, and a Python microservice achieving F1-score 0.80+ in fraud detection with scikit-learn.",
+    "skills_demonstrated": [
+      "Node.js",
+      "Express",
+      "TypeScript",
+      "PostgreSQL",
+      "Prisma",
+      "Redis",
+      "Stripe API",
+      "Python",
+      "scikit-learn",
+      "Docker",
+      "GitHub Actions",
+      "CI/CD"
+    ],
+    "talking_points": [
+      "Implemented end-to-end Stripe payment integration with Checkout Sessions, webhook handling, and real-time order status updates",
+      "Built ML-based fraud detection microservice in Python achieving F1-score 0.80+ using scikit-learn classification models",
+      "Designed Redis-backed shopping cart with TTL-based auto-expiration reducing PostgreSQL write load by 40%",
+      "Developed comprehensive REST API with 20+ endpoints covering product catalog, cart, orders, and payment processing",
+      "Set up CI/CD pipeline with GitHub Actions, Docker containerization, and automated test suite (Jest + Supertest)"
+    ]
+  },
+  "ai_workflow": {
+    "planning": {
+      "model": "Claude Opus 4.6",
+      "prompt_template": "I'm building an e-commerce backend API with fraud detection using Node.js/Express + TypeScript, PostgreSQL + Prisma, Redis for cart management, Stripe payment integration, and Python + scikit-learn for ML-based fraud detection. Help me design the system architecture considering: database schema for products/orders/users/payments, Stripe Checkout Session + webhook flow, Redis cart with TTL, fraud scoring pipeline, layered architecture (controller/service/repository), and microservice communication between Node.js API and Python ML service.",
+      "when_to_use": "Her milestone'un basinda kullan — veritabani semasi, odeme akisi ve fraud detection pipeline planlamak icin"
+    },
+    "code_review": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "Review this e-commerce backend code (Express + Prisma + Stripe + Redis) for: payment security (PCI compliance, webhook signature verification), SQL injection prevention, proper transaction handling for orders, Redis cart implementation, rate limiting, input validation, error handling, idempotent webhook handlers, and separation of concerns. Also review the Python fraud detection model for feature engineering and model evaluation.",
+      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle Stripe webhook handler'lari, odeme guvenligi ve fraud model entegrasyonu icin"
+    },
+    "debugging": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "I'm getting this error in my e-commerce API (Express + PostgreSQL + Prisma + Stripe + Redis + Python ML): [error]. The relevant code is: [code]. Stripe webhook payload: [payload]. I'm trying to [goal].",
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle Stripe webhook hatalari, Prisma transaction sorunlari ve ML model entegrasyon hatalari icin"
+    },
+    "research": {
+      "model": "Gemini 2.5 Pro",
+      "prompt_template": "Explain [concept] with practical examples for an e-commerce backend with fraud detection. Topics I need help with: Stripe Checkout Session API and webhooks, PCI DSS compliance, Redis data structures for shopping cart, Prisma transactions and nested writes, scikit-learn fraud detection models (Isolation Forest, Random Forest), feature engineering for fraud detection, GitHub Actions CI/CD pipeline, and Docker multi-service setup.",
+      "when_to_use": "Yeni bir konsept ogrenirken kullan — ozellikle Stripe API, fraud detection ML modelleri ve guvenlik best practice'leri icin"
+    }
+  },
+  "deployment_guide": {
+    "recommended_stack": {
+      "frontend": "Vercel",
+      "backend": "Railway",
+      "database": "Neon (Serverless PostgreSQL)",
+      "cache": "Upstash Redis",
+      "payment": "Stripe (test mode)"
+    },
+    "steps": [
+      {
+        "title": "Neon Database Olustur",
+        "commands": [
+          "# neon.tech'e git, yeni proje olustur"
+        ],
+        "instructions": "Connection string'i kopyala. Neon ucretsiz tier yeterli"
+      },
+      {
+        "title": "Stripe Test Mode Ayarla",
+        "commands": [
+          "# dashboard.stripe.com > Developers > API keys"
+        ],
+        "instructions": "Test mode API key'lerini kullan. Webhook endpoint'i Railway URL'ine yonlendir"
+      },
+      {
+        "title": "Backend Deploy (Railway)",
+        "commands": [
+          "railway login",
+          "railway init",
+          "railway up"
+        ],
+        "instructions": "Env vars: DATABASE_URL, JWT_SECRET, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, REDIS_URL, CORS_ORIGIN"
+      },
+      {
+        "title": "Frontend Deploy (Vercel)",
+        "commands": [
+          "pnpm dlx vercel --yes"
+        ],
+        "instructions": "VITE_API_URL ve VITE_STRIPE_PUBLISHABLE_KEY env var'larini ayarla"
+      },
+      {
+        "title": "Stripe Webhook Kaydi",
+        "commands": [
+          "stripe listen --forward-to https://your-railway-url.up.railway.app/api/webhooks/stripe"
+        ],
+        "instructions": "Production'da Stripe Dashboard > Webhooks > Add endpoint ile kayit yap"
+      }
+    ],
+    "env_vars": [
+      "DATABASE_URL",
+      "JWT_SECRET",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",
+      "STRIPE_PUBLISHABLE_KEY",
+      "REDIS_URL",
+      "CORS_ORIGIN",
+      "VITE_API_URL",
+      "VITE_STRIPE_PUBLISHABLE_KEY"
+    ],
+    "estimated_time": "45 dakika",
+    "cost": "Ucretsiz (Stripe test mode + hobby tier servisler)",
+    "demo_checklist": [
+      "Urun listeleme ve filtreleme",
+      "Sepete ekleme/cikarma",
+      "Stripe Checkout ile odeme (test kart: 4242...)",
+      "Siparis durumu guncelleme",
+      "Fraud detection skoru goruntuleme",
+      "Webhook olaylari isleniyor"
+    ]
+  },
+  "portfolio_showcase": {
+    "readme_must_haves": [
+      "Proje aciklamasi ve motivasyon (2-3 cumle)",
+      "Canli demo linki (Vercel/Railway badge ile)",
+      "Teknoloji stack badge'leri",
+      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Mimari diyagram (ASCII veya draw.io)",
+      "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
+      "API dokumantasyonu (/docs linki veya Postman collection)",
+      "Ogrenilenler ve kararlar bolumu"
+    ],
+    "screenshot_suggestions": [
+      "Dashboard/Anasayfa",
+      "Ana ozellik ekrani",
+      "Mobile gorunum"
+    ],
+    "live_demo_url_template": "https://ecommerce-api.vercel.app",
+    "github_repo_template": "https://github.com/USERNAME/ecommerce-fraud-detection"
+  }
+}

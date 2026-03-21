@@ -1,0 +1,617 @@
+{
+  "id": "linkedin-profile-guide",
+  "title": "LinkedIn Profil Optimizasyon Rehberi",
+  "description": "Recruiter'larin seni bulmasini saglayan LinkedIn stratejisi. LinkedIn'de gorünür ol, dogru anahtar kelimeleri kullan, profesyonel bir profil olustur.",
+  "sections": [
+    {
+      "id": "profil-fotografi-banner",
+      "title": "Profil Fotografi & Banner",
+      "icon": "📸",
+      "content": "LinkedIn'de ilk izlenim profil fotografinla baslar. Recruiter'lar günde yüzlerce profil tarıyor — profesyonel bir foto seni öne cikarir. Banner ise senin 'reklam panonn': ne yaptigini, hangi teknolojileri kullandigini bir bakista anlatir.",
+      "tips": [
+        "Yüzün net görünsün, arka plan sade olsun (tek renk veya blur)",
+        "Omuzlardan yukarı çekilmiş, iyi ışıklandırılmış bir fotoğraf kullan",
+        "Güler yüzlü ol ama abartma — profesyonel bir izlenim bırak",
+        "Telefon kamerası yeterli, stüdyo şart değil — doğal ışıkta pencere kenarında çek",
+        "Fotoğrafı 400x400px ve üzeri çözünürlükte yükle",
+        "Canva veya Figma ile banner tasarla — 1584x396px boyutunda olmalı",
+        "Banner'da şunları yaz: rolün (Full Stack Developer & AI Engineer), 3-4 ana teknolojin, iletişim bilgin",
+        "Banner renk paleti: koyu mavi/siyah arka plan + beyaz/yeşil yazılar (tech hissi verir)",
+        "Banner'a GitHub ve portfolio URL'ini ekleyebilirsin"
+      ],
+      "examples": [
+        "Banner örneği 1: 'Full Stack Developer | React • TypeScript • Python • FastAPI | Building AI-Powered Applications' — koyu gradient arka plan, sol tarafta küçük profil ikonu",
+        "Banner örneği 2: 'KTÜ Bilgisayar Mühendisliği | Open to Work | github.com/username' — üniversite logosu + tech ikonları",
+        "Banner örneği 3: Minimalist tasarım — sadece 'I build things with code.' yazısı ve alt satırda teknoloji ikonları"
+      ],
+      "checklist": [
+        "Profesyonel profil fotoğrafı yüklendi",
+        "Banner tasarlandı ve yüklendi (1584x396px)",
+        "Banner'da rol ve teknolojiler yazıyor",
+        "Fotoğraf ve banner mobilde de düzgün görünüyor"
+      ]
+    },
+    {
+      "id": "headline-formulu",
+      "title": "Headline Formülü",
+      "icon": "✍️",
+      "content": "Headline, LinkedIn'de en çok okunan alandır. Arama sonuçlarında, yorumlarında, bağlantı isteklerinde — her yerde görünür. Recruiter'lar adayları headline'a göre filtreler. 220 karakter sınırın var, her harfi akıllıca kullan. Formül: [Rol] | [Teknolojiler] | [Değer önerisi veya şu an ne yaptığın]",
+      "tips": [
+        "Kesinlikle 'İş arıyorum' veya 'Unemployed' yazma — değer odaklı ol",
+        "'Student' yerine 'Developer' yaz — artık mezunsun",
+        "En çok aranan keyword'leri headline'a koy: React, TypeScript, Python, Node.js",
+        "Pipe karakteri (|) ile bölümleri ayır — okunabilirliği artırır",
+        "Hem Full Stack hem AI Engineer hedefin varsa ikisini de yaz",
+        "İngilizce yaz — global recruiter'lar seni bulsun",
+        "Buzzword'lerden kaçın: 'passionate', 'motivated', 'hardworking' — bunlar boş kalıp"
+      ],
+      "examples": [
+        "Full Stack Developer | React, TypeScript, Node.js, Python | Building Scalable Web Applications",
+        "Full Stack Developer & AI Engineer | React, FastAPI, LangChain | Turning Ideas into Intelligent Apps",
+        "Software Engineer | TypeScript, React, Python, PostgreSQL | Open to Full Stack & AI Roles",
+        "AI Engineer | Python, LangChain, RAG, FastAPI | Building AI-Powered Solutions with Modern Web Tech",
+        "Full Stack Developer | React, Next.js, TypeScript, Python | KTÜ Computer Engineering Graduate",
+        "Junior Full Stack Developer | React • Node.js • Python • Docker | Looking for Remote Opportunities",
+        "Software Developer | AI & Web Development | Python, TypeScript, React, FastAPI | Open to Work"
+      ],
+      "checklist": [
+        "Headline 220 karakterin altında",
+        "En az bir hedef rol yazılı (Full Stack Developer veya AI Engineer)",
+        "En az 3-4 teknoloji keyword'ü var",
+        "İngilizce yazılmış",
+        "Değer önerisi veya 'Open to Work' ifadesi var"
+      ]
+    },
+    {
+      "id": "about-summary-bolumu",
+      "title": "About / Summary Bölümü",
+      "icon": "📝",
+      "content": "About bölümü senin elevator pitch'in. Recruiter'lar ilk 3 satırı görür ('see more' tıklanmadan), bu yüzden ilk 3 satır çok kritik. 3 paragraf formülü kullan: 1) Hook — Kim olduğun ve ne yaptığın (dikkat çekici giriş), 2) Skills & Experience — Teknolojilerin ve projelerinde neler başardığın, 3) Call to Action — Ne aradığın ve nasıl ulaşılacağı. ATS (Applicant Tracking System) keyword'lerini doğal şekilde serpiştir.",
+      "tips": [
+        "İlk 3 satır 'see more' tıklanmadan görünür — en güçlü cümleni oraya yaz",
+        "2000+ karakter kullan — LinkedIn algoritması uzun About bölümlerini sever",
+        "Keyword stuffing yapma ama önemli terimleri doğal şekilde kullan",
+        "Sayılarla konuş: '5+ proje', '10+ teknoloji', '3.5 yıl deneyim'",
+        "Bullet point (•) kullanarak okunabilirliği artır",
+        "Hem İngilizce hem Türkçe versiyon hazırla — İngilizce primary olsun",
+        "Son paragrafta email adresini yaz — recruiter'lar direkt ulaşsın",
+        "Emojileri ölçülü kullan — 1-2 tane yeterli, profili ciddiyetsiz gösterme"
+      ],
+      "examples": [
+        {
+          "language": "English",
+          "label": "Full Stack Developer odaklı About",
+          "template": "I build full-stack web applications that solve real problems. With a strong foundation in React, TypeScript, Node.js, and Python, I create performant, user-friendly applications from frontend to backend.\n\n• Frontend: React, Next.js, TypeScript, Tailwind CSS, Zustand\n• Backend: Node.js, Express, Python, FastAPI, REST APIs, GraphQL\n• Database: PostgreSQL, MongoDB, Redis, Prisma ORM\n• DevOps: Docker, GitHub Actions, CI/CD, AWS basics, Vercel\n• AI/ML: LangChain, OpenAI API, RAG pipelines, vector databases\n\nI've built [X] production-ready projects including an AI-powered [project name], a real-time [project name], and a full-stack [project name]. Each project follows clean architecture principles, includes comprehensive testing, and is deployed with CI/CD pipelines.\n\nBSc in Computer Engineering from Karadeniz Technical University (KTÜ).\n\nCurrently open to Full Stack Developer and AI Engineer roles (remote or on-site). Let's connect!\n📧 your.email@gmail.com"
+        },
+        {
+          "language": "English",
+          "label": "AI Engineer odaklı About",
+          "template": "I build intelligent applications at the intersection of AI and web development. My focus is on creating production-ready AI systems using LangChain, RAG architectures, and modern web technologies.\n\n• AI/ML: LangChain, LlamaIndex, OpenAI API, Hugging Face, RAG, vector databases (Pinecone, ChromaDB)\n• Backend: Python, FastAPI, Node.js, REST APIs, WebSockets\n• Frontend: React, TypeScript, Next.js — because AI needs great interfaces\n• Data: PostgreSQL, MongoDB, Redis, pandas, data pipelines\n• Infrastructure: Docker, AWS (S3, Lambda), GitHub Actions, CI/CD\n\nI've built AI-powered applications including [project name] with RAG pipeline, [project name] using multi-agent systems, and [project name] with real-time AI features. I believe the best AI products combine cutting-edge models with solid engineering practices.\n\nBSc in Computer Engineering from Karadeniz Technical University (KTÜ).\n\nOpen to AI Engineer and Full Stack Developer positions. Reach me at:\n📧 your.email@gmail.com"
+        },
+        {
+          "language": "Turkish",
+          "label": "Türkçe About (ikincil profil için)",
+          "template": "Modern web teknolojileri ve yapay zeka ile gerçek problemleri çözen uygulamalar geliştiriyorum. React, TypeScript, Python ve FastAPI ile frontend'den backend'e, AI pipeline'larından deployment'a kadar tüm süreci yönetiyorum.\n\nTeknoloji yığınım:\n• Frontend: React, Next.js, TypeScript, Tailwind CSS\n• Backend: Python, FastAPI, Node.js, Express\n• AI/ML: LangChain, RAG, OpenAI API, vektör veritabanları\n• Veritabanı: PostgreSQL, MongoDB, Redis\n• DevOps: Docker, GitHub Actions, CI/CD, AWS\n\nKTÜ Bilgisayar Mühendisliği mezunuyum. [X] adet production-ready proje geliştirdim. Temiz kod, test yazma ve CI/CD pipeline'ları ile profesyonel standartlarda çalışıyorum.\n\nFull Stack Developer ve AI Engineer pozisyonlarına açığım (remote veya yerinde).\n📧 your.email@gmail.com"
+        }
+      ],
+      "checklist": [
+        "İlk 3 satır dikkat çekici ve güçlü",
+        "Teknolojiler bullet point ile listelenmiş",
+        "En az 15 keyword doğal şekilde geçiyor",
+        "Proje sayıları ve somut başarılar var",
+        "Email adresi yazılı",
+        "2000+ karakter uzunluğunda",
+        "İngilizce primary versiyon hazır",
+        "Call to action var (Open to Work, Let's connect)"
+      ]
+    },
+    {
+      "id": "experience-bolumu",
+      "title": "Experience Bölümü",
+      "icon": "💼",
+      "content": "Resmi iş deneyimin olmasa bile, projelerini experience olarak ekleyebilirsin. LinkedIn'de 'Self-employed', 'Freelance' veya 'Independent Projects' olarak listeleyebilirsin. Önemli olan: her entry'de ne yaptığını, hangi teknolojileri kullandığını ve sonuçları somut olarak yazman. Recruiter'lar action verb + metrik ister.",
+      "tips": [
+        "Her projeyi ayrı bir experience entry olarak ekle",
+        "Şirket adı olarak 'Self-Employed', 'Independent Developer' veya 'Personal Projects' kullan",
+        "Tarih olarak projenin başlangıç ve bitiş tarihlerini yaz (örn: 'Oct 2025 – Jan 2026')",
+        "Her bullet point'u action verb ile başlat: Built, Developed, Implemented, Designed, Deployed, Integrated, Optimized",
+        "Mümkünse metrik ekle: 'Reduced API response time by 40%', 'Handled 10K+ concurrent users'",
+        "Teknoloji listesini her entry'nin sonuna ekle: 'Tech: React, TypeScript, FastAPI, PostgreSQL, Docker'",
+        "LinkedIn'de 'Add media' ile projenin GitHub linkini veya canlı demo'sunu ekle",
+        "Staj, freelance veya gönüllü iş varsa kesinlikle ekle"
+      ],
+      "examples": [
+        {
+          "framing": "Full Stack Developer",
+          "title": "Full Stack Developer",
+          "company": "Self-Employed / Independent Projects",
+          "date": "Jun 2025 – Present",
+          "bullets": [
+            "Built a full-stack e-commerce platform with React, TypeScript, and Node.js, featuring real-time inventory management and Stripe payment integration",
+            "Developed RESTful APIs with FastAPI and PostgreSQL, implementing JWT authentication and role-based access control",
+            "Designed and implemented responsive UI components using Tailwind CSS and Zustand state management, achieving 95+ Lighthouse performance score",
+            "Set up CI/CD pipelines with GitHub Actions and Docker, automating testing and deployment to AWS",
+            "Tech: React, TypeScript, Node.js, FastAPI, PostgreSQL, Docker, GitHub Actions, AWS"
+          ]
+        },
+        {
+          "framing": "AI Engineer",
+          "title": "AI Engineer / ML Developer",
+          "company": "Self-Employed / Independent Projects",
+          "date": "Sep 2025 – Present",
+          "bullets": [
+            "Architected and deployed a RAG-based AI assistant using LangChain, ChromaDB, and OpenAI API, processing 500+ documents with 92% retrieval accuracy",
+            "Built a multi-agent AI system for automated code review, reducing manual review time by 60%",
+            "Developed a real-time AI chat application with FastAPI WebSockets and React frontend, supporting streaming responses",
+            "Implemented vector database pipelines with Pinecone for semantic search across large document collections",
+            "Tech: Python, LangChain, OpenAI API, FastAPI, ChromaDB, Pinecone, React, Docker"
+          ]
+        }
+      ],
+      "action_verbs": [
+        "Built", "Developed", "Designed", "Implemented", "Deployed",
+        "Architected", "Integrated", "Optimized", "Automated", "Created",
+        "Engineered", "Configured", "Migrated", "Refactored", "Scaled",
+        "Streamlined", "Established", "Launched", "Maintained", "Resolved"
+      ],
+      "checklist": [
+        "En az 3-4 experience entry var",
+        "Her entry'de tarih aralığı belirtilmiş",
+        "Her entry'de 3-5 bullet point var",
+        "Bullet point'lar action verb ile başlıyor",
+        "Teknoloji listesi her entry'nin sonunda",
+        "Mümkünse metrikler eklenmiş",
+        "GitHub linkleri veya media eklenmiş"
+      ]
+    },
+    {
+      "id": "skills-bolumu",
+      "title": "Skills Bölümü",
+      "icon": "🛠️",
+      "content": "LinkedIn Skills bölümü doğrudan arama sıralamanı etkiler. Recruiter'lar 'React developer' diye aratınca, Skills bölümünde 'React' yazan profiller üste çıkar. 50 skill ekleyebilirsin — hepsini kullan. Endorsement almak için bağlantılarından rica et. En önemli 3 skill'i 'pin' yap.",
+      "tips": [
+        "50 skill sınırını doldur — boş bırakma",
+        "En güçlü 3 skill'i pinle (Top 3 Skills)",
+        "Skill Assessment quiz'lerini geç — profilinde 'verified' badge çıkar",
+        "Bağlantılarından endorsement iste — karşılıklı endorsement yapın",
+        "Genel skill'ler yerine spesifik olanları tercih et: 'Programming' yerine 'Python', 'TypeScript'",
+        "Her ay yeni öğrendiğin teknolojiyi ekle"
+      ],
+      "skills_by_category": {
+        "languages": {
+          "title": "Programlama Dilleri",
+          "skills": [
+            "JavaScript", "TypeScript", "Python", "HTML5", "CSS3", "SQL", "Bash"
+          ]
+        },
+        "frontend": {
+          "title": "Frontend",
+          "skills": [
+            "React.js", "Next.js", "Tailwind CSS", "Redux", "Zustand",
+            "Responsive Web Design", "Single Page Applications (SPA)",
+            "Progressive Web Apps (PWA)", "Figma", "UI/UX Design"
+          ]
+        },
+        "backend": {
+          "title": "Backend",
+          "skills": [
+            "Node.js", "Express.js", "FastAPI", "REST APIs", "GraphQL",
+            "WebSockets", "Microservices", "API Development",
+            "Authentication (JWT, OAuth)", "Server-Side Development"
+          ]
+        },
+        "databases": {
+          "title": "Veritabani",
+          "skills": [
+            "PostgreSQL", "MongoDB", "Redis", "Prisma ORM",
+            "SQLAlchemy", "Database Design", "Data Modeling"
+          ]
+        },
+        "ai_ml": {
+          "title": "AI / ML",
+          "skills": [
+            "LangChain", "OpenAI API", "RAG (Retrieval-Augmented Generation)",
+            "Vector Databases", "Prompt Engineering", "Hugging Face",
+            "Natural Language Processing (NLP)", "Machine Learning",
+            "Artificial Intelligence", "LLM Applications"
+          ]
+        },
+        "devops": {
+          "title": "DevOps & Cloud",
+          "skills": [
+            "Docker", "GitHub Actions", "CI/CD", "AWS",
+            "Vercel", "Linux", "Nginx"
+          ]
+        },
+        "tools_practices": {
+          "title": "Araclar & Pratikler",
+          "skills": [
+            "Git", "GitHub", "Agile Methodologies", "Scrum",
+            "Test-Driven Development (TDD)", "Clean Code",
+            "Software Architecture", "Problem Solving",
+            "Technical Writing"
+          ]
+        }
+      },
+      "top_3_pin_recommendations": [
+        "React.js — Full Stack Developer hedefin için",
+        "Python — Hem backend hem AI tarafı için",
+        "TypeScript — Modern developer olduğunu gösterir"
+      ],
+      "checklist": [
+        "50 skill eklenmiş",
+        "En önemli 3 skill pinlenmiş",
+        "En az 2-3 Skill Assessment geçilmiş",
+        "Bağlantılardan endorsement istenmiş",
+        "Skill'ler headline ve about ile tutarlı"
+      ]
+    },
+    {
+      "id": "featured-bolumu",
+      "title": "Featured Bölümü",
+      "icon": "⭐",
+      "content": "Featured bölümü profilinin en görünür alanlarından biri. Buraya en iyi projelerini, blog yazılarını veya proje demosu paylaştığın post'ları pin'le. Recruiter profiline geldiğinde ilk göreceği şeylerden biri burası.",
+      "tips": [
+        "En etkileyici 3-4 projeyi pinle",
+        "Her featured item için dikkat çekici bir görsel ekle (screenshot veya demo GIF)",
+        "Proje post'ları yaz ve onları featured'a ekle — direkt link yerine post daha çok etkileşim alır",
+        "GitHub repo linkleri + canlı demo linkleri ekle",
+        "Portfolio siteni featured'ın ilk sırasına koy",
+        "Sıralama önemli: en güçlü proje en üstte olsun"
+      ],
+      "what_to_feature": [
+        {
+          "type": "Proje Demo Post'u",
+          "description": "LinkedIn'de projenin demo videosunu veya GIF'ini paylaş, teknik detayları anlat. Bu post'u featured'a ekle.",
+          "example_post_structure": "🚀 [Proje Adı] — [Tek cümlelik açıklama]\n\n[2-3 paragraf: Problem, Çözüm, Teknik detaylar]\n\nTech Stack: [teknolojiler]\n\n🔗 GitHub: [link]\n🌐 Live Demo: [link]\n\n#FullStackDeveloper #React #Python #OpenToWork"
+        },
+        {
+          "type": "Portfolio Website",
+          "description": "Kişisel portfolio siteni featured'ın en üstüne koy"
+        },
+        {
+          "type": "Teknik Blog Yazısı",
+          "description": "Öğrendiğin bir teknolojiyi anlatan blog yazısı veya LinkedIn article'ı"
+        },
+        {
+          "type": "GitHub Profile",
+          "description": "GitHub profilinin linkini ekle — pinned repo'larla birlikte güçlü bir etki yaratır"
+        }
+      ],
+      "checklist": [
+        "En az 3 featured item eklenmiş",
+        "Her item'da görsel var",
+        "Portfolio site featured'da",
+        "En güçlü proje en üstte",
+        "Linkler çalışıyor ve güncel"
+      ]
+    },
+    {
+      "id": "post-stratejisi",
+      "title": "Post Stratejisi",
+      "icon": "📢",
+      "content": "LinkedIn'de düzenli post paylaşmak profilinin görünürlüğünü 5-10x artırır. Recruiter'lar aktif profilleri tercih eder. Haftada 2-3 post hedefle. İçerik türlerini çeşitlendir: proje demoları, öğrenme günlükleri, teknik içgörüler, kariyer paylaşımları.",
+      "tips": [
+        "Haftada 2-3 post paylaş — tutarlılık çok önemli",
+        "En iyi saatler: Salı-Perşembe, sabah 08:00-10:00 veya öğlen 12:00-13:00 (Türkiye saati)",
+        "İlk satır hook olsun — insanlar 'see more' tıklasın",
+        "Her post'ta 3-5 hashtag kullan, daha fazla değil",
+        "Görselli post'lar 2x daha fazla etkileşim alır — screenshot, GIF, video ekle",
+        "Başkalarının post'larına yorum yap — bu da seni görünür kılar",
+        "Türkçe ve İngilizce karışık paylaş — İngilizce post'lar daha geniş kitleye ulaşır",
+        "Post'larında 'biz' dili kullan: 'Ben yaptım' yerine 'Bu projede şunu öğrendim'",
+        "Tartışma başlatan sorular sor — yorumlar algoritma için çok değerli"
+      ],
+      "post_types": [
+        {
+          "type": "Proje Demo",
+          "frequency": "Her proje tamamlandığında",
+          "template": "🚀 Just shipped: [Proje Adı]\n\n[Problem neydi? 1-2 cümle]\n[Nasıl çözdün? 2-3 cümle]\n[Teknik öne çıkan özellik? 1-2 cümle]\n\nTech Stack: React, TypeScript, FastAPI, PostgreSQL\n\n[Demo GIF veya screenshot]\n\n🔗 GitHub: [link]\n🌐 Live: [link]\n\n#FullStackDeveloper #React #TypeScript #BuildInPublic #OpenToWork"
+        },
+        {
+          "type": "Öğrenme Paylaşımı",
+          "frequency": "Haftada 1",
+          "template": "💡 [Öğrendiğin şey] hakkında bugün öğrendiklerim:\n\n[3-5 bullet point halinde key takeaway'ler]\n\n[Kısa bir kod snippet veya diagram ekleyebilirsin]\n\nBu konuda deneyimi olan var mı? Yaklaşımınız nasıl?\n\n#TechLearning #WebDevelopment #AI"
+        },
+        {
+          "type": "Teknik İçgörü",
+          "frequency": "Haftada 1",
+          "template": "[Provokatif veya ilginç bir teknik görüş]\n\n[Neden böyle düşünüyorsun? 3-4 paragraf]\n\n[Karşıt görüş de belirt — dengeli ol]\n\nSiz ne düşünüyorsunuz?\n\n#SoftwareEngineering #TechOpinions"
+        },
+        {
+          "type": "Kariyer Güncellemesi",
+          "frequency": "Ayda 1-2",
+          "template": "📊 [Ay] ayı özeti:\n\n✅ [Tamamlanan proje/öğrenme]\n✅ [Tamamlanan proje/öğrenme]\n🔜 [Gelecek ay hedefi]\n\nBu yolculukta bana destek olan herkese teşekkürler!\n\n#BuildInPublic #DeveloperJourney #OpenToWork"
+        }
+      ],
+      "recommended_hashtags": [
+        "#FullStackDeveloper", "#WebDevelopment", "#React", "#TypeScript",
+        "#Python", "#AIEngineer", "#MachineLearning", "#LangChain",
+        "#BuildInPublic", "#OpenToWork", "#SoftwareEngineering",
+        "#TechTwitter", "#100DaysOfCode", "#DevCommunity",
+        "#Frontend", "#Backend", "#Docker", "#FastAPI"
+      ],
+      "checklist": [
+        "Haftalık post takvimi oluşturuldu",
+        "İlk proje demo post'u paylaşıldı",
+        "3-5 hashtag stratejisi belirlendi",
+        "Görseller hazırlandı (screenshot, GIF)",
+        "En az 5 kişinin post'una yorum yapıldı"
+      ]
+    },
+    {
+      "id": "connection-stratejisi",
+      "title": "Connection Stratejisi",
+      "icon": "🤝",
+      "content": "LinkedIn'de 500+ bağlantıya ulaşmak profilinin arama sıralamasını yükseltir. Ama rastgele değil, stratejik bağlantılar kur. Recruiter'lar, hiring manager'lar, CTO'lar ve aynı alandaki developer'larla bağlan. Her bağlantı isteğinde kısa bir not ekle — kabul oranını 3x artırır.",
+      "tips": [
+        "Hedef: 500+ bağlantı — bu eşiği geçince '500+' olarak görünür",
+        "Her gün 5-10 bağlantı isteği gönder",
+        "Bağlantı isteğinde her zaman not ekle — 300 karakter sınırı var",
+        "Recruiter'lara özel not yaz — genel mesaj gönderme",
+        "İstanbul, Ankara, İzmir'deki tech şirketlerinin çalışanlarıyla bağlan",
+        "LinkedIn'de 'People also viewed' bölümünden benzer profilleri bul",
+        "Alumni ağını kullan — KTÜ mezunlarını filtrele ve bağlan",
+        "Bağlandıktan sonra 'thank you' mesajı at — ilişkiyi başlat"
+      ],
+      "who_to_connect": [
+        "Tech Recruiter'lar — 'Technical Recruiter' veya 'Talent Acquisition' arayarak bul",
+        "Hiring Manager'lar — hedef şirketlerdeki Engineering Manager'lar",
+        "CTO'lar ve VP of Engineering — özellikle startup'larda direkt karar vericiler",
+        "Senior Developer'lar — mentor olabilirler + referans verebilirler",
+        "Aynı bootcamp/üniversiteden mezunlar — KTÜ ağı",
+        "Tech community organizer'ları — etkinliklere davet edebilirler",
+        "Hedef şirketlerdeki developer'lar — şirket kültürü hakkında bilgi alabilirsin"
+      ],
+      "message_templates": [
+        {
+          "scenario": "Recruiter'a bağlantı isteği (İngilizce)",
+          "message": "Hi [Name], I'm a Full Stack Developer skilled in React, TypeScript, and Python. I'd love to connect and learn about opportunities at [Company]. Thank you!"
+        },
+        {
+          "scenario": "Recruiter'a bağlantı isteği (Türkçe)",
+          "message": "Merhaba [İsim], Full Stack Developer olarak React, TypeScript ve Python ile projeler geliştiriyorum. [Şirket]'teki fırsatları öğrenmek isterim. Bağlantı kurmaktan memnuniyet duyarım!"
+        },
+        {
+          "scenario": "Developer'a bağlantı isteği",
+          "message": "Hi [Name], I saw your post about [topic] — great insights! I'm also working with [shared technology]. Would love to connect and exchange ideas."
+        },
+        {
+          "scenario": "Hiring Manager'a bağlantı isteği",
+          "message": "Hi [Name], I'm a Computer Engineering graduate building full-stack and AI-powered applications. I'm interested in [Company]'s engineering team. Would love to connect!"
+        },
+        {
+          "scenario": "Bağlantı sonrası teşekkür mesajı",
+          "message": "Thanks for connecting, [Name]! I'm currently building projects with React, TypeScript, and AI tools. I'd love to hear about any opportunities that might be a good fit. Here's my portfolio: [link]"
+        },
+        {
+          "scenario": "Referans isteme mesajı",
+          "message": "Hi [Name], I noticed [Company] has an open [Role] position. I've been building similar projects with [relevant tech]. Would you be open to referring me? I'd be happy to share my portfolio and GitHub. Thank you!"
+        }
+      ],
+      "checklist": [
+        "Günlük 5-10 bağlantı isteği gönderiliyor",
+        "Her istekte kişiselleştirilmiş not var",
+        "Recruiter, hiring manager ve developer karışımı",
+        "500+ bağlantı hedefine doğru ilerleniyor",
+        "Bağlantı sonrası follow-up mesajları atılıyor",
+        "KTÜ alumni ağı taranmış"
+      ]
+    },
+    {
+      "id": "tr-vs-en-profil",
+      "title": "TR vs EN Profil Stratejisi",
+      "icon": "🌍",
+      "content": "LinkedIn'de profil dilini doğru seçmek çok önemli. Global fırsatlara açık olmak istiyorsan İngilizce primary olmalı. Türkiye'deki fırsatları da kaçırmamak için ikincil dil olarak Türkçe ekle. LinkedIn'de birden fazla dilde profil oluşturma özelliği var — bunu kullan.",
+      "tips": [
+        "Primary profil dili: İngilizce — global recruiter'lar seni bulsun",
+        "İkincil dil olarak Türkçe ekle: LinkedIn Settings > Profile Language",
+        "İngilizce profilde Türkçe terimler kullanma — tamamen İngilizce yaz",
+        "Türkçe profilde İngilizce teknik terimler kullanabilirsin (React, TypeScript vs.)",
+        "URL'ini özelleştir: linkedin.com/in/adinsoyadindev (İngilizce karakter kullan)",
+        "Konum olarak 'Turkey' yaz — 'Türkiye' değil (İngilizce profil için)",
+        "Remote iş hedefin varsa kesinlikle İngilizce profil şart"
+      ],
+      "recommendations": {
+        "primary_language": "English",
+        "secondary_language": "Turkish",
+        "reasoning": "Global şirketler ve remote pozisyonlar İngilizce arama yapar. Türk recruiter'lar da genellikle İngilizce keyword'lerle arama yapar (React Developer, Full Stack Developer). Türkçe ikincil profil ise Türkiye'deki yerel fırsatları yakalar.",
+        "custom_url_tips": [
+          "linkedin.com/in/adinsoyadin — en temiz format",
+          "linkedin.com/in/adinsoyadindev — 'dev' ekleyerek developer olduğunu vurgula",
+          "Türkçe karakter kullanma (ı, ö, ü, ş, ç, ğ)",
+          "Rakam ekleme zorunluluğu varsa doğum yılını değil, anlamsız bir rakam ekle"
+        ]
+      },
+      "checklist": [
+        "Primary profil dili İngilizce olarak ayarlandı",
+        "İkincil dil olarak Türkçe eklendi",
+        "Custom URL oluşturuldu (Türkçe karakter yok)",
+        "İngilizce profil tamamen İngilizce yazılmış",
+        "Türkçe profil de eksiksiz doldurulmuş"
+      ]
+    },
+    {
+      "id": "recruiter-arama-optimizasyonu",
+      "title": "Recruiter Arama Optimizasyonu",
+      "icon": "🔍",
+      "content": "LinkedIn'de recruiter'lar adayları LinkedIn Recruiter veya normal arama ile bulur. Senin profilinin arama sonuçlarında üst sıralarda çıkması için keyword optimizasyonu yapman gerekir. LinkedIn'in arama algoritması şu alanlara bakar (öncelik sırasına göre): 1) Headline, 2) Current Job Title, 3) Skills, 4) About/Summary, 5) Experience descriptions. Bu alanlarda doğru keyword'leri kullanmak seni görünür kılar.",
+      "tips": [
+        "Open to Work özelliğini aç: LinkedIn Settings > Job Seeking Preferences > Open to Work",
+        "'Recruiters only' seçeneğini kullan — sadece recruiter'lar görsün (mevcut işverenin görmesin)",
+        "Veya yeşil 'Open to Work' çerçevesini aç — daha agresif ama etkili",
+        "Hedef rol olarak şunları ekle: Full Stack Developer, Software Engineer, AI Engineer, Frontend Developer, Backend Developer",
+        "Konum tercihlerini ekle: Remote, Turkey, Europe, Worldwide",
+        "Headline'da en çok aranan keyword'ler olsun: React, TypeScript, Python, Node.js",
+        "Current position başlığında hedef rolünü yaz: 'Full Stack Developer' — 'Student' veya 'Job Seeker' yazma",
+        "Skills bölümünü tamamen doldur — her skill arama sıralamanı etkiler",
+        "Profil tamamlama oranını %100'e çıkar — 'All-Star' profiller daha üstte çıkar"
+      ],
+      "keyword_placement_strategy": {
+        "headline": {
+          "priority": "En yüksek",
+          "keywords": ["Full Stack Developer", "Software Engineer", "AI Engineer", "React", "TypeScript", "Python"],
+          "note": "Headline'daki keyword'ler arama sıralamasında en çok ağırlığa sahip"
+        },
+        "current_title": {
+          "priority": "Çok yüksek",
+          "keywords": ["Full Stack Developer", "Software Engineer", "AI Engineer"],
+          "note": "Mevcut pozisyon başlığı recruiter filtrelerinde direkt kullanılır"
+        },
+        "skills": {
+          "priority": "Yüksek",
+          "keywords": ["React.js", "TypeScript", "Python", "Node.js", "FastAPI", "LangChain", "Docker", "PostgreSQL"],
+          "note": "50 skill ekle — recruiter'lar skill filtresi kullanır"
+        },
+        "about": {
+          "priority": "Orta-Yüksek",
+          "keywords": ["full stack development", "AI applications", "web development", "REST APIs", "microservices"],
+          "note": "Doğal cümleler içinde keyword'leri kullan — spam gibi görünmesin"
+        },
+        "experience": {
+          "priority": "Orta",
+          "keywords": ["built", "developed", "implemented", "deployed", "React", "TypeScript", "Python", "FastAPI"],
+          "note": "Her bullet point'ta en az 1 teknoloji keyword'ü olsun"
+        }
+      },
+      "open_to_work_settings": {
+        "job_titles": [
+          "Full Stack Developer",
+          "Software Engineer",
+          "AI Engineer",
+          "Frontend Developer",
+          "Backend Developer",
+          "Software Developer",
+          "Web Developer"
+        ],
+        "location_types": ["Remote", "On-site", "Hybrid"],
+        "locations": ["Turkey", "Europe", "Worldwide"],
+        "start_date": "Immediately",
+        "visibility": "Recruiters only (önerilir) veya All LinkedIn members"
+      },
+      "profile_completion_checklist": [
+        "Profil fotoğrafı var",
+        "Banner var",
+        "Headline doldurulmuş ve keyword'lü",
+        "About/Summary 2000+ karakter",
+        "En az 3 Experience entry var",
+        "Education bölümü doldurulmuş (KTÜ Bilgisayar Mühendisliği)",
+        "50 skill eklenmiş",
+        "En az 3 featured item var",
+        "Certifications varsa eklenmiş",
+        "Custom URL oluşturulmuş",
+        "Open to Work açılmış",
+        "İkincil dil eklenmiş"
+      ],
+      "checklist": [
+        "Open to Work açıldı (doğru roller ve lokasyonlarla)",
+        "Headline'da en az 4 keyword var",
+        "Current title hedef role ayarlandı",
+        "50 skill eklendi",
+        "Profil tamamlama oranı %100 (All-Star)",
+        "Keyword'ler tüm bölümlere doğal şekilde serpiştirildi"
+      ]
+    }
+  ],
+  "weekly_action_plan": {
+    "title": "Haftalık LinkedIn Aksiyon Planı",
+    "description": "Her hafta bu adımları takip et — 4 hafta içinde profilin recruiter radarına girer.",
+    "week_1": {
+      "title": "Profil Kurulumu",
+      "tasks": [
+        "Profesyonel fotoğraf çek ve yükle",
+        "Banner tasarla ve yükle",
+        "Headline'ı optimize et",
+        "About bölümünü yaz (İngilizce)",
+        "Custom URL oluştur",
+        "50 skill ekle ve en önemli 3'ünü pinle"
+      ]
+    },
+    "week_2": {
+      "title": "Experience & Featured",
+      "tasks": [
+        "3-4 proje experience olarak ekle",
+        "Her entry'ye action verb'lü bullet point'lar yaz",
+        "Featured bölümüne 3-4 item ekle",
+        "Education bölümünü doldur (KTÜ)",
+        "İkincil dil (Türkçe) ekle ve doldur",
+        "Open to Work özelliğini aç"
+      ]
+    },
+    "week_3": {
+      "title": "Network Kurma",
+      "tasks": [
+        "Her gün 10 stratejik bağlantı isteği gönder",
+        "KTÜ alumni ağını tara ve bağlan",
+        "5 recruiter ile bağlan",
+        "5 hiring manager ile bağlan",
+        "Bağlantı sonrası teşekkür mesajları at",
+        "İlk proje demo post'unu paylaş"
+      ]
+    },
+    "week_4": {
+      "title": "İçerik & Sürdürme",
+      "tasks": [
+        "Haftada 2-3 post paylaşmaya başla",
+        "Her gün 5 post'a yorum yap",
+        "Skill assessment quiz'lerini geç",
+        "Endorsement karşılıklı yapın",
+        "LinkedIn analytics'i kontrol et — hangi post'lar daha çok görüntüleniyor?",
+        "Zayıf bölümleri güncelle ve iyileştir"
+      ]
+    }
+  },
+  "common_mistakes": {
+    "title": "En Sık Yapılan LinkedIn Hataları",
+    "mistakes": [
+      {
+        "mistake": "Headline'da 'İş arıyorum' veya 'Unemployed' yazmak",
+        "fix": "Değer odaklı headline yaz: 'Full Stack Developer | React, TypeScript, Python'"
+      },
+      {
+        "mistake": "Profil fotoğrafı koymamak veya selfie koymak",
+        "fix": "Profesyonel, yüzün net göründüğü, sade arka planlı bir fotoğraf kullan"
+      },
+      {
+        "mistake": "About bölümünü boş bırakmak",
+        "fix": "2000+ karakterlik, keyword-dense bir About yaz"
+      },
+      {
+        "mistake": "Skills bölümüne 5-10 skill eklemek",
+        "fix": "50 skill sınırını doldur — her skill arama sıralamanı etkiler"
+      },
+      {
+        "mistake": "Hiç post paylaşmamak",
+        "fix": "Haftada 2-3 post paylaş — aktif profiller daha çok görünür"
+      },
+      {
+        "mistake": "Bağlantı isteğinde not yazmamak",
+        "fix": "Her istekte kişiselleştirilmiş 1-2 cümlelik not yaz"
+      },
+      {
+        "mistake": "Profili Türkçe yazmak",
+        "fix": "Primary dili İngilizce yap, ikincil dil olarak Türkçe ekle"
+      },
+      {
+        "mistake": "Experience bölümünü boş bırakmak çünkü 'iş deneyimim yok' düşüncesi",
+        "fix": "Projeleri experience olarak ekle — Self-Employed / Independent Developer olarak listele"
+      }
+    ]
+  },
+  "senior_cto_note": {
+    "title": "Senior / CTO Böyle Öğrenir",
+    "content": "Senior developer'lar ve CTO'lar LinkedIn'i sadece profil olarak değil, 'personal brand' aracı olarak kullanır. Onlar düzenli içerik üretir, topluluklarla etkileşir ve kendilerini 'thought leader' olarak konumlandırır. İlk adım: profilini kusursuz yap. İkinci adım: her hafta en az 2 değerli içerik paylaş. Üçüncü adım: 'Open to Work' badge'inden 'Recruiter'lar beni arıyor' aşamasına geç. Bu rehberdeki her adımı uygularsan, 4-8 hafta içinde recruiter mesajları almaya başlarsın."
+  },
+  "must_note": {
+    "title": "Bunu Kesinlikle Not Al",
+    "items": [
+      "LinkedIn headline'ın senin dijital kartvizit — her gün yüzlerce kez görülür",
+      "İlk 3 satır (About bölümü) 'see more' tıklanmadan görünür — en güçlü cümleni oraya yaz",
+      "50 skill ekle — her biri arama sıralamanı etkiler",
+      "Haftada 2-3 post = 5-10x daha fazla profil görüntülenmesi",
+      "Projelerini experience olarak ekle — 'iş deneyimim yok' diye boş bırakma",
+      "İngilizce primary profil + Türkçe secondary = maksimum görünürlük",
+      "500+ bağlantı eşiği arama sıralamanı yükseltir — stratejik bağlantılar kur"
+    ]
+  }
+}

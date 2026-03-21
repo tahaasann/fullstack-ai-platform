@@ -1,0 +1,83 @@
+{
+  "title": "CSS Specificity Calculator",
+  "description": "CSS seçicilerinin specificity değerini hesapla",
+  "description_detail": "# CSS Specificity Calculator\n\nCSS seçici string'i verildiğinde, specificity değerini hesaplayın.\n\n## Specificity Kuralları\nSpecificity (a, b, c) formatındadır:\n- **a**: ID seçicileri sayısı (#id)\n- **b**: Class seçicileri (.class), attribute seçicileri ([attr]) ve pseudo-class (:hover) sayısı\n- **c**: Element seçicileri (div, p) ve pseudo-element (::before) sayısı\n\n## Özel Durumlar\n- `*` (universal) = (0, 0, 0)\n- Combinators (` `, `>`, `+`, `~`) sayılmaz\n- `:not()` pseudo-class sayılmaz ama içindeki seçici sayılır\n\n## Karşılaştırma\n`compareSpecificity(sel1, sel2)` fonksiyonu hangi seçicinin daha yüksek specificity'e sahip olduğunu döndürür.\n\n## Örnek\n```\ncalculateSpecificity('#nav .item') → [1, 1, 0]\ncalculateSpecificity('div > p.active') → [0, 1, 2]\n```",
+  "difficulty": "orta",
+  "category": "css",
+  "tags": ["css", "specificity", "selectors", "parsing"],
+  "examples": [
+    {
+      "input": "calculateSpecificity('#main .header h1')",
+      "output": "[1, 1, 1]",
+      "explanation": "#main = 1 ID, .header = 1 class, h1 = 1 element"
+    },
+    {
+      "input": "compareSpecificity('#id', '.a.b.c.d.e.f.g.h.i.j.k')",
+      "output": "#id wins",
+      "explanation": "1 ID (1,0,0) 11 class'tan (0,11,0) daha spesifik"
+    }
+  ],
+  "constraints": [
+    "Inline style ve !important dışarıda bırakılır",
+    "Geçerli CSS seçici formatı varsayılır",
+    "Specificity karşılaştırması soldan sağa yapılır (a > b > c)"
+  ],
+  "starter_code": {
+    "python": "def calculate_specificity(selector: str) -> list:\n    # Your code here\n    pass\n\ndef compare_specificity(sel1: str, sel2: str) -> str:\n    # Your code here\n    pass",
+    "javascript": "function calculateSpecificity(selector) {\n  // Your code here\n}\n\nfunction compareSpecificity(sel1, sel2) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "calc", "selector": "#id"},
+      "expected_output": [1, 0, 0]
+    },
+    {
+      "input": {"fn": "calc", "selector": ".class"},
+      "expected_output": [0, 1, 0]
+    },
+    {
+      "input": {"fn": "calc", "selector": "div"},
+      "expected_output": [0, 0, 1]
+    },
+    {
+      "input": {"fn": "calc", "selector": "#nav .item.active a:hover"},
+      "expected_output": [1, 3, 1]
+    },
+    {
+      "input": {"fn": "calc", "selector": "*"},
+      "expected_output": [0, 0, 0]
+    },
+    {
+      "input": {"fn": "compare", "sel1": "#id", "sel2": ".a .b .c"},
+      "expected_output": 1
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "calc", "selector": "div > p + span ~ a"},
+      "expected_output": [0, 0, 4]
+    },
+    {
+      "input": {"fn": "calc", "selector": "#a #b .c .d div span"},
+      "expected_output": [2, 2, 2]
+    },
+    {
+      "input": {"fn": "compare", "sel1": ".a.b.c", "sel2": ".x.y.z"},
+      "expected_output": 0
+    }
+  ],
+  "hints": [
+    "Seçiciyi token'lara ayır: # ile başlayanlar ID, . ile başlayanlar class, harf ile başlayanlar element",
+    "Combinator'ları (boşluk, >, +, ~) ve * yıldızını filtrele",
+    ":hover gibi pseudo-class'ları b kategorisine, ::before gibi pseudo-element'leri c kategorisine say"
+  ],
+  "solution": {
+    "python": "import re\n\ndef calculate_specificity(selector: str) -> list:\n    a, b, c = 0, 0, 0\n    \n    # Remove :not() wrapper but keep inner content\n    selector = re.sub(r':not\\(([^)]*)\\)', r'\\1', selector)\n    \n    # Split by combinators and whitespace\n    parts = re.split(r'[\\s>+~]+', selector.strip())\n    \n    for part in parts:\n        if not part or part == '*':\n            continue\n        \n        # Count IDs\n        a += len(re.findall(r'#[\\w-]+', part))\n        \n        # Count classes, attributes, pseudo-classes\n        b += len(re.findall(r'\\.[\\w-]+', part))\n        b += len(re.findall(r'\\[[^\\]]*\\]', part))\n        b += len(re.findall(r':[a-zA-Z][\\w-]*(?!:)', part))\n        \n        # Count elements and pseudo-elements\n        clean = re.sub(r'#[\\w-]+', '', part)\n        clean = re.sub(r'\\.[\\w-]+', '', clean)\n        clean = re.sub(r'\\[[^\\]]*\\]', '', clean)\n        clean = re.sub(r'::[\\w-]+', '', clean)\n        clean = re.sub(r':[\\w-]+', '', clean)\n        \n        c += len(re.findall(r'::[\\w-]+', part))\n        \n        if clean and clean != '*':\n            c += 1\n    \n    return [a, b, c]\n\ndef compare_specificity(sel1: str, sel2: str) -> int:\n    s1 = calculate_specificity(sel1)\n    s2 = calculate_specificity(sel2)\n    for i in range(3):\n        if s1[i] > s2[i]: return 1\n        if s1[i] < s2[i]: return -1\n    return 0",
+    "javascript": "function calculateSpecificity(selector) {\n  let a = 0, b = 0, c = 0;\n  \n  selector = selector.replace(/:not\\(([^)]*)\\)/g, '$1');\n  const parts = selector.trim().split(/[\\s>+~]+/);\n  \n  for (let part of parts) {\n    if (!part || part === '*') continue;\n    \n    const ids = part.match(/#[\\w-]+/g) || [];\n    a += ids.length;\n    \n    const classes = part.match(/\\.[\\w-]+/g) || [];\n    const attrs = part.match(/\\[[^\\]]*\\]/g) || [];\n    const pseudoClasses = part.match(/:[a-zA-Z][\\w-]*/g) || [];\n    b += classes.length + attrs.length + pseudoClasses.length;\n    \n    const pseudoElements = part.match(/::[\\w-]+/g) || [];\n    c += pseudoElements.length;\n    \n    let clean = part.replace(/#[\\w-]+/g, '')\n                     .replace(/\\.[\\w-]+/g, '')\n                     .replace(/\\[[^\\]]*\\]/g, '')\n                     .replace(/::[\\w-]+/g, '')\n                     .replace(/:[\\w-]+/g, '');\n    if (clean && clean !== '*') c += 1;\n  }\n  \n  return [a, b, c];\n}\n\nfunction compareSpecificity(sel1, sel2) {\n  const s1 = calculateSpecificity(sel1);\n  const s2 = calculateSpecificity(sel2);\n  for (let i = 0; i < 3; i++) {\n    if (s1[i] > s2[i]) return 1;\n    if (s1[i] < s2[i]) return -1;\n  }\n  return 0;\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "CSS specificity hesaplama kurallarını, cascade algoritmasını ve seçici öncelik sırasını derinlemesine anlarsın. Bu bilgi CSS debugging ve stil çakışmalarını çözmede kritiktir."
+}

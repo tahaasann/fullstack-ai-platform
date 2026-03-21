@@ -1,0 +1,98 @@
+{
+  "id": "mod-20-career/quiz-01",
+  "title": "Teknik Mulakat ve Kariyer Stratejisi Quiz",
+  "passing_score": 70,
+  "time_limit_minutes": 12,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "order_steps",
+      "difficulty": "orta",
+      "question": "UMPIRE method'un adimlarini dogru siraya koyun:",
+      "steps": [
+        "Implement (Kodla)",
+        "Plan (Planla)",
+        "Evaluate (Degerlendir)",
+        "Match (Pattern esle)",
+        "Understand (Anla)",
+        "Review (Gozden gecir)"
+      ],
+      "correct": [4, 3, 1, 0, 5, 2],
+      "explanation": "UMPIRE: Understand (Anla) → Match (Pattern esle) → Plan (Planla) → Implement (Kodla) → Review (Gozden gecir) → Evaluate (Degerlendir). Bu siralamayi takip etmek interview'da sistematik ve profesyonel gorunnmeni saglar."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "difficulty": "kolay",
+      "question": "STAR method'da 'A' harfi neyi temsil eder?",
+      "options": [
+        "Analysis - Problemi analiz etme",
+        "Action - Sen ne yaptin (spesifik adimlar)",
+        "Achievement - Elde edilen basari",
+        "Approach - Yaklasim yontemi"
+      ],
+      "correct": 1,
+      "explanation": "STAR: Situation (Durum), Task (Gorev), Action (Eylem - senin spesifik olarak ne yaptigin), Result (Sonuc). Action kismi en onemli kisimdir cunku interviewer senin bireysel katkin hakkinda bilgi edinmek ister."
+    },
+    {
+      "id": "q3",
+      "type": "true_false",
+      "difficulty": "kolay",
+      "question": "ATS (Applicant Tracking System) grafik, tablo ve kolon iceren CV'leri sorunsuz okuyabilir.",
+      "correct": false,
+      "explanation": "ATS sistemleri grafik, tablo ve kolon iceren CV'leri dogru parse edemez. ATS-friendly CV basit formatta, standart basliklarla ve keyword'lerle yazilmalidir. CV'lerin %75'e yakini insan tarafindan gorulmeden ATS tarafindan elenir."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "Coding interview'da stuck kaldiginizda en dogru yaklasim hangisidir?",
+      "options": [
+        "Sessizce dusunmeye devam etmek",
+        "Hemen 'bilmiyorum' demek",
+        "Su ana kadar dusundugun yaklasimi paylasip, takildigin noktayi belirterek ipucu istemek",
+        "Soruyu degistirmesini istemek"
+      ],
+      "correct": 2,
+      "explanation": "Interview'da stuck kaldiginizda sessiz kalmak veya pes etmek yerine, dusunce surecinizi paylasmaniz ve nerede takildiginizi belirtmeniz gerekir. Interviewer'lar ipucu vermeye hazirdir ve bunu zayiflik olarak gormezler. Onemli olan problem cozme surecinizi gostermenizdir."
+    },
+    {
+      "id": "q5",
+      "type": "explain_code",
+      "difficulty": "orta",
+      "question": "Asagidaki CV bullet point'ini neden 'iyi' bir ornek oldugunu ve 'Developed the frontend' ifadesinden neden daha etkili oldugunu aciklayin:\n\n'Developed React frontend serving 10K daily users, reducing page load time from 4s to 1.2s through code splitting and lazy loading'",
+      "correct": "Bu bullet point etkilidir cunku: (1) Spesifik teknoloji belirtir (React), (2) Olceklenebilir etki gosterir (10K daily users), (3) Somut iyilestirme rakamlari verir (4s'den 1.2s'ye), (4) Nasil yapildigini aciklar (code splitting, lazy loading). 'Developed the frontend' ise ne olcekte, ne etkiyle veya nasil yapildigini gostermiyor.",
+      "explanation": "CV'de impact bazli yazim onemlidir. Rakamlar ve spesifik teknikler kullanmak, hiring manager'a senin ne yaptigini ve ne kadar etkili oldugunu somut olarak gosterir. 'Developed X' yerine 'Developed X serving Y users, improving Z by W%' formulu kullanilmalidir."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "Is arama kanallarindan hangisi en yuksek etkililik oranina sahiptir?",
+      "options": [
+        "Online is ilanlarina basvuru (Kariyer.net, Indeed)",
+        "Recruiter ajanslari",
+        "Networking (LinkedIn, meetup, referral)",
+        "Sirket web sitelerinden direkt basvuru"
+      ],
+      "correct": 2,
+      "explanation": "Networking is bulmada en etkili kanaldir (yaklasik %60 etki). Referral ile yapilan basvurularin kabul orani, online basvurulara gore cok daha yuksektir. Ideal kombinasyon: %60 networking + %30 direkt basvuru + %10 recruiter."
+    },
+    {
+      "id": "q7",
+      "type": "true_false",
+      "difficulty": "kolay",
+      "question": "Maas muzakeresinde ilk rakami siz soylemek stratejik olarak avantajlidir.",
+      "correct": false,
+      "explanation": "Maas muzakeresinde ilk rakami sen soylemek genellikle dezavantajlidir cunku cok dusuk soylersen potansiyel kazanci kaybedersin, cok yuksek soylersen seni eleyebilirler. Bunun yerine sirketten range istemek ve elindeki alternatifleri (baska offer'lar) kullanarak muzakere yapmak daha etkilidir."
+    },
+    {
+      "id": "q8",
+      "type": "code_completion",
+      "difficulty": "zor",
+      "question": "Asagidaki LinkedIn headline ornegini profesyonel bir Full Stack Developer icin tamamlayin. Headline'da pozisyon, ana teknolojiler ve bir anahtar kelime olmali:\n\n\"_______________ | React & Node.js | _______________\"",
+      "correct": "Full Stack Developer | React & Node.js | Building Scalable Web Applications",
+      "explanation": "LinkedIn headline'i 120 karakter limiti icinde maximum bilgiyi vermelidir. Ideal format: [Pozisyon] | [Ana Teknolojiler] | [Deger Onerisi/Anahtar Kelime]. 'Open to Work' veya 'Looking for Job' gibi ifadeler yerine becerilerinizi ve deger onerinizi vurgulamak daha etkilidir. Recruiter'lar keyword bazli arama yapar."
+    }
+  ]
+}

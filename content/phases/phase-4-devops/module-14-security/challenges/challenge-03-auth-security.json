@@ -1,0 +1,86 @@
+{
+  "id": "challenge-auth-security",
+  "title": "Guvenli Auth Middleware Implementasyonu",
+  "difficulty": "zor",
+  "category": "security",
+  "tags": ["jwt", "authentication", "rate-limiting", "middleware", "security"],
+  "related_lesson": "mod-14-security/lesson-02",
+  "description_tr": "JWT dogrulama, rate limiting ve input sanitization iceren guvenli bir authentication middleware sistemi implement et.",
+  "description_detail": "Production-grade bir auth middleware zinciri olusturun. JWT token dogrulama, brute-force korunmasi icin rate limiting, ve injection saldirilarina karsi input sanitization icermeli. Her middleware tek sorumluluk prensibine uymali.",
+  "examples": [
+    {
+      "input": "request = {headers: {'Authorization': 'Bearer valid.jwt.token'}}",
+      "output": "{user: {id: 1, role: 'admin'}, authenticated: true}",
+      "explanation": "Gecerli JWT token ile istek basariyla dogrulanir ve kullanici bilgileri eklenir."
+    },
+    {
+      "input": "request = {headers: {}, ip: '1.2.3.4'} // 100+ istek/dakika",
+      "output": "{status: 429, error: 'Too many requests'}",
+      "explanation": "Rate limit asildiginda 429 status code ile reddedilir."
+    }
+  ],
+  "constraints": [
+    "JWT dogrulama: signature, expiration ve issuer kontrolu yapilmali",
+    "Rate limiting: IP bazli, sliding window algoritmasi",
+    "Input sanitization: SQL injection, XSS ve NoSQL injection'a karsi",
+    "Her middleware next() veya error response dondurmeli"
+  ],
+  "starter_code": {
+    "javascript": "const jwt = require('jsonwebtoken');\n\n// JWT Secret (production'da environment variable'dan alinmali)\nconst JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';\n\n/**\n * JWT Authentication Middleware\n * - Authorization header'dan Bearer token'i al\n * - Token'i dogrula (signature, expiration, issuer)\n * - Gecersizse 401 dondur\n * - Gecerliyse req.user'a decoded payload'i ekle\n */\nfunction authMiddleware(req, res, next) {\n    // IMPLEMENT ET\n}\n\n/**\n * Rate Limiting Middleware\n * - IP bazli istek sayaci (sliding window)\n * - Limit: 100 istek / 15 dakika\n * - Limit asilirsa 429 dondur + Retry-After header\n * - Kalan istek sayisini X-RateLimit-Remaining header'inda goster\n */\nconst requestCounts = new Map();\nfunction rateLimitMiddleware(req, res, next) {\n    // IMPLEMENT ET\n}\n\n/**\n * Input Sanitization Middleware  \n * - req.body, req.query ve req.params'i sanitize et\n * - HTML tag'lerini strip et\n * - SQL injection pattern'larini tespit et ve engelle\n * - NoSQL injection icin $ ile baslayan key'leri kaldir\n * - Temizlenmis veriyi req'e geri yaz\n */\nfunction sanitizeMiddleware(req, res, next) {\n    // IMPLEMENT ET\n}\n\nmodule.exports = { authMiddleware, rateLimitMiddleware, sanitizeMiddleware };",
+    "python": "import jwt\nimport time\nfrom functools import wraps\nfrom collections import defaultdict\n\nJWT_SECRET = 'super-secret-key'  # production'da env var'dan alinmali\n\ndef auth_middleware(f):\n    \"\"\"\n    JWT Authentication Decorator\n    - Authorization header'dan Bearer token'i al\n    - Token'i dogrula (signature, expiration, issuer)\n    - Gecersizse 401 dondur\n    - Gecerliyse request.user'a decoded payload'i ekle\n    \"\"\"\n    @wraps(f)\n    def decorated(request, *args, **kwargs):\n        # IMPLEMENT ET\n        pass\n    return decorated\n\n# Rate limit store\nrequest_counts = defaultdict(list)\n\ndef rate_limit_middleware(max_requests=100, window_seconds=900):\n    \"\"\"\n    Rate Limiting Decorator Factory\n    - IP bazli istek sayaci (sliding window)\n    - Limit asilirsa 429 dondur + Retry-After header\n    - Kalan istek sayisini header'da goster\n    \"\"\"\n    def decorator(f):\n        @wraps(f)\n        def decorated(request, *args, **kwargs):\n            # IMPLEMENT ET\n            pass\n        return decorated\n    return decorator\n\ndef sanitize_input(data):\n    \"\"\"\n    Input Sanitization\n    - HTML tag'lerini strip et\n    - SQL injection pattern'larini tespit et\n    - NoSQL injection icin $ key'leri kaldir\n    - Recursive olarak nested dict/list'leri de temizle\n    \"\"\"\n    # IMPLEMENT ET\n    pass"
+  },
+  "test_cases": [
+    {
+      "input": {"header": "Bearer valid.jwt.token", "secret": "super-secret-key"},
+      "expected": "authenticated_with_user_payload",
+      "description": "Gecerli JWT token ile kullanici dogrulanmali ve payload eklenmeli"
+    },
+    {
+      "input": {"header": "Bearer expired.jwt.token"},
+      "expected": "401_token_expired",
+      "description": "Suresi dolmus token ile 401 donmeli"
+    },
+    {
+      "input": {"ip": "1.2.3.4", "request_count": 101},
+      "expected": "429_rate_limited",
+      "description": "Rate limit asildiginda 429 ve Retry-After header donmeli"
+    },
+    {
+      "input": {"body": {"name": "<script>alert('xss')</script>", "query": "'; DROP TABLE users; --"}},
+      "expected": "sanitized_input",
+      "description": "XSS ve SQL injection pattern'lari temizlenmeli"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"header": ""},
+      "expected": "401_no_token",
+      "description": "Token yoksa 401 donmeli"
+    },
+    {
+      "input": {"header": "Bearer tampered.token.here"},
+      "expected": "401_invalid_signature",
+      "description": "Signature'i bozulmus token reddedilmeli"
+    },
+    {
+      "input": {"body": {"$gt": "", "$ne": null}},
+      "expected": "nosql_injection_blocked",
+      "description": "NoSQL injection operatorleri temizlenmeli"
+    }
+  ],
+  "hints": [
+    "JWT dogrulamada jwt.verify() veya jwt.decode() kullan. verify=True ile signature kontrolu yapilir. ExpiredSignatureError yakalayarak suresi dolmus token'lari ayir.",
+    "Sliding window rate limiting: Her IP icin timestamp listesi tut. Yeni istekte window disindaki timestamp'leri sil, kalanlar limit'i asiyorsa reddet. Map/dict temizligi icin setInterval/periodic cleanup kullan.",
+    "Input sanitization icin recursive bir fonksiyon yaz: string ise HTML strip + SQL pattern check, object/dict ise key'leri kontrol et ($ ile baslayanlari sil), array/list ise her elemani recursive sanitize et."
+  ],
+  "solution": {
+    "javascript": "function authMiddleware(req, res, next) {\n    const authHeader = req.headers.authorization;\n    if (!authHeader || !authHeader.startsWith('Bearer ')) {\n        return res.status(401).json({ error: 'No token provided' });\n    }\n    const token = authHeader.split(' ')[1];\n    try {\n        const decoded = jwt.verify(token, JWT_SECRET, { issuer: 'app' });\n        req.user = decoded;\n        next();\n    } catch (err) {\n        if (err.name === 'TokenExpiredError') {\n            return res.status(401).json({ error: 'Token expired' });\n        }\n        return res.status(401).json({ error: 'Invalid token' });\n    }\n}\n\nfunction rateLimitMiddleware(req, res, next) {\n    const ip = req.ip || req.connection.remoteAddress;\n    const now = Date.now();\n    const windowMs = 15 * 60 * 1000;\n    const maxRequests = 100;\n    if (!requestCounts.has(ip)) requestCounts.set(ip, []);\n    const timestamps = requestCounts.get(ip).filter(t => now - t < windowMs);\n    if (timestamps.length >= maxRequests) {\n        const retryAfter = Math.ceil((timestamps[0] + windowMs - now) / 1000);\n        res.set('Retry-After', retryAfter);\n        res.set('X-RateLimit-Remaining', '0');\n        return res.status(429).json({ error: 'Too many requests' });\n    }\n    timestamps.push(now);\n    requestCounts.set(ip, timestamps);\n    res.set('X-RateLimit-Remaining', String(maxRequests - timestamps.length));\n    next();\n}\n\nfunction sanitize(value) {\n    if (typeof value === 'string') {\n        let clean = value.replace(/<[^>]*>/g, '');\n        const sqlPatterns = /('|--|;|DROP|DELETE|INSERT|UPDATE|ALTER|EXEC)/gi;\n        if (sqlPatterns.test(clean)) clean = clean.replace(sqlPatterns, '');\n        return clean;\n    }\n    if (Array.isArray(value)) return value.map(sanitize);\n    if (value && typeof value === 'object') {\n        const result = {};\n        for (const [k, v] of Object.entries(value)) {\n            if (!k.startsWith('$')) result[k] = sanitize(v);\n        }\n        return result;\n    }\n    return value;\n}\n\nfunction sanitizeMiddleware(req, res, next) {\n    if (req.body) req.body = sanitize(req.body);\n    if (req.query) req.query = sanitize(req.query);\n    if (req.params) req.params = sanitize(req.params);\n    next();\n}",
+    "python": "import jwt\nimport time\nimport re\nimport html\nfrom functools import wraps\nfrom collections import defaultdict\n\nJWT_SECRET = 'super-secret-key'\nrequest_counts = defaultdict(list)\n\ndef auth_middleware(f):\n    @wraps(f)\n    def decorated(request, *args, **kwargs):\n        auth_header = request.headers.get('Authorization', '')\n        if not auth_header.startswith('Bearer '):\n            return {'error': 'No token provided'}, 401\n        token = auth_header.split(' ')[1]\n        try:\n            decoded = jwt.decode(token, JWT_SECRET, algorithms=['HS256'], issuer='app')\n            request.user = decoded\n        except jwt.ExpiredSignatureError:\n            return {'error': 'Token expired'}, 401\n        except jwt.InvalidTokenError:\n            return {'error': 'Invalid token'}, 401\n        return f(request, *args, **kwargs)\n    return decorated\n\ndef rate_limit_middleware(max_requests=100, window_seconds=900):\n    def decorator(f):\n        @wraps(f)\n        def decorated(request, *args, **kwargs):\n            ip = request.remote_addr\n            now = time.time()\n            request_counts[ip] = [t for t in request_counts[ip] if now - t < window_seconds]\n            if len(request_counts[ip]) >= max_requests:\n                retry_after = int(request_counts[ip][0] + window_seconds - now)\n                return {'error': 'Too many requests', 'retry_after': retry_after}, 429\n            request_counts[ip].append(now)\n            return f(request, *args, **kwargs)\n        return decorated\n    return decorator\n\ndef sanitize_input(data):\n    if isinstance(data, str):\n        clean = re.sub(r'<[^>]*>', '', data)\n        clean = re.sub(r\"('|--|;|DROP|DELETE|INSERT|UPDATE|ALTER|EXEC)\", '', clean, flags=re.I)\n        return clean\n    if isinstance(data, list):\n        return [sanitize_input(item) for item in data]\n    if isinstance(data, dict):\n        return {k: sanitize_input(v) for k, v in data.items() if not k.startswith('$')}\n    return data",
+    "explanation_tr": "Uc katmanli guvenlik middleware zinciri olusturduk: 1) JWT auth ile kimlik dogrulama (signature + expiration + issuer kontrolu), 2) Sliding window rate limiting ile brute-force korunmasi, 3) Recursive input sanitization ile injection saldirilarina karsi koruma. Bu pattern production'da her API'de kullanilir."
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Production-grade auth middleware zinciri olusturmayi ogrendin. JWT lifecycle, rate limiting algoritmalari ve input sanitization senior-level mulakatlarin vazgecilmez konularidir. Bu pattern'i her backend projesinde kullanacaksin."
+}

@@ -1,0 +1,114 @@
+{
+  "id": "mod-01-internet/quiz-01",
+  "title": "İnternet & Web Temelleri Quiz",
+  "description": "TCP/IP, HTTP, DNS ve web mimarisi konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "TCP 3-way handshake'in doğru sırası hangisidir?",
+      "options": [
+        "ACK → SYN → SYN-ACK",
+        "SYN → SYN-ACK → ACK",
+        "SYN → ACK → SYN-ACK",
+        "SYN-ACK → SYN → ACK"
+      ],
+      "correct": 1,
+      "explanation": "TCP bağlantısı SYN → SYN-ACK → ACK sırasıyla kurulur. İstemci bağlantı isteği gönderir (SYN), sunucu hem onaylar hem kendi isteğini gönderir (SYN-ACK), istemci onaylar (ACK).",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Aşağıdakilerden hangisi TCP/IP modelinin katmanları arasında DEĞİLDİR?",
+      "options": [
+        "Uygulama Katmanı (Application Layer)",
+        "Sunum Katmanı (Presentation Layer)",
+        "Taşıma Katmanı (Transport Layer)",
+        "Ağ Katmanı (Network Layer)"
+      ],
+      "correct": 1,
+      "explanation": "Sunum Katmanı (Presentation Layer) OSI modelinde vardır ama TCP/IP modelinde yoktur. TCP/IP modeli 5 katmandan oluşur: Fiziksel, Veri Bağlantı, Ağ, Taşıma ve Uygulama.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "true_false",
+      "question": "UDP, TCP'den daha hızlıdır çünkü güvenilirlik kontrolü (acknowledgment, retransmission) yapmaz.",
+      "correct": true,
+      "explanation": "Doğru! UDP connectionless bir protokoldür, paketlerin ulaşıp ulaşmadığını kontrol etmez. Bu onu hızlı ama güvenilmez yapar. Video streaming, online oyunlar ve DNS sorguları gibi hız-kritik senaryolarda tercih edilir.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "code_completion",
+      "question": "HTTPS varsayılan olarak hangi port numarasını kullanır? Sayıyı yazın:",
+      "code_template": "HTTPS port: _____",
+      "correct_answers": ["443"],
+      "explanation": "HTTPS (HTTP Secure) varsayılan olarak port 443 kullanır. HTTP ise port 80 kullanır. Bu portları bilmek web geliştirme için temeldir.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "order_steps",
+      "question": "Tarayıcıya bir URL yazdığında olaylar hangi sırayla gerçekleşir?",
+      "steps": [
+        "DNS çözümlemesi - domain'in IP adresi bulunur",
+        "TCP 3-way handshake ile bağlantı kurulur",
+        "TLS handshake ile şifreli bağlantı kurulur (HTTPS ise)",
+        "HTTP GET isteği gönderilir",
+        "Sunucu yanıt döndürür ve tarayıcı render eder"
+      ],
+      "correct_order": [0, 1, 2, 3, 4],
+      "explanation": "Sıra: Önce DNS ile IP bulunur, sonra TCP bağlantısı kurulur, HTTPS ise TLS handshake yapılır, ardından HTTP isteği gönderilir ve yanıt render edilir.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q6",
+      "type": "explain_code",
+      "question": "Aşağıdaki terminal çıktısı ne anlama geliyor? Ne bilgisi veriyor?",
+      "code": "$ ping google.com\nPinging google.com [142.250.185.238] with 32 bytes of data:\nReply from 142.250.185.238: bytes=32 time=12ms TTL=118\nReply from 142.250.185.238: bytes=32 time=11ms TTL=118",
+      "correct_keywords": ["ip adresi", "gecikme", "latency", "12ms", "ulaşılabilir", "erişilebilir", "TTL"],
+      "sample_answer": "Bu çıktı, google.com'un IP adresinin 142.250.185.238 olduğunu ve sunucuya ulaşılabilir olduğunu gösteriyor. Her pakete ortalama 12ms gecikme (latency) ile yanıt alınıyor. TTL=118, paketin 118 router'dan daha geçebileceğini belirtir.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Encapsulation (kapsülleme) sürecinde veri hangi sırayla işlenir?",
+      "options": [
+        "Fiziksel → Ağ → Taşıma → Uygulama",
+        "Uygulama → Taşıma → Ağ → Veri Bağlantı → Fiziksel",
+        "Ağ → Taşıma → Fiziksel → Uygulama",
+        "Taşıma → Uygulama → Ağ → Fiziksel"
+      ],
+      "correct": 1,
+      "explanation": "Gönderen tarafta veri üstten alta doğru akar: Uygulama katmanı veriyi oluşturur, Taşıma katmanı segment yapar, Ağ katmanı paket yapar, Veri Bağlantı katmanı frame yapar, Fiziksel katman bit olarak gönderir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Localhost IP adresi hangisidir?",
+      "options": [
+        "192.168.1.1",
+        "10.0.0.1",
+        "127.0.0.1",
+        "255.255.255.0"
+      ],
+      "correct": 2,
+      "explanation": "127.0.0.1 localhost (loopback) adresidir - kendi bilgisayarını ifade eder. Geliştirme sırasında local server'ına bağlanmak için kullanırsın. 192.168.x.x ve 10.x.x.x özel (private) ağ adresleridir. 255.255.255.0 ise bir subnet mask'tir.",
+      "difficulty": "kolay",
+      "points": 10
+    }
+  ]
+}

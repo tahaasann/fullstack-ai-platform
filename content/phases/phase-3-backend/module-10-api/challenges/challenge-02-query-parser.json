@@ -1,0 +1,84 @@
+{
+  "title": "Query Parameter Parser",
+  "description": "Karmaşık query string'leri parse ederek array, nested object desteği sağla",
+  "description_detail": "# Query Parameter Parser\n\nKarmaşık query string'leri parse eden bir fonksiyon yazın.\n\n## Desteklenen Formatlar\n\n1. **Basit**: `?name=john&age=25` → `{name: 'john', age: '25'}`\n2. **Array**: `?color=red&color=blue` → `{color: ['red', 'blue']}`\n3. **Bracket Array**: `?tags[]=js&tags[]=py` → `{tags: ['js', 'py']}`\n4. **Nested**: `?user[name]=john&user[age]=25` → `{user: {name: 'john', age: '25'}}`\n5. **URL Encoded**: `?q=hello%20world` → `{q: 'hello world'}`\n6. **Boolean/Number**: değerler string olarak kalır (cast yok)\n\n## İstenilen Fonksiyonlar\n\n### `parseQuery(queryString)`\nQuery string'i parse ederek obje döndürür.\n\n### `buildQuery(params)`\nObjeyi query string'e dönüştürür.",
+  "difficulty": "orta",
+  "category": "api",
+  "tags": ["query-string", "parsing", "url", "api"],
+  "examples": [
+    {
+      "input": "parseQuery('name=john&age=25')",
+      "output": "{'name': 'john', 'age': '25'}",
+      "explanation": "Basit key=value çiftleri"
+    },
+    {
+      "input": "parseQuery('tags[]=js&tags[]=py&tags[]=go')",
+      "output": "{'tags': ['js', 'py', 'go']}",
+      "explanation": "Bracket notation ile array"
+    }
+  ],
+  "constraints": [
+    "? işareti varsa kaldırılmalı",
+    "URL decode yapılmalı (%20 -> boşluk)",
+    "Boş query string {} döndürmeli",
+    "Değersiz parametre: 'key' → {key: ''}"
+  ],
+  "starter_code": {
+    "python": "def parse_query(query_string: str) -> dict:\n    # Your code here\n    pass\n\ndef build_query(params: dict) -> str:\n    # Your code here\n    pass",
+    "javascript": "function parseQuery(queryString) {\n  // Your code here\n}\n\nfunction buildQuery(params) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "parse", "query": "name=john&age=25"},
+      "expected_output": {"name": "john", "age": "25"}
+    },
+    {
+      "input": {"fn": "parse", "query": "color=red&color=blue"},
+      "expected_output": {"color": ["red", "blue"]}
+    },
+    {
+      "input": {"fn": "parse", "query": "tags[]=js&tags[]=py"},
+      "expected_output": {"tags": ["js", "py"]}
+    },
+    {
+      "input": {"fn": "parse", "query": "user[name]=john&user[age]=25"},
+      "expected_output": {"user": {"name": "john", "age": "25"}}
+    },
+    {
+      "input": {"fn": "parse", "query": "q=hello%20world"},
+      "expected_output": {"q": "hello world"}
+    },
+    {
+      "input": {"fn": "parse", "query": ""},
+      "expected_output": {}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "parse", "query": "?a=1&b=2&c=3"},
+      "expected_output": {"a": "1", "b": "2", "c": "3"}
+    },
+    {
+      "input": {"fn": "build", "params": {"name": "john", "age": "25"}},
+      "expected_output": "name=john&age=25"
+    },
+    {
+      "input": {"fn": "parse", "query": "empty=&flag"},
+      "expected_output": {"empty": "", "flag": ""}
+    }
+  ],
+  "hints": [
+    "Önce ? kaldır, sonra & ile split et. Her parçayı = ile key/value olarak ayır",
+    "Key'de [] varsa array, [name] varsa nested object olarak işle",
+    "URL decode için Python'da urllib.parse.unquote, JS'de decodeURIComponent kullan"
+  ],
+  "solution": {
+    "python": "from urllib.parse import unquote\nimport re\n\ndef parse_query(query_string: str) -> dict:\n    if not query_string:\n        return {}\n    \n    query_string = query_string.lstrip('?')\n    if not query_string:\n        return {}\n    \n    result = {}\n    pairs = query_string.split('&')\n    \n    for pair in pairs:\n        if '=' in pair:\n            key, value = pair.split('=', 1)\n        else:\n            key, value = pair, ''\n        \n        key = unquote(key)\n        value = unquote(value)\n        \n        # Bracket array: key[]\n        if key.endswith('[]'):\n            base_key = key[:-2]\n            if base_key not in result:\n                result[base_key] = []\n            result[base_key].append(value)\n        # Nested: key[sub]\n        elif '[' in key and key.endswith(']'):\n            match = re.match(r'^([^\\[]+)\\[([^\\]]+)\\]$', key)\n            if match:\n                base_key, sub_key = match.groups()\n                if base_key not in result:\n                    result[base_key] = {}\n                result[base_key][sub_key] = value\n        # Simple or duplicate\n        else:\n            if key in result:\n                if isinstance(result[key], list):\n                    result[key].append(value)\n                else:\n                    result[key] = [result[key], value]\n            else:\n                result[key] = value\n    \n    return result\n\ndef build_query(params: dict) -> str:\n    pairs = []\n    for key, value in params.items():\n        if isinstance(value, list):\n            for v in value:\n                pairs.append(f'{key}[]={v}')\n        elif isinstance(value, dict):\n            for k, v in value.items():\n                pairs.append(f'{key}[{k}]={v}')\n        else:\n            pairs.append(f'{key}={value}')\n    return '&'.join(pairs)",
+    "javascript": "function parseQuery(queryString) {\n  if (!queryString) return {};\n  queryString = queryString.replace(/^\\?/, '');\n  if (!queryString) return {};\n\n  const result = {};\n  const pairs = queryString.split('&');\n\n  for (const pair of pairs) {\n    const eqIdx = pair.indexOf('=');\n    let key = eqIdx === -1 ? decodeURIComponent(pair) : decodeURIComponent(pair.slice(0, eqIdx));\n    const value = eqIdx === -1 ? '' : decodeURIComponent(pair.slice(eqIdx + 1));\n\n    if (key.endsWith('[]')) {\n      const baseKey = key.slice(0, -2);\n      if (!result[baseKey]) result[baseKey] = [];\n      result[baseKey].push(value);\n    } else if (/^([^[]+)\\[([^\\]]+)\\]$/.test(key)) {\n      const [, baseKey, subKey] = key.match(/^([^[]+)\\[([^\\]]+)\\]$/);\n      if (!result[baseKey]) result[baseKey] = {};\n      result[baseKey][subKey] = value;\n    } else {\n      if (key in result) {\n        if (Array.isArray(result[key])) result[key].push(value);\n        else result[key] = [result[key], value];\n      } else {\n        result[key] = value;\n      }\n    }\n  }\n  return result;\n}\n\nfunction buildQuery(params) {\n  const pairs = [];\n  for (const [key, value] of Object.entries(params)) {\n    if (Array.isArray(value)) {\n      value.forEach(v => pairs.push(`${key}[]=${v}`));\n    } else if (typeof value === 'object' && value !== null) {\n      Object.entries(value).forEach(([k, v]) => pairs.push(`${key}[${k}]=${v}`));\n    } else {\n      pairs.push(`${key}=${value}`);\n    }\n  }\n  return pairs.join('&');\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Query string parsing'in inceliklerini, URL encoding/decoding'i ve API parametreleri iletişimini öğrenirsin. Express.js ve Next.js'in query parsing'i tam bu mantıkla çalışır."
+}

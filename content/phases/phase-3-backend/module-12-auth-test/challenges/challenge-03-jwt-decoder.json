@@ -1,0 +1,75 @@
+{
+  "title": "JWT Decoder",
+  "description": "JWT token'larını decode et ve doğrula",
+  "description_detail": "# JWT Decoder\n\nJWT (JSON Web Token) token'larını decode eden ve doğrulayan fonksiyonlar yazın.\n\n## JWT Yapısı\n```\nheader.payload.signature\n```\nHer bölüm Base64URL encoded'dır.\n\n## İstenilen Fonksiyonlar\n\n### 1. `decodeJWT(token)`\nToken'ı decode ederek header ve payload'ı döndürür (signature doğrulamadan).\n\n### 2. `isExpired(token)`\nToken'ın expire olup olmadığını kontrol eder (payload.exp alanı).\n\n### 3. `extractClaims(token)`\nStandart JWT claim'lerini döndürür: iss, sub, aud, exp, iat, nbf, jti\n\n## Örnek\n```javascript\nconst token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4ifQ.signature';\ndecodeJWT(token);\n// {\n//   header: { alg: 'HS256' },\n//   payload: { sub: '1234567890', name: 'John' }\n// }\n```",
+  "difficulty": "orta",
+  "category": "auth",
+  "tags": ["jwt", "auth", "security", "base64"],
+  "examples": [
+    {
+      "input": "decodeJWT('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.sig')",
+      "output": "{'header': {'alg': 'HS256'}, 'payload': {'sub': '1234567890'}}",
+      "explanation": "Base64URL decode edilerek header ve payload çıkarıldı"
+    }
+  ],
+  "constraints": [
+    "Token 3 parçadan oluşmalı (. ile ayrılmış)",
+    "Base64URL decode yapılmalı (+ yerine -, / yerine _ kullanılır)",
+    "Geçersiz token için null döndür",
+    "Signature doğrulama yapılmaz (sadece decode)"
+  ],
+  "starter_code": {
+    "python": "import base64\nimport json\n\ndef decode_jwt(token: str) -> dict:\n    # Your code here\n    pass\n\ndef is_expired(token: str) -> bool:\n    # Your code here\n    pass\n\ndef extract_claims(token: str) -> dict:\n    # Your code here\n    pass",
+    "javascript": "function decodeJWT(token) {\n  // Your code here\n}\n\nfunction isExpired(token) {\n  // Your code here\n}\n\nfunction extractClaims(token) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "decode", "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4ifQ.sig"},
+      "expected_output": {"header": {"alg": "HS256"}, "payload": {"sub": "1234567890", "name": "John"}}
+    },
+    {
+      "input": {"fn": "decode", "token": "invalid_token"},
+      "expected_output": null
+    },
+    {
+      "input": {"fn": "expired", "token": "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDAwMDAwMDB9.sig"},
+      "expected_output": true
+    },
+    {
+      "input": {"fn": "expired", "token": "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjk5OTk5OTk5OTl9.sig"},
+      "expected_output": false
+    },
+    {
+      "input": {"fn": "claims", "token": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhdXRoLmV4YW1wbGUuY29tIiwic3ViIjoiMTIzIiwiYXVkIjoiYXBpIn0.sig"},
+      "expected_output": {"iss": "auth.example.com", "sub": "123", "aud": "api"}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "decode", "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDAwMDAwMDB9.sig"},
+      "expected_output": {"header": {"alg": "RS256", "typ": "JWT"}, "payload": {"iat": 1700000000}}
+    },
+    {
+      "input": {"fn": "decode", "token": "a.b"},
+      "expected_output": null
+    },
+    {
+      "input": {"fn": "expired", "token": "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoibm9fZXhwIn0.sig"},
+      "expected_output": false
+    }
+  ],
+  "hints": [
+    "Base64URL decode: - → +, _ → / dönüşümü yap, padding (=) ekle, sonra base64 decode",
+    "Token'ı . ile split et, 3 parça olmalı. Header ve payload'ı ayrı ayrı decode et",
+    "isExpired: payload.exp varsa ve Date.now()/1000 > exp ise true döndür"
+  ],
+  "solution": {
+    "python": "import base64\nimport json\nimport time\n\ndef _base64url_decode(s):\n    s = s.replace('-', '+').replace('_', '/')\n    padding = 4 - len(s) % 4\n    if padding != 4:\n        s += '=' * padding\n    return base64.b64decode(s).decode('utf-8')\n\ndef decode_jwt(token: str) -> dict:\n    try:\n        parts = token.split('.')\n        if len(parts) != 3:\n            return None\n        \n        header = json.loads(_base64url_decode(parts[0]))\n        payload = json.loads(_base64url_decode(parts[1]))\n        \n        return {'header': header, 'payload': payload}\n    except Exception:\n        return None\n\ndef is_expired(token: str) -> bool:\n    decoded = decode_jwt(token)\n    if not decoded:\n        return True\n    \n    exp = decoded['payload'].get('exp')\n    if exp is None:\n        return False\n    \n    return time.time() > exp\n\ndef extract_claims(token: str) -> dict:\n    decoded = decode_jwt(token)\n    if not decoded:\n        return {}\n    \n    standard_claims = ['iss', 'sub', 'aud', 'exp', 'iat', 'nbf', 'jti']\n    payload = decoded['payload']\n    return {k: payload[k] for k in standard_claims if k in payload}",
+    "javascript": "function base64UrlDecode(str) {\n  str = str.replace(/-/g, '+').replace(/_/g, '/');\n  while (str.length % 4) str += '=';\n  return JSON.parse(atob(str));\n}\n\nfunction decodeJWT(token) {\n  try {\n    const parts = token.split('.');\n    if (parts.length !== 3) return null;\n    const header = base64UrlDecode(parts[0]);\n    const payload = base64UrlDecode(parts[1]);\n    return { header, payload };\n  } catch (e) {\n    return null;\n  }\n}\n\nfunction isExpired(token) {\n  const decoded = decodeJWT(token);\n  if (!decoded) return true;\n  const exp = decoded.payload.exp;\n  if (exp === undefined) return false;\n  return Date.now() / 1000 > exp;\n}\n\nfunction extractClaims(token) {\n  const decoded = decodeJWT(token);\n  if (!decoded) return {};\n  const standard = ['iss', 'sub', 'aud', 'exp', 'iat', 'nbf', 'jti'];\n  const result = {};\n  for (const key of standard) {\n    if (key in decoded.payload) result[key] = decoded.payload[key];\n  }\n  return result;\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "JWT'nin iç yapısını, Base64URL encoding'i, claim kavramlarını ve token expiration mantığını öğrenirsin. JWT modern API authentication'ın temelidir ve her backend pozisyonunda sorulur."
+}

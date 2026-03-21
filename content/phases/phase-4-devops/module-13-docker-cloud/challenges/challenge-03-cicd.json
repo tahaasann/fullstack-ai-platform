@@ -1,0 +1,82 @@
+{
+  "id": "challenge-cicd-pipeline",
+  "title": "GitHub Actions CI/CD Pipeline",
+  "difficulty": "zor",
+  "category": "devops",
+  "tags": ["ci-cd", "github-actions", "automation", "deployment"],
+  "related_lesson": "mod-13-docker-cloud/lesson-02",
+  "description_tr": "Bir full-stack proje icin eksiksiz bir GitHub Actions CI/CD pipeline YAML dosyasi olustur. Build, test, lint ve deploy asamalarini icermeli.",
+  "description_detail": "Gercek bir projede kullanilabilecek bir CI/CD pipeline tanimlayin. Pipeline push ve pull request event'lerinde tetiklenmeli, paralel job'lar icermeli, caching kullanmali ve staging/production ortamlarina deploy etmelidir.",
+  "examples": [
+    {
+      "input": "pipeline = parse_workflow('ci-cd.yml')",
+      "output": "{'jobs': ['lint', 'test', 'build', 'deploy-staging', 'deploy-production'], 'triggers': ['push', 'pull_request']}",
+      "explanation": "Pipeline 5 job icermeli ve push/PR event'lerinde tetiklenmeli."
+    }
+  ],
+  "constraints": [
+    "GitHub Actions workflow syntax'i kullanin",
+    "main branch'e push ve pull_request'te tetiklenmeli",
+    "lint ve test job'lari paralel calismali",
+    "build job'i lint + test'e bagimli olmali",
+    "deploy-production sadece main branch'te calismali ve manual approval gerektirmeli"
+  ],
+  "starter_code": {
+    "python": "def generate_pipeline_config():\n    \"\"\"\n    GitHub Actions CI/CD pipeline konfigurasyonunu dict olarak dondur.\n    YAML'a donusturulunce gecerli bir workflow dosyasi olusturmali.\n    \n    Gerekli job'lar:\n    1. lint: ESLint + Prettier kontrolu\n    2. test: Jest unit testleri (coverage raporuyla)\n    3. build: Docker image build + push to registry\n    4. deploy-staging: Staging ortamina otomatik deploy\n    5. deploy-production: Production deploy (manual approval + main branch only)\n    \n    Her job'da:\n    - Node.js 20 kullanin\n    - npm cache'i aktif edin\n    - Uygun needs (bagimlilik) tanimlayin\n    \"\"\"\n    pass",
+    "javascript": "function generatePipelineConfig() {\n    /**\n     * GitHub Actions CI/CD pipeline konfigurasyonunu object olarak dondur.\n     * YAML'a donusturulunce gecerli bir workflow dosyasi olusturmali.\n     * \n     * Gerekli job'lar:\n     * 1. lint: ESLint + Prettier kontrolu\n     * 2. test: Jest unit testleri (coverage raporuyla)\n     * 3. build: Docker image build + push to registry\n     * 4. deploy-staging: Staging ortamina otomatik deploy\n     * 5. deploy-production: Production deploy (manual approval + main branch only)\n     * \n     * Her job'da:\n     * - Node.js 20 kullanin\n     * - npm cache'i aktif edin\n     * - Uygun needs (bagimlilik) tanimlayin\n     */\n}"
+  },
+  "test_cases": [
+    {
+      "input": {},
+      "expected": "has_correct_triggers",
+      "description": "Pipeline push ve pull_request event'lerinde tetiklenmeli"
+    },
+    {
+      "input": {},
+      "expected": "has_five_jobs",
+      "description": "lint, test, build, deploy-staging, deploy-production job'lari olmali"
+    },
+    {
+      "input": {},
+      "expected": "lint_test_parallel",
+      "description": "lint ve test job'lari birbirinden bagimsiz (paralel) calismali"
+    },
+    {
+      "input": {},
+      "expected": "build_depends_on_lint_test",
+      "description": "build job'i needs: [lint, test] ile bagimli olmali"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {},
+      "expected": "production_main_only",
+      "description": "deploy-production sadece main branch'te calismali"
+    },
+    {
+      "input": {},
+      "expected": "has_caching",
+      "description": "npm veya node_modules caching kullanilmali"
+    },
+    {
+      "input": {},
+      "expected": "has_environment",
+      "description": "Deploy job'lari environment tanimlamali (staging/production)"
+    }
+  ],
+  "hints": [
+    "GitHub Actions'da 'needs' alani ile job bagimliliklari tanimlanir. needs belirtilmeyen job'lar paralel calisir.",
+    "Production deploy icin 'environment' alani kullanarak GitHub'in built-in approval mekanizmasini aktif edebilirsin. if: github.ref == 'refs/heads/main' ile branch kontrolu yap.",
+    "Caching icin actions/setup-node@v4 action'inda cache: 'npm' parametresini kullan. Bu node_modules'u cache'ler ve CI suresini %40-60 kisaltir."
+  ],
+  "solution": {
+    "python": "def generate_pipeline_config():\n    return {\n        'name': 'CI/CD Pipeline',\n        'on': {\n            'push': {'branches': ['main', 'develop']},\n            'pull_request': {'branches': ['main']}\n        },\n        'jobs': {\n            'lint': {\n                'runs-on': 'ubuntu-latest',\n                'steps': [\n                    {'uses': 'actions/checkout@v4'},\n                    {'uses': 'actions/setup-node@v4', 'with': {'node-version': '20', 'cache': 'npm'}},\n                    {'run': 'npm ci'},\n                    {'run': 'npm run lint'},\n                    {'run': 'npm run format:check'}\n                ]\n            },\n            'test': {\n                'runs-on': 'ubuntu-latest',\n                'steps': [\n                    {'uses': 'actions/checkout@v4'},\n                    {'uses': 'actions/setup-node@v4', 'with': {'node-version': '20', 'cache': 'npm'}},\n                    {'run': 'npm ci'},\n                    {'run': 'npm test -- --coverage'},\n                    {'uses': 'actions/upload-artifact@v4', 'with': {'name': 'coverage', 'path': 'coverage/'}}\n                ]\n            },\n            'build': {\n                'runs-on': 'ubuntu-latest',\n                'needs': ['lint', 'test'],\n                'steps': [\n                    {'uses': 'actions/checkout@v4'},\n                    {'uses': 'docker/setup-buildx-action@v3'},\n                    {'uses': 'docker/login-action@v3', 'with': {'registry': 'ghcr.io', 'username': '${{ github.actor }}', 'password': '${{ secrets.GITHUB_TOKEN }}'}},\n                    {'uses': 'docker/build-push-action@v5', 'with': {'push': True, 'tags': 'ghcr.io/${{ github.repository }}:${{ github.sha }}', 'cache-from': 'type=gha', 'cache-to': 'type=gha,mode=max'}}\n                ]\n            },\n            'deploy-staging': {\n                'runs-on': 'ubuntu-latest',\n                'needs': ['build'],\n                'environment': 'staging',\n                'steps': [\n                    {'uses': 'actions/checkout@v4'},\n                    {'run': 'echo \"Deploying to staging...\"'},\n                    {'run': 'echo \"Deploy ${{ github.sha }} to staging complete\"'}\n                ]\n            },\n            'deploy-production': {\n                'runs-on': 'ubuntu-latest',\n                'needs': ['deploy-staging'],\n                'if': \"github.ref == 'refs/heads/main'\",\n                'environment': 'production',\n                'steps': [\n                    {'uses': 'actions/checkout@v4'},\n                    {'run': 'echo \"Deploying to production...\"'},\n                    {'run': 'echo \"Deploy ${{ github.sha }} to production complete\"'}\n                ]\n            }\n        }\n    }",
+    "javascript": "function generatePipelineConfig() {\n    return {\n        name: 'CI/CD Pipeline',\n        on: {\n            push: { branches: ['main', 'develop'] },\n            pull_request: { branches: ['main'] }\n        },\n        jobs: {\n            lint: {\n                'runs-on': 'ubuntu-latest',\n                steps: [\n                    { uses: 'actions/checkout@v4' },\n                    { uses: 'actions/setup-node@v4', with: { 'node-version': '20', cache: 'npm' } },\n                    { run: 'npm ci' },\n                    { run: 'npm run lint' },\n                    { run: 'npm run format:check' }\n                ]\n            },\n            test: {\n                'runs-on': 'ubuntu-latest',\n                steps: [\n                    { uses: 'actions/checkout@v4' },\n                    { uses: 'actions/setup-node@v4', with: { 'node-version': '20', cache: 'npm' } },\n                    { run: 'npm ci' },\n                    { run: 'npm test -- --coverage' },\n                    { uses: 'actions/upload-artifact@v4', with: { name: 'coverage', path: 'coverage/' } }\n                ]\n            },\n            build: {\n                'runs-on': 'ubuntu-latest',\n                needs: ['lint', 'test'],\n                steps: [\n                    { uses: 'actions/checkout@v4' },\n                    { uses: 'docker/setup-buildx-action@v3' },\n                    { uses: 'docker/login-action@v3', with: { registry: 'ghcr.io', username: '${{ github.actor }}', password: '${{ secrets.GITHUB_TOKEN }}' } },\n                    { uses: 'docker/build-push-action@v5', with: { push: true, tags: 'ghcr.io/${{ github.repository }}:${{ github.sha }}', 'cache-from': 'type=gha', 'cache-to': 'type=gha,mode=max' } }\n                ]\n            },\n            'deploy-staging': {\n                'runs-on': 'ubuntu-latest',\n                needs: ['build'],\n                environment: 'staging',\n                steps: [\n                    { uses: 'actions/checkout@v4' },\n                    { run: 'echo \"Deploying to staging...\"' },\n                    { run: 'echo \"Deploy complete\"' }\n                ]\n            },\n            'deploy-production': {\n                'runs-on': 'ubuntu-latest',\n                needs: ['deploy-staging'],\n                if: \"github.ref == 'refs/heads/main'\",\n                environment: 'production',\n                steps: [\n                    { uses: 'actions/checkout@v4' },\n                    { run: 'echo \"Deploying to production...\"' },\n                    { run: 'echo \"Deploy complete\"' }\n                ]\n            }\n        }\n    };\n}",
+    "explanation_tr": "CI/CD pipeline'da lint ve test paralel calisir (birbirine bagimli degildir). build her ikisine bagimlidir (needs: [lint, test]). Deploy asamalari sirayla ilerler: staging -> production. Production deploy sadece main branch'te calisir ve GitHub environment protection rules ile manual approval gerektirir."
+  },
+  "complexity": {
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)"
+  },
+  "learn_after_solving": "CI/CD pipeline tasariminin temellerini ogrendin: paralel job'lar, bagimlilik zincirleri, branch koruma, environment-based deploy. Bu pattern her buyuk projede kullanilir ve DevOps mulakat sorularinin temelini olusturur."
+}

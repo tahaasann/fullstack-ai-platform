@@ -1,0 +1,80 @@
+{
+  "title": "Generator Pipeline",
+  "description": "Generator'lar kullanarak veri işleme pipeline'ı oluştur",
+  "description_detail": "# Generator Pipeline\n\nBir dizi transformation fonksiyonu ve veri kaynağı verildiğinde, generator'lar kullanarak lazy evaluation ile veri işleme pipeline'ı oluşturun.\n\n## İstenilen Fonksiyonlar\n\n### 1. `pipeline(data, *transforms)`\nVeri üzerinde sırayla transform fonksiyonlarını uygulayan bir generator döndürür.\n\n### 2. `take(gen, n)`\nGenerator'dan ilk n elemanı liste olarak döndürür.\n\n### 3. `chain(*generators)`\nBirden fazla generator'ı birleştirir.\n\n## Örnek\n```python\ndef double(x): return x * 2\ndef add_one(x): return x + 1\n\nresult = list(pipeline([1, 2, 3], double, add_one))\n# [3, 5, 7]  (1*2+1, 2*2+1, 3*2+1)\n```",
+  "difficulty": "orta",
+  "category": "python",
+  "tags": ["generators", "lazy-evaluation", "pipeline", "functional"],
+  "examples": [
+    {
+      "input": "pipeline([1, 2, 3], lambda x: x * 2, lambda x: x + 1)",
+      "output": "[3, 5, 7]",
+      "explanation": "Her eleman önce 2 ile çarpılır, sonra 1 eklenir"
+    },
+    {
+      "input": "take(pipeline(range(1000000), lambda x: x ** 2), 3)",
+      "output": "[0, 1, 4]",
+      "explanation": "Lazy evaluation: milyonlarca eleman oluşturmadan sadece 3 tane hesaplanır"
+    }
+  ],
+  "constraints": [
+    "pipeline fonksiyonu generator döndürmeli (lazy evaluation)",
+    "take fonksiyonu en fazla n eleman döndürmeli",
+    "chain fonksiyonu generator'ları sırayla tüketmeli",
+    "Bellek kullanımı veri boyutundan bağımsız olmalı"
+  ],
+  "starter_code": {
+    "python": "def pipeline(data, *transforms):\n    # Your code here\n    pass\n\ndef take(gen, n):\n    # Your code here\n    pass\n\ndef chain(*generators):\n    # Your code here\n    pass",
+    "javascript": "function* pipeline(data, ...transforms) {\n  // Your code here\n}\n\nfunction take(gen, n) {\n  // Your code here\n}\n\nfunction* chain(...generators) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "pipeline", "data": [1, 2, 3], "transforms": ["double"]},
+      "expected_output": [2, 4, 6]
+    },
+    {
+      "input": {"fn": "pipeline", "data": [1, 2, 3, 4, 5], "transforms": ["double", "add_one"]},
+      "expected_output": [3, 5, 7, 9, 11]
+    },
+    {
+      "input": {"fn": "take", "data": [10, 20, 30, 40, 50], "n": 3},
+      "expected_output": [10, 20, 30]
+    },
+    {
+      "input": {"fn": "pipeline", "data": [], "transforms": ["double"]},
+      "expected_output": []
+    },
+    {
+      "input": {"fn": "chain", "gens": [[1, 2], [3, 4], [5]]},
+      "expected_output": [1, 2, 3, 4, 5]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "pipeline", "data": [0, -1, 5], "transforms": ["square", "add_one"]},
+      "expected_output": [1, 2, 26]
+    },
+    {
+      "input": {"fn": "take", "data": [1, 2, 3], "n": 10},
+      "expected_output": [1, 2, 3]
+    },
+    {
+      "input": {"fn": "chain", "gens": [[], [1], [], [2, 3]]},
+      "expected_output": [1, 2, 3]
+    }
+  ],
+  "hints": [
+    "Generator fonksiyonu yield keyword'ü ile değer üretir, tüm listeyi bellekte tutmaz",
+    "pipeline'da her transform'u sırayla uygulamak için iç içe generator kullan veya reduce ile birleştir",
+    "take fonksiyonunda itertools.islice kullanabilir veya basit bir sayaçlı döngü yapabilirsin"
+  ],
+  "solution": {
+    "python": "def pipeline(data, *transforms):\n    for item in data:\n        result = item\n        for transform in transforms:\n            result = transform(result)\n        yield result\n\ndef take(gen, n):\n    result = []\n    for i, item in enumerate(gen):\n        if i >= n:\n            break\n        result.append(item)\n    return result\n\ndef chain(*generators):\n    for gen in generators:\n        yield from gen",
+    "javascript": "function* pipeline(data, ...transforms) {\n  for (const item of data) {\n    let result = item;\n    for (const transform of transforms) {\n      result = transform(result);\n    }\n    yield result;\n  }\n}\n\nfunction take(gen, n) {\n  const result = [];\n  let count = 0;\n  for (const item of gen) {\n    if (count >= n) break;\n    result.push(item);\n    count++;\n  }\n  return result;\n}\n\nfunction* chain(...generators) {\n  for (const gen of generators) {\n    yield* gen;\n  }\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n * m) where n = data length, m = transform count",
+    "optimal_space": "O(1) - lazy evaluation"
+  },
+  "learn_after_solving": "Generator'ların lazy evaluation avantajını, pipeline pattern'ini ve bellek-verimli veri işlemeyi öğrenirsin. Bu pattern büyük veri setleri, stream processing ve ETL pipeline'larında yaygın kullanılır."
+}

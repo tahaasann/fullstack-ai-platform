@@ -1,0 +1,139 @@
+{
+  "id": "mod-07-react/quiz-01",
+  "title": "React + TypeScript Quiz",
+  "description": "React hooks, state management, routing, Next.js ve performance konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "React'te useEffect hook'unun dependency array'i boş ([]) verildiğinde ne olur?",
+      "options": [
+        "Effect her render'da çalışır",
+        "Effect sadece component mount olduğunda bir kez çalışır",
+        "Effect hiç çalışmaz",
+        "Effect sadece component unmount olduğunda çalışır"
+      ],
+      "correct": 1,
+      "explanation": "Boş dependency array ([]) verildiğinde, useEffect sadece component ilk kez mount olduğunda çalışır. Dependency array hiç verilmezse her render'da, dependency'ler verilirse sadece o değerler değiştiğinde çalışır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Aşağıdaki kodda butona 3 kez tıklandığında count değeri ne olur?\n\nconst [count, setCount] = useState(0);\nconst handleClick = () => {\n  setCount(count + 1);\n  setCount(count + 1);\n  setCount(count + 1);\n};",
+      "options": [
+        "3",
+        "1",
+        "9",
+        "0"
+      ],
+      "correct": 1,
+      "explanation": "Her tıklamada üç setCount çağrısı da aynı closure'daki count değerini (0, sonra 1, sonra 2) kullanır. Hepsi aynı render cycle'da olduğu için batch edilir ve count sadece 1 artar. 3 tıklama sonunda count = 3 olur ama her tıklamada 1 artar. Tek bir tıklamada 3 artması için setCount(prev => prev + 1) kullanılmalıdır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "React'te key prop'u ne işe yarar ve neden index kullanmak sakıncalıdır?",
+      "options": [
+        "Key sadece console uyarısını kaldırmak içindir, index kullanmak sorun yaratmaz",
+        "Key, React'in hangi elemanın değiştiğini takip etmesini sağlar. Index kullanılırsa liste sırası değiştiğinde React yanlış elemanları güncelleyebilir",
+        "Key, CSS styling için kullanılır",
+        "Key, TypeScript type checking için zorunludur"
+      ],
+      "correct": 1,
+      "explanation": "Key, React'in reconciliation algoritmasında elemanları tanımlamasını sağlar. Benzersiz ve sabit bir id kullanılmalıdır. Index kullanılırsa, eleman eklendiğinde/silindiğinde/sıralandığında React elemanları karıştırabilir ve input değerleri, animasyonlar gibi şeyler yanlış elemana bağlanabilir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Zustand'ın React Context API'ye göre en büyük performans avantajı nedir?",
+      "options": [
+        "Zustand daha küçük bir kütüphanedir",
+        "Zustand TypeScript desteği daha iyidir",
+        "Zustand selector ile sadece kullanılan state parçası değiştiğinde re-render tetikler",
+        "Zustand server-side rendering destekler"
+      ],
+      "correct": 2,
+      "explanation": "Context API'de context değeri değiştiğinde, o context'i kullanan TÜM component'ler re-render olur. Zustand'da ise useStore((state) => state.count) gibi selector kullanarak sadece count değiştiğinde re-render tetiklenir. Bu, büyük uygulamalarda ciddi performans farkı yaratır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Next.js App Router'da bir component varsayılan olarak nedir ve 'use client' direktifi ne yapar?",
+      "options": [
+        "Varsayılan Client Component'tir, 'use client' gereksizdir",
+        "Varsayılan Server Component'tir, 'use client' component'i tarayıcıda çalışabilir hale getirir",
+        "Varsayılan Static Component'tir, 'use client' dinamik yapar",
+        "Varsayılan Hybrid Component'tir, 'use client' sadece hook'ları aktifleştirir"
+      ],
+      "correct": 1,
+      "explanation": "App Router'da tüm component'ler varsayılan olarak Server Component'tir - sunucuda çalışır, 0 KB JS gönderir, async/await kullanabilir. 'use client' direktifi eklendiğinde component Client Component olur: useState, useEffect, onClick gibi tarayıcı özelliklerini kullanabilir ama JS bundle'a dahil olur.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "type": "true_false",
+      "question": "React'te hook'lar koşullu olarak (if bloğu içinde) çağrılabilir, çünkü React her render'da hook'ları yeniden değerlendirir.",
+      "correct": false,
+      "explanation": "Yanlış! Hook'lar ASLA koşullu olarak çağrılamaz. React, hook'ları çağrı sırasına göre takip eder (linked list). Bir if bloğu içinde hook çağrılırsa, koşul değiştiğinde çağrı sırası kayar ve state'ler karışır. Hook'lar her zaman component'in en üst seviyesinde, aynı sırayla çağrılmalıdır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "type": "code_completion",
+      "question": "Aşağıdaki useEffect'te, component unmount olduğunda interval'i temizleyen cleanup fonksiyonunu tamamla:",
+      "code_template": "useEffect(() => {\n  const id = setInterval(() => {\n    setCount(prev => prev + 1);\n  }, 1000);\n\n  _____ () => clearInterval(id);\n}, []);",
+      "correct_answers": ["return"],
+      "explanation": "useEffect'ten bir fonksiyon return edildiğinde, bu fonksiyon cleanup olarak çalışır. Component unmount olduğunda veya dependency'ler değişmeden önce çağrılır. Bu sayede interval, event listener, subscription gibi kaynaklar temizlenir ve memory leak önlenir.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "code_completion",
+      "question": "Aşağıdaki Next.js App Router sayfasında, veriyi her istekte taze almak (SSR davranışı) için fetch opsiyonunu tamamla:",
+      "code_template": "async function Page() {\n  const data = await fetch('https://api.example.com/data', {\n    _____: 'no-store'\n  });\n  return <div>{/* render */}</div>;\n}",
+      "correct_answers": ["cache"],
+      "explanation": "Next.js App Router'da fetch() varsayılan olarak cache kullanır (SSG davranışı). cache: 'no-store' ile her istekte sunucudan taze veri alınır (SSR davranışı). Alternatif olarak next: { revalidate: 60 } ile ISR davranışı da elde edilebilir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "order_steps",
+      "question": "Bir Next.js sayfası istendiğinde aşağıdaki adımlar hangi sırayla gerçekleşir?",
+      "steps": [
+        "Middleware çalışır (auth kontrolü, redirect)",
+        "Route eşleştirilir ve layout/page component'leri belirlenir",
+        "Server Component'ler sunucuda render edilir (data fetch dahil)",
+        "HTML istemciye gönderilir",
+        "Client Component'ler hydrate edilir (interaktif hale gelir)"
+      ],
+      "correct_order": [0, 1, 2, 3, 4],
+      "explanation": "Sıra: Önce middleware her istekte çalışır (auth, redirect). Sonra route eşleştirilir. Server Component'ler sunucuda render edilip HTML oluşturulur. HTML istemciye gönderilir (kullanıcı hemen içeriği görür). Son olarak Client Component'ler hydrate edilir ve sayfa interaktif hale gelir.",
+      "difficulty": "zor",
+      "points": 15
+    },
+    {
+      "id": "q10",
+      "type": "explain_code",
+      "question": "Aşağıdaki React kodu ne yapar? Her satırı açıkla ve potansiyel sorunları belirt.",
+      "code": "function SearchResults({ query }: { query: string }) {\n  const [results, setResults] = useState<string[]>([]);\n  const [loading, setLoading] = useState(false);\n\n  useEffect(() => {\n    let cancelled = false;\n\n    async function search() {\n      setLoading(true);\n      const res = await fetch(`/api/search?q=${query}`);\n      const data = await res.json();\n      if (!cancelled) {\n        setResults(data);\n        setLoading(false);\n      }\n    }\n\n    search();\n    return () => { cancelled = true; };\n  }, [query]);\n\n  return loading ? <p>Aranıyor...</p> : <ul>{results.map(r => <li key={r}>{r}</li>)}</ul>;\n}",
+      "correct_keywords": ["useEffect", "race condition", "cleanup", "cancelled", "async", "fetch", "dependency array", "query"],
+      "sample_answer": "Bu component bir arama sonucu listesi render eder. query prop'u değiştiğinde useEffect tetiklenir ve API'den arama yapar. Race condition'ı önlemek için cancelled flag kullanılır: Eğer query hızla değişirse, önceki arama sonucu geldiğinde cancelled true olacağı için state güncellenmez (eski sonuç yeni sorguya yazılmaz). Cleanup fonksiyonu (return () => { cancelled = true }) her yeni query'de ve component unmount olduğunda çalışır. Bu pattern, kullanıcının hızla yazarken eski sonuçların gösterilmesini engeller.",
+      "difficulty": "zor",
+      "points": 15
+    }
+  ]
+}

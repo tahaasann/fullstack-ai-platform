@@ -1,0 +1,95 @@
+{
+  "id": "challenge-git-scenarios",
+  "title": "Git Senaryo Çözücü",
+  "difficulty": "orta",
+  "category": "git",
+  "tags": ["git", "version-control", "branching", "workflow"],
+  "related_lesson": "mod-04-git/lesson-01",
+  "description_tr": "Verilen Git senaryoları için doğru komut sırasını döndüren bir fonksiyon yaz.",
+  "description_detail": "Bir geliştirici günlük çalışmasında farklı Git senaryolarıyla karşılaşır. Her senaryo için uygulanması gereken Git komutlarının doğru sırasını döndüren bir fonksiyon yazın. Fonksiyon senaryo adını alır ve Git komutlarını liste (list) olarak döndürür.",
+  "examples": [
+    {
+      "input": "scenario = 'new_feature'",
+      "output": "['git checkout -b feature/new-feature', 'git add .', 'git commit -m \"feat: add new feature\"', 'git push -u origin feature/new-feature']",
+      "explanation": "Yeni bir özellik geliştirmek için: branch oluştur, değişiklikleri stage'le, commit et ve remote'a push et."
+    },
+    {
+      "input": "scenario = 'undo_last_commit'",
+      "output": "['git reset --soft HEAD~1']",
+      "explanation": "Son commit'i geri almak (değişiklikleri koruyarak) için --soft reset kullanılır."
+    },
+    {
+      "input": "scenario = 'save_work_switch_branch'",
+      "output": "['git stash', 'git checkout other-branch', 'git stash pop']",
+      "explanation": "Mevcut değişiklikleri stash'leyip başka branch'e geçip sonra geri getirmek."
+    }
+  ],
+  "constraints": [
+    "Fonksiyon her zaman bir liste (list of strings) döndürmelidir",
+    "Bilinmeyen senaryolar için boş liste döndürün",
+    "Komutlar çalıştırılma sırasına göre olmalıdır"
+  ],
+  "starter_code": {
+    "python": "def git_scenario_solver(scenario: str) -> list:\n    # Verilen senaryo için doğru git komut sırasını döndür\n    # Senaryolar: 'new_feature', 'undo_last_commit', 'save_work_switch_branch',\n    #             'sync_with_remote', 'resolve_conflict', 'hotfix',\n    #             'clean_branches', 'interactive_rebase', 'cherry_pick_commit',\n    #             'create_tag'\n    pass",
+    "javascript": "function gitScenarioSolver(scenario) {\n    // Verilen senaryo için doğru git komut sırasını döndür\n    // Senaryolar: 'new_feature', 'undo_last_commit', 'save_work_switch_branch',\n    //             'sync_with_remote', 'resolve_conflict', 'hotfix',\n    //             'clean_branches', 'interactive_rebase', 'cherry_pick_commit',\n    //             'create_tag'\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"scenario": "new_feature"},
+      "expected": ["git checkout -b feature/new-feature", "git add .", "git commit -m \"feat: add new feature\"", "git push -u origin feature/new-feature"]
+    },
+    {
+      "input": {"scenario": "undo_last_commit"},
+      "expected": ["git reset --soft HEAD~1"]
+    },
+    {
+      "input": {"scenario": "save_work_switch_branch"},
+      "expected": ["git stash", "git checkout other-branch", "git stash pop"]
+    },
+    {
+      "input": {"scenario": "sync_with_remote"},
+      "expected": ["git fetch origin", "git pull origin main"]
+    },
+    {
+      "input": {"scenario": "resolve_conflict"},
+      "expected": ["git fetch origin", "git merge origin/main", "git add .", "git commit -m \"fix: resolve merge conflict\""]
+    },
+    {
+      "input": {"scenario": "hotfix"},
+      "expected": ["git checkout main", "git pull origin main", "git checkout -b hotfix/urgent-fix", "git add .", "git commit -m \"hotfix: urgent fix\"", "git push -u origin hotfix/urgent-fix"]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"scenario": "clean_branches"},
+      "expected": ["git branch --merged", "git branch -d old-branch", "git fetch --prune"]
+    },
+    {
+      "input": {"scenario": "interactive_rebase"},
+      "expected": ["git rebase -i HEAD~3"]
+    },
+    {
+      "input": {"scenario": "cherry_pick_commit"},
+      "expected": ["git log --oneline", "git cherry-pick abc1234"]
+    },
+    {
+      "input": {"scenario": "create_tag"},
+      "expected": ["git tag -a v1.0.0 -m \"Release v1.0.0\"", "git push origin v1.0.0"]
+    }
+  ],
+  "hints": [
+    "Her senaryoyu bir dictionary key'i olarak düşün ve value olarak komut listesi ata. Python'da dict kullanmak if-else'den daha temizdir.",
+    "Git iş akışlarını düşün: yeni özellik için branch oluştur → kodla → commit et → push et. Her senaryo belirli bir sıradaki komutları gerektirir.",
+    "Çözüm: scenarios = {'new_feature': ['git checkout -b ...', 'git add .', ...], ...} şeklinde bir sözlük oluştur ve return scenarios.get(scenario, []) kullan."
+  ],
+  "solution": {
+    "python": "def git_scenario_solver(scenario: str) -> list:\n    scenarios = {\n        'new_feature': [\n            'git checkout -b feature/new-feature',\n            'git add .',\n            'git commit -m \"feat: add new feature\"',\n            'git push -u origin feature/new-feature'\n        ],\n        'undo_last_commit': [\n            'git reset --soft HEAD~1'\n        ],\n        'save_work_switch_branch': [\n            'git stash',\n            'git checkout other-branch',\n            'git stash pop'\n        ],\n        'sync_with_remote': [\n            'git fetch origin',\n            'git pull origin main'\n        ],\n        'resolve_conflict': [\n            'git fetch origin',\n            'git merge origin/main',\n            'git add .',\n            'git commit -m \"fix: resolve merge conflict\"'\n        ],\n        'hotfix': [\n            'git checkout main',\n            'git pull origin main',\n            'git checkout -b hotfix/urgent-fix',\n            'git add .',\n            'git commit -m \"hotfix: urgent fix\"',\n            'git push -u origin hotfix/urgent-fix'\n        ],\n        'clean_branches': [\n            'git branch --merged',\n            'git branch -d old-branch',\n            'git fetch --prune'\n        ],\n        'interactive_rebase': [\n            'git rebase -i HEAD~3'\n        ],\n        'cherry_pick_commit': [\n            'git log --oneline',\n            'git cherry-pick abc1234'\n        ],\n        'create_tag': [\n            'git tag -a v1.0.0 -m \"Release v1.0.0\"',\n            'git push origin v1.0.0'\n        ]\n    }\n    return scenarios.get(scenario, [])",
+    "javascript": "function gitScenarioSolver(scenario) {\n    const scenarios = {\n        'new_feature': [\n            'git checkout -b feature/new-feature',\n            'git add .',\n            'git commit -m \"feat: add new feature\"',\n            'git push -u origin feature/new-feature'\n        ],\n        'undo_last_commit': [\n            'git reset --soft HEAD~1'\n        ],\n        'save_work_switch_branch': [\n            'git stash',\n            'git checkout other-branch',\n            'git stash pop'\n        ],\n        'sync_with_remote': [\n            'git fetch origin',\n            'git pull origin main'\n        ],\n        'resolve_conflict': [\n            'git fetch origin',\n            'git merge origin/main',\n            'git add .',\n            'git commit -m \"fix: resolve merge conflict\"'\n        ],\n        'hotfix': [\n            'git checkout main',\n            'git pull origin main',\n            'git checkout -b hotfix/urgent-fix',\n            'git add .',\n            'git commit -m \"hotfix: urgent fix\"',\n            'git push -u origin hotfix/urgent-fix'\n        ],\n        'clean_branches': [\n            'git branch --merged',\n            'git branch -d old-branch',\n            'git fetch --prune'\n        ],\n        'interactive_rebase': [\n            'git rebase -i HEAD~3'\n        ],\n        'cherry_pick_commit': [\n            'git log --oneline',\n            'git cherry-pick abc1234'\n        ],\n        'create_tag': [\n            'git tag -a v1.0.0 -m \"Release v1.0.0\"',\n            'git push origin v1.0.0'\n        ]\n    };\n    return scenarios[scenario] || [];\n}",
+    "explanation_tr": "Dictionary/Object lookup pattern kullandık. Her senaryo bir key, komut listesi ise value. get() ile bilinmeyen senaryolar için boş liste döndürüyoruz. Bu pattern, karmaşık if-else yapılarından çok daha okunabilir ve bakımı kolaydır."
+  },
+  "complexity": {
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)"
+  },
+  "learn_after_solving": "Bu problemle Git iş akışlarını ve dictionary lookup pattern'ını pekiştirdin. Gerçek projelerde her gün bu senaryolarla karşılaşacaksın. Komutları ezberlemek yerine, hangi senaryoda hangi akışın uygulanacağını anlamak önemli."
+}

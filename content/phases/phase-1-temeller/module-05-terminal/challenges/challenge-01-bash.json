@@ -1,0 +1,83 @@
+{
+  "id": "challenge-bash-script",
+  "title": "Bash Script Yaz",
+  "difficulty": "kolay",
+  "category": "terminal",
+  "tags": ["bash", "shell-scripting", "automation"],
+  "related_lesson": "mod-05-terminal/lesson-01",
+  "description_tr": "Verilen proje türüne göre doğru kurulum bash script içeriğini üreten bir fonksiyon yaz.",
+  "description_detail": "Farklı proje türleri (Node.js, Python, React, vb.) için uygun kurulum bash script'i üreten bir fonksiyon yazın. Fonksiyon proje türünü string olarak alır ve çalıştırılabilir bash script içeriğini string olarak döndürür. Script, projeye uygun dizin yapısını oluşturmalı, bağımlılıkları yüklemeli ve temel konfigürasyonu yapmalıdır.",
+  "examples": [
+    {
+      "input": "project_type = 'node'",
+      "output": "#!/bin/bash\nmkdir -p src tests\npnpm init\necho 'node_modules/' > .gitignore\ngit init",
+      "explanation": "Node.js projesi için: dizinleri oluştur, pnpm init çalıştır, .gitignore ekle ve git başlat. 📌 2026'da pnpm, npm'in yerini aldı — disk verimli, strict dependency resolution."
+    },
+    {
+      "input": "project_type = 'python'",
+      "output": "#!/bin/bash\nmkdir -p src tests\npython3 -m venv venv\necho 'venv/' > .gitignore\ntouch requirements.txt\ngit init",
+      "explanation": "Python projesi için: dizinleri oluştur, virtual environment kur, .gitignore ekle ve git başlat."
+    }
+  ],
+  "constraints": [
+    "Fonksiyon her zaman bir string döndürmelidir",
+    "Script'in ilk satırı #!/bin/bash olmalıdır",
+    "Bilinmeyen proje türleri için boş string döndürün",
+    "Her script git init içermelidir"
+  ],
+  "starter_code": {
+    "python": "def generate_setup_script(project_type: str) -> str:\n    # Verilen proje türü için bash setup script'i üret\n    # Proje türleri: 'node', 'python', 'react', 'fullstack', 'static'\n    pass",
+    "javascript": "function generateSetupScript(projectType) {\n    // Verilen proje türü için bash setup script'i üret\n    // Proje türleri: 'node', 'python', 'react', 'fullstack', 'static'\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"project_type": "node"},
+      "expected": "#!/bin/bash\nmkdir -p src tests\npnpm init\necho 'node_modules/' > .gitignore\ngit init"
+    },
+    {
+      "input": {"project_type": "python"},
+      "expected": "#!/bin/bash\nmkdir -p src tests\npython3 -m venv venv\necho 'venv/' > .gitignore\ntouch requirements.txt\ngit init"
+    },
+    {
+      "input": {"project_type": "react"},
+      "expected": "#!/bin/bash\npnpm create vite . --template react-ts\npnpm install\necho 'node_modules/' >> .gitignore\ngit init"
+    },
+    {
+      "input": {"project_type": "fullstack"},
+      "expected": "#!/bin/bash\nmkdir -p client server server/src server/tests\ncd client && pnpm create vite . --template react-ts && pnpm install && cd ..\ncd server && pnpm init && cd ..\necho 'node_modules/' > .gitignore\ngit init"
+    },
+    {
+      "input": {"project_type": "static"},
+      "expected": "#!/bin/bash\nmkdir -p css js images\ntouch index.html css/style.css js/main.js\ngit init"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"project_type": "unknown"},
+      "expected": ""
+    },
+    {
+      "input": {"project_type": ""},
+      "expected": ""
+    },
+    {
+      "input": {"project_type": "NODE"},
+      "expected": ""
+    }
+  ],
+  "hints": [
+    "Her proje türü için sabit bir script string'i tanımlayabilirsin. Python'da üç tırnak (\"\"\") ile çok satırlı string oluşturabilirsin.",
+    "Dictionary kullanarak proje türü ile script'i eşleştir. dict.get(key, default) ile bilinmeyen türler için boş string döndür.",
+    "Çözüm: scripts = {'node': '#!/bin/bash\\nmkdir -p src tests\\n...', ...} şeklinde bir sözlük oluştur ve return scripts.get(project_type, '') kullan."
+  ],
+  "solution": {
+    "python": "def generate_setup_script(project_type: str) -> str:\n    scripts = {\n        'node': '#!/bin/bash\\nmkdir -p src tests\\npnpm init\\necho \\'node_modules/\\' > .gitignore\\ngit init',\n        'python': '#!/bin/bash\\nmkdir -p src tests\\npython3 -m venv venv\\necho \\'venv/\\' > .gitignore\\ntouch requirements.txt\\ngit init',\n        'react': '#!/bin/bash\\npnpm create vite . --template react-ts\\npnpm install\\necho \\'node_modules/\\' >> .gitignore\\ngit init',\n        'fullstack': '#!/bin/bash\\nmkdir -p client server server/src server/tests\\ncd client && pnpm create vite . --template react-ts && pnpm install && cd ..\\ncd server && pnpm init && cd ..\\necho \\'node_modules/\\' > .gitignore\\ngit init',\n        'static': '#!/bin/bash\\nmkdir -p css js images\\ntouch index.html css/style.css js/main.js\\ngit init'\n    }\n    return scripts.get(project_type, '')",
+    "javascript": "function generateSetupScript(projectType) {\n    const scripts = {\n        'node': '#!/bin/bash\\nmkdir -p src tests\\npnpm init\\necho \\'node_modules/\\' > .gitignore\\ngit init',\n        'python': '#!/bin/bash\\nmkdir -p src tests\\npython3 -m venv venv\\necho \\'venv/\\' > .gitignore\\ntouch requirements.txt\\ngit init',\n        'react': '#!/bin/bash\\npnpm create vite . --template react-ts\\npnpm install\\necho \\'node_modules/\\' >> .gitignore\\ngit init',\n        'fullstack': '#!/bin/bash\\nmkdir -p client server server/src server/tests\\ncd client && pnpm create vite . --template react-ts && pnpm install && cd ..\\ncd server && pnpm init && cd ..\\necho \\'node_modules/\\' > .gitignore\\ngit init',\n        'static': '#!/bin/bash\\nmkdir -p css js images\\ntouch index.html css/style.css js/main.js\\ngit init'\n    };\n    return scripts[projectType] || '';\n}",
+    "explanation_tr": "Dictionary/Object lookup pattern'ı kullandık. Her proje türü bir key, karşılık gelen bash script ise value. get() ile bilinmeyen proje türleri için boş string döndürüyoruz. 📌 2026 Notu: create-react-app (CRA) 2023'te deprecated oldu. Artık Vite kullanılıyor (daha hızlı HMR, ESM-native). npm yerine pnpm tercih ediliyor (disk verimli, strict dependency resolution)."
+  },
+  "complexity": {
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)"
+  },
+  "learn_after_solving": "Bu problemle bash script yapısını ve dictionary lookup pattern'ını pekiştirdin. Gerçek dünyada proje kurulum otomasyonu çok yaygındır. create-react-app, create-next-app, django-admin startproject gibi araçlar tam olarak bu işi yapar. İleride kendi scaffolding aracını yazabilirsin."
+}

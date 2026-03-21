@@ -1,0 +1,99 @@
+{
+  "id": "challenge-security-audit",
+  "title": "Express.js Uygulama Güvenlik Denetimi: Açıkları Bul ve Düzelt",
+  "difficulty": "orta",
+  "category": "security",
+  "tags": ["security-audit", "xss", "sql-injection", "csrf", "owasp", "helmet", "input-validation", "express"],
+  "related_lesson": "mod-14-security/lesson-01",
+  "description_tr": "Güvenlik açıkları içeren bir Express.js uygulamasında security audit yapın: SQL injection, XSS, eksik güvenlik header'ları, güvensiz password storage, CORS misconfiguration ve diğer OWASP Top 10 açıklarını bulun ve düzeltin.",
+  "description_detail": "Size güvenlik açıkları içeren bir Express.js uygulaması verilecek. Göreviniz: (1) Koddaki tüm güvenlik açıklarını tespit edin (en az 8 açık), (2) Her açığın OWASP kategorisini belirleyin, (3) Her açığı düzeltin ve düzeltmenin neden gerekli olduğunu açıklayın. Açıklar: SQL injection (string concatenation), XSS (output encoding eksikliği), güvensiz password storage (MD5), eksik helmet middleware, CORS wildcard + credentials, rate limiting yok, error message'da stack trace sızıntısı, HttpOnly cookie flag eksik.",
+  "examples": [
+    {
+      "input": "// Vulnerable Code\nconst query = `SELECT * FROM users WHERE email = '${email}'`;",
+      "output": "// Fixed Code\nconst query = 'SELECT * FROM users WHERE email = $1';\nconst result = await db.query(query, [email]);",
+      "explanation": "SQL Injection (OWASP A03): String interpolation yerine parameterized query kullan. Kullanıcı girdisi SQL komutundan tamamen ayrılır."
+    },
+    {
+      "input": "// Vulnerable Code\nconst hash = crypto.createHash('md5').update(password).digest('hex');",
+      "output": "// Fixed Code\nconst hash = await bcrypt.hash(password, 12);",
+      "explanation": "Cryptographic Failures (OWASP A02): MD5 şifre hash'leme için güvensizdir. bcrypt (salt rounds: 12) veya Argon2id kullan."
+    },
+    {
+      "input": "// Vulnerable Code\napp.use(cors({ origin: '*', credentials: true }));",
+      "output": "// Fixed Code\napp.use(cors({\n  origin: ['https://myapp.com'],\n  credentials: true\n}));",
+      "explanation": "Security Misconfiguration (OWASP A05): Wildcard origin + credentials birlikte kullanılamaz ve güvensizdir. İzin verilen origin'leri whitelist ile belirle."
+    }
+  ],
+  "constraints": [
+    "En az 8 güvenlik açığı bulunmalı ve düzeltilmeli",
+    "Her açık için OWASP Top 10 kategorisi belirtilmeli",
+    "SQL Injection düzeltmesi parameterized query kullanmalı",
+    "Password hashing bcrypt (salt rounds >= 12) veya Argon2 ile yapılmalı",
+    "helmet middleware eklenmiş olmalı",
+    "CORS whitelist tabanlı olmalı",
+    "Rate limiting eklenmiş olmalı (login endpoint için sıkı)",
+    "Error handler production'da stack trace sızdırmamalı",
+    "Cookie'ler httpOnly, secure ve sameSite flag'lerine sahip olmalı"
+  ],
+  "starter_code": {
+    "javascript": "const express = require('express');\nconst crypto = require('crypto');\nconst cors = require('cors');\nconst { Pool } = require('pg');\n\nconst app = express();\napp.use(express.json());\n\n// ===== BUG 1: CORS Misconfiguration =====\napp.use(cors({ origin: '*', credentials: true }));\n\n// ===== BUG 2: Helmet eksik =====\n// Güvenlik header'ları yok!\n\nconst db = new Pool({\n  connectionString: process.env.DATABASE_URL\n});\n\n// ===== BUG 3: MD5 ile password hashing =====\napp.post('/api/auth/register', async (req, res) => {\n  try {\n    const { name, email, password } = req.body;\n    // BUG: Input validation yok!\n\n    // BUG: MD5 güvensiz!\n    const passwordHash = crypto.createHash('md5').update(password).digest('hex');\n\n    // BUG 4: SQL Injection!\n    const query = `INSERT INTO users (name, email, password_hash) VALUES ('${name}', '${email}', '${passwordHash}') RETURNING *`;\n    const result = await db.query(query);\n\n    // BUG 5: Password hash response'da dönüyor!\n    res.status(201).json(result.rows[0]);\n  } catch (error) {\n    // BUG 6: Stack trace sızıntısı!\n    res.status(500).json({ error: error.message, stack: error.stack });\n  }\n});\n\napp.post('/api/auth/login', async (req, res) => {\n  try {\n    const { email, password } = req.body;\n\n    // BUG 7: SQL Injection!\n    const query = `SELECT * FROM users WHERE email = '${email}'`;\n    const result = await db.query(query);\n    const user = result.rows[0];\n\n    if (!user) {\n      // BUG 8: User enumeration - farklı hata mesajları\n      return res.status(404).json({ error: 'Kullanıcı bulunamadı' });\n    }\n\n    const passwordHash = crypto.createHash('md5').update(password).digest('hex');\n    if (passwordHash !== user.password_hash) {\n      return res.status(401).json({ error: 'Şifre yanlış' });\n    }\n\n    // BUG 9: Session cookie güvensiz!\n    res.cookie('session', user.id, {\n      // httpOnly, secure, sameSite flag'leri YOK!\n    });\n\n    res.json({ message: 'Giriş başarılı', userId: user.id });\n  } catch (error) {\n    res.status(500).json({ error: error.message, stack: error.stack });\n  }\n});\n\n// BUG 10: Rate limiting yok!\napp.get('/api/users/:id', async (req, res) => {\n  try {\n    // BUG 11: SQL Injection!\n    const query = `SELECT * FROM users WHERE id = ${req.params.id}`;\n    const result = await db.query(query);\n\n    if (!result.rows[0]) {\n      return res.status(404).json({ error: 'Kullanıcı bulunamadı' });\n    }\n\n    // BUG: Password hash response'da dönüyor!\n    res.json(result.rows[0]);\n  } catch (error) {\n    res.status(500).json({ error: error.message, stack: error.stack });\n  }\n});\n\n// BUG 12: XSS vulnerability\napp.get('/api/search', async (req, res) => {\n  const { q } = req.query;\n\n  // BUG: SQL Injection + XSS (arama sonucu HTML'de render edilirse)\n  const query = `SELECT * FROM products WHERE name LIKE '%${q}%'`;\n  const result = await db.query(query);\n\n  res.json(result.rows);  // İçerik encode edilmemiş\n});\n\napp.listen(3000);\n\n// ==========================================\n// GÖREV: Yukarıdaki TÜM güvenlik açıklarını bulun ve düzeltin.\n// Her düzeltme için:\n// 1. Açığın ne olduğunu belirtin\n// 2. OWASP Top 10 kategorisini yazın\n// 3. Düzeltmeyi uygulayın\n// =========================================="
+  },
+  "test_cases": [
+    {
+      "input": {"test": "sql_injection_fixed", "code": "Check all queries use parameterized format ($1, $2)"},
+      "expected": "No string interpolation/concatenation in SQL queries"
+    },
+    {
+      "input": {"test": "bcrypt_used", "code": "Check password hashing uses bcrypt or argon2"},
+      "expected": "bcrypt.hash with saltRounds >= 12 or argon2.hash"
+    },
+    {
+      "input": {"test": "helmet_added", "code": "Check helmet middleware is used"},
+      "expected": "app.use(helmet()) is present"
+    },
+    {
+      "input": {"test": "cors_whitelist", "code": "Check CORS configuration"},
+      "expected": "CORS origin is whitelist-based, not wildcard *"
+    },
+    {
+      "input": {"test": "no_password_in_response", "code": "Check API responses"},
+      "expected": "password_hash is excluded from all API responses"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"test": "rate_limiting", "code": "Check rate limiting middleware"},
+      "expected": "Rate limiter is applied, especially to login endpoint"
+    },
+    {
+      "input": {"test": "cookie_security_flags", "code": "Check cookie settings"},
+      "expected": "Cookies have httpOnly: true, secure: true, sameSite: 'strict'"
+    },
+    {
+      "input": {"test": "no_stack_trace", "code": "Check error handler in production"},
+      "expected": "Stack trace not exposed in production error responses"
+    },
+    {
+      "input": {"test": "generic_login_error", "code": "Check login error messages"},
+      "expected": "Same error message for wrong email and wrong password (no user enumeration)"
+    },
+    {
+      "input": {"test": "input_validation", "code": "Check input validation on register"},
+      "expected": "Email format, password strength, and name validation present"
+    }
+  ],
+  "hints": [
+    "SQL Injection: Tüm db.query çağrılarını parameterized query formatına çevir. Template literal (`${var}`) yerine placeholder ($1, $2) kullan ve değerleri array olarak geçir: db.query('SELECT * FROM users WHERE email = $1', [email]). LIKE sorguları için: db.query('... WHERE name LIKE $1', [`%${q}%`]).",
+    "Password & Response: (1) crypto.createHash('md5') yerine bcrypt.hash(password, 12) kullan. Login'de bcrypt.compare ile doğrula. (2) Response'dan password_hash'i çıkar: const { password_hash, ...safeUser } = user; res.json(safeUser);. (3) Login'de email ve şifre hataları için aynı mesajı kullan: 'Geçersiz email veya şifre'.",
+    "Middleware & Config: (1) helmet ekle: app.use(helmet()). (2) CORS whitelist: cors({ origin: ['https://myapp.com'], credentials: true }). (3) Rate limiter: express-rate-limit ile login'e max 5 deneme/15dk kısıtlaması koy. (4) Cookie: { httpOnly: true, secure: true, sameSite: 'strict' }. (5) Error handler: production'da stack trace'i gizle."
+  ],
+  "solution": {
+    "javascript": "const express = require('express');\nconst bcrypt = require('bcrypt');\nconst helmet = require('helmet');\nconst cors = require('cors');\nconst rateLimit = require('express-rate-limit');\nconst { Pool } = require('pg');\nconst Joi = require('joi');\n\nconst app = express();\napp.use(express.json());\n\n// FIX 1: Helmet ile güvenlik header'ları\napp.use(helmet());\n\n// FIX 2: CORS whitelist\nconst allowedOrigins = [\n  'https://myapp.com',\n  'https://admin.myapp.com'\n];\nif (process.env.NODE_ENV === 'development') {\n  allowedOrigins.push('http://localhost:3000');\n}\napp.use(cors({\n  origin: function(origin, callback) {\n    if (!origin || allowedOrigins.includes(origin)) {\n      callback(null, true);\n    } else {\n      callback(new Error('CORS not allowed'));\n    }\n  },\n  credentials: true\n}));\n\n// FIX 3: Rate limiting\nconst apiLimiter = rateLimit({\n  windowMs: 15 * 60 * 1000,\n  max: 100,\n  standardHeaders: true,\n  legacyHeaders: false\n});\n\nconst loginLimiter = rateLimit({\n  windowMs: 15 * 60 * 1000,\n  max: 5,\n  message: { error: 'Çok fazla giriş denemesi, lütfen bekleyin' },\n  skipSuccessfulRequests: true\n});\n\napp.use('/api/', apiLimiter);\napp.use('/api/auth/login', loginLimiter);\n\nconst db = new Pool({ connectionString: process.env.DATABASE_URL });\n\n// Input validation schemas\nconst registerSchema = Joi.object({\n  name: Joi.string().min(2).max(50).required(),\n  email: Joi.string().email().max(255).required(),\n  password: Joi.string().min(8).max(128)\n    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)/)\n    .required()\n});\n\n// FIX 4+5+6: Parameterized query, bcrypt, input validation\napp.post('/api/auth/register', async (req, res) => {\n  try {\n    // Input validation\n    const { error, value } = registerSchema.validate(req.body);\n    if (error) {\n      return res.status(400).json({\n        error: 'Validation hatası',\n        details: error.details.map(d => d.message)\n      });\n    }\n\n    const { name, email, password } = value;\n\n    // Check duplicate email (parameterized)\n    const existing = await db.query('SELECT id FROM users WHERE email = $1', [email]);\n    if (existing.rows.length > 0) {\n      return res.status(409).json({ error: 'Bu email zaten kayıtlı' });\n    }\n\n    // bcrypt ile hash (MD5 yerine)\n    const passwordHash = await bcrypt.hash(password, 12);\n\n    // Parameterized query (SQL injection koruması)\n    const query = 'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, created_at';\n    const result = await db.query(query, [name, email, passwordHash]);\n\n    // Password hash response'da YOK (RETURNING'de belirtmedik)\n    res.status(201).json(result.rows[0]);\n  } catch (error) {\n    // Stack trace GİZLİ\n    console.error('Register error:', error);\n    res.status(500).json({ error: 'Sunucu hatası' });\n  }\n});\n\n// FIX 7+8+9: Login güvenliği\napp.post('/api/auth/login', async (req, res) => {\n  try {\n    const { email, password } = req.body;\n\n    if (!email || !password) {\n      return res.status(400).json({ error: 'Email ve şifre gerekli' });\n    }\n\n    // Parameterized query\n    const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);\n    const user = result.rows[0];\n\n    // Generic hata mesajı (user enumeration koruması)\n    if (!user || !(await bcrypt.compare(password, user.password_hash))) {\n      return res.status(401).json({ error: 'Geçersiz email veya şifre' });\n    }\n\n    // Güvenli cookie\n    res.cookie('session', user.id, {\n      httpOnly: true,\n      secure: process.env.NODE_ENV === 'production',\n      sameSite: 'strict',\n      maxAge: 24 * 60 * 60 * 1000\n    });\n\n    res.json({ message: 'Giriş başarılı' });\n  } catch (error) {\n    console.error('Login error:', error);\n    res.status(500).json({ error: 'Sunucu hatası' });\n  }\n});\n\n// FIX 10: User endpoint güvenliği\napp.get('/api/users/:id', async (req, res) => {\n  try {\n    const userId = parseInt(req.params.id, 10);\n    if (isNaN(userId)) {\n      return res.status(400).json({ error: 'Geçersiz kullanıcı ID' });\n    }\n\n    // Parameterized query + password hash hariç\n    const result = await db.query(\n      'SELECT id, name, email, created_at FROM users WHERE id = $1',\n      [userId]\n    );\n\n    if (!result.rows[0]) {\n      return res.status(404).json({ error: 'Kullanıcı bulunamadı' });\n    }\n\n    res.json(result.rows[0]);\n  } catch (error) {\n    console.error('User fetch error:', error);\n    res.status(500).json({ error: 'Sunucu hatası' });\n  }\n});\n\n// FIX 11: Search endpoint güvenliği\napp.get('/api/search', async (req, res) => {\n  try {\n    const { q } = req.query;\n    if (!q || typeof q !== 'string') {\n      return res.status(400).json({ error: 'Arama terimi gerekli' });\n    }\n\n    // Parameterized LIKE query\n    const result = await db.query(\n      'SELECT id, name, description, price FROM products WHERE name ILIKE $1 LIMIT 50',\n      [`%${q}%`]\n    );\n\n    res.json(result.rows);\n  } catch (error) {\n    console.error('Search error:', error);\n    res.status(500).json({ error: 'Sunucu hatası' });\n  }\n});\n\n// Global error handler\napp.use((err, req, res, next) => {\n  console.error('Unhandled error:', err);\n  res.status(500).json({\n    error: process.env.NODE_ENV === 'production'\n      ? 'Sunucu hatası'\n      : err.message\n  });\n});\n\napp.listen(3000);",
+    "explanation_tr": "Düzeltilen güvenlik açıkları:\n\n1. CORS Misconfiguration (A05): origin: '*' + credentials yerine whitelist tabanlı origin kontrolü.\n\n2. Eksik Security Headers (A05): helmet() middleware eklendi - HSTS, CSP, X-Frame-Options vb. otomatik.\n\n3. Güvensiz Password Hashing (A02): MD5 yerine bcrypt (salt rounds: 12). MD5 saniyede milyarlarca deneme yapılabilir, bcrypt kasıtlı olarak yavaştır.\n\n4. SQL Injection (A03): Tüm string interpolation'lar parameterized query'ye çevrildi ($1, $2 placeholder).\n\n5. Sensitive Data Exposure (A02): password_hash response'lardan çıkarıldı. SELECT'te sadece gerekli kolonlar belirtildi.\n\n6. Stack Trace Sızıntısı (A09): Production'da error.stack döndürülmüyor, sadece generic mesaj.\n\n7. User Enumeration (A07): Login'de 'Kullanıcı bulunamadı' ve 'Şifre yanlış' yerine tek mesaj: 'Geçersiz email veya şifre'.\n\n8. Güvensiz Cookie (A07): httpOnly (XSS koruması), secure (HTTPS only), sameSite: 'strict' (CSRF koruması) flag'leri eklendi.\n\n9. Rate Limiting Eksikliği (A07): Genel API ve login endpoint için rate limiting eklendi.\n\n10. Input Validation Eksikliği (A03): Joi ile email format, password strength ve name validation eklendi."
+  },
+  "complexity": {
+    "optimal_time": "N/A (security audit - code review task)",
+    "optimal_space": "N/A"
+  },
+  "learn_after_solving": "Bu challenge ile gerçek dünya güvenlik açıklarını tespit etme ve düzeltme becerisi kazandın. OWASP Top 10 kategorilerini pratik ettin: SQL Injection (A03), Cryptographic Failures (A02), Security Misconfiguration (A05), Authentication Failures (A07) ve Logging Failures (A09). Gerçek projelerde bu audit sürecini otomatize etmek için: ESLint security plugins (eslint-plugin-security), Snyk/SonarQube static analysis, OWASP ZAP dynamic testing ve düzenli penetration testing eklenmelidir."
+}

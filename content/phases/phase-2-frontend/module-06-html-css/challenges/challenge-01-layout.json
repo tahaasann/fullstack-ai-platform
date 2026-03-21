@@ -1,0 +1,98 @@
+{
+  "id": "challenge-layout",
+  "title": "Responsive Layout Challenge",
+  "difficulty": "orta",
+  "category": "css",
+  "tags": ["flexbox", "grid", "responsive", "layout", "css"],
+  "related_lesson": "mod-06-css/lesson-02",
+  "description_tr": "Verilen layout gereksinimlerine göre doğru CSS (Flexbox/Grid) kodunu üret. Navbar, kart grid'i ve holy grail layout gibi yaygın kalıpları hem Flexbox hem Grid ile çözeceksin.",
+  "description_detail": "Bir CSS layout motoru fonksiyonu yazacaksınız. Fonksiyon bir layout gereksinimi (tip ve parametreler) alır ve o layout'u oluşturacak CSS property'lerini bir dictionary/object olarak döndürür. Desteklenmesi gereken layout tipleri: (1) center - elemanı yatay ve dikey ortalar, (2) navbar - logo solda, linkler sağda, dikey ortalı, (3) card-grid - responsive kart grid'i (belirli minimum genişlik ve gap), (4) sidebar-layout - sabit genişlikte sidebar + esnek content alanı, (5) holy-grail - header, footer, sidebar ve content alanlarından oluşan klasik sayfa düzeni.",
+  "examples": [
+    {
+      "input": "generate_layout('center')",
+      "output": "{'display': 'flex', 'justify-content': 'center', 'align-items': 'center', 'min-height': '100vh'}",
+      "explanation": "Flexbox ile tam ortalama: justify-content yatay, align-items dikey ortalama sağlar."
+    },
+    {
+      "input": "generate_layout('navbar')",
+      "output": "{'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'padding': '0 24px', 'height': '64px'}",
+      "explanation": "Navbar: Logo solda, linkler sağda (space-between), dikey ortalı (align-items: center)."
+    },
+    {
+      "input": "generate_layout('card-grid', min_width='250px', gap='16px')",
+      "output": "{'display': 'grid', 'grid-template-columns': 'repeat(auto-fit, minmax(250px, 1fr))', 'gap': '16px'}",
+      "explanation": "Responsive kart grid'i: auto-fit ile otomatik sütun sayısı, minmax ile minimum genişlik."
+    }
+  ],
+  "constraints": [
+    "center layout Flexbox kullanmalıdır (display: flex)",
+    "navbar layout justify-content: space-between ve align-items: center içermelidir",
+    "card-grid layout CSS Grid kullanmalıdır (display: grid) ve auto-fit/minmax kalıbını uygulamalıdır",
+    "sidebar-layout Flexbox kullanmalı, sidebar sabit genişlikte (flex-shrink: 0), content esnek (flex: 1) olmalıdır",
+    "holy-grail layout CSS Grid template areas kullanmalıdır",
+    "Tüm döndürülen değerler dictionary/object formatında olmalıdır"
+  ],
+  "starter_code": {
+    "python": "def generate_layout(layout_type, **kwargs):\n    \"\"\"Verilen layout tipine göre CSS property'lerini döndür.\n    \n    Args:\n        layout_type: 'center', 'navbar', 'card-grid', 'sidebar-layout', 'holy-grail'\n        **kwargs: Ek parametreler (min_width, gap, sidebar_width vb.)\n    \n    Returns:\n        dict: CSS property-value çiftleri\n    \n    Örnek:\n        generate_layout('center')\n        # {'display': 'flex', 'justify-content': 'center', ...}\n        \n        generate_layout('card-grid', min_width='300px', gap='24px')\n        # {'display': 'grid', 'grid-template-columns': 'repeat(auto-fit, minmax(300px, 1fr))', ...}\n    \"\"\"\n    # Layout motorunu burada implement et\n    pass",
+    "javascript": "/**\n * Verilen layout tipine göre CSS property'lerini döndür.\n * \n * @param {string} layoutType - 'center', 'navbar', 'card-grid', 'sidebar-layout', 'holy-grail'\n * @param {Object} options - Ek parametreler (minWidth, gap, sidebarWidth vb.)\n * @returns {Object} CSS property-value çiftleri\n * \n * Örnek:\n *   generateLayout('center')\n *   // { display: 'flex', justifyContent: 'center', ... }\n *   \n *   generateLayout('card-grid', { minWidth: '300px', gap: '24px' })\n *   // { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', ... }\n */\nfunction generateLayout(layoutType, options = {}) {\n    // Layout motorunu burada implement et\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"test": "center_display", "code": "result = generate_layout('center')\nresult = result['display']"},
+      "expected": "flex"
+    },
+    {
+      "input": {"test": "center_justify", "code": "result = generate_layout('center')\nresult = result['justify-content']"},
+      "expected": "center"
+    },
+    {
+      "input": {"test": "center_align", "code": "result = generate_layout('center')\nresult = result['align-items']"},
+      "expected": "center"
+    },
+    {
+      "input": {"test": "navbar_justify", "code": "result = generate_layout('navbar')\nresult = result['justify-content']"},
+      "expected": "space-between"
+    },
+    {
+      "input": {"test": "card_grid_display", "code": "result = generate_layout('card-grid', min_width='250px', gap='16px')\nresult = result['display']"},
+      "expected": "grid"
+    },
+    {
+      "input": {"test": "card_grid_columns", "code": "result = generate_layout('card-grid', min_width='300px', gap='24px')\nresult = result['grid-template-columns']"},
+      "expected": "repeat(auto-fit, minmax(300px, 1fr))"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"test": "card_grid_gap", "code": "result = generate_layout('card-grid', min_width='250px', gap='20px')\nresult = result['gap']"},
+      "expected": "20px"
+    },
+    {
+      "input": {"test": "sidebar_display", "code": "result = generate_layout('sidebar-layout', sidebar_width='250px', gap='24px')\nresult = result['display']"},
+      "expected": "flex"
+    },
+    {
+      "input": {"test": "holy_grail_display", "code": "result = generate_layout('holy-grail')\nresult = result['display']"},
+      "expected": "grid"
+    },
+    {
+      "input": {"test": "holy_grail_areas", "code": "result = generate_layout('holy-grail')\nresult = 'header' in result.get('grid-template-areas', '') and 'sidebar' in result.get('grid-template-areas', '') and 'content' in result.get('grid-template-areas', '') and 'footer' in result.get('grid-template-areas', '')"},
+      "expected": true
+    }
+  ],
+  "hints": [
+    "center layout için Flexbox kullan: display: flex, justify-content: center, align-items: center, min-height: 100vh. Bu en temel ve en sık kullanılan layout kalıbıdır.",
+    "card-grid layout için CSS Grid ve auto-fit/minmax kalıbını kullan: display: grid, grid-template-columns: repeat(auto-fit, minmax({min_width}, 1fr)), gap: {gap}. min_width ve gap parametrelerini kwargs'tan al.",
+    "Tam çözüm ipucu: Her layout tipini if/elif ile kontrol et. sidebar-layout için display: flex, gap parametresi ve iki child CSS objesi (sidebar: flex: 0 0 {width}, content: flex: 1) döndür. holy-grail için grid-template-areas ile 'header header' / 'sidebar content' / 'footer footer' kalıbını kullan."
+  ],
+  "solution": {
+    "python": "def generate_layout(layout_type, **kwargs):\n    if layout_type == 'center':\n        return {\n            'display': 'flex',\n            'justify-content': 'center',\n            'align-items': 'center',\n            'min-height': '100vh'\n        }\n    \n    elif layout_type == 'navbar':\n        return {\n            'display': 'flex',\n            'justify-content': 'space-between',\n            'align-items': 'center',\n            'padding': '0 24px',\n            'height': '64px'\n        }\n    \n    elif layout_type == 'card-grid':\n        min_width = kwargs.get('min_width', '250px')\n        gap = kwargs.get('gap', '16px')\n        return {\n            'display': 'grid',\n            'grid-template-columns': f'repeat(auto-fit, minmax({min_width}, 1fr))',\n            'gap': gap\n        }\n    \n    elif layout_type == 'sidebar-layout':\n        sidebar_width = kwargs.get('sidebar_width', '250px')\n        gap = kwargs.get('gap', '24px')\n        return {\n            'display': 'flex',\n            'gap': gap,\n            'sidebar': {\n                'flex': f'0 0 {sidebar_width}'\n            },\n            'content': {\n                'flex': '1'\n            }\n        }\n    \n    elif layout_type == 'holy-grail':\n        return {\n            'display': 'grid',\n            'grid-template-areas': '\"header header\" \"sidebar content\" \"footer footer\"',\n            'grid-template-columns': '250px 1fr',\n            'grid-template-rows': 'auto 1fr auto',\n            'min-height': '100vh',\n            'gap': '0'\n        }\n    \n    else:\n        raise ValueError(f\"Bilinmeyen layout tipi: {layout_type}\")",
+    "javascript": "function generateLayout(layoutType, options = {}) {\n    switch (layoutType) {\n        case 'center':\n            return {\n                display: 'flex',\n                'justify-content': 'center',\n                'align-items': 'center',\n                'min-height': '100vh'\n            };\n        \n        case 'navbar':\n            return {\n                display: 'flex',\n                'justify-content': 'space-between',\n                'align-items': 'center',\n                padding: '0 24px',\n                height: '64px'\n            };\n        \n        case 'card-grid': {\n            const minWidth = options.minWidth || '250px';\n            const gap = options.gap || '16px';\n            return {\n                display: 'grid',\n                'grid-template-columns': `repeat(auto-fit, minmax(${minWidth}, 1fr))`,\n                gap: gap\n            };\n        }\n        \n        case 'sidebar-layout': {\n            const sidebarWidth = options.sidebarWidth || '250px';\n            const sGap = options.gap || '24px';\n            return {\n                display: 'flex',\n                gap: sGap,\n                sidebar: {\n                    flex: `0 0 ${sidebarWidth}`\n                },\n                content: {\n                    flex: '1'\n                }\n            };\n        }\n        \n        case 'holy-grail':\n            return {\n                display: 'grid',\n                'grid-template-areas': '\"header header\" \"sidebar content\" \"footer footer\"',\n                'grid-template-columns': '250px 1fr',\n                'grid-template-rows': 'auto 1fr auto',\n                'min-height': '100vh',\n                gap: '0'\n            };\n        \n        default:\n            throw new Error(`Bilinmeyen layout tipi: ${layoutType}`);\n    }\n}",
+    "explanation_tr": "generate_layout fonksiyonu bir layout motoru gibi çalışır. Verilen layout tipine göre uygun CSS property'lerini dictionary olarak döndürür.\n\ncenter: Flexbox ile tam ortalama. justify-content ve align-items center, min-height 100vh ile tam sayfa ortalama.\n\nnavbar: Flexbox ile space-between. Logo ve linkler iki uca yaslanır, align-items center ile dikey ortalanır.\n\ncard-grid: CSS Grid ile responsive grid. auto-fit + minmax kalıbı ile ekran boyutuna göre otomatik sütun sayısı ayarlanır. min_width parametresi minimum kart genişliğini belirler.\n\nsidebar-layout: Flexbox ile sidebar + content. Sidebar flex: 0 0 {width} ile sabit genişlikte kalır (büyümez, küçülmez). Content flex: 1 ile kalan alanı kaplar.\n\nholy-grail: CSS Grid template areas ile klasik sayfa düzeni. Header ve footer tam genişlik, ortada sidebar ve content yan yana."
+  },
+  "complexity": {
+    "optimal_time": "O(1) per layout generation",
+    "optimal_space": "O(1) - sabit boyutlu dictionary döndürülür"
+  },
+  "learn_after_solving": "Bu challenge ile Flexbox ve CSS Grid'in temel layout kalıplarını öğrendin. center ve navbar gibi tek boyutlu düzenler için Flexbox, card-grid ve holy-grail gibi iki boyutlu düzenler için CSS Grid kullanıldığını gördün. Gerçek projelerde bu kalıpları doğrudan CSS olarak yazarsın ama buradaki mantıksal düşünme süreci - 'bu layout için hangi CSS property'leri gerekli?' - her layout sorununda sana yol gösterecek."
+}

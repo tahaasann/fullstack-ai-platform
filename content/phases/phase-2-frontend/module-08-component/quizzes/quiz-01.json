@@ -1,0 +1,108 @@
+{
+  "id": "mod-08-api/quiz-01",
+  "title": "Component Architecture & Data Fetching Quiz",
+  "description": "Component pattern'lari, data fetching stratejileri ve TanStack Query konularini ne kadar anladigini test et.",
+  "passing_score": 70,
+  "time_limit_minutes": 12,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Atomic Design'da bir Header component'i (Logo + Navigation + SearchBar + UserCard iceren) hangi seviyeye aittir?",
+      "options": [
+        "Atom",
+        "Molecule",
+        "Organism",
+        "Template"
+      ],
+      "correct": 2,
+      "explanation": "Header, birden fazla molecule ve atom'un birlesiminden olusan karmasik bir UI blogudur. Logo (atom), Navigation (molecule), SearchBar (molecule) ve UserCard (molecule) icerir. Bu tanim organism seviyesine karsilik gelir.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Higher-Order Component (HOC) kullanirken asagidakilerden hangisi bir performans bug'ina neden olur?",
+      "options": [
+        "HOC'u module seviyesinde (component disinda) tanimlamak",
+        "HOC'u render metodu icinde olusturmak",
+        "HOC'a displayName atamak",
+        "HOC ile props forwarding yapmak"
+      ],
+      "correct": 1,
+      "explanation": "HOC'u render icinde olusturmak (ornegin const Enhanced = withAuth(Dashboard) satirini component body'sinde yazmak), her render'da yeni bir component referansi olusturur. React bunu tamamen yeni bir component olarak gorur, onceki component'i unmount edip yenisini mount eder. Bu da tum state'in kaybolmasina ve gereksiz re-render'lara neden olur.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "TanStack Query'de staleTime: 0 ve gcTime: 300000 ayarlandiginda asagidakilerden hangisi dogrudur?",
+      "options": [
+        "Veri hic cache'lenmez ve her seferinde sunucudan cekilir",
+        "Veri aninda 'stale' kabul edilir ama 5 dakika cache'te tutulur",
+        "Veri 5 dakika boyunca fresh kabul edilir",
+        "Veri sadece 5 dakika sonra sunucudan cekilir"
+      ],
+      "correct": 1,
+      "explanation": "staleTime: 0, verinin aninda 'stale' (bayat) kabul edilecegi anlamina gelir - component her mount oldugunda refetch tetiklenir. Ancak gcTime: 300000 (5 dakika), verinin cache'te tutulma suresini belirler. Yani veri refetch edilirken onceki veri hala cache'te gosterilir (stale-while-revalidate davranisi).",
+      "difficulty": "zor",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "fetch API ile ilgili asagidaki ifadelerden hangisi DOGRUDUR?",
+      "options": [
+        "fetch, 404 Not Found hatasi icin Promise reject eder",
+        "fetch, 500 Internal Server Error icin Promise reject eder",
+        "fetch, sadece network hatalari icin Promise reject eder",
+        "fetch, tum HTTP hatalari icin Promise reject eder"
+      ],
+      "correct": 2,
+      "explanation": "fetch API, yalnizca network hatalari (sunucuya ulasilamadiginda) icin Promise reject eder. 404, 500 gibi HTTP hata kodlarinda Promise resolve olur ama response.ok false doner. Bu nedenle fetch kullanirken response.ok kontrolu yapman gerekir. Axios ise 4xx/5xx icin otomatik reject eder.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "true_false",
+      "question": "React'te Error Boundary component'leri functional component olarak yazilabilir cunku useErrorBoundary hook'u mevcuttur.",
+      "correct": false,
+      "explanation": "Yanlis! React'te getDerivedStateFromError ve componentDidCatch lifecycle metotlarinin functional component karsiligi henuz bulunmuyor. Bu nedenle Error Boundary'ler su an icin class component olmak zorundadir. Ancak react-error-boundary gibi third-party kutuphaneler, bu class component'i soyutlayip hook-tabanli bir API sunar.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "type": "code_completion",
+      "question": "TanStack Query ile bir mutation sonrasi ilgili query cache'ini gecersiz kilmak icin asagidaki kodu tamamla:",
+      "code_template": "const queryClient = useQueryClient();\n\nconst deleteMutation = useMutation({\n  mutationFn: (id) => api.delete(`/users/${id}`),\n  onSuccess: () => {\n    queryClient._____({\n      queryKey: [\"users\"]\n    });\n  },\n});",
+      "correct_answers": ["invalidateQueries"],
+      "explanation": "queryClient.invalidateQueries() metodu, belirtilen queryKey'e sahip tum query'leri 'stale' olarak isaretler ve aktif olanlari otomatik refetch eder. Mutation (olusturma, guncelleme, silme) sonrasi ilgili query'leri invalidate etmek, cache'in guncel kalmasini saglar.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "type": "code_completion",
+      "question": "Axios interceptor ile her request'e Authorization header eklemek icin asagidaki kodu tamamla:",
+      "code_template": "api.interceptors._____.use(\n  (config) => {\n    const token = localStorage.getItem(\"accessToken\");\n    if (token) {\n      config.headers.Authorization = `Bearer ${token}`;\n    }\n    return config;\n  },\n  (error) => Promise.reject(error)\n);",
+      "correct_answers": ["request"],
+      "explanation": "Axios'ta interceptors.request.use() metodu, her HTTP istegi gonderilmeden ONCE calisir. Bu, her istege otomatik olarak Authorization header eklemek icin ideal yerdir. interceptors.response.use() ise sunucu yanitI aldiktan SONRA calisir (ornegin 401 hatasi yakalayip token yenilemek icin).",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "explain_code",
+      "question": "Asagidaki React kodu ne yapar? Optimistic update mekanizmasini adim adim acikla.",
+      "code": "const likeMutation = useMutation({\n  mutationFn: () => api.post(`/posts/${postId}/like`),\n  onMutate: async () => {\n    await queryClient.cancelQueries({ queryKey: ['posts', postId] });\n    const previous = queryClient.getQueryData(['posts', postId]);\n    queryClient.setQueryData(['posts', postId], (old) => ({\n      ...old,\n      likes: old.likes + 1,\n      isLiked: true,\n    }));\n    return { previous };\n  },\n  onError: (err, vars, context) => {\n    queryClient.setQueryData(['posts', postId], context.previous);\n  },\n  onSettled: () => {\n    queryClient.invalidateQueries({ queryKey: ['posts', postId] });\n  },\n});",
+      "correct_keywords": ["optimistic update", "onMutate", "cache", "rollback", "cancelQueries", "setQueryData", "invalidateQueries", "previous", "onError", "geri al"],
+      "sample_answer": "Bu kod bir optimistic update (iyimser guncelleme) pattern'i uygular: 1) onMutate: Sunucuya istek gondermeden ONCE calisan callback. Devam eden fetch'leri iptal eder (cancelQueries), mevcut cache verisini kaydeder (rollback icin), ve cache'i aninda gunceller (likes + 1, isLiked: true). Kullanici begeni butonuna tikladiginda UI aninda guncellenir. 2) onError: Sunucu hatasi donerse, onceden kaydedilen 'previous' verisiyle cache eski haline dondurulur (rollback). 3) onSettled: Basari veya hata farketmeksizin, sunucudan guncel veriyi almak icin query invalidate edilir. Bu pattern, kullaniciya aninda geri bildirim verirken veri tutarlIlIgInI korur.",
+      "difficulty": "zor",
+      "points": 20
+    }
+  ]
+}

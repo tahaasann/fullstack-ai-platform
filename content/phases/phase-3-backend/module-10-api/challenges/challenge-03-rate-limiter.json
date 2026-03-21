@@ -1,0 +1,75 @@
+{
+  "title": "API Rate Limiter",
+  "description": "Sliding window algoritması ile API rate limiter implementasyonu",
+  "description_detail": "# API Rate Limiter\n\nAPI isteklerini sınırlandıran bir sliding window rate limiter implement edin.\n\n## İstenilen Sınıf: `RateLimiter`\n\n### Constructor\n```javascript\nnew RateLimiter({\n  maxRequests: 100,    // Pencere başına max istek\n  windowMs: 60000,     // Pencere süresi (ms)\n})\n```\n\n### Methodlar\n- `isAllowed(clientId)` — İsteğe izin verilir mi? Boolean döndürür.\n- `getRemainingRequests(clientId)` — Kalan istek hakkı.\n- `getResetTime(clientId)` — Pencere sıfırlanma zamanı (ms).\n- `consume(clientId)` — İstek kaydeder ve `{ allowed, remaining, resetTime }` döndürür.\n\n## Sliding Window Mantığı\nSabit pencere yerine, her istek kendi zamanını kaydeder. windowMs'den eski istekler temizlenir.\n\n## Örnek\n```javascript\nconst limiter = new RateLimiter({ maxRequests: 3, windowMs: 1000 });\nlimiter.consume('user1'); // { allowed: true, remaining: 2 }\nlimiter.consume('user1'); // { allowed: true, remaining: 1 }\nlimiter.consume('user1'); // { allowed: true, remaining: 0 }\nlimiter.consume('user1'); // { allowed: false, remaining: 0 }\n```",
+  "difficulty": "zor",
+  "category": "api",
+  "tags": ["rate-limiting", "sliding-window", "api", "security"],
+  "examples": [
+    {
+      "input": "RateLimiter(max=3, window=1000): 4 rapid requests from same client",
+      "output": "3 allowed, 1 rejected",
+      "explanation": "3 istek hakkı var, 4. istek reddedilir"
+    }
+  ],
+  "constraints": [
+    "Her client ayrı takip edilmeli",
+    "Eski istekler otomatik temizlenmeli (memory leak önleme)",
+    "Thread-safe olması gerekmez (single-threaded ortam)",
+    "Zaman fonksiyonu enjekte edilebilmeli (test kolaylığı)"
+  ],
+  "starter_code": {
+    "python": "class RateLimiter:\n    def __init__(self, max_requests=100, window_ms=60000, now_fn=None):\n        # Your code here\n        pass\n    \n    def is_allowed(self, client_id: str) -> bool:\n        pass\n    \n    def consume(self, client_id: str) -> dict:\n        pass\n    \n    def get_remaining(self, client_id: str) -> int:\n        pass",
+    "javascript": "class RateLimiter {\n  constructor({ maxRequests = 100, windowMs = 60000, nowFn = Date.now } = {}) {\n    // Your code here\n  }\n\n  isAllowed(clientId) {}\n  consume(clientId) {}\n  getRemaining(clientId) {}\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"max": 3, "window": 1000, "requests": [{"client": "a", "time": 0}, {"client": "a", "time": 100}, {"client": "a", "time": 200}]},
+      "expected_output": [{"allowed": true, "remaining": 2}, {"allowed": true, "remaining": 1}, {"allowed": true, "remaining": 0}]
+    },
+    {
+      "input": {"max": 2, "window": 1000, "requests": [{"client": "a", "time": 0}, {"client": "a", "time": 100}, {"client": "a", "time": 200}]},
+      "expected_output": [{"allowed": true, "remaining": 1}, {"allowed": true, "remaining": 0}, {"allowed": false, "remaining": 0}]
+    },
+    {
+      "input": {"max": 2, "window": 1000, "requests": [{"client": "a", "time": 0}, {"client": "b", "time": 0}, {"client": "a", "time": 100}, {"client": "b", "time": 100}]},
+      "expected_output": [{"allowed": true, "remaining": 1}, {"allowed": true, "remaining": 1}, {"allowed": true, "remaining": 0}, {"allowed": true, "remaining": 0}]
+    },
+    {
+      "input": {"max": 1, "window": 100, "requests": [{"client": "a", "time": 0}, {"client": "a", "time": 50}, {"client": "a", "time": 150}]},
+      "expected_output": [{"allowed": true, "remaining": 0}, {"allowed": false, "remaining": 0}, {"allowed": true, "remaining": 0}]
+    },
+    {
+      "input": {"max": 5, "window": 1000, "requests": [{"client": "x", "time": 0}]},
+      "expected_output": [{"allowed": true, "remaining": 4}]
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"max": 3, "window": 500, "requests": [{"client": "a", "time": 0}, {"client": "a", "time": 200}, {"client": "a", "time": 400}, {"client": "a", "time": 600}]},
+      "expected_output": [{"allowed": true}, {"allowed": true}, {"allowed": true}, {"allowed": true}]
+    },
+    {
+      "input": {"max": 0, "window": 1000, "requests": [{"client": "a", "time": 0}]},
+      "expected_output": [{"allowed": false, "remaining": 0}]
+    },
+    {
+      "input": {"max": 2, "window": 100, "requests": [{"client": "a", "time": 0}, {"client": "a", "time": 10}, {"client": "a", "time": 20}, {"client": "a", "time": 110}]},
+      "expected_output": [{"allowed": true}, {"allowed": true}, {"allowed": false}, {"allowed": true}]
+    }
+  ],
+  "hints": [
+    "Her client için istek zamanlarını bir listede tut",
+    "consume() çağrıldığında önce windowMs'den eski zamanları temizle, sonra mevcut sayıya bak",
+    "remaining = max(0, maxRequests - aktif_istek_sayısı)"
+  ],
+  "solution": {
+    "python": "import time\n\nclass RateLimiter:\n    def __init__(self, max_requests=100, window_ms=60000, now_fn=None):\n        self.max_requests = max_requests\n        self.window_ms = window_ms\n        self.now_fn = now_fn or (lambda: time.time() * 1000)\n        self.clients = {}\n    \n    def _cleanup(self, client_id):\n        now = self.now_fn()\n        if client_id in self.clients:\n            self.clients[client_id] = [\n                t for t in self.clients[client_id]\n                if now - t < self.window_ms\n            ]\n    \n    def is_allowed(self, client_id: str) -> bool:\n        self._cleanup(client_id)\n        requests = self.clients.get(client_id, [])\n        return len(requests) < self.max_requests\n    \n    def consume(self, client_id: str) -> dict:\n        self._cleanup(client_id)\n        if client_id not in self.clients:\n            self.clients[client_id] = []\n        \n        requests = self.clients[client_id]\n        allowed = len(requests) < self.max_requests\n        \n        if allowed:\n            requests.append(self.now_fn())\n        \n        remaining = max(0, self.max_requests - len(requests))\n        reset_time = requests[0] + self.window_ms if requests else self.now_fn() + self.window_ms\n        \n        return {\n            'allowed': allowed,\n            'remaining': remaining,\n            'reset_time': reset_time\n        }\n    \n    def get_remaining(self, client_id: str) -> int:\n        self._cleanup(client_id)\n        count = len(self.clients.get(client_id, []))\n        return max(0, self.max_requests - count)",
+    "javascript": "class RateLimiter {\n  constructor({ maxRequests = 100, windowMs = 60000, nowFn = Date.now } = {}) {\n    this.maxRequests = maxRequests;\n    this.windowMs = windowMs;\n    this.nowFn = nowFn;\n    this.clients = new Map();\n  }\n\n  _cleanup(clientId) {\n    const now = this.nowFn();\n    const requests = this.clients.get(clientId) || [];\n    const valid = requests.filter(t => now - t < this.windowMs);\n    this.clients.set(clientId, valid);\n  }\n\n  isAllowed(clientId) {\n    this._cleanup(clientId);\n    return (this.clients.get(clientId) || []).length < this.maxRequests;\n  }\n\n  consume(clientId) {\n    this._cleanup(clientId);\n    if (!this.clients.has(clientId)) this.clients.set(clientId, []);\n    const requests = this.clients.get(clientId);\n    const allowed = requests.length < this.maxRequests;\n\n    if (allowed) requests.push(this.nowFn());\n\n    const remaining = Math.max(0, this.maxRequests - requests.length);\n    const resetTime = requests.length ? requests[0] + this.windowMs : this.nowFn() + this.windowMs;\n\n    return { allowed, remaining, resetTime };\n  }\n\n  getRemaining(clientId) {\n    this._cleanup(clientId);\n    return Math.max(0, this.maxRequests - (this.clients.get(clientId) || []).length);\n  }\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n) per request (cleanup)",
+    "optimal_space": "O(n * m) clients * requests"
+  },
+  "learn_after_solving": "Sliding window rate limiting algoritmasını, API koruma stratejilerini ve DDoS savunma mekanizmalarını öğrenirsin. Bu pattern tüm production API'larda zorunludur (express-rate-limit, Nginx, API Gateway)."
+}

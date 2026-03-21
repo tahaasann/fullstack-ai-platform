@@ -1,0 +1,80 @@
+{
+  "title": "HTTP Header Parser",
+  "description": "Ham HTTP request string'ini parse ederek yapılandırılmış objeye dönüştür",
+  "description_detail": "# HTTP Header Parser\n\nHam bir HTTP request string'i verildiğinde, bunu parse ederek yapılandırılmış bir objeye dönüştürün.\n\n## Format\nHTTP request formatı:\n```\nMETHOD PATH HTTP/VERSION\\r\\n\nHeader-Name: Header-Value\\r\\n\n...\\r\\n\n\\r\\n\nbody\n```\n\n## Döndürülecek Obje\n```\n{\n  method: string,\n  path: string,\n  version: string,\n  headers: { [key: string]: string },\n  body: string | null\n}\n```\n\n## Kurallar\n- Header isimleri lowercase'e dönüştürülmeli\n- Body boşsa null olmalı\n- Geçersiz request için null döndür",
+  "difficulty": "kolay",
+  "category": "web",
+  "tags": ["http", "parsing", "string-manipulation"],
+  "examples": [
+    {
+      "input": "GET /api/users HTTP/1.1\\r\\nHost: example.com\\r\\nAccept: application/json\\r\\n\\r\\n",
+      "output": "{'method': 'GET', 'path': '/api/users', 'version': '1.1', 'headers': {'host': 'example.com', 'accept': 'application/json'}, 'body': null}",
+      "explanation": "GET isteği, body yok, header'lar lowercase'e dönüştürüldü"
+    },
+    {
+      "input": "POST /api/login HTTP/1.1\\r\\nContent-Type: application/json\\r\\n\\r\\n{\"user\":\"admin\"}",
+      "output": "{'method': 'POST', 'path': '/api/login', 'version': '1.1', 'headers': {'content-type': 'application/json'}, 'body': '{\"user\":\"admin\"}'}",
+      "explanation": "POST isteği, JSON body mevcut"
+    }
+  ],
+  "constraints": [
+    "Header isimleri case-insensitive (lowercase'e dönüştür)",
+    "Satır ayırıcı \\r\\n (CRLF)",
+    "Body ve header'lar arasında boş satır (\\r\\n\\r\\n) var",
+    "Geçersiz format için null döndür"
+  ],
+  "starter_code": {
+    "python": "def parse_http_request(raw_request: str):\n    # Your code here\n    pass",
+    "javascript": "function parseHttpRequest(rawRequest) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n",
+      "expected_output": {"method": "GET", "path": "/", "version": "1.1", "headers": {"host": "example.com"}, "body": null}
+    },
+    {
+      "input": "POST /data HTTP/1.1\r\nContent-Type: text/plain\r\nContent-Length: 5\r\n\r\nhello",
+      "expected_output": {"method": "POST", "path": "/data", "version": "1.1", "headers": {"content-type": "text/plain", "content-length": "5"}, "body": "hello"}
+    },
+    {
+      "input": "DELETE /api/item/42 HTTP/1.1\r\nAuthorization: Bearer token123\r\n\r\n",
+      "expected_output": {"method": "DELETE", "path": "/api/item/42", "version": "1.1", "headers": {"authorization": "Bearer token123"}, "body": null}
+    },
+    {
+      "input": "PUT /update HTTP/2\r\nX-Custom: value\r\n\r\n{\"id\":1}",
+      "expected_output": {"method": "PUT", "path": "/update", "version": "2", "headers": {"x-custom": "value"}, "body": "{\"id\":1}"}
+    },
+    {
+      "input": "INVALID STRING",
+      "expected_output": null
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": "GET /path?q=test HTTP/1.0\r\nAccept: */*\r\nCache-Control: no-cache\r\n\r\n",
+      "expected_output": {"method": "GET", "path": "/path?q=test", "version": "1.0", "headers": {"accept": "*/*", "cache-control": "no-cache"}, "body": null}
+    },
+    {
+      "input": "PATCH /api/v2/users/1 HTTP/1.1\r\nContent-Type: application/json\r\nAccept: application/json\r\nX-Request-ID: abc-123\r\n\r\n{\"name\":\"test\"}",
+      "expected_output": {"method": "PATCH", "path": "/api/v2/users/1", "version": "1.1", "headers": {"content-type": "application/json", "accept": "application/json", "x-request-id": "abc-123"}, "body": "{\"name\":\"test\"}"}
+    },
+    {
+      "input": "",
+      "expected_output": null
+    }
+  ],
+  "hints": [
+    "Önce \\r\\n\\r\\n ile header kısmını body'den ayır",
+    "İlk satırı (request line) boşluklarla split et: method, path, version",
+    "Kalan satırları ':' ile split edip header objesine ekle, key'leri lowercase yap"
+  ],
+  "solution": {
+    "python": "def parse_http_request(raw_request: str):\n    if not raw_request or '\\r\\n' not in raw_request:\n        return None\n    \n    try:\n        parts = raw_request.split('\\r\\n\\r\\n', 1)\n        header_section = parts[0]\n        body = parts[1] if len(parts) > 1 and parts[1] else None\n        \n        lines = header_section.split('\\r\\n')\n        request_line = lines[0].split(' ')\n        \n        if len(request_line) != 3:\n            return None\n        \n        method = request_line[0]\n        path = request_line[1]\n        version = request_line[2].replace('HTTP/', '')\n        \n        headers = {}\n        for line in lines[1:]:\n            if ':' in line:\n                key, value = line.split(':', 1)\n                headers[key.strip().lower()] = value.strip()\n        \n        return {\n            'method': method,\n            'path': path,\n            'version': version,\n            'headers': headers,\n            'body': body\n        }\n    except Exception:\n        return None",
+    "javascript": "function parseHttpRequest(rawRequest) {\n  if (!rawRequest || !rawRequest.includes('\\r\\n')) return null;\n\n  try {\n    const [headerSection, ...bodyParts] = rawRequest.split('\\r\\n\\r\\n');\n    const body = bodyParts.join('\\r\\n\\r\\n') || null;\n\n    const lines = headerSection.split('\\r\\n');\n    const [method, path, httpVersion] = lines[0].split(' ');\n\n    if (!method || !path || !httpVersion) return null;\n\n    const version = httpVersion.replace('HTTP/', '');\n    const headers = {};\n\n    for (let i = 1; i < lines.length; i++) {\n      const colonIdx = lines[i].indexOf(':');\n      if (colonIdx > 0) {\n        const key = lines[i].slice(0, colonIdx).trim().toLowerCase();\n        const value = lines[i].slice(colonIdx + 1).trim();\n        headers[key] = value;\n      }\n    }\n\n    return { method, path, version, headers, body };\n  } catch (e) {\n    return null;\n  }\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "HTTP request'lerinin iç yapısını, request line / header / body ayrımını ve header parsing mantığını anlamış olursun. Bu bilgi API debugging ve backend development için temeldir."
+}

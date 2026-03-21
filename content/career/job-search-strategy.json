@@ -1,0 +1,249 @@
+{
+  "id": "job-search-strategy",
+  "title": "Is Arama Stratejisi",
+  "description": "Sistematik is arama metodolojisi. Gunluk rutin, platform stratejisi, network olusturma ve maas muzakeresi ile is arama surecini profesyonelce yonet.",
+  "sections": [
+    {
+      "id": "gunluk-rutin",
+      "title": "Gunluk Rutin",
+      "icon": "📅",
+      "content": "Is arama bir is gibi yapmalisin — belirsiz degil, sistematik. Her gun ayni saatte, ayni rutinle, takip edilebilir bir sekilde ilerle. 3.5 yildir is ariyorsan, sorun yetkinligin degil buyuk ihtimalle sistematik olmamandir. Asagidaki rutini haftada 5 gun, minimum 4 saat uygula.",
+      "tips": [
+        "Sabah 09:00-13:00 arasi is arama blogu ayir — bu senin 'isin'",
+        "Gunluk minimum 5 kaliteli basvuru hedefle — 50 rastgele degil, 5 hedefli",
+        "Her basvuru icin CV'yi o ilana ozel customize et (15-20 dk/basvuru)",
+        "Ogleden sonra: proje gelistirme, portfolio guncelleme, network etkinlikleri",
+        "Aksam: LinkedIn engagement — paylasimlara yorum yap, icerik paylas",
+        "Haftada 1 gun retrospektif yap: kac basvuru, kac donus, ne ise yaramadi",
+        "Pazartesi gunu haftalik hedef belirle, Cuma gunu degerlendir",
+        "Basvuru yapmayan gunler bile LinkedIn'de aktif ol — algoritma seni gostersin",
+        "Rejection'lari takip et — pattern gorursen CV/portfolio'yu guncelle"
+      ],
+      "examples": [
+        {
+          "label": "Ideal gunluk program",
+          "template": "09:00 - 09:30 | LinkedIn kontrolu: yeni ilanlar, mesajlar, bildirimler\n09:30 - 11:30 | Hedefli basvuru (5 adet, her biri customize edilmis)\n11:30 - 12:00 | Follow-up: gecen haftaki basvurulara takip mesaji\n12:00 - 13:00 | Network: cold message gonder, LinkedIn'de yorum yap\n---\n14:00 - 16:00 | Proje gelistirme veya portfolio guncelleme\n16:00 - 17:00 | Ogrenme: yeni teknoloji, mulakat hazirlik, LeetCode\n17:00 - 17:30 | LinkedIn icerik paylasimi veya teknik blog yazisi\n17:30 - 18:00 | Gun sonu: basvuru takip tablosunu guncelle"
+        },
+        {
+          "label": "Haftalik hedef tablosu",
+          "template": "Haftalik Hedefler:\n- [ ] 25 kaliteli basvuru (5/gun x 5 gun)\n- [ ] 10 cold message (LinkedIn/email)\n- [ ] 3 follow-up mesaji\n- [ ] 2 LinkedIn icerik paylasimi\n- [ ] 1 proje guncellemesi veya yeni ozellik\n- [ ] 1 teknik blog yazisi\n- [ ] 1 community etkinligine katilim\n- [ ] Cuma retrospektifi yapildi"
+        }
+      ],
+      "checklist": [
+        "Gunluk 4+ saat is arama blogu ayrildi",
+        "Minimum 5 kaliteli basvuru/gun hedefi var",
+        "Basvuru takip tablosu olusturuldu",
+        "Haftalik retrospektif gunu belirlendi",
+        "LinkedIn'de gunluk aktiflik var"
+      ]
+    },
+    {
+      "id": "platform-stratejisi",
+      "title": "Platform Stratejisi",
+      "icon": "🌐",
+      "content": "Her platformun farkli bir stratejisi var. Hepsine ayni CV'yi atip bekleme — her platformun kulturunu, algoritmasini ve kullanici tipini anla. Turkiye ve global pazari ayri degerlendir.",
+      "tips": [
+        "Tek platforma baglanma — en az 3-4 platformda aktif ol",
+        "Her platformun profilini ayri optimize et",
+        "Remote pozisyonlar icin global platformlara agirlik ver",
+        "Turkiye pazari icin kariyer.net + LinkedIn yeterli",
+        "Her platformda haftalik yeni ilan kontrolu yap",
+        "Platform bazli basvuru donus oranlarini takip et — hangisi ise yariyor?"
+      ],
+      "examples": [
+        {
+          "label": "LinkedIn stratejisi",
+          "template": "LinkedIn — EN ONEMLI PLATFORM\n\nProfil optimizasyonu:\n- 'Open to Work' badge'ini ac (sadece recruiter'lara gorunur secenegi var)\n- Headline'da hedef pozisyon + keyword'ler olsun\n- Haftada 2-3 paylasim yap (proje guncellemesi, ogrenilen ders, teknik icerik)\n- Her gun 15-20 dakika baskalarinin paylasimlarina yorum yap\n\nIs arama:\n- 'Easy Apply' filtresini kullan — hizli basvuru\n- Sirket sayfalarini takip et — yeni ilan bildirimi al\n- Recruiter'lara connection request + kisa not gonder\n- Alumni networkunu kullan: KTU mezunlarini filtrele\n\nIcerik stratejisi:\n- Proje tamamladin: demo GIF'i + teknik aciklama paylas\n- Yeni teknoloji ogrendin: ogrenme surecini paylas\n- Bug cozdu: 'Bugun ogrendigim sey' serisi baslat\n- Haftada 1 teknik icerik, 1 kariyer/motivasyon icerigi"
+        },
+        {
+          "label": "kariyer.net stratejisi",
+          "template": "kariyer.net — TURKIYE PAZARI\n\n- CV'yi Turkce olarak yukle\n- 'Hemen Basvur' ozelligini kullan\n- Filtreler: Bilgisayar/Yazilim, Deneyimsiz + 1-3 Yil, tam zamanli\n- Haftalik yeni ilan alarmi kur: 'Full Stack Developer', 'Frontend Developer', 'Backend Developer', 'Yazilim Muhendisi'\n- Turkiye'deki buyuk teknoloji sirketlerini elden gec: Trendyol, Getir, Peak Games, Hepsiburada, Insider, Pazarama\n- Basvurudan 1 hafta sonra takip mesaji gonder"
+        },
+        {
+          "label": "Global remote platformlar",
+          "template": "Wellfound (eski AngelList) — STARTUP'LAR\n- Startup ekosistemi icin en iyi platform\n- Profili detayli doldur, 'Remote' tercihini sec\n- Startup'larin culture fit'e onem verdigi icin About bolumunu kisisellestir\n\nToptal — PREMIUM FREELANCE\n- Basvuru sureci zor ama kabul edilirsen yuksek ucretli projeler\n- Teknik mulakat + test projesi var\n- Kabul orani %3 — ama denenmeye deger\n\nRemoteOK / WeWorkRemotely — REMOTE JOBS\n- Sadece remote pozisyonlar\n- Haftalik kontrol et, hizli basvur\n\nIndeed — GLOBAL\n- 'Remote' ve 'Turkey' filtreleri ile ara\n- ATS-uyumlu CV sart\n\nStack Overflow Jobs / LinkedIn Jobs — DEVELOPER ODAKLI\n- Tech stack ile filtreleme yapilabiliyor\n- Profilinde GitHub linki ve teknik detaylar onemli"
+        }
+      ],
+      "checklist": [
+        "LinkedIn profili optimize edildi",
+        "kariyer.net'te Turkce CV yuklendi",
+        "En az 2 global platforma kayit olundu",
+        "Her platformda ilan alarmi kuruldu",
+        "Platform bazli donus orani takip ediliyor"
+      ]
+    },
+    {
+      "id": "network-olusturma",
+      "title": "Network Olusturma",
+      "icon": "🤝",
+      "content": "Ilanlarin %60-70'i hic yayinlanmadan dolduruluyor — referans ve network ile. Turkiye'de bu oran daha da yuksek. Cold basvuru yapmak zorunlu ama network olusturursan firsatlarin katlaniyor. Network = isini kolaylastiracak insanlarla gercek iliskiler kurmak.",
+      "tips": [
+        "Haftada minimum 10 cold message gonder (LinkedIn veya email)",
+        "Mesajda karsi tarafin bir calismasini referans goster — generic mesaj atma",
+        "Turkish tech community'lere katil: Kommunity, coderspace.io, Frontend Istanbul, DevIstanbul",
+        "Discord/Slack topluluklari: Reactiflux, TypeScript Community, Python Discord, LangChain Discord",
+        "Meetup'lara katil: online bile olsa soru sor, gorun",
+        "Open source projelere katki yap — maintainer'larla tanisirsin",
+        "KTU alumni networkunu kullan — LinkedIn'de 'KTU' ile filtrele",
+        "Mulakat bile olsa network firsati: reddedilsen bile tesekkur mesaji gonder",
+        "Recruiter'larla iyi iliskiler kur — bugunku red, yarin yonlendirme olabilir"
+      ],
+      "examples": [
+        {
+          "label": "Cold message sablonu — LinkedIn (Turkce)",
+          "template": "Merhaba [Isim] Bey/Hanim,\n\n[Sirket]'teki calismanizi LinkedIn'den takip ediyorum. Ozellikle [spesifik proje/paylasim/teknoloji] hakkindaki paylasiminiz cok ilgimi cekti.\n\nBen KTU Bilgisayar Muhendisligi mezunuyum ve React, TypeScript, Python ile full-stack projeler gelistiriyorum. Su an [hedef pozisyon] pozisyonlarina basvuruyorum.\n\n[Sirket]'teki calisma kulturunu ve muhendislik sureclerinizi merak ediyorum. 15 dakikalik kisa bir sohbet icin musait olur musunuz?\n\nTesekkurler,\n[Ad Soyad]"
+        },
+        {
+          "label": "Cold message sablonu — LinkedIn (English)",
+          "template": "Hi [Name],\n\nI came across your work at [Company] and was particularly impressed by [specific project/post/technology]. Your approach to [topic] resonated with how I think about software development.\n\nI'm a Computer Engineering graduate from KTU, Turkey, building full-stack and AI-powered applications with React, TypeScript, Python, and LangChain. I'm currently exploring [target role] opportunities.\n\nWould you be open to a 15-minute virtual coffee chat? I'd love to learn about your experience at [Company] and any advice you might have.\n\nBest regards,\n[Full Name]\ngithub.com/username"
+        },
+        {
+          "label": "Turkiye tech communityleri",
+          "template": "Aktif Topluluklar:\n\n1. Kommunity (kommunity.com) — Turkiye'nin en buyuk tech community platformu\n   - Etkinliklere katil, konusmacilara soru sor\n   - Istanbul, Ankara, Izmir'de duzenli meetup'lar\n\n2. coderspace.io — Turkce developer communitesi\n   - Hackathon'lara katil — CV icin mukemmel\n   - Mentorluk programlari var\n\n3. Frontend Istanbul — Frontend odakli topluluk\n   - Aylik meetup'lar, YouTube'da kayitlar\n   - Konusmaci olarak basvur — gorunurlugunu artir\n\n4. DevIstanbul — Genel developer toplulugi\n   - Discord'da aktif\n   - Is ilanlari kanali var\n\n5. Python Istanbul / Ankara — Python communitesi\n   - AI/ML ilgi alani olan insanlarla tanisirsin\n\n6. GDG (Google Developer Groups) Turkey\n   - Google teknolojileri odakli\n   - DevFest etkinlikleri networklemek icin ideal\n\n7. Twitter/X Tech Turkiye\n   - @nicatmemmedov, @AhsanayevArslan gibi aktif developer'lari takip et\n   - #turkishdev hashtag'ini kullan"
+        }
+      ],
+      "checklist": [
+        "Haftada 10+ cold message gonderiliyor",
+        "En az 2 community'ye katilindi",
+        "KTU alumni networku arastirildi",
+        "Discord/Slack topluluklarina katilindi",
+        "Meetup'lara katilim basladi",
+        "Cold message sablonlari hazir"
+      ]
+    },
+    {
+      "id": "remote-calisma-firsatlari",
+      "title": "Remote Calisma Firsatlari",
+      "icon": "🌍",
+      "content": "Turkiye'de yazilimci maasi dusuk, remote calismada 3-5 kat fazla kazanabilirsin. Saat dilimi avantajin var: UTC+3 Avrupa ile cakisiyor. Freelancing hem gelir saglar hem is deneyimi olusturur. Remote is ararken dil, iletisim ve zaman yonetimi becerilerini vurgula.",
+      "tips": [
+        "Ingilizce seviyeni B2+ yap — remote iste iletisim her sey",
+        "UTC+3 avantajini kullan: Avrupa firmalarina 'ayni saat dilimi' olarak sun",
+        "ABD firmalari icin: 'overlap hours' (kesisen calismsa saatleri) belirt",
+        "Freelancing'e baslayarak gelir sagla ve referans olustur",
+        "Upwork'te ilk 3 isi dusuk fiyata al — review topla, sonra fiyat artir",
+        "Toptal'a basvur — kabul edilirsen saat ucreti $40-80+ arasi",
+        "Fiverr'da spesifik servisler sun: 'React dashboard', 'FastAPI backend', 'AI chatbot'",
+        "Remote sirketler arayin: GitLab, Automattic, Toptal, Zapier, Buffer, Deel",
+        "Turkiye merkezli remote-friendly sirketler: Insider, Getir, Trendyol (bazi pozisyonlar)"
+      ],
+      "examples": [
+        {
+          "label": "Upwork profil stratejisi",
+          "template": "Upwork Profil Olusturma:\n\n1. Baslik: 'Full Stack Developer | React, TypeScript, Python, FastAPI | AI Integration'\n2. Saat ucreti baslangic: $15-20 (ilk 5 is icin, review toplamak amaciyla)\n3. Hedef saat ucreti (10+ review sonrasi): $30-50\n4. Uzmanlik alanlari ekle: Web Development, AI/ML, API Development\n5. Portfolio: en iyi 3 projenin demosu + aciklamasi\n\nIlk is bulma taktikleri:\n- Yeni ilan yayinlandiktan 1 saat icinde basvur — erken basvuru avantaj\n- Cover letter'da musterinin spesifik problemini referans goster\n- 'Ilk isinizde %50 indirim' gibi bir acilis teklifi yap\n- Kucuk, hizli tamamlanabilir islerle basla (fix a bug, add a feature)\n- 100% Job Success Score hedefle — bu seni one cikarir\n\nOrnek cover letter:\n'Hi [Client Name], I noticed you need [specific requirement]. I've built a similar [project type] using [technologies] — here's a live demo: [link]. I can start immediately and deliver within [timeframe]. Happy to discuss the details!'"
+        },
+        {
+          "label": "Saat dilimi yonetimi",
+          "template": "Saat Dilimi Avantaji — UTC+3:\n\nAvrupa (UTC+0 ile UTC+2):\n- 1-3 saat fark — neredeyse tamamen cakisiyor\n- 09:00-18:00 TR = 07:00-16:00 UK / 08:00-17:00 DE\n- 'Same timezone as Central Europe' diye belirt\n\nABD Dogu Yakasi (UTC-5):\n- 8 saat fark\n- 15:00-23:00 TR = 08:00-16:00 EST cakisma\n- 'Available for 4+ overlap hours with EST' de\n\nABD Bati Yakasi (UTC-8):\n- 11 saat fark — zor ama mumkun\n- 18:00-02:00 TR = 08:00-16:00 PST cakisma\n- Async calismaya istekli oldugunu belirt\n\nAsenkron calisma becerileri:\n- Detayli yazili iletisim (Notion/Confluence/Slack)\n- Loom video kaydi ile progress update\n- Self-managed, deadline-driven calisma stili"
+        }
+      ],
+      "checklist": [
+        "Ingilizce seviyesi B2+ kontrol edildi",
+        "En az 1 freelance platforma profil olusturuldu",
+        "Remote-friendly sirket listesi hazirlandi",
+        "Saat dilimi overlap saatleri belirlendi",
+        "Upwork/Toptal profili optimize edildi"
+      ]
+    },
+    {
+      "id": "basvuru-takip-sistemi",
+      "title": "Basvuru Takip Sistemi",
+      "icon": "📋",
+      "content": "Organize olmayan is arama = zaman kaybi. Her basvuruyu, her gorusmeyi, her donus aldigin/almadigin mesaji kaydet. Pattern'leri gor: hangi sirketler donus yapiyor, hangi CV versiyonu ise yariyor, hangi platformdan gelen basvurular sonuc veriyor.",
+      "tips": [
+        "Google Sheets veya Notion ile takip tablosu olustur",
+        "Her basvurudan sonra 30 saniye ayirip tabloya ekle",
+        "Haftada 1 analiz yap: donus orani, platform performansi, CV versiyonu",
+        "Follow-up tarihlerini takvimine ekle — otomatik hatirlatma kur",
+        "Rejection sebebini not al — pattern gorursen iyilestir",
+        "Aylik ozet rapor cikar: toplam basvuru, donus, mulakat, teklif"
+      ],
+      "examples": [
+        {
+          "label": "Basvuru takip tablosu sutunlari",
+          "template": "Google Sheets Sutunlari:\n\n| Sutun | Aciklama | Ornek |\n|-------|----------|-------|\n| Tarih | Basvuru tarihi | 15.03.2026 |\n| Sirket | Sirket adi | Trendyol |\n| Pozisyon | Ilan basligi | Senior Frontend Developer |\n| Platform | Nereden basvurdun | LinkedIn Easy Apply |\n| CV Versiyonu | Hangi CV'yi gonderdin | FS_v3_react_focused |\n| Durum | Basvuru durumu | Basvuruldu / Donus bekleniyor / Mulakat / Red / Teklif |\n| Follow-up Tarihi | Ne zaman takip edeceksin | 22.03.2026 |\n| Notlar | Ozel notlar | Recruiter'a LinkedIn'den mesaj attim |\n| Donus Tarihi | Ne zaman donus geldi | 20.03.2026 |\n| Red Sebebi | Neden reddedildin | 'Daha deneyimli aday' / 'Pozisyon kapatildi' |\n| Maas Araligi | Belirtilen maas | 50.000-70.000 TL / $3000-5000 |"
+        },
+        {
+          "label": "Haftalik analiz sablonu",
+          "template": "Haftalik Retrospektif — Hafta [X]\n\nSayilar:\n- Toplam basvuru: 25\n- Donus gelen: 4 (%16)\n- Mulakat daveti: 2 (%8)\n- Red: 5\n- Bekleniyor: 16\n\nPlatform performansi:\n- LinkedIn: 15 basvuru, 3 donus (%20) — EN IYI\n- kariyer.net: 7 basvuru, 1 donus (%14)\n- Wellfound: 3 basvuru, 0 donus (%0)\n\nGozlemler:\n- React + TypeScript keyword'lu CV'ler daha cok donus aliyor\n- Startup'lar daha hizli donus yapiyor\n- Cover letter ekledigim basvurularda donus orani 2x\n\nGelecek hafta icin aksiyonlar:\n- CV'de TypeScript vurgusunu artir\n- Her basvuruya cover letter ekle\n- Wellfound profilini guncelle"
+        }
+      ],
+      "checklist": [
+        "Takip tablosu olusturuldu (Google Sheets/Notion)",
+        "Tum sutunlar tanimlandi",
+        "Her basvuru ayni gun tabloya ekleniyor",
+        "Follow-up tarihleri takvime eklendi",
+        "Haftalik retrospektif yapiliyor",
+        "Aylik ozet rapor cikariliyor"
+      ]
+    },
+    {
+      "id": "red-flag-tanima",
+      "title": "Red Flag Tanima",
+      "icon": "🚩",
+      "content": "3.5 yildir is ariyorsan umutsuzluk hissedebilirsin — ama her teklif iyi teklif degildir. Koту bir iste 6 ay calismak, CV'ne zarar verir ve motivasyonunu kirdir. Su red flag'leri gor ve kendini koru.",
+      "tips": [
+        "Ucretsiz deneme projesi isteyenlere dikkat — 2-4 saat makul, 1 hafta degil",
+        "Is ilaninda 'dinamik calisma ortami' = fazla mesai, dusuk maas olabilir",
+        "'Startup ruhu' + dusuk maas = sozle kandirma riski",
+        "Mulakatta sadece teknik degil, sen de sirketе soru sor",
+        "Maas konusulmadan 3+ mulakat = zaman kaybi",
+        "Ilanin 6+ aydir acik olmasi = yuksek turnover veya kararsiz yonetim",
+        "Glassdoor/Kununu yorumlarini oku — tek yorum degil, pattern'e bak",
+        "Sozlesmeyi avukata goster — rekabet yasagi, fikri mulkiyet maddeleri kontrol et"
+      ],
+      "examples": [
+        {
+          "label": "Red flag listesi",
+          "template": "KESINLIKLE KACINILMASI GEREKEN:\n\n1. Ucretsiz staj / ucretsiz deneme donemi\n   - 'Stajyer' adi altinda tam zamanli calistiranlar\n   - 'Once 1 ay ucretsiz dene, begenirsen devam ederiz'\n   - Turkiye'de yaygin — kabul etme\n\n2. Asiri dusuk maas teklifleri\n   - 2026 icin Full Stack Developer minimum: 45.000-55.000 TL (junior)\n   - Bu altinda teklif = seni sozmu canin istediginde kullanmak istiyorlar\n\n3. Tanimlanmamis is tanimi\n   - 'Her sey biraz senden beklenecek'\n   - 'Yazilim da yaparsin, destek de verirsin, pazarlama da yaparsin'\n   - Net pozisyon tanimi yoksa, net kariyer gelisimi de yok\n\n4. Tek kisilik 'IT departmani' olmak\n   - 'Sen bize yazilimci lazimsin, her seyi sen yap'\n   - Mentorluk yok, code review yok, gelisim yok\n\n5. Son dakika sozlesme degisiklikleri\n   - Mulakatta soylenen ile sozlesmedeki farkli\n   - 'Sozlesmeyi simdi imzala, detaylari sonra konusuruz'\n\n6. Asiri uzun mulakat sureci\n   - 5+ mulakat turu = karar verememe veya ucretsiz danismanlik alma\n   - 'Bir de su projeyi yap bakalim' — her turda yeni proje = somurul"
+        },
+        {
+          "label": "Sirkete sorulacak sorular",
+          "template": "Mulakatta SIRKETE sormalisin:\n\n1. 'Muhendislik ekibi kac kisi ve nasil yapilandirilmis?'\n   - 1-2 kisi = her sey senden beklenecek\n\n2. 'Code review sureci nasil isliyor?'\n   - Yoksa = kod kalitesi umurlarinda degil\n\n3. 'Onboarding sureci nasil?'\n   - Yoksa = cozmeye calis, kimse yardim etmez\n\n4. 'Bu pozisyondaki bir onceki kisi neden ayrildi?'\n   - Cevap vermezlerse = buyuk red flag\n\n5. 'Sprint/proje planlama nasil yapiliyor?'\n   - 'Plan yok, ne gelirse onu yapiyoruz' = kaos\n\n6. 'Yillik maas artisi ve terfi kriterleri neler?'\n   - 'Performansa gore' ama kriter yok = keyfi karar\n\n7. 'Remote/hybrid calisma imkani var mi?'\n   - Yanit belirsizse = yok demektir"
+        }
+      ],
+      "checklist": [
+        "Ucretsiz deneme projesi talepleri reddediliyor",
+        "Maas arastirmasi yapildi (piyasa ortalamalari biliniyor)",
+        "Her mulakatta sirkete soru soruluyor",
+        "Sozlesme kontrol edildi (rekabet yasagi, IP maddeleri)",
+        "Glassdoor/Kununu yorumlari okundu",
+        "Is tanimi net ve yazili olarak alinmis"
+      ]
+    },
+    {
+      "id": "maas-muzakere",
+      "title": "Maas Muzakere",
+      "icon": "💰",
+      "content": "Maas muzakere etmemek para kaybidir. Turkiye'de insanlar muzakere etmekten cekinir — bu seni avantajli kilar. Her teklif muzakere edilebilir. Ilk teklifleri kabul etme, karsi teklif sun. Remote pozisyonlarda kur avantajin var — dolar/euro bazli calis.",
+      "tips": [
+        "Ilk maas sorusunu SEN sorma — sirketten bekle. 'Butceniz ne kadar?' de",
+        "Maas beklentisi sorarlarsa aralik ver: 'X ile Y arasi dusunuyorum'",
+        "Ilk teklifi ASLA hemen kabul etme — 'Dusunmem icin 2 gun sure verir misiniz?' de",
+        "Karsi teklifte %10-20 ustune cik — pazarlik payi birak",
+        "Sadece maas degil, toplam paketi degerlendir: sigorta, yemek, ulasim, remote, egitim butcesi",
+        "Remote/global pozisyonlarda Turkiye maasi degil, pozisyon maasi iste",
+        "Reddetmeyi ogren — kotuye evet demektense iyi firsati bekle",
+        "Birden fazla teklif varsa leverage olarak kullan (etik sekilde)"
+      ],
+      "examples": [
+        {
+          "label": "2026 Turkiye yazilimci maas araliklari (tahmini)",
+          "template": "Turkiye Maas Araliklari (Brut, Aylik, 2026 tahmini):\n\nJunior Full Stack Developer (0-2 yil):\n- Kucuk sirket: 40.000 - 55.000 TL\n- Orta sirket: 50.000 - 70.000 TL\n- Buyuk sirket/startup: 60.000 - 90.000 TL\n\nMid-Level Full Stack Developer (2-4 yil):\n- Kucuk sirket: 60.000 - 80.000 TL\n- Orta sirket: 75.000 - 100.000 TL\n- Buyuk sirket/startup: 90.000 - 130.000 TL\n\nRemote (Global Sirket, USD bazli):\n- Junior: $1.500 - $3.000/ay\n- Mid-Level: $3.000 - $5.000/ay\n- Senior: $5.000 - $8.000/ay\n\nFreelance (Upwork, USD bazli):\n- Baslangic: $15-25/saat\n- Deneyimli: $30-50/saat\n- Uzman: $50-80+/saat\n\nNOT: Bu rakamlar tahmini ve sektor, sehir, sirket buyuklugune gore degisir."
+        },
+        {
+          "label": "Muzakere diyalog ornekleri",
+          "template": "SENARYO 1 — Maas beklentisi soruluyor:\nRecruiter: 'Maas beklentiniz nedir?'\nSen: 'Oncelikle pozisyonun sorumluluk alani ve toplam paketi ogrenmeyi tercih ederim. Butcenizi paylasir misiniz?'\n\nSENARYO 2 — Israr edilirse:\nRecruiter: 'Bir aralik vermeniz lazim.'\nSen: 'Piyasa arastirmama ve deneyimimе gore, [X] ile [Y] arasi bir aralik dusunuyorum. Ancak toplam paket (yan haklar, remote imkani, egitim butcesi) da kararimda etkili olacak.'\n\nSENARYO 3 — Teklif geldiginde:\nRecruiter: 'Size aylik [X] TL teklif ediyoruz.'\nSen: 'Tesekkurler, teklifinizi degerlendirmem icin 2 is gunu sure verir misiniz? Ayrica, projelerimde gosterdigim [spesifik basari] goz onune alindiginda, [X+%15] seviyesini dusunebilir misiniz?'\n\nSENARYO 4 — Kabul:\nSen: 'Tesekkur ederim, teklifi kabul ediyorum. Baslama tarihini ve sozlesme detaylarini gorusmek icin ne zaman uygun olursunuz?'"
+        }
+      ],
+      "checklist": [
+        "Piyasa maas arastirmasi yapildi",
+        "Minimum kabul edilebilir maas belirlendi",
+        "Muzakere stratejisi hazirlandi",
+        "Toplam paket degerlendirme kriterleri listelendi",
+        "Karsi teklif senaryolari prova edildi",
+        "Birden fazla teklif stratejisi planlandi"
+      ]
+    }
+  ]
+}

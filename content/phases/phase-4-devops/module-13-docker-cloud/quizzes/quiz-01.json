@@ -1,0 +1,135 @@
+{
+  "id": "mod-13-docker/quiz-01",
+  "title": "Docker, CI/CD, Kubernetes & Cloud Quiz",
+  "description": "Docker containerization, CI/CD pipeline, Kubernetes orchestration ve cloud temel kavramlarını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 25,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Docker image ile container arasındaki fark nedir?",
+      "options": [
+        "Image çalışan bir process, container ise dosya sistemi",
+        "Image read-only bir template, container ise image'ın çalışan bir instance'ı",
+        "Image sadece Linux'ta çalışır, container her yerde çalışır",
+        "Aralarında fark yoktur, aynı şeydir"
+      ],
+      "correct": 1,
+      "explanation": "Image, Dockerfile'dan build edilen read-only bir template'tir (class gibi). Container ise image'ın çalışan bir instance'ıdır (object gibi). Bir image'dan birden fazla container oluşturabilirsin. Image disk'te saklanır, container memory'de çalışır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "question": "Dockerfile'da 'COPY package.json pnpm-lock.yaml ./' komutunu 'COPY . .' komutundan önce yazmak, Docker'ın layer caching mekanizması sayesinde build süresini kısaltır. Çünkü package.json değişmedikçe pnpm install layer'ı cache'ten gelir.",
+      "correct": true,
+      "explanation": "Doğru! Docker her komutu layer olarak cache'ler. Bir layer değiştiğinde sonraki tüm layer'lar yeniden build edilir. package.json nadiren değişir, uygulama kodu sık değişir. Bu sıralama ile pnpm install --frozen-lockfile sadece package.json değiştiğinde çalışır, her kod değişikliğinde değil.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "code_completion",
+      "question": "Aşağıdaki Dockerfile'da eksik komutları tamamlayın. Multi-stage build ile production image oluşturun:",
+      "code": "# Build stage\nFROM node:20-alpine AS ____\nWORKDIR /app\nCOPY package.json pnpm-lock.yaml ./\nRUN corepack enable && pnpm install --frozen-lockfile\nCOPY . .\nRUN pnpm build\n\n# Production stage\nFROM node:20-alpine\nWORKDIR /app\nCOPY --from=____ /app/dist ./dist\nCOPY --from=____ /app/node_modules ./node_modules\n____ node\nEXPOSE 3000\nCMD [\"node\", \"dist/server.js\"]",
+      "correct": "builder, builder, builder, USER",
+      "explanation": "Multi-stage build'de ilk stage'e 'AS builder' ile isim verilir. Production stage'de 'COPY --from=builder' ile sadece gerekli dosyalar kopyalanır. 'USER node' komutu güvenlik için non-root kullanıcıya geçiş yapar. Bu pattern image boyutunu dramatik şekilde küçültür.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "docker-compose.yml'da 'depends_on' ile 'healthcheck' birlikte kullanmanın sebebi nedir?",
+      "options": [
+        "depends_on servisin hazır olduğunu garanti eder, healthcheck gereksizdir",
+        "depends_on sadece başlatma sırasını belirler, healthcheck ile servisin gerçekten hazır olduğu doğrulanır",
+        "healthcheck sadece production'da kullanılır, depends_on yeterlidir",
+        "İkisi de aynı işi yapar, biri yeterlidir"
+      ],
+      "correct": 1,
+      "explanation": "depends_on sadece container'ın başlatılma sırasını belirler, servisin gerçekten hazır olduğunu garanti ETMEZ. PostgreSQL container'ı başlamış olabilir ama henüz connection kabul etmiyor olabilir. 'condition: service_healthy' ile healthcheck'in geçmesini bekleyebilirsin.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "explain_code",
+      "question": "Bu GitHub Actions workflow adımı ne yapar? Neden kullanılır?",
+      "code": "- name: Build and push\n  uses: docker/build-push-action@v5\n  with:\n    context: .\n    push: true\n    tags: |\n      ghcr.io/${{ github.repository }}:latest\n      ghcr.io/${{ github.repository }}:${{ github.sha }}\n    cache-from: type=gha\n    cache-to: type=gha,mode=max",
+      "correct": "Bu adım Docker image'ını build eder ve GitHub Container Registry'ye (ghcr.io) push eder. İki tag kullanır: 'latest' (en son versiyon) ve commit SHA (izlenebilirlik için). 'cache-from/cache-to: type=gha' parametreleri GitHub Actions cache'ini kullanarak build süresini kısaltır. Build layer'ları cache'lenir, değişmeyen layer'lar tekrar build edilmez.",
+      "explanation": "docker/build-push-action, GitHub Actions'da Docker image build ve push işlemini kolaylaştıran resmi bir action'dır. Commit SHA ile tag'lemek, her deployment'ın hangi kod versiyonundan oluşturulduğunu takip etmemizi sağlar. GHA cache ise CI pipeline süresini önemli ölçüde kısaltır.",
+      "difficulty": "zor",
+      "points": 15
+    },
+    {
+      "id": "q6",
+      "type": "order_steps",
+      "question": "Bir CI/CD pipeline'ının doğru aşama sırasını belirle:",
+      "steps": [
+        "Lint ve type check (kod kalitesi)",
+        "Unit ve integration testler",
+        "Docker image build",
+        "Security vulnerability tarama",
+        "Image'ı registry'ye push etme",
+        "Staging ortamına deploy",
+        "Production ortamına deploy"
+      ],
+      "correct_order": [0, 1, 3, 2, 4, 5, 6],
+      "explanation": "Pipeline sırası: (1) Lint/typecheck - hızlı kod kalite kontrolü, (2) Testler - doğruluk kontrolü, (3) Security scan - güvenlik taraması, (4) Docker build - image oluşturma, (5) Push - registry'ye gönderme, (6) Staging deploy - test ortamında doğrulama, (7) Production deploy. Her aşama bir kalite kapısıdır, biri fail olursa pipeline durur.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Kubernetes'te liveness probe ile readiness probe arasındaki fark nedir?",
+      "options": [
+        "Liveness probe CPU kullanımını, readiness probe memory kullanımını kontrol eder",
+        "Liveness probe container'ın sağlıklı olup olmadığını kontrol eder (başarısızsa yeniden başlatır), readiness probe traffic almaya hazır olup olmadığını kontrol eder (başarısızsa traffic yönlendirmez)",
+        "İkisi de aynı şeyi kontrol eder, farklı isimler aynı fonksiyon",
+        "Liveness probe sadece başlangıçta, readiness probe sürekli çalışır"
+      ],
+      "correct": 1,
+      "explanation": "Liveness probe: Container çalışıyor mu? Başarısız olursa Kubernetes container'ı yeniden başlatır (deadlock, memory leak tespiti). Readiness probe: Container traffic almaya hazır mı? Başarısız olursa Service, bu Pod'a traffic yönlendirmez (DB connection bekleniyor, warm-up süreci). İkisi birlikte kullanılmalıdır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "true_false",
+      "question": "Terraform state dosyası (terraform.tfstate) hassas bilgiler içerebilir (database password, API key gibi). Bu dosya Git'e commit edilmemeli ve remote backend (S3 + DynamoDB) ile yönetilmelidir.",
+      "correct": true,
+      "explanation": "Doğru! terraform.tfstate dosyası tüm altyapı kaynaklarının mevcut durumunu ve yapılandırmasını içerir - bu da database password'leri, API key'leri gibi hassas bilgileri kapsar. Remote backend kullanarak: (1) Hassas veriler Git'e girmez, (2) Team üyeleri aynı state'i paylaşır, (3) DynamoDB ile state lock sağlanır (concurrent erişim engellenir).",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "Container'ları neden root kullanıcı ile çalıştırmamalıyız?",
+      "options": [
+        "Root kullanıcı daha fazla RAM tüketir",
+        "Container escape vulnerability durumunda attacker host sistemine root erişimi sağlayabilir",
+        "Root kullanıcı ile container daha yavaş çalışır",
+        "Docker root kullanıcıyı desteklemez"
+      ],
+      "correct": 1,
+      "explanation": "Container escape (container breakout) vulnerability'si durumunda, root olarak çalışan container host sistemine root erişimi sağlayabilir. Non-root user ile çalıştırmak defense-in-depth prensibinin bir parçasıdır. Dockerfile'da 'USER node' komutu ile, Kubernetes'te 'runAsNonRoot: true' ile zorunlu tutulmalıdır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "explain_code",
+      "question": "Bu Kubernetes Deployment manifest'indeki 'strategy' bölümü ne işe yarar?",
+      "code": "spec:\n  replicas: 3\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxSurge: 1\n      maxUnavailable: 0",
+      "correct": "Bu strateji zero-downtime deployment sağlar. RollingUpdate tipi pod'ları tek tek günceller. maxSurge: 1 - güncelleme sırasında en fazla 1 ekstra pod oluşturulabilir (toplam 4). maxUnavailable: 0 - hiçbir anda mevcut pod'lardan biri bile unavailable olamaz. Yani her zaman en az 3 pod traffic'e cevap verir, yeni pod hazır olunca eski pod kapatılır.",
+      "explanation": "Rolling update stratejisi production'da zero-downtime deployment için kritiktir. maxUnavailable: 0 ile kullanıcılar hiçbir kesinti yaşamaz. Alternatif olarak Recreate stratejisi tüm pod'ları aynı anda kapatıp yenilerini başlatır (downtime olur). Blue-Green deployment ise iki tam ortam arasında anlık geçiş yapar.",
+      "difficulty": "zor",
+      "points": 15
+    }
+  ]
+}

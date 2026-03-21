@@ -1,0 +1,84 @@
+{
+  "title": "Retry Fetcher with Exponential Backoff",
+  "description": "Exponential backoff ile hata durumunda otomatik tekrar deneyen fetch wrapper",
+  "description_detail": "# Retry Fetcher\n\nHTTP isteklerini exponential backoff stratejisi ile tekrar deneyen bir fetch wrapper yazın.\n\n## İstenilen Fonksiyon: `createRetryFetcher(options)`\n\n### Options\n```javascript\n{\n  maxRetries: 3,          // Maksimum deneme sayısı\n  baseDelay: 1000,        // İlk bekleme süresi (ms)\n  maxDelay: 30000,        // Maksimum bekleme süresi (ms)\n  backoffFactor: 2,       // Çarpan (delay = base * factor^attempt)\n  retryableStatuses: [500, 502, 503, 504],  // Tekrar denenecek HTTP kodları\n  onRetry: (attempt, delay, error) => {}    // Her retry'da çağrılacak callback\n}\n```\n\n### Davranış\n1. İstek başarısız olursa (retryable status veya network error)\n2. `baseDelay * backoffFactor^attempt` kadar bekle\n3. Jitter ekle (rastgele 0-delay arası)\n4. maxDelay'i aşma\n5. maxRetries'a ulaşılınca son hatayı fırlat\n\n## Hesaplama\n```\nDelay = min(baseDelay * backoffFactor^attempt, maxDelay)\nJittered = random(0, delay)\n```",
+  "difficulty": "zor",
+  "category": "react",
+  "tags": ["fetch", "retry", "exponential-backoff", "error-handling"],
+  "examples": [
+    {
+      "input": "fetch fails 2 times then succeeds, maxRetries=3",
+      "output": "Success after 3rd attempt",
+      "explanation": "İlk 2 deneme başarısız, 3. denemede başarılı"
+    },
+    {
+      "input": "backoff delays: base=1000, factor=2",
+      "output": "delays: 1000, 2000, 4000, ...",
+      "explanation": "Her denemede bekleme süresi 2 katına çıkar"
+    }
+  ],
+  "constraints": [
+    "Sadece retryableStatuses listesindeki kodlar tekrar denenebilir",
+    "4xx hataları (404, 401) tekrar denenmemeli (default olarak)",
+    "maxDelay aşılmamalı",
+    "Toplam deneme = 1 (ilk) + maxRetries (tekrar)"
+  ],
+  "starter_code": {
+    "python": "import time\nimport random\n\ndef create_retry_fetcher(max_retries=3, base_delay=1000, max_delay=30000, backoff_factor=2, retryable_statuses=None):\n    # Your code here\n    pass",
+    "javascript": "function createRetryFetcher(options = {}) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fail_count": 0, "max_retries": 3},
+      "expected_output": {"attempts": 1, "success": true}
+    },
+    {
+      "input": {"fail_count": 2, "max_retries": 3, "fail_status": 500},
+      "expected_output": {"attempts": 3, "success": true}
+    },
+    {
+      "input": {"fail_count": 5, "max_retries": 3, "fail_status": 500},
+      "expected_output": {"attempts": 4, "success": false}
+    },
+    {
+      "input": {"fail_count": 1, "max_retries": 3, "fail_status": 404},
+      "expected_output": {"attempts": 1, "success": false}
+    },
+    {
+      "input": {"base_delay": 100, "backoff_factor": 2, "attempt": 0},
+      "expected_output": {"delay": 100}
+    },
+    {
+      "input": {"base_delay": 100, "backoff_factor": 2, "attempt": 3},
+      "expected_output": {"delay": 800}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"base_delay": 1000, "backoff_factor": 2, "attempt": 10, "max_delay": 30000},
+      "expected_output": {"delay": 30000}
+    },
+    {
+      "input": {"fail_count": 1, "max_retries": 1, "fail_status": 503},
+      "expected_output": {"attempts": 2, "success": true}
+    },
+    {
+      "input": {"fail_count": 0, "max_retries": 0},
+      "expected_output": {"attempts": 1, "success": true}
+    }
+  ],
+  "hints": [
+    "calculateDelay(attempt) = Math.min(baseDelay * Math.pow(backoffFactor, attempt), maxDelay)",
+    "Jitter eklemek için: actualDelay = Math.random() * calculatedDelay",
+    "Bir for döngüsü ile maxRetries kadar dene, her denemede status kontrol et, retryable değilse hemen hata fırlat"
+  ],
+  "solution": {
+    "python": "import time\nimport random\n\ndef create_retry_fetcher(max_retries=3, base_delay=1000, max_delay=30000, backoff_factor=2, retryable_statuses=None):\n    if retryable_statuses is None:\n        retryable_statuses = {500, 502, 503, 504}\n    \n    def calculate_delay(attempt):\n        delay = base_delay * (backoff_factor ** attempt)\n        delay = min(delay, max_delay)\n        return delay\n    \n    def fetch_with_retry(fetch_fn, on_retry=None):\n        last_error = None\n        \n        for attempt in range(max_retries + 1):\n            try:\n                result = fetch_fn()\n                status = result.get('status', 200)\n                \n                if status >= 400:\n                    if status not in retryable_statuses:\n                        raise Exception(f'Non-retryable error: {status}')\n                    if attempt < max_retries:\n                        delay = calculate_delay(attempt)\n                        jittered = random.random() * delay\n                        if on_retry:\n                            on_retry(attempt + 1, jittered, f'Status {status}')\n                        time.sleep(jittered / 1000)\n                        continue\n                    raise Exception(f'Max retries exceeded: {status}')\n                \n                return result\n            except Exception as e:\n                last_error = e\n                if attempt < max_retries:\n                    delay = calculate_delay(attempt)\n                    jittered = random.random() * delay\n                    if on_retry:\n                        on_retry(attempt + 1, jittered, str(e))\n                    time.sleep(jittered / 1000)\n        \n        raise last_error\n    \n    return {\n        'fetch': fetch_with_retry,\n        'calculate_delay': calculate_delay\n    }",
+    "javascript": "function createRetryFetcher(options = {}) {\n  const {\n    maxRetries = 3,\n    baseDelay = 1000,\n    maxDelay = 30000,\n    backoffFactor = 2,\n    retryableStatuses = [500, 502, 503, 504],\n    onRetry = () => {}\n  } = options;\n\n  function calculateDelay(attempt) {\n    return Math.min(baseDelay * Math.pow(backoffFactor, attempt), maxDelay);\n  }\n\n  async function fetchWithRetry(fetchFn) {\n    let lastError;\n\n    for (let attempt = 0; attempt <= maxRetries; attempt++) {\n      try {\n        const response = await fetchFn();\n\n        if (response.status >= 400) {\n          if (!retryableStatuses.includes(response.status)) {\n            throw new Error(`Non-retryable error: ${response.status}`);\n          }\n          throw new Error(`Retryable error: ${response.status}`);\n        }\n\n        return response;\n      } catch (error) {\n        lastError = error;\n\n        if (attempt < maxRetries && !error.message.startsWith('Non-retryable')) {\n          const delay = calculateDelay(attempt);\n          const jittered = Math.random() * delay;\n          onRetry(attempt + 1, jittered, error);\n          await new Promise(r => setTimeout(r, jittered));\n        } else if (error.message.startsWith('Non-retryable')) {\n          throw error;\n        }\n      }\n    }\n\n    throw lastError;\n  }\n\n  return { fetch: fetchWithRetry, calculateDelay };\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(maxRetries)",
+    "optimal_space": "O(1)"
+  },
+  "learn_after_solving": "Exponential backoff stratejisini, jitter'ın neden gerekli olduğunu (thundering herd problem) ve resilient HTTP client pattern'ini öğrenirsin. AWS SDK, gRPC ve tüm production API client'ları bu pattern'i kullanır."
+}

@@ -1,0 +1,84 @@
+{
+  "title": "Memo Optimizer",
+  "description": "Gereksiz re-render'ları tespit et ve düzelt",
+  "description_detail": "# Memo Optimizer\n\nReact component'lerinde gereksiz re-render'ları tespit eden ve önleyen yardımcı fonksiyonlar yazın.\n\n## İstenilen Fonksiyonlar\n\n### 1. `shallowEqual(objA, objB)`\nİki objenin shallow (yüzeysel) eşitliğini kontrol eder. React.memo'nun varsayılan karşılaştırma fonksiyonu.\n\n### 2. `deepEqual(objA, objB)`\nİki objenin deep (derin) eşitliğini kontrol eder.\n\n### 3. `createSelector(inputSelectors, resultFn)`\nReselect-benzeri memoized selector. Input değişmedikçe önceki sonucu döndürür.\n\n## Örnek\n```javascript\nshallowEqual({a: 1, b: 2}, {a: 1, b: 2}); // true\nshallowEqual({a: {x: 1}}, {a: {x: 1}});   // false (nested obje)\ndeepEqual({a: {x: 1}}, {a: {x: 1}});       // true\n```",
+  "difficulty": "orta",
+  "category": "react",
+  "tags": ["react", "performance", "memoization", "optimization"],
+  "examples": [
+    {
+      "input": "shallowEqual({a: 1, b: [1,2]}, {a: 1, b: [1,2]})",
+      "output": "false",
+      "explanation": "b array'i farklı referans, shallow equal false döner"
+    },
+    {
+      "input": "deepEqual({a: 1, b: [1,2]}, {a: 1, b: [1,2]})",
+      "output": "true",
+      "explanation": "Deep comparison: tüm değerler eşit"
+    }
+  ],
+  "constraints": [
+    "shallowEqual sadece birinci seviye key/value karşılaştırması yapar",
+    "deepEqual nested obje ve array'leri recursive kontrol eder",
+    "createSelector input değişmedikçe aynı referansı döndürmeli",
+    "null, undefined, NaN gibi edge case'ler doğru handle edilmeli"
+  ],
+  "starter_code": {
+    "python": "def shallow_equal(obj_a, obj_b) -> bool:\n    # Your code here\n    pass\n\ndef deep_equal(obj_a, obj_b) -> bool:\n    # Your code here\n    pass\n\ndef create_selector(*args):\n    # Your code here\n    pass",
+    "javascript": "function shallowEqual(objA, objB) {\n  // Your code here\n}\n\nfunction deepEqual(objA, objB) {\n  // Your code here\n}\n\nfunction createSelector(...args) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "shallow", "a": {"x": 1, "y": 2}, "b": {"x": 1, "y": 2}},
+      "expected_output": true
+    },
+    {
+      "input": {"fn": "shallow", "a": {"x": [1]}, "b": {"x": [1]}},
+      "expected_output": false
+    },
+    {
+      "input": {"fn": "deep", "a": {"x": {"y": [1, 2, 3]}}, "b": {"x": {"y": [1, 2, 3]}}},
+      "expected_output": true
+    },
+    {
+      "input": {"fn": "deep", "a": {"x": 1}, "b": {"x": 2}},
+      "expected_output": false
+    },
+    {
+      "input": {"fn": "shallow", "a": {}, "b": {}},
+      "expected_output": true
+    },
+    {
+      "input": {"fn": "deep", "a": [1, [2, [3]]], "b": [1, [2, [3]]]},
+      "expected_output": true
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "shallow", "a": null, "b": null},
+      "expected_output": true
+    },
+    {
+      "input": {"fn": "deep", "a": null, "b": {}},
+      "expected_output": false
+    },
+    {
+      "input": {"fn": "deep", "a": {"a": null, "b": null}, "b": {"a": null, "b": null}},
+      "expected_output": true
+    }
+  ],
+  "hints": [
+    "shallowEqual: Object.keys ile her iki objenin key'lerini karşılaştır, sonra her key için === ile değer karşılaştır",
+    "deepEqual: typeof kontrolü yap, obje/array ise recursive çağır, primitif ise === ile karşılaştır",
+    "createSelector: son input'ları sakla, shallowEqual ile karşılaştır, değişmediyse cached sonucu döndür"
+  ],
+  "solution": {
+    "python": "def shallow_equal(obj_a, obj_b) -> bool:\n    if obj_a is obj_b:\n        return True\n    if obj_a is None or obj_b is None:\n        return False\n    if type(obj_a) != type(obj_b):\n        return False\n    if isinstance(obj_a, dict):\n        if set(obj_a.keys()) != set(obj_b.keys()):\n            return False\n        return all(obj_a[k] is obj_b[k] or obj_a[k] == obj_b[k] for k in obj_a if not isinstance(obj_a[k], (dict, list)))\n    return obj_a == obj_b\n\ndef deep_equal(obj_a, obj_b) -> bool:\n    if obj_a is obj_b:\n        return True\n    if type(obj_a) != type(obj_b):\n        return False\n    if obj_a is None or obj_b is None:\n        return obj_a is obj_b\n    if isinstance(obj_a, dict):\n        if set(obj_a.keys()) != set(obj_b.keys()):\n            return False\n        return all(deep_equal(obj_a[k], obj_b[k]) for k in obj_a)\n    if isinstance(obj_a, (list, tuple)):\n        if len(obj_a) != len(obj_b):\n            return False\n        return all(deep_equal(a, b) for a, b in zip(obj_a, obj_b))\n    return obj_a == obj_b\n\ndef create_selector(*args):\n    input_selectors = args[:-1]\n    result_fn = args[-1]\n    last_inputs = [None]\n    last_result = [None]\n    \n    def selector(state):\n        inputs = tuple(s(state) for s in input_selectors)\n        if last_inputs[0] is not None and inputs == last_inputs[0]:\n            return last_result[0]\n        last_inputs[0] = inputs\n        last_result[0] = result_fn(*inputs)\n        return last_result[0]\n    \n    return selector",
+    "javascript": "function shallowEqual(objA, objB) {\n  if (Object.is(objA, objB)) return true;\n  if (typeof objA !== 'object' || typeof objB !== 'object') return false;\n  if (objA === null || objB === null) return false;\n\n  const keysA = Object.keys(objA);\n  const keysB = Object.keys(objB);\n  if (keysA.length !== keysB.length) return false;\n\n  return keysA.every(key => \n    Object.prototype.hasOwnProperty.call(objB, key) && Object.is(objA[key], objB[key])\n  );\n}\n\nfunction deepEqual(objA, objB) {\n  if (Object.is(objA, objB)) return true;\n  if (typeof objA !== typeof objB) return false;\n  if (objA === null || objB === null) return objA === objB;\n  if (typeof objA !== 'object') return false;\n\n  if (Array.isArray(objA) !== Array.isArray(objB)) return false;\n  if (Array.isArray(objA)) {\n    if (objA.length !== objB.length) return false;\n    return objA.every((val, i) => deepEqual(val, objB[i]));\n  }\n\n  const keysA = Object.keys(objA);\n  const keysB = Object.keys(objB);\n  if (keysA.length !== keysB.length) return false;\n  return keysA.every(key => deepEqual(objA[key], objB[key]));\n}\n\nfunction createSelector(...args) {\n  const resultFn = args.pop();\n  const inputSelectors = args;\n  let lastInputs = null;\n  let lastResult = null;\n\n  return function(state) {\n    const inputs = inputSelectors.map(sel => sel(state));\n    if (lastInputs && inputs.every((val, i) => Object.is(val, lastInputs[i]))) {\n      return lastResult;\n    }\n    lastInputs = inputs;\n    lastResult = resultFn(...inputs);\n    return lastResult;\n  };\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n) for shallow, O(n*m) for deep",
+    "optimal_space": "O(d) recursion depth for deep"
+  },
+  "learn_after_solving": "React'te referans eşitliği vs değer eşitliği farkını, memo/useMemo/useCallback'in iç çalışma mantığını ve selector pattern'ini öğrenirsin. Bu bilgi React performans optimizasyonunun temelidir."
+}

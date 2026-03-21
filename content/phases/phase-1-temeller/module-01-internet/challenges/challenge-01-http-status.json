@@ -1,0 +1,67 @@
+{
+  "id": "challenge-http-status",
+  "title": "HTTP Status Code Eşleştirme",
+  "difficulty": "kolay",
+  "category": "web",
+  "tags": ["http", "status-codes"],
+  "related_lesson": "mod-01-internet/lesson-02",
+  "description_tr": "Verilen HTTP senaryoları için doğru status code'unu döndüren bir fonksiyon yaz.",
+  "description_detail": "Bir web sunucusunun farklı durumlarda hangi HTTP status code'unu döndürmesi gerektiğini belirleyen bir fonksiyon yazın. Fonksiyon bir senaryo string'i alır ve uygun HTTP status code'unu (integer) döndürür.",
+  "examples": [
+    {
+      "input": "scenario = 'success'",
+      "output": "200",
+      "explanation": "Başarılı bir GET isteği 200 OK döndürür."
+    },
+    {
+      "input": "scenario = 'not_found'",
+      "output": "404",
+      "explanation": "İstenen kaynak bulunamadığında 404 Not Found döndürülür."
+    },
+    {
+      "input": "scenario = 'created'",
+      "output": "201",
+      "explanation": "Yeni bir kaynak başarıyla oluşturulduğunda 201 Created döndürülür."
+    }
+  ],
+  "constraints": [
+    "Fonksiyon her zaman bir integer döndürmelidir",
+    "Bilinmeyen senaryolar için 500 döndürün"
+  ],
+  "starter_code": {
+    "python": "def get_status_code(scenario: str) -> int:\n    # Verilen senaryo için doğru HTTP status code'unu döndür\n    # Senaryolar: 'success', 'created', 'no_content', 'bad_request',\n    #             'unauthorized', 'forbidden', 'not_found',\n    #             'method_not_allowed', 'conflict', 'server_error',\n    #             'redirect', 'permanent_redirect'\n    pass",
+    "javascript": "function getStatusCode(scenario) {\n    // Verilen senaryo için doğru HTTP status code'unu döndür\n    // Senaryolar: 'success', 'created', 'no_content', 'bad_request',\n    //             'unauthorized', 'forbidden', 'not_found',\n    //             'method_not_allowed', 'conflict', 'server_error',\n    //             'redirect', 'permanent_redirect'\n}"
+  },
+  "test_cases": [
+    {"input": {"scenario": "success"}, "expected": 200},
+    {"input": {"scenario": "created"}, "expected": 201},
+    {"input": {"scenario": "no_content"}, "expected": 204},
+    {"input": {"scenario": "bad_request"}, "expected": 400},
+    {"input": {"scenario": "unauthorized"}, "expected": 401},
+    {"input": {"scenario": "forbidden"}, "expected": 403},
+    {"input": {"scenario": "not_found"}, "expected": 404}
+  ],
+  "hidden_test_cases": [
+    {"input": {"scenario": "method_not_allowed"}, "expected": 405},
+    {"input": {"scenario": "conflict"}, "expected": 409},
+    {"input": {"scenario": "server_error"}, "expected": 500},
+    {"input": {"scenario": "redirect"}, "expected": 302},
+    {"input": {"scenario": "permanent_redirect"}, "expected": 301},
+    {"input": {"scenario": "unknown_scenario"}, "expected": 500}
+  ],
+  "hints": [
+    "HTTP status code'ları aileler halinde gruplanır: 2xx başarı, 3xx yönlendirme, 4xx istemci hatası, 5xx sunucu hatası.",
+    "Python'da dictionary (sözlük) kullanarak senaryo-code eşleşmesi yapabilirsin. dict.get(key, default) ile bilinmeyen durumlar için varsayılan değer döndürebilirsin.",
+    "Çözüm: status_codes = {'success': 200, 'created': 201, ...} şeklinde bir sözlük oluştur ve return status_codes.get(scenario, 500) kullan."
+  ],
+  "solution": {
+    "python": "def get_status_code(scenario: str) -> int:\n    status_codes = {\n        'success': 200,\n        'created': 201,\n        'no_content': 204,\n        'redirect': 302,\n        'permanent_redirect': 301,\n        'bad_request': 400,\n        'unauthorized': 401,\n        'forbidden': 403,\n        'not_found': 404,\n        'method_not_allowed': 405,\n        'conflict': 409,\n        'server_error': 500\n    }\n    return status_codes.get(scenario, 500)",
+    "javascript": "function getStatusCode(scenario) {\n    const statusCodes = {\n        'success': 200,\n        'created': 201,\n        'no_content': 204,\n        'redirect': 302,\n        'permanent_redirect': 301,\n        'bad_request': 400,\n        'unauthorized': 401,\n        'forbidden': 403,\n        'not_found': 404,\n        'method_not_allowed': 405,\n        'conflict': 409,\n        'server_error': 500\n    };\n    return statusCodes[scenario] || 500;\n}",
+    "explanation_tr": "Dictionary/Object lookup pattern kullandık. Bu, if-else zincirinden çok daha temiz ve performanslı. get() metodu ile bilinmeyen anahtarlar için varsayılan değer (500) döndürüyoruz. Zaman: O(1), Alan: O(n) - n senaryo sayısı."
+  },
+  "complexity": {
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)"
+  },
+  "learn_after_solving": "Bu problemle dictionary/object lookup pattern'ını öğrendin. Bu pattern, if-else zincirlerinden çok daha temiz ve O(1) erişim süresi sağlar. Aynı pattern'ı routing, config management ve strategy pattern'da da kullanacaksın."
+}

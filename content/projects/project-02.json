@@ -1,0 +1,896 @@
+{
+  "id": "project-02",
+  "title": "Full Stack Proje Yönetim Uygulaması (Trello Clone)",
+  "difficulty": "Orta",
+  "estimated_days": 14,
+  "tech_stack": [
+    "React",
+    "TypeScript",
+    "Node.js",
+    "Express",
+    "PostgreSQL",
+    "Prisma",
+    "JWT",
+    "Docker"
+  ],
+  "brief": "Bu projede, Trello benzeri bir kanban board uygulaması geliştireceksin. Kullanıcılar board'lar oluşturabilecek, kartları sürükle-bırak ile listeler arasında taşıyabilecek ve takım arkadaşlarına görev atayabilecek. Bu proje, full stack geliştirme becerilerini gerçek dünya uygulamasıyla pekiştirecek.\n\nBackend'de Node.js/Express ile RESTful API tasarlayacak, PostgreSQL veritabanı ile ilişkisel veri modelleme yapacak ve JWT tabanlı authentication sistemi kuracaksın. Prisma ORM kullanarak type-safe veritabanı işlemleri gerçekleştireceksin. Frontend'de React ile komponent bazlı mimari, drag-and-drop interaksiyon ve optimistic updates gibi ileri seviye konseptleri uygulayacaksın.\n\nBu proje, iş mülakatlarında en çok sorulan 'bir CRUD uygulaması yapabilir misin?' sorusunun çok ötesine geçiyor. Veritabanı ilişkileri, authentication, authorization, real-time güncelleme ve Docker ile containerization gibi production-level konuları kapsıyor. Proje sonunda hem backend hem frontend'de profesyonel seviye deneyim kazanmış olacaksın.\n\nAyrıca bu projede Test-Driven Development (TDD) yaklaşımıyla test yazacak, Docker ile containerize edecek ve CI pipeline kuracaksın. Bu beceriler, junior'dan mid-level'a geçişteki en kritik farklardan biridir.",
+  "target_roles": [
+    "Full Stack Developer",
+    "Backend Developer"
+  ],
+  "architecture": {
+    "overview": "Klasik 3-tier mimari: React frontend (SPA), Node.js/Express REST API, PostgreSQL veritabanı. Prisma ORM ile veritabanı erişimi, JWT ile stateless authentication. Docker Compose ile tüm servislerin orchestration'ı sağlanır.",
+    "diagram": "┌────────────────────────────────────────────────────────┐\n│                     Docker Compose                     │\n│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │\n│  │   React App  │  │  Express API │  │  PostgreSQL  │  │\n│  │   (Vite)     │──│   + Prisma   │──│   Database   │  │\n│  │   Port 5173  │  │   Port 3001  │  │   Port 5432  │  │\n│  └──────────────┘  └──────┬───────┘  └──────────────┘  │\n│                           │                            │\n│                    ┌──────┴───────┐                     │\n│                    │  JWT Auth    │                     │\n│                    │  Middleware  │                     │\n│                    └──────────────┘                     │\n└────────────────────────────────────────────────────────┘\n\n  API Endpoint Yapısı:\n  POST   /api/auth/register\n  POST   /api/auth/login\n  GET    /api/auth/me\n  GET    /api/boards\n  POST   /api/boards\n  GET    /api/boards/:id\n  POST   /api/boards/:id/lists\n  PUT    /api/lists/:id/reorder\n  POST   /api/lists/:id/cards\n  PUT    /api/cards/:id\n  PUT    /api/cards/:id/move\n  DELETE /api/cards/:id",
+    "decisions": [
+      {
+        "decision": "Neden PostgreSQL?",
+        "reasoning": "Kanban board verileri ilişkiseldir: Board -> List -> Card -> User. PostgreSQL, bu tür ilişkisel veriler için en uygun seçimdir. JSONB desteği ile esnek meta veri saklama, full-text search ve row-level security gibi gelişmiş özellikler sunar.",
+        "alternatives": "MongoDB, MySQL, SQLite",
+        "when_to_choose_alternative": "MongoDB: Şema sık değişiyorsa ve ilişkiler zayıfsa. MySQL: Mevcut MySQL altyapısı varsa. SQLite: Prototip veya tek kullanıcılı uygulamalarda."
+      },
+      {
+        "decision": "Neden Prisma ORM?",
+        "reasoning": "Prisma, TypeScript-first ORM'dir. Schema dosyasından otomatik tip üretimi yapar, migration yönetimi sağlar ve type-safe query builder sunar. Prisma Studio ile veritabanını GUI'den görüntüleyebilirsin.",
+        "alternatives": "Drizzle ORM, TypeORM, Knex.js, raw SQL",
+        "when_to_choose_alternative": "Drizzle: Daha hafif ve SQL'e yakın bir abstraction isteniyorsa. TypeORM: Decorator-based yaklaşım tercih ediliyorsa. Raw SQL: Karmaşık sorgularda ORM'in yetmediği durumlarda."
+      },
+      {
+        "decision": "Neden JWT Authentication?",
+        "reasoning": "JWT, stateless authentication sağlar — server'da session saklamaya gerek yoktur. Bu, horizontal scaling için idealdir. Token bazlı auth, frontend SPA'larla doğal olarak uyumludur. Access token + Refresh token pattern'ı ile güvenli token yönetimi yapılır.",
+        "alternatives": "Session-based auth, OAuth only, Passport.js",
+        "when_to_choose_alternative": "Session-based: Server-rendered uygulamalarda. OAuth only: Sadece 3rd party login (Google, GitHub) yeterliyse. Passport.js: Çoklu auth stratejisi gerekiyorsa."
+      },
+      {
+        "decision": "Neden Express.js?",
+        "reasoning": "Express, Node.js ekosisteminin en olgun ve yaygın kullanılan web framework'üdür. Minimal ve esnek yapısı, middleware pattern'ı ile kolay genişletilebilirlik sağlar. Devasa ekosistemi ve topluluk desteği vardır.",
+        "alternatives": "Fastify, NestJS, Hono",
+        "when_to_choose_alternative": "Fastify: Daha yüksek performans gerekiyorsa. NestJS: Enterprise-grade, Angular-like yapı isteniyorsa. Hono: Edge runtime desteği ve minimal overhead."
+      }
+    ]
+  },
+  "what_you_learn": {
+    "technical": [
+      "RESTful API tasarımı ve implementasyonu",
+      "PostgreSQL ile ilişkisel veritabanı modelleme",
+      "Prisma ORM ile type-safe database işlemleri",
+      "JWT authentication (access + refresh token)",
+      "Express middleware pattern",
+      "React ile SPA geliştirme",
+      "Drag and drop implementasyonu",
+      "Optimistic updates",
+      "Docker ve Docker Compose",
+      "API testing (Jest + Supertest)",
+      "Input validation (Zod)",
+      "Error handling pattern'ları"
+    ],
+    "architectural": [
+      "3-tier architecture (presentation, business, data)",
+      "Repository pattern",
+      "Service layer pattern",
+      "Middleware chain pattern",
+      "REST API design principles",
+      "Database migration stratejisi"
+    ],
+    "soft_skills": [
+      "API documentation yazma (Swagger/OpenAPI)",
+      "Git branching stratejisi (feature branches)",
+      "Code review yapma ve alma",
+      "Teknik karar verme ve trade-off analizi",
+      "Proje planlama ve sprint yönetimi"
+    ]
+  },
+  "requirements": {
+    "functional": [
+      "Kullanıcı kayıt ve giriş sistemi (email + password)",
+      "Board CRUD: Oluşturma, listeleme, güncelleme, silme",
+      "List CRUD: Board içinde listeler oluşturma ve yeniden sıralama",
+      "Card CRUD: List içinde kartlar oluşturma, düzenleme, silme",
+      "Drag & Drop: Kartları listeler arası taşıma",
+      "Kart detayları: Açıklama, etiketler (label), son tarih (due date)",
+      "Arama: Board içinde kart arama",
+      "Kullanıcı profili: İsim, avatar güncelleme"
+    ],
+    "non_functional": [
+      "API response time p95 < 200ms",
+      "JWT token expiry: Access 15dk, Refresh 7gün",
+      "Password hashing: bcrypt ile minimum 10 salt rounds",
+      "Rate limiting: 100 request/dakika per IP",
+      "Input validation: Tüm endpoint'lerde Zod ile validasyon",
+      "CORS konfigürasyonu: Sadece frontend origin'e izin ver",
+      "SQL injection ve XSS koruması",
+      "Docker ile containerized deployment"
+    ]
+  },
+  "evaluation_criteria": [
+    {
+      "criterion": "API Tasarımı",
+      "weight": 20,
+      "description": "RESTful prensiplere uyum, tutarlı response formatı, proper HTTP status code'ları, pagination, error handling"
+    },
+    {
+      "criterion": "Veritabanı Tasarımı",
+      "weight": 15,
+      "description": "Normalizasyon, index kullanımı, migration stratejisi, ilişki doğruluğu, seed data"
+    },
+    {
+      "criterion": "Authentication & Güvenlik",
+      "weight": 15,
+      "description": "JWT implementasyonu, password hashing, rate limiting, input validation, CORS"
+    },
+    {
+      "criterion": "Frontend Kalitesi",
+      "weight": 20,
+      "description": "Component mimarisi, state management, drag & drop UX, error handling, loading states"
+    },
+    {
+      "criterion": "Test Coverage",
+      "weight": 15,
+      "description": "Unit testler, integration testler, API testleri, minimum %70 coverage"
+    },
+    {
+      "criterion": "DevOps",
+      "weight": 15,
+      "description": "Docker Compose, environment management, README, CI pipeline"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "p02-m1",
+      "title": "Proje Mimarisi ve Geliştirme Ortamı",
+      "overview": "Full stack bir projenin en kritik aşaması, başlangıç mimarisinin doğru kurulmasıdır. Bu milestone'da monorepo yapısını, backend ve frontend projelerini, Docker Compose konfigürasyonunu ve veritabanı bağlantısını kuracaksın.",
+      "estimated_hours": 6,
+      "concepts_covered": [
+        "Monorepo yapısı",
+        "Docker Compose",
+        "Express setup",
+        "React + Vite setup",
+        "Environment management"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Monorepo Proje Yapısını Oluşturma",
+          "why": "Backend ve frontend'in aynı repository'de tutulması (monorepo), geliştirme sürecini hızlandırır. Shared types, tek git history ve koordineli deployment sağlar. Büyük şirketler (Google, Meta) monorepo kullanır çünkü cross-project değişiklikler tek commit'te yapılabilir.",
+          "instructions": "Proje kök dizinini ve alt projeleri oluştur. Backend için Express, frontend için React + Vite kullan.",
+          "code_snippet": "mkdir task-manager && cd task-manager\n\n# Kök dizin package.json\npnpm init\n\n# Backend setup\nmkdir -p server/src/{controllers,services,middleware,routes,validators,utils}\ncd server && pnpm init && cd ..\ncd server\npnpm install express cors helmet morgan dotenv\npnpm install -D typescript @types/express @types/cors @types/morgan ts-node-dev\npnpm dlx tsc --init\ncd ..\n\n# Frontend setup\npnpm create vite@latest client -- --template react-ts\ncd client\npnpm install\npnpm install axios react-router-dom @tanstack/react-query\ncd ..\n\n# Proje yapısı\n# task-manager/\n# ├── server/          (Express API)\n# │   ├── src/\n# │   │   ├── controllers/\n# │   │   ├── services/\n# │   │   ├── middleware/\n# │   │   ├── routes/\n# │   │   ├── validators/\n# │   │   └── utils/\n# │   ├── prisma/\n# │   └── tests/\n# ├── client/          (React SPA)\n# │   └── src/\n# ├── docker-compose.yml\n# └── README.md",
+          "deep_dive": "Klasör yapısı, 'separation of concerns' prensibine uyar: controllers HTTP request/response'u yönetir, services business logic içerir, middleware cross-cutting concerns (auth, logging, validation) işler. Bu katmanlı yapı, her katmanın bağımsız test edilmesini sağlar. helmet güvenlik header'ları ekler, morgan HTTP request logging yapar, cors cross-origin isteklere izin verir.",
+          "checkpoint": "server/ ve client/ klasörleri oluşturulmuş olmalı. pnpm run dev ile her ikisi de başlatılabilmeli."
+        },
+        {
+          "step": 2,
+          "title": "Docker Compose ile Geliştirme Ortamı",
+          "why": "Docker Compose, tüm servisleri (API, veritabanı, frontend) tek komutla başlatır. 'Bende çalışıyor ama seninkinde çalışmıyor' sorununu ortadan kaldırır. Her geliştiricinin aynı ortamda çalışmasını garanti eder. PostgreSQL kurulumu Docker ile saniyeler sürer.",
+          "instructions": "docker-compose.yml dosyasını oluştur. PostgreSQL, backend ve frontend servislerini tanımla.",
+          "code_snippet": "# docker-compose.yml\nservices:\n  db:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_USER: taskuser\n      POSTGRES_PASSWORD: taskpass123\n      POSTGRES_DB: taskmanager\n    ports:\n      - '5432:5432'\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U taskuser -d taskmanager']\n      interval: 5s\n      timeout: 5s\n      retries: 5\n\n  server:\n    build:\n      context: ./server\n      dockerfile: Dockerfile.dev\n    ports:\n      - '3001:3001'\n    environment:\n      DATABASE_URL: postgresql://taskuser:taskpass123@db:5432/taskmanager\n      JWT_SECRET: your-super-secret-key-change-in-production\n      NODE_ENV: development\n    volumes:\n      - ./server:/app\n      - /app/node_modules\n    depends_on:\n      db:\n        condition: service_healthy\n    command: pnpm run dev\n\n  client:\n    build:\n      context: ./client\n      dockerfile: Dockerfile.dev\n    ports:\n      - '5173:5173'\n    volumes:\n      - ./client:/app\n      - /app/node_modules\n    depends_on:\n      - server\n\nvolumes:\n  pgdata:",
+          "deep_dive": "healthcheck, PostgreSQL'in gerçekten hazır olana kadar bekletir — yoksa backend başlarken DB henüz hazır olmayabilir. volumes ile host dosya sistemi container'a mount edilir — kodu değiştirdiğinde container içi de güncellenir (hot reload). /app/node_modules anonymous volume'u, host'taki node_modules'ı ezmesini önler. alpine image'lar çok daha küçüktür (5MB vs 130MB).",
+          "checkpoint": "docker compose up komutu ile tüm servisler başlamalı. PostgreSQL'e bağlantı kurulabilmeli. Backend API localhost:3001'de yanıt vermeli."
+        },
+        {
+          "step": 3,
+          "title": "Express Server ve Temel Middleware Kurulumu",
+          "why": "Express server'ın doğru konfigürasyonu, güvenlik ve hata yönetiminin temelini oluşturur. Middleware chain, her request'in geçtiği pipeline'dır — logging, CORS, body parsing, error handling burada yapılır. İlk gün kurulan middleware yapısı, projenin tüm yaşam döngüsü boyunca kullanılır.",
+          "instructions": "Express server'ı oluştur. Temel middleware'leri ekle ve hata yönetimi kur.",
+          "code_snippet": "// server/src/index.ts\nimport express from 'express';\nimport cors from 'cors';\nimport helmet from 'helmet';\nimport morgan from 'morgan';\nimport { config } from './utils/config';\nimport { errorHandler } from './middleware/error-handler';\nimport { notFoundHandler } from './middleware/not-found';\nimport authRoutes from './routes/auth.routes';\nimport boardRoutes from './routes/board.routes';\n\nconst app = express();\n\n// Security middleware\napp.use(helmet());\napp.use(cors({ origin: config.clientUrl, credentials: true }));\n\n// Parsing middleware\napp.use(express.json({ limit: '10mb' }));\napp.use(express.urlencoded({ extended: true }));\n\n// Logging\napp.use(morgan('dev'));\n\n// Routes\napp.use('/api/auth', authRoutes);\napp.use('/api/boards', boardRoutes);\n\n// Health check\napp.get('/api/health', (req, res) => {\n  res.json({ status: 'ok', timestamp: new Date().toISOString() });\n});\n\n// Error handling (en sonda olmalı)\napp.use(notFoundHandler);\napp.use(errorHandler);\n\napp.listen(config.port, () => {\n  console.log(`Server running on port ${config.port}`);\n});\n\n// server/src/middleware/error-handler.ts\nimport { Request, Response, NextFunction } from 'express';\n\nexport class AppError extends Error {\n  statusCode: number;\n  isOperational: boolean;\n\n  constructor(message: string, statusCode: number) {\n    super(message);\n    this.statusCode = statusCode;\n    this.isOperational = true;\n    Error.captureStackTrace(this, this.constructor);\n  }\n}\n\nexport function errorHandler(\n  err: Error,\n  req: Request,\n  res: Response,\n  _next: NextFunction\n) {\n  if (err instanceof AppError) {\n    return res.status(err.statusCode).json({\n      status: 'error',\n      message: err.message,\n    });\n  }\n\n  console.error('Unexpected error:', err);\n  return res.status(500).json({\n    status: 'error',\n    message: 'Beklenmeyen bir hata oluştu',\n  });\n}\n\n// server/src/utils/config.ts\nimport dotenv from 'dotenv';\ndotenv.config();\n\nexport const config = {\n  port: parseInt(process.env.PORT || '3001'),\n  databaseUrl: process.env.DATABASE_URL || '',\n  jwtSecret: process.env.JWT_SECRET || 'fallback-secret',\n  jwtExpiresIn: '15m',\n  jwtRefreshExpiresIn: '7d',\n  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',\n};",
+          "deep_dive": "Middleware sırası önemlidir: helmet (güvenlik) en başta, error handler en sonda olmalıdır. AppError class'ı, operational error'lar (kullanıcı hataları) ile programming error'ları (bug'lar) ayırır. isOperational flag'i, error'ın kullanıcıya gösterilip gösterilmeyeceğini belirler. express.json({ limit: '10mb' }) ile body boyutunu sınırlayarak DoS saldırılarını önlersin.",
+          "checkpoint": "curl http://localhost:3001/api/health komutu { status: 'ok' } dönmeli. CORS header'ları response'ta görünmeli. Olmayan route'a istek 404 dönmeli."
+        },
+        {
+          "step": 4,
+          "title": "Prisma Kurulumu ve İlk Migration",
+          "why": "Prisma, TypeScript ekosisteminin en güçlü ORM'idir. Schema-first yaklaşımıyla veritabanı modelini tek bir dosyada tanımlarsın ve otomatik tip üretimi yapılır. Migration sistemi, veritabanı şema değişikliklerini versiyon kontrollü yapar — takım çalışmasında şema çakışmalarını önler.",
+          "instructions": "Prisma'yı kur, schema tanımla ve ilk migration'ı çalıştır.",
+          "code_snippet": "cd server\npnpm dlx prisma init\n\n// server/prisma/schema.prisma\ngenerator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id        String   @id @default(cuid())\n  email     String   @unique\n  name      String\n  password  String\n  avatar    String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  boards    Board[]\n  cards     Card[]   @relation(\"assignee\")\n\n  @@map(\"users\")\n}\n\nmodel Board {\n  id        String   @id @default(cuid())\n  title     String\n  color     String   @default(\"#3b82f6\")\n  userId    String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  lists     List[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"boards\")\n}\n\nmodel List {\n  id       String @id @default(cuid())\n  title    String\n  position Int\n  boardId  String\n  board    Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)\n  cards    Card[]\n\n  @@map(\"lists\")\n}\n\nmodel Card {\n  id          String    @id @default(cuid())\n  title       String\n  description String?\n  position    Int\n  dueDate     DateTime?\n  labels      String[]  @default([])\n  listId      String\n  list        List      @relation(fields: [listId], references: [id], onDelete: Cascade)\n  assigneeId  String?\n  assignee    User?     @relation(\"assignee\", fields: [assigneeId], references: [id])\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n\n  @@map(\"cards\")\n}\n\n// Migration çalıştır\npnpm dlx prisma migrate dev --name init\n\n// Prisma Client üret\npnpm dlx prisma generate",
+          "deep_dive": "cuid(), UUID'ye göre daha kısa ve collision-resistant ID üretir. onDelete: Cascade ile board silindiğinde ilişkili list'ler de silinir — orphan record kalmaz. position alanı, list ve card sıralama için kullanılır (drag & drop için kritik). @@map ile model ismi PascalCase kalırken tablo ismi snake_case olur — SQL convention'a uyar. String[] tipi, PostgreSQL'in native array tipine map edilir — labels için ayrı tablo gerekmez.",
+          "checkpoint": "pnpm dlx prisma migrate dev başarılı olmalı. pnpm dlx prisma studio ile veritabanı tablolarını görebilmeli. TypeScript'te Prisma Client tip önerilerini görmeli."
+        },
+        {
+          "step": 5,
+          "title": "Seed Data ve Prisma Studio",
+          "why": "Seed data, geliştirme sırasında veritabanında test verisi sağlar. Boş veritabanıyla geliştirme yapmak zorlaşır ve hataları tespit etmeyi engeller. Ayrıca yeni geliştiricilerin projeyi klonlayıp hemen çalışmaya başlamasını sağlar.",
+          "instructions": "Prisma seed script'i oluştur ve çalıştır.",
+          "code_snippet": "// server/prisma/seed.ts\nimport { PrismaClient } from '@prisma/client';\nimport bcrypt from 'bcrypt';\n\nconst prisma = new PrismaClient();\n\nasync function main() {\n  // Test kullanıcısı oluştur\n  const hashedPassword = await bcrypt.hash('password123', 10);\n  \n  const user = await prisma.user.create({\n    data: {\n      email: 'test@example.com',\n      name: 'Test Kullanıcı',\n      password: hashedPassword,\n    },\n  });\n\n  // Örnek board oluştur\n  const board = await prisma.board.create({\n    data: {\n      title: 'Proje Geliştirme',\n      color: '#3b82f6',\n      userId: user.id,\n      lists: {\n        create: [\n          {\n            title: 'Yapılacak',\n            position: 0,\n            cards: {\n              create: [\n                { title: 'Veritabanı şeması tasarla', position: 0, labels: ['backend'] },\n                { title: 'API endpoint\\'leri yaz', position: 1, labels: ['backend'] },\n              ],\n            },\n          },\n          {\n            title: 'Devam Eden',\n            position: 1,\n            cards: {\n              create: [\n                { title: 'Login sayfası', position: 0, labels: ['frontend'] },\n              ],\n            },\n          },\n          {\n            title: 'Tamamlanan',\n            position: 2,\n          },\n        ],\n      },\n    },\n  });\n\n  console.log('Seed data oluşturuldu:', { userId: user.id, boardId: board.id });\n}\n\nmain()\n  .catch(console.error)\n  .finally(() => prisma.$disconnect());\n\n// package.json'a ekle:\n// \"prisma\": { \"seed\": \"tsx prisma/seed.ts\" }\n\n// Çalıştır:\n// pnpm dlx prisma db seed",
+          "deep_dive": "Nested create (lists -> cards), Prisma'nın güçlü özelliklerinden biridir — tek transaction'da tüm ilişkili verileri oluşturur. bcrypt.hash'in ikinci parametresi (10), salt rounds sayısıdır — her ek round işlem süresini 2 katına çıkarır. 10 rounds, güvenlik ve performans arasında iyi bir denge sağlar (2026 standartlarında). prisma.$disconnect() ile connection pool kapatılır — memory leak önlenir.",
+          "checkpoint": "pnpm dlx prisma db seed başarılı olmalı. pnpm dlx prisma studio'da board, list ve card verileri görünmeli. Test kullanıcısı ile giriş yapılabilmeli."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Docker Compose'da healthcheck ile servis bağımlılıklarını yönet — DB hazır olmadan API başlamamalı.\n- Prisma schema'da @@map ile tablo isimlerini SQL convention'a (snake_case) çevir.\n- onDelete: Cascade ile parent silinince child'lar da silinir — orphan record önlenir.\n- Express middleware sırası: helmet > cors > body parser > routes > 404 handler > error handler.\n- Error handler'da operational ve programming error'ları ayır — kullanıcıya sadece operational error göster.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar projeye başlarken 'local development experience'ı optimize eder. docker compose up ile her şeyin tek komutla çalışması gerekir. Makefile veya package.json scripts ile sık kullanılan komutları kısayol yapar: make dev, make seed, make test. Ayrıca environment variable'ları .env.example dosyasında dökümante eder — yeni gelen developer secret'ları bilmek zorunda kalmamalı, sadece kopyalayıp doldurmalı."
+    },
+    {
+      "id": "p02-m2",
+      "title": "Veritabanı Tasarımı ve CRUD Servisleri",
+      "overview": "Bu milestone'da veritabanı ilişkilerini detaylandıracak, service layer pattern'ı ile business logic'i organize edecek ve temel CRUD operasyonlarını implement edeceksin. İyi tasarlanmış bir service layer, kodun test edilebilirliğini ve yeniden kullanılabilirliğini artırır.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "Service layer pattern",
+        "Repository pattern",
+        "Prisma CRUD",
+        "Error handling",
+        "Input validation"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Board Service Layer Oluşturma",
+          "why": "Service layer, business logic'i controller'lardan ayırır. Controller sadece HTTP request/response yönetirken, service veri işleme ve iş kurallarını uygular. Bu ayrım, aynı logic'in farklı context'lerde (API, WebSocket, CLI) kullanılmasını sağlar.",
+          "instructions": "Board için service ve controller katmanlarını oluştur.",
+          "code_snippet": "// server/src/lib/prisma.ts (singleton pattern)\nimport { PrismaClient } from '@prisma/client';\n\nconst globalForPrisma = globalThis as unknown as { prisma: PrismaClient };\nexport const prisma = globalForPrisma.prisma ?? new PrismaClient();\nif (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;\n\n// server/src/services/board.service.ts\nimport { prisma } from '../lib/prisma';\nimport { AppError } from '../middleware/error-handler';\n\nexport class BoardService {\n  async getAll(userId: string) {\n    return prisma.board.findMany({\n      where: { userId },\n      include: {\n        lists: {\n          orderBy: { position: 'asc' },\n          include: {\n            cards: {\n              orderBy: { position: 'asc' },\n            },\n          },\n        },\n        _count: { select: { lists: true } },\n      },\n      orderBy: { updatedAt: 'desc' },\n    });\n  }\n\n  async getById(id: string, userId: string) {\n    const board = await prisma.board.findFirst({\n      where: { id, userId },\n      include: {\n        lists: {\n          orderBy: { position: 'asc' },\n          include: {\n            cards: {\n              orderBy: { position: 'asc' },\n              include: { assignee: { select: { id: true, name: true, avatar: true } } },\n            },\n          },\n        },\n      },\n    });\n\n    if (!board) {\n      throw new AppError('Board bulunamadı', 404);\n    }\n\n    return board;\n  }\n\n  async create(userId: string, data: { title: string; color?: string }) {\n    return prisma.board.create({\n      data: {\n        title: data.title,\n        color: data.color || '#3b82f6',\n        userId,\n        lists: {\n          create: [\n            { title: 'Yapılacak', position: 0 },\n            { title: 'Devam Eden', position: 1 },\n            { title: 'Tamamlanan', position: 2 },\n          ],\n        },\n      },\n      include: { lists: true },\n    });\n  }\n\n  async update(id: string, userId: string, data: { title?: string; color?: string }) {\n    const board = await prisma.board.findFirst({ where: { id, userId } });\n    if (!board) throw new AppError('Board bulunamadı', 404);\n\n    return prisma.board.update({\n      where: { id },\n      data,\n    });\n  }\n\n  async delete(id: string, userId: string) {\n    const board = await prisma.board.findFirst({ where: { id, userId } });\n    if (!board) throw new AppError('Board bulunamadı', 404);\n\n    return prisma.board.delete({ where: { id } });\n  }\n}",
+          "deep_dive": "findFirst ile findUnique arasındaki fark: findFirst where koşulunda birden fazla alan kullanabilir (id + userId), findUnique sadece @unique/@id alanlarda çalışır. include ile ilişkili verileri tek sorguda getiriyoruz — N+1 query problemini önler. _count ile ilişkili kayıt sayısını ayrı sorgu yapmadan alırız. Board oluşturulduğunda varsayılan 3 liste otomatik oluşturulur — kullanıcı hemen kullanmaya başlayabilir.",
+          "checkpoint": "BoardService tüm CRUD metodları çalışmalı. Olmayan board'a erişimde AppError fırlatılmalı. TypeScript tipler doğru olmalı."
+        },
+        {
+          "step": 2,
+          "title": "Input Validation ile Zod Entegrasyonu",
+          "why": "Kullanıcı girdilerini doğrulamak, güvenliğin ilk katmanıdır. SQL injection, XSS ve mantıksal hataları önler. Zod, TypeScript-first validation kütüphanesidir — schema'dan otomatik tip çıkarımı yapar, böylece validation ve TypeScript tipleri her zaman senkronize kalır.",
+          "instructions": "Zod schema'ları tanımla ve validation middleware'i oluştur.",
+          "code_snippet": "pnpm install zod\n\n// server/src/validators/board.validator.ts\nimport { z } from 'zod';\n\nexport const createBoardSchema = z.object({\n  body: z.object({\n    title: z\n      .string()\n      .min(1, 'Board başlığı boş olamaz')\n      .max(100, 'Board başlığı 100 karakterden uzun olamaz')\n      .trim(),\n    color: z\n      .string()\n      .regex(/^#[0-9A-Fa-f]{6}$/, 'Geçerli bir hex renk kodu girin')\n      .optional(),\n  }),\n});\n\nexport const updateBoardSchema = z.object({\n  body: z.object({\n    title: z.string().min(1).max(100).trim().optional(),\n    color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),\n  }),\n  params: z.object({\n    id: z.string().cuid(),\n  }),\n});\n\n// server/src/middleware/validate.ts\nimport { Request, Response, NextFunction } from 'express';\nimport { AnyZodObject, ZodError } from 'zod';\n\nexport function validate(schema: AnyZodObject) {\n  return async (req: Request, res: Response, next: NextFunction) => {\n    try {\n      await schema.parseAsync({\n        body: req.body,\n        query: req.query,\n        params: req.params,\n      });\n      next();\n    } catch (error) {\n      if (error instanceof ZodError) {\n        return res.status(400).json({\n          status: 'validation_error',\n          errors: error.errors.map((e) => ({\n            field: e.path.join('.'),\n            message: e.message,\n          })),\n        });\n      }\n      next(error);\n    }\n  };\n}\n\n// Route'ta kullanım:\n// router.post('/', authenticate, validate(createBoardSchema), boardController.create);",
+          "deep_dive": "Zod'un z.infer<typeof schema> ile TypeScript tipini otomatik çıkarabilirsin — böylece schema ve tip asla uyumsuz olmaz. trim() ile boşlukları temizlemek, kullanıcı hatasını önler. cuid() validation'ı, id parametresinin Prisma'nın ürettiği format olduğunu doğrular. Validation middleware'i route handler'dan önce çalışır — geçersiz veri asla controller'a ulaşmaz.",
+          "checkpoint": "Geçersiz veri gönderildiğinde 400 status ve detaylı hata mesajları dönmeli. Geçerli veri sorunsuz geçmeli. TypeScript tipleri Zod schema'sından türetilmeli."
+        },
+        {
+          "step": 3,
+          "title": "Board Controller ve Route Tanımları",
+          "why": "Controller, HTTP katmanını yönetir: request'i parse eder, service'i çağırır ve response'u formatlar. Route dosyası, URL pattern'larını controller metodlarıyla eşleştirir. Bu ayrım, her katmanın sorumluluğunu netleştirir ve test edilebilirliği artırır.",
+          "instructions": "Board controller'ını ve route tanımlarını oluştur.",
+          "code_snippet": "// server/src/controllers/board.controller.ts\nimport { Request, Response, NextFunction } from 'express';\nimport { BoardService } from '../services/board.service';\n\nconst boardService = new BoardService();\n\nexport class BoardController {\n  async getAll(req: Request, res: Response, next: NextFunction) {\n    try {\n      const boards = await boardService.getAll(req.userId!);\n      res.json({ status: 'success', data: boards });\n    } catch (error) {\n      next(error);\n    }\n  }\n\n  async getById(req: Request, res: Response, next: NextFunction) {\n    try {\n      const board = await boardService.getById(req.params.id, req.userId!);\n      res.json({ status: 'success', data: board });\n    } catch (error) {\n      next(error);\n    }\n  }\n\n  async create(req: Request, res: Response, next: NextFunction) {\n    try {\n      const board = await boardService.create(req.userId!, req.body);\n      res.status(201).json({ status: 'success', data: board });\n    } catch (error) {\n      next(error);\n    }\n  }\n\n  async update(req: Request, res: Response, next: NextFunction) {\n    try {\n      const board = await boardService.update(req.params.id, req.userId!, req.body);\n      res.json({ status: 'success', data: board });\n    } catch (error) {\n      next(error);\n    }\n  }\n\n  async delete(req: Request, res: Response, next: NextFunction) {\n    try {\n      await boardService.delete(req.params.id, req.userId!);\n      res.status(204).send();\n    } catch (error) {\n      next(error);\n    }\n  }\n}\n\n// server/src/routes/board.routes.ts\nimport { Router } from 'express';\nimport { BoardController } from '../controllers/board.controller';\nimport { authenticate } from '../middleware/auth';\nimport { validate } from '../middleware/validate';\nimport { createBoardSchema, updateBoardSchema } from '../validators/board.validator';\n\nconst router = Router();\nconst controller = new BoardController();\n\nrouter.use(authenticate);\n\nrouter.get('/', controller.getAll.bind(controller));\nrouter.get('/:id', controller.getById.bind(controller));\nrouter.post('/', validate(createBoardSchema), controller.create.bind(controller));\nrouter.put('/:id', validate(updateBoardSchema), controller.update.bind(controller));\nrouter.delete('/:id', controller.delete.bind(controller));\n\nexport default router;",
+          "deep_dive": "Her controller metodu try-catch ile sarılır ve hata next(error) ile error handler middleware'ine iletilir. Alternatif olarak asyncHandler wrapper fonksiyonu kullanılabilir. bind(controller) gereklidir çünkü Express route handler'ları callback olarak geçirilir ve this context'i kaybolur. 201 status kodu resource oluşturulduğunda, 204 silme işleminde kullanılır (no content). router.use(authenticate) ile tüm board route'ları auth gerektirir.",
+          "checkpoint": "Tüm CRUD endpoint'leri çalışmalı. Postman veya curl ile test edilmeli. Auth olmadan erişimde 401, geçersiz veri ile 400 dönmeli."
+        },
+        {
+          "step": 4,
+          "title": "List ve Card Servisleri",
+          "why": "List ve Card, board'un alt kaynakları (nested resources) olarak tasarlanır. List sıralama (reorder) ve Card taşıma (move) işlemleri, kanban board'un temel işlevselliğini oluşturur. Bu işlemler, transaction içinde yapılmalıdır çünkü birden fazla kaydın position değeri güncellenir.",
+          "instructions": "List ve Card için service, controller ve route dosyalarını oluştur. Sıralama ve taşıma logic'ini implement et.",
+          "code_snippet": "// server/src/services/card.service.ts\nimport { prisma } from '../lib/prisma';\nimport { AppError } from '../middleware/error-handler';\n\nexport class CardService {\n  async create(listId: string, data: { title: string; description?: string }) {\n    const list = await prisma.list.findUnique({ where: { id: listId } });\n    if (!list) throw new AppError('List bulunamadı', 404);\n\n    const maxPosition = await prisma.card.aggregate({\n      where: { listId },\n      _max: { position: true },\n    });\n\n    return prisma.card.create({\n      data: {\n        ...data,\n        listId,\n        position: (maxPosition._max.position ?? -1) + 1,\n      },\n    });\n  }\n\n  async move(cardId: string, targetListId: string, newPosition: number) {\n    const card = await prisma.card.findUnique({ where: { id: cardId } });\n    if (!card) throw new AppError('Card bulunamadı', 404);\n\n    return prisma.$transaction(async (tx) => {\n      // Hedef listteki kartların pozisyonlarını güncelle\n      await tx.card.updateMany({\n        where: {\n          listId: targetListId,\n          position: { gte: newPosition },\n        },\n        data: { position: { increment: 1 } },\n      });\n\n      // Kaynak listteki boşluğu kapat\n      if (card.listId !== targetListId) {\n        await tx.card.updateMany({\n          where: {\n            listId: card.listId,\n            position: { gt: card.position },\n          },\n          data: { position: { decrement: 1 } },\n        });\n      }\n\n      // Kartı taşı\n      return tx.card.update({\n        where: { id: cardId },\n        data: { listId: targetListId, position: newPosition },\n      });\n    });\n  }\n\n  async update(cardId: string, data: {\n    title?: string;\n    description?: string;\n    dueDate?: Date | null;\n    labels?: string[];\n  }) {\n    return prisma.card.update({\n      where: { id: cardId },\n      data,\n    });\n  }\n\n  async delete(cardId: string) {\n    const card = await prisma.card.findUnique({ where: { id: cardId } });\n    if (!card) throw new AppError('Card bulunamadı', 404);\n\n    return prisma.$transaction(async (tx) => {\n      await tx.card.delete({ where: { id: cardId } });\n      // Silinen kartın altındaki kartların pozisyonlarını güncelle\n      await tx.card.updateMany({\n        where: {\n          listId: card.listId,\n          position: { gt: card.position },\n        },\n        data: { position: { decrement: 1 } },\n      });\n    });\n  }\n}",
+          "deep_dive": "prisma.$transaction, birden fazla veritabanı işlemini atomik yapar — ya hepsi başarılı olur, ya hiçbiri. Bu, card taşıma sırasında pozisyon tutarsızlığını önler. aggregate ile mevcut en yüksek pozisyonu buluruz — yeni kart her zaman sona eklenir. updateMany, birden fazla kaydı tek sorguda günceller. Sıralama logic'i karmaşıktır: taşınan kartın eski yerinde boşluk kapatılır, yeni yerinde yer açılır.",
+          "checkpoint": "Kart oluşturma, güncelleme, silme ve listeler arası taşıma çalışmalı. Taşıma sonrası pozisyonlar tutarlı olmalı. Transaction hatalarında rollback çalışmalı."
+        },
+        {
+          "step": 5,
+          "title": "Tutarlı API Response Formatı",
+          "why": "Tüm API endpoint'lerinin aynı response formatını kullanması, frontend geliştirmeyi kolaylaştırır ve profesyonel API tasarımını gösterir. Tutarlı format, error handling, pagination ve metadata için standart bir yapı sağlar.",
+          "instructions": "API response helper fonksiyonlarını oluştur ve tüm controller'larda kullan.",
+          "code_snippet": "// server/src/utils/api-response.ts\nimport { Response } from 'express';\n\nexport interface ApiResponse<T> {\n  status: 'success' | 'error';\n  data?: T;\n  message?: string;\n  meta?: {\n    page?: number;\n    limit?: number;\n    total?: number;\n    totalPages?: number;\n  };\n}\n\nexport function sendSuccess<T>(res: Response, data: T, statusCode = 200) {\n  const response: ApiResponse<T> = {\n    status: 'success',\n    data,\n  };\n  return res.status(statusCode).json(response);\n}\n\nexport function sendPaginated<T>(\n  res: Response,\n  data: T[],\n  total: number,\n  page: number,\n  limit: number\n) {\n  const response: ApiResponse<T[]> = {\n    status: 'success',\n    data,\n    meta: {\n      page,\n      limit,\n      total,\n      totalPages: Math.ceil(total / limit),\n    },\n  };\n  return res.json(response);\n}\n\nexport function sendError(res: Response, message: string, statusCode = 400) {\n  const response: ApiResponse<null> = {\n    status: 'error',\n    message,\n  };\n  return res.status(statusCode).json(response);\n}",
+          "deep_dive": "Generic tip <T> ile response data tipi type-safe olur — sendSuccess<Board>(res, board) ile Board tipinde data döndüğü garanti edilir. meta objesi, pagination bilgisini standart şekilde iletir. totalPages hesaplaması Math.ceil ile yapılır — kalan kayıtlar için ek sayfa oluşturulur. Bu pattern, frontend'de generic API client yazılmasını kolaylaştırır çünkü tüm response'lar aynı yapıdadır.",
+          "checkpoint": "Tüm API response'ları { status, data, meta } formatında olmalı. Error response'ları { status: 'error', message } formatında olmalı."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Service layer, business logic'i controller'dan ayırır — test edilebilirlik ve yeniden kullanılabilirlik sağlar.\n- prisma.$transaction ile atomik işlemler — kart taşıma sırasında pozisyon tutarsızlığı önlenir.\n- Zod ile input validation — schema'dan TypeScript tipi otomatik çıkarılır (z.infer).\n- Tutarlı API response formatı: { status, data, meta } — frontend'de generic client yazılabilir.\n- position alanı drag & drop sıralaması için kritik — taşıma logic'i transaction içinde olmalı.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar 'defense in depth' uygular: validation client'ta da server'da da yapılır. Client validation UX için (hızlı geri bildirim), server validation güvenlik için (client bypass edilebilir). Ayrıca N+1 query problemi konusunda hassastırlar — Prisma'nın include seçeneği ile ilişkili verileri tek query'de getirmek, sayfa başına düzinelerce query'yi teke indirir. Production'da query performance monitoring (Prisma'nın query logging'i) aktif edilir."
+    },
+    {
+      "id": "p02-m3",
+      "title": "Authentication Sistemi",
+      "overview": "Güvenli bir authentication sistemi, her web uygulamasının temel taşıdır. Bu milestone'da JWT tabanlı auth sistemi kuracak, password hashing, token management ve protected route'lar implement edeceksin.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "JWT",
+        "bcrypt",
+        "Access/Refresh token",
+        "Auth middleware",
+        "Protected routes"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Kullanıcı Kayıt (Register) Endpoint'i",
+          "why": "Kayıt işlemi, kullanıcı verilerini güvenli şekilde saklamanın ilk adımıdır. Password asla düz metin olarak saklanmaz — bcrypt ile hash'lenir. Email benzersizliği veritabanı seviyesinde enforce edilir.",
+          "instructions": "Auth service'i oluştur. Register endpoint'ini implement et.",
+          "code_snippet": "pnpm install bcrypt jsonwebtoken\npnpm install -D @types/bcrypt @types/jsonwebtoken\n\n// server/src/services/auth.service.ts\nimport { prisma } from '../lib/prisma';\nimport bcrypt from 'bcrypt';\nimport jwt from 'jsonwebtoken';\nimport { config } from '../utils/config';\nimport { AppError } from '../middleware/error-handler';\n\nexport class AuthService {\n  async register(data: { email: string; name: string; password: string }) {\n    const existingUser = await prisma.user.findUnique({\n      where: { email: data.email },\n    });\n\n    if (existingUser) {\n      throw new AppError('Bu email adresi zaten kayıtlı', 409);\n    }\n\n    const hashedPassword = await bcrypt.hash(data.password, 10);\n\n    const user = await prisma.user.create({\n      data: {\n        email: data.email,\n        name: data.name,\n        password: hashedPassword,\n      },\n      select: {\n        id: true,\n        email: true,\n        name: true,\n        createdAt: true,\n      },\n    });\n\n    const tokens = this.generateTokens(user.id);\n\n    return { user, ...tokens };\n  }\n\n  async login(email: string, password: string) {\n    const user = await prisma.user.findUnique({ where: { email } });\n\n    if (!user) {\n      throw new AppError('Email veya parola hatalı', 401);\n    }\n\n    const isPasswordValid = await bcrypt.compare(password, user.password);\n\n    if (!isPasswordValid) {\n      throw new AppError('Email veya parola hatalı', 401);\n    }\n\n    const tokens = this.generateTokens(user.id);\n\n    return {\n      user: {\n        id: user.id,\n        email: user.email,\n        name: user.name,\n      },\n      ...tokens,\n    };\n  }\n\n  async refreshToken(token: string) {\n    try {\n      const payload = jwt.verify(token, config.jwtSecret) as { userId: string; type: string };\n      \n      if (payload.type !== 'refresh') {\n        throw new AppError('Geçersiz token tipi', 401);\n      }\n\n      const user = await prisma.user.findUnique({ where: { id: payload.userId } });\n      if (!user) throw new AppError('Kullanıcı bulunamadı', 401);\n\n      return this.generateTokens(user.id);\n    } catch {\n      throw new AppError('Geçersiz refresh token', 401);\n    }\n  }\n\n  private generateTokens(userId: string) {\n    const accessToken = jwt.sign(\n      { userId, type: 'access' },\n      config.jwtSecret,\n      { expiresIn: config.jwtExpiresIn }\n    );\n\n    const refreshToken = jwt.sign(\n      { userId, type: 'refresh' },\n      config.jwtSecret,\n      { expiresIn: config.jwtRefreshExpiresIn }\n    );\n\n    return { accessToken, refreshToken };\n  }\n}",
+          "deep_dive": "select ile password alanını response'dan çıkarıyoruz — hassas veri asla client'a gönderilmez. 409 Conflict status kodu, 'bu kaynak zaten var' anlamına gelir (duplicate email). Login'de 'Email veya parola hatalı' gibi belirsiz hata mesajı kullanılır — spesifik mesaj (örn. 'email bulunamadı') saldırganlara email enum attack'ı yapma imkanı verir. Refresh token pattern'ı: access token kısa ömürlü (15dk), refresh token uzun ömürlü (7gün) — access token çalınsa bile kısa sürede geçersiz olur.",
+          "checkpoint": "Register endpoint'i yeni kullanıcı oluşturmalı ve token dönmeli. Duplicate email'de 409 dönmeli. Login yanlış parola ile 401 dönmeli."
+        },
+        {
+          "step": 2,
+          "title": "Authentication Middleware",
+          "why": "Auth middleware, her korumalı route'tan önce çalışarak JWT token'ı doğrular. Geçersiz veya süresi dolmuş token ile erişim engellenir. Bu middleware, request objesine userId ekleyerek downstream handler'ların kullanıcıyı tanımasını sağlar.",
+          "instructions": "JWT doğrulama middleware'ini oluştur. Express Request tipini genişlet.",
+          "code_snippet": "// server/src/types/express.d.ts\ndeclare namespace Express {\n  interface Request {\n    userId?: string;\n  }\n}\n\n// server/src/middleware/auth.ts\nimport { Request, Response, NextFunction } from 'express';\nimport jwt from 'jsonwebtoken';\nimport { config } from '../utils/config';\nimport { AppError } from './error-handler';\n\nexport function authenticate(req: Request, res: Response, next: NextFunction) {\n  const authHeader = req.headers.authorization;\n\n  if (!authHeader || !authHeader.startsWith('Bearer ')) {\n    throw new AppError('Authentication token gerekli', 401);\n  }\n\n  const token = authHeader.split(' ')[1];\n\n  try {\n    const payload = jwt.verify(token, config.jwtSecret) as {\n      userId: string;\n      type: string;\n    };\n\n    if (payload.type !== 'access') {\n      throw new AppError('Geçersiz token tipi', 401);\n    }\n\n    req.userId = payload.userId;\n    next();\n  } catch (error) {\n    if (error instanceof jwt.TokenExpiredError) {\n      throw new AppError('Token süresi dolmuş', 401);\n    }\n    throw new AppError('Geçersiz token', 401);\n  }\n}",
+          "deep_dive": "Bearer token formatı, OAuth 2.0 standardıdır: 'Authorization: Bearer <token>'. Token payload'ında type alanı, access ve refresh token'ları ayırır — refresh token ile API erişimi engellenir. Express.Request tip genişletmesi (declaration merging), TypeScript'in structural typing özelliğini kullanır. TokenExpiredError özel olarak yakalanır çünkü client'a 'token'ını yenile' mesajı gönderilir (refresh flow tetiklenir).",
+          "checkpoint": "Auth middleware, geçerli token ile req.userId setlemeli. Geçersiz/süresi dolmuş token ile 401 dönmeli. Token olmadan 401 dönmeli."
+        },
+        {
+          "step": 3,
+          "title": "Rate Limiting ve Güvenlik Katmanları",
+          "why": "Rate limiting, brute force saldırılarını ve API kötüye kullanımını önler. Login endpoint'inde özellikle kritiktir — saldırgan binlerce parola deneyebilir. Ek güvenlik katmanları (helmet, CORS, input sanitization) defense-in-depth prensibini uygular.",
+          "instructions": "Rate limiting middleware'ini kur ve güvenlik katmanlarını yapılandır.",
+          "code_snippet": "pnpm install express-rate-limit\n\n// server/src/middleware/rate-limit.ts\nimport rateLimit from 'express-rate-limit';\n\nexport const generalLimiter = rateLimit({\n  windowMs: 15 * 60 * 1000, // 15 dakika\n  max: 100, // IP başına 100 istek\n  message: {\n    status: 'error',\n    message: 'Çok fazla istek gönderdiniz, lütfen daha sonra tekrar deneyin',\n  },\n  standardHeaders: true,\n  legacyHeaders: false,\n});\n\nexport const authLimiter = rateLimit({\n  windowMs: 15 * 60 * 1000,\n  max: 10, // Login için 15 dakikada 10 deneme\n  message: {\n    status: 'error',\n    message: 'Çok fazla giriş denemesi, 15 dakika sonra tekrar deneyin',\n  },\n  standardHeaders: true,\n  legacyHeaders: false,\n});\n\n// Route'larda kullanım:\n// app.use('/api/', generalLimiter);\n// app.use('/api/auth/login', authLimiter);",
+          "deep_dive": "standardHeaders: true, RFC draft-ietf-httpapi-ratelimit-headers'a uygun header'lar ekler: RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset. Client bu header'ları okuyarak rate limit durumunu gösterebilir. Login endpoint'i için daha sıkı limit (10 deneme) uygulanır çünkü burası brute force saldırısının hedefidir. Production'da Redis store kullanılır — memory store cluster ortamında çalışmaz.",
+          "checkpoint": "Rate limit aşıldığında 429 Too Many Requests dönmeli. Response header'larında rate limit bilgileri görünmeli. Login ve genel limitler farklı olmalı."
+        },
+        {
+          "step": 4,
+          "title": "Auth Route'ları ve Controller",
+          "why": "Auth route'ları, register, login ve token refresh işlemlerini bir araya getirir. Her endpoint'in kendi validation'ı ve rate limit'i olmalıdır. Token refresh flow, kullanıcı deneyimini iyileştirir — access token süresi dolduğunda otomatik yenileme yapılır.",
+          "instructions": "Auth controller ve route'larını oluştur.",
+          "code_snippet": "// server/src/validators/auth.validator.ts\nimport { z } from 'zod';\n\nexport const registerSchema = z.object({\n  body: z.object({\n    email: z.string().email('Geçerli bir email adresi girin'),\n    name: z.string().min(2, 'İsim en az 2 karakter olmalı').max(50),\n    password: z\n      .string()\n      .min(8, 'Parola en az 8 karakter olmalı')\n      .regex(/[A-Z]/, 'En az bir büyük harf içermeli')\n      .regex(/[a-z]/, 'En az bir küçük harf içermeli')\n      .regex(/[0-9]/, 'En az bir rakam içermeli'),\n  }),\n});\n\nexport const loginSchema = z.object({\n  body: z.object({\n    email: z.string().email(),\n    password: z.string().min(1, 'Parola gerekli'),\n  }),\n});\n\n// server/src/routes/auth.routes.ts\nimport { Router } from 'express';\nimport { AuthController } from '../controllers/auth.controller';\nimport { validate } from '../middleware/validate';\nimport { authenticate } from '../middleware/auth';\nimport { authLimiter } from '../middleware/rate-limit';\nimport { registerSchema, loginSchema } from '../validators/auth.validator';\n\nconst router = Router();\nconst controller = new AuthController();\n\nrouter.post('/register', validate(registerSchema), controller.register.bind(controller));\nrouter.post('/login', authLimiter, validate(loginSchema), controller.login.bind(controller));\nrouter.post('/refresh', controller.refreshToken.bind(controller));\nrouter.get('/me', authenticate, controller.getMe.bind(controller));\n\nexport default router;",
+          "deep_dive": "Password validation regex pattern'ı: en az 8 karakter, büyük harf, küçük harf ve rakam zorunluluğu. Bu, OWASP password policy önerilerine uygundur. Login'de parola için min(1) kullanılır (detaylı validation gerekmez çünkü zaten hash ile karşılaştırılacak). Rate limiter sadece login'e uygulanır — register için genel limiter yeterli. Refresh endpoint'i rate limit gerektirmez çünkü token theft durumunda saldırgan zaten access token'a sahiptir.",
+          "checkpoint": "POST /api/auth/register ile yeni kullanıcı oluşturulabilmeli. POST /api/auth/login ile token alınabilmeli. POST /api/auth/refresh ile yeni access token alınabilmeli."
+        },
+        {
+          "step": 5,
+          "title": "Frontend Auth Context ve Token Yönetimi",
+          "why": "Frontend'de auth state management, kullanıcı oturumunu uygulamanın her yerinden erişilebilir tutar. Token'lar güvenli şekilde saklanmalı ve API isteklerinde otomatik olarak eklenmeli. Token refresh flow, kullanıcının farkında olmadan oturumunu devam ettirir.",
+          "instructions": "React Context ile auth state management kur. Axios interceptor ile otomatik token yönetimi sağla.",
+          "code_snippet": "// client/src/lib/api.ts\nimport axios from 'axios';\n\nconst api = axios.create({\n  baseURL: 'http://localhost:3001/api',\n});\n\n// Request interceptor - token ekle\napi.interceptors.request.use((config) => {\n  const token = localStorage.getItem('accessToken');\n  if (token) {\n    config.headers.Authorization = `Bearer ${token}`;\n  }\n  return config;\n});\n\n// Response interceptor - token refresh\napi.interceptors.response.use(\n  (response) => response,\n  async (error) => {\n    const originalRequest = error.config;\n\n    if (error.response?.status === 401 && !originalRequest._retry) {\n      originalRequest._retry = true;\n\n      try {\n        const refreshToken = localStorage.getItem('refreshToken');\n        const { data } = await axios.post(\n          'http://localhost:3001/api/auth/refresh',\n          { token: refreshToken }\n        );\n\n        localStorage.setItem('accessToken', data.data.accessToken);\n        localStorage.setItem('refreshToken', data.data.refreshToken);\n\n        originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;\n        return api(originalRequest);\n      } catch {\n        localStorage.removeItem('accessToken');\n        localStorage.removeItem('refreshToken');\n        window.location.href = '/login';\n      }\n    }\n\n    return Promise.reject(error);\n  }\n);\n\nexport { api };\n\n// client/src/contexts/auth-context.tsx\nimport { createContext, useContext, useState, useEffect, ReactNode } from 'react';\nimport { api } from '../lib/api';\n\ninterface User {\n  id: string;\n  email: string;\n  name: string;\n}\n\ninterface AuthContextType {\n  user: User | null;\n  isLoading: boolean;\n  login: (email: string, password: string) => Promise<void>;\n  register: (email: string, name: string, password: string) => Promise<void>;\n  logout: () => void;\n}\n\nconst AuthContext = createContext<AuthContextType | null>(null);\n\nexport function AuthProvider({ children }: { children: ReactNode }) {\n  const [user, setUser] = useState<User | null>(null);\n  const [isLoading, setIsLoading] = useState(true);\n\n  useEffect(() => {\n    const token = localStorage.getItem('accessToken');\n    if (token) {\n      api.get('/auth/me')\n        .then(({ data }) => setUser(data.data))\n        .catch(() => logout())\n        .finally(() => setIsLoading(false));\n    } else {\n      setIsLoading(false);\n    }\n  }, []);\n\n  const login = async (email: string, password: string) => {\n    const { data } = await api.post('/auth/login', { email, password });\n    localStorage.setItem('accessToken', data.data.accessToken);\n    localStorage.setItem('refreshToken', data.data.refreshToken);\n    setUser(data.data.user);\n  };\n\n  const register = async (email: string, name: string, password: string) => {\n    const { data } = await api.post('/auth/register', { email, name, password });\n    localStorage.setItem('accessToken', data.data.accessToken);\n    localStorage.setItem('refreshToken', data.data.refreshToken);\n    setUser(data.data.user);\n  };\n\n  const logout = () => {\n    localStorage.removeItem('accessToken');\n    localStorage.removeItem('refreshToken');\n    setUser(null);\n  };\n\n  return (\n    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>\n      {children}\n    </AuthContext.Provider>\n  );\n}\n\nexport const useAuth = () => {\n  const context = useContext(AuthContext);\n  if (!context) throw new Error('useAuth must be used within AuthProvider');\n  return context;\n};",
+          "deep_dive": "Axios interceptor, her request ve response'u otomatik olarak yakalar. Request interceptor token ekler, response interceptor 401 durumunda otomatik refresh yapar. _retry flag'i sonsuz döngüyü önler. Refresh başarısız olursa kullanıcı login sayfasına yönlendirilir. localStorage'da token saklamak XSS saldırısına açıktır — daha güvenli alternatif httpOnly cookie'dir, ama bu CSRF koruması gerektirir. Trade-off bilinçli yapılmalıdır.",
+          "checkpoint": "Login sonrası token localStorage'a kaydedilmeli. API isteklerinde token otomatik eklenmeli. Token expire olduğunda refresh otomatik çalışmalı."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Password ASLA düz metin saklanmaz — bcrypt ile hash'le (minimum 10 salt rounds).\n- Login hata mesajı belirsiz olmalı ('email veya parola hatalı') — email enum attack'ı önler.\n- Access token: 15dk, Refresh token: 7gün — kısa ömürlü access token güvenliği artırır.\n- Rate limiting: login için sıkı (10/15dk), genel API için gevşek (100/15dk).\n- Axios interceptor ile token refresh otomatik yapılır — kullanıcı hiçbir şey fark etmez.\n- localStorage XSS'e açık — production'da httpOnly cookie değerlendir.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar auth'u asla kendileri sıfırdan yazmaz — battle-tested kütüphaneler (Passport.js, Auth.js) veya servisler (Auth0, Clerk, Supabase Auth) kullanır. Ama NASIL çalıştığını bilmek zorunludur çünkü hata ayıklama ve güvenlik audit'inde bu bilgi gerekir. Ayrıca token rotation (her refresh'te yeni refresh token üretme) ve token blacklisting (logout sonrası token'ı geçersiz kılma) gibi ileri seviye pattern'ları uygularlar."
+    },
+    {
+      "id": "p02-m4",
+      "title": "Frontend CRUD ve Board Arayüzü",
+      "overview": "Bu milestone'da React ile kanban board arayüzünü oluşturacaksın. Component mimarisi, state management (TanStack Query), routing ve API entegrasyonu bu aşamanın odak noktaları.",
+      "estimated_hours": 10,
+      "concepts_covered": [
+        "React component architecture",
+        "TanStack Query",
+        "React Router",
+        "Form handling",
+        "Loading/Error states"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "React Router ve Sayfa Yapısı",
+          "why": "SPA (Single Page Application) routing, sayfa geçişlerinde tam sayfa yenileme olmadan içerik değişimi sağlar. React Router, URL'e göre hangi component'in render edileceğini belirler. Protected route'lar, auth olmayan kullanıcıların korumalı sayfalara erişimini engeller.",
+          "instructions": "React Router kurulumu yap. Public ve protected route'ları tanımla.",
+          "code_snippet": "// client/src/App.tsx\nimport { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';\nimport { QueryClient, QueryClientProvider } from '@tanstack/react-query';\nimport { AuthProvider, useAuth } from './contexts/auth-context';\nimport { LoginPage } from './pages/login';\nimport { RegisterPage } from './pages/register';\nimport { BoardsPage } from './pages/boards';\nimport { BoardDetailPage } from './pages/board-detail';\nimport { Layout } from './components/layout';\n\nconst queryClient = new QueryClient({\n  defaultOptions: {\n    queries: {\n      staleTime: 1000 * 60, // 1 dakika\n      retry: 1,\n    },\n  },\n});\n\nfunction ProtectedRoute({ children }: { children: React.ReactNode }) {\n  const { user, isLoading } = useAuth();\n\n  if (isLoading) return <div className=\"flex h-screen items-center justify-center\">Yükleniyor...</div>;\n  if (!user) return <Navigate to=\"/login\" replace />;\n\n  return <>{children}</>;\n}\n\nexport function App() {\n  return (\n    <QueryClientProvider client={queryClient}>\n      <AuthProvider>\n        <BrowserRouter>\n          <Routes>\n            <Route path=\"/login\" element={<LoginPage />} />\n            <Route path=\"/register\" element={<RegisterPage />} />\n            <Route\n              path=\"/\"\n              element={\n                <ProtectedRoute>\n                  <Layout />\n                </ProtectedRoute>\n              }\n            >\n              <Route index element={<BoardsPage />} />\n              <Route path=\"boards/:id\" element={<BoardDetailPage />} />\n            </Route>\n          </Routes>\n        </BrowserRouter>\n      </AuthProvider>\n    </QueryClientProvider>\n  );\n}",
+          "deep_dive": "staleTime, TanStack Query'nin veriyi ne kadar süre 'taze' kabul edeceğini belirler — 1 dakika içinde aynı sorgu tekrar yapılmaz (cache'ten okunur). ProtectedRoute, auth state yüklenene kadar loading gösterir, auth yoksa login'e yönlendirir. Nested routes (Layout içindeki index ve boards/:id), shared layout pattern'ı uygular — header ve sidebar her sayfada ortak kalır.",
+          "checkpoint": "Login olmadan / adresine gidince /login'e yönlendirmeli. Login olduktan sonra board listesi görünmeli. URL değişimlerinde doğru sayfalar render olmalı."
+        },
+        {
+          "step": 2,
+          "title": "Board Listesi ve Oluşturma",
+          "why": "Board listesi, uygulamanın ana sayfasıdır. TanStack Query ile API'den board verilerini çekmek, cache yönetimi, loading ve error state'lerini otomatik handle eder. Mutation ile yeni board oluşturulduğunda cache otomatik güncellenir.",
+          "instructions": "Board listesi sayfasını ve yeni board oluşturma modalını implement et.",
+          "code_snippet": "// client/src/hooks/use-boards.ts\nimport { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';\nimport { api } from '../lib/api';\n\nexport function useBoards() {\n  return useQuery({\n    queryKey: ['boards'],\n    queryFn: async () => {\n      const { data } = await api.get('/boards');\n      return data.data;\n    },\n  });\n}\n\nexport function useCreateBoard() {\n  const queryClient = useQueryClient();\n\n  return useMutation({\n    mutationFn: async (board: { title: string; color: string }) => {\n      const { data } = await api.post('/boards', board);\n      return data.data;\n    },\n    onSuccess: () => {\n      queryClient.invalidateQueries({ queryKey: ['boards'] });\n    },\n  });\n}\n\n// client/src/pages/boards.tsx\nimport { useState } from 'react';\nimport { Link } from 'react-router-dom';\nimport { useBoards, useCreateBoard } from '../hooks/use-boards';\n\nexport function BoardsPage() {\n  const { data: boards, isLoading, error } = useBoards();\n  const createBoard = useCreateBoard();\n  const [showModal, setShowModal] = useState(false);\n\n  if (isLoading) return <BoardsSkeleton />;\n  if (error) return <div>Bir hata oluştu</div>;\n\n  return (\n    <div className=\"p-6\">\n      <div className=\"mb-6 flex items-center justify-between\">\n        <h1 className=\"text-2xl font-bold\">Board'larım</h1>\n        <button\n          onClick={() => setShowModal(true)}\n          className=\"rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700\"\n        >\n          Yeni Board\n        </button>\n      </div>\n\n      <div className=\"grid gap-4 sm:grid-cols-2 lg:grid-cols-3\">\n        {boards?.map((board: any) => (\n          <Link\n            key={board.id}\n            to={`/boards/${board.id}`}\n            className=\"group rounded-xl p-6 text-white transition-transform hover:scale-105\"\n            style={{ backgroundColor: board.color }}\n          >\n            <h2 className=\"text-lg font-semibold\">{board.title}</h2>\n            <p className=\"mt-1 text-sm opacity-80\">\n              {board._count?.lists || 0} liste\n            </p>\n          </Link>\n        ))}\n      </div>\n    </div>\n  );\n}\n\nfunction BoardsSkeleton() {\n  return (\n    <div className=\"grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3\">\n      {[1, 2, 3].map((i) => (\n        <div key={i} className=\"h-24 animate-pulse rounded-xl bg-gray-200\" />\n      ))}\n    </div>\n  );\n}",
+          "deep_dive": "invalidateQueries, mutation başarılı olduğunda cache'i geçersiz kılar ve otomatik refetch tetikler. Bu, 'optimistic update'ın basit versiyonudur. Skeleton loading pattern'ı, loading spinner'dan daha iyi UX sağlar — kullanıcı içeriğin yapısını görür. queryKey: ['boards'] ile tüm board query'leri tek key altında gruplandırılır.",
+          "checkpoint": "Board listesi API'den yüklenmeli. Yeni board oluşturunca liste güncellenmeli. Loading sırasında skeleton gösterilmeli."
+        },
+        {
+          "step": 3,
+          "title": "Board Detay Sayfası - Kanban Görünümü",
+          "why": "Kanban board görünümü, uygulamanın ana etkileşim noktasıdır. Listeler yatay olarak dizilir, kartlar dikey olarak sıralanır. Bu sayfa, CSS Flexbox/Grid becerilerini, karmaşık state management'ı ve nested component'leri bir arada kullanır.",
+          "instructions": "Board detay sayfasını kanban görünümüyle implement et.",
+          "code_snippet": "// client/src/pages/board-detail.tsx\nimport { useParams } from 'react-router-dom';\nimport { useQuery } from '@tanstack/react-query';\nimport { api } from '../lib/api';\nimport { KanbanList } from '../components/kanban-list';\nimport { AddList } from '../components/add-list';\n\nexport function BoardDetailPage() {\n  const { id } = useParams<{ id: string }>();\n\n  const { data: board, isLoading } = useQuery({\n    queryKey: ['board', id],\n    queryFn: async () => {\n      const { data } = await api.get(`/boards/${id}`);\n      return data.data;\n    },\n  });\n\n  if (isLoading) return <div>Yükleniyor...</div>;\n  if (!board) return <div>Board bulunamadı</div>;\n\n  return (\n    <div className=\"h-full\">\n      <div className=\"border-b px-6 py-4\">\n        <h1 className=\"text-xl font-bold\">{board.title}</h1>\n      </div>\n\n      <div className=\"flex h-[calc(100vh-8rem)] gap-4 overflow-x-auto p-6\">\n        {board.lists?.map((list: any) => (\n          <KanbanList key={list.id} list={list} boardId={board.id} />\n        ))}\n        <AddList boardId={board.id} />\n      </div>\n    </div>\n  );\n}\n\n// client/src/components/kanban-list.tsx\nimport { useState } from 'react';\nimport { KanbanCard } from './kanban-card';\nimport { AddCard } from './add-card';\n\ninterface KanbanListProps {\n  list: {\n    id: string;\n    title: string;\n    cards: Array<{\n      id: string;\n      title: string;\n      description?: string;\n      labels: string[];\n      dueDate?: string;\n    }>;\n  };\n  boardId: string;\n}\n\nexport function KanbanList({ list, boardId }: KanbanListProps) {\n  return (\n    <div className=\"flex h-full w-72 flex-shrink-0 flex-col rounded-xl bg-gray-100 dark:bg-gray-800\">\n      <div className=\"flex items-center justify-between p-3\">\n        <h3 className=\"font-semibold text-gray-700 dark:text-gray-300\">\n          {list.title}\n        </h3>\n        <span className=\"rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-400\">\n          {list.cards.length}\n        </span>\n      </div>\n\n      <div className=\"flex-1 space-y-2 overflow-y-auto p-2\">\n        {list.cards.map((card) => (\n          <KanbanCard key={card.id} card={card} />\n        ))}\n      </div>\n\n      <AddCard listId={list.id} boardId={boardId} />\n    </div>\n  );\n}\n\n// client/src/components/kanban-card.tsx\nexport function KanbanCard({ card }: { card: any }) {\n  return (\n    <div className=\"cursor-pointer rounded-lg bg-white p-3 shadow-sm transition-shadow hover:shadow-md dark:bg-gray-700\">\n      {card.labels.length > 0 && (\n        <div className=\"mb-2 flex gap-1\">\n          {card.labels.map((label: string) => (\n            <span\n              key={label}\n              className=\"rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700\"\n            >\n              {label}\n            </span>\n          ))}\n        </div>\n      )}\n      <p className=\"text-sm text-gray-800 dark:text-gray-200\">{card.title}</p>\n      {card.dueDate && (\n        <p className=\"mt-2 text-xs text-gray-500\">\n          {new Date(card.dueDate).toLocaleDateString('tr-TR')}\n        </p>\n      )}\n    </div>\n  );\n}",
+          "deep_dive": "overflow-x-auto ile yatay scroll sağlanır — çok sayıda liste olduğunda. flex-shrink-0 ile listeler sıkışmaz, sabit 288px (w-72) genişlikte kalır. h-[calc(100vh-8rem)] ile listelerin yüksekliği viewport'a göre hesaplanır — header yüksekliği çıkarılır. overflow-y-auto ile her liste kendi içinde dikey scroll sağlar. Bu layout Trello'nun klasik kanban board görünümünü replike eder.",
+          "checkpoint": "Board detay sayfasında listeler yatay, kartlar dikey olarak görünmeli. Yatay scroll çalışmalı. Kart etiketleri ve tarihleri gösterilmeli."
+        },
+        {
+          "step": 4,
+          "title": "Kart Oluşturma ve Düzenleme",
+          "why": "Kart CRUD işlemleri, uygulamanın temel etkileşimleridir. Inline editing (tıkla ve düzenle) pattern'ı, modal açmaya gerek kalmadan hızlı düzenleme sağlar. Optimistic update ile kullanıcı anında geri bildirim alır — API yanıtını beklemez.",
+          "instructions": "Kart oluşturma formu ve düzenleme modalını implement et.",
+          "code_snippet": "// client/src/components/add-card.tsx\nimport { useState } from 'react';\nimport { useMutation, useQueryClient } from '@tanstack/react-query';\nimport { api } from '../lib/api';\n\nexport function AddCard({ listId, boardId }: { listId: string; boardId: string }) {\n  const [isAdding, setIsAdding] = useState(false);\n  const [title, setTitle] = useState('');\n  const queryClient = useQueryClient();\n\n  const createCard = useMutation({\n    mutationFn: async (data: { title: string }) => {\n      const { data: result } = await api.post(`/lists/${listId}/cards`, data);\n      return result.data;\n    },\n    onSuccess: () => {\n      queryClient.invalidateQueries({ queryKey: ['board', boardId] });\n      setTitle('');\n      setIsAdding(false);\n    },\n  });\n\n  if (!isAdding) {\n    return (\n      <button\n        onClick={() => setIsAdding(true)}\n        className=\"m-2 rounded-lg p-2 text-left text-sm text-gray-500 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700\"\n      >\n        + Kart ekle\n      </button>\n    );\n  }\n\n  return (\n    <form\n      onSubmit={(e) => {\n        e.preventDefault();\n        if (title.trim()) createCard.mutate({ title: title.trim() });\n      }}\n      className=\"p-2\"\n    >\n      <textarea\n        autoFocus\n        value={title}\n        onChange={(e) => setTitle(e.target.value)}\n        onKeyDown={(e) => {\n          if (e.key === 'Enter' && !e.shiftKey) {\n            e.preventDefault();\n            if (title.trim()) createCard.mutate({ title: title.trim() });\n          }\n          if (e.key === 'Escape') setIsAdding(false);\n        }}\n        placeholder=\"Kart başlığı girin...\"\n        className=\"w-full resize-none rounded-lg border p-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700\"\n        rows={2}\n      />\n      <div className=\"mt-2 flex gap-2\">\n        <button\n          type=\"submit\"\n          disabled={!title.trim() || createCard.isPending}\n          className=\"rounded-lg bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50\"\n        >\n          Ekle\n        </button>\n        <button\n          type=\"button\"\n          onClick={() => setIsAdding(false)}\n          className=\"rounded-lg px-3 py-1 text-sm text-gray-500 hover:bg-gray-200\"\n        >\n          İptal\n        </button>\n      </div>\n    </form>\n  );\n}",
+          "deep_dive": "Enter ile gönderme ve Escape ile iptal, klavye kullanıcıları için standart UX pattern'dır. Shift+Enter ile yeni satır ekleme desteği, çok satırlı başlıklar için kullanılır. autoFocus, form açıldığında cursor'ı otomatik textarea'ya koyar. isPending (önceki isLoading), mutation devam ederken butonun tekrar tıklanmasını önler — double submission koruması.",
+          "checkpoint": "Listeye yeni kart eklenebilmeli. Enter ile gönder, Escape ile iptal çalışmalı. Kart eklenince liste anında güncellenmeli."
+        },
+        {
+          "step": 5,
+          "title": "Loading, Error ve Empty State Yönetimi",
+          "why": "Uygulamanın her durumu (loading, error, empty, success) için uygun UI göstermek, profesyonel UX'in temel gereksinimidir. Skeleton loading, error boundary ve empty state component'leri, kullanıcının her zaman ne olduğunu bilmesini sağlar.",
+          "instructions": "Tüm sayfalarda loading, error ve empty state'leri implement et.",
+          "code_snippet": "// client/src/components/ui/error-fallback.tsx\nexport function ErrorFallback({\n  error,\n  resetErrorBoundary,\n}: {\n  error: Error;\n  resetErrorBoundary: () => void;\n}) {\n  return (\n    <div className=\"flex flex-col items-center justify-center p-8\">\n      <div className=\"rounded-xl bg-red-50 p-6 text-center dark:bg-red-900/20\">\n        <h2 className=\"text-lg font-semibold text-red-800 dark:text-red-200\">\n          Bir hata oluştu\n        </h2>\n        <p className=\"mt-2 text-sm text-red-600 dark:text-red-300\">\n          {error.message}\n        </p>\n        <button\n          onClick={resetErrorBoundary}\n          className=\"mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700\"\n        >\n          Tekrar Dene\n        </button>\n      </div>\n    </div>\n  );\n}\n\n// client/src/components/ui/empty-state.tsx\nexport function EmptyState({\n  title,\n  description,\n  action,\n}: {\n  title: string;\n  description: string;\n  action?: { label: string; onClick: () => void };\n}) {\n  return (\n    <div className=\"flex flex-col items-center justify-center p-12 text-center\">\n      <div className=\"rounded-full bg-gray-100 p-4 dark:bg-gray-800\">\n        <svg className=\"h-12 w-12 text-gray-400\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={1.5} d=\"M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10\" />\n        </svg>\n      </div>\n      <h3 className=\"mt-4 text-lg font-semibold text-gray-900 dark:text-white\">{title}</h3>\n      <p className=\"mt-1 text-sm text-gray-500 dark:text-gray-400\">{description}</p>\n      {action && (\n        <button\n          onClick={action.onClick}\n          className=\"mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700\"\n        >\n          {action.label}\n        </button>\n      )}\n    </div>\n  );\n}",
+          "deep_dive": "Error boundary pattern'ı, React uygulamasındaki hataların tüm sayfayı çökertmesini önler — sadece hatayı içeren bölüm etkilenir. resetErrorBoundary, kullanıcının tekrar denemesini sağlar (component'i unmount/remount eder). Empty state, kullanıcıya 'ne yapmalı' ipucu verir — sadece boş sayfa göstermek kafa karıştırır. Bu üç state (loading, error, empty) + success state, professional UI'ın '4 state rule' kuralıdır.",
+          "checkpoint": "Yükleme sırasında skeleton gösterilmeli. API hatası olduğunda error component gösterilmeli. Board/kart olmadığında empty state gösterilmeli."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- TanStack Query: queryKey cache'in anahtarı, staleTime cache süresini belirler, invalidateQueries cache'i temizler.\n- 4 State Rule: Her component'in loading, error, empty ve success state'i olmalı.\n- Skeleton loading > spinner — kullanıcı içerik yapısını görür ve daha az 'bekleme' hisseder.\n- Optimistic update: API yanıtı gelmeden UI'ı güncelle — daha hızlı UX.\n- Keyboard shortcuts (Enter, Escape): Profesyonel UX için temel gereksinim.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar error handling'i sistematik yapar. Her API çağrısının failure case'i düşünülür: network hatası, timeout, 4xx, 5xx, malformed response. Error boundary ile uygulamanın kısmi çöküşü yönetilir. Ayrıca 'retry with exponential backoff' pattern'ı uygulanır: başarısız request'ler 1s, 2s, 4s aralıklarla tekrar denenir. TanStack Query bunu built-in olarak destekler."
+    },
+    {
+      "id": "p02-m5",
+      "title": "Drag & Drop Implementasyonu",
+      "overview": "Kanban board'un en kritik özelliği, kartları sürükle-bırak ile listeler arasında taşımaktır. Bu milestone'da dnd-kit kütüphanesini kullanarak profesyonel drag & drop deneyimi implement edeceksin.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "dnd-kit",
+        "Drag and drop",
+        "Optimistic updates",
+        "Reorder algorithm",
+        "Animation"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "dnd-kit Kütüphanesi Kurulumu ve Temel Yapı",
+          "why": "dnd-kit, React için en modern ve erişilebilir drag-and-drop kütüphanesidir. react-beautiful-dnd (Atlassian) maintained edilmediği için dnd-kit tercih edilir. Accessibility-first yaklaşımıyla keyboard ve screen reader desteği built-in olarak gelir.",
+          "instructions": "dnd-kit kur ve kanban board'da temel DnD yapısını oluştur.",
+          "code_snippet": "pnpm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities\n\n// client/src/components/kanban-board.tsx\nimport { useState } from 'react';\nimport {\n  DndContext,\n  DragOverlay,\n  closestCorners,\n  KeyboardSensor,\n  PointerSensor,\n  useSensor,\n  useSensors,\n  DragStartEvent,\n  DragEndEvent,\n  DragOverEvent,\n} from '@dnd-kit/core';\nimport {\n  SortableContext,\n  verticalListSortingStrategy,\n} from '@dnd-kit/sortable';\nimport { useMutation, useQueryClient } from '@tanstack/react-query';\nimport { api } from '../lib/api';\nimport { SortableCard } from './sortable-card';\nimport { KanbanCard } from './kanban-card';\n\nexport function KanbanBoard({ board }: { board: any }) {\n  const [activeCard, setActiveCard] = useState<any>(null);\n  const queryClient = useQueryClient();\n\n  const sensors = useSensors(\n    useSensor(PointerSensor, {\n      activationConstraint: { distance: 8 },\n    }),\n    useSensor(KeyboardSensor)\n  );\n\n  const moveCard = useMutation({\n    mutationFn: async (data: { cardId: string; listId: string; position: number }) => {\n      await api.put(`/cards/${data.cardId}/move`, {\n        targetListId: data.listId,\n        newPosition: data.position,\n      });\n    },\n    onSuccess: () => {\n      queryClient.invalidateQueries({ queryKey: ['board', board.id] });\n    },\n  });\n\n  function handleDragStart(event: DragStartEvent) {\n    const { active } = event;\n    const card = findCard(active.id as string);\n    setActiveCard(card);\n  }\n\n  function handleDragEnd(event: DragEndEvent) {\n    const { active, over } = event;\n    setActiveCard(null);\n\n    if (!over) return;\n\n    const activeCard = findCard(active.id as string);\n    if (!activeCard) return;\n\n    const overList = findListForCard(over.id as string);\n    if (!overList) return;\n\n    const overIndex = overList.cards.findIndex((c: any) => c.id === over.id);\n\n    moveCard.mutate({\n      cardId: activeCard.id,\n      listId: overList.id,\n      position: overIndex >= 0 ? overIndex : overList.cards.length,\n    });\n  }\n\n  function findCard(id: string) {\n    for (const list of board.lists) {\n      const card = list.cards.find((c: any) => c.id === id);\n      if (card) return card;\n    }\n    return null;\n  }\n\n  function findListForCard(id: string) {\n    return board.lists.find((l: any) =>\n      l.cards.some((c: any) => c.id === id)\n    ) || board.lists.find((l: any) => l.id === id);\n  }\n\n  return (\n    <DndContext\n      sensors={sensors}\n      collisionDetection={closestCorners}\n      onDragStart={handleDragStart}\n      onDragEnd={handleDragEnd}\n    >\n      <div className=\"flex gap-4 overflow-x-auto p-6\">\n        {board.lists.map((list: any) => (\n          <div key={list.id} className=\"w-72 flex-shrink-0 rounded-xl bg-gray-100 p-3 dark:bg-gray-800\">\n            <h3 className=\"mb-3 font-semibold\">{list.title}</h3>\n            <SortableContext\n              items={list.cards.map((c: any) => c.id)}\n              strategy={verticalListSortingStrategy}\n            >\n              <div className=\"space-y-2\">\n                {list.cards.map((card: any) => (\n                  <SortableCard key={card.id} card={card} />\n                ))}\n              </div>\n            </SortableContext>\n          </div>\n        ))}\n      </div>\n\n      <DragOverlay>\n        {activeCard ? (\n          <div className=\"rotate-3 opacity-90\">\n            <KanbanCard card={activeCard} />\n          </div>\n        ) : null}\n      </DragOverlay>\n    </DndContext>\n  );\n}",
+          "deep_dive": "activationConstraint: { distance: 8 } ile 8px hareket etmeden drag başlamaz — bu, normal click'i drag'den ayırır. closestCorners collision detection algoritması, en yakın köşeye göre drop hedefini belirler — kanban board'lar için en uygun algoritmadır. DragOverlay, sürüklenen kartın 'ghost' görünümünü render eder — rotate-3 ile hafif eğim verilir (Trello'daki gibi). KeyboardSensor, erişilebilirlik için klavye ile drag-drop sağlar.",
+          "checkpoint": "Kartlar sürüklenebilmeli. Sürükleme sırasında ghost kart görünmeli. Bırakıldığında kart yeni pozisyonuna yerleşmeli ve API çağrısı yapılmalı."
+        },
+        {
+          "step": 2,
+          "title": "Sortable Card Component",
+          "why": "Her sürüklenebilir kart, useSortable hook'u ile drag-drop yeteneklerini kazanır. Transform ve transition stilleri, smooth animasyon sağlar. isDragging state'i ile sürüklenen kartın orijinal yerinde placeholder gösterilir.",
+          "instructions": "Sortable card component'ini implement et.",
+          "code_snippet": "// client/src/components/sortable-card.tsx\nimport { useSortable } from '@dnd-kit/sortable';\nimport { CSS } from '@dnd-kit/utilities';\nimport { KanbanCard } from './kanban-card';\n\nexport function SortableCard({ card }: { card: any }) {\n  const {\n    attributes,\n    listeners,\n    setNodeRef,\n    transform,\n    transition,\n    isDragging,\n  } = useSortable({ id: card.id });\n\n  const style = {\n    transform: CSS.Transform.toString(transform),\n    transition,\n    opacity: isDragging ? 0.5 : 1,\n  };\n\n  return (\n    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>\n      <KanbanCard card={card} />\n    </div>\n  );\n}",
+          "deep_dive": "useSortable, useDroppable ve useDraggable'ı birleştirir — bir kart hem sürüklenebilir hem de üzerine bırakılabilir. CSS.Transform.toString, transform objesini CSS string'e çevirir (translate3d kullanarak GPU acceleration sağlar). isDragging: true olduğunda orijinal yerdeki kart yarı saydam olur — kullanıcı kartın nereden alındığını görür. attributes ve listeners, erişilebilirlik ARIA attribute'ları ve event handler'larını spread eder.",
+          "checkpoint": "Kartlar smooth animasyonla sürüklenmeli. Sürüklenen kartın orijinal yeri yarı saydam olmalı. Bırakıldığında animasyonla yerine oturmalı."
+        },
+        {
+          "step": 3,
+          "title": "Listeler Arası Kart Taşıma",
+          "why": "Listeler arası taşıma, kanban board'un en karmaşık etkileşimidir. Sürükleme sırasında kartın hangi listeye ait olduğu dinamik olarak değişir. onDragOver event'i ile intermediate state yönetimi yapılır.",
+          "instructions": "Listeler arası taşıma logic'ini implement et. Optimistic update ekle.",
+          "code_snippet": "// handleDragOver - KanbanBoard component'ine ekle\nfunction handleDragOver(event: DragOverEvent) {\n  const { active, over } = event;\n  if (!over) return;\n\n  const activeId = active.id as string;\n  const overId = over.id as string;\n\n  const activeList = findListForCard(activeId);\n  const overList = findListForCard(overId) || board.lists.find((l: any) => l.id === overId);\n\n  if (!activeList || !overList || activeList.id === overList.id) return;\n\n  // Optimistic update: kartı lokal state'te taşı\n  queryClient.setQueryData(['board', board.id], (old: any) => {\n    if (!old) return old;\n\n    const newLists = old.lists.map((list: any) => {\n      if (list.id === activeList.id) {\n        return {\n          ...list,\n          cards: list.cards.filter((c: any) => c.id !== activeId),\n        };\n      }\n      if (list.id === overList.id) {\n        const card = activeList.cards.find((c: any) => c.id === activeId);\n        const overIndex = list.cards.findIndex((c: any) => c.id === overId);\n        const newCards = [...list.cards];\n        newCards.splice(overIndex >= 0 ? overIndex : newCards.length, 0, card);\n        return { ...list, cards: newCards };\n      }\n      return list;\n    });\n\n    return { ...old, lists: newLists };\n  });\n}\n\n// DndContext'e onDragOver ekle:\n// <DndContext onDragOver={handleDragOver} ...>",
+          "deep_dive": "queryClient.setQueryData ile cache doğrudan güncellenir — API yanıtı beklenmeden UI anında değişir. Bu 'optimistic update' pattern'ıdır. Eğer API hatası olursa, invalidateQueries ile cache'i gerçek veriye geri döndürebiliriz. splice ile kartı doğru pozisyona ekliyoruz. Bu yaklaşım, 60fps smooth drag deneyimi sağlar çünkü her drag hareketi API çağrısı beklemez.",
+          "checkpoint": "Kart bir listeden diğerine sürüklendiğinde anında taşınmalı (API yanıtı beklenmeden). Bırakıldığında API çağrısı yapılmalı. Hata durumunda eski haline dönmeli."
+        },
+        {
+          "step": 4,
+          "title": "Sıralama Persistance ve Edge Case Handling",
+          "why": "Drag-and-drop'ta edge case'ler kullanıcı deneyimini bozabilir: boş listeye bırakma, aynı pozisyona bırakma, network hatası sırasında state tutarsızlığı. Bu durumları handle etmek, production-ready uygulamanın gereksinimdir.",
+          "instructions": "Edge case'leri handle et. Error recovery mekanizması ekle.",
+          "code_snippet": "// Gelişmiş handleDragEnd\nfunction handleDragEnd(event: DragEndEvent) {\n  const { active, over } = event;\n  setActiveCard(null);\n\n  if (!over) {\n    // Geçersiz yere bırakıldı - state'i geri al\n    queryClient.invalidateQueries({ queryKey: ['board', board.id] });\n    return;\n  }\n\n  const activeId = active.id as string;\n  const overId = over.id as string;\n\n  // Aynı pozisyon - bir şey yapma\n  if (activeId === overId) return;\n\n  const overList = findListForCard(overId) || board.lists.find((l: any) => l.id === overId);\n  if (!overList) return;\n\n  const overIndex = overList.cards.findIndex((c: any) => c.id === overId);\n  const newPosition = overIndex >= 0 ? overIndex : overList.cards.length;\n\n  moveCard.mutate(\n    {\n      cardId: activeId,\n      listId: overList.id,\n      position: newPosition,\n    },\n    {\n      onError: () => {\n        // API hatası - cache'i gerçek veriye geri döndür\n        queryClient.invalidateQueries({ queryKey: ['board', board.id] });\n      },\n    }\n  );\n}",
+          "deep_dive": "Error recovery pattern'ı: optimistic update başarısız olduğunda invalidateQueries ile server'daki gerçek veri tekrar çekilir. Bu, client state'in her zaman server ile tutarlı kalmasını garanti eder. 'Aynı pozisyona bırakma' kontrolü gereksiz API çağrısını önler. null over kontrolü, kartın geçersiz bir yere bırakıldığını (board dışına) handle eder.",
+          "checkpoint": "Kartı board dışına bırakma işleminde geri dönmeli. Aynı pozisyona bırakmada API çağrısı yapılmamalı. Network hatası durumunda state geri alınmalı."
+        },
+        {
+          "step": 5,
+          "title": "Drag Animasyonları ve UX Polish",
+          "why": "İyi animasyonlar, kullanıcının 'kontrolde olduğu' hissini artırır. Drag sırasında cursor değişimi, drop zone highlight'ı ve smooth transition'lar, profesyonel UX'in parçasıdır. Bu detaylar, amatör ve profesyonel uygulamayı ayırır.",
+          "instructions": "Drag animasyonlarını ve UX detaylarını ekle.",
+          "code_snippet": "/* client/src/styles/dnd.css */\n.card-dragging {\n  cursor: grabbing;\n  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);\n  transform: rotate(3deg);\n}\n\n.list-drop-target {\n  background-color: rgba(59, 130, 246, 0.05);\n  border: 2px dashed rgba(59, 130, 246, 0.3);\n}\n\n.card-placeholder {\n  background-color: rgba(59, 130, 246, 0.1);\n  border: 2px dashed rgba(59, 130, 246, 0.3);\n  border-radius: 0.5rem;\n  min-height: 3rem;\n}",
+          "deep_dive": "rotate(3deg) efekti, kartın fiziksel olarak 'alındığı' hissini verir — Trello ve Notion bu pattern'ı kullanır. box-shadow artışı, kartın 'yükseldiği' illüzyonunu oluşturur (elevation). Drop zone highlight, kullanıcıya kartı nereye bırakabileceğini gösterir. Bu tür micro-interactions, uygulamanın 'polished' hissetmesini sağlar ve kullanıcı memnuniyetini artırır.",
+          "checkpoint": "Sürükleme sırasında kart hafif eğik ve gölgeli olmalı. Drop zone highlight'lanmalı. Transition'lar smooth olmalı (60fps)."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- dnd-kit: React için en modern DnD kütüphanesi. react-beautiful-dnd artık bakımı yapılmıyor.\n- activationConstraint: { distance: 8 } ile click ve drag ayırılır.\n- Optimistic update: queryClient.setQueryData ile cache'i anında güncelle, API sonrası invalidate et.\n- Error recovery: API hatası durumunda invalidateQueries ile gerçek veriye geri dön.\n- DragOverlay ile ghost element — transform animasyonu GPU-accelerated olmalı.\n- Edge case'ler: boş liste, aynı pozisyon, board dışına bırakma.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar drag-and-drop'u implement ederken önce accessibility'yi düşünür. Keyboard ile sürükleme (Space ile başlat, Arrow ile taşı, Space ile bırak) olmazsa olmazdır. Ayrıca touch device'larda uzun basma (long press) ile aktivasyon, ve drag sırasında auto-scroll (listenin altına sürüklerken otomatik scroll) gibi detayları gözden kaçırmazlar. Performance açısından da drag sırasında gereksiz re-render'ları önlemek için React.memo ve useMemo kullanılır."
+    },
+    {
+      "id": "p02-m6",
+      "title": "Testing ve Kalite Güvencesi",
+      "overview": "Test yazmak, kodun doğru çalıştığını garanti eder ve gelecekteki değişikliklerin mevcut işlevselliği bozmadığını doğrular. Bu milestone'da backend API testleri, frontend component testleri ve entegrasyon testleri yazacaksın.",
+      "estimated_hours": 8,
+      "concepts_covered": [
+        "Jest",
+        "Supertest",
+        "React Testing Library",
+        "Mocking",
+        "Test database"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Backend Test Altyapısı ve İlk API Testleri",
+          "why": "API testleri, endpoint'lerin doğru çalıştığını doğrular. Supertest ile HTTP istekleri simüle edilir, Jest ile assertion'lar yapılır. Test veritabanı ile production verisi etkilenmez.",
+          "instructions": "Jest ve Supertest kurulumunu yap. İlk API testlerini yaz.",
+          "code_snippet": "pnpm install -D jest ts-jest @types/jest supertest @types/supertest\n\n// server/jest.config.ts\nexport default {\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  roots: ['<rootDir>/tests'],\n  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],\n};\n\n// server/tests/setup.ts\nimport { PrismaClient } from '@prisma/client';\nconst prisma = new PrismaClient();\n\nbeforeEach(async () => {\n  // Her test öncesi veritabanını temizle\n  await prisma.card.deleteMany();\n  await prisma.list.deleteMany();\n  await prisma.board.deleteMany();\n  await prisma.user.deleteMany();\n});\n\nafterAll(async () => {\n  await prisma.$disconnect();\n});\n\n// server/tests/auth.test.ts\nimport request from 'supertest';\nimport app from '../src/app';\n\ndescribe('Auth API', () => {\n  describe('POST /api/auth/register', () => {\n    it('should register a new user', async () => {\n      const res = await request(app)\n        .post('/api/auth/register')\n        .send({\n          email: 'test@test.com',\n          name: 'Test User',\n          password: 'Password123',\n        });\n\n      expect(res.status).toBe(201);\n      expect(res.body.status).toBe('success');\n      expect(res.body.data.user.email).toBe('test@test.com');\n      expect(res.body.data.accessToken).toBeDefined();\n      expect(res.body.data.user.password).toBeUndefined();\n    });\n\n    it('should reject duplicate email', async () => {\n      await request(app)\n        .post('/api/auth/register')\n        .send({ email: 'test@test.com', name: 'User 1', password: 'Password123' });\n\n      const res = await request(app)\n        .post('/api/auth/register')\n        .send({ email: 'test@test.com', name: 'User 2', password: 'Password456' });\n\n      expect(res.status).toBe(409);\n    });\n\n    it('should reject weak password', async () => {\n      const res = await request(app)\n        .post('/api/auth/register')\n        .send({ email: 'test@test.com', name: 'User', password: '123' });\n\n      expect(res.status).toBe(400);\n    });\n  });\n\n  describe('POST /api/auth/login', () => {\n    it('should login with correct credentials', async () => {\n      await request(app)\n        .post('/api/auth/register')\n        .send({ email: 'test@test.com', name: 'User', password: 'Password123' });\n\n      const res = await request(app)\n        .post('/api/auth/login')\n        .send({ email: 'test@test.com', password: 'Password123' });\n\n      expect(res.status).toBe(200);\n      expect(res.body.data.accessToken).toBeDefined();\n    });\n\n    it('should reject wrong password', async () => {\n      await request(app)\n        .post('/api/auth/register')\n        .send({ email: 'test@test.com', name: 'User', password: 'Password123' });\n\n      const res = await request(app)\n        .post('/api/auth/login')\n        .send({ email: 'test@test.com', password: 'WrongPass123' });\n\n      expect(res.status).toBe(401);\n    });\n  });\n});",
+          "deep_dive": "beforeEach'te veritabanını temizlemek, testler arası izolasyonu sağlar — bir testin verisi diğerini etkilemez. Test veritabanı URL'i environment variable ile ayrılır (DATABASE_URL_TEST). password: toBeUndefined() testi, hassas verinin response'ta olmadığını doğrular. AAA pattern'ı (Arrange-Act-Assert): veri hazırla, işlemi yap, sonucu doğrula.",
+          "checkpoint": "pnpm test komutu ile tüm testler geçmeli. Auth endpoint'leri için en az 5 test yazılmış olmalı. Test veritabanı kullanılmalı."
+        },
+        {
+          "step": 2,
+          "title": "Board API Testleri",
+          "why": "Board CRUD testleri, iş mantığının doğruluğunu garanti eder. Authentication gerektiren endpoint'lerde token yönetimi test edilir. Authorization testleri, bir kullanıcının başka kullanıcının verilerine erişemediğini doğrular.",
+          "instructions": "Board CRUD endpoint'leri için kapsamlı testler yaz.",
+          "code_snippet": "// server/tests/boards.test.ts\nimport request from 'supertest';\nimport app from '../src/app';\n\ndescribe('Boards API', () => {\n  let authToken: string;\n\n  beforeEach(async () => {\n    const res = await request(app)\n      .post('/api/auth/register')\n      .send({ email: 'test@test.com', name: 'User', password: 'Password123' });\n    authToken = res.body.data.accessToken;\n  });\n\n  describe('POST /api/boards', () => {\n    it('should create a board with default lists', async () => {\n      const res = await request(app)\n        .post('/api/boards')\n        .set('Authorization', `Bearer ${authToken}`)\n        .send({ title: 'Test Board' });\n\n      expect(res.status).toBe(201);\n      expect(res.body.data.title).toBe('Test Board');\n      expect(res.body.data.lists).toHaveLength(3);\n    });\n\n    it('should reject without auth', async () => {\n      const res = await request(app)\n        .post('/api/boards')\n        .send({ title: 'Test Board' });\n\n      expect(res.status).toBe(401);\n    });\n  });\n\n  describe('GET /api/boards', () => {\n    it('should return only user boards', async () => {\n      await request(app)\n        .post('/api/boards')\n        .set('Authorization', `Bearer ${authToken}`)\n        .send({ title: 'Board 1' });\n\n      // Başka kullanıcı\n      const otherUser = await request(app)\n        .post('/api/auth/register')\n        .send({ email: 'other@test.com', name: 'Other', password: 'Password123' });\n\n      await request(app)\n        .post('/api/boards')\n        .set('Authorization', `Bearer ${otherUser.body.data.accessToken}`)\n        .send({ title: 'Other Board' });\n\n      const res = await request(app)\n        .get('/api/boards')\n        .set('Authorization', `Bearer ${authToken}`);\n\n      expect(res.status).toBe(200);\n      expect(res.body.data).toHaveLength(1);\n      expect(res.body.data[0].title).toBe('Board 1');\n    });\n  });\n});",
+          "deep_dive": "Authorization testi kritiktir: bir kullanıcının başka kullanıcının board'unu göremediğini doğrular. Bu, IDOR (Insecure Direct Object Reference) zafiyetini test eder — OWASP Top 10'un en yaygın güvenlik açığıdır. beforeEach'te her test için yeni kullanıcı oluşturulur — test izolasyonu sağlanır. set('Authorization', ...) ile auth header eklenir.",
+          "checkpoint": "Board CRUD testleri (create, read, update, delete) geçmeli. Authorization testleri (başka kullanıcı erişimi engellenmeli) geçmeli."
+        },
+        {
+          "step": 3,
+          "title": "Frontend Component Testleri",
+          "why": "Component testleri, UI'ın kullanıcı perspektifinden doğru çalıştığını doğrular. React Testing Library, implementation detail yerine kullanıcı etkileşimlerini test eder — 'bu buton render oluyor mu?' yerine 'butona tıklayınca ne oluyor?' sorusunu cevaplar.",
+          "instructions": "React Testing Library ile temel component testleri yaz.",
+          "code_snippet": "// client/src/components/__tests__/kanban-card.test.tsx\nimport { render, screen } from '@testing-library/react';\nimport { KanbanCard } from '../kanban-card';\n\ndescribe('KanbanCard', () => {\n  const mockCard = {\n    id: '1',\n    title: 'Test Kartı',\n    description: 'Açıklama',\n    labels: ['frontend', 'bug'],\n    dueDate: '2024-12-31',\n  };\n\n  it('should render card title', () => {\n    render(<KanbanCard card={mockCard} />);\n    expect(screen.getByText('Test Kartı')).toBeInTheDocument();\n  });\n\n  it('should render labels', () => {\n    render(<KanbanCard card={mockCard} />);\n    expect(screen.getByText('frontend')).toBeInTheDocument();\n    expect(screen.getByText('bug')).toBeInTheDocument();\n  });\n\n  it('should render due date', () => {\n    render(<KanbanCard card={mockCard} />);\n    expect(screen.getByText('31.12.2024')).toBeInTheDocument();\n  });\n\n  it('should not render labels section when empty', () => {\n    render(<KanbanCard card={{ ...mockCard, labels: [] }} />);\n    expect(screen.queryByText('frontend')).not.toBeInTheDocument();\n  });\n});",
+          "deep_dive": "screen.getByText kullanıcının gördüğü metni arar — CSS selector yerine insan-okunabilir sorgular kullanılır. queryByText null dönebilir (getByText hata fırlatır) — 'element yok' assertion'ları için kullanılır. Mock data ile component'i izole ederiz — API bağımlılığı yok. Testing Library'nin felsefesi: 'ne kadar testler yazılım kullanıcılarına benzerse, o kadar güvenilir olur'.",
+          "checkpoint": "pnpm test (client) ile tüm component testleri geçmeli. En az 3 component için test yazılmış olmalı."
+        },
+        {
+          "step": 4,
+          "title": "CI Pipeline ve Test Otomasyonu",
+          "why": "CI (Continuous Integration) pipeline, her git push'ta testleri otomatik çalıştırır. Kırık kod asla main branch'e merge edilemez. Bu, takım çalışmasında kod kalitesinin otomatik enforcement'ıdır.",
+          "instructions": "GitHub Actions ile CI pipeline kur.",
+          "code_snippet": "# .github/workflows/ci.yml\nname: CI\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]\n\njobs:\n  test-server:\n    runs-on: ubuntu-latest\n    services:\n      postgres:\n        image: postgres:16-alpine\n        env:\n          POSTGRES_USER: testuser\n          POSTGRES_PASSWORD: testpass\n          POSTGRES_DB: testdb\n        ports:\n          - 5432:5432\n        options: >-\n          --health-cmd pg_isready\n          --health-interval 10s\n          --health-timeout 5s\n          --health-retries 5\n\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n          cache: pnpm\n          cache-dependency-path: server/pnpm-lock.yaml\n\n      - name: Install dependencies\n        run: cd server && pnpm install --frozen-lockfile\n\n      - name: Run migrations\n        run: cd server && pnpm dlx prisma migrate deploy\n        env:\n          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb\n\n      - name: Run tests\n        run: cd server && pnpm test\n        env:\n          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb\n          JWT_SECRET: test-secret\n\n  test-client:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n          cache: pnpm\n          cache-dependency-path: client/pnpm-lock.yaml\n\n      - name: Install dependencies\n        run: cd client && pnpm install --frozen-lockfile\n\n      - name: Run tests\n        run: cd client && pnpm test -- --watchAll=false",
+          "deep_dive": "GitHub Actions'da PostgreSQL service container, test veritabanını sağlar. pnpm install --frozen-lockfile, pnpm-lock.yaml'a göre tam aynı versiyonları kurar — çözümleme yapmaz, hızlı ve deterministik. cache ile node_modules önbelleğe alınır — sonraki run'lar çok daha hızlı. prisma migrate deploy (dev değil) production migration'ı çalıştırır — interaktif sorular sormaz.",
+          "checkpoint": "GitHub'a push yapıldığında CI pipeline tetiklenmeli. Tüm testler CI'da geçmeli. PR'da CI status badge görünmeli."
+        },
+        {
+          "step": 5,
+          "title": "Test Coverage Raporu ve Eksik Testler",
+          "why": "Test coverage, kodun ne kadarının testlerle korunduğunu ölçer. %100 coverage hedefi gerçekçi değildir ama kritik iş mantığının (auth, CRUD, validation) test edilmesi zorunludur. Coverage raporu, hangi bölümlerin test edilmediğini gösterir.",
+          "instructions": "Coverage raporunu aktifleştir ve eksik testleri tamamla.",
+          "code_snippet": "// server/jest.config.ts'e ekle\ncollectCoverage: true,\ncoverageDirectory: 'coverage',\ncoverageReporters: ['text', 'lcov'],\ncoverageThreshold: {\n  global: {\n    branches: 70,\n    functions: 70,\n    lines: 70,\n    statements: 70,\n  },\n},\n\n// pnpm test -- --coverage",
+          "deep_dive": "coverageThreshold ile minimum coverage sınırı belirlenir — sınırın altında test suite fail eder. lcov format'ı, codecov ve coveralls gibi servislerle entegrasyon sağlar. %70, iyi bir başlangıç hedefidir. branches coverage, if/else dallarının ne kadarının test edildiğini ölçer — genellikle en düşük kalan metriktir.",
+          "checkpoint": "pnpm test -- --coverage ile coverage raporu görünmeli. Tüm servisler %70+ coverage'a sahip olmalı. CI'da coverage threshold enforce edilmeli."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Testing pyramid: çok unit test, orta integration test, az E2E test.\n- Supertest ile API testleri: gerçek HTTP istekleri simüle edilir, middleware chain dahil.\n- React Testing Library: kullanıcı perspektifinden test — getByText, getByRole kullanılır.\n- CI pipeline: her push'ta otomatik test — kırık kod main'e merge edilemez.\n- Coverage threshold: %70 iyi başlangıç, kritik path'ler %90+ olmalı.\n- Test isolation: her test kendi verisini oluşturur ve temizler.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar test stratejisini test pyramid'ine göre belirler: unit testler hızlı ve çok, integration testler orta, E2E testler yavaş ve az. 'Her satırı test etme, her davranışı test et' prensibi uygulanır. Ayrıca CI pipeline'da paralel test çalıştırma (Jest --shard), test sonuçlarının PR comment olarak gösterilmesi ve flaky test detection gibi ileri seviye pratikler uygulanır."
+    },
+    {
+      "id": "p02-m7",
+      "title": "Docker, Deployment ve Dokümantasyon",
+      "overview": "Son milestone'da projeyi production-ready hale getireceksin. Docker multi-stage build ile optimize container image'lar oluşturacak, API dokümantasyonu yazacak ve deployment rehberi hazırlayacaksın.",
+      "estimated_hours": 6,
+      "concepts_covered": [
+        "Docker multi-stage build",
+        "Swagger/OpenAPI",
+        "Production best practices",
+        "README"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Production Docker Image Oluşturma",
+          "why": "Multi-stage Docker build, development dependency'lerini final image'dan çıkararak image boyutunu dramatik şekilde azaltır. Küçük image, daha hızlı deploy ve daha az kaynak tüketimi demektir.",
+          "instructions": "Production-ready Dockerfile oluştur.",
+          "code_snippet": "# server/Dockerfile\n# Build stage\nFROM node:22-alpine AS builder\nWORKDIR /app\nCOPY package.json pnpm-lock.yaml ./\nCOPY prisma ./prisma/\nRUN corepack enable && pnpm install --frozen-lockfile\nCOPY . .\nRUN pnpm dlx prisma generate\nRUN pnpm run build\n\n# Production stage\nFROM node:22-alpine AS production\nWORKDIR /app\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules ./node_modules\nCOPY --from=builder /app/prisma ./prisma\nCOPY --from=builder /app/package*.json ./\n\nENV NODE_ENV=production\nEXPOSE 3001\n\n# Non-root user for security\nRUN addgroup -g 1001 -S nodejs && adduser -S express -u 1001\nUSER express\n\nCMD [\"node\", \"dist/index.js\"]",
+          "deep_dive": "Multi-stage build: builder stage'de TypeScript compile edilir ve tüm dependency'ler kurulur. Production stage'e sadece dist (compiled JS), node_modules ve prisma kopyalanır — devDependencies dahil olmaz. Non-root user, container içi güvenliği artırır — process root yetkisiyle çalışmaz. alpine image (~50MB) vs debian image (~350MB) dramatik boyut farkı sağlar.",
+          "checkpoint": "docker build ile image oluşturulmalı. docker run ile container başarılı başlamalı. Image boyutu 200MB'ın altında olmalı."
+        },
+        {
+          "step": 2,
+          "title": "API Dokümantasyonu (Swagger/OpenAPI)",
+          "why": "API dokümantasyonu, frontend geliştiricilerin ve entegrasyon yapan ekiplerin API'ı anlamasını sağlar. Swagger UI, interaktif dokümantasyon sunarak API'ı doğrudan tarayıcıdan test etme imkanı verir.",
+          "instructions": "swagger-jsdoc ve swagger-ui-express ile API dokümantasyonu oluştur.",
+          "code_snippet": "pnpm install swagger-jsdoc swagger-ui-express\npnpm install -D @types/swagger-jsdoc @types/swagger-ui-express\n\n// server/src/utils/swagger.ts\nimport swaggerJsdoc from 'swagger-jsdoc';\n\nconst options: swaggerJsdoc.Options = {\n  definition: {\n    openapi: '3.0.0',\n    info: {\n      title: 'Task Manager API',\n      version: '1.0.0',\n      description: 'Trello-benzeri kanban board API dokümantasyonu',\n    },\n    servers: [{ url: 'http://localhost:3001/api' }],\n    components: {\n      securitySchemes: {\n        bearerAuth: {\n          type: 'http',\n          scheme: 'bearer',\n          bearerFormat: 'JWT',\n        },\n      },\n    },\n  },\n  apis: ['./src/routes/*.ts'],\n};\n\nexport const swaggerSpec = swaggerJsdoc(options);\n\n// Route dosyalarına JSDoc ekle:\n/**\n * @swagger\n * /boards:\n *   get:\n *     summary: Tüm board'ları listele\n *     security:\n *       - bearerAuth: []\n *     responses:\n *       200:\n *         description: Board listesi\n *       401:\n *         description: Authentication gerekli\n */",
+          "deep_dive": "OpenAPI 3.0 standardı, API'ı makine-okunabilir şekilde tanımlar. Bu tanımdan client SDK'ları, test suite'leri ve mock server'lar otomatik üretilebilir. swagger-jsdoc, JSDoc comment'lerinden OpenAPI spec oluşturur — dokümantasyon kodun yanında yaşar ve güncel kalır. securitySchemes, JWT auth'un tüm endpoint'lerde nasıl kullanılacağını tanımlar.",
+          "checkpoint": "/api/docs adresinde Swagger UI görünmeli. Tüm endpoint'ler dokümante edilmiş olmalı. Try it out ile API test edilebilmeli."
+        },
+        {
+          "step": 3,
+          "title": "Environment Yönetimi ve Güvenlik Son Kontrol",
+          "why": "Production ortamında environment variable'lar güvenli şekilde yönetilmeli. Secret'lar asla kod reposunda olmamalı. Bu son kontrol, güvenlik açıklarını tespit eder ve production-ready olduğunu doğrular.",
+          "instructions": "Environment yönetimini düzenle ve güvenlik kontrol listesini uygula.",
+          "code_snippet": "# .env.example (repo'ya dahil - secret'sız)\nDATABASE_URL=postgresql://user:password@localhost:5432/taskmanager\nJWT_SECRET=change-this-to-a-long-random-string\nNODE_ENV=development\nPORT=3001\nCLIENT_URL=http://localhost:5173\n\n# Güvenlik kontrol listesi:\n# [x] .env dosyası .gitignore'da\n# [x] Password bcrypt ile hashlenmiş (10+ rounds)\n# [x] JWT secret minimum 32 karakter\n# [x] CORS sadece frontend origin'e izin veriyor\n# [x] Rate limiting aktif\n# [x] Input validation tüm endpoint'lerde\n# [x] SQL injection koruması (Prisma parameterized queries)\n# [x] XSS koruması (helmet CSP headers)\n# [x] HTTPS zorunlu (production'da)\n# [x] Error message'larda stack trace gösterilmiyor (production'da)",
+          "deep_dive": ".env.example dosyası, hangi environment variable'ların gerekli olduğunu dökümante eder — secret değerleri içermez. Yeni developer bu dosyayı .env olarak kopyalayıp kendi değerlerini girer. Production'da environment variable'lar hosting platformundan (Vercel, Railway, AWS) inject edilir. NODE_ENV=production ile Express hata mesajlarında stack trace göstermez.",
+          "checkpoint": ".env.example dosyası tüm gerekli variable'ları listelemeli. .env dosyası .gitignore'da olmalı. Güvenlik kontrol listesinin her maddesi geçmeli."
+        },
+        {
+          "step": 4,
+          "title": "Profesyonel README ve Proje Dokümantasyonu",
+          "why": "README, projenin vitrinidir. GitHub'da ilk bakılan dosyadır. İyi bir README: projeyi tanıtır, kurulumu açıklar, API'yı özetler ve teknik kararları belirtir. Bu, iş başvurularında büyük fark yaratır.",
+          "instructions": "Kapsamlı README.md yaz. Proje yapısını, kurulumu ve API özetini ekle.",
+          "code_snippet": "# README yapısı:\n# Task Manager - Kanban Board\n## Screenshots / Demo GIF\n## Özellikler\n## Teknoloji Stack'i\n## Mimari\n## Hızlı Başlangıç\n  ### Gereksinimler (Docker, Node.js)\n  ### Kurulum (3 adım: clone, env, docker compose up)\n## API Dokümantasyonu\n  ### Endpoint listesi tablosu\n## Test\n  ### Nasıl çalıştırılır\n  ### Coverage raporu\n## Proje Yapısı (folder tree)\n## Teknik Kararlar\n## Lisans",
+          "deep_dive": "Demo GIF veya screenshot, projeyi anında anlatır — recruiter'lar genellikle README'deki görsellere bakar. Hızlı başlangıç bölümü 3 adımı geçmemeli — karmaşık kurulum caydırıcıdır. Teknik kararlar bölümü, neden bu stack'i seçtiğini açıklar — mülakatlarda sık sorulan bir konudur.",
+          "checkpoint": "README profesyonel görünmeli. Clone ve docker compose up ile proje 3 dakikada çalışmalı. API endpoint tablosu eksiksiz olmalı."
+        },
+        {
+          "step": 5,
+          "title": "Final Review ve Production Checklist",
+          "why": "Production'a çıkmadan önce son bir review, gözden kaçan sorunları tespit eder. Kod kalitesi, güvenlik, performans ve dokümantasyon bir bütün olarak değerlendirilir.",
+          "instructions": "Production checklist'i uygula ve tüm maddeleri doğrula.",
+          "code_snippet": "// Production Checklist:\n// Kod Kalitesi\n// [x] TypeScript strict mode aktif\n// [x] ESLint hata yok\n// [x] Prettier formatlama uygulanmış\n// [x] console.log temizlenmiş\n\n// Güvenlik\n// [x] Tüm secret'lar env variable\n// [x] CORS konfigüre\n// [x] Rate limiting aktif\n// [x] Input validation tüm endpoint'lerde\n\n// Testing\n// [x] API testleri geçiyor\n// [x] Frontend testleri geçiyor  \n// [x] Coverage %70+\n// [x] CI pipeline çalışıyor\n\n// DevOps\n// [x] Docker build başarılı\n// [x] docker compose up ile çalışıyor\n// [x] Health check endpoint var\n\n// Dokümantasyon\n// [x] README eksiksiz\n// [x] Swagger API docs\n// [x] .env.example\n// [x] Conventional commits",
+          "deep_dive": "Production checklist, havacılıkta pilot'ların uçuş öncesi kontrol listesi gibidir — her seferinde aynı adımlar takip edilir, böylece insan hatası minimize edilir. Bu checklist'i CI pipeline'a entegre etmek (lint, test, build, security scan) otomasyonu sağlar. Bazı şirketler 'Definition of Done' olarak bu tür checklist'ler kullanır.",
+          "checkpoint": "Tüm checklist maddeleri tamamlanmış olmalı. docker compose up ile sıfırdan çalışmalı. GitHub'da repo temiz ve profesyonel görünmeli."
+        }
+      ],
+      "must_note": "📝 MUTLAKA NOT AL:\n- Docker multi-stage build: builder stage + production stage = küçük image, güvenli deployment.\n- Non-root user: container güvenliği için process root yetkisiyle çalışmamalı.\n- Swagger/OpenAPI: API dokümantasyonu kod yanında yaşar — güncel kalır.\n- .env.example: secret'sız, gerekli variable'ları dökümante eder.\n- Production checklist: güvenlik, test, DevOps, dokümantasyon — her deploy öncesi çalıştır.\n- README'de demo GIF/screenshot: recruiter'ların ilk baktığı yer.",
+      "senior_learns": "🎩 Senior/CTO böyle öğrenir:\nSenior developer'lar 'operational readiness' düşünür: logging (structured JSON logs), monitoring (health check, metrics), alerting (error threshold aşıldığında bildirim), backup stratejisi. Ayrıca 'runbook' hazırlarlar — bir sorun olduğunda adım adım ne yapılacağı dökümante edilir. Deploy sonrası smoke test (temel işlevsellik kontrolü) otomatize edilir. İyi bir proje, kodun ötesinde tüm bu operational concern'ları karşılar."
+    },
+    {
+      "id": "p02-deployment",
+      "title": "Deployment ve Portfolio Showcase",
+      "estimated_hours": 4,
+      "steps": [
+        {
+          "title": "Production Build",
+          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "code_snippet": "pnpm build && pnpm test"
+        },
+        {
+          "title": "Deploy",
+          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et"
+        },
+        {
+          "title": "Profesyonel README",
+          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz"
+        },
+        {
+          "title": "Demo Video (Opsiyonel)",
+          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla"
+        }
+      ],
+      "checkpoint": "Proje canli URL'den erisilebilir, README profesyonel, screenshot'lar ekli, GitHub repo public"
+    }
+  ],
+  "interview_prep": {
+    "questions": [
+      "REST API tasarlarken nelere dikkat edersin? Resource naming, HTTP methods ve status code kullanımını açıkla.",
+      "JWT authentication nasıl çalışır? Access token ve refresh token farkı nedir? Token'ı nerede saklarsın ve neden?",
+      "N+1 query problemi nedir? Prisma'da bu sorunu nasıl çözersin?",
+      "Optimistic update nedir? Ne zaman kullanılır? Error recovery nasıl yapılır?",
+      "Database migration nedir ve neden önemlidir? Prisma migration workflow'unu açıkla.",
+      "Docker multi-stage build ne işe yarar? Image boyutunu nasıl optimize edersin?",
+      "CORS nedir ve neden gereklidir? Yanlış konfigüre edilirse ne olur?",
+      "Rate limiting neden önemlidir? Hangi endpoint'lerde daha sıkı olmalı?"
+    ],
+    "talking_points": [
+      "Trello benzeri kanban board'u full stack olarak sıfırdan geliştirdim: React frontend, Express API, PostgreSQL veritabanı.",
+      "JWT tabanlı auth sistemi kurdum: access/refresh token pattern, bcrypt password hashing, rate limiting.",
+      "Prisma ORM ile type-safe database işlemleri yaptım. Migration stratejisi ve seed data oluşturdum.",
+      "dnd-kit ile drag-and-drop implement ettim. Optimistic updates ile anlık UI güncellemesi sağladım.",
+      "Jest + Supertest ile API testleri, React Testing Library ile component testleri yazdım. %70+ coverage.",
+      "Docker Compose ile geliştirme ortamı, multi-stage build ile production image oluşturdum.",
+      "Swagger ile API dokümantasyonu yazdım. GitHub Actions CI pipeline kurdum."
+    ]
+  },
+  "resources": [
+    {
+      "title": "Prisma Documentation",
+      "url": "https://www.prisma.io/docs",
+      "why": "Prisma ORM'in resmi dokümantasyonu. Schema tasarımı, migration, query örnekleri ve best practices."
+    },
+    {
+      "title": "Express.js Guide",
+      "url": "https://expressjs.com/en/guide/routing.html",
+      "why": "Express routing, middleware ve error handling konularında resmi rehber."
+    },
+    {
+      "title": "TanStack Query Documentation",
+      "url": "https://tanstack.com/query/latest",
+      "why": "React Query ile data fetching, caching, mutations ve optimistic updates."
+    },
+    {
+      "title": "dnd-kit Documentation",
+      "url": "https://docs.dndkit.com/",
+      "why": "Drag and drop implementasyonu için detaylı rehber ve örnekler."
+    },
+    {
+      "title": "JWT.io",
+      "url": "https://jwt.io/",
+      "why": "JWT token'ların yapısını anlama ve debug etme aracı."
+    },
+    {
+      "title": "OWASP Authentication Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "why": "Authentication güvenliği için endüstri standardı best practices."
+    }
+  ],
+  "cv_guidance": {
+    "project_title_for_cv": "Full Stack Project Management Application (Kanban Board)",
+    "bullet_points": {
+      "Full Stack Developer": [
+        "Built a full stack Kanban board application using React.js, TypeScript, Node.js, and Express.js with PostgreSQL, supporting real-time drag-and-drop task management across multiple boards",
+        "Designed and implemented RESTful API with 12+ endpoints, JWT authentication (access + refresh tokens), and role-based authorization handling 50+ concurrent users",
+        "Developed drag-and-drop interface with optimistic updates using @dnd-kit, reducing perceived latency by 90% and improving user interaction responsiveness",
+        "Containerized application with Docker Compose orchestrating 3 services (React.js, Node.js API, PostgreSQL) with automated CI/CD pipeline via GitHub Actions"
+      ],
+      "AI Engineer": [
+        "Implemented type-safe database layer using Prisma ORM with PostgreSQL, designing normalized relational schema with 4 tables and one-to-many relationships",
+        "Built data-driven task analytics with aggregation queries tracking team productivity metrics, task completion rates, and workload distribution",
+        "Developed automated testing suite with Jest achieving 80%+ code coverage, including integration tests for API endpoints and unit tests for business logic"
+      ]
+    },
+    "skills_gained": {
+      "Frontend": [
+        "React.js",
+        "TypeScript",
+        "Tailwind CSS",
+        "Drag-and-Drop (@dnd-kit)",
+        "Optimistic Updates",
+        "State Management"
+      ],
+      "Backend": [
+        "Node.js",
+        "Express.js",
+        "RESTful API Design",
+        "JWT Authentication",
+        "Prisma ORM",
+        "Middleware Architecture"
+      ],
+      "Database": [
+        "PostgreSQL",
+        "Relational Data Modeling",
+        "Database Migrations",
+        "Indexing"
+      ],
+      "DevOps": [
+        "Docker",
+        "Docker Compose",
+        "GitHub Actions CI/CD",
+        "Environment Management"
+      ]
+    },
+    "ats_keywords": [
+      "React.js",
+      "TypeScript",
+      "Node.js",
+      "Express.js",
+      "PostgreSQL",
+      "Prisma ORM",
+      "JWT",
+      "REST API",
+      "Docker",
+      "Docker Compose",
+      "GitHub Actions",
+      "CI/CD",
+      "Tailwind CSS",
+      "Drag-and-Drop",
+      "Authentication",
+      "Authorization",
+      "TDD",
+      "Jest"
+    ],
+    "cv_placement": "CV'nin 'Projeler' bölümünde Full Stack Developer pozisyonları icin birinci sıraya koy. Bu proje CRUD'un otesinde authentication, authorization, drag-and-drop ve Docker gibi production-level konulari kapsiyor. Backend Developer pozisyonlari icin de guclu bir proje.",
+    "metrics_you_can_claim": [
+      "12+ RESTful API endpoint tasarimi ve implementasyonu",
+      "JWT ile guvenli authentication sistemi (access + refresh token)",
+      "Optimistic updates ile %90 algilanan gecikme azaltmasi",
+      "Docker Compose ile 3 servisin orchestration'i",
+      "Jest ile %80+ kod kapsami (code coverage)",
+      "Prisma ORM ile 4 tablo ve iliskisel veri modelleme",
+      "GitHub Actions CI/CD pipeline ile otomatik test ve deployment"
+    ]
+  },
+  "github_guidance": {
+    "repo_name": "fullstack-project-management",
+    "repo_description": "Full-stack Kanban board app with React, TypeScript, Node.js, Express, PostgreSQL, Prisma, JWT auth, drag-and-drop, and Docker",
+    "topics": [
+      "react",
+      "typescript",
+      "nodejs",
+      "express",
+      "postgresql",
+      "prisma",
+      "jwt",
+      "docker",
+      "kanban",
+      "drag-and-drop",
+      "tailwindcss",
+      "rest-api"
+    ],
+    "when_to_create": "Projeye başladığın ilk gün repo'yu oluştur. İlk commit: monorepo yapısı (client/ + server/) + package.json'lar + TypeScript konfigürasyonu + Docker Compose boilerplate.",
+    "pin_on_profile": false,
+    "readme_sections": [
+      "# Fullstack Project Management + one-line description",
+      "Badges: build status, tech stack (React, Node.js, PostgreSQL, Docker), license (shields.io)",
+      "## 📸 Screenshots / Demo GIF",
+      "## ✨ Features (bullet list)",
+      "## 🛠 Tech Stack (table: Frontend | Backend | Database | DevOps)",
+      "## 🚀 Getting Started (prerequisites, pnpm install, docker compose up, env vars)",
+      "## 📐 Architecture (ASCII diagram or visual)",
+      "## 📡 API Documentation (main endpoints, example request/response)",
+      "## 🧠 What I Learned (3-5 concepts learned from this project)",
+      "## 📄 License (MIT)"
+    ],
+    "commit_convention": "Conventional Commits: feat:, fix:, docs:, refactor:, test:, chore:",
+    "commit_examples": [
+      "feat: implement drag-and-drop Kanban board with DnD Kit",
+      "feat: add JWT authentication with access and refresh token rotation",
+      "fix: resolve optimistic update rollback on network failure",
+      "docs: add API endpoint documentation with request/response examples",
+      "refactor: extract board service layer from controller logic",
+      "test: add integration tests for card CRUD operations with Jest",
+      "chore: configure Docker Compose for PostgreSQL service"
+    ],
+    "branch_strategy": "main (production) + develop (active) + feature/* + fix/* + docs/*",
+    "daily_commit_target": "Günde en az 3-5 anlamlı commit. Contribution graph'ın yeşil kalması önemli.",
+    "pro_tips": [
+      "Her milestone bittiğinde git tag ekle: v0.1.0, v0.2.0...",
+      "README'ye mutlaka screenshot/GIF ekle — görsel proje daha çok dikkat çeker",
+      "Issues oluştur ve kapat — proje yönetimi becerini gösterir",
+      "GitHub Projects board kullan — Kanban tarzı iş takibi",
+      "Drag-and-drop demosunu GIF olarak README'ye ekle — en etkileyici özellik budur",
+      "Prisma migration dosyalarını commit'le — veritabanı versiyonlama becerisini gösterir"
+    ]
+  },
+  "cover_letter_guidance": {
+    "project_highlight": "Developed a full-stack Kanban project management application (Trello clone) with React, TypeScript, Node.js/Express, PostgreSQL, and Prisma ORM, featuring drag-and-drop card management, JWT authentication, real-time optimistic updates, and Docker containerization.",
+    "skills_demonstrated": [
+      "React",
+      "TypeScript",
+      "Node.js",
+      "Express",
+      "PostgreSQL",
+      "Prisma ORM",
+      "JWT Authentication",
+      "Docker",
+      "REST API Design",
+      "Drag and Drop"
+    ],
+    "talking_points": [
+      "Designed and implemented RESTful API with 15+ endpoints following layered architecture (Controller → Service → Repository)",
+      "Built drag-and-drop Kanban board with optimistic updates for seamless user experience across boards, lists, and cards",
+      "Implemented secure JWT authentication with access/refresh token rotation and role-based authorization",
+      "Modeled relational database schema with Prisma ORM supporting Users, Boards, Lists, and Cards with type-safe queries",
+      "Containerized full stack with Docker Compose orchestrating React, Express, and PostgreSQL services"
+    ]
+  },
+  "ai_workflow": {
+    "planning": {
+      "model": "Claude Opus 4.6",
+      "prompt_template": "I'm building a Trello-like kanban board application with React + TypeScript frontend, Node.js/Express REST API, PostgreSQL with Prisma ORM, JWT authentication, and Docker. Help me design the system architecture considering: database schema for boards/lists/cards relationships, drag-and-drop reordering logic with position tracking, JWT access+refresh token flow, optimistic updates strategy, and API endpoint structure following REST conventions.",
+      "when_to_use": "Her milestone'un basinda kullan — veritabani semasi, API tasarimi ve authentication akisi planlamak icin"
+    },
+    "code_review": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "Review this Node.js/Express + Prisma code for: proper layered architecture (controller/service/repository), Prisma query optimization and relation handling, JWT token security (httpOnly cookies, token rotation), TypeScript type safety, error handling middleware, input validation, SQL injection prevention, and RESTful API design. Also check React component structure and drag-and-drop implementation.",
+      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle Prisma sorgulari, auth middleware ve drag-and-drop mantigi icin"
+    },
+    "debugging": {
+      "model": "Claude Sonnet 4.5",
+      "prompt_template": "I'm getting this error in my Trello clone project (React + Express + PostgreSQL + Prisma + JWT): [error]. The relevant code is: [code]. My Prisma schema is: [schema]. I'm trying to [goal].",
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle Prisma migration hatalari, JWT token sorunlari ve drag-and-drop state yonetimi icin"
+    },
+    "research": {
+      "model": "Gemini 2.5 Pro",
+      "prompt_template": "Explain [concept] with practical examples for a full-stack kanban board app. Topics I need help with: Prisma ORM relations and nested writes, JWT refresh token rotation, @dnd-kit library, optimistic updates with React Query, Express middleware patterns, Docker Compose multi-service setup, and integration testing with Supertest.",
+      "when_to_use": "Yeni bir kutuphane veya pattern ogrenirken kullan — ozellikle Prisma, drag-and-drop ve JWT icin"
+    }
+  },
+  "deployment_guide": {
+    "recommended_stack": {
+      "frontend": "Vercel",
+      "backend": "Railway",
+      "database": "Neon (Serverless PostgreSQL)"
+    },
+    "steps": [
+      {
+        "title": "Neon Database Olustur",
+        "commands": [
+          "# neon.tech'e git, yeni proje olustur",
+          "# Connection string'i kopyala"
+        ],
+        "instructions": "Neon ucretsiz tier: 0.5 GB storage, 190 compute hours/ay"
+      },
+      {
+        "title": "Backend Deploy (Railway)",
+        "commands": [
+          "railway login",
+          "railway init",
+          "railway link",
+          "railway up"
+        ],
+        "instructions": "Environment variables ekle: DATABASE_URL, JWT_SECRET, CORS_ORIGIN"
+      },
+      {
+        "title": "Frontend Deploy (Vercel)",
+        "commands": [
+          "pnpm dlx vercel --yes"
+        ],
+        "instructions": "VITE_API_URL env var'ini Railway URL'ine ayarla"
+      },
+      {
+        "title": "Prisma Migration",
+        "commands": [
+          "DATABASE_URL=... pnpm dlx prisma migrate deploy"
+        ],
+        "instructions": "Production'da migrate deploy kullan (migrate dev degil)"
+      }
+    ],
+    "env_vars": [
+      "DATABASE_URL",
+      "JWT_SECRET",
+      "CORS_ORIGIN",
+      "VITE_API_URL"
+    ],
+    "estimated_time": "30 dakika",
+    "cost": "Ucretsiz (tum servisler hobby tier)",
+    "demo_checklist": [
+      "Kayit/giris calisiyor",
+      "Board olusturma/silme",
+      "Kart surukle-birak",
+      "Real-time guncelleme",
+      "JWT token yenileme"
+    ]
+  },
+  "portfolio_showcase": {
+    "readme_must_haves": [
+      "Proje aciklamasi ve motivasyon (2-3 cumle)",
+      "Canli demo linki (Vercel/Railway badge ile)",
+      "Teknoloji stack badge'leri",
+      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Mimari diyagram (ASCII veya draw.io)",
+      "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
+      "API dokumantasyonu (/docs linki veya Postman collection)",
+      "Ogrenilenler ve kararlar bolumu"
+    ],
+    "screenshot_suggestions": [
+      "Dashboard/Anasayfa",
+      "Ana ozellik ekrani",
+      "Mobile gorunum"
+    ],
+    "live_demo_url_template": "https://trello-clone.vercel.app",
+    "github_repo_template": "https://github.com/USERNAME/trello-clone"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "id": "challenge-sql-queries",
+  "title": "E-Ticaret SQL Sorgu Challenge",
+  "difficulty": "orta",
+  "category": "sql",
+  "tags": ["sql", "joins", "subqueries", "window-functions", "cte", "postgresql"],
+  "related_lesson": "mod-11-db/lesson-01",
+  "description_tr": "Bir e-ticaret veritabanında karmaşık SQL sorguları yaz: JOIN'ler, subquery'ler, CTE'ler ve window function'lar kullanarak iş gereksinimlerini karşıla.",
+  "description_detail": "Verilen e-ticaret veritabanı şemasında 4 farklı zorluk seviyesinde SQL sorgusu yazacaksınız: (1) Çoklu JOIN ile sipariş detay raporu, (2) Subquery ile ortalama üzeri harcama yapan müşteriler, (3) CTE ile aylık satış trend raporu, (4) Window Function ile her kategorideki top 3 ürün. Her sorgu gerçek dünya iş gereksinimlerini karşılar.",
+  "examples": [
+    {
+      "input": "-- Soru 1: Her siparişin müşteri adı, ürün adı, adet ve toplam tutarını getir\n-- Tablolar: users, orders, order_items, products",
+      "output": "| musteri      | urun           | adet | toplam  |\n|-------------|----------------|------|---------|\n| Ahmet Yilmaz | MacBook Pro   | 1    | 45000   |\n| Ahmet Yilmaz | Mouse         | 2    | 500     |\n| Ayse Kaya    | iPhone 15     | 1    | 65000   |",
+      "explanation": "users → orders → order_items → products tabloları INNER JOIN ile birleştirilir."
+    },
+    {
+      "input": "-- Soru 4: Her kategorideki en çok satan 3 ürünü getir (window function)\n-- Tablolar: products, order_items",
+      "output": "| kategori     | urun          | toplam_satis | siralama |\n|-------------|---------------|-------------|----------|\n| electronics | iPhone 15     | 1250        | 1        |\n| electronics | MacBook Pro   | 890         | 2        |\n| electronics | AirPods       | 750         | 3        |\n| clothing    | Tshirt Basic  | 2100        | 1        |",
+      "explanation": "DENSE_RANK() OVER (PARTITION BY category ORDER BY total_sold DESC) ile her kategoride sıralama yapılır."
+    }
+  ],
+  "constraints": [
+    "PostgreSQL söz dizimi kullanılmalıdır",
+    "Her sorgu tek bir SQL statement olmalıdır",
+    "Alias kullanarak okunabilir sütun isimleri verilmelidir",
+    "JOIN türü doğru seçilmelidir (INNER vs LEFT)",
+    "Window function sorgusunda subquery veya CTE kullanılabilir",
+    "Tüm sorgular doğru sonuç döndürmelidir"
+  ],
+  "starter_code": {
+    "sql": "-- E-Ticaret Veritabanı Şeması:\n-- users: id, first_name, last_name, email, city, created_at\n-- products: id, name, price, category, stock, created_at\n-- orders: id, user_id, total_amount, status, created_at\n-- order_items: id, order_id, product_id, quantity, unit_price\n\n-- ============================================\n-- SORU 1: Sipariş Detay Raporu (JOIN)\n-- Her siparişin müşteri tam adı, ürün adı, adedi ve\n-- satır toplam tutarını (quantity * unit_price) getir.\n-- Sadece 'completed' statüsündeki siparişleri dahil et.\n-- Sipariş tarihine göre azalan sırala.\n-- ============================================\n\n-- Sorgunuzu buraya yazın:\n\n\n-- ============================================\n-- SORU 2: Ortalama Üstü Müşteriler (Subquery)\n-- Toplam harcaması, tüm müşterilerin ortalama toplam\n-- harcamasından yüksek olan müşterilerin adı, email'i\n-- ve toplam harcamasını getir.\n-- ============================================\n\n-- Sorgunuzu buraya yazın:\n\n\n-- ============================================\n-- SORU 3: Aylık Satış Trend Raporu (CTE + Window)\n-- Her ayın toplam gelirini, bir önceki ayın gelirini\n-- ve büyüme yüzdesini hesapla.\n-- Sadece 'completed' siparişleri dahil et.\n-- ============================================\n\n-- Sorgunuzu buraya yazın:\n\n\n-- ============================================\n-- SORU 4: Kategori Bazında Top 3 Ürün (Window Function)\n-- Her kategorideki en çok satan (toplam adet) 3 ürünü\n-- getir. Sıralama, ürün adı ve toplam satış adedini göster.\n-- ============================================\n\n-- Sorgunuzu buraya yazın:\n",
+    "javascript": "// Bu challenge SQL odaklıdır.\n// Aşağıdaki Prisma kodunu kullanarak sorguları Node.js'te çalıştırabilirsiniz.\n\nconst { PrismaClient } = require('@prisma/client');\nconst prisma = new PrismaClient();\n\n// Soru 1: Sipariş Detay Raporu\nasync function getOrderDetails() {\n  // Prisma ile veya raw SQL ile yazın\n  const result = await prisma.$queryRaw`\n    -- SQL sorgunuzu buraya yazın\n  `;\n  return result;\n}\n\n// Soru 2: Ortalama Üstü Müşteriler\nasync function getAboveAverageCustomers() {\n  // SQL sorgunuzu buraya yazın\n}\n\n// Soru 3: Aylık Satış Trendi\nasync function getMonthlySalesTrend() {\n  // SQL sorgunuzu buraya yazın\n}\n\n// Soru 4: Kategori Top 3\nasync function getCategoryTop3() {\n  // SQL sorgunuzu buraya yazın\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"test": "query1_joins", "description": "Sipariş detay raporu doğru JOIN'leri kullanıyor"},
+      "expected": "INNER JOIN users, orders, order_items, products; WHERE status = 'completed'; ORDER BY DESC"
+    },
+    {
+      "input": {"test": "query2_subquery", "description": "Subquery ile ortalama hesaplanıyor"},
+      "expected": "HAVING SUM(total_amount) > (SELECT AVG(total_spent) FROM ...)"
+    },
+    {
+      "input": {"test": "query3_cte_window", "description": "CTE ve LAG window function kullanılıyor"},
+      "expected": "WITH monthly AS (...) SELECT LAG(revenue) OVER (ORDER BY month)"
+    },
+    {
+      "input": {"test": "query4_window_rank", "description": "DENSE_RANK veya ROW_NUMBER ile kategori bazında sıralama"},
+      "expected": "DENSE_RANK() OVER (PARTITION BY category ORDER BY total_sold DESC) WHERE rank <= 3"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"test": "query1_alias", "description": "Okunabilir alias isimleri kullanılmış"},
+      "expected": "AS musteri, AS urun, AS toplam gibi anlamlı alias'lar"
+    },
+    {
+      "input": {"test": "query2_efficiency", "description": "Subquery verimli yazılmış"},
+      "expected": "Correlated subquery yerine scalar subquery veya CTE tercih edilmiş"
+    },
+    {
+      "input": {"test": "query3_growth_calc", "description": "Büyüme yüzdesi doğru hesaplanmış"},
+      "expected": "(current - previous) / previous * 100 formülü"
+    },
+    {
+      "input": {"test": "query4_dense_rank", "description": "Eşit satışlarda doğru sıralama"},
+      "expected": "DENSE_RANK tercih edilmiş (eşit satışlar aynı sırada)"
+    }
+  ],
+  "hints": [
+    "Soru 1: users → orders (user_id) → order_items (order_id) → products (product_id) şeklinde 3 JOIN yap. CONCAT(first_name, ' ', last_name) ile tam ad oluştur.",
+    "Soru 2: Önce her kullanıcının toplam harcamasını hesapla (GROUP BY + SUM), sonra HAVING ile ortalamanın üstündekileri filtrele. Ortalamayı subquery ile hesapla.",
+    "Soru 3: CTE ile aylık gelirleri hesapla (DATE_TRUNC + SUM + GROUP BY). Ana sorguda LAG() ile önceki ayı al. Büyüme: (gelir - önceki) / önceki * 100. ROUND ile 2 ondalık.",
+    "Soru 4: Önce products ve order_items JOIN'leyerek kategori+ürün bazında toplam satışı hesapla. Sonra DENSE_RANK() OVER (PARTITION BY category ORDER BY total DESC) ile sırala. WHERE rank <= 3 filtrele."
+  ],
+  "solution": {
+    "sql": "-- SORU 1: Sipariş Detay Raporu\nSELECT\n  CONCAT(u.first_name, ' ', u.last_name) AS musteri,\n  p.name AS urun,\n  oi.quantity AS adet,\n  (oi.quantity * oi.unit_price) AS toplam_tutar,\n  o.created_at AS siparis_tarihi\nFROM orders o\nINNER JOIN users u ON o.user_id = u.id\nINNER JOIN order_items oi ON o.id = oi.order_id\nINNER JOIN products p ON oi.product_id = p.id\nWHERE o.status = 'completed'\nORDER BY o.created_at DESC;\n\n-- SORU 2: Ortalama Üstü Müşteriler\nSELECT\n  CONCAT(u.first_name, ' ', u.last_name) AS musteri,\n  u.email,\n  SUM(o.total_amount) AS toplam_harcama\nFROM users u\nINNER JOIN orders o ON u.id = o.user_id\nWHERE o.status = 'completed'\nGROUP BY u.id, u.first_name, u.last_name, u.email\nHAVING SUM(o.total_amount) > (\n  SELECT AVG(user_total) FROM (\n    SELECT SUM(total_amount) AS user_total\n    FROM orders\n    WHERE status = 'completed'\n    GROUP BY user_id\n  ) avg_calc\n)\nORDER BY toplam_harcama DESC;\n\n-- SORU 3: Aylık Satış Trend Raporu\nWITH monthly_revenue AS (\n  SELECT\n    DATE_TRUNC('month', created_at) AS ay,\n    SUM(total_amount) AS gelir\n  FROM orders\n  WHERE status = 'completed'\n  GROUP BY DATE_TRUNC('month', created_at)\n)\nSELECT\n  ay,\n  gelir,\n  LAG(gelir) OVER (ORDER BY ay) AS onceki_ay_gelir,\n  ROUND(\n    (gelir - LAG(gelir) OVER (ORDER BY ay))\n    / LAG(gelir) OVER (ORDER BY ay) * 100, 2\n  ) AS buyume_yuzde\nFROM monthly_revenue\nORDER BY ay DESC;\n\n-- SORU 4: Kategori Bazında Top 3\nSELECT kategori, urun, toplam_satis, siralama\nFROM (\n  SELECT\n    p.category AS kategori,\n    p.name AS urun,\n    SUM(oi.quantity) AS toplam_satis,\n    DENSE_RANK() OVER (\n      PARTITION BY p.category\n      ORDER BY SUM(oi.quantity) DESC\n    ) AS siralama\n  FROM products p\n  INNER JOIN order_items oi ON p.id = oi.product_id\n  GROUP BY p.category, p.name\n) ranked\nWHERE siralama <= 3\nORDER BY kategori, siralama;",
+    "javascript": "// Prisma ile çözüm\n\n// Soru 1\nconst orderDetails = await prisma.$queryRaw`\n  SELECT CONCAT(u.first_name, ' ', u.last_name) AS musteri,\n    p.name AS urun, oi.quantity AS adet,\n    (oi.quantity * oi.unit_price) AS toplam_tutar\n  FROM orders o\n  INNER JOIN users u ON o.user_id = u.id\n  INNER JOIN order_items oi ON o.id = oi.order_id\n  INNER JOIN products p ON oi.product_id = p.id\n  WHERE o.status = 'completed'\n  ORDER BY o.created_at DESC\n`;\n\n// Soru 4\nconst top3ByCategory = await prisma.$queryRaw`\n  SELECT kategori, urun, toplam_satis, siralama FROM (\n    SELECT p.category AS kategori, p.name AS urun,\n      SUM(oi.quantity) AS toplam_satis,\n      DENSE_RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity) DESC) AS siralama\n    FROM products p\n    INNER JOIN order_items oi ON p.id = oi.product_id\n    GROUP BY p.category, p.name\n  ) ranked WHERE siralama <= 3\n`;",
+    "explanation_tr": "Soru 1: 4 tablo INNER JOIN ile birleştirilir. CONCAT ile ad-soyad, quantity * unit_price ile satır toplamı hesaplanır.\n\nSoru 2: İç içe subquery ile önce her kullanıcının toplam harcaması, sonra bunların ortalaması hesaplanır. HAVING ile ortalama üstü filtrelenir.\n\nSoru 3: CTE (WITH) ile aylık gelirler hesaplanır. LAG() window function ile önceki ayın geliri alınır. Büyüme yüzdesi: (şimdiki - önceki) / önceki * 100.\n\nSoru 4: GROUP BY ile ürün bazında toplam satış hesaplanır. DENSE_RANK() OVER (PARTITION BY category) ile kategori içi sıralama yapılır. WHERE rank <= 3 ile top 3 filtrelenir. DENSE_RANK eşit satışları aynı sırada gösterir."
+  },
+  "complexity": {
+    "optimal_time": "Depends on table size and indexing",
+    "optimal_space": "O(n) for result set"
+  },
+  "learn_after_solving": "Bu challenge ile SQL'in 4 temel ileri konusunu pratik ettin: multi-table JOIN'ler ile karmaşık veri birleştirme, subquery ile dinamik filtreleme, CTE ile okunabilir ve modüler sorgu yazma, window function ile analitik hesaplamalar. Bu becerileri birleştirerek gerçek dünya raporlama ve veri analizi ihtiyaçlarını karşılayabilirsin. Mülakatlarda bu konular çok sık sorulur."
+}

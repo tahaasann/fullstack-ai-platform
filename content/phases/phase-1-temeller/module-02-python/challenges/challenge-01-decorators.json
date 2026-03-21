@@ -1,0 +1,70 @@
+{
+  "id": "challenge-decorators",
+  "title": "Custom Decorator Yaz",
+  "difficulty": "orta",
+  "category": "python",
+  "tags": ["decorators", "closures", "memoization", "performance"],
+  "related_lesson": "mod-02-python/lesson-03",
+  "description_tr": "Fonksiyon yürütme süresini ölçen bir @timer decorator'u ve fonksiyon sonuçlarını cache'leyen bir @cache decorator'u yaz.",
+  "description_detail": "İki adet custom decorator yazacaksınız: (1) @timer - dekore edilen fonksiyonun çalışma süresini ölçer ve konsola yazdırır, fonksiyonun sonucunu döndürür. (2) @cache - daha önce aynı argümanlarla çağrılmış fonksiyonun sonucunu cache'den döndürür (memoization). Cache'de yoksa fonksiyonu çalıştırır, sonucu cache'e kaydeder ve döndürür.",
+  "examples": [
+    {
+      "input": "@timer\ndef toplama(a, b):\n    return a + b\n\ntoplama(3, 5)",
+      "output": "toplama fonksiyonu 0.0001s sürdü\n8",
+      "explanation": "@timer decorator'u fonksiyonun çalışma süresini ölçer ve sonucu döndürür."
+    },
+    {
+      "input": "@cache\ndef fibonacci(n):\n    if n < 2:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n\nfibonacci(10)",
+      "output": "55",
+      "explanation": "@cache decorator'u aynı argümanlarla tekrar çağrıldığında hesaplama yapmadan cache'den döndürür."
+    },
+    {
+      "input": "@cache\ndef kare(x):\n    return x ** 2\n\nkare(4)  # hesaplar, cache'e kaydeder\nkare(4)  # cache'den döndürür",
+      "output": "16\n16",
+      "explanation": "İlk çağrıda hesaplanır ve cache'e yazılır. İkinci çağrıda cache'den okunur."
+    }
+  ],
+  "constraints": [
+    "timer decorator fonksiyonun adını ve süresini yazdırmalıdır",
+    "timer decorator fonksiyonun orijinal dönüş değerini döndürmelidir",
+    "cache decorator herhangi bir sayıda pozisyonel argümanı desteklemelidir",
+    "cache decorator aynı argümanlar için fonksiyonu tekrar çalıştırmamalıdır",
+    "Her iki decorator da @wraps kullanarak orijinal fonksiyon metadatasını korumalıdır",
+    "time modülünü kullanabilirsiniz"
+  ],
+  "starter_code": {
+    "python": "import time\nfrom functools import wraps\n\n\ndef timer(func):\n    \"\"\"Fonksiyonun çalışma süresini ölçen decorator.\n    \n    Kullanım:\n        @timer\n        def my_func():\n            pass\n    \"\"\"\n    # Decorator'u burada implement et\n    pass\n\n\ndef cache(func):\n    \"\"\"Fonksiyon sonuçlarını cache'leyen decorator (memoization).\n    \n    Kullanım:\n        @cache\n        def fibonacci(n):\n            if n < 2: return n\n            return fibonacci(n-1) + fibonacci(n-2)\n    \"\"\"\n    # Decorator'u burada implement et\n    pass",
+    "javascript": "/**\n * Fonksiyonun çalışma süresini ölçen decorator.\n * \n * Kullanım:\n *   const myFunc = timer(function myFunc() { ... });\n */\nfunction timer(func) {\n    // Decorator'u burada implement et\n}\n\n\n/**\n * Fonksiyon sonuçlarını cache'leyen decorator (memoization).\n * \n * Kullanım:\n *   const fibonacci = cache(function fibonacci(n) {\n *       if (n < 2) return n;\n *       return fibonacci(n-1) + fibonacci(n-2);\n *   });\n */\nfunction cache(func) {\n    // Decorator'u burada implement et\n}"
+  },
+  "test_cases": [
+    {"input": {"test": "timer_returns_value", "code": "@timer\ndef topla(a, b): return a + b\nresult = topla(3, 5)"}, "expected": 8},
+    {"input": {"test": "timer_returns_string", "code": "@timer\ndef selamla(isim): return f'Merhaba {isim}'\nresult = selamla('Ali')"}, "expected": "Merhaba Ali"},
+    {"input": {"test": "cache_basic", "code": "@cache\ndef kare(x): return x ** 2\nresult = kare(4)"}, "expected": 16},
+    {"input": {"test": "cache_same_args", "code": "@cache\ndef kare(x): return x ** 2\nkare(5)\nresult = kare(5)"}, "expected": 25},
+    {"input": {"test": "cache_different_args", "code": "@cache\ndef topla(a, b): return a + b\ntopla(1, 2)\nresult = topla(3, 4)"}, "expected": 7},
+    {"input": {"test": "cache_fibonacci", "code": "@cache\ndef fib(n):\n    if n < 2: return n\n    return fib(n-1) + fib(n-2)\nresult = fib(10)"}, "expected": 55},
+    {"input": {"test": "timer_preserves_name", "code": "@timer\ndef my_func(): pass\nresult = my_func.__name__"}, "expected": "my_func"}
+  ],
+  "hidden_test_cases": [
+    {"input": {"test": "cache_preserves_name", "code": "@cache\ndef my_func(): pass\nresult = my_func.__name__"}, "expected": "my_func"},
+    {"input": {"test": "cache_fibonacci_large", "code": "@cache\ndef fib(n):\n    if n < 2: return n\n    return fib(n-1) + fib(n-2)\nresult = fib(30)"}, "expected": 832040},
+    {"input": {"test": "timer_with_no_args", "code": "@timer\ndef sabit(): return 42\nresult = sabit()"}, "expected": 42},
+    {"input": {"test": "cache_single_arg_multiple_calls", "code": "call_count = 0\n@cache\ndef tracked(x):\n    global call_count\n    call_count += 1\n    return x * 2\ntracked(3)\ntracked(3)\ntracked(3)\nresult = call_count"}, "expected": 1},
+    {"input": {"test": "timer_returns_none", "code": "@timer\ndef no_return(): pass\nresult = no_return()"}, "expected": null}
+  ],
+  "hints": [
+    "timer decorator'u için time.time() ile fonksiyon çalışmadan önce ve sonra zamanı ölç, farkı yazdır. Wrapper fonksiyon *args ve **kwargs almalı.",
+    "cache decorator'u için bir dictionary (sözlük) kullan. Anahtar olarak fonksiyona gelen argümanları tuple'a çevir: key = args. Eğer key sözlükte varsa direkt döndür, yoksa fonksiyonu çalıştır ve sonucu kaydet.",
+    "Tam çözüm ipucu: Her iki decorator'da da @wraps(func) kullanarak orijinal fonksiyonun __name__ ve __doc__ bilgilerini koru. Cache decorator'unda cache = {} sözlüğünü wrapper fonksiyonun dışında (ama decorator'un içinde) tanımla - closure sayesinde wrapper bu sözlüğe erişebilir."
+  ],
+  "solution": {
+    "python": "import time\nfrom functools import wraps\n\n\ndef timer(func):\n    @wraps(func)\n    def wrapper(*args, **kwargs):\n        start = time.time()\n        result = func(*args, **kwargs)\n        end = time.time()\n        print(f\"{func.__name__} fonksiyonu {end - start:.4f}s sürdü\")\n        return result\n    return wrapper\n\n\ndef cache(func):\n    cache_dict = {}\n    \n    @wraps(func)\n    def wrapper(*args):\n        if args in cache_dict:\n            return cache_dict[args]\n        result = func(*args)\n        cache_dict[args] = result\n        return result\n    return wrapper",
+    "javascript": "function timer(func) {\n    function wrapper(...args) {\n        const start = performance.now();\n        const result = func(...args);\n        const end = performance.now();\n        console.log(`${func.name} fonksiyonu ${((end - start) / 1000).toFixed(4)}s sürdü`);\n        return result;\n    }\n    Object.defineProperty(wrapper, 'name', { value: func.name });\n    return wrapper;\n}\n\n\nfunction cache(func) {\n    const cacheMap = new Map();\n    \n    function wrapper(...args) {\n        const key = JSON.stringify(args);\n        if (cacheMap.has(key)) {\n            return cacheMap.get(key);\n        }\n        const result = func(...args);\n        cacheMap.set(key, result);\n        return result;\n    }\n    Object.defineProperty(wrapper, 'name', { value: func.name });\n    return wrapper;\n}",
+    "explanation_tr": "timer decorator'u: time.time() ile başlangıç ve bitiş zamanını ölçer, farkı yazdırır ve orijinal sonucu döndürür. Zaman: O(1) ek maliyet, Alan: O(1).\n\ncache decorator'u: Closure ile bir dictionary tutar. Argümanları tuple olarak anahtar yapar. Cache hit varsa O(1)'de döndürür, yoksa fonksiyonu çalıştırır ve kaydeder. Fibonacci örneğinde O(2^n) olan karmaşıklığı O(n)'e düşürür. Zaman: Amortized O(1) lookup, Alan: O(n) - n benzersiz argüman sayısı.\n\n@wraps(func) kullanımı, orijinal fonksiyonun __name__, __doc__ ve __module__ gibi metadata bilgilerini korur. Bu, debugging ve introspection için önemlidir."
+  },
+  "complexity": {
+    "optimal_time": "O(1) per call (cache hit)",
+    "optimal_space": "O(n) - n unique argument combinations"
+  },
+  "learn_after_solving": "Bu challenge ile decorator pattern'ını, closure kavramını ve memoization tekniğini öğrendin. @timer gibi cross-cutting concern'leri (logging, auth, rate-limiting) decorator ile uygulayabilirsin. @cache ise functools.lru_cache'in temelini oluşturur - production'da lru_cache(maxsize=128) kullanarak bellek limitli cache yapabilirsin."
+}

@@ -1,0 +1,80 @@
+{
+  "title": "Commit Message Validator",
+  "description": "Conventional Commits formatına göre commit mesajlarını doğrula",
+  "description_detail": "# Commit Message Validator\n\nConventional Commits spesifikasyonuna göre commit mesajlarını doğrulayan bir fonksiyon yazın.\n\n## Conventional Commit Formatı\n```\n<type>(<scope>): <description>\n\n[optional body]\n\n[optional footer(s)]\n```\n\n## Kurallar\n- **type** (zorunlu): feat, fix, docs, style, refactor, test, chore, perf, ci, build\n- **scope** (opsiyonel): Parantez içinde, küçük harf alfanumerik\n- **description** (zorunlu): Küçük harfle başlamalı, nokta ile bitmemeli, 72 karakteri geçmemeli\n- **breaking change**: type'dan sonra `!` veya footer'da `BREAKING CHANGE:` \n\n## Döndürülecek Obje\n```\n{\n  valid: boolean,\n  type: string | null,\n  scope: string | null,\n  description: string | null,\n  breaking: boolean,\n  errors: string[]\n}\n```",
+  "difficulty": "orta",
+  "category": "git",
+  "tags": ["git", "conventional-commits", "validation", "regex"],
+  "examples": [
+    {
+      "input": "feat(auth): add login endpoint",
+      "output": "{'valid': true, 'type': 'feat', 'scope': 'auth', 'description': 'add login endpoint', 'breaking': false, 'errors': []}",
+      "explanation": "Geçerli conventional commit"
+    },
+    {
+      "input": "Fixed the bug",
+      "output": "{'valid': false, 'type': null, 'scope': null, 'description': null, 'breaking': false, 'errors': ['Invalid commit format']}",
+      "explanation": "Type belirtilmemiş, format yanlış"
+    }
+  ],
+  "constraints": [
+    "Type listesi: feat, fix, docs, style, refactor, test, chore, perf, ci, build",
+    "Description 72 karakteri geçmemeli",
+    "Description küçük harfle başlamalı",
+    "Description nokta ile bitmemeli"
+  ],
+  "starter_code": {
+    "python": "def validate_commit(message: str) -> dict:\n    # Your code here\n    pass",
+    "javascript": "function validateCommit(message) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": "feat: add new feature",
+      "expected_output": {"valid": true, "type": "feat", "scope": null, "description": "add new feature", "breaking": false, "errors": []}
+    },
+    {
+      "input": "fix(api): resolve null pointer exception",
+      "expected_output": {"valid": true, "type": "fix", "scope": "api", "description": "resolve null pointer exception", "breaking": false, "errors": []}
+    },
+    {
+      "input": "feat!: drop support for Node 12",
+      "expected_output": {"valid": true, "type": "feat", "scope": null, "description": "drop support for Node 12", "breaking": true, "errors": []}
+    },
+    {
+      "input": "invalid message",
+      "expected_output": {"valid": false, "type": null, "scope": null, "description": null, "breaking": false, "errors": ["Invalid commit format"]}
+    },
+    {
+      "input": "feat: Add Something.",
+      "expected_output": {"valid": false, "type": "feat", "scope": null, "description": "Add Something.", "breaking": false, "errors": ["Description must start with lowercase", "Description must not end with period"]}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": "docs(readme): update installation instructions",
+      "expected_output": {"valid": true, "type": "docs", "scope": "readme", "description": "update installation instructions", "breaking": false, "errors": []}
+    },
+    {
+      "input": "feat(auth)!: change token format",
+      "expected_output": {"valid": true, "type": "feat", "scope": "auth", "description": "change token format", "breaking": true, "errors": []}
+    },
+    {
+      "input": "unknown: something",
+      "expected_output": {"valid": false, "type": "unknown", "scope": null, "description": "something", "breaking": false, "errors": ["Invalid type: unknown"]}
+    }
+  ],
+  "hints": [
+    "Regex ile formatı parse et: /^(\\w+)(\\(([a-z0-9]+)\\))?(!)?:\\s(.+)$/",
+    "Parse ettikten sonra type'ın geçerli listede olup olmadığını kontrol et",
+    "Description kurallarını ayrı ayrı kontrol edip her ihlali errors listesine ekle"
+  ],
+  "solution": {
+    "python": "import re\n\ndef validate_commit(message: str) -> dict:\n    valid_types = {'feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'perf', 'ci', 'build'}\n    \n    result = {\n        'valid': True,\n        'type': None,\n        'scope': None,\n        'description': None,\n        'breaking': False,\n        'errors': []\n    }\n    \n    first_line = message.split('\\n')[0]\n    pattern = r'^(\\w+)(\\(([a-z0-9]+)\\))?(!)?:\\s(.+)$'\n    match = re.match(pattern, first_line)\n    \n    if not match:\n        result['valid'] = False\n        result['errors'].append('Invalid commit format')\n        return result\n    \n    commit_type = match.group(1)\n    scope = match.group(3)\n    breaking = match.group(4) == '!'\n    description = match.group(5)\n    \n    result['type'] = commit_type\n    result['scope'] = scope\n    result['description'] = description\n    result['breaking'] = breaking or 'BREAKING CHANGE:' in message\n    \n    if commit_type not in valid_types:\n        result['errors'].append(f'Invalid type: {commit_type}')\n    \n    if description and description[0].isupper():\n        result['errors'].append('Description must start with lowercase')\n    \n    if description and description.endswith('.'):\n        result['errors'].append('Description must not end with period')\n    \n    if description and len(description) > 72:\n        result['errors'].append('Description exceeds 72 characters')\n    \n    result['valid'] = len(result['errors']) == 0\n    return result",
+    "javascript": "function validateCommit(message) {\n  const validTypes = new Set(['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'perf', 'ci', 'build']);\n\n  const result = {\n    valid: true,\n    type: null,\n    scope: null,\n    description: null,\n    breaking: false,\n    errors: []\n  };\n\n  const firstLine = message.split('\\n')[0];\n  const match = firstLine.match(/^(\\w+)(\\(([a-z0-9]+)\\))?(!)?:\\s(.+)$/);\n\n  if (!match) {\n    result.valid = false;\n    result.errors.push('Invalid commit format');\n    return result;\n  }\n\n  const [, type, , scope, bang, description] = match;\n  result.type = type;\n  result.scope = scope || null;\n  result.description = description;\n  result.breaking = bang === '!' || message.includes('BREAKING CHANGE:');\n\n  if (!validTypes.has(type)) {\n    result.errors.push(`Invalid type: ${type}`);\n  }\n  if (description && description[0] === description[0].toUpperCase() && description[0] !== description[0].toLowerCase()) {\n    result.errors.push('Description must start with lowercase');\n  }\n  if (description && description.endsWith('.')) {\n    result.errors.push('Description must not end with period');\n  }\n  if (description && description.length > 72) {\n    result.errors.push('Description exceeds 72 characters');\n  }\n\n  result.valid = result.errors.length === 0;\n  return result;\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)"
+  },
+  "learn_after_solving": "Conventional Commits standardını, regex ile metin parsing'i ve validation pattern'ini öğrenirsin. Bu standard semantic versioning, changelog oluşturma ve CI/CD pipeline'larında otomatik release için kritiktir."
+}

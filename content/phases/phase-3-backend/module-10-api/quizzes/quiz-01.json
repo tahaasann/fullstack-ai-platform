@@ -1,0 +1,114 @@
+{
+  "id": "mod-10-api/quiz-01",
+  "title": "REST API Tasarımı, GraphQL ve API Dokümantasyonu Quiz",
+  "description": "RESTful API prensipleri, URL tasarımı, pagination, GraphQL, gRPC ve OpenAPI konularını ne kadar anladın?",
+  "passing_score": 70,
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Aşağıdaki URL tasarımlarından hangisi RESTful prensiplere AYKIRIDIR?",
+      "options": [
+        "GET /api/v1/users/123/orders",
+        "DELETE /api/v1/users/123",
+        "POST /api/v1/users/createUser",
+        "PATCH /api/v1/users/123"
+      ],
+      "correct": 2,
+      "explanation": "POST /api/v1/users/createUser aykırıdır çünkü URL'de fiil (createUser) kullanılmış. RESTful tasarımda HTTP method (POST) zaten 'oluşturma' eylemini belirtir. Doğrusu: POST /api/v1/users. URL'lerde isim (noun) kullanılır, fiil (verb) kullanılmaz.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "question": "PUT isteği idempotent'tir; yani aynı PUT isteğini 10 kez göndersen bile sonuç, 1 kez göndermekle aynıdır. Ancak POST isteği idempotent değildir ve her çağrıda yeni bir kayıt oluşturabilir.",
+      "correct": true,
+      "explanation": "Doğru! PUT bir kaynağı tamamen günceller (replace). Aynı veriyle 10 kez güncellesen sonuç değişmez. POST ise her çağrıda yeni kayıt oluşturabilir. Bu yüzden ödeme API'lerinde Idempotency-Key header'ı kullanılarak POST isteğinin güvenle tekrarlanması sağlanır.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Cursor-based pagination'ın offset-based'e göre en büyük avantajı nedir?",
+      "options": [
+        "Toplam sayfa sayısını hesaplayabilmesi",
+        "Rastgele bir sayfaya atlayabilmesi",
+        "Büyük veri setlerinde tutarlı performans göstermesi ve yeni kayıtlardan etkilenmemesi",
+        "Daha az kod gerektirmesi"
+      ],
+      "correct": 2,
+      "explanation": "Cursor-based pagination, OFFSET kullanmadığı için veri seti ne kadar büyük olursa olsun tutarlı performans sağlar. Ayrıca yeni kayıt eklendiğinde 'sayfa kayması' (drift) problemi yaşanmaz. Offset-based'de OFFSET 10000 gibi değerlerde veritabanı ilk 10000 satırı okuyup atlayacağı için performans ciddi şekilde düşer.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "type": "code_completion",
+      "question": "Aşağıdaki GraphQL sorgusunda, bir kullanıcının adını ve yazılarının başlıklarını tek istekte almak için boşluğu doldurun:",
+      "code_template": "query {\n  user(id: \"123\") {\n    name\n    _____ {\n      title\n    }\n  }\n}",
+      "correct_answers": ["posts"],
+      "explanation": "GraphQL'de ilişkisel verilere erişmek için iç içe (nested) sorgular kullanılır. User type'ında posts alanı tanımlıysa, tek bir sorguda kullanıcı bilgisi ve yazıları birlikte alınabilir. Bu, REST'te 2 ayrı istek gerektirecek verinin tek istekte alınmasını sağlar (under-fetching çözümü).",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "type": "explain_code",
+      "question": "Aşağıdaki HTTP yanıtı RFC 7807 formatındadır. Her alanın ne anlama geldiğini açıkla.",
+      "code": "{\n  \"type\": \"https://api.myapp.com/errors/insufficient-funds\",\n  \"title\": \"Insufficient Funds\",\n  \"status\": 422,\n  \"detail\": \"Hesabınızda yeterli bakiye bulunmamaktadır. Mevcut bakiye: 50 TL, İstenen: 150 TL\",\n  \"instance\": \"/api/v1/payments/789\",\n  \"balance\": 50,\n  \"required\": 150\n}",
+      "correct_keywords": ["RFC 7807", "problem details", "type", "title", "status", "detail", "instance", "extension"],
+      "sample_answer": "Bu yanıt RFC 7807 Problem Details formatındadır. 'type' alanı hata türünü tanımlayan URI'dir (dokümantasyona link). 'title' hatanın kısa ve insan tarafından okunabilir başlığıdır. 'status' HTTP durum kodudur (422 = işlenemeyen varlık). 'detail' hatanın detaylı açıklamasıdır. 'instance' hatanın oluştuğu spesifik kaynağın URI'sidir. 'balance' ve 'required' ise extension member'lardır - standart dışı ama faydalı ek bilgiler sağlar.",
+      "difficulty": "zor",
+      "points": 15
+    },
+    {
+      "id": "q6",
+      "type": "order_steps",
+      "question": "Bir REST API'yi tasarlarken aşağıdaki adımlar hangi sırayla yapılmalıdır?",
+      "steps": [
+        "Resource'ları (kaynakları) belirle (users, products, orders)",
+        "Her resource için URL yapısını tasarla (/api/v1/users)",
+        "HTTP method'ları ile CRUD operasyonlarını eşle (GET, POST, PUT, DELETE)",
+        "Request/Response formatlarını ve validation kurallarını tanımla",
+        "OpenAPI/Swagger ile API'yi dokümante et"
+      ],
+      "correct_order": [0, 1, 2, 3, 4],
+      "explanation": "API tasarımı: Önce domain'deki resource'lar belirlenir, sonra URL yapısı oluşturulur, HTTP method'lar eşlenir, veri formatları ve kuralları tanımlanır ve son olarak tüm bunlar OpenAPI spec ile dokümante edilir. Bu sıra API-First Design yaklaşımının temelidir.",
+      "difficulty": "orta",
+      "points": 15
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "gRPC'nin REST ve GraphQL'e göre çok daha hızlı olmasının ana nedeni nedir?",
+      "options": [
+        "Daha az endpoint kullanması",
+        "JSON yerine Protocol Buffers (binary serialization) ve HTTP/2 kullanması",
+        "Veritabanı sorgularını optimize etmesi",
+        "Client-side caching yapması"
+      ],
+      "correct": 1,
+      "explanation": "gRPC, HTTP/2 üzerinde çalışır (multiplexing, header compression, binary framing) ve Protocol Buffers ile binary serialization kullanır. JSON'un text tabanlı serialize/deserialize işlemi yerine binary format kullanmak hem daha küçük payload hem daha hızlı işleme sağlar. Bu özellikler gRPC'yi microservice'ler arası iletişimde ideal kılar.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Bir API'de kullanıcı kimlik doğrulaması yapılmamışsa (giriş yapılmamış) hangi HTTP status kodu dönmelidir?",
+      "options": [
+        "400 Bad Request",
+        "401 Unauthorized",
+        "403 Forbidden",
+        "404 Not Found"
+      ],
+      "correct": 1,
+      "explanation": "401 Unauthorized: Kimlik doğrulama (authentication) yapılmamış, giriş yapılması gerekiyor. 403 Forbidden: Kimlik doğrulanmış AMA yetki (authorization) yok. Örneğin: giriş yapmış normal kullanıcı admin sayfasına erişmeye çalışıyor = 403. Giriş yapmamış kullanıcı korumalı endpoint'e erişmeye çalışıyor = 401.",
+      "difficulty": "kolay",
+      "points": 10
+    }
+  ]
+}

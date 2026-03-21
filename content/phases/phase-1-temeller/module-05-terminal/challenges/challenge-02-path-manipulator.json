@@ -1,0 +1,80 @@
+{
+  "title": "Path Manipulator",
+  "description": "Dosya yollarını çöz, normalize et ve bileşenlerini çıkar",
+  "description_detail": "# Path Manipulator\n\nDosya sistemi yollarını manipüle eden fonksiyonlar yazın.\n\n## İstenilen Fonksiyonlar\n\n### 1. `normalizePath(path)`\n`.` ve `..` ifadelerini çözerek yolu normalize eder.\n- `./` kaldırılır\n- `../` üst dizine gider\n- Ardışık `/` tekil yapılır\n- Kök dizinin üstüne çıkılamaz\n\n### 2. `extractComponents(path)`\nYolun bileşenlerini döndürür:\n```\n{ dir: string, base: string, name: string, ext: string }\n```\n\n### 3. `resolvePaths(basePath, relativePath)`\nBase path üzerinden relative path'i çözer.\n\n## Örnek\n```\nnormalizePath('/home/user/../admin/./docs') → '/home/admin/docs'\nextractComponents('/home/user/file.txt') → { dir: '/home/user', base: 'file.txt', name: 'file', ext: '.txt' }\n```",
+  "difficulty": "kolay",
+  "category": "terminal",
+  "tags": ["path", "filesystem", "string-manipulation"],
+  "examples": [
+    {
+      "input": "normalizePath('/a/b/../c/./d')",
+      "output": "/a/c/d",
+      "explanation": ".. bir üst dizine gider (b kaldırılır), . aynı dizin (kaldırılır)"
+    },
+    {
+      "input": "extractComponents('/home/user/app.min.js')",
+      "output": "{'dir': '/home/user', 'base': 'app.min.js', 'name': 'app.min', 'ext': '.js'}",
+      "explanation": "Son nokta uzantıyı belirler"
+    }
+  ],
+  "constraints": [
+    "Yollar Unix stili (/) kullanır",
+    "Kök dizinin üstüne çıkılamaz (/../ -> /)",
+    "Boş path '.' döndürmeli",
+    "Uzantısız dosyalar için ext boş string olmalı"
+  ],
+  "starter_code": {
+    "python": "def normalize_path(path: str) -> str:\n    # Your code here\n    pass\n\ndef extract_components(path: str) -> dict:\n    # Your code here\n    pass\n\ndef resolve_paths(base_path: str, relative_path: str) -> str:\n    # Your code here\n    pass",
+    "javascript": "function normalizePath(path) {\n  // Your code here\n}\n\nfunction extractComponents(path) {\n  // Your code here\n}\n\nfunction resolvePaths(basePath, relativePath) {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "normalize", "path": "/a/b/../c"},
+      "expected_output": "/a/c"
+    },
+    {
+      "input": {"fn": "normalize", "path": "/a/./b/./c"},
+      "expected_output": "/a/b/c"
+    },
+    {
+      "input": {"fn": "normalize", "path": "/a//b///c"},
+      "expected_output": "/a/b/c"
+    },
+    {
+      "input": {"fn": "extract", "path": "/home/user/file.txt"},
+      "expected_output": {"dir": "/home/user", "base": "file.txt", "name": "file", "ext": ".txt"}
+    },
+    {
+      "input": {"fn": "resolve", "base": "/home/user", "relative": "../admin/docs"},
+      "expected_output": "/home/admin/docs"
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "normalize", "path": "/../../../a"},
+      "expected_output": "/a"
+    },
+    {
+      "input": {"fn": "extract", "path": "/Makefile"},
+      "expected_output": {"dir": "/", "base": "Makefile", "name": "Makefile", "ext": ""}
+    },
+    {
+      "input": {"fn": "resolve", "base": "/a/b/c", "relative": "../../d"},
+      "expected_output": "/a/d"
+    }
+  ],
+  "hints": [
+    "Path'i / ile split et, her parçayı bir stack'te işle: '.' atla, '..' pop yap, diğerlerini push et",
+    "extractComponents için son /'dan sonrası base, base'deki son noktadan sonrası ext",
+    "resolvePaths için base ve relative'i birleştirip normalize et"
+  ],
+  "solution": {
+    "python": "def normalize_path(path: str) -> str:\n    if not path:\n        return '.'\n    is_absolute = path.startswith('/')\n    parts = path.split('/')\n    stack = []\n    \n    for part in parts:\n        if part == '' or part == '.':\n            continue\n        elif part == '..':\n            if stack and stack[-1] != '..':\n                stack.pop()\n        else:\n            stack.append(part)\n    \n    result = '/'.join(stack)\n    if is_absolute:\n        return '/' + result\n    return result if result else '.'\n\ndef extract_components(path: str) -> dict:\n    last_slash = path.rfind('/')\n    if last_slash == -1:\n        dir_part = '.'\n        base = path\n    else:\n        dir_part = path[:last_slash] if last_slash > 0 else '/'\n        base = path[last_slash + 1:]\n    \n    last_dot = base.rfind('.')\n    if last_dot > 0:\n        name = base[:last_dot]\n        ext = base[last_dot:]\n    else:\n        name = base\n        ext = ''\n    \n    return {'dir': dir_part, 'base': base, 'name': name, 'ext': ext}\n\ndef resolve_paths(base_path: str, relative_path: str) -> str:\n    if relative_path.startswith('/'):\n        return normalize_path(relative_path)\n    combined = base_path + '/' + relative_path\n    return normalize_path(combined)",
+    "javascript": "function normalizePath(path) {\n  if (!path) return '.';\n  const isAbsolute = path.startsWith('/');\n  const parts = path.split('/');\n  const stack = [];\n\n  for (const part of parts) {\n    if (part === '' || part === '.') continue;\n    if (part === '..') {\n      if (stack.length && stack[stack.length - 1] !== '..') stack.pop();\n    } else {\n      stack.push(part);\n    }\n  }\n\n  const result = stack.join('/');\n  if (isAbsolute) return '/' + result;\n  return result || '.';\n}\n\nfunction extractComponents(path) {\n  const lastSlash = path.lastIndexOf('/');\n  const dir = lastSlash <= 0 ? (lastSlash === 0 ? '/' : '.') : path.slice(0, lastSlash);\n  const base = path.slice(lastSlash + 1);\n  const lastDot = base.lastIndexOf('.');\n  const name = lastDot > 0 ? base.slice(0, lastDot) : base;\n  const ext = lastDot > 0 ? base.slice(lastDot) : '';\n  return { dir, base, name, ext };\n}\n\nfunction resolvePaths(basePath, relativePath) {\n  if (relativePath.startsWith('/')) return normalizePath(relativePath);\n  return normalizePath(basePath + '/' + relativePath);\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)"
+  },
+  "learn_after_solving": "Dosya yolu manipülasyonunun iç mantığını, stack kullanarak path normalization'ı ve Unix path semantiğini öğrenirsin. Node.js path modülü tam olarak bu mantıkla çalışır."
+}

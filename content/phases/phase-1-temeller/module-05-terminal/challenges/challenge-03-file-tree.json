@@ -1,0 +1,76 @@
+{
+  "title": "File System Tree Builder",
+  "description": "Düz dosya yolu listesinden ağaç yapısı oluştur",
+  "description_detail": "# File System Tree Builder\n\nDüz dosya yolları listesi verildiğinde, bunları ağaç veri yapısına dönüştürün ve opsiyonel olarak görsel tree formatında yazdırın.\n\n## İstenilen Fonksiyonlar\n\n### 1. `buildTree(paths)`\nDosya yolları listesinden ağaç yapısı oluşturur.\nDöndürür: Nested dictionary/object\n\n### 2. `printTree(tree, prefix='')`\nAğacı görsel formatta string olarak döndürür.\n\n## Örnek\n```\npaths = ['src/index.js', 'src/utils/helper.js', 'README.md']\n\nbuildTree sonucu:\n{\n  'README.md': null,\n  'src': {\n    'index.js': null,\n    'utils': {\n      'helper.js': null\n    }\n  }\n}\n\nprintTree sonucu:\n├── README.md\n└── src\n    ├── index.js\n    └── utils\n        └── helper.js\n```",
+  "difficulty": "orta",
+  "category": "terminal",
+  "tags": ["tree", "filesystem", "data-structures", "recursion"],
+  "examples": [
+    {
+      "input": "buildTree(['a/b/c.txt', 'a/d.txt'])",
+      "output": "{'a': {'b': {'c.txt': null}, 'd.txt': null}}",
+      "explanation": "Dosyalar null, dizinler nested obje"
+    }
+  ],
+  "constraints": [
+    "Dosyalar null/None olarak temsil edilir",
+    "Dizinler nested obje/dict olarak temsil edilir",
+    "Çıktıda alfabetik sıralama yapılmalı (dizinler önce)",
+    "Yollar / ile ayrılır",
+    "Aynı dizin birden fazla path'te görünebilir"
+  ],
+  "starter_code": {
+    "python": "def build_tree(paths: list) -> dict:\n    # Your code here\n    pass\n\ndef print_tree(tree: dict, prefix: str = '') -> str:\n    # Your code here\n    pass",
+    "javascript": "function buildTree(paths) {\n  // Your code here\n}\n\nfunction printTree(tree, prefix = '') {\n  // Your code here\n}"
+  },
+  "test_cases": [
+    {
+      "input": {"fn": "build", "paths": ["src/index.js", "src/utils/helper.js", "README.md"]},
+      "expected_output": {"README.md": null, "src": {"index.js": null, "utils": {"helper.js": null}}}
+    },
+    {
+      "input": {"fn": "build", "paths": ["a.txt"]},
+      "expected_output": {"a.txt": null}
+    },
+    {
+      "input": {"fn": "build", "paths": []},
+      "expected_output": {}
+    },
+    {
+      "input": {"fn": "build", "paths": ["a/b/c/d.txt", "a/b/e.txt", "a/f.txt"]},
+      "expected_output": {"a": {"b": {"c": {"d.txt": null}, "e.txt": null}, "f.txt": null}}
+    },
+    {
+      "input": {"fn": "build", "paths": ["x/y.js", "x/z.js", "x/a.js"]},
+      "expected_output": {"x": {"a.js": null, "y.js": null, "z.js": null}}
+    }
+  ],
+  "hidden_test_cases": [
+    {
+      "input": {"fn": "build", "paths": ["deep/nested/path/to/file.txt"]},
+      "expected_output": {"deep": {"nested": {"path": {"to": {"file.txt": null}}}}}
+    },
+    {
+      "input": {"fn": "build", "paths": ["a/x.txt", "b/x.txt", "c/x.txt"]},
+      "expected_output": {"a": {"x.txt": null}, "b": {"x.txt": null}, "c": {"x.txt": null}}
+    },
+    {
+      "input": {"fn": "build", "paths": ["same/path/file.txt", "same/path/file2.txt"]},
+      "expected_output": {"same": {"path": {"file.txt": null, "file2.txt": null}}}
+    }
+  ],
+  "hints": [
+    "Her path'i / ile split et, parçaları sırayla iç içe dict/object'e yerleştir",
+    "Son parça dosya (null), diğerleri dizin (nested dict)",
+    "printTree için recursive yaklaşım: her seviyede son eleman için └──, diğerleri için ├── kullan"
+  ],
+  "solution": {
+    "python": "def build_tree(paths: list) -> dict:\n    tree = {}\n    for path in paths:\n        parts = path.split('/')\n        current = tree\n        for i, part in enumerate(parts):\n            if i == len(parts) - 1:\n                current[part] = None\n            else:\n                if part not in current or current[part] is None:\n                    current[part] = {}\n                current = current[part]\n    return dict(sorted(tree.items(), key=lambda x: (x[1] is None, x[0])))\n\ndef _sort_tree(tree):\n    if tree is None:\n        return None\n    sorted_tree = {}\n    items = sorted(tree.items(), key=lambda x: (x[1] is None, x[0]))\n    for k, v in items:\n        sorted_tree[k] = _sort_tree(v)\n    return sorted_tree\n\ndef print_tree(tree: dict, prefix: str = '') -> str:\n    tree = _sort_tree(tree)\n    lines = []\n    items = list(tree.items())\n    for i, (name, subtree) in enumerate(items):\n        is_last = i == len(items) - 1\n        connector = '└── ' if is_last else '├── '\n        lines.append(prefix + connector + name)\n        if subtree is not None:\n            extension = '    ' if is_last else '│   '\n            lines.append(print_tree(subtree, prefix + extension))\n    return '\\n'.join(lines)",
+    "javascript": "function buildTree(paths) {\n  const tree = {};\n  for (const path of paths) {\n    const parts = path.split('/');\n    let current = tree;\n    for (let i = 0; i < parts.length; i++) {\n      if (i === parts.length - 1) {\n        current[parts[i]] = null;\n      } else {\n        if (!(parts[i] in current) || current[parts[i]] === null) {\n          current[parts[i]] = {};\n        }\n        current = current[parts[i]];\n      }\n    }\n  }\n  return sortTree(tree);\n}\n\nfunction sortTree(tree) {\n  if (tree === null) return null;\n  const sorted = {};\n  const entries = Object.entries(tree).sort((a, b) => {\n    const aIsFile = a[1] === null;\n    const bIsFile = b[1] === null;\n    if (aIsFile !== bIsFile) return aIsFile ? 1 : -1;\n    return a[0].localeCompare(b[0]);\n  });\n  for (const [k, v] of entries) sorted[k] = sortTree(v);\n  return sorted;\n}\n\nfunction printTree(tree, prefix = '') {\n  const entries = Object.entries(sortTree(tree));\n  const lines = [];\n  entries.forEach(([name, subtree], i) => {\n    const isLast = i === entries.length - 1;\n    lines.push(prefix + (isLast ? '└── ' : '├── ') + name);\n    if (subtree !== null) {\n      lines.push(printTree(subtree, prefix + (isLast ? '    ' : '│   ')));\n    }\n  });\n  return lines.join('\\n');\n}"
+  },
+  "complexity": {
+    "optimal_time": "O(n * m) where n = paths, m = avg depth",
+    "optimal_space": "O(n * m)"
+  },
+  "learn_after_solving": "Ağaç veri yapısını düz veriden oluşturmayı, recursive rendering'i ve dosya sistemi abstraction'ını öğrenirsin. Bu pattern IDE dosya gezginleri, CLI araçları ve proje yapısı görselleştirmede kullanılır."
+}
