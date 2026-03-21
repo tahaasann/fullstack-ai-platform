@@ -13,7 +13,7 @@
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/tahaasann)
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤-ea4aaa?logo=github&logoColor=white)](https://github.com/sponsors/tahaasann)
 [![GitHub Stars](https://img.shields.io/github/stars/tahaasann/fullstack-ai-platform?style=social)](https://github.com/tahaasann/fullstack-ai-platform)
 
 </div>
@@ -270,13 +270,13 @@ Katkılarınızı bekliyoruz! Yazım hatası düzeltmek, yeni ders eklemek veya 
 
 <div align="center">
 
-### ☕ Support / Destek
+### 💖 Support / Destek
 
-If this platform helped you, consider supporting the project:
+If this platform helped you, consider sponsoring:
 
-Bu platform işine yaradıysa, projeye destek olmayı düşünebilirsin:
+Bu platform işine yaradıysa, destek olmayı düşünebilirsin:
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black&style=for-the-badge)](https://buymeacoffee.com/tahaasann)
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor_on_GitHub-❤-ea4aaa?logo=github&logoColor=white&style=for-the-badge)](https://github.com/sponsors/tahaasann)
 
 ⭐ Don't forget to star this repo! / Repo'ya yıldız vermeyi unutma!
 
