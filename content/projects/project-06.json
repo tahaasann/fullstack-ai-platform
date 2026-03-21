@@ -197,66 +197,92 @@
           "substeps": [
             {
               "order": "1.1",
-              "action": "Proje kok dizinini olustur",
+              "action": "Proje kök dizinini oluştur ve içine gir",
               "type": "terminal",
               "command": "mkdir ai-content-platform && cd ai-content-platform",
-              "expected_output": "Klasor olusturuldu",
-              "why": "Tum proje dosyalarinin duzenli bir sekilde tek bir dizinde toplanmasi gerekir. Temiz bir baslangic, ileride karmasikligi onler."
+              "expected_output": "Klasör oluşturuldu",
+              "why": "Her proje temiz bir dizinle başlar. Tüm dosyalar tek bir kök dizinde toplanacak — dağınık yapı ileride kabus olur."
             },
             {
               "order": "1.2",
-              "action": "Python sanal ortam olustur ve uv ile baslat",
+              "action": "uv ile Python projesini başlat ve sanal ortam oluştur",
               "type": "terminal",
               "command": "pip install uv && uv init && uv venv && source .venv/bin/activate",
               "expected_output": "Using Python 3.12+\nCreated virtual environment",
-              "why": "uv, Rust tabanli modern bir paket yoneticisidir. pip'ten 10-100x daha hizlidir ve lock dosyasi ile reproducible builds garanti eder. Sanal ortam, sistem Python'unu kirletmeden bagimliliklari izole eder."
+              "why": "uv, Rust tabanlı modern paket yöneticisidir — pip'ten 10-100x daha hızlı. Sanal ortam sistem Python'unu kirletmeden bağımlılıkları izole eder."
             },
             {
               "order": "1.3",
-              "action": "pyproject.toml dosyasina bagimliliklari ekle",
+              "action": "pyproject.toml dosyasını aç ve proje bilgilerini yaz",
               "type": "code_write",
               "file": "pyproject.toml",
-              "code": "[project]\nname = \"ai-content-platform\"\nversion = \"0.1.0\"\nrequires-python = \">=3.12\"\n\ndependencies = [\n    \"fastapi>=0.115.0\",\n    \"uvicorn>=0.32.0\",\n    \"openai>=1.50.0\",\n    \"anthropic>=0.40.0\",\n    \"google-genai>=1.0.0\",\n    \"pydantic-settings>=2.1.0\",\n    \"redis>=5.0.0\",\n    \"sqlalchemy>=2.0.0\",\n    \"alembic>=1.13.0\",\n    \"httpx>=0.27.0\",\n    \"tiktoken>=0.7.0\",\n    \"asyncpg>=0.30.0\",\n]",
-              "why": "pyproject.toml, Python projelerinin standart konfiguerasyon dosyasidir. Her bagimliligin minimum versiyonunu belirterek uyumluluk sorunlarini onleriz. uv bu dosyayi okuyarak lock dosyasi olusturur."
+              "code": "[project]\nname = \"ai-content-platform\"\nversion = \"0.1.0\"\nrequires-python = \">=3.12\"",
+              "why": "Önce iskelet — sadece proje adı ve Python versiyonu. Bağımlılıkları tek tek ekleyeceğiz, hepsini bir anda değil."
             },
             {
               "order": "1.4",
-              "action": "Bagimliliklari kur",
-              "type": "terminal",
-              "command": "uv sync",
-              "expected_output": "Resolved X packages\nInstalled X packages",
-              "why": "uv sync, pyproject.toml'deki bagimliliklari cozer ve kurar. Lock dosyasi otomatik olusturulur — bu sayede her developer ayni versiyonlari kullanir."
+              "action": "Bağımlılıklar lazım — pyproject.toml'a dependencies bloğunu ekle",
+              "type": "code_add",
+              "file": "pyproject.toml",
+              "position": "bottom",
+              "code": "\ndependencies = [\n    \"fastapi>=0.115.0\",\n    \"uvicorn>=0.32.0\",\n    \"openai>=1.50.0\",\n    \"anthropic>=0.40.0\",\n    \"google-genai>=1.0.0\",\n    \"pydantic-settings>=2.1.0\",\n    \"redis>=5.0.0\",\n    \"sqlalchemy>=2.0.0\",\n    \"alembic>=1.13.0\",\n    \"httpx>=0.27.0\",\n    \"tiktoken>=0.7.0\",\n    \"asyncpg>=0.30.0\",\n]",
+              "why": "1.3'te yazdığımız iskeletin altına bağımlılıkları ekliyoruz. Her paketin minimum versiyonunu belirtmek uyumluluk sorunlarını önler."
             },
             {
               "order": "1.5",
-              "action": "Domain-driven klasor yapisini olustur",
+              "action": "Bağımlılıkları kur ve lock dosyasını oluştur",
               "type": "terminal",
-              "command": "mkdir -p ai_content_platform/{core,providers,content,prompts,evaluation,fine_tuning} && touch ai_content_platform/__init__.py ai_content_platform/core/__init__.py ai_content_platform/providers/__init__.py ai_content_platform/content/__init__.py ai_content_platform/prompts/__init__.py ai_content_platform/evaluation/__init__.py ai_content_platform/fine_tuning/__init__.py",
-              "expected_output": "Klasorler ve __init__.py dosyalari olusturuldu",
-              "why": "Domain-driven dizin yapisi, her modulun bagimsiz gelistirilmesini saglar. __init__.py dosyalari Python'a bu dizinlerin paket oldugunu soyler. Her modul kendi sorumluluguna sahiptir: providers/ LLM entegrasyonu, content/ icerik uretimi, prompts/ prompt yonetimi."
+              "command": "uv sync",
+              "expected_output": "Resolved X packages\nInstalled X packages",
+              "why": "1.4'te yazdığımız bağımlılıkları kuruyor. uv.lock dosyası otomatik oluşur — her developer aynı versiyonları kullanır."
             },
             {
               "order": "1.6",
-              "action": "FastAPI ana uygulamayi olustur",
-              "type": "code_write",
-              "file": "ai_content_platform/main.py",
-              "code": "from fastapi import FastAPI\n\napp = FastAPI(\n    title=\"AI Content Platform\",\n    version=\"0.1.0\",\n    description=\"Multi-LLM content generation platform\"\n)\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"healthy\", \"version\": \"0.1.0\"}",
-              "why": "Health check endpoint'i, uygulamanin ayakta oldugunu dogrulamak icin standarttir. Docker, Kubernetes ve load balancer'lar bu endpoint'i kullanarak servis durumunu kontrol eder."
+              "action": "Domain-driven klasör yapısını oluştur",
+              "type": "terminal",
+              "command": "mkdir -p ai_content_platform/{core,providers,content,prompts,evaluation,fine_tuning} && touch ai_content_platform/__init__.py ai_content_platform/core/__init__.py ai_content_platform/providers/__init__.py ai_content_platform/content/__init__.py ai_content_platform/prompts/__init__.py ai_content_platform/evaluation/__init__.py ai_content_platform/fine_tuning/__init__.py",
+              "expected_output": "Klasörler ve __init__.py dosyaları oluşturuldu",
+              "why": "Her modül kendi sorumluluğuna sahip: providers/ LLM entegrasyonu, content/ içerik üretimi, prompts/ prompt yönetimi. __init__.py dosyaları Python'a bunların paket olduğunu söyler."
             },
             {
               "order": "1.7",
-              "action": "Uygulamayi baslat ve test et",
-              "type": "terminal",
-              "command": "uvicorn ai_content_platform.main:app --reload --port 8000",
-              "expected_output": "Uvicorn running on http://127.0.0.1:8000",
-              "why": "--reload flag'i dosya degisikliklerinde otomatik yeniden baslatma saglar. Development ortaminda hizli iterasyon icin kritiktir."
+              "action": "main.py dosyasını oluştur — önce FastAPI iskeletini yaz",
+              "type": "code_write",
+              "file": "ai_content_platform/main.py",
+              "code": "from fastapi import FastAPI\n\napp = FastAPI(\n    title=\"AI Content Platform\",\n    version=\"0.1.0\",\n)",
+              "why": "Önce en basit çalışan iskelet. Henüz endpoint yok — sadece uygulama nesnesi oluşturuyoruz."
             },
             {
               "order": "1.8",
-              "action": "Health endpoint'ini dogrula",
+              "action": "İskelete GERİ DÖN — health check endpoint'i ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/main.py",
+              "position": "bottom",
+              "code": "\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\n        \"status\": \"healthy\",\n        \"version\": \"0.1.0\"\n    }",
+              "why": "1.7'de oluşturduğumuz app nesnesine ilk endpoint'i ekliyoruz. Health check, Docker/Kubernetes'in servisi izlemesi için standarttır."
+            },
+            {
+              "order": "1.9",
+              "action": "Uygulamayı başlat — çalışıyor mu kontrol et",
+              "type": "terminal",
+              "command": "uvicorn ai_content_platform.main:app --reload --port 8000",
+              "expected_output": "Uvicorn running on http://127.0.0.1:8000",
+              "why": "1.7-1.8'de yazdığımız kodun çalıştığını doğruluyoruz. --reload dosya değişikliklerinde otomatik yeniden başlatır."
+            },
+            {
+              "order": "1.10",
+              "action": "Health endpoint'ini tarayıcıda doğrula",
               "type": "validate",
-              "validation": "Tarayicida http://localhost:8000/health adresini ac. {\"status\": \"healthy\", \"version\": \"0.1.0\"} yanitini gormelisin. Ayrica http://localhost:8000/docs adresinde Swagger UI acilmali.",
-              "why": "Her adimdan sonra dogrulama yapmak, hatalari erken yakalamayi saglar. Swagger UI, API'nin otomatik dokuemantasyonunu gosterir — FastAPI'nin en gueclue ozelliklerinden biridir."
+              "validation": "Tarayıcıda http://localhost:8000/health adresini aç — {\"status\": \"healthy\", \"version\": \"0.1.0\"} yanıtını görmelisin. http://localhost:8000/docs adresinde Swagger UI açılmalı.",
+              "why": "1.8'de yazdığımız endpoint gerçekten çalışıyor mu? Swagger UI, FastAPI'nin otomatik dokümantasyonunu gösterir — her endpoint burada test edilebilir."
+            },
+            {
+              "order": "1.11",
+              "action": "Git ile ilk commit'i yap",
+              "type": "terminal",
+              "command": "git init && git add . && git commit -m \"chore: initialize FastAPI project with domain-driven structure\"",
+              "expected_output": "[main (root-commit)] chore: initialize...",
+              "why": "Çalışan bir iskelet var — bunu kaydetmek lazım. Sorun çıktığında bu noktaya geri dönebilirsin."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── core/\n│   │   └── __init__.py\n│   ├── providers/\n│   │   └── __init__.py\n│   ├── content/\n│   │   └── __init__.py\n│   ├── prompts/\n│   │   └── __init__.py\n│   ├── evaluation/\n│   │   └── __init__.py\n│   └── fine_tuning/\n│       └── __init__.py\n├── pyproject.toml\n├── uv.lock\n└── .venv/",
@@ -289,42 +315,95 @@
           "substeps": [
             {
               "order": "2.1",
-              "action": ".env dosyasini olustur",
+              "action": ".env dosyasını oluştur — API key'lerini buraya yaz",
               "type": "code_write",
               "file": ".env",
-              "code": "# LLM Provider API Keys\nOPENAI_API_KEY=sk-your-openai-key-here\nANTHROPIC_API_KEY=sk-ant-your-anthropic-key-here\nGEMINI_API_KEY=your-gemini-key-here\n\n# Database\nDATABASE_URL=postgresql+asyncpg://localhost/ai_content\n\n# Redis\nREDIS_URL=redis://localhost:6379\n\n# App\nDEBUG=true",
-              "why": "API key'leri kod icinde yazmak guevenlik acigadir. .env dosyasi ile hassas bilgiler koddan ayrilir. Bu dosya .gitignore'a eklenmeli — asla Git'e commit edilmemelidir."
+              "code": "# LLM Provider API Keys\nOPENAI_API_KEY=sk-your-openai-key-here\nANTHROPIC_API_KEY=sk-ant-your-key-here\nGEMINI_API_KEY=your-gemini-key-here\n\n# Database\nDATABASE_URL=postgresql+asyncpg://localhost/ai_content\n\n# Redis\nREDIS_URL=redis://localhost:6379\n\n# App\nDEBUG=true",
+              "why": "API key'leri kodda yazmak güvenlik açığıdır. .env dosyası ile hassas bilgiler koddan ayrılır."
             },
             {
               "order": "2.2",
-              "action": ".gitignore dosyasini olustur",
+              "action": ".gitignore oluştur — .env'yi Git'e eklememek kritik",
               "type": "code_write",
               "file": ".gitignore",
               "code": ".env\n.venv/\n__pycache__/\n*.pyc\n.pytest_cache/\n*.egg-info/\ndist/\nbuild/",
-              "why": ".env dosyasinin Git'e eklenmesini onlemek kritiktir. API key'lerinin GitHub'a yueklenmesi guevenlik ihlalidir ve key'ler aninda devre disi birakilmalidir."
+              "why": "2.1'de oluşturduğumuz .env dosyasının GitHub'a yüklenmesini önlüyoruz. API key'lerinin sızması güvenlik ihlalidir."
             },
             {
               "order": "2.3",
-              "action": "LLM Provider enum ve config siniflarini olustur",
+              "action": "config.py dosyasını aç — önce LLMProvider enum iskeletini yaz",
               "type": "code_write",
               "file": "ai_content_platform/core/config.py",
-              "code": "from pydantic_settings import BaseSettings\nfrom pydantic import SecretStr\nfrom enum import Enum\nfrom functools import lru_cache\n\n\nclass LLMProvider(str, Enum):\n    OPENAI = \"openai\"\n    ANTHROPIC = \"anthropic\"\n    GEMINI = \"gemini\"\n\n\nclass OpenAIConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"gpt-4o\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.0025\n    output_cost_per_1k: float = 0.01\n    model_config = {\"env_prefix\": \"OPENAI_\"}\n\n\nclass AnthropicConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"claude-sonnet-4-5-20250514\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.003\n    output_cost_per_1k: float = 0.015\n    model_config = {\"env_prefix\": \"ANTHROPIC_\"}\n\n\nclass GeminiConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"gemini-2.0-flash\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.0001\n    output_cost_per_1k: float = 0.0004\n    model_config = {\"env_prefix\": \"GEMINI_\"}\n\n\nclass Settings(BaseSettings):\n    app_name: str = \"AI Content Platform\"\n    debug: bool = False\n    default_provider: LLMProvider = LLMProvider.OPENAI\n    fallback_providers: list[LLMProvider] = [\n        LLMProvider.OPENAI, LLMProvider.ANTHROPIC, LLMProvider.GEMINI\n    ]\n    database_url: str = \"postgresql+asyncpg://localhost/ai_content\"\n    redis_url: str = \"redis://localhost:6379\"\n    cache_ttl: int = 3600\n    openai: OpenAIConfig = OpenAIConfig()\n    anthropic: AnthropicConfig = AnthropicConfig()\n    gemini: GeminiConfig = GeminiConfig()\n    model_config = {\"env_file\": \".env\", \"env_file_encoding\": \"utf-8\"}\n\n\n@lru_cache\ndef get_settings() -> Settings:\n    return Settings()",
-              "why": "Pydantic Settings ile tuem konfiguerasyon type-safe olur. SecretStr, API key'lerin log'lara sizmasini onler — str() cagrildiginda '**********' doner. Her provider icin ayri config grubu, env_prefix ile .env'den otomatik yueklenir."
+              "code": "from enum import Enum\n\n\nclass LLMProvider(str, Enum):\n    OPENAI = \"openai\"\n    ANTHROPIC = \"anthropic\"\n    GEMINI = \"gemini\"",
+              "why": "Önce en basit parça — desteklenen provider'ların listesi. Enum ile type-safe karşılaştırma yapılır, typo'lar compile-time'da yakalanır."
             },
             {
               "order": "2.4",
-              "action": "Config'in dogru yueklendigini test et",
-              "type": "terminal",
-              "command": "python -c \"from ai_content_platform.core.config import get_settings; s = get_settings(); print(f'App: {s.app_name}'); print(f'Provider: {s.default_provider}'); print(f'OpenAI Key: {s.openai.api_key}')\"",
-              "expected_output": "App: AI Content Platform\nProvider: LLMProvider.OPENAI\nOpenAI Key: **********",
-              "why": "Config'in .env dosyasindan dogru yueklendigini ve SecretStr'in key'leri maskeledigini dogruluyoruz. Bu adim atlanirsa, runtime'da 'API key bulunamadi' hatasi alirsiniz."
+              "action": "Import'lar lazım — dosyanın ÜSTÜNE çık, gerekli modülleri ekle",
+              "type": "code_modify",
+              "file": "ai_content_platform/core/config.py",
+              "code": "from pydantic_settings import BaseSettings\nfrom pydantic import SecretStr\nfrom enum import Enum\nfrom functools import lru_cache",
+              "why": "2.3'te Enum'u kullandık ama şimdi Pydantic Settings de lazım. SecretStr API key'lerin log'lara sızmasını önler — str() çağrıldığında '**********' döner."
             },
             {
               "order": "2.5",
-              "action": "Eksik API key hatasi kontrolue",
+              "action": "Enum'un ALTINA OpenAI config sınıfını ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/config.py",
+              "position": "after_enum",
+              "code": "\n\nclass OpenAIConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"gpt-4o\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.0025\n    output_cost_per_1k: float = 0.01\n    model_config = {\"env_prefix\": \"OPENAI_\"}",
+              "why": "Her provider için ayrı config sınıfı. env_prefix sayesinde .env'deki OPENAI_API_KEY otomatik yüklenir. Maliyet bilgisi tracking için şimdiden ekliyoruz."
+            },
+            {
+              "order": "2.6",
+              "action": "Aynı şekilde Anthropic ve Gemini config'lerini ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/config.py",
+              "position": "after_openai_config",
+              "code": "\n\nclass AnthropicConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"claude-sonnet-4-5-20250514\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.003\n    output_cost_per_1k: float = 0.015\n    model_config = {\"env_prefix\": \"ANTHROPIC_\"}\n\n\nclass GeminiConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"gemini-2.0-flash\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.0001\n    output_cost_per_1k: float = 0.0004\n    model_config = {\"env_prefix\": \"GEMINI_\"}",
+              "why": "2.5'teki OpenAI pattern'ini tekrarlıyoruz. Her provider'ın farklı fiyatlandırması var — Gemini en ucuz, Anthropic en pahalı."
+            },
+            {
+              "order": "2.7",
+              "action": "Ana Settings sınıfını ekle — tüm config'leri birleştir",
+              "type": "code_add",
+              "file": "ai_content_platform/core/config.py",
+              "position": "bottom",
+              "code": "\n\nclass Settings(BaseSettings):\n    app_name: str = \"AI Content Platform\"\n    debug: bool = False\n    default_provider: LLMProvider = LLMProvider.OPENAI\n    fallback_providers: list[LLMProvider] = [\n        LLMProvider.OPENAI,\n        LLMProvider.ANTHROPIC,\n        LLMProvider.GEMINI\n    ]\n    database_url: str = \"postgresql+asyncpg://localhost/ai_content\"\n    redis_url: str = \"redis://localhost:6379\"\n    cache_ttl: int = 3600\n    model_config = {\"env_file\": \".env\"}",
+              "why": "2.5-2.6'daki provider config'lerini tek bir ana sınıfta topluyoruz. fallback_providers sırası önemli — ilk başarısız olursa sırayla dener."
+            },
+            {
+              "order": "2.8",
+              "action": "Settings'e GERİ DÖN — provider config'lerini alt alan olarak ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/config.py",
+              "position": "inside_settings",
+              "code": "    openai: OpenAIConfig = OpenAIConfig()\n    anthropic: AnthropicConfig = AnthropicConfig()\n    gemini: GeminiConfig = GeminiConfig()",
+              "why": "2.5-2.6'da tanımladığımız config sınıflarını Settings içine gömüyoruz. settings.openai.api_key şeklinde erişilebilir."
+            },
+            {
+              "order": "2.9",
+              "action": "Dosyanın EN ALTINA singleton factory fonksiyonu ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/config.py",
+              "position": "bottom",
+              "code": "\n\n@lru_cache\ndef get_settings() -> Settings:\n    return Settings()",
+              "why": "2.4'te import ettiğimiz lru_cache'i kullanıyoruz. Her çağrıda yeni Settings oluşturmak yerine tek instance kullanılır — performans ve tutarlılık."
+            },
+            {
+              "order": "2.10",
+              "action": "Config'in doğru yüklendiğini terminal'de test et",
+              "type": "terminal",
+              "command": "python -c \"from ai_content_platform.core.config import get_settings; s = get_settings(); print(f'App: {s.app_name}'); print(f'Provider: {s.default_provider}'); print(f'OpenAI Key: {s.openai.api_key}')\"",
+              "expected_output": "App: AI Content Platform\nProvider: LLMProvider.OPENAI\nOpenAI Key: **********",
+              "why": "2.1'deki .env dosyasından değerlerin doğru yüklendiğini ve SecretStr'in key'leri maskelediğini doğruluyoruz."
+            },
+            {
+              "order": "2.11",
+              "action": "Eksik API key hatasını test et — fail-fast prensibi",
               "type": "validate",
-              "validation": ".env dosyasindan OPENAI_API_KEY satirini sil ve Settings() olusturmayi dene. ValidationError almalisin. Sonra geri ekle.",
-              "why": "Pydantic validation, eksik zorunlu alanlari baslangicta yakalar. Bu, production'da 'API key undefined' hatalarini onler — fail-fast prensibi."
+              "validation": ".env dosyasından OPENAI_API_KEY satırını sil ve Settings() oluşturmayı dene. ValidationError almalısın. Sonra geri ekle.",
+              "why": "Pydantic validation, eksik zorunlu alanları başlangıçta yakalar. Production'da 'API key undefined' hatalarını önler."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── core/\n│   │   ├── __init__.py\n│   │   └── config.py          # <-- YENİ\n│   ├── providers/\n│   ├── content/\n│   ├── prompts/\n│   ├── evaluation/\n│   └── fine_tuning/\n├── .env                        # <-- YENİ\n├── .gitignore                   # <-- YENİ\n├── pyproject.toml\n└── uv.lock",
@@ -357,36 +436,88 @@
           "substeps": [
             {
               "order": "3.1",
-              "action": "LLMMessage ve LLMResponse dataclass'larini olustur",
+              "action": "base.py dosyasını oluştur — önce veri yapılarının iskeletini yaz",
               "type": "code_write",
               "file": "ai_content_platform/providers/base.py",
-              "code": "from abc import ABC, abstractmethod\nfrom dataclasses import dataclass, field\nfrom typing import AsyncIterator\nfrom datetime import datetime, timezone\nimport uuid\n\n\n@dataclass\nclass LLMMessage:\n    role: str  # \"system\", \"user\", \"assistant\"\n    content: str\n\n\n@dataclass\nclass LLMResponse:\n    id: str = field(default_factory=lambda: str(uuid.uuid4()))\n    content: str = \"\"\n    provider: str = \"\"\n    model: str = \"\"\n    input_tokens: int = 0\n    output_tokens: int = 0\n    total_tokens: int = 0\n    cost: float = 0.0\n    latency_ms: float = 0.0\n    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))\n    metadata: dict = field(default_factory=dict)",
-              "why": "Standart veri yapilari, tuem provider'lardan gelen yanitlari ayni formatta temsil eder. Uest katmanlar hangi provider'dan geldiginden bagimsiz calisabilir. dataclass, boilerplate kodu azaltir."
+              "code": "from dataclasses import dataclass, field\n\n\n@dataclass\nclass LLMMessage:\n    role: str  # \"system\", \"user\", \"assistant\"\n    content: str",
+              "why": "Önce en basit veri yapısı — mesaj formatı. Her provider farklı format kullanır ama bizim standart formatımız bu olacak."
             },
             {
               "order": "3.2",
-              "action": "BaseLLMProvider abstract sinifini ekle",
-              "type": "code_add",
+              "action": "Import'lar lazım — ÜSTE ÇIK ve ek modülleri ekle",
+              "type": "code_modify",
               "file": "ai_content_platform/providers/base.py",
-              "code": "\n\nclass BaseLLMProvider(ABC):\n    def __init__(self, config: dict):\n        self.config = config\n        self._request_count = 0\n        self._total_tokens = 0\n        self._total_cost = 0.0\n\n    @property\n    @abstractmethod\n    def provider_name(self) -> str: ...\n\n    @abstractmethod\n    async def generate(self, messages: list[LLMMessage], temperature: float = 0.7, max_tokens: int = 4096, **kwargs) -> LLMResponse: ...\n\n    @abstractmethod\n    async def stream(self, messages: list[LLMMessage], temperature: float = 0.7, max_tokens: int = 4096, **kwargs) -> AsyncIterator[str]: ...\n\n    @abstractmethod\n    def count_tokens(self, text: str) -> int: ...\n\n    def calculate_cost(self, input_tokens: int, output_tokens: int) -> float:\n        input_cost = (input_tokens / 1000) * self.config.get(\"input_cost_per_1k\", 0)\n        output_cost = (output_tokens / 1000) * self.config.get(\"output_cost_per_1k\", 0)\n        return round(input_cost + output_cost, 6)\n\n    def get_stats(self) -> dict:\n        return {\"provider\": self.provider_name, \"request_count\": self._request_count, \"total_tokens\": self._total_tokens, \"total_cost\": self._total_cost}",
-              "position": "bottom",
-              "why": "Abstract Base Class, tuem provider'larin uymasi gereken kontrati tanimlar. Eksik metod implement'i class olusturulurken TypeError verir — bug'i erken yakalar. calculate_cost ve get_stats gibi ortak metodlar base class'ta implement edilir."
+              "code": "from abc import ABC, abstractmethod\nfrom dataclasses import dataclass, field\nfrom typing import AsyncIterator\nfrom datetime import datetime, timezone\nimport uuid",
+              "why": "3.1'de sadece dataclass kullandık ama şimdi ABC (abstract class) ve diğer tipler de lazım. İhtiyaç duydukça import ekliyoruz."
             },
             {
               "order": "3.3",
-              "action": "Abstract class'in kontrat zorlamasini test et",
-              "type": "terminal",
-              "command": "python -c \"from ai_content_platform.providers.base import BaseLLMProvider\ntry:\n    class BadProvider(BaseLLMProvider): pass\n    bp = BadProvider({})\nexcept TypeError as e:\n    print(f'Beklenen hata: {e}')\nprint('Abstract kontrat dogru calisiyor!')\"",
-              "expected_output": "Beklenen hata: Can't instantiate abstract class BadProvider...\nAbstract kontrat dogru calisiyor!",
-              "why": "ABC'nin abstract metodlari zorladigini dogruluyoruz. Bu kontrat olmazsa, eksik metod runtime'da AttributeError verir — bunu yakalamak cok daha zordur."
+              "action": "LLMMessage'ın ALTINA LLMResponse dataclass'ını ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "after_message",
+              "code": "\n\n@dataclass\nclass LLMResponse:\n    id: str = field(default_factory=lambda: str(uuid.uuid4()))\n    content: str = \"\"\n    provider: str = \"\"\n    model: str = \"\"\n    input_tokens: int = 0\n    output_tokens: int = 0\n    total_tokens: int = 0\n    cost: float = 0.0\n    latency_ms: float = 0.0\n    created_at: datetime = field(\n        default_factory=lambda: datetime.now(timezone.utc)\n    )\n    metadata: dict = field(default_factory=dict)",
+              "why": "3.1'deki LLMMessage giriş formatı, bu ise çıkış formatı. Hangi provider'dan geldiğinden bağımsız, her zaman aynı yapıda yanıt alırsın."
             },
             {
               "order": "3.4",
-              "action": "providers/__init__.py'yi guencelle",
+              "action": "Şimdi abstract base class iskeletini yaz — sadece __init__ ve property",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "bottom",
+              "code": "\n\nclass BaseLLMProvider(ABC):\n    def __init__(self, config: dict):\n        self.config = config\n        self._request_count = 0\n        self._total_tokens = 0\n        self._total_cost = 0.0\n\n    @property\n    @abstractmethod\n    def provider_name(self) -> str: ...",
+              "why": "Önce iskelet — sınıf yapısı ve tek bir abstract property. Tüm provider'ların uyması gereken kontratı adım adım ekleyeceğiz."
+            },
+            {
+              "order": "3.5",
+              "action": "Sınıfa GERİ DÖN — abstract metodları ekle: generate ve stream",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "inside_base_class",
+              "code": "\n    @abstractmethod\n    async def generate(\n        self, messages: list[LLMMessage],\n        temperature: float = 0.7,\n        max_tokens: int = 4096, **kwargs\n    ) -> LLMResponse: ...\n\n    @abstractmethod\n    async def stream(\n        self, messages: list[LLMMessage],\n        temperature: float = 0.7,\n        max_tokens: int = 4096, **kwargs\n    ) -> AsyncIterator[str]: ...",
+              "why": "3.4'teki iskeletin içine asıl iş yapan metodları ekliyoruz. generate() tek seferlik yanıt, stream() token token yanıt üretir."
+            },
+            {
+              "order": "3.6",
+              "action": "Bir abstract metod daha — count_tokens",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "inside_base_class",
+              "code": "\n    @abstractmethod\n    def count_tokens(self, text: str) -> int: ...",
+              "why": "Her provider farklı tokenizer kullanır. Token sayısı doğrudan maliyeti belirler — bu yüzden her provider kendi implementasyonunu yazmalı."
+            },
+            {
+              "order": "3.7",
+              "action": "Ortak metodları ekle — bunlar abstract DEĞİL, tüm provider'lar paylaşır",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "inside_base_class",
+              "code": "\n    def calculate_cost(\n        self, input_tokens: int, output_tokens: int\n    ) -> float:\n        input_cost = (input_tokens / 1000) * self.config.get(\n            \"input_cost_per_1k\", 0\n        )\n        output_cost = (output_tokens / 1000) * self.config.get(\n            \"output_cost_per_1k\", 0\n        )\n        return round(input_cost + output_cost, 6)\n\n    def get_stats(self) -> dict:\n        return {\n            \"provider\": self.provider_name,\n            \"request_count\": self._request_count,\n            \"total_tokens\": self._total_tokens,\n            \"total_cost\": self._total_cost\n        }",
+              "why": "3.5-3.6'daki metodlar abstract — her provider kendisi yazar. Ama maliyet hesaplama ve istatistikler tüm provider'larda aynı, base class'ta bir kez yazıyoruz."
+            },
+            {
+              "order": "3.8",
+              "action": "Abstract class'ın kontrat zorlayıp zorlamadığını test et",
+              "type": "terminal",
+              "command": "python -c \"from ai_content_platform.providers.base import BaseLLMProvider; \ntry:\n    class BadProvider(BaseLLMProvider): pass\n    bp = BadProvider({})\nexcept TypeError as e:\n    print(f'Beklenen hata: {e}')\nprint('Abstract kontrat doğru çalışıyor!')\"",
+              "expected_output": "Beklenen hata: Can't instantiate abstract class BadProvider...\nAbstract kontrat doğru çalışıyor!",
+              "why": "3.4-3.6'da tanımladığımız abstract metodları implement etmeden sınıf oluşturulamamalı. Bu, eksik metodu runtime yerine başlangıçta yakalar."
+            },
+            {
+              "order": "3.9",
+              "action": "BAŞKA DOSYAYA GEÇ — providers/__init__.py'yi güncelle",
               "type": "code_write",
               "file": "ai_content_platform/providers/__init__.py",
-              "code": "from .base import BaseLLMProvider, LLMMessage, LLMResponse\n\n__all__ = [\"BaseLLMProvider\", \"LLMMessage\", \"LLMResponse\"]",
-              "why": "Public API'yi __init__.py'de tanimlamak, dis kodun from providers import LLMMessage seklinde temiz import yapmasini saglar."
+              "code": "from .base import BaseLLMProvider, LLMMessage, LLMResponse\n\n__all__ = [\n    \"BaseLLMProvider\",\n    \"LLMMessage\",\n    \"LLMResponse\",\n]",
+              "why": "3.1-3.7'de oluşturduğumuz sınıfları paketin public API'sine ekliyoruz. Dış kod from providers import LLMMessage şeklinde temiz import yapabilir."
+            },
+            {
+              "order": "3.10",
+              "action": "Import'un çalıştığını doğrula",
+              "type": "terminal",
+              "command": "python -c \"from ai_content_platform.providers import LLMMessage, LLMResponse; m = LLMMessage(role='user', content='test'); print(f'Mesaj: {m.role} - {m.content}'); r = LLMResponse(content='yanıt'); print(f'Yanıt: {r.content}, ID: {r.id[:8]}...')\"",
+              "expected_output": "Mesaj: user - test\nYanıt: yanıt, ID: xxxxxxxx...",
+              "why": "3.9'da tanımladığımız public API'nin çalıştığını doğruluyoruz. LLMResponse'un otomatik UUID oluşturduğunu kontrol ediyoruz."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── core/\n│   │   ├── __init__.py\n│   │   └── config.py\n│   ├── providers/\n│   │   ├── __init__.py         # <-- GÜNCELLENDİ\n│   │   └── base.py             # <-- YENİ\n│   ├── content/\n│   ├── prompts/\n│   ├── evaluation/\n│   └── fine_tuning/\n├── .env\n├── .gitignore\n├── pyproject.toml\n└── uv.lock",
@@ -414,36 +545,96 @@
           "substeps": [
             {
               "order": "4.1",
-              "action": "CircuitBreaker sinifini olustur",
+              "action": "factory.py dosyasını oluştur — önce CircuitBreaker iskeletini yaz",
               "type": "code_write",
               "file": "ai_content_platform/providers/factory.py",
-              "code": "from typing import Type\nimport asyncio\nimport time\nimport logging\nfrom .base import BaseLLMProvider, LLMMessage, LLMResponse\n\nlogger = logging.getLogger(__name__)\n\nclass CircuitBreaker:\n    def __init__(self, failure_threshold: int = 3, recovery_timeout: int = 60):\n        self.failure_threshold = failure_threshold\n        self.recovery_timeout = recovery_timeout\n        self.failure_count = 0\n        self.last_failure_time = 0\n        self.state = \"CLOSED\"\n\n    def record_failure(self):\n        self.failure_count += 1\n        self.last_failure_time = time.time()\n        if self.failure_count >= self.failure_threshold:\n            self.state = \"OPEN\"\n\n    def record_success(self):\n        self.failure_count = 0\n        self.state = \"CLOSED\"\n\n    def can_execute(self) -> bool:\n        if self.state == \"CLOSED\": return True\n        if self.state == \"OPEN\":\n            if time.time() - self.last_failure_time > self.recovery_timeout:\n                self.state = \"HALF_OPEN\"\n                return True\n            return False\n        return True",
-              "why": "Circuit Breaker Pattern, suerekli coeken bir provider'a istek goendermek yerine onu gecici devre disi birakir. Bu olmadan, coeken provider her istekte timeout bekleterek tuem uygulamayi yavaslatir."
+              "code": "import time\n\n\nclass CircuitBreaker:\n    def __init__(\n        self, failure_threshold: int = 3,\n        recovery_timeout: int = 60\n    ):\n        self.failure_threshold = failure_threshold\n        self.recovery_timeout = recovery_timeout\n        self.failure_count = 0\n        self.last_failure_time = 0\n        self.state = \"CLOSED\"",
+              "why": "Önce CircuitBreaker iskeleti. CLOSED = normal çalışma, OPEN = provider devre dışı. Sürekli çöken provider'a istek göndermek tüm uygulamayı yavaşlatır."
             },
             {
               "order": "4.2",
-              "action": "ProviderFactory sinifini ekle",
+              "action": "CircuitBreaker'a GERİ DÖN — state yönetim metodlarını ekle",
               "type": "code_add",
               "file": "ai_content_platform/providers/factory.py",
-              "code": "\n\nclass ProviderFactory:\n    def __init__(self, settings):\n        self.settings = settings\n        self._registry: dict[str, Type[BaseLLMProvider]] = {}\n        self._instances: dict[str, BaseLLMProvider] = {}\n        self._circuit_breakers: dict[str, CircuitBreaker] = {}\n\n    def register(self, name: str, provider_class: Type[BaseLLMProvider]):\n        self._registry[name] = provider_class\n        self._circuit_breakers[name] = CircuitBreaker()\n\n    def get_provider(self, name: str) -> BaseLLMProvider:\n        if name not in self._instances:\n            if name not in self._registry:\n                raise ValueError(f\"Bilinmeyen provider: {name}\")\n            config = getattr(self.settings, name, {})\n            self._instances[name] = self._registry[name](config)\n        return self._instances[name]\n\n    async def generate_with_fallback(self, messages: list[LLMMessage], preferred_provider: str | None = None, **kwargs) -> LLMResponse:\n        providers_to_try = []\n        if preferred_provider: providers_to_try.append(preferred_provider)\n        for p in self.settings.fallback_providers:\n            if p.value not in providers_to_try: providers_to_try.append(p.value)\n        last_error = None\n        for provider_name in providers_to_try:\n            cb = self._circuit_breakers.get(provider_name)\n            if cb and not cb.can_execute(): continue\n            try:\n                provider = self.get_provider(provider_name)\n                start_time = time.time()\n                response = await provider.generate(messages, **kwargs)\n                response.latency_ms = (time.time() - start_time) * 1000\n                if cb: cb.record_success()\n                return response\n            except Exception as e:\n                last_error = e\n                if cb: cb.record_failure()\n                continue\n        raise RuntimeError(f\"Tuem provider'lar basarisiz oldu. Son hata: {last_error}\")",
-              "position": "bottom",
-              "why": "Factory Pattern, provider olusturma detaylarini merkezlestirir. Fallback chain ile bir provider coektueueğunde otomatik olarak siradakine gecer — production'da servis suerekliligi icin kritiktir."
+              "position": "inside_circuit_breaker",
+              "code": "\n    def record_failure(self):\n        self.failure_count += 1\n        self.last_failure_time = time.time()\n        if self.failure_count >= self.failure_threshold:\n            self.state = \"OPEN\"\n\n    def record_success(self):\n        self.failure_count = 0\n        self.state = \"CLOSED\"",
+              "why": "4.1'deki iskeletin içine davranış ekliyoruz. Threshold aşılınca OPEN'a geçer, başarılı olunca CLOSED'a döner."
             },
             {
               "order": "4.3",
-              "action": "Factory'yi test et",
-              "type": "terminal",
-              "command": "python -c \"from ai_content_platform.providers.factory import ProviderFactory, CircuitBreaker\ncb = CircuitBreaker(failure_threshold=2)\nprint(f'State: {cb.state}, can_execute: {cb.can_execute()}')\ncb.record_failure()\ncb.record_failure()\nprint(f'State: {cb.state}, can_execute: {cb.can_execute()}')\nprint('Circuit breaker dogru calisiyor!')\"",
-              "expected_output": "State: CLOSED, can_execute: True\nState: OPEN, can_execute: False\nCircuit breaker dogru calisiyor!",
-              "why": "Circuit breaker'in threshold sonrasi OPEN state'e gectigini dogruluyoruz. Bu mekanizma production'da binlerce istegi koruyor."
+              "action": "Bir metod daha — can_execute ile provider'ın kullanılıp kullanılamayacağını kontrol et",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_circuit_breaker",
+              "code": "\n    def can_execute(self) -> bool:\n        if self.state == \"CLOSED\":\n            return True\n        if self.state == \"OPEN\":\n            if time.time() - self.last_failure_time > self.recovery_timeout:\n                self.state = \"HALF_OPEN\"\n                return True\n            return False\n        return True  # HALF_OPEN — bir deneme izni",
+              "why": "4.2'deki record metodları state'i değiştiriyor, bu metod ise state'e göre karar veriyor. HALF_OPEN, recovery timeout sonrası tek deneme izni verir."
             },
             {
               "order": "4.4",
-              "action": "providers/__init__.py'yi guencelle",
+              "action": "Import'lar lazım — dosyanın ÜSTÜNE ÇIK ve ek modülleri ekle",
+              "type": "code_modify",
+              "file": "ai_content_platform/providers/factory.py",
+              "code": "from typing import Type\nimport time\nimport logging\nfrom .base import BaseLLMProvider, LLMMessage, LLMResponse\n\nlogger = logging.getLogger(__name__)",
+              "why": "Şimdi ProviderFactory yazacağız — bunun için base modülünden import gerekiyor. 4.1'de sadece time import etmiştik, şimdi ihtiyaç arttı."
+            },
+            {
+              "order": "4.5",
+              "action": "CircuitBreaker'ın ALTINA ProviderFactory iskeletini yaz",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "after_circuit_breaker",
+              "code": "\n\nclass ProviderFactory:\n    def __init__(self, settings):\n        self.settings = settings\n        self._registry: dict[str, Type[BaseLLMProvider]] = {}\n        self._instances: dict[str, BaseLLMProvider] = {}\n        self._circuit_breakers: dict[str, CircuitBreaker] = {}",
+              "why": "Factory Pattern — provider oluşturma mantığını merkezileştirir. _registry class'ları, _instances singleton'ları, _circuit_breakers sağlık durumlarını tutar."
+            },
+            {
+              "order": "4.6",
+              "action": "Factory'ye GERİ DÖN — register ve get_provider metodlarını ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_factory",
+              "code": "\n    def register(\n        self, name: str,\n        provider_class: Type[BaseLLMProvider]\n    ):\n        self._registry[name] = provider_class\n        self._circuit_breakers[name] = CircuitBreaker()\n\n    def get_provider(self, name: str) -> BaseLLMProvider:\n        if name not in self._instances:\n            if name not in self._registry:\n                raise ValueError(f\"Bilinmeyen provider: {name}\")\n            config = getattr(self.settings, name, {})\n            self._instances[name] = self._registry[name](config)\n        return self._instances[name]",
+              "why": "4.5'teki iskeletin içine temel operasyonları ekliyoruz. register() yeni provider ekler (Open-Closed Principle), get_provider() lazy singleton döner."
+            },
+            {
+              "order": "4.7",
+              "action": "Fallback metodunu yaz — önce provider listesini hazırla",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_factory",
+              "code": "\n    async def generate_with_fallback(\n        self, messages: list[LLMMessage],\n        preferred_provider: str | None = None,\n        **kwargs\n    ) -> LLMResponse:\n        providers_to_try = []\n        if preferred_provider:\n            providers_to_try.append(preferred_provider)\n        for p in self.settings.fallback_providers:\n            if p.value not in providers_to_try:\n                providers_to_try.append(p.value)",
+              "why": "Tercih edilen provider varsa ilk sıraya, sonra fallback listesini ekliyoruz. Bu liste sırayla denenecek."
+            },
+            {
+              "order": "4.7b",
+              "action": "Fallback döngüsünü ekle — provider'ları sırayla dene",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_generate_with_fallback",
+              "code": "        last_error = None\n        for provider_name in providers_to_try:\n            cb = self._circuit_breakers.get(provider_name)\n            if cb and not cb.can_execute():\n                continue\n            try:\n                provider = self.get_provider(provider_name)\n                start = time.time()\n                response = await provider.generate(\n                    messages, **kwargs\n                )\n                response.latency_ms = (\n                    time.time() - start\n                ) * 1000\n                if cb:\n                    cb.record_success()\n                return response\n            except Exception as e:\n                last_error = e\n                if cb:\n                    cb.record_failure()\n                continue\n        raise RuntimeError(\n            f\"Tüm provider'lar başarısız. Son hata: {last_error}\"\n        )",
+              "why": "4.7'deki listeyi sırayla deniyor. Circuit breaker açıksa provider atlanır, başarılı olursa döner, başarısız olursa sonrakine geçer."
+            },
+            {
+              "order": "4.8",
+              "action": "CircuitBreaker'ın doğru çalıştığını test et",
+              "type": "terminal",
+              "command": "python -c \"from ai_content_platform.providers.factory import CircuitBreaker\ncb = CircuitBreaker(failure_threshold=2)\nprint(f'State: {cb.state}, can_execute: {cb.can_execute()}')\ncb.record_failure()\ncb.record_failure()\nprint(f'State: {cb.state}, can_execute: {cb.can_execute()}')\nprint('Circuit breaker doğru çalışıyor!')\"",
+              "expected_output": "State: CLOSED, can_execute: True\nState: OPEN, can_execute: False\nCircuit breaker doğru çalışıyor!",
+              "why": "4.1-4.3'te yazdığımız CircuitBreaker'ın 2 hatadan sonra OPEN'a geçtiğini doğruluyoruz."
+            },
+            {
+              "order": "4.9",
+              "action": "BAŞKA DOSYAYA GEÇ — providers/__init__.py'yi güncelle",
               "type": "code_modify",
               "file": "ai_content_platform/providers/__init__.py",
-              "code": "from .base import BaseLLMProvider, LLMMessage, LLMResponse\nfrom .factory import ProviderFactory, CircuitBreaker\n\n__all__ = [\"BaseLLMProvider\", \"LLMMessage\", \"LLMResponse\", \"ProviderFactory\", \"CircuitBreaker\"]",
-              "why": "Yeni olusturulan Factory ve CircuitBreaker siniflarini paketin public API'sine ekliyoruz."
+              "code": "from .base import BaseLLMProvider, LLMMessage, LLMResponse\nfrom .factory import ProviderFactory, CircuitBreaker\n\n__all__ = [\n    \"BaseLLMProvider\", \"LLMMessage\", \"LLMResponse\",\n    \"ProviderFactory\", \"CircuitBreaker\",\n]",
+              "why": "4.5-4.7'de oluşturduğumuz Factory ve CircuitBreaker'ı public API'ye ekliyoruz."
+            },
+            {
+              "order": "4.10",
+              "action": "Factory import'unu doğrula",
+              "type": "validate",
+              "validation": "python -c \"from ai_content_platform.providers import ProviderFactory; print('Factory import başarılı')\" komutunu çalıştır. Hata olmamalı.",
+              "why": "4.9'da güncellediğimiz __init__.py'nin doğru çalıştığını doğruluyoruz. Import hatası varsa ilerleyemeyiz."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── core/\n│   │   ├── __init__.py\n│   │   └── config.py\n│   ├── providers/\n│   │   ├── __init__.py\n│   │   ├── base.py\n│   │   └── factory.py          # <-- YENİ\n│   ├── content/\n│   ├── prompts/\n│   ├── evaluation/\n│   └── fine_tuning/\n├── .env\n├── .gitignore\n├── pyproject.toml\n└── uv.lock",
@@ -476,58 +667,112 @@
           "substeps": [
             {
               "order": "5.1",
-              "action": "Database baglanti moduluenue olustur",
+              "action": "database.py dosyasını oluştur — bağlantı iskeletini yaz",
               "type": "code_write",
               "file": "ai_content_platform/core/database.py",
-              "code": "from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession\nfrom ai_content_platform.core.config import get_settings\n\nsettings = get_settings()\nengine = create_async_engine(settings.database_url, echo=settings.debug)\nasync_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)\n\nasync def get_db() -> AsyncSession:\n    async with async_session() as session:\n        yield session",
-              "why": "Async SQLAlchemy engine, FastAPI'nin async yapisiyla uyumludur. expire_on_commit=False, session kapandiktan sonra da objelere erisimi muemkuen kilar."
+              "code": "from sqlalchemy.ext.asyncio import (\n    create_async_engine,\n    async_sessionmaker,\n    AsyncSession,\n)\nfrom ai_content_platform.core.config import get_settings\n\nsettings = get_settings()\nengine = create_async_engine(\n    settings.database_url, echo=settings.debug\n)",
+              "why": "Önce engine — veritabanına bağlantı noktası. echo=True debug modda tüm SQL sorgularını loglar, production'da kapalı olmalı."
             },
             {
               "order": "5.2",
-              "action": "SQLAlchemy modellerini olustur",
-              "type": "code_write",
-              "file": "ai_content_platform/core/models.py",
-              "code": "from sqlalchemy import Column, String, Text, Float, Integer, DateTime, ForeignKey, JSON, Enum as SQLEnum\nfrom sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column\nfrom sqlalchemy.ext.asyncio import AsyncAttrs\nfrom datetime import datetime, timezone\nimport enum\n\nclass Base(AsyncAttrs, DeclarativeBase): pass\n\nclass ContentType(str, enum.Enum):\n    BLOG_POST = \"blog_post\"\n    SOCIAL_MEDIA = \"social_media\"\n    EMAIL = \"email\"\n    PRODUCT_DESC = \"product_description\"\n\nclass Prompt(Base):\n    __tablename__ = \"prompts\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    name: Mapped[str] = mapped_column(String(255), unique=True)\n    description: Mapped[str] = mapped_column(Text, nullable=True)\n    content_type: Mapped[ContentType] = mapped_column(SQLEnum(ContentType))\n    active_version: Mapped[int] = mapped_column(Integer, default=1)\n    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))\n    versions: Mapped[list[\"PromptVersion\"]] = relationship(back_populates=\"prompt\", cascade=\"all, delete-orphan\")\n\nclass PromptVersion(Base):\n    __tablename__ = \"prompt_versions\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    prompt_id: Mapped[str] = mapped_column(ForeignKey(\"prompts.id\", ondelete=\"CASCADE\"))\n    version: Mapped[int] = mapped_column(Integer)\n    system_template: Mapped[str] = mapped_column(Text)\n    user_template: Mapped[str] = mapped_column(Text)\n    few_shot_examples: Mapped[list] = mapped_column(JSON, default=list)\n    change_note: Mapped[str] = mapped_column(Text, nullable=True)\n    avg_quality_score: Mapped[float] = mapped_column(Float, nullable=True)\n    usage_count: Mapped[int] = mapped_column(Integer, default=0)\n    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))\n    prompt: Mapped[\"Prompt\"] = relationship(back_populates=\"versions\")\n\nclass GeneratedContent(Base):\n    __tablename__ = \"generated_contents\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    prompt_version_id: Mapped[str] = mapped_column(ForeignKey(\"prompt_versions.id\"))\n    provider: Mapped[str] = mapped_column(String(50))\n    model: Mapped[str] = mapped_column(String(100))\n    input_variables: Mapped[dict] = mapped_column(JSON)\n    content: Mapped[str] = mapped_column(Text)\n    input_tokens: Mapped[int] = mapped_column(Integer)\n    output_tokens: Mapped[int] = mapped_column(Integer)\n    cost_usd: Mapped[float] = mapped_column(Float)\n    latency_ms: Mapped[float] = mapped_column(Float)\n    user_rating: Mapped[int] = mapped_column(Integer, nullable=True)\n    user_feedback: Mapped[str] = mapped_column(Text, nullable=True)\n    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))\n    evaluations: Mapped[list[\"Evaluation\"]] = relationship(back_populates=\"content\")\n\nclass Evaluation(Base):\n    __tablename__ = \"evaluations\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    content_id: Mapped[str] = mapped_column(ForeignKey(\"generated_contents.id\"))\n    evaluator_type: Mapped[str] = mapped_column(String(50))\n    score: Mapped[float] = mapped_column(Float)\n    feedback: Mapped[str] = mapped_column(Text, nullable=True)\n    metrics: Mapped[dict] = mapped_column(JSON, default=dict)\n    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))\n    content: Mapped[\"GeneratedContent\"] = relationship(back_populates=\"evaluations\")\n\nclass UsageLog(Base):\n    __tablename__ = \"usage_logs\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    provider: Mapped[str] = mapped_column(String(50))\n    model: Mapped[str] = mapped_column(String(100))\n    input_tokens: Mapped[int] = mapped_column(Integer)\n    output_tokens: Mapped[int] = mapped_column(Integer)\n    cost_usd: Mapped[float] = mapped_column(Float)\n    endpoint: Mapped[str] = mapped_column(String(255))\n    status: Mapped[str] = mapped_column(String(20))\n    error_message: Mapped[str] = mapped_column(Text, nullable=True)\n    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))",
-              "why": "Her LLM cagrisinin kaydini tutmak, maliyet kontrolue ve prompt optimizasyonu icin zorunludur. Prompt versioning ile degisiklikler izlenir, koetue bir prompt degisikligi geri alinabilir. Evaluation tablosu, AI-as-Judge puanlarini saklar."
+              "action": "database.py'ye GERİ DÖN — session factory ve dependency'yi ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/database.py",
+              "position": "bottom",
+              "code": "\nasync_session = async_sessionmaker(\n    engine, class_=AsyncSession,\n    expire_on_commit=False\n)\n\n\nasync def get_db() -> AsyncSession:\n    async with async_session() as session:\n        yield session",
+              "why": "5.1'deki engine'i kullanarak session factory oluşturuyoruz. expire_on_commit=False, session kapandıktan sonra da objelere erişimi mümkün kılar."
             },
             {
               "order": "5.3",
-              "action": "Alembic'i baslat",
-              "type": "terminal",
-              "command": "alembic init alembic",
-              "expected_output": "Creating directory alembic... done\nGenerating alembic.ini... done",
-              "why": "Alembic, SQLAlchemy icin migration aracidir. Database schema degisikliklerini version control altinda tutar — ekip arkadaslariniz ve production ayni schema'yi kullanir."
+              "action": "BAŞKA DOSYAYA GEÇ — models.py oluştur, önce Base ve enum iskeletini yaz",
+              "type": "code_write",
+              "file": "ai_content_platform/core/models.py",
+              "code": "from sqlalchemy.orm import DeclarativeBase\nfrom sqlalchemy.ext.asyncio import AsyncAttrs\nimport enum\n\n\nclass Base(AsyncAttrs, DeclarativeBase):\n    pass\n\n\nclass ContentType(str, enum.Enum):\n    BLOG_POST = \"blog_post\"\n    SOCIAL_MEDIA = \"social_media\"\n    EMAIL = \"email\"\n    PRODUCT_DESC = \"product_description\"",
+              "why": "Önce temel yapı taşları — Base class ve ContentType enum. Tüm modeller Base'den türeyecek, ContentType içerik türlerini type-safe tanımlar."
             },
             {
               "order": "5.4",
-              "action": "Alembic env.py dosyasini guencelle",
+              "action": "Import'lar lazım — ÜSTE ÇIK ve SQLAlchemy tiplerini ekle",
               "type": "code_modify",
-              "file": "alembic/env.py",
-              "code": "# target_metadata satirini su sekilde guencelle:\nfrom ai_content_platform.core.models import Base\ntarget_metadata = Base.metadata",
-              "why": "Alembic'in model'lerimizi tanimasi icin metadata'yi baglamamiz gerekir. Bu olmadan migration otomatik olusturulamaz."
+              "file": "ai_content_platform/core/models.py",
+              "code": "from sqlalchemy import (\n    String, Text, Float, Integer,\n    DateTime, ForeignKey, JSON,\n    Enum as SQLEnum\n)\nfrom sqlalchemy.orm import (\n    DeclarativeBase, relationship,\n    Mapped, mapped_column\n)\nfrom sqlalchemy.ext.asyncio import AsyncAttrs\nfrom datetime import datetime, timezone\nimport enum",
+              "why": "5.3'te sadece Base ve enum yazdık. Şimdi tablo tanımları için SQLAlchemy tiplerini import ediyoruz — ihtiyaç duydukça ekleme prensibi."
             },
             {
               "order": "5.5",
-              "action": "İlk migration'i olustur",
-              "type": "terminal",
-              "command": "alembic revision --autogenerate -m \"initial schema\"",
-              "expected_output": "Generating /path/to/alembic/versions/xxxx_initial_schema.py",
-              "why": "autogenerate, model'lerdeki degisiklikleri otomatik tespit eder ve migration dosyasi olusturur. Manuel migration yazmak hataya aciktir."
+              "action": "İlk model — Prompt tablosunu ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_content_type",
+              "code": "\n\nclass Prompt(Base):\n    __tablename__ = \"prompts\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    name: Mapped[str] = mapped_column(String(255), unique=True)\n    description: Mapped[str] = mapped_column(Text, nullable=True)\n    content_type: Mapped[ContentType] = mapped_column(\n        SQLEnum(ContentType)\n    )\n    active_version: Mapped[int] = mapped_column(Integer, default=1)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    versions: Mapped[list[\"PromptVersion\"]] = relationship(\n        back_populates=\"prompt\",\n        cascade=\"all, delete-orphan\"\n    )",
+              "why": "Her prompt'un birden fazla versiyonu olabilir. active_version production'da kullanılan versiyon. versions ilişkisi ile tüm versiyonlara erişilir."
             },
             {
               "order": "5.6",
-              "action": "Migration'i uygula",
-              "type": "terminal",
-              "command": "alembic upgrade head",
-              "expected_output": "Running upgrade -> xxxx, initial schema",
-              "why": "Migration'i veritabanina uygulamak, tablolari olusturur. head, en son migration'a kadar tuem migration'lari calistirir."
+              "action": "PromptVersion modelini ekle — prompt ile ilişkili",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_prompt",
+              "code": "\n\nclass PromptVersion(Base):\n    __tablename__ = \"prompt_versions\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    prompt_id: Mapped[str] = mapped_column(\n        ForeignKey(\"prompts.id\", ondelete=\"CASCADE\")\n    )\n    version: Mapped[int] = mapped_column(Integer)\n    system_template: Mapped[str] = mapped_column(Text)\n    user_template: Mapped[str] = mapped_column(Text)\n    few_shot_examples: Mapped[list] = mapped_column(JSON, default=list)\n    change_note: Mapped[str] = mapped_column(Text, nullable=True)\n    avg_quality_score: Mapped[float] = mapped_column(Float, nullable=True)\n    usage_count: Mapped[int] = mapped_column(Integer, default=0)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    prompt: Mapped[\"Prompt\"] = relationship(back_populates=\"versions\")",
+              "why": "5.5'teki Prompt ile one-to-many ilişki. Her versiyon system_template ve user_template içerir — prompt değişiklikleri bu şekilde izlenir."
             },
             {
               "order": "5.7",
-              "action": "Tablolarin olusturuldugunu dogrula",
+              "action": "GeneratedContent modelini ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_prompt_version",
+              "code": "\n\nclass GeneratedContent(Base):\n    __tablename__ = \"generated_contents\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    prompt_version_id: Mapped[str] = mapped_column(\n        ForeignKey(\"prompt_versions.id\")\n    )\n    provider: Mapped[str] = mapped_column(String(50))\n    model: Mapped[str] = mapped_column(String(100))\n    input_variables: Mapped[dict] = mapped_column(JSON)\n    content: Mapped[str] = mapped_column(Text)\n    input_tokens: Mapped[int] = mapped_column(Integer)\n    output_tokens: Mapped[int] = mapped_column(Integer)\n    cost_usd: Mapped[float] = mapped_column(Float)\n    latency_ms: Mapped[float] = mapped_column(Float)\n    user_rating: Mapped[int] = mapped_column(Integer, nullable=True)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    evaluations: Mapped[list[\"Evaluation\"]] = relationship(\n        back_populates=\"content\"\n    )",
+              "why": "Her LLM çağrısının sonucu burada saklanır — provider, model, token kullanımı, maliyet ve kullanıcı puanı. Fine-tuning dataset'i buradan oluşturulur."
+            },
+            {
+              "order": "5.7b",
+              "action": "Evaluation modelini ekle — kalite puanları için",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_generated_content",
+              "code": "\n\nclass Evaluation(Base):\n    __tablename__ = \"evaluations\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    content_id: Mapped[str] = mapped_column(\n        ForeignKey(\"generated_contents.id\")\n    )\n    evaluator_type: Mapped[str] = mapped_column(String(50))\n    score: Mapped[float] = mapped_column(Float)\n    feedback: Mapped[str] = mapped_column(Text, nullable=True)\n    metrics: Mapped[dict] = mapped_column(JSON, default=dict)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    content: Mapped[\"GeneratedContent\"] = relationship(\n        back_populates=\"evaluations\"\n    )",
+              "why": "5.7'deki GeneratedContent ile one-to-many ilişki. AI-as-Judge puanları, BLEU/ROUGE metrikleri ve insan feedback'i bu tabloda saklanır."
+            },
+            {
+              "order": "5.8",
+              "action": "Son model — UsageLog tablosunu ekle (maliyet takibi için)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "bottom",
+              "code": "\n\nclass UsageLog(Base):\n    __tablename__ = \"usage_logs\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    provider: Mapped[str] = mapped_column(String(50))\n    model: Mapped[str] = mapped_column(String(100))\n    input_tokens: Mapped[int] = mapped_column(Integer)\n    output_tokens: Mapped[int] = mapped_column(Integer)\n    cost_usd: Mapped[float] = mapped_column(Float)\n    endpoint: Mapped[str] = mapped_column(String(255))\n    status: Mapped[str] = mapped_column(String(20))\n    error_message: Mapped[str] = mapped_column(Text, nullable=True)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )",
+              "why": "Her API çağrısının maliyeti burada loglanır. Provider bazında aylık raporlar bu tablodan üretilir — bütçe kontrolü için zorunlu."
+            },
+            {
+              "order": "5.9",
+              "action": "Alembic'i başlat — migration altyapısını kur",
+              "type": "terminal",
+              "command": "alembic init alembic",
+              "expected_output": "Creating directory alembic... done\nGenerating alembic.ini... done",
+              "why": "Alembic, veritabanı şeması değişikliklerini version control altında tutar. Ekip arkadaşlarınız ve production aynı şemayı kullanır."
+            },
+            {
+              "order": "5.10",
+              "action": "BAŞKA DOSYAYA GEÇ — alembic/env.py'yi güncelle, model metadata'yı bağla",
+              "type": "code_modify",
+              "file": "alembic/env.py",
+              "code": "# target_metadata satırını şu şekilde güncelle:\nfrom ai_content_platform.core.models import Base\ntarget_metadata = Base.metadata",
+              "why": "5.3-5.8'de tanımladığımız modelleri Alembic'in tanıması için metadata'yı bağlıyoruz. Bu olmadan migration otomatik oluşturulamaz."
+            },
+            {
+              "order": "5.11",
+              "action": "İlk migration'ı oluştur ve uygula",
+              "type": "terminal",
+              "command": "alembic revision --autogenerate -m \"initial schema\" && alembic upgrade head",
+              "expected_output": "Generating .../versions/xxxx_initial_schema.py\nRunning upgrade -> xxxx, initial schema",
+              "why": "5.5-5.8'deki tüm modeller için tabloları oluşturuyoruz. autogenerate, modellerdeki değişiklikleri otomatik tespit eder."
+            },
+            {
+              "order": "5.12",
+              "action": "Tabloların oluşturulduğunu doğrula",
               "type": "validate",
-              "validation": "psql -d ai_content ile veritabanina baglan ve \\dt komutu ile tablolari listele. prompts, prompt_versions, generated_contents, evaluations, usage_logs tablolarini gormelisin.",
-              "why": "Migration'in basarili oldugunu ve tuem tablolarin olustugundan emin olmak, veri katmaninin hazir oldugunu garanti eder."
+              "validation": "psql -d ai_content ile veritabanına bağlan ve \\dt komutu ile tabloları listele. prompts, prompt_versions, generated_contents, evaluations, usage_logs tablolarını görmelisin.",
+              "why": "5.11'deki migration'ın başarılı olduğunu ve tüm tabloların oluştuğundan emin olmak, veri katmanının hazır olduğunu kanıtlar."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── core/\n│   │   ├── __init__.py\n│   │   ├── config.py\n│   │   ├── database.py         # <-- YENİ\n│   │   └── models.py           # <-- YENİ\n│   ├── providers/\n│   │   ├── __init__.py\n│   │   ├── base.py\n│   │   └── factory.py\n│   ├── content/\n│   ├── prompts/\n│   ├── evaluation/\n│   └── fine_tuning/\n├── alembic/                     # <-- YENİ\n│   ├── env.py\n│   ├── script.py.mako\n│   └── versions/\n│       └── xxxx_initial_schema.py\n├── alembic.ini                  # <-- YENİ\n├── .env\n├── .gitignore\n├── pyproject.toml\n└── uv.lock",
@@ -569,35 +814,95 @@
           "substeps": [
             {
               "order": "1.1",
-              "action": "OpenAI provider dosyasini olustur",
+              "action": "openai_provider.py dosyasını oluştur — önce sınıf iskeletini yaz",
               "type": "code_write",
               "file": "ai_content_platform/providers/openai_provider.py",
-              "code": "import openai\nimport tiktoken\nimport asyncio\nfrom typing import AsyncIterator\nfrom .base import BaseLLMProvider, LLMMessage, LLMResponse\n\nclass OpenAIProvider(BaseLLMProvider):\n    def __init__(self, config):\n        super().__init__(config)\n        self._client = openai.AsyncOpenAI(api_key=config.api_key.get_secret_value())\n        self._encoder = tiktoken.encoding_for_model(config.model)\n\n    @property\n    def provider_name(self) -> str: return \"openai\"\n\n    async def generate(self, messages, temperature=0.7, max_tokens=4096, **kwargs):\n        openai_messages = [{\"role\": m.role, \"content\": m.content} for m in messages]\n        retry_count = 0\n        while retry_count <= 3:\n            try:\n                response = await self._client.chat.completions.create(model=self.config.model, messages=openai_messages, temperature=temperature, max_tokens=max_tokens, **kwargs)\n                usage = response.usage\n                cost = self.calculate_cost(usage.prompt_tokens, usage.completion_tokens)\n                self._request_count += 1\n                self._total_tokens += usage.total_tokens\n                self._total_cost += cost\n                return LLMResponse(content=response.choices[0].message.content, provider=self.provider_name, model=response.model, input_tokens=usage.prompt_tokens, output_tokens=usage.completion_tokens, total_tokens=usage.total_tokens, cost=cost, metadata={\"finish_reason\": response.choices[0].finish_reason})\n            except openai.RateLimitError:\n                retry_count += 1\n                if retry_count > 3: raise\n                await asyncio.sleep(2 ** (retry_count - 1))\n            except openai.APIStatusError as e:\n                if e.status_code >= 500:\n                    retry_count += 1\n                    if retry_count > 3: raise\n                    await asyncio.sleep(1)\n                else: raise\n\n    async def stream(self, messages, temperature=0.7, max_tokens=4096, **kwargs):\n        openai_messages = [{\"role\": m.role, \"content\": m.content} for m in messages]\n        stream = await self._client.chat.completions.create(model=self.config.model, messages=openai_messages, temperature=temperature, max_tokens=max_tokens, stream=True, **kwargs)\n        async for chunk in stream:\n            if chunk.choices[0].delta.content: yield chunk.choices[0].delta.content\n\n    def count_tokens(self, text): return len(self._encoder.encode(text))",
-              "why": "OpenAI, LLM duenyasinin de facto standardidir. İlk provider'i implement etmek, base class'in dogru tasarlanip tasarlanmadigini test eder. Retry logic ile rate limit ve server hatalari otomatik yeniden denenir."
+              "code": "from .base import BaseLLMProvider, LLMMessage, LLMResponse\n\n\nclass OpenAIProvider(BaseLLMProvider):\n    @property\n    def provider_name(self) -> str:\n        return \"openai\"",
+              "why": "Önce en basit iskelet — sadece sınıf tanımı ve zorunlu provider_name property'si. Adım adım dolduracağız."
             },
             {
               "order": "1.2",
-              "action": "OpenAI provider'ini factory'ye kaydet",
-              "type": "code_write",
-              "file": "ai_content_platform/core/dependencies.py",
-              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\n\n@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    return factory",
-              "why": "Dependency injection ile factory'yi merkezi bir yerden olusturuyoruz. lru_cache, uygulama boyunca tek bir factory instance'i kullanilmasini saglar."
+              "action": "Import'lar lazım — ÜSTE ÇIK, openai ve tiktoken'ı ekle",
+              "type": "code_modify",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "code": "import openai\nimport tiktoken\nimport asyncio\nfrom typing import AsyncIterator\nfrom .base import BaseLLMProvider, LLMMessage, LLMResponse",
+              "why": "1.1'de sadece base'den import ettik. Şimdi gerçek OpenAI SDK ve tiktoken tokenizer lazım — ihtiyaç duydukça import ekliyoruz."
             },
             {
               "order": "1.3",
-              "action": "OpenAI ile basit bir test cagrisi yap",
-              "type": "terminal",
-              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()\n    messages = [LLMMessage(role='user', content='Merhaba, 2+2 kac eder?')]\n    response = await factory.generate_with_fallback(messages)\n    print(f'Yanit: {response.content}')\n    print(f'Token: {response.total_tokens}, Maliyet: ${response.cost}')\nasyncio.run(test())\"",
-              "expected_output": "Yanit: 2+2 = 4 eder.\nToken: ~25, Maliyet: $0.000xxx",
-              "why": "İlk LLM API cagrisini yaparak provider'in dogru calistigini dogruluyoruz. Token sayisi ve maliyet hesaplamasinin dogrulugunu kontrol ediyoruz."
+              "action": "Sınıfa GERİ DÖN — __init__ metodunu yaz",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_class_top",
+              "code": "    def __init__(self, config):\n        super().__init__(config)\n        self._client = openai.AsyncOpenAI(\n            api_key=config.api_key.get_secret_value()\n        )\n        self._encoder = tiktoken.encoding_for_model(\n            config.model\n        )",
+              "why": "1.2'de import ettiğimiz openai ve tiktoken'ı kullanıyoruz. AsyncOpenAI async/await desteği sağlar. tiktoken model-spesifik tokenizer yükler."
             },
             {
               "order": "1.4",
-              "action": "Token sayimini dogrula",
+              "action": "generate() metodunu yaz — mesaj dönüşümü ve API çağrısı",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_class",
+              "code": "\n    async def generate(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        openai_messages = [\n            {\"role\": m.role, \"content\": m.content}\n            for m in messages\n        ]\n        retry_count = 0\n        while retry_count <= 3:\n            try:\n                response = await self._client.chat.completions.create(\n                    model=self.config.model,\n                    messages=openai_messages,\n                    temperature=temperature,\n                    max_tokens=max_tokens, **kwargs\n                )\n                break\n            except openai.RateLimitError:\n                retry_count += 1\n                if retry_count > 3: raise\n                await asyncio.sleep(2 ** (retry_count - 1))\n            except openai.APIStatusError as e:\n                if e.status_code >= 500:\n                    retry_count += 1\n                    if retry_count > 3: raise\n                    await asyncio.sleep(1)\n                else: raise",
+              "why": "1.3'te oluşturduğumuz client ile API çağrısı yapıyoruz. Rate limit'te exponential backoff, server hatasında basit retry uygulanır."
+            },
+            {
+              "order": "1.4b",
+              "action": "generate() içine GERİ DÖN — response'u LLMResponse'a dönüştür",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "        usage = response.usage\n        cost = self.calculate_cost(\n            usage.prompt_tokens,\n            usage.completion_tokens\n        )\n        self._request_count += 1\n        self._total_tokens += usage.total_tokens\n        self._total_cost += cost\n        return LLMResponse(\n            content=response.choices[0].message.content,\n            provider=self.provider_name,\n            model=response.model,\n            input_tokens=usage.prompt_tokens,\n            output_tokens=usage.completion_tokens,\n            total_tokens=usage.total_tokens,\n            cost=cost,\n        )",
+              "why": "1.4'teki API yanıtını M1 Step 3'te tanımladığımız LLMResponse formatına dönüştürüyoruz. Token ve maliyet bilgisi burada hesaplanır."
+            },
+            {
+              "order": "1.5",
+              "action": "stream() metodunu implement et — token token yield",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_class",
+              "code": "\n    async def stream(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        openai_messages = [\n            {\"role\": m.role, \"content\": m.content}\n            for m in messages\n        ]\n        stream = await self._client.chat.completions.create(\n            model=self.config.model,\n            messages=openai_messages,\n            temperature=temperature,\n            max_tokens=max_tokens,\n            stream=True, **kwargs\n        )\n        async for chunk in stream:\n            if chunk.choices[0].delta.content:\n                yield chunk.choices[0].delta.content",
+              "why": "1.4'teki generate() tam yanıt bekler, stream() ise token token yield eder. Kullanıcı 30 saniye beklemek yerine anında yanıt görmeye başlar."
+            },
+            {
+              "order": "1.6",
+              "action": "count_tokens() metodunu implement et",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_class",
+              "code": "\n    def count_tokens(self, text: str) -> int:\n        return len(self._encoder.encode(text))",
+              "why": "1.3'te yüklediğimiz tiktoken encoder'ını kullanıyoruz. Token sayısı doğrudan maliyeti belirler — yaklaşık değer yetmez."
+            },
+            {
+              "order": "1.7",
+              "action": "BAŞKA DOSYAYA GEÇ — dependencies.py oluştur ve factory'yi kur",
+              "type": "code_write",
+              "file": "ai_content_platform/core/dependencies.py",
+              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\n\n\n@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    return factory",
+              "why": "1.1-1.6'da yazdığımız OpenAI provider'ını factory'ye kaydediyoruz. lru_cache uygulama boyunca tek factory instance'ı kullanılmasını sağlar."
+            },
+            {
+              "order": "1.8",
+              "action": "OpenAI ile basit bir test çağrısı yap",
               "type": "terminal",
-              "command": "python -c \"from ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.core.config import get_settings\nsettings = get_settings()\nprovider = OpenAIProvider(settings.openai)\ncount = provider.count_tokens('Merhaba duenya, bu bir test mesajidir.')\nprint(f'Token sayisi: {count}')\"",
-              "expected_output": "Token sayisi: 12",
-              "why": "tiktoken ile token sayiminin dogru calistigini dogruluyoruz. Maliyet hesaplamasi bu sayiya baglidir — yanlis sayim yanlis maliyet demektir."
+              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()\n    messages = [LLMMessage(role='user', content='2+2 kaç eder?')]\n    response = await factory.generate_with_fallback(messages)\n    print(f'Yanıt: {response.content}')\n    print(f'Token: {response.total_tokens}, Maliyet: ${response.cost}')\nasyncio.run(test())\"",
+              "expected_output": "Yanıt: 2+2 = 4 eder.\nToken: ~25, Maliyet: $0.000xxx",
+              "why": "1.1-1.7'de yazdığımız tüm kodun uçtan uca çalıştığını doğruluyoruz. İlk gerçek LLM API çağrısı!"
+            },
+            {
+              "order": "1.9",
+              "action": "Token sayımının doğruluğunu kontrol et",
+              "type": "terminal",
+              "command": "python -c \"from ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.core.config import get_settings\nprovider = OpenAIProvider(get_settings().openai)\ncount = provider.count_tokens('Merhaba dünya, bu bir test mesajıdır.')\nprint(f'Token sayısı: {count}')\"",
+              "expected_output": "Token sayısı: 12",
+              "why": "1.6'da yazdığımız count_tokens'ın doğru çalıştığını doğruluyoruz. Maliyet hesaplaması bu sayıya bağlı — yanlış sayım yanlış fatura demektir."
+            },
+            {
+              "order": "1.10",
+              "action": "Provider istatistiklerini kontrol et",
+              "type": "validate",
+              "validation": "1.8'deki test sonrası provider.get_stats() çağır. request_count=1, total_tokens>0, total_cost>0 olmalı.",
+              "why": "M1 Step 3'te base class'a eklediğimiz get_stats() metodunun gerçek verilerle çalıştığını doğruluyoruz."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── core/\n│   │   ├── __init__.py\n│   │   ├── config.py\n│   │   ├── database.py\n│   │   ├── dependencies.py     # <-- YENİ\n│   │   └── models.py\n│   ├── providers/\n│   │   ├── __init__.py\n│   │   ├── base.py\n│   │   ├── factory.py\n│   │   └── openai_provider.py  # <-- YENİ\n│   ├── content/\n│   ├── prompts/\n│   ├── evaluation/\n│   └── fine_tuning/\n├── alembic/\n├── .env\n├── pyproject.toml\n└── uv.lock",
@@ -630,27 +935,78 @@
           "substeps": [
             {
               "order": "2.1",
-              "action": "Anthropic provider dosyasini olustur",
+              "action": "anthropic_provider.py dosyasını oluştur — sınıf iskeletini yaz",
               "type": "code_write",
               "file": "ai_content_platform/providers/anthropic_provider.py",
-              "code": "import anthropic\nfrom typing import AsyncIterator\nfrom .base import BaseLLMProvider, LLMMessage, LLMResponse\n\nclass AnthropicProvider(BaseLLMProvider):\n    def __init__(self, config):\n        super().__init__(config)\n        self._client = anthropic.AsyncAnthropic(api_key=config.api_key.get_secret_value())\n\n    @property\n    def provider_name(self) -> str: return \"anthropic\"\n\n    def _prepare_messages(self, messages):\n        system_prompt = None\n        anthropic_messages = []\n        for msg in messages:\n            if msg.role == \"system\":\n                system_prompt = msg.content if system_prompt is None else system_prompt + \"\\n\" + msg.content\n            else:\n                anthropic_messages.append({\"role\": msg.role, \"content\": msg.content})\n        return system_prompt, anthropic_messages\n\n    async def generate(self, messages, temperature=0.7, max_tokens=4096, **kwargs):\n        system_prompt, anthropic_messages = self._prepare_messages(messages)\n        params = {\"model\": self.config.model, \"messages\": anthropic_messages, \"max_tokens\": max_tokens, \"temperature\": temperature}\n        if system_prompt: params[\"system\"] = system_prompt\n        response = await self._client.messages.create(**params)\n        content_text = \"\".join(block.text for block in response.content if block.type == \"text\")\n        cost = self.calculate_cost(response.usage.input_tokens, response.usage.output_tokens)\n        total = response.usage.input_tokens + response.usage.output_tokens\n        self._request_count += 1\n        self._total_tokens += total\n        self._total_cost += cost\n        return LLMResponse(content=content_text, provider=self.provider_name, model=response.model, input_tokens=response.usage.input_tokens, output_tokens=response.usage.output_tokens, total_tokens=total, cost=cost, metadata={\"stop_reason\": response.stop_reason})\n\n    async def stream(self, messages, temperature=0.7, max_tokens=4096, **kwargs):\n        system_prompt, anthropic_messages = self._prepare_messages(messages)\n        params = {\"model\": self.config.model, \"messages\": anthropic_messages, \"max_tokens\": max_tokens, \"temperature\": temperature}\n        if system_prompt: params[\"system\"] = system_prompt\n        async with self._client.messages.stream(**params) as stream:\n            async for text in stream.text_stream: yield text\n\n    def count_tokens(self, text): return int(len(text.split()) * 1.3)",
-              "why": "Anthropic API, OpenAI'dan farkli bir yapiya sahiptir — system prompt messages listesinin disindadir. Bu farki abstraction layer otomatik yoenetir. İkinci provider eklemek, base class tasariminin dogrulugunu kanitlar."
+              "code": "from .base import BaseLLMProvider, LLMMessage, LLMResponse\n\n\nclass AnthropicProvider(BaseLLMProvider):\n    @property\n    def provider_name(self) -> str:\n        return \"anthropic\"",
+              "why": "Önce iskelet — M2 Step 1'deki OpenAI ile aynı pattern. Base class'ın kontratını takip ediyoruz."
             },
             {
               "order": "2.2",
-              "action": "Factory'ye Anthropic provider'ini kaydet",
+              "action": "ÜSTE ÇIK — anthropic SDK import'unu ekle",
               "type": "code_modify",
-              "file": "ai_content_platform/core/dependencies.py",
-              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.providers.anthropic_provider import AnthropicProvider\n\n@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    factory.register(\"anthropic\", AnthropicProvider)\n    return factory",
-              "why": "Yeni provider eklemek sadece bir satir register() cagrisi gerektirir — Open-Closed Principle'in guezel bir oernegi. Mevcut koda dokunmadan yeni oezellik ekliyoruz."
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "code": "import anthropic\nfrom typing import AsyncIterator\nfrom .base import BaseLLMProvider, LLMMessage, LLMResponse",
+              "why": "Anthropic'in kendi SDK'sı var — OpenAI'dan farklı API yapısı. AsyncAnthropic client kullanacağız."
             },
             {
               "order": "2.3",
-              "action": "Her iki provider'i ayni mesajla test et",
+              "action": "Sınıfa GERİ DÖN — __init__ ve _prepare_messages'ı yaz",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_class_top",
+              "code": "    def __init__(self, config):\n        super().__init__(config)\n        self._client = anthropic.AsyncAnthropic(\n            api_key=config.api_key.get_secret_value()\n        )\n\n    def _prepare_messages(self, messages):\n        system_prompt = None\n        anthropic_messages = []\n        for msg in messages:\n            if msg.role == \"system\":\n                system_prompt = msg.content\n            else:\n                anthropic_messages.append(\n                    {\"role\": msg.role, \"content\": msg.content}\n                )\n        return system_prompt, anthropic_messages",
+              "why": "Kritik fark: Anthropic'te system prompt messages listesinin DIŞINDA. OpenAI'da {role:'system'} olarak gönderilir. Bu dönüşümü abstraction layer otomatik yapar."
+            },
+            {
+              "order": "2.4",
+              "action": "generate() metodunu yaz — API çağrısı",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_class",
+              "code": "\n    async def generate(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_prompt, msgs = self._prepare_messages(messages)\n        params = {\n            \"model\": self.config.model,\n            \"messages\": msgs,\n            \"max_tokens\": max_tokens,\n            \"temperature\": temperature,\n        }\n        if system_prompt:\n            params[\"system\"] = system_prompt\n        response = await self._client.messages.create(**params)",
+              "why": "2.3'teki _prepare_messages ile system prompt'u ayırıp Anthropic API'ye gönderiyoruz. max_tokens Anthropic'te zorunlu parametre."
+            },
+            {
+              "order": "2.4b",
+              "action": "generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "        content = \"\".join(\n            b.text for b in response.content\n            if b.type == \"text\"\n        )\n        cost = self.calculate_cost(\n            response.usage.input_tokens,\n            response.usage.output_tokens\n        )\n        total = (\n            response.usage.input_tokens +\n            response.usage.output_tokens\n        )\n        self._request_count += 1\n        self._total_tokens += total\n        self._total_cost += cost\n        return LLMResponse(\n            content=content,\n            provider=self.provider_name,\n            model=response.model,\n            input_tokens=response.usage.input_tokens,\n            output_tokens=response.usage.output_tokens,\n            total_tokens=total, cost=cost,\n        )",
+              "why": "2.4'teki API yanıtını standart LLMResponse formatına dönüştürüyoruz. Anthropic'te content bir ContentBlock listesi — text bloklarını birleştiriyoruz."
+            },
+            {
+              "order": "2.5",
+              "action": "stream() ve count_tokens() metodlarını ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_class",
+              "code": "\n    async def stream(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_prompt, msgs = self._prepare_messages(messages)\n        params = {\n            \"model\": self.config.model,\n            \"messages\": msgs,\n            \"max_tokens\": max_tokens,\n            \"temperature\": temperature,\n        }\n        if system_prompt:\n            params[\"system\"] = system_prompt\n        async with self._client.messages.stream(\n            **params\n        ) as stream:\n            async for text in stream.text_stream:\n                yield text\n\n    def count_tokens(self, text: str) -> int:\n        return int(len(text.split()) * 1.3)",
+              "why": "2.4'teki generate() ile aynı mesaj hazırlığı ama stream modunda. count_tokens yaklaşık hesaplama — Anthropic'in tokenizer'ı API çağrısı gerektirir, maliyetinden kaçınıyoruz."
+            },
+            {
+              "order": "2.6",
+              "action": "BAŞKA DOSYAYA GEÇ — dependencies.py'ye Anthropic'i kaydet",
+              "type": "code_modify",
+              "file": "ai_content_platform/core/dependencies.py",
+              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.providers.anthropic_provider import AnthropicProvider\n\n\n@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    factory.register(\"anthropic\", AnthropicProvider)\n    return factory",
+              "why": "M2 Step 1'deki factory'ye yeni provider eklemek sadece iki satır — import ve register(). Open-Closed Principle'ın güzel bir örneği."
+            },
+            {
+              "order": "2.7",
+              "action": "Her iki provider'ı aynı mesajla karşılaştırmalı test et",
               "type": "terminal",
-              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()\n    messages = [LLMMessage(role='system', content='Kisa cevap ver.'), LLMMessage(role='user', content='Python nedir?')]\n    for name in ['openai', 'anthropic']:\n        r = await factory.generate_with_fallback(messages, preferred_provider=name)\n        print(f'{r.provider}: {r.content[:80]}... (\\${r.cost:.4f})')\nasyncio.run(test())\"",
-              "expected_output": "openai: Python, genel amacli... ($0.00xx)\nanthropic: Python, yueksek seviyeli... ($0.00xx)",
-              "why": "Ayni mesaj listesinin her iki provider'da da calistigini dogruluyoruz. System prompt'un Anthropic'te otomatik ayrildigini ve maliyet hesaplamasinin dogru oldugunu kontrol ediyoruz."
+              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()\n    messages = [LLMMessage(role='system', content='Kısa cevap ver.'), LLMMessage(role='user', content='Python nedir?')]\n    for name in ['openai', 'anthropic']:\n        r = await factory.generate_with_fallback(messages, preferred_provider=name)\n        print(f'{r.provider}: {r.content[:80]}... (${r.cost:.4f})')\nasyncio.run(test())\"",
+              "expected_output": "openai: Python, genel amaçlı... ($0.00xx)\nanthropic: Python, yüksek seviyeli... ($0.00xx)",
+              "why": "Aynı mesaj listesinin her iki provider'da da çalıştığını doğruluyoruz. System prompt'un Anthropic'te otomatik ayrıldığını kontrol ediyoruz."
+            },
+            {
+              "order": "2.8",
+              "action": "Abstraction'ın çalıştığını doğrula — system prompt ayrımı",
+              "type": "validate",
+              "validation": "2.7'deki testte system prompt 'Kısa cevap ver.' kullandık. Anthropic hata vermeden yanıt döndüyse _prepare_messages() doğru çalışıyor demektir. Log'da 'anthropic başarılı' mesajını görmelisin.",
+              "why": "2.3'te yazdığımız _prepare_messages() gerçek API çağrısında test edildi. Bu, abstraction layer'ın doğru tasarlandığının kanıtı."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── core/\n│   │   ├── __init__.py\n│   │   ├── config.py\n│   │   ├── database.py\n│   │   ├── dependencies.py     # <-- GÜNCELLENDİ\n│   │   └── models.py\n│   ├── providers/\n│   │   ├── __init__.py\n│   │   ├── base.py\n│   │   ├── factory.py\n│   │   ├── openai_provider.py\n│   │   └── anthropic_provider.py  # <-- YENİ\n│   ├── content/\n│   ├── prompts/\n│   ├── evaluation/\n│   └── fine_tuning/\n├── alembic/\n├── .env\n├── pyproject.toml\n└── uv.lock",
@@ -683,34 +1039,94 @@
           "substeps": [
             {
               "order": "3.1",
-              "action": "Gemini provider dosyasini olustur",
+              "action": "gemini_provider.py dosyasını oluştur — sınıf iskeletini yaz",
               "type": "code_write",
               "file": "ai_content_platform/providers/gemini_provider.py",
-              "code": "import google.generativeai as genai\nfrom typing import AsyncIterator\nfrom .base import BaseLLMProvider, LLMMessage, LLMResponse\n\nclass GeminiProvider(BaseLLMProvider):\n    def __init__(self, config):\n        super().__init__(config)\n        genai.configure(api_key=config.api_key.get_secret_value())\n        self._model = genai.GenerativeModel(model_name=config.model, safety_settings=[{\"category\": \"HARM_CATEGORY_HARASSMENT\", \"threshold\": \"BLOCK_MEDIUM_AND_ABOVE\"}])\n\n    @property\n    def provider_name(self) -> str: return \"gemini\"\n\n    def _convert_messages(self, messages):\n        system_instruction = None\n        contents = []\n        for msg in messages:\n            if msg.role == \"system\": system_instruction = msg.content\n            else:\n                role = \"model\" if msg.role == \"assistant\" else msg.role\n                contents.append({\"role\": role, \"parts\": [{\"text\": msg.content}]})\n        return system_instruction, contents\n\n    async def generate(self, messages, temperature=0.7, max_tokens=4096, **kwargs):\n        system_instruction, contents = self._convert_messages(messages)\n        model = self._model\n        if system_instruction: model = genai.GenerativeModel(model_name=self.config.model, system_instruction=system_instruction)\n        response = await model.generate_content_async(contents=contents, generation_config=genai.types.GenerationConfig(temperature=temperature, max_output_tokens=max_tokens))\n        usage = response.usage_metadata\n        input_tokens = usage.prompt_token_count\n        output_tokens = usage.candidates_token_count\n        cost = self.calculate_cost(input_tokens, output_tokens)\n        self._request_count += 1\n        self._total_tokens += input_tokens + output_tokens\n        self._total_cost += cost\n        return LLMResponse(content=response.text, provider=self.provider_name, model=self.config.model, input_tokens=input_tokens, output_tokens=output_tokens, total_tokens=input_tokens + output_tokens, cost=cost)\n\n    async def stream(self, messages, temperature=0.7, max_tokens=4096, **kwargs):\n        system_instruction, contents = self._convert_messages(messages)\n        model = self._model\n        if system_instruction: model = genai.GenerativeModel(model_name=self.config.model, system_instruction=system_instruction)\n        response = await model.generate_content_async(contents=contents, generation_config=genai.types.GenerationConfig(temperature=temperature, max_output_tokens=max_tokens), stream=True)\n        async for chunk in response:\n            if chunk.text: yield chunk.text\n\n    def count_tokens(self, text):\n        result = self._model.count_tokens(text)\n        return result.total_tokens",
-              "why": "Gemini'nin tamamen farkli API yapisi (contents, parts formati, 'model' rolue) gercek duenyadaki cesitliligi temsil eder. Uecuencue provider sorunsuz entegre olduysa, abstraction layer dogru tasarlanmistir."
+              "code": "from .base import BaseLLMProvider, LLMMessage, LLMResponse\n\n\nclass GeminiProvider(BaseLLMProvider):\n    @property\n    def provider_name(self) -> str:\n        return \"gemini\"",
+              "why": "Üçüncü provider — aynı iskelet pattern'i. Bu sefer sorunsuz entegre olursa mimarinin ölçeklenebilir olduğu kanıtlanır."
             },
             {
               "order": "3.2",
-              "action": "Factory'ye Gemini provider'ini kaydet",
+              "action": "ÜSTE ÇIK — Google GenAI import'unu ekle",
               "type": "code_modify",
-              "file": "ai_content_platform/core/dependencies.py",
-              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.providers.anthropic_provider import AnthropicProvider\nfrom ai_content_platform.providers.gemini_provider import GeminiProvider\n\n@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    factory.register(\"anthropic\", AnthropicProvider)\n    factory.register(\"gemini\", GeminiProvider)\n    return factory",
-              "why": "Uecuencue provider'i eklemek yine sadece iki satir degisiklik gerektirdi — bu, mimarinin oelceklenebilir oldugunu kanitlar."
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "code": "import google.generativeai as genai\nfrom typing import AsyncIterator\nfrom .base import BaseLLMProvider, LLMMessage, LLMResponse",
+              "why": "Google'ın kendi SDK'sı — tamamen farklı API yapısı. contents/parts formatı kullanıyor, role isimleri bile farklı ('model' vs 'assistant')."
             },
             {
               "order": "3.3",
-              "action": "Uec provider'i karsilastirmali test et",
-              "type": "terminal",
-              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()\n    messages = [LLMMessage(role='user', content='AI nedir? Bir cuemle ile acikla.')]\n    for name in ['openai', 'anthropic', 'gemini']:\n        r = await factory.generate_with_fallback(messages, preferred_provider=name)\n        print(f'{r.provider} ({r.model}): {r.content[:100]}... | \\${r.cost:.6f}')\nasyncio.run(test())\"",
-              "expected_output": "openai (gpt-4o): AI, makinelerin... | $0.000xxx\nanthropic (claude-...): AI, insan... | $0.000xxx\ngemini (gemini-...): AI, bilgisayar... | $0.000xxx",
-              "why": "Ayni prompt'un uec farkli provider'da calistigini ve her birinin maliyet/token metriklerini dogru raporladigini dogruluyoruz."
+              "action": "Sınıfa GERİ DÖN — __init__ ve _convert_messages'ı yaz",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class_top",
+              "code": "    def __init__(self, config):\n        super().__init__(config)\n        genai.configure(\n            api_key=config.api_key.get_secret_value()\n        )\n        self._model = genai.GenerativeModel(\n            model_name=config.model\n        )\n\n    def _convert_messages(self, messages):\n        system_instruction = None\n        contents = []\n        for msg in messages:\n            if msg.role == \"system\":\n                system_instruction = msg.content\n            else:\n                role = \"model\" if msg.role == \"assistant\" else msg.role\n                contents.append({\n                    \"role\": role,\n                    \"parts\": [{\"text\": msg.content}]\n                })\n        return system_instruction, contents",
+              "why": "Gemini'de 'assistant' yerine 'model' kullanılıyor ve mesajlar contents/parts formatında. Bu küçük fark, abstraction olmadan bug'a neden olur."
             },
             {
               "order": "3.4",
-              "action": "Fallback mekanizmasini test et",
+              "action": "generate() metodunu yaz — model hazırlığı ve API çağrısı",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class",
+              "code": "\n    async def generate(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_instruction, contents = self._convert_messages(\n            messages\n        )\n        model = self._model\n        if system_instruction:\n            model = genai.GenerativeModel(\n                model_name=self.config.model,\n                system_instruction=system_instruction\n            )\n        response = await model.generate_content_async(\n            contents=contents,\n            generation_config=genai.types.GenerationConfig(\n                temperature=temperature,\n                max_output_tokens=max_tokens,\n            )\n        )",
+              "why": "3.3'teki _convert_messages ile formatı dönüştürüp API'ye gönderiyoruz. System instruction varsa model yeniden oluşturuluyor — Gemini'nin API tasarımı böyle."
+            },
+            {
+              "order": "3.4b",
+              "action": "generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "        usage = response.usage_metadata\n        cost = self.calculate_cost(\n            usage.prompt_token_count,\n            usage.candidates_token_count\n        )\n        total = (\n            usage.prompt_token_count +\n            usage.candidates_token_count\n        )\n        self._request_count += 1\n        self._total_tokens += total\n        self._total_cost += cost\n        return LLMResponse(\n            content=response.text,\n            provider=self.provider_name,\n            model=self.config.model,\n            input_tokens=usage.prompt_token_count,\n            output_tokens=usage.candidates_token_count,\n            total_tokens=total, cost=cost,\n        )",
+              "why": "3.4'teki API yanıtını LLMResponse'a dönüştürüyoruz. Gemini'de token bilgisi usage_metadata altında, diğer provider'lardan farklı alan isimleri kullanıyor."
+            },
+            {
+              "order": "3.5",
+              "action": "stream() metodunu ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class",
+              "code": "\n    async def stream(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_instruction, contents = self._convert_messages(\n            messages\n        )\n        model = self._model\n        if system_instruction:\n            model = genai.GenerativeModel(\n                model_name=self.config.model,\n                system_instruction=system_instruction\n            )\n        response = await model.generate_content_async(\n            contents=contents,\n            generation_config=genai.types.GenerationConfig(\n                temperature=temperature,\n                max_output_tokens=max_tokens,\n            ),\n            stream=True\n        )\n        async for chunk in response:\n            if chunk.text:\n                yield chunk.text",
+              "why": "3.4'teki generate() pattern'inin stream versiyonu. stream=True parametresi ile API chunk chunk yanıt verir."
+            },
+            {
+              "order": "3.5b",
+              "action": "count_tokens() metodunu ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class",
+              "code": "\n    def count_tokens(self, text: str) -> int:\n        result = self._model.count_tokens(text)\n        return result.total_tokens",
+              "why": "Gemini'nin yerleşik tokenizer'ını kullanıyoruz — API üzerinden doğru token sayısı döner. OpenAI'daki tiktoken'ın muadili."
+            },
+            {
+              "order": "3.6",
+              "action": "BAŞKA DOSYAYA GEÇ — dependencies.py'ye Gemini'yi ekle",
+              "type": "code_modify",
+              "file": "ai_content_platform/core/dependencies.py",
+              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.providers.anthropic_provider import AnthropicProvider\nfrom ai_content_platform.providers.gemini_provider import GeminiProvider\n\n\n@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    factory.register(\"anthropic\", AnthropicProvider)\n    factory.register(\"gemini\", GeminiProvider)\n    return factory",
+              "why": "Üçüncü provider'ı eklemek yine sadece iki satır değişiklik. Mimari doğruysa yeni provider eklemek kolay olmalı — ve öyle."
+            },
+            {
+              "order": "3.7",
+              "action": "Üç provider'ı karşılaştırmalı test et",
+              "type": "terminal",
+              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()\n    messages = [LLMMessage(role='user', content='AI nedir? Bir cümle ile açıkla.')]\n    for name in ['openai', 'anthropic', 'gemini']:\n        r = await factory.generate_with_fallback(messages, preferred_provider=name)\n        print(f'{r.provider} ({r.model}): {r.content[:80]}... | ${r.cost:.6f}')\nasyncio.run(test())\"",
+              "expected_output": "openai (gpt-4o): AI, makinelerin... | $0.000xxx\nanthropic (claude-...): AI, insan... | $0.000xxx\ngemini (gemini-...): AI, bilgisayar... | $0.000xxx",
+              "why": "Aynı prompt'un üç farklı provider'da çalıştığını ve her birinin maliyet/token metriklerini doğru raporladığını doğruluyoruz."
+            },
+            {
+              "order": "3.8",
+              "action": "Fallback mekanizmasını test et — provider çökünce ne olur?",
               "type": "validate",
-              "validation": ".env'de OPENAI_API_KEY'i gecersiz bir degerle degistir ve generate_with_fallback cagir. OpenAI basarisiz olduktan sonra otomatik olarak Anthropic'e gecmeli. Logda 'openai basarisiz' ve ardindan 'anthropic basarili' mesajlarini gormelisin.",
-              "why": "Fallback mekanizmasi production'da servis suereklligini garanti eder. Bir provider coektueueğunde kullanici hicbir sey fark etmeden diger provider'dan yanit alir."
+              "validation": ".env'de OPENAI_API_KEY'i geçersiz bir değerle değiştir ve generate_with_fallback çağır. OpenAI başarısız olduktan sonra otomatik olarak Anthropic'e geçmeli. Log'da 'openai başarısız' ve 'anthropic başarılı' mesajlarını görmelisin. Sonra key'i geri al.",
+              "why": "Fallback mekanizması production'da servis sürekliliğini garanti eder. Bir provider çöktüğünde kullanıcı hiçbir şey fark etmeden diğer provider'dan yanıt alır."
+            },
+            {
+              "order": "3.9",
+              "action": "Maliyet karşılaştırmasını gözlemle",
+              "type": "validate",
+              "validation": "3.7'deki test sonuçlarında üç provider'ın maliyetlerini karşılaştır. Gemini en ucuz (0.0001$/1k token), OpenAI orta, Anthropic en pahalı olmalı. Bu bilgi intelligent routing için kullanılacak.",
+              "why": "Provider abstraction'ın asıl gücü burada — aynı işi en ucuz provider'a yönlendirebilirsin. Basit sorular Gemini'ye, karmaşık sorular GPT-4o'ya."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── core/\n│   │   ├── __init__.py\n│   │   ├── config.py\n│   │   ├── database.py\n│   │   ├── dependencies.py     # <-- GÜNCELLENDİ\n│   │   └── models.py\n│   ├── providers/\n│   │   ├── __init__.py\n│   │   ├── base.py\n│   │   ├── factory.py\n│   │   ├── openai_provider.py\n│   │   ├── anthropic_provider.py\n│   │   └── gemini_provider.py  # <-- YENİ\n│   ├── content/\n│   ├── prompts/\n│   ├── evaluation/\n│   └── fine_tuning/\n├── alembic/\n├── .env\n├── pyproject.toml\n└── uv.lock",
@@ -743,43 +1159,93 @@
           "substeps": [
             {
               "order": "4.1",
-              "action": "Content API router dosyasini olustur",
+              "action": "API route dizinlerini oluştur",
               "type": "terminal",
               "command": "mkdir -p ai_content_platform/api/routes && touch ai_content_platform/api/__init__.py ai_content_platform/api/routes/__init__.py",
-              "expected_output": "Dizinler ve dosyalar olusturuldu",
-              "why": "API route'larini ayri bir modulde organize etmek, kodun yoenetilebilirligini artirir. Her domain icin ayri router dosyasi olmalidir."
+              "expected_output": "Dizinler ve dosyalar oluşturuldu",
+              "why": "API route'larını ayrı modülde organize ediyoruz. Her domain için ayrı router dosyası — content.py, prompts.py gibi."
             },
             {
               "order": "4.2",
-              "action": "SSE streaming ile content generation endpoint'ini olustur",
+              "action": "content.py dosyasını oluştur — önce router ve request model iskeletini yaz",
               "type": "code_write",
               "file": "ai_content_platform/api/routes/content.py",
-              "code": "from fastapi import APIRouter, Depends\nfrom fastapi.responses import StreamingResponse\nfrom pydantic import BaseModel\nimport json\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nfrom ai_content_platform.providers.factory import ProviderFactory\n\nrouter = APIRouter(prefix=\"/api/content\", tags=[\"content\"])\n\nclass GenerateRequest(BaseModel):\n    prompt: str\n    content_type: str = \"blog_post\"\n    tone: str = \"professional\"\n    provider: str | None = None\n    stream: bool = True\n    temperature: float = 0.7\n    max_tokens: int = 4096\n\nasync def sse_generator(factory, messages, provider_name, **kwargs):\n    total_content = \"\"\n    try:\n        provider = factory.get_provider(provider_name or \"openai\")\n        async for token in provider.stream(messages, **kwargs):\n            total_content += token\n            yield f\"data: {json.dumps({'type': 'token', 'content': token})}\\n\\n\"\n        input_text = \" \".join(m.content for m in messages)\n        input_tokens = provider.count_tokens(input_text)\n        output_tokens = provider.count_tokens(total_content)\n        cost = provider.calculate_cost(input_tokens, output_tokens)\n        yield f\"data: {json.dumps({'type': 'done', 'usage': {'input_tokens': input_tokens, 'output_tokens': output_tokens, 'cost_usd': cost, 'provider': provider.provider_name}})}\\n\\n\"\n    except Exception as e:\n        yield f\"data: {json.dumps({'type': 'error', 'message': str(e)})}\\n\\n\"\n\n@router.post(\"/generate\")\nasync def generate_content(request: GenerateRequest, factory: ProviderFactory = Depends(get_provider_factory)):\n    messages = [\n        LLMMessage(role=\"system\", content=f\"Sen profesyonel bir icerik yazarisin. Icerik tuerue: {request.content_type}. Ton: {request.tone}. Tuerkce yaz.\"),\n        LLMMessage(role=\"user\", content=request.prompt)\n    ]\n    if request.stream:\n        return StreamingResponse(sse_generator(factory, messages, request.provider, temperature=request.temperature, max_tokens=request.max_tokens), media_type=\"text/event-stream\", headers={\"Cache-Control\": \"no-cache\", \"Connection\": \"keep-alive\", \"X-Accel-Buffering\": \"no\"})\n    response = await factory.generate_with_fallback(messages, preferred_provider=request.provider, temperature=request.temperature, max_tokens=request.max_tokens)\n    return {\"content\": response.content, \"usage\": {\"input_tokens\": response.input_tokens, \"output_tokens\": response.output_tokens, \"cost_usd\": response.cost, \"provider\": response.provider, \"model\": response.model, \"latency_ms\": response.latency_ms}}",
-              "why": "SSE (Server-Sent Events) ile token token yanit goendermek, kullanicinin 30 saniye beklemek yerine aninda yanit goermeye baslamasini saglar. Bu pattern ChatGPT ve Claude dahil tuem modern AI uygulamalarinda kullanilir."
+              "code": "from fastapi import APIRouter\nfrom pydantic import BaseModel\n\nrouter = APIRouter(\n    prefix=\"/api/content\", tags=[\"content\"]\n)\n\n\nclass GenerateRequest(BaseModel):\n    prompt: str\n    content_type: str = \"blog_post\"\n    tone: str = \"professional\"\n    provider: str | None = None\n    stream: bool = True\n    temperature: float = 0.7\n    max_tokens: int = 4096",
+              "why": "Önce iskelet — router ve giriş modeli. Endpoint'leri henüz yazmadık, önce veri yapısını tanımlıyoruz."
             },
             {
               "order": "4.3",
-              "action": "Router'i ana uygulamaya bagla",
+              "action": "Import'lar lazım — ÜSTE ÇIK, streaming ve dependency import'larını ekle",
               "type": "code_modify",
-              "file": "ai_content_platform/main.py",
-              "code": "from fastapi import FastAPI\nfrom ai_content_platform.api.routes.content import router as content_router\n\napp = FastAPI(title=\"AI Content Platform\", version=\"0.1.0\")\napp.include_router(content_router)\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"healthy\", \"version\": \"0.1.0\"}",
-              "why": "include_router ile moduler router'lari ana uygulamaya bagliyoruz. Her domain kendi router'ina sahip olur — kod organizasyonu icin en iyi pratik."
+              "file": "ai_content_platform/api/routes/content.py",
+              "code": "from fastapi import APIRouter, Depends\nfrom fastapi.responses import StreamingResponse\nfrom pydantic import BaseModel\nimport json\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nfrom ai_content_platform.providers.factory import ProviderFactory",
+              "why": "4.2'de sadece APIRouter vardı. Şimdi StreamingResponse (SSE için), Depends (DI için) ve provider modülleri lazım."
             },
             {
               "order": "4.4",
-              "action": "Streaming endpoint'i curl ile test et",
-              "type": "terminal",
-              "command": "curl -N -X POST http://localhost:8000/api/content/generate -H \"Content-Type: application/json\" -d '{\"prompt\": \"Python hakkinda kisa bir paragraf yaz\", \"stream\": true}'",
-              "expected_output": "data: {\"type\": \"token\", \"content\": \"Python\"}\ndata: {\"type\": \"token\", \"content\": \",\"}\n...\ndata: {\"type\": \"done\", \"usage\": {...}}",
-              "why": "curl -N flag'i buffering'i kapatir ve SSE event'lerini gercek zamanli gosterir. Her token ayri bir 'data:' satiri olarak gelmelidir."
+              "action": "SSE generator fonksiyonunu yaz — streaming'in kalbi",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "after_request_model",
+              "code": "\n\nasync def sse_generator(factory, messages, provider_name, **kwargs):\n    total_content = \"\"\n    try:\n        provider = factory.get_provider(\n            provider_name or \"openai\"\n        )\n        async for token in provider.stream(\n            messages, **kwargs\n        ):\n            total_content += token\n            yield f\"data: {json.dumps({'type': 'token', 'content': token})}\\n\\n\"\n        input_text = \" \".join(m.content for m in messages)\n        input_tokens = provider.count_tokens(input_text)\n        output_tokens = provider.count_tokens(total_content)\n        cost = provider.calculate_cost(input_tokens, output_tokens)\n        yield f\"data: {json.dumps({'type': 'done', 'usage': {'input_tokens': input_tokens, 'output_tokens': output_tokens, 'cost_usd': cost, 'provider': provider.provider_name}})}\\n\\n\"\n    except Exception as e:\n        yield f\"data: {json.dumps({'type': 'error', 'message': str(e)})}\\n\\n\"",
+              "why": "SSE formatı: 'data: {...}\\n\\n'. Her token ayrı event olarak gönderilir. Stream bittiğinde 'done' event'i maliyet bilgisiyle gelir. Hata olursa 'error' event'i."
             },
             {
               "order": "4.5",
-              "action": "Non-streaming endpoint'i test et",
+              "action": "Endpoint'in streaming kısmını yaz",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "bottom",
+              "code": "\n\n@router.post(\"/generate\")\nasync def generate_content(\n    request: GenerateRequest,\n    factory: ProviderFactory = Depends(get_provider_factory)\n):\n    messages = [\n        LLMMessage(\n            role=\"system\",\n            content=(\n                f\"Sen profesyonel bir içerik yazarısın. \"\n                f\"İçerik türü: {request.content_type}. \"\n                f\"Ton: {request.tone}. Türkçe yaz.\"\n            )\n        ),\n        LLMMessage(role=\"user\", content=request.prompt)\n    ]\n    if request.stream:\n        return StreamingResponse(\n            sse_generator(\n                factory, messages, request.provider,\n                temperature=request.temperature,\n                max_tokens=request.max_tokens\n            ),\n            media_type=\"text/event-stream\",\n            headers={\n                \"Cache-Control\": \"no-cache\",\n                \"X-Accel-Buffering\": \"no\"\n            }\n        )",
+              "why": "4.2'deki GenerateRequest, 4.3'teki import'lar ve 4.4'teki sse_generator burada birleşiyor. Stream modunda SSE yanıt döner."
+            },
+            {
+              "order": "4.5b",
+              "action": "Endpoint'e GERİ DÖN — non-streaming yanıt kısmını ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "inside_generate_content",
+              "code": "    response = await factory.generate_with_fallback(\n        messages,\n        preferred_provider=request.provider,\n        temperature=request.temperature,\n        max_tokens=request.max_tokens\n    )\n    return {\n        \"content\": response.content,\n        \"usage\": {\n            \"input_tokens\": response.input_tokens,\n            \"output_tokens\": response.output_tokens,\n            \"cost_usd\": response.cost,\n            \"provider\": response.provider,\n        }\n    }",
+              "why": "4.5'te stream=true durumunu handle ettik. stream=false ise tam yanıt bekleyip JSON olarak döner — batch işleme senaryoları için."
+            },
+            {
+              "order": "4.6",
+              "action": "BAŞKA DOSYAYA GEÇ — main.py'ye router'ı bağla",
+              "type": "code_modify",
+              "file": "ai_content_platform/main.py",
+              "code": "from fastapi import FastAPI\nfrom ai_content_platform.api.routes.content import router as content_router\n\napp = FastAPI(\n    title=\"AI Content Platform\",\n    version=\"0.1.0\",\n)\napp.include_router(content_router)\n\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"healthy\", \"version\": \"0.1.0\"}",
+              "why": "M1 Step 1'de oluşturduğumuz main.py'ye ÜSTE ÇIK ve router import'unu ekle. include_router ile modüler yapıyı ana uygulamaya bağlıyoruz."
+            },
+            {
+              "order": "4.7",
+              "action": "Streaming endpoint'ini curl ile test et",
+              "type": "terminal",
+              "command": "curl -N -X POST http://localhost:8000/api/content/generate -H \"Content-Type: application/json\" -d '{\"prompt\": \"Python hakkında kısa bir paragraf yaz\", \"stream\": true}'",
+              "expected_output": "data: {\"type\": \"token\", \"content\": \"Python\"}\ndata: {\"type\": \"token\", \"content\": \",\"}\n...\ndata: {\"type\": \"done\", \"usage\": {...}}",
+              "why": "4.4-4.5'te yazdığımız SSE endpoint'inin çalıştığını doğruluyoruz. curl -N buffering'i kapatır ve event'leri gerçek zamanlı gösterir."
+            },
+            {
+              "order": "4.8",
+              "action": "Non-streaming modunu da test et",
               "type": "terminal",
               "command": "curl -X POST http://localhost:8000/api/content/generate -H \"Content-Type: application/json\" -d '{\"prompt\": \"AI nedir?\", \"stream\": false}'",
               "expected_output": "{\"content\": \"AI, ...\", \"usage\": {\"input_tokens\": ..., \"cost_usd\": ...}}",
-              "why": "Streaming olmayan mod da calismali — bazi kullanim senaryolarinda tam yanit beklemek gerekir (oernegin batch isleme)."
+              "why": "4.5'te stream=false durumunu da handle ettik. Batch işleme gibi senaryolarda tam yanıt beklemek gerekir."
+            },
+            {
+              "order": "4.9",
+              "action": "Swagger UI'da endpoint'i kontrol et",
+              "type": "validate",
+              "validation": "http://localhost:8000/docs adresini aç. POST /api/content/generate endpoint'i görünmeli. 'Try it out' ile test et — GenerateRequest şeması doğru görünmeli.",
+              "why": "FastAPI'nin otomatik dokümantasyonu, API'nin doğru tanımlandığını ve frontend geliştiricilerin kolayca kullanabileceğini doğrular."
+            },
+            {
+              "order": "4.10",
+              "action": "Farklı provider ile streaming'i test et",
+              "type": "terminal",
+              "command": "curl -N -X POST http://localhost:8000/api/content/generate -H \"Content-Type: application/json\" -d '{\"prompt\": \"Docker nedir?\", \"stream\": true, \"provider\": \"anthropic\"}'",
+              "expected_output": "data: {\"type\": \"token\", \"content\": \"Docker\"}\n...\ndata: {\"type\": \"done\", \"usage\": {\"provider\": \"anthropic\"}}",
+              "why": "Provider seçiminin streaming'de de çalıştığını doğruluyoruz. M2 Step 2'de eklediğimiz Anthropic provider'ı SSE üzerinden token token gönderiyor."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py                 # <-- GÜNCELLENDİ\n│   ├── api/                     # <-- YENİ\n│   │   ├── __init__.py\n│   │   └── routes/\n│   │       ├── __init__.py\n│   │       └── content.py\n│   ├── core/\n│   │   ├── __init__.py\n│   │   ├── config.py\n│   │   ├── database.py\n│   │   ├── dependencies.py\n│   │   └── models.py\n│   ├── providers/\n│   │   ├── __init__.py\n│   │   ├── base.py\n│   │   ├── factory.py\n│   │   ├── openai_provider.py\n│   │   ├── anthropic_provider.py\n│   │   └── gemini_provider.py\n│   ├── content/\n│   ├── prompts/\n│   ├── evaluation/\n│   └── fine_tuning/\n├── alembic/\n├── .env\n├── pyproject.toml\n└── uv.lock",
@@ -812,59 +1278,103 @@
           "substeps": [
             {
               "order": "5.1",
-              "action": "Docker Compose ile Redis ve PostgreSQL baslat",
+              "action": "docker-compose.yml oluştur — Redis ve PostgreSQL servisleri",
               "type": "code_write",
               "file": "docker-compose.yml",
               "code": "version: '3.8'\nservices:\n  postgres:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_DB: ai_content\n      POSTGRES_USER: postgres\n      POSTGRES_PASSWORD: postgres\n    ports:\n      - \"5432:5432\"\n    volumes:\n      - postgres_data:/var/lib/postgresql/data\n  redis:\n    image: redis:7-alpine\n    ports:\n      - \"6379:6379\"\n    volumes:\n      - redis_data:/data\nvolumes:\n  postgres_data:\n  redis_data:",
-              "why": "Docker Compose ile tuem bagimli servisleri tek komutla baslatmak, development ortamini standartlastirir. Her developer ayni veritabani ve cache versiyonunu kullanir."
+              "why": "Tüm bağımlı servisleri tek komutla başlatmak development ortamını standartlaştırır. Her developer aynı veritabanı ve cache versiyonunu kullanır."
             },
             {
               "order": "5.2",
-              "action": "Servisleri baslat",
+              "action": "Servisleri başlat ve doğrula",
               "type": "terminal",
               "command": "docker compose up -d",
               "expected_output": "Container ai-content-platform-postgres-1  Started\nContainer ai-content-platform-redis-1  Started",
-              "why": "-d flag'i servisleri arka planda baslatir. PostgreSQL ve Redis artik localhost'ta erisilebilir durumdadir."
+              "why": "5.1'deki docker-compose.yml'ı çalıştırıyoruz. -d flag'i arka planda başlatır."
             },
             {
               "order": "5.3",
-              "action": "LLM cache moduluenue olustur",
+              "action": "cache.py dosyasını oluştur — önce LLMCache iskeletini yaz",
               "type": "code_write",
               "file": "ai_content_platform/core/cache.py",
-              "code": "import redis.asyncio as redis\nimport hashlib\nimport json\nfrom typing import Optional\nimport logging\n\nlogger = logging.getLogger(__name__)\n\nclass LLMCache:\n    def __init__(self, redis_url: str, default_ttl: int = 3600):\n        self._redis = redis.from_url(redis_url, decode_responses=True)\n        self._default_ttl = default_ttl\n        self._hits = 0\n        self._misses = 0\n\n    def _make_key(self, messages, model, temperature):\n        key_data = json.dumps({\"messages\": messages, \"model\": model, \"temperature\": temperature}, sort_keys=True)\n        return f\"llm_cache:{hashlib.sha256(key_data.encode()).hexdigest()}\"\n\n    async def get(self, messages, model, temperature):\n        key = self._make_key(messages, model, temperature)\n        cached = await self._redis.get(key)\n        if cached:\n            self._hits += 1\n            return json.loads(cached)\n        self._misses += 1\n        return None\n\n    async def set(self, messages, model, temperature, response, ttl=None):\n        key = self._make_key(messages, model, temperature)\n        await self._redis.set(key, json.dumps(response), ex=ttl or self._default_ttl)\n\n    def get_stats(self):\n        total = self._hits + self._misses\n        hit_rate = self._hits / total * 100 if total > 0 else 0\n        return {\"hits\": self._hits, \"misses\": self._misses, \"hit_rate\": f\"{hit_rate:.1f}%\"}",
-              "why": "LLM API cagirilari pahali ve yavastir. Ayni prompt icin cache kullanmak hem maliyeti duesueruer hem de yanit sueresini milisaniyeye indirir. SHA256 hash ile cache key olusturmak, collision riskini sifira indirir."
+              "code": "import redis.asyncio as redis\nimport logging\n\nlogger = logging.getLogger(__name__)\n\n\nclass LLMCache:\n    def __init__(\n        self, redis_url: str,\n        default_ttl: int = 3600\n    ):\n        self._redis = redis.from_url(\n            redis_url, decode_responses=True\n        )\n        self._default_ttl = default_ttl\n        self._hits = 0\n        self._misses = 0",
+              "why": "Önce iskelet — bağlantı ve istatistik değişkenleri. Metodları adım adım ekleyeceğiz."
             },
             {
               "order": "5.4",
-              "action": "Maliyet tracking moduluenue olustur",
-              "type": "code_write",
-              "file": "ai_content_platform/core/cost_tracker.py",
-              "code": "from datetime import datetime, timezone\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy import select, func\nimport uuid\nfrom ai_content_platform.core.models import UsageLog\n\nclass CostTracker:\n    def __init__(self, db: AsyncSession, monthly_budget: float = 100.0):\n        self.db = db\n        self.monthly_budget = monthly_budget\n\n    async def log_usage(self, provider, model, input_tokens, output_tokens, cost, status=\"success\"):\n        log = UsageLog(id=str(uuid.uuid4()), provider=provider, model=model, input_tokens=input_tokens, output_tokens=output_tokens, cost_usd=cost, endpoint=\"/api/content/generate\", status=status)\n        self.db.add(log)\n        await self.db.commit()\n\n    async def get_monthly_report(self):\n        start = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0)\n        result = await self.db.execute(select(UsageLog.provider, func.sum(UsageLog.cost_usd).label(\"total_cost\"), func.sum(UsageLog.input_tokens).label(\"total_input\"), func.sum(UsageLog.output_tokens).label(\"total_output\"), func.count().label(\"request_count\")).where(UsageLog.created_at >= start).group_by(UsageLog.provider))\n        providers = []\n        total_cost = 0.0\n        for row in result:\n            providers.append({\"provider\": row.provider, \"total_cost\": round(row.total_cost, 4), \"total_input_tokens\": row.total_input, \"total_output_tokens\": row.total_output, \"request_count\": row.request_count})\n            total_cost += row.total_cost\n        return {\"period\": start.strftime(\"%Y-%m\"), \"total_cost\": round(total_cost, 4), \"budget\": self.monthly_budget, \"budget_usage\": f\"{(total_cost/self.monthly_budget)*100:.1f}%\", \"providers\": providers}",
-              "why": "Her API cagrisinin maliyetini kaydetmek, aylik buetceyi kontrol altinda tutmak icin zorunludur. Provider bazinda raporlama ile hangi provider'in daha maliyet-etkin oldugunu veri ile goerebilirsiniz."
+              "action": "Import'lar lazım — ÜSTE ÇIK, hashlib ve json ekle",
+              "type": "code_modify",
+              "file": "ai_content_platform/core/cache.py",
+              "code": "import redis.asyncio as redis\nimport hashlib\nimport json\nfrom typing import Optional\nimport logging\n\nlogger = logging.getLogger(__name__)",
+              "why": "5.3'te sadece redis import ettik. Şimdi cache key oluşturmak için hashlib, veri serileştirmek için json lazım."
             },
             {
               "order": "5.5",
-              "action": "Maliyet raporu endpoint'i ekle",
+              "action": "LLMCache'e GERİ DÖN — _make_key ve get metodlarını ekle",
               "type": "code_add",
-              "file": "ai_content_platform/api/routes/content.py",
-              "code": "\n\n@router.get(\"/costs\")\nasync def get_cost_report():\n    from ai_content_platform.core.database import get_db\n    from ai_content_platform.core.cost_tracker import CostTracker\n    async for db in get_db():\n        tracker = CostTracker(db)\n        return await tracker.get_monthly_report()",
-              "position": "bottom",
-              "why": "Maliyet dashboard'u, LLM harcamalarini goerueuener kilar. Hangi provider'in ne kadar kullanildigini ve buetcenin ne kadarinin harcandigini gosterir."
+              "file": "ai_content_platform/core/cache.py",
+              "position": "inside_class",
+              "code": "\n    def _make_key(self, messages, model, temperature):\n        key_data = json.dumps(\n            {\"messages\": messages, \"model\": model,\n             \"temperature\": temperature},\n            sort_keys=True\n        )\n        return f\"llm_cache:{hashlib.sha256(key_data.encode()).hexdigest()}\"\n\n    async def get(self, messages, model, temperature):\n        key = self._make_key(messages, model, temperature)\n        cached = await self._redis.get(key)\n        if cached:\n            self._hits += 1\n            return json.loads(cached)\n        self._misses += 1\n        return None",
+              "why": "SHA256 hash ile cache key oluşturuyoruz — aynı input her zaman aynı key üretir. Cache hit'te pahalı API çağrısı atlanır."
             },
             {
               "order": "5.6",
-              "action": "Redis baglantisini test et",
-              "type": "terminal",
-              "command": "python -c \"import asyncio\nimport redis.asyncio as r\nasync def test():\n    client = r.from_url('redis://localhost:6379', decode_responses=True)\n    await client.set('test_key', 'merhaba')\n    val = await client.get('test_key')\n    print(f'Redis calisiyor: {val}')\n    await client.delete('test_key')\nasyncio.run(test())\"",
-              "expected_output": "Redis calisiyor: merhaba",
-              "why": "Redis baglantisinin calistigini dogrulamak, cache moduluenue entegre etmeden oence altyapinin hazir oldugunu garanti eder."
+              "action": "set ve get_stats metodlarını ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cache.py",
+              "position": "inside_class",
+              "code": "\n    async def set(\n        self, messages, model, temperature,\n        response, ttl=None\n    ):\n        key = self._make_key(messages, model, temperature)\n        await self._redis.set(\n            key, json.dumps(response),\n            ex=ttl or self._default_ttl\n        )\n\n    def get_stats(self):\n        total = self._hits + self._misses\n        hit_rate = self._hits / total * 100 if total > 0 else 0\n        return {\n            \"hits\": self._hits,\n            \"misses\": self._misses,\n            \"hit_rate\": f\"{hit_rate:.1f}%\"\n        }",
+              "why": "5.5'teki get ile çift — set cache'e yazar. TTL (Time To Live) ile cache otomatik temizlenir. get_stats ile cache etkinliğini ölçebilirsin."
             },
             {
               "order": "5.7",
-              "action": "Cache ve maliyet sistemini dogrula",
+              "action": "BAŞKA DOSYAYA GEÇ — cost_tracker.py oluştur, iskeletini yaz",
+              "type": "code_write",
+              "file": "ai_content_platform/core/cost_tracker.py",
+              "code": "from datetime import datetime, timezone\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy import select, func\nimport uuid\nfrom ai_content_platform.core.models import UsageLog\n\n\nclass CostTracker:\n    def __init__(\n        self, db: AsyncSession,\n        monthly_budget: float = 100.0\n    ):\n        self.db = db\n        self.monthly_budget = monthly_budget",
+              "why": "Önce iskelet — veritabanı bağlantısı ve bütçe limiti. Her API çağrısının maliyetini burada loglayacağız."
+            },
+            {
+              "order": "5.8",
+              "action": "CostTracker'a GERİ DÖN — log_usage metodunu ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cost_tracker.py",
+              "position": "inside_class",
+              "code": "\n    async def log_usage(\n        self, provider, model,\n        input_tokens, output_tokens,\n        cost, status=\"success\"\n    ):\n        log = UsageLog(\n            id=str(uuid.uuid4()),\n            provider=provider, model=model,\n            input_tokens=input_tokens,\n            output_tokens=output_tokens,\n            cost_usd=cost,\n            endpoint=\"/api/content/generate\",\n            status=status\n        )\n        self.db.add(log)\n        await self.db.commit()",
+              "why": "5.7'deki iskeletin içine kayıt mantığını ekliyoruz. Her API çağrısının maliyeti burada veritabanına yazılır."
+            },
+            {
+              "order": "5.8b",
+              "action": "Aylık maliyet raporu metodunu ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cost_tracker.py",
+              "position": "inside_class",
+              "code": "\n    async def get_monthly_report(self):\n        start = datetime.now(timezone.utc).replace(\n            day=1, hour=0, minute=0, second=0\n        )\n        result = await self.db.execute(\n            select(\n                UsageLog.provider,\n                func.sum(UsageLog.cost_usd).label(\"total_cost\"),\n                func.count().label(\"request_count\")\n            )\n            .where(UsageLog.created_at >= start)\n            .group_by(UsageLog.provider)\n        )\n        providers = []\n        total_cost = 0.0\n        for row in result:\n            providers.append({\n                \"provider\": row.provider,\n                \"total_cost\": round(row.total_cost, 4),\n                \"request_count\": row.request_count\n            })\n            total_cost += row.total_cost\n        return {\n            \"period\": start.strftime(\"%Y-%m\"),\n            \"total_cost\": round(total_cost, 4),\n            \"budget\": self.monthly_budget,\n            \"providers\": providers\n        }",
+              "why": "5.8'deki log_usage kayıt yapar, bu metod ise o kayıtlardan aylık rapor üretir. Provider bazında harcama gösterir."
+            },
+            {
+              "order": "5.9",
+              "action": "BAŞKA DOSYAYA GEÇ — content.py'ye maliyet raporu endpoint'i ekle",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "bottom",
+              "code": "\n\n@router.get(\"/costs\")\nasync def get_cost_report():\n    from ai_content_platform.core.database import get_db\n    from ai_content_platform.core.cost_tracker import CostTracker\n    async for db in get_db():\n        tracker = CostTracker(db)\n        return await tracker.get_monthly_report()",
+              "why": "5.7-5.8'de oluşturduğumuz CostTracker'ı API endpoint'i olarak expose ediyoruz. Provider bazında harcama raporu döner."
+            },
+            {
+              "order": "5.10",
+              "action": "Redis bağlantısını test et",
+              "type": "terminal",
+              "command": "python -c \"import asyncio\nimport redis.asyncio as r\nasync def test():\n    client = r.from_url('redis://localhost:6379', decode_responses=True)\n    await client.set('test_key', 'merhaba')\n    val = await client.get('test_key')\n    print(f'Redis çalışıyor: {val}')\n    await client.delete('test_key')\nasyncio.run(test())\"",
+              "expected_output": "Redis çalışıyor: merhaba",
+              "why": "5.2'de başlattığımız Redis'in gerçekten çalıştığını doğruluyoruz. Cache modülünü entegre etmeden önce altyapının hazır olduğunu garantiliyoruz."
+            },
+            {
+              "order": "5.11",
+              "action": "Cache ve maliyet sistemini doğrula",
               "type": "validate",
-              "validation": "Ayni prompt'u iki kez /api/content/generate endpoint'ine goender. İlk cagri LLM API'ye gitmeli (cache miss), ikinci cagri cache'ten doenmeli (cok daha hizli). /api/content/costs endpoint'i maliyet raporu doenduermelidir.",
-              "why": "Cache hit/miss davranisini ve maliyet tracking'in dogru calistigini son bir kez dogruluyoruz. İkinci cagrinin yanit sueresi milisaniye seviyesinde olmali."
+              "validation": "Aynı prompt'u iki kez /api/content/generate endpoint'ine gönder. İlk çağrı LLM API'ye gitmeli (cache miss), ikinci çağrı cache'ten dönmeli (çok daha hızlı). /api/content/costs endpoint'i maliyet raporu döndürmeli.",
+              "why": "5.3-5.8'de yazdığımız tüm cache ve maliyet tracking kodunun uçtan uca çalıştığını doğruluyoruz. İkinci çağrının yanıt süresi milisaniye seviyesinde olmalı."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── api/\n│   │   ├── __init__.py\n│   │   └── routes/\n│   │       ├── __init__.py\n│   │       └── content.py      # <-- GÜNCELLENDİ\n│   ├── core/\n│   │   ├── __init__.py\n│   │   ├── cache.py            # <-- YENİ\n│   │   ├── config.py\n│   │   ├── cost_tracker.py     # <-- YENİ\n│   │   ├── database.py\n│   │   ├── dependencies.py\n│   │   └── models.py\n│   ├── providers/\n│   │   ├── __init__.py\n│   │   ├── base.py\n│   │   ├── factory.py\n│   │   ├── openai_provider.py\n│   │   ├── anthropic_provider.py\n│   │   └── gemini_provider.py\n│   ├── content/\n│   ├── prompts/\n│   ├── evaluation/\n│   └── fine_tuning/\n├── alembic/\n├── docker-compose.yml           # <-- YENİ\n├── .env\n├── .gitignore\n├── pyproject.toml\n└── uv.lock",
@@ -901,34 +1411,68 @@
           "substeps": [
             {
               "order": "1.1",
-              "action": "Dockerfile olustur",
+              "action": "Dockerfile oluştur — önce base image ve workdir iskeletini yaz",
               "type": "code_write",
               "file": "Dockerfile",
-              "code": "FROM python:3.12-slim\nWORKDIR /app\nCOPY pyproject.toml uv.lock ./\nRUN pip install uv && uv sync --frozen --no-dev\nCOPY . .\nEXPOSE 8000\nCMD [\"uvicorn\", \"ai_content_platform.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]",
-              "why": "Dockerfile ile uygulamayi container icinde calistirmak, ortam bagimliligini ortadan kaldirir. --frozen flag'i lock dosyasindan birebir ayni versiyonlari kurar."
+              "code": "FROM python:3.12-slim\nWORKDIR /app",
+              "why": "Önce en basit iskelet — base image ve çalışma dizini. slim image gereksiz paketleri içermez, container boyutunu küçültür."
             },
             {
               "order": "1.2",
-              "action": "Testleri calistir",
-              "type": "terminal",
-              "command": "python -m pytest tests/ -v --tb=short",
-              "expected_output": "===== X passed =====",
-              "why": "Production'a deploy etmeden oence tuem testlerin gectiginden emin olmak zorunludur. Kirik test ile deploy yapmak, production'da bug demektir."
+              "action": "Dockerfile'a GERİ DÖN — bağımlılık kurulumunu ekle",
+              "type": "code_add",
+              "file": "Dockerfile",
+              "position": "bottom",
+              "code": "COPY pyproject.toml uv.lock ./\nRUN pip install uv && uv sync --frozen --no-dev",
+              "why": "1.1'deki iskeletin altına bağımlılık kurulumunu ekliyoruz. Önce sadece lock dosyalarını kopyalıyoruz — Docker layer cache'i sayesinde kod değişse bile bağımlılıklar yeniden kurulmaz."
             },
             {
               "order": "1.3",
-              "action": "Docker imajini build et ve test et",
-              "type": "terminal",
-              "command": "docker build -t ai-content-platform . && docker run --rm -p 8000:8000 --env-file .env ai-content-platform",
-              "expected_output": "Uvicorn running on http://0.0.0.0:8000",
-              "why": "Docker imajinin dogru calistigini lokal ortamda dogrulamak, deploy sorunlarini oenceden yakalar."
+              "action": "Dockerfile'a GERİ DÖN — kaynak kodu kopyala ve başlat komutu ekle",
+              "type": "code_add",
+              "file": "Dockerfile",
+              "position": "bottom",
+              "code": "COPY . .\nEXPOSE 8000\nCMD [\"uvicorn\", \"ai_content_platform.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]",
+              "why": "1.2'deki bağımlılıkların üstüne kaynak kodu ekliyoruz. EXPOSE dokümantasyon amaçlı, CMD container başladığında çalışacak komut."
             },
             {
               "order": "1.4",
-              "action": "Saglik kontrolue yap",
+              "action": "Testleri çalıştır — production'a deploy etmeden önce zorunlu",
+              "type": "terminal",
+              "command": "python -m pytest tests/ -v --tb=short",
+              "expected_output": "===== X passed =====",
+              "why": "Kırık test ile deploy yapmak, production'da bug demektir. Tüm testlerin geçtiğinden emin olmak zorunlu."
+            },
+            {
+              "order": "1.5",
+              "action": "Docker imajını build et",
+              "type": "terminal",
+              "command": "docker build -t ai-content-platform .",
+              "expected_output": "Successfully built ...\nSuccessfully tagged ai-content-platform:latest",
+              "why": "1.1-1.3'te yazdığımız Dockerfile'dan imaj oluşturuyoruz. Build hataları varsa production'a deploy etmeden yakalanır."
+            },
+            {
+              "order": "1.6",
+              "action": "Container'ı başlat ve test et",
+              "type": "terminal",
+              "command": "docker run --rm -p 8000:8000 --env-file .env ai-content-platform",
+              "expected_output": "Uvicorn running on http://0.0.0.0:8000",
+              "why": "1.5'te build ettiğimiz imajı container olarak çalıştırıyoruz. --env-file ile .env'deki API key'leri container'a aktarıyoruz."
+            },
+            {
+              "order": "1.7",
+              "action": "Container içinden sağlık kontrolü yap",
               "type": "validate",
-              "validation": "curl http://localhost:8000/health ile saglik kontrolue yap. {\"status\": \"healthy\"} yaniti doenmeli. /docs adresinde Swagger UI acilmali.",
-              "why": "Container icinden uygulamanin duezguen calistigini dogrulamak, production deploy'un basarili olacagini garanti eder."
+              "validation": "curl http://localhost:8000/health ile sağlık kontrolü yap. {\"status\": \"healthy\"} yanıtı dönmeli. /docs adresinde Swagger UI açılmalı.",
+              "why": "1.6'da başlattığımız container'ın düzgün çalıştığını doğruluyoruz. Container içinde sorun varsa production'da da aynı sorun yaşanır."
+            },
+            {
+              "order": "1.8",
+              "action": "Container'ı durdur ve devam et",
+              "type": "terminal",
+              "command": "docker stop $(docker ps -q --filter ancestor=ai-content-platform)",
+              "expected_output": "Container durduruldu",
+              "why": "1.6'da başlattığımız test container'ını durdurup port'u serbest bırakıyoruz. Deploy adımına geçmeye hazırız."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── ... (tuem moduller)\n├── tests/\n│   ├── __init__.py\n│   ├── test_providers.py\n│   ├── test_content.py\n│   └── test_cache.py\n├── alembic/\n├── Dockerfile                   # <-- YENİ\n├── docker-compose.yml\n├── .env\n├── .gitignore\n├── pyproject.toml\n└── uv.lock",
@@ -952,32 +1496,32 @@
           "substeps": [
             {
               "order": "2.1",
-              "action": "Railway hesabi olustur ve CLI kur",
+              "action": "Railway CLI'ı kur ve giriş yap",
               "type": "terminal",
               "command": "npm install -g @railway/cli && railway login",
               "expected_output": "Logged in as ...",
-              "why": "Railway, FastAPI uygulamalarini kolay deploy etmek icin idealdir. CLI ile terminal'den dogrudan deploy yapabilirsiniz."
+              "why": "Railway, FastAPI uygulamalarını kolay deploy etmek için ideal. CLI ile terminal'den doğrudan deploy yapabilirsin."
             },
             {
               "order": "2.2",
-              "action": "Railway projesini baslat ve deploy et",
+              "action": "Railway projesini başlat ve deploy et",
               "type": "terminal",
               "command": "railway init && railway up",
               "expected_output": "Deploying... Done!\nService URL: https://xxx.railway.app",
-              "why": "railway up komutu Dockerfile'i algilar ve otomatik build + deploy yapar. Environment variable'lari Railway dashboard'dan ayarlanmalidir."
+              "why": "2.1'de giriş yaptığımız Railway'e projeyi deploy ediyoruz. Dockerfile'ı otomatik algılar ve build + deploy yapar."
             },
             {
               "order": "2.3",
-              "action": "Environment variable'lari ayarla",
+              "action": "Environment variable'ları Railway dashboard'dan ayarla",
               "type": "explain",
-              "why": "Railway dashboard'a gir ve su environment variable'lari ekle: OPENAI_API_KEY, ANTHROPIC_API_KEY, DATABASE_URL (Neon'dan), REDIS_URL (Upstash'ten). Hassas bilgileri asla kodda tutma."
+              "why": "Railway dashboard'a gir ve şu environment variable'ları ekle: OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, DATABASE_URL (Neon'dan), REDIS_URL (Upstash'ten). Hassas bilgileri asla kodda tutma."
             },
             {
               "order": "2.4",
-              "action": "Deploy'u dogrula",
+              "action": "Deploy'u doğrula",
               "type": "validate",
-              "validation": "Railway'in verdigi URL + /health endpoint'ini tarayicida ac. {\"status\": \"healthy\"} yaniti gormelisin. /docs adresinde Swagger UI acilmali.",
-              "why": "Production deploy'un basarili oldugunu ve tuem servislerin birbirine baglandigini dogrulamak kritiktir."
+              "validation": "Railway'in verdiği URL + /health endpoint'ini tarayıcıda aç. {\"status\": \"healthy\"} yanıtı görmelisin. /docs adresinde Swagger UI açılmalı.",
+              "why": "2.2'deki deploy'un başarılı olduğunu ve tüm servislerin birbirine bağlandığını doğruluyoruz. Production ortamında çalışan uygulama!"
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── ... (tuem moduller)\n├── alembic/\n├── Dockerfile\n├── docker-compose.yml\n├── railway.json                 # <-- OTOMATİK OLUSTURULDU\n├── .env\n├── .gitignore\n├── pyproject.toml\n└── uv.lock",
@@ -1006,24 +1550,42 @@
           "substeps": [
             {
               "order": "3.1",
-              "action": "README.md dosyasini olustur",
+              "action": "README.md dosyasını oluştur — önce başlık ve açıklama iskeletini yaz",
               "type": "code_write",
               "file": "README.md",
-              "code": "# AI Content Platform\n\nMulti-LLM content generation platform with provider abstraction, prompt versioning, and cost tracking.\n\n## Tech Stack\n- **Backend:** FastAPI, Python, PostgreSQL, Redis\n- **AI/ML:** OpenAI, Anthropic, Google Gemini, LangChain\n- **DevOps:** Docker, Docker Compose\n\n## Features\n- Multi-provider LLM integration\n- Automatic provider fallback with circuit breaker\n- Streaming SSE responses\n- Prompt versioning and A/B testing\n- Cost tracking and analytics\n- Redis caching for LLM responses\n\n## Getting Started\n```bash\ngit clone https://github.com/USERNAME/ai-content-platform.git\ncd ai-content-platform\nuv sync\ndocker compose up -d\ncp .env.example .env\nuvicorn ai_content_platform.main:app --reload\n```\n\n## License\nMIT",
-              "why": "Profesyonel bir README, projenin ilk izlenimini belirler. Recruiter'lar ve hiring manager'lar README'ye bakarak projenin kalitesini degerlendirir."
+              "code": "# AI Content Platform\n\nMulti-LLM content generation platform with provider abstraction, prompt versioning, and cost tracking.",
+              "why": "Önce en basit iskelet — proje adı ve tek satır açıklama. Profesyonel bir README'nin ilk izlenimi burada başlar."
             },
             {
               "order": "3.2",
-              "action": "Ekran goeruentueleri ekle",
-              "type": "explain",
-              "why": "Proje calisirken en az 3 ekran goeruentuesue al: 1) Swagger UI ile API dokuemantasyonu, 2) Streaming yanit oernegi, 3) Maliyet raporu endpoint yaniti. screenshots/ klasoerune kaydet ve README'ye ekle."
+              "action": "README'ye GERİ DÖN — tech stack ve özellik listesini ekle",
+              "type": "code_add",
+              "file": "README.md",
+              "position": "bottom",
+              "code": "\n\n## Tech Stack\n- **Backend:** FastAPI, Python, PostgreSQL, Redis\n- **AI/ML:** OpenAI, Anthropic, Google Gemini\n- **DevOps:** Docker, Docker Compose\n\n## Features\n- Multi-provider LLM integration\n- Automatic provider fallback with circuit breaker\n- Streaming SSE responses\n- Prompt versioning and A/B testing\n- Cost tracking and analytics\n- Redis caching for LLM responses",
+              "why": "3.1'deki iskeletin altına detay ekliyoruz. Recruiter'lar bu bölüme bakarak projenin kapsamını anlar."
             },
             {
               "order": "3.3",
-              "action": "README'nin eksiksiz oldugunu kontrol et",
+              "action": "Kurulum talimatlarını ekle",
+              "type": "code_add",
+              "file": "README.md",
+              "position": "bottom",
+              "code": "\n\n## Getting Started\n```bash\ngit clone https://github.com/USERNAME/ai-content-platform.git\ncd ai-content-platform\nuv sync\ndocker compose up -d\ncp .env.example .env\nuvicorn ai_content_platform.main:app --reload\n```\n\n## License\nMIT",
+              "why": "3.2'deki özellik listesinden sonra nasıl çalıştırılacağı lazım. Başka bir developer'ın projeyi 5 dakikada ayağa kaldırabilmesi gerekir."
+            },
+            {
+              "order": "3.4",
+              "action": "Ekran görüntüleri al ve ekle",
+              "type": "explain",
+              "why": "Proje çalışırken en az 3 ekran görüntüsü al: 1) Swagger UI ile API dokümantasyonu, 2) Streaming yanıt örneği, 3) Maliyet raporu endpoint yanıtı. screenshots/ klasörüne kaydet ve README'ye ekle."
+            },
+            {
+              "order": "3.5",
+              "action": "README'nin eksiksiz olduğunu doğrula",
               "type": "validate",
-              "validation": "README'de sunlar olmali: proje aciklamasi, teknoloji stack, kurulum talimatlari, oezellik listesi, mimari diyagram, ekran goeruentueleri, lisans. GitHub'da render edildiginde duezguen goerueuenmeli.",
-              "why": "Eksik README, projenin ciddiye alinmamasina neden olur. GitHub'daki ilk izlenim, profesyonellik algisini belirler."
+              "validation": "README'de şunlar olmalı: proje açıklaması, teknoloji stack, kurulum talimatları, özellik listesi, mimari diyagram, ekran görüntüleri, lisans. GitHub'da render edildiğinde düzgün görünmeli.",
+              "why": "3.1-3.4'te adım adım oluşturduğumuz README'nin eksiksiz olduğunu kontrol ediyoruz. Eksik README, projenin ciddiye alınmamasına neden olur."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── ... (tuem moduller)\n├── screenshots/                 # <-- YENİ\n│   ├── swagger-ui.png\n│   ├── streaming-demo.png\n│   └── cost-report.png\n├── alembic/\n├── Dockerfile\n├── docker-compose.yml\n├── README.md                    # <-- YENİ\n├── .env\n├── .env.example                 # <-- YENİ\n├── .gitignore\n├── pyproject.toml\n└── uv.lock",
@@ -1047,24 +1609,24 @@
           "substeps": [
             {
               "order": "4.1",
-              "action": "Demo senaryosunu hazirla",
+              "action": "Demo senaryosunu planla",
               "type": "explain",
-              "why": "2-3 dakikalik demo videosunda goesterilecek akisi oenceden planla: 1) Uygulama tanitimi, 2) İcerik ueretimi (provider secimi ile), 3) Streaming yanit, 4) Maliyet raporu, 5) Mimari kararlari kisaca acikla."
+              "why": "2-3 dakikalık demo videosunda gösterilecek akışı önceden planla: 1) Uygulama tanıtımı, 2) İçerik üretimi (provider seçimi ile), 3) Streaming yanıt, 4) Maliyet raporu, 5) Mimari kararları kısaca açıkla."
             },
             {
               "order": "4.2",
-              "action": "Ekran kaydi al",
+              "action": "Ekran kaydı al",
               "type": "terminal",
-              "command": "# OBS Studio veya loom.com ile ekran kaydi al",
-              "expected_output": "demo.mp4 dosyasi olusturuldu",
-              "why": "Demo video, teknik yetkinligini en etkili sekilde gosteren aractir. Recruiter'lar kod okumaz ama video izler."
+              "command": "# OBS Studio veya loom.com ile ekran kaydı al",
+              "expected_output": "demo.mp4 dosyası oluşturuldu",
+              "why": "4.1'deki senaryoya göre ekran kaydı alıyoruz. Video, teknik yetkinliğini en etkili şekilde gösteren araçtır."
             },
             {
               "order": "4.3",
-              "action": "Videoyu yuekle ve README'ye ekle",
+              "action": "Videoyu yükle ve README'ye ekle",
               "type": "validate",
-              "validation": "Videoyu YouTube veya Loom'a yuekle. README'ye demo linkini ekle. Video 3 dakikayi gecmemeli, ses kalitesi iyi olmali.",
-              "why": "Demo videosu projenin canli calistigini kanitlar ve portfolyo degerini oememli oelcuede artirir."
+              "validation": "Videoyu YouTube veya Loom'a yükle. README'ye demo linkini ekle. Video 3 dakikayı geçmemeli, ses kalitesi iyi olmalı.",
+              "why": "4.2'deki videoyu paylaşılabilir hale getiriyoruz. Demo videosu projenin canlı çalıştığını kanıtlar ve portfolyo değerini önemli ölçüde artırır."
             }
           ],
           "folder_structure_after": "ai-content-platform/\n├── ai_content_platform/\n│   ├── ... (tuem moduller)\n├── screenshots/\n├── alembic/\n├── Dockerfile\n├── docker-compose.yml\n├── README.md                    # <-- GÜNCELLENDİ (demo linki eklendi)\n├── .env\n├── .env.example\n├── .gitignore\n├── pyproject.toml\n└── uv.lock",
