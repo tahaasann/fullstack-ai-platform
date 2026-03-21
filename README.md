@@ -13,7 +13,6 @@
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-[![Sponsor](https://img.shields.io/badge/Sponsor-❤-ea4aaa?logo=github&logoColor=white)](https://github.com/sponsors/tahaasann)
 [![GitHub Stars](https://img.shields.io/github/stars/tahaasann/fullstack-ai-platform?style=social)](https://github.com/tahaasann/fullstack-ai-platform)
 
 </div>
@@ -269,14 +268,6 @@ Katkılarınızı bekliyoruz! Yazım hatası düzeltmek, yeni ders eklemek veya 
 ---
 
 <div align="center">
-
-### 💖 Support / Destek
-
-If this platform helped you, consider sponsoring:
-
-Bu platform işine yaradıysa, destek olmayı düşünebilirsin:
-
-[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor_on_GitHub-❤-ea4aaa?logo=github&logoColor=white&style=for-the-badge)](https://github.com/sponsors/tahaasann)
 
 ⭐ Don't forget to star this repo! / Repo'ya yıldız vermeyi unutma!
 
