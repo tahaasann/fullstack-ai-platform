@@ -13,6 +13,7 @@ import EnglishSection from '../components/english/EnglishSection';
 import MustNote from '../components/lesson/MustNote';
 import SeniorLearns from '../components/lesson/SeniorLearns';
 import AIGuidance from '../components/lesson/AIGuidance';
+import ArchitectureDiagram from '../components/lesson/ArchitectureDiagram';
 import BookmarkButton from '../components/common/BookmarkButton';
 import MarkdownRenderer from '../components/common/MarkdownRenderer';
 
@@ -168,6 +169,8 @@ const LessonSection = memo(function LessonSection({ section }: { section: Sectio
       return <SeniorLearns data={section} />;
     case 'ai-guidance':
       return <AIGuidance data={section} />;
+    case 'architecture':
+      return <ArchitectureDiagram title={section.title} content={section.content} description={section.description} />;
     default:
       return <MarkdownRenderer content={section.content || ''} />;
   }

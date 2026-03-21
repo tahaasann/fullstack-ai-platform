@@ -706,6 +706,284 @@ CDN ile:  Turkiye → Istanbul Edge = 10ms
 
 ---
 
+## 6.5 Cache Invalidation Stratejileri
+
+:::concept
+### Cache Invalidation — "En Zor Problem"
+
+Phil Karlton: "Bilgisayar biliminde iki zor şey var: cache invalidation ve isimlendirme."
+
+Cache invalidation, cache'teki verinin ne zaman ve nasıl güncelleneceğini belirler. Yanlış strateji = stale data veya tutarsızlık.
+:::
+
+:::architecture[Cache Invalidation Stratejileri]
+```
+WRITE-THROUGH:
+  App ──write──► Cache ──sync write──► DB
+  Okuma: Cache'ten (her zaman güncel)
+  Yazma: Cache + DB aynı anda güncellenir
+  ✅ Cache her zaman güncel
+  ❌ Write latency 2x (iki yere yazılıyor)
+
+WRITE-BEHIND (Write-Back):
+  App ──write──► Cache ──async──► Queue ──batch write──► DB
+  Okuma: Cache'ten
+  Yazma: Önce cache, sonra asenkron DB'ye
+  ✅ Çok hızlı write
+  ❌ Cache crash = data loss riski
+
+WRITE-AROUND:
+  App ──write──► DB (cache atlanır)
+  App ──read──► Cache MISS ──► DB ──► Cache'e yaz
+  Okuma: Cache-aside ile lazy loading
+  Yazma: Sadece DB'ye
+  ✅ Write-once-read-never veri için ideal
+  ❌ İlk okuma her zaman cache miss
+```
+:::
+
+:::comparison
+### Ne Zaman Hangi Strateji?
+
+| Strateji | Write Hızı | Read Hızı | Tutarlılık | Risk | Kullanım |
+|----------|-----------|-----------|------------|------|----------|
+| **Write-Through** | Yavaş | Hızlı | Güçlü | Düşük | Banka, finans |
+| **Write-Behind** | Çok hızlı | Hızlı | Zayıf | Data loss | Gaming leaderboard |
+| **Write-Around** | Hızlı | İlk miss | Orta | Düşük | Log, archival data |
+| **Cache-Aside** | Orta | Hızlı | Eventual | Stale data | Genel amaçlı (en yaygın) |
+:::
+
+:::realworld
+### Discord — Cache Invalidation
+
+Discord, milyarlarca mesajı yönetirken cache invalidation için hibrit yaklaşım kullanır: Sık erişilen channel'lar için Write-Through, eski mesajlar için Write-Around. Her guild (sunucu) için ayrı cache partition'ı tutulur. Hot partition sorunu için consistent hashing ile cache node'ları dağıtılır. Cache miss oranını %5'in altında tutmak SLO hedefleri arasındadır.
+:::
+
+---
+
+## 6.6 Message Queue Derinlemesine: Kafka vs RabbitMQ vs SQS
+
+:::concept
+### Doğru Message Queue Seçimi
+
+Message queue seçimi sistemin en kritik kararlarından biridir. Yanlış seçim, sonradan değiştirmesi çok maliyetli olan teknik borç yaratır.
+:::
+
+:::architecture[Message Queue Karşılaştırma]
+```
+RABBITMQ (Smart Broker / Dumb Consumer):
+  Producer ──► Exchange ──routing──► Queue ──push──► Consumer
+                 │
+            ┌────┼────┐
+            ▼    ▼    ▼
+         Queue1 Queue2 Queue3
+
+  - Message consume edilince silinir
+  - Complex routing (topic, fanout, headers)
+  - Per-message acknowledgment
+
+KAFKA (Dumb Broker / Smart Consumer):
+  Producer ──► Topic ──► Partition 0 [msg1, msg2, msg3, ...]
+                    ──► Partition 1 [msg4, msg5, msg6, ...]
+                    ──► Partition 2 [msg7, msg8, msg9, ...]
+                              │
+                    Consumer Group (her partition tek consumer)
+
+  - Message silinmez (retention period boyunca kalır)
+  - Consumer offset ile kendi ilerlemesini takip eder
+  - Replay mümkün (event sourcing uyumlu)
+
+AWS SQS (Managed / Serverless):
+  Producer ──► SQS Queue ──poll──► Lambda / Consumer
+                    │
+              Standard Queue: At-least-once, sırasız
+              FIFO Queue: Exactly-once, sıralı (düşük throughput)
+
+  - Zero ops (AWS yönetir)
+  - Auto-scaling
+  - 14 gün retention
+```
+:::
+
+:::comparison
+### Kafka vs RabbitMQ vs SQS — Detaylı Karşılaştırma
+
+| Kriter | Kafka | RabbitMQ | AWS SQS |
+|--------|-------|----------|---------|
+| **Throughput** | 1M+ msg/s | 50K msg/s | 3K msg/s (FIFO) |
+| **Latency** | ms düzeyinde | sub-ms | 10-100ms |
+| **Message Retention** | Configurable (günler/haftalar) | Consume edilince silinir | 14 güne kadar |
+| **Ordering** | Partition başına garanti | Queue başına garanti | FIFO queue ile |
+| **Delivery** | At-least-once | At-least-once / at-most-once | At-least-once / exactly-once (FIFO) |
+| **Replay** | Evet (offset reset) | Hayır | Hayır |
+| **Routing** | Topic + partition | Exchange types (fanout, topic, direct) | Basit queue |
+| **Ops Burden** | Yüksek (ZooKeeper/KRaft) | Orta | Sıfır (managed) |
+| **Maliyet** | Altyapı + ops | Altyapı + ops | Pay-per-request |
+| **Best For** | Event streaming, log aggregation, real-time analytics | Task queue, RPC, microservice iletişimi | Serverless, basit queue ihtiyacı |
+:::
+
+:::deha-tip
+### Karar Rehberi: Hangi Queue Ne Zaman?
+
+**Kafka seç eğer:**
+- Event streaming / log aggregation yapıyorsan
+- Event replay gerekiyorsa (event sourcing)
+- Çok yüksek throughput (100K+ msg/s)
+- Birden fazla consumer aynı veriyi okuyacaksa
+
+**RabbitMQ seç eğer:**
+- Geleneksel task queue gerekiyorsa
+- Complex routing kuralları varsa
+- RPC pattern kullanıyorsan
+- Sub-millisecond latency kritikse
+
+**SQS seç eğer:**
+- AWS ekosistemindeysen
+- Ops yükü istemiyorsan
+- Lambda ile serverless mimari kuruyorsan
+- Basit queue yeterli ve ölçekleme otomatik olsun istiyorsan
+:::
+
+---
+
+## 6.7 Consensus Temelleri — Raft Algoritması
+
+:::concept
+### Distributed Consensus Nedir?
+
+Distributed sistemlerde birden fazla node'un **aynı değer üzerinde anlaşması** gerekir. Lider seçimi, konfigürasyon değişiklikleri, distributed lock gibi işlemler consensus gerektirir.
+
+**Raft**, anlaşılması kolay bir consensus algoritmasıdır. Paxos'un daha basit alternatifidir.
+:::
+
+:::architecture[Raft Algoritması — Basitleştirilmiş]
+```
+RAFT STATE MACHINE:
+
+  ┌──────────┐    timeout     ┌────────────┐   çoğunluk oyu
+  │ Follower │──────────────►│ Candidate  │──────────────►┌──────────┐
+  │          │◄──────────────│            │               │  Leader  │
+  └──────────┘  yeni lider   └────────────┘               └──────────┘
+       ▲          bulundu          ▲                            │
+       │                           │   oy kaybedildi           │
+       │                           └───────────────────────────│
+       │                                                       │
+       └───────────── heartbeat gelmezse ──────────────────────┘
+
+
+LOG REPLICATION (3 node örneği):
+
+  Leader:    [cmd1] [cmd2] [cmd3] [cmd4]  ← client yazma buraya
+                │      │      │      │
+                ▼      ▼      ▼      ▼
+  Follower1: [cmd1] [cmd2] [cmd3] [cmd4]  ← replicate edilir
+  Follower2: [cmd1] [cmd2] [cmd3]         ← biraz geride olabilir
+
+  COMMIT RULE: Çoğunluk (2/3 node) kabul ettiyse → committed
+               Leader + 1 Follower yeterli (quorum)
+```
+:::
+
+:::code
+### Raft — Basitleştirilmiş Python Modeli
+
+```python
+import random
+import time
+from enum import Enum
+
+class NodeState(Enum):
+    FOLLOWER = "follower"
+    CANDIDATE = "candidate"
+    LEADER = "leader"
+
+class RaftNode:
+    """Basitleştirilmiş Raft node simülasyonu"""
+
+    def __init__(self, node_id: str, peers: list[str]):
+        self.node_id = node_id
+        self.peers = peers
+        self.state = NodeState.FOLLOWER
+        self.current_term = 0
+        self.voted_for = None
+        self.log: list[dict] = []
+        self.commit_index = -1
+
+    def start_election(self):
+        """Follower → Candidate geçişi ve oy isteme"""
+        self.state = NodeState.CANDIDATE
+        self.current_term += 1
+        self.voted_for = self.node_id
+        votes_received = 1  # Kendine oy verir
+
+        print(f"[{self.node_id}] Election started for term {self.current_term}")
+
+        # Diğer node'lardan oy iste (simülasyon)
+        for peer in self.peers:
+            # Gerçekte RPC ile oy istenir
+            vote_granted = random.random() > 0.3  # %70 oy verme olasılığı
+            if vote_granted:
+                votes_received += 1
+                print(f"  [{peer}] Voted YES for {self.node_id}")
+
+        # Çoğunluk kontrolü
+        total_nodes = len(self.peers) + 1
+        if votes_received > total_nodes // 2:
+            self.state = NodeState.LEADER
+            print(f"[{self.node_id}] Became LEADER (term {self.current_term}, "
+                  f"votes: {votes_received}/{total_nodes})")
+        else:
+            self.state = NodeState.FOLLOWER
+            print(f"[{self.node_id}] Election failed, back to FOLLOWER")
+
+    def append_entry(self, command: str) -> bool:
+        """Leader'a yeni entry ekleme"""
+        if self.state != NodeState.LEADER:
+            print(f"[{self.node_id}] Not leader, cannot append")
+            return False
+
+        entry = {
+            "term": self.current_term,
+            "command": command,
+            "index": len(self.log)
+        }
+        self.log.append(entry)
+
+        # Çoğunluk replicate edince commit et
+        replicated = 1  # Leader'ın kendisi
+        for peer in self.peers:
+            # Gerçekte AppendEntries RPC ile replicate edilir
+            success = random.random() > 0.1  # %90 başarı
+            if success:
+                replicated += 1
+
+        total = len(self.peers) + 1
+        if replicated > total // 2:
+            self.commit_index = len(self.log) - 1
+            print(f"[{self.node_id}] Entry committed: '{command}' "
+                  f"(replicated: {replicated}/{total})")
+            return True
+
+        return False
+
+# Simülasyon
+node = RaftNode("node-1", ["node-2", "node-3", "node-4", "node-5"])
+node.start_election()
+
+if node.state == NodeState.LEADER:
+    node.append_entry("SET user:1 Ali")
+    node.append_entry("SET user:2 Ayse")
+```
+:::
+
+:::realworld
+### etcd ve Kubernetes — Raft Kullanımı
+
+Kubernetes'in kalbi olan etcd, cluster state'ini (pod tanımları, config'ler, secret'lar) saklamak için Raft consensus kullanır. 3 veya 5 etcd node'u çalışır. Herhangi bir node çökse bile çoğunluk (quorum) sağlandığı sürece cluster çalışmaya devam eder. Bu yüzden production Kubernetes cluster'larında tek sayıda etcd node'u (3, 5, 7) kullanılır — çift sayıda node ile quorum avantajı yoktur.
+:::
+
+---
+
 ## 7. Database Sharding & Replication
 
 :::concept
@@ -955,6 +1233,42 @@ Interview'da CAP yerine PACELC'den bahsetmek seni one çıkarır.
 | Leaky Bucket | Sabit hizda isler | Duz trafik | Burst isleyemez |
 | Fixed Window | Sabit zaman penceresi | Basit | Pencere sinirinda spike |
 | Sliding Window | Kayan zaman penceresi | Duz limit | Daha fazla hafiza |
+
+:::architecture[Rate Limiting Algoritmaları — Görsel Karşılaştırma]
+```
+TOKEN BUCKET:
+  ┌─────────────┐
+  │ Bucket      │  Capacity: 10 tokens
+  │ ●●●●●●●●   │  Refill: 2 tokens/sec
+  │             │
+  │  [Request]──┤──► Token var? → ALLOW (token -1)
+  │             │──► Token yok? → REJECT (429)
+  └─────────────┘
+  Burst'e izin verir: Biriken token'lar hızlı tüketilebilir
+
+LEAKY BUCKET:
+  ┌─────────────┐
+  │ Queue       │  Queue size: 10
+  │ ■ ■ ■ ■ ■   │
+  │             │
+  │  [Request]──┤──► Queue dolu? → REJECT
+  │             │──► Queue boş? → Ekle
+  └──────┬──────┘
+         │ Sabit hız (1 req/sec)
+         ▼
+     [İşleniyor]
+  Burst yok: Her zaman sabit hızda işler
+
+SLIDING WINDOW:
+  ←────────── 60 saniye pencere ──────────►
+  [■][■][■][ ][ ][ ][■][■][ ][ ][■][ ][ ][■][NOW]
+   ↑                                           ↑
+   Pencere başlangıcı                    Şu an
+   (eski request'ler düşer)
+
+  Penceredeki request sayısı < limit? → ALLOW
+```
+:::
 :::
 
 :::code
@@ -1371,6 +1685,40 @@ Interview'da şunları mutlaka belirt:
 - [ ] Monitoring ve alerting
 - [ ] Security (authentication, rate limiting)
 - [ ] Testing stratejisi
+:::
+
+:::interview
+### System Design Mülakat Soruları — Junior vs Senior
+
+**S1**: "Cache invalidation stratejilerini açıklayın."
+
+**Junior cevap**: "TTL koyarız, süresi dolunca cache temizlenir."
+
+**Senior cevap**: "Dört temel strateji var: Write-Through (cache + DB aynı anda yazılır, consistency güçlü ama write yavaş), Write-Behind (cache'e yazılır, DB'ye async yazılır — çok hızlı ama crash'te data loss riski), Write-Around (DB'ye yazılır, cache atlanır — write-once-read-never veri için ideal), ve Cache-Aside (en yaygın — read'de cache miss olunca DB'den oku, cache'e yaz). Thundering herd problemini mutex/lock ile çözerim. Cache ve DB arasında race condition'ı önlemek için 'DB güncelle → cache sil' sırası kritiktir."
+
+---
+
+**S2**: "Kafka ile RabbitMQ arasında nasıl seçim yaparsın?"
+
+**Junior cevap**: "Kafka daha popüler, onu kullanırım."
+
+**Senior cevap**: "İhtiyaca göre değişir. Event streaming, log aggregation veya event sourcing yapıyorsam Kafka — çünkü message retention ve replay özelliği var. Geleneksel task queue, RPC veya complex routing gerekiyorsa RabbitMQ — exchange types ile esnek routing sağlar. AWS ekosisteminde basit queue yeterliyse SQS — zero ops. Throughput ihtiyacı da belirleyici: Kafka 1M+ msg/s, RabbitMQ 50K msg/s. Trade-off: Kafka'nın operational complexity'si yüksek (ZooKeeper/KRaft yönetimi)."
+
+---
+
+**S3**: "Distributed sistemlerde consensus neden gerekli?"
+
+**Junior cevap**: "Node'ların anlaşması için."
+
+**Senior cevap**: "Distributed sistemlerde birden fazla node'un aynı state üzerinde tutarlı olması gerekir. Leader election (hangi node master?), configuration changes ve distributed lock gibi işlemler consensus gerektirir. Raft algoritması bunu sağlar: bir leader seçilir, client yazmaları leader'a gider, leader çoğunluğa (quorum) replicate eder, çoğunluk onaylarsa commit eder. etcd (Kubernetes'in state store'u) Raft kullanır. 2n+1 node ile n hata tolere edilir — bu yüzden production'da 3 veya 5 node kullanılır."
+
+---
+
+**S4**: "Rate limiting neden gerekli ve hangi algoritmayı seçersin?"
+
+**Junior cevap**: "DDoS koruması için. Fixed window kullanırım."
+
+**Senior cevap**: "Rate limiting dört amaç için gerekli: DDoS koruması, API kötüye kullanımını önleme, kaynak adaletli dağıtımı ve maliyet kontrolü. Token Bucket tercih ederim çünkü burst trafiğe izin verir — normal zamanda token birikir, anlık trafik artışında bu token'lar tüketilir. Sliding Window daha hassas ama daha fazla memory kullanır. Production'da Redis-based distributed rate limiter kullanırım (Lua script ile atomic işlem, race condition yok). API Gateway seviyesinde (Kong/Nginx) uygulanır."
 :::
 
 :::knowledge-check

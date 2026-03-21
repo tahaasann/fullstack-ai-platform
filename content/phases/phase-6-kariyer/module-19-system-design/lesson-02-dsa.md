@@ -305,6 +305,55 @@ def is_palindrome(s: str) -> bool:
 
 print(is_palindrome("A man, a plan, a canal: Panama"))  # True
 ```
+
+```javascript
+// JavaScript — Two Pointers Pattern
+
+// Two Sum (sorted array)
+function twoSum(nums, target) {
+  const seen = new Map();
+  for (let i = 0; i < nums.length; i++) {
+    const complement = target - nums[i];
+    if (seen.has(complement)) {
+      return [seen.get(complement), i];
+    }
+    seen.set(nums[i], i);
+  }
+  return [];
+}
+
+console.log(twoSum([2, 7, 11, 15], 9)); // [0, 1]
+
+// Container With Most Water
+function maxArea(height) {
+  let left = 0, right = height.length - 1;
+  let maxWater = 0;
+
+  while (left < right) {
+    const width = right - left;
+    const h = Math.min(height[left], height[right]);
+    maxWater = Math.max(maxWater, width * h);
+
+    if (height[left] < height[right]) left++;
+    else right--;
+  }
+  return maxWater;
+}
+
+// Valid Palindrome
+function isPalindrome(s) {
+  const cleaned = s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  let left = 0, right = cleaned.length - 1;
+  while (left < right) {
+    if (cleaned[left] !== cleaned[right]) return false;
+    left++;
+    right--;
+  }
+  return true;
+}
+
+console.log(isPalindrome("A man, a plan, a canal: Panama")); // true
+```
 :::
 
 :::code
@@ -416,6 +465,45 @@ def min_window(s: str, t: str) -> str:
     return "" if min_len == float('inf') else s[min_start:min_start + min_len]
 
 print(min_window("ADOBECODEBANC", "ABC"))  # "BANC"
+```
+
+```javascript
+// JavaScript — Sliding Window Pattern
+
+// Maximum Subarray Sum of Size K
+function maxSubarraySumK(arr, k) {
+  if (arr.length < k) return 0;
+
+  let windowSum = arr.slice(0, k).reduce((a, b) => a + b, 0);
+  let maxSum = windowSum;
+
+  for (let i = k; i < arr.length; i++) {
+    windowSum += arr[i] - arr[i - k];
+    maxSum = Math.max(maxSum, windowSum);
+  }
+  return maxSum;
+}
+
+console.log(maxSubarraySumK([2, 1, 5, 1, 3, 2], 3)); // 9
+
+// Longest Substring Without Repeating Characters
+function lengthOfLongestSubstring(s) {
+  const charSet = new Set();
+  let left = 0, maxLength = 0;
+
+  for (let right = 0; right < s.length; right++) {
+    while (charSet.has(s[right])) {
+      charSet.delete(s[left]);
+      left++;
+    }
+    charSet.add(s[right]);
+    maxLength = Math.max(maxLength, right - left + 1);
+  }
+  return maxLength;
+}
+
+console.log(lengthOfLongestSubstring("abcabcbb")); // 3
+console.log(lengthOfLongestSubstring("pwwkew"));   // 3
 ```
 :::
 
@@ -535,6 +623,46 @@ def subarray_sum(nums: list[int], k: int) -> int:
 print(subarray_sum([1, 1, 1], 2))      # 2
 print(subarray_sum([1, 2, 3], 3))      # 2 ([1,2] ve [3])
 ```
+
+```javascript
+// JavaScript — Hash Table Interview Problemleri
+
+// Group Anagrams
+function groupAnagrams(strs) {
+  const groups = new Map();
+  for (const s of strs) {
+    const key = [...s].sort().join('');
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(s);
+  }
+  return [...groups.values()];
+}
+
+console.log(groupAnagrams(["eat","tea","tan","ate","nat","bat"]));
+// [["eat","tea","ate"], ["tan","nat"], ["bat"]]
+
+// Top K Frequent Elements
+function topKFrequent(nums, k) {
+  const count = new Map();
+  for (const num of nums) {
+    count.set(num, (count.get(num) || 0) + 1);
+  }
+
+  // Bucket sort
+  const buckets = Array.from({ length: nums.length + 1 }, () => []);
+  for (const [num, freq] of count) {
+    buckets[freq].push(num);
+  }
+
+  const result = [];
+  for (let i = buckets.length - 1; i >= 0 && result.length < k; i--) {
+    result.push(...buckets[i]);
+  }
+  return result.slice(0, k);
+}
+
+console.log(topKFrequent([1,1,1,2,2,3], 2)); // [1, 2]
+```
 :::
 
 ---
@@ -652,6 +780,50 @@ def daily_temperatures(temperatures: list[int]) -> list[int]:
 
 print(daily_temperatures([73,74,75,71,69,72,76,73]))
 # [1, 1, 4, 2, 1, 1, 0, 0]
+```
+
+```javascript
+// JavaScript — Stack Interview Problemleri
+
+// Valid Parentheses
+function isValidParentheses(s) {
+  const stack = [];
+  const matching = { ')': '(', ']': '[', '}': '{' };
+
+  for (const char of s) {
+    if (char in matching) {
+      if (!stack.length || stack[stack.length - 1] !== matching[char]) {
+        return false;
+      }
+      stack.pop();
+    } else {
+      stack.push(char);
+    }
+  }
+  return stack.length === 0;
+}
+
+console.log(isValidParentheses("()[]{}")); // true
+console.log(isValidParentheses("([)]"));   // false
+
+// Daily Temperatures (Monotonic Stack)
+function dailyTemperatures(temperatures) {
+  const n = temperatures.length;
+  const result = new Array(n).fill(0);
+  const stack = []; // index'ler
+
+  for (let i = 0; i < n; i++) {
+    while (stack.length && temperatures[i] > temperatures[stack[stack.length - 1]]) {
+      const prevIdx = stack.pop();
+      result[prevIdx] = i - prevIdx;
+    }
+    stack.push(i);
+  }
+  return result;
+}
+
+console.log(dailyTemperatures([73,74,75,71,69,72,76,73]));
+// [1, 1, 4, 2, 1, 1, 0, 0]
 ```
 :::
 
@@ -984,7 +1156,55 @@ def is_valid_bst(root: TreeNode) -> bool:
                 validate(node.right, node.val, max_val))
 
     return validate(root, float('-inf'), float('inf'))
+```
 
+```javascript
+// JavaScript — Tree Interview Problemleri
+
+class TreeNode {
+  constructor(val = 0, left = null, right = null) {
+    this.val = val;
+    this.left = left;
+    this.right = right;
+  }
+}
+
+// Maximum Depth
+function maxDepth(root) {
+  if (!root) return 0;
+  return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+}
+
+// Level Order Traversal (BFS)
+function levelOrder(root) {
+  if (!root) return [];
+  const result = [];
+  const queue = [root];
+
+  while (queue.length) {
+    const level = [];
+    const size = queue.length;
+    for (let i = 0; i < size; i++) {
+      const node = queue.shift();
+      level.push(node.val);
+      if (node.left) queue.push(node.left);
+      if (node.right) queue.push(node.right);
+    }
+    result.push(level);
+  }
+  return result;
+}
+
+// Validate BST
+function isValidBST(root, min = -Infinity, max = Infinity) {
+  if (!root) return true;
+  if (root.val <= min || root.val >= max) return false;
+  return isValidBST(root.left, min, root.val) &&
+         isValidBST(root.right, root.val, max);
+}
+```
+
+```python
 
 # ============================================
 # PROBLEM 19: Lowest Common Ancestor (LeetCode #236)
@@ -1612,6 +1832,58 @@ def length_of_lis(nums: list[int]) -> int:
 
 print(length_of_lis([10, 9, 2, 5, 3, 7, 101, 18]))  # 4 ([2,3,7,101])
 ```
+
+```javascript
+// JavaScript — DP Problemleri
+
+// Climbing Stairs
+function climbStairs(n) {
+  if (n <= 2) return n;
+  let prev2 = 1, prev1 = 2;
+  for (let i = 3; i <= n; i++) {
+    const current = prev1 + prev2;
+    prev2 = prev1;
+    prev1 = current;
+  }
+  return prev1;
+}
+
+console.log(climbStairs(5)); // 8
+
+// Coin Change
+function coinChange(coins, amount) {
+  const dp = new Array(amount + 1).fill(Infinity);
+  dp[0] = 0;
+
+  for (let i = 1; i <= amount; i++) {
+    for (const coin of coins) {
+      if (coin <= i && dp[i - coin] + 1 < dp[i]) {
+        dp[i] = dp[i - coin] + 1;
+      }
+    }
+  }
+  return dp[amount] === Infinity ? -1 : dp[amount];
+}
+
+console.log(coinChange([1, 5, 10, 25], 30)); // 2 (25 + 5)
+
+// Longest Increasing Subsequence
+function lengthOfLIS(nums) {
+  if (!nums.length) return 0;
+  const dp = new Array(nums.length).fill(1);
+
+  for (let i = 1; i < nums.length; i++) {
+    for (let j = 0; j < i; j++) {
+      if (nums[j] < nums[i]) {
+        dp[i] = Math.max(dp[i], dp[j] + 1);
+      }
+    }
+  }
+  return Math.max(...dp);
+}
+
+console.log(lengthOfLIS([10, 9, 2, 5, 3, 7, 101, 18])); // 4
+```
 :::
 
 :::tip
@@ -1719,6 +1991,40 @@ Interview'da her probleme sistematik yaklas:
 | DP | Overlapping subproblems | Coin Change, LCS, Knapsack |
 | Greedy | Lokal optimal = global optimal | Activity Selection, Jump Game |
 | Heap | Top-K, median, merge sorted | Kth Largest, Merge K Lists |
+:::
+
+:::interview
+### DSA Mülakat Soruları — Junior vs Senior
+
+**S1**: "Two Sum problemini çöz."
+
+**Junior cevap**: Brute force iki nested loop ile O(n^2) çözüm yazar.
+
+**Senior cevap**: "Önce soruyu netleştireyim — array sıralı mı? Duplicate var mı? Birden fazla çözüm olabilir mi?" Sonra hash map ile O(n) çözüm yazar. Edge case'leri belirtir (boş array, tek eleman, aynı eleman iki kez). Time ve space complexity'yi açıklar. Sıralı array ise two pointers ile O(1) space alternatifi olduğunu da belirtir.
+
+---
+
+**S2**: "LRU Cache nasıl implement edersin?"
+
+**Junior cevap**: "Array kullanırım, her erişimde elemanı başa taşırım." (Bu O(n) olur)
+
+**Senior cevap**: "Hash Map + Doubly Linked List kombinasyonu. Hash Map O(1) lookup sağlar, Doubly Linked List O(1) insertion/deletion sağlar. get() ve put() ikisi de O(1). En son erişilen elemanı listenin başına taşırım, kapasite dolduğunda listenin sonundaki elemanı silerim. Bu Redis ve Memcached'in de kullandığı yapıdır."
+
+---
+
+**S3**: "Bu çözümün time complexity'si ne?"
+
+**Junior cevap**: "O(n)" (genellikle doğru ama neden olduğunu açıklayamaz)
+
+**Senior cevap**: "Bu çözümde dış döngü n kez çalışır, iç döngü amortized olarak toplamda n kez çalışır (sliding window — her eleman en fazla bir kez eklenir ve bir kez çıkarılır). Dolayısıyla toplam O(n) time. Space complexity O(min(n, k)) çünkü set en fazla k farklı karakter tutar. Worst case'te k=n olduğunda O(n) space."
+
+---
+
+**S4**: "Array'de duplicate'ı O(1) space ile tespit edebilir misin?"
+
+**Junior cevap**: "Hash set kullanırım." (Bu O(n) space)
+
+**Senior cevap**: "Eğer array elemanları 1 ile n arasındaysa Floyd's cycle detection (tortoise and hare) kullanırım — O(n) time, O(1) space. Array'i linked list gibi düşünürüm: nums[i] bir sonraki index'e işaret eder. Duplicate varsa cycle oluşur. Sort edip ardışık kontrol de O(1) space ama O(n log n) time — ve input'u mutate eder ki bu kabul edilmeyebilir."
 :::
 
 :::knowledge-check
@@ -1845,6 +2151,128 @@ assert find_anagrams("hello", "xyz") == []
 ```
 
 **Beklenen sonuç:** Her iki problem O(n) ile çözülmeli. Sliding window'un nasıl çalıştığını adım adım açıkla (pencere nasıl kayar, ne eklenir, ne çıkarılır).
+
+---
+
+### Alistirma 4: Graph — Course Schedule (Orta)
+
+LeetCode #207 — Topological Sort ile cycle detection:
+
+```python
+def can_finish(num_courses: int, prerequisites: list[list[int]]) -> bool:
+    """
+    Ders ön koşullarına göre tüm dersleri alabilir misin?
+    prerequisites = [[1, 0]] → Ders 1 için önce Ders 0 alınmalı.
+
+    Cycle varsa → tüm dersler alınamaz (False)
+    Cycle yoksa → alınabilir (True)
+
+    Örnek:
+        can_finish(2, [[1, 0]]) → True (0 → 1 sırasıyla al)
+        can_finish(2, [[1, 0], [0, 1]]) → False (cycle: 0 → 1 → 0)
+
+    Hint: Graph oluştur + Topological Sort (Kahn's algorithm — BFS ile)
+    veya DFS ile cycle detection
+    """
+    # TODO: Implement
+    pass
+
+# Test cases:
+assert can_finish(2, [[1, 0]]) == True
+assert can_finish(2, [[1, 0], [0, 1]]) == False
+assert can_finish(4, [[1, 0], [2, 1], [3, 2]]) == True  # Linear dependency
+assert can_finish(1, []) == True  # Tek ders, ön koşul yok
+```
+
+**Beklenen sonuc:** Topological sort veya DFS ile O(V+E) cozum. Adjacency list ile graph olustur, in-degree hesapla, BFS ile isle.
+
+---
+
+### Alistirma 5: DP — House Robber (Orta)
+
+LeetCode #198 — Dinamik programlama klasiği:
+
+```javascript
+/**
+ * Bir hırsız, yan yana evleri soyamaz.
+ * Maksimum ne kadar para çalabilir?
+ *
+ * Örnek:
+ *   Input: [1, 2, 3, 1]
+ *   Output: 4 (1. ev + 3. ev = 1 + 3 = 4)
+ *
+ *   Input: [2, 7, 9, 3, 1]
+ *   Output: 12 (1. ev + 3. ev + 5. ev = 2 + 9 + 1 = 12)
+ *
+ * dp[i] = Math.max(dp[i-1], dp[i-2] + nums[i])
+ * Seçenek 1: Bu evi soyma → dp[i-1]
+ * Seçenek 2: Bu evi soy → dp[i-2] + nums[i]
+ *
+ * Hint: O(1) space ile çözülebilir (sadece prev1 ve prev2 tut)
+ */
+function rob(nums) {
+  // TODO: Implement
+}
+
+// Test cases:
+console.assert(rob([1, 2, 3, 1]) === 4);
+console.assert(rob([2, 7, 9, 3, 1]) === 12);
+console.assert(rob([2, 1, 1, 2]) === 4);
+console.assert(rob([]) === 0);
+console.assert(rob([5]) === 5);
+```
+
+**Beklenen sonuc:** O(n) time, O(1) space DP cozumu. Bottom-up yaklasimla prev1 ve prev2 degiskenleri yeterli.
+
+---
+
+### Alistirma 6: Binary Search — Rotated Sorted Array (Zor)
+
+LeetCode #33 — Modified binary search:
+
+```python
+def search_rotated(nums: list[int], target: int) -> int:
+    """
+    Rotated sorted array'de target'i bul.
+
+    Ornek:
+        Input: nums=[4, 5, 6, 7, 0, 1, 2], target=0
+        Output: 4
+
+        Input: nums=[4, 5, 6, 7, 0, 1, 2], target=3
+        Output: -1
+
+    Kisit: O(log n) cozum — linear scan kabul edilmez
+    Hint: Binary search'te her adimda hangi yarinin sirali
+          oldugunu belirle, target o yarida mi kontrol et.
+    """
+    # TODO: Implement
+    pass
+
+# Test cases:
+assert search_rotated([4, 5, 6, 7, 0, 1, 2], 0) == 4
+assert search_rotated([4, 5, 6, 7, 0, 1, 2], 3) == -1
+assert search_rotated([1], 0) == -1
+assert search_rotated([1], 1) == 0
+assert search_rotated([3, 1], 1) == 1
+```
+
+**Beklenen sonuc:** O(log n) modified binary search. Her adimda left/right yarinin hangisinin sorted oldugunu belirle, target o range'te mi kontrol et.
+:::
+
+:::realworld
+## Gerçek Dünyada DSA Kullanımı
+
+| Şirket | Problem | Kullanılan Algoritma/Veri Yapısı |
+|--------|---------|----------------------------------|
+| **Google** | Web sayfalarını sıralama | Graph algorithms (PageRank) |
+| **Netflix** | Film önerileri | Collaborative filtering + Graph |
+| **Uber** | En kısa rota bulma | Dijkstra + A* algoritması |
+| **Twitter** | Trending topics | Hash Map + Min Heap (Top-K) |
+| **Discord** | Mesaj arama | Trie + Inverted Index |
+| **Spotify** | Shuffle oynatma | Fisher-Yates Shuffle (O(n)) |
+| **Amazon** | Autocomplete | Trie (Prefix Tree) |
+| **Redis** | LRU Cache eviction | Hash Map + Doubly Linked List |
 :::
 
 :::external-resource

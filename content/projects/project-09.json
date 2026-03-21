@@ -146,28 +146,336 @@
           "why": "ML projeleri cok bilesenden olusur — temiz yapi bastan sart.",
           "instructions": "FastAPI + Celery + MLflow + PostgreSQL + Redis icin docker-compose olustur. Her servis ayri container.",
           "code_snippet": "# Proje yapisi\n/api          # FastAPI app\n/workers      # Celery workers\n/ml           # ML pipeline modules\n/features     # Feature engineering\n/monitoring   # Drift detection\n/frontend     # React dashboard",
-          "checkpoint": "docker-compose up ile tum servisler calisiyor mu?"
+          "checkpoint": "docker-compose up ile tum servisler calisiyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Proje kök dizinini oluştur",
+              "type": "terminal",
+              "command": "mkdir -p ml-pipeline-platform && cd ml-pipeline-platform",
+              "expected_output": "Klasör oluşturuldu",
+              "why": "ML projelerinde birçok servis bir arada çalışır. Temiz bir kök dizin ile başlamak, karmaşıklığı yönetilebilir kılar."
+            },
+            {
+              "order": "1.2",
+              "action": "Proje alt klasörlerini oluştur",
+              "type": "terminal",
+              "command": "mkdir -p api workers ml features monitoring frontend",
+              "expected_output": "6 klasör oluşturuldu: api, workers, ml, features, monitoring, frontend",
+              "why": "Her bileşeni ayrı klasörde tutmak, mikro-servis benzeri mimariyi yansıtır. İleride her bileşen bağımsız olarak geliştirilebilir ve deploy edilebilir."
+            },
+            {
+              "order": "1.3",
+              "action": "Python sanal ortamını oluştur ve bağımlılıkları kur",
+              "type": "terminal",
+              "command": "python -m venv venv && source venv/bin/activate && pip install fastapi uvicorn sqlalchemy psycopg2-binary celery redis mlflow scikit-learn pandas pydantic python-multipart",
+              "expected_output": "Successfully installed fastapi uvicorn sqlalchemy ... (tüm paketler kuruldu)",
+              "why": "Sanal ortam, proje bağımlılıklarını sistem Python'ından izole eder. ML projeleri çok sayıda kütüphane gerektirir — izolasyon çakışmaları önler."
+            },
+            {
+              "order": "1.4",
+              "action": "requirements.txt dosyasını oluştur",
+              "type": "code_write",
+              "file": "requirements.txt",
+              "code": "fastapi==0.104.1\nuvicorn==0.24.0\nsqlalchemy==2.0.23\npsycopg2-binary==2.9.9\ncelery==5.3.6\nredis==5.0.1\nmlflow==2.9.2\nscikit-learn==1.3.2\npandas==2.1.4\npydantic==2.5.3\npython-multipart==0.0.6\nalembic==1.13.1",
+              "why": "Bağımlılıkları sabitlenmiş versiyonlarla kaydetmek, farklı ortamlarda aynı sonucu garanti eder. Versiyon belirtmezsen ileride uyumsuzluk yaşarsın."
+            },
+            {
+              "order": "1.5",
+              "action": "docker-compose.yml dosyasını oluştur",
+              "type": "code_write",
+              "file": "docker-compose.yml",
+              "code": "version: '3.8'\n\nservices:\n  api:\n    build:\n      context: .\n      dockerfile: Dockerfile.api\n    ports:\n      - \"8000:8000\"\n    environment:\n      - DATABASE_URL=postgresql://mluser:mlpass@db:5432/mlpipeline\n      - REDIS_URL=redis://redis:6379/0\n      - MLFLOW_TRACKING_URI=http://mlflow:5000\n    depends_on:\n      - db\n      - redis\n      - mlflow\n    volumes:\n      - ./api:/app/api\n      - ./ml:/app/ml\n      - ./features:/app/features\n\n  worker:\n    build:\n      context: .\n      dockerfile: Dockerfile.worker\n    environment:\n      - DATABASE_URL=postgresql://mluser:mlpass@db:5432/mlpipeline\n      - REDIS_URL=redis://redis:6379/0\n      - MLFLOW_TRACKING_URI=http://mlflow:5000\n    depends_on:\n      - db\n      - redis\n      - mlflow\n    volumes:\n      - ./workers:/app/workers\n      - ./ml:/app/ml\n      - model_artifacts:/app/artifacts\n\n  mlflow:\n    image: ghcr.io/mlflow/mlflow:v2.9.2\n    ports:\n      - \"5000:5000\"\n    environment:\n      - BACKEND_STORE_URI=postgresql://mluser:mlpass@db:5432/mlpipeline\n      - ARTIFACT_ROOT=/mlflow/artifacts\n    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql://mluser:mlpass@db:5432/mlpipeline --default-artifact-root /mlflow/artifacts\n    depends_on:\n      - db\n    volumes:\n      - mlflow_artifacts:/mlflow/artifacts\n\n  db:\n    image: postgres:16-alpine\n    environment:\n      - POSTGRES_USER=mluser\n      - POSTGRES_PASSWORD=mlpass\n      - POSTGRES_DB=mlpipeline\n    ports:\n      - \"5432:5432\"\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n\n  redis:\n    image: redis:7-alpine\n    ports:\n      - \"6379:6379\"\n\n  frontend:\n    build:\n      context: ./frontend\n      dockerfile: Dockerfile\n    ports:\n      - \"5173:5173\"\n    depends_on:\n      - api\n\nvolumes:\n  pgdata:\n  mlflow_artifacts:\n  model_artifacts:",
+              "why": "docker-compose ile tüm servisleri tek komutla ayağa kaldırırsın. Her servis izole container'da çalışır — birinin çökmesi diğerlerini etkilemez."
+            },
+            {
+              "order": "1.6",
+              "action": "Dockerfile.api oluştur",
+              "type": "code_write",
+              "file": "Dockerfile.api",
+              "code": "FROM python:3.11-slim\n\nWORKDIR /app\n\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\n\nCOPY api/ ./api/\nCOPY ml/ ./ml/\nCOPY features/ ./features/\n\nCMD [\"uvicorn\", \"api.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\", \"--reload\"]",
+              "why": "API servisi için ayrı Dockerfile, sadece gerekli dosyaları içeren hafif bir image oluşturur. --no-cache-dir ile image boyutunu küçük tutuyoruz."
+            },
+            {
+              "order": "1.7",
+              "action": "Ana FastAPI uygulamasını oluştur",
+              "type": "code_write",
+              "file": "api/__init__.py",
+              "code": "",
+              "why": "Python paket yapısı için __init__.py gereklidir. Boş olsa bile modülün import edilebilmesini sağlar."
+            },
+            {
+              "order": "1.8",
+              "action": "api/main.py dosyasını oluştur",
+              "type": "code_write",
+              "file": "api/main.py",
+              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI(\n    title=\"ML Pipeline Platform\",\n    description=\"End-to-end ML pipeline and model serving platform\",\n    version=\"0.1.0\"\n)\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"http://localhost:5173\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"healthy\", \"service\": \"ml-pipeline-api\"}",
+              "why": "FastAPI uygulaması API gateway olarak görev yapar. CORS middleware ile frontend'den gelen isteklere izin veriyoruz. Health check endpoint'i servisin ayakta olduğunu doğrular."
+            },
+            {
+              "order": "1.9",
+              "action": "Docker servislerini ayağa kaldır ve test et",
+              "type": "terminal",
+              "command": "docker-compose up -d && docker-compose ps",
+              "expected_output": "Creating ml-pipeline-platform_db_1 ... done\nCreating ml-pipeline-platform_redis_1 ... done\nCreating ml-pipeline-platform_mlflow_1 ... done\nCreating ml-pipeline-platform_api_1 ... done\n(tüm servisler Up durumunda)",
+              "why": "Tüm servislerin birlikte çalıştığını doğrulamak, ileride entegrasyon sorunlarını önler. -d flag'i servisleri arka planda çalıştırır."
+            },
+            {
+              "order": "1.10",
+              "action": "Servisleri doğrula",
+              "type": "validate",
+              "validation": "curl http://localhost:8000/health → {\"status\":\"healthy\"}\ncurl http://localhost:5000 → MLflow UI\nRedis: docker-compose exec redis redis-cli ping → PONG\nPostgreSQL: docker-compose exec db psql -U mluser -d mlpipeline -c '\\l' → veritabanı listesi",
+              "why": "Her servisi ayrı ayrı test etmek, sorun varsa hangi serviste olduğunu hızlıca bulmayı sağlar."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── __init__.py\n│   └── main.py\n├── workers/\n├── ml/\n├── features/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n├── Dockerfile.api\n├── requirements.txt\n└── venv/",
+          "common_errors": [
+            {
+              "error": "docker-compose: command not found",
+              "cause": "Docker Compose sisteme kurulu değil veya Docker Desktop çalışmıyor.",
+              "fix": "Docker Desktop'u kur ve başlat. docker compose (v2) veya docker-compose (v1) komutunu dene."
+            },
+            {
+              "error": "Error starting userland proxy: listen tcp4 0.0.0.0:5432: bind: address already in use",
+              "cause": "Yerel makinede zaten bir PostgreSQL servisi 5432 portunda çalışıyor.",
+              "fix": "docker-compose.yml'de portu 5433:5432 olarak değiştir veya yerel PostgreSQL'i durdur: sudo systemctl stop postgresql"
+            },
+            {
+              "error": "mlflow server fails to start: connection refused to postgres",
+              "cause": "MLflow servisi PostgreSQL'den önce başlamaya çalışıyor, depends_on sadece container başlangıcını bekler, servis hazırlığını değil.",
+              "fix": "docker-compose.yml'de MLflow servisine healthcheck ekle veya wait-for-it.sh script'i kullan."
+            }
+          ]
         },
         {
           "step": 2,
           "title": "Veri Ingestion Pipeline",
           "why": "ML pipeline'in ilk adimi veriyi guvenli sekilde sisteme almak.",
           "instructions": "CSV/JSON upload endpoint'i olustur. Pydantic ile sema validasyonu. Buyuk dosyalar icin streaming upload. Veri profiling (column types, missing values, distributions).",
-          "checkpoint": "CSV yukleyip veri profili goruntuleniyor mu?"
+          "checkpoint": "CSV yukleyip veri profili goruntuleniyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Veritabanı modeli dosyasını oluştur",
+              "type": "code_write",
+              "file": "api/models.py",
+              "code": "from sqlalchemy import Column, Integer, String, DateTime, Float, JSON, Text\nfrom sqlalchemy.ext.declarative import declarative_base\nfrom datetime import datetime\n\nBase = declarative_base()\n\nclass Dataset(Base):\n    __tablename__ = \"datasets\"\n\n    id = Column(Integer, primary_key=True, index=True)\n    name = Column(String(255), nullable=False)\n    version = Column(Integer, default=1)\n    file_path = Column(String(500), nullable=False)\n    file_size = Column(Integer)\n    row_count = Column(Integer)\n    column_count = Column(Integer)\n    columns_info = Column(JSON)\n    quality_score = Column(Float)\n    profile = Column(JSON)\n    created_at = Column(DateTime, default=datetime.utcnow)\n    description = Column(Text)",
+              "why": "SQLAlchemy modeli veritabanı şemasını Python sınıfı olarak tanımlar. Her dataset'in metadata'sını (satır sayısı, sütun bilgileri, kalite skoru) kaydetmek ileride dataset versiyonlama için gereklidir."
+            },
+            {
+              "order": "2.2",
+              "action": "Veritabanı bağlantı modülünü oluştur",
+              "type": "code_write",
+              "file": "api/database.py",
+              "code": "import os\nfrom sqlalchemy import create_engine\nfrom sqlalchemy.orm import sessionmaker\n\nDATABASE_URL = os.getenv(\"DATABASE_URL\", \"postgresql://mluser:mlpass@localhost:5432/mlpipeline\")\n\nengine = create_engine(DATABASE_URL)\nSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)\n\ndef get_db():\n    db = SessionLocal()\n    try:\n        yield db\n    finally:\n        db.close()",
+              "why": "Veritabanı bağlantısını merkezi bir modülde tutmak, tüm endpoint'lerin aynı bağlantı havuzunu kullanmasını sağlar. get_db generator'ı FastAPI dependency injection ile çalışır."
+            },
+            {
+              "order": "2.3",
+              "action": "Pydantic şemalarını oluştur",
+              "type": "code_write",
+              "file": "api/schemas.py",
+              "code": "from pydantic import BaseModel, Field\nfrom typing import Optional, List, Dict, Any\nfrom datetime import datetime\n\nclass DatasetUploadResponse(BaseModel):\n    id: int\n    name: str\n    version: int\n    row_count: int\n    column_count: int\n    quality_score: float\n    profile: Dict[str, Any]\n    created_at: datetime\n\n    class Config:\n        from_attributes = True\n\nclass DataProfile(BaseModel):\n    column_name: str\n    dtype: str\n    missing_count: int\n    missing_percentage: float\n    unique_count: int\n    mean: Optional[float] = None\n    std: Optional[float] = None\n    min_val: Optional[float] = None\n    max_val: Optional[float] = None",
+              "why": "Pydantic şemaları hem API validasyonu hem de veri profilleme için kullanılır. Gelen CSV'nin yapısını otomatik doğrular, hatalı veriyi erken yakalar."
+            },
+            {
+              "order": "2.4",
+              "action": "Veri profilleme servisini oluştur",
+              "type": "code_write",
+              "file": "api/services/data_profiler.py",
+              "code": "import pandas as pd\nimport numpy as np\nfrom typing import Dict, Any\n\ndef profile_dataset(df: pd.DataFrame) -> Dict[str, Any]:\n    profile = {\n        \"row_count\": len(df),\n        \"column_count\": len(df.columns),\n        \"columns\": []\n    }\n    for col in df.columns:\n        col_profile = {\n            \"name\": col,\n            \"dtype\": str(df[col].dtype),\n            \"missing_count\": int(df[col].isnull().sum()),\n            \"missing_pct\": round(df[col].isnull().mean() * 100, 2),\n            \"unique_count\": int(df[col].nunique()),\n        }\n        if pd.api.types.is_numeric_dtype(df[col]):\n            col_profile.update({\n                \"mean\": round(float(df[col].mean()), 4),\n                \"std\": round(float(df[col].std()), 4),\n                \"min\": float(df[col].min()),\n                \"max\": float(df[col].max()),\n            })\n        profile[\"columns\"].append(col_profile)\n    \n    missing_total = df.isnull().sum().sum()\n    total_cells = df.shape[0] * df.shape[1]\n    profile[\"quality_score\"] = round((1 - missing_total / total_cells) * 100, 2) if total_cells > 0 else 0\n    return profile",
+              "why": "Veri profilleme her yüklenen dataset'in kalitesini otomatik değerlendirir. Missing value oranı, veri tipleri ve dağılım istatistikleri model eğitimi öncesi kritik bilgilerdir."
+            },
+            {
+              "order": "2.5",
+              "action": "Dataset upload endpoint'ini oluştur",
+              "type": "code_write",
+              "file": "api/routers/datasets.py",
+              "code": "import os\nimport pandas as pd\nfrom fastapi import APIRouter, UploadFile, File, Depends, HTTPException\nfrom sqlalchemy.orm import Session\nfrom api.database import get_db\nfrom api.models import Dataset\nfrom api.services.data_profiler import profile_dataset\n\nrouter = APIRouter(prefix=\"/api/datasets\", tags=[\"datasets\"])\n\nUPLOAD_DIR = \"data/uploads\"\nos.makedirs(UPLOAD_DIR, exist_ok=True)\n\n@router.post(\"/upload\")\nasync def upload_dataset(\n    file: UploadFile = File(...),\n    db: Session = Depends(get_db)\n):\n    if not file.filename.endswith((\".csv\", \".json\")):\n        raise HTTPException(400, \"Sadece CSV ve JSON dosyaları desteklenir\")\n    \n    file_path = os.path.join(UPLOAD_DIR, file.filename)\n    content = await file.read()\n    with open(file_path, \"wb\") as f:\n        f.write(content)\n    \n    if file.filename.endswith(\".csv\"):\n        df = pd.read_csv(file_path)\n    else:\n        df = pd.read_json(file_path)\n    \n    profile = profile_dataset(df)\n    \n    dataset = Dataset(\n        name=file.filename,\n        file_path=file_path,\n        file_size=len(content),\n        row_count=profile[\"row_count\"],\n        column_count=profile[\"column_count\"],\n        columns_info={\"columns\": [c[\"name\"] for c in profile[\"columns\"]]},\n        quality_score=profile[\"quality_score\"],\n        profile=profile\n    )\n    db.add(dataset)\n    db.commit()\n    db.refresh(dataset)\n    \n    return {\n        \"id\": dataset.id,\n        \"name\": dataset.name,\n        \"profile\": profile\n    }\n\n@router.get(\"/\")\nasync def list_datasets(db: Session = Depends(get_db)):\n    return db.query(Dataset).all()",
+              "why": "Upload endpoint CSV/JSON dosyalarını kabul eder, otomatik profilleme yapar ve sonuçları veritabanına kaydeder. Dosya türü kontrolü güvenlik için şarttır."
+            },
+            {
+              "order": "2.6",
+              "action": "Router'ı ana uygulamaya bağla",
+              "type": "code_modify",
+              "file": "api/main.py",
+              "code": "from api.routers import datasets\n\napp.include_router(datasets.router)",
+              "position": "bottom",
+              "why": "FastAPI'de router'lar modüler yapı sağlar. Her kaynak (dataset, model, training) kendi router dosyasında tanımlanır ve ana uygulamaya include edilir."
+            },
+            {
+              "order": "2.7",
+              "action": "Veritabanı tablolarını oluştur ve endpoint'i test et",
+              "type": "terminal",
+              "command": "python -c \"from api.models import Base; from api.database import engine; Base.metadata.create_all(bind=engine)\"\ncurl -X POST http://localhost:8000/api/datasets/upload -F \"file=@sample_data.csv\"",
+              "expected_output": "{\"id\": 1, \"name\": \"sample_data.csv\", \"profile\": {\"row_count\": ..., \"quality_score\": ...}}",
+              "why": "Tabloları oluşturup gerçek bir dosya yükleyerek tüm akışın çalıştığını doğruluyoruz. Profil sonuçları doğru geliyorsa pipeline sağlıklı demektir."
+            },
+            {
+              "order": "2.8",
+              "action": "Endpoint'i doğrula",
+              "type": "validate",
+              "validation": "http://localhost:8000/docs adresinde Swagger UI'da /api/datasets/upload endpoint'ini gör. Bir CSV dosyası yükle ve profil sonuçlarını kontrol et: row_count, column_count, quality_score değerleri doğru olmalı.",
+              "why": "FastAPI otomatik Swagger dokümantasyonu oluşturur. API'nin doğru çalıştığını interaktif olarak test etmek, hataları erken yakalar."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── models.py\n│   ├── database.py\n│   ├── schemas.py\n│   ├── routers/\n│   │   └── datasets.py\n│   └── services/\n│       └── data_profiler.py\n├── data/\n│   └── uploads/\n├── workers/\n├── ml/\n├── features/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n├── Dockerfile.api\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "sqlalchemy.exc.OperationalError: could not connect to server: Connection refused",
+              "cause": "PostgreSQL container'ı henüz hazır değil veya bağlantı bilgileri yanlış.",
+              "fix": "docker-compose ps ile PostgreSQL'in çalıştığını doğrula. DATABASE_URL'deki host, port, user, password değerlerini kontrol et."
+            },
+            {
+              "error": "422 Unprocessable Entity - value is not a valid upload file",
+              "cause": "curl komutuyla dosya gönderirken -F flag'i yerine -d kullanılmış veya dosya yolu yanlış.",
+              "fix": "curl -X POST -F \"file=@dosya.csv\" http://localhost:8000/api/datasets/upload şeklinde -F kullan. Dosyanın var olduğundan emin ol."
+            },
+            {
+              "error": "pandas.errors.EmptyDataError: No columns to parse from file",
+              "cause": "Yüklenen CSV dosyası boş veya geçersiz formatta.",
+              "fix": "Upload öncesi dosya boyutu kontrolü ekle. Boş dosya için özel hata mesajı döndür."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Data Validation & Cleaning",
           "why": "Garbage in = garbage out. Model kalitesi veri kalitesine baglidir.",
           "instructions": "Otomatik veri temizleme:\n1. Missing value handling (drop, mean, median, mode)\n2. Outlier detection (IQR, Z-score)\n3. Type inference ve conversion\n4. Data quality score hesaplama",
-          "checkpoint": "Eksik degerli ve outlier'li veri setinde temizleme dogru calisiyor mu?"
+          "checkpoint": "Eksik degerli ve outlier'li veri setinde temizleme dogru calisiyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Veri temizleme servisini oluştur",
+              "type": "code_write",
+              "file": "api/services/data_cleaner.py",
+              "code": "import pandas as pd\nimport numpy as np\nfrom typing import Dict, Any, Optional\n\nclass DataCleaner:\n    def __init__(self, df: pd.DataFrame):\n        self.df = df.copy()\n        self.report = {\"steps\": [], \"original_shape\": df.shape}\n    \n    def handle_missing_values(self, strategy: str = \"mean\") -> 'DataCleaner':\n        for col in self.df.select_dtypes(include=[np.number]).columns:\n            missing = self.df[col].isnull().sum()\n            if missing > 0:\n                if strategy == \"mean\":\n                    self.df[col].fillna(self.df[col].mean(), inplace=True)\n                elif strategy == \"median\":\n                    self.df[col].fillna(self.df[col].median(), inplace=True)\n                elif strategy == \"drop\":\n                    self.df.dropna(subset=[col], inplace=True)\n                self.report[\"steps\"].append(f\"{col}: {missing} missing → {strategy}\")\n        \n        for col in self.df.select_dtypes(include=[\"object\"]).columns:\n            missing = self.df[col].isnull().sum()\n            if missing > 0:\n                self.df[col].fillna(self.df[col].mode()[0], inplace=True)\n                self.report[\"steps\"].append(f\"{col}: {missing} missing → mode\")\n        return self\n    \n    def detect_outliers(self, method: str = \"iqr\", threshold: float = 1.5) -> 'DataCleaner':\n        outlier_counts = {}\n        for col in self.df.select_dtypes(include=[np.number]).columns:\n            if method == \"iqr\":\n                Q1 = self.df[col].quantile(0.25)\n                Q3 = self.df[col].quantile(0.75)\n                IQR = Q3 - Q1\n                mask = (self.df[col] < Q1 - threshold * IQR) | (self.df[col] > Q3 + threshold * IQR)\n                outlier_counts[col] = int(mask.sum())\n            elif method == \"zscore\":\n                z_scores = np.abs((self.df[col] - self.df[col].mean()) / self.df[col].std())\n                mask = z_scores > 3\n                outlier_counts[col] = int(mask.sum())\n        self.report[\"outliers\"] = outlier_counts\n        return self\n    \n    def get_quality_score(self) -> float:\n        missing_ratio = self.df.isnull().sum().sum() / (self.df.shape[0] * self.df.shape[1])\n        return round((1 - missing_ratio) * 100, 2)\n    \n    def clean(self) -> tuple:\n        self.report[\"final_shape\"] = self.df.shape\n        self.report[\"quality_score\"] = self.get_quality_score()\n        return self.df, self.report",
+              "why": "Veri temizleme modülü builder pattern kullanır — zincirleme çağrılarla temizleme adımlarını birleştirebilirsin. Her adım rapor oluşturur, böylece ne yapıldığını takip edebilirsin."
+            },
+            {
+              "order": "3.2",
+              "action": "Temizleme endpoint'ini oluştur",
+              "type": "code_add",
+              "file": "api/routers/datasets.py",
+              "code": "@router.post(\"/{dataset_id}/clean\")\nasync def clean_dataset(\n    dataset_id: int,\n    strategy: str = \"mean\",\n    outlier_method: str = \"iqr\",\n    db: Session = Depends(get_db)\n):\n    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()\n    if not dataset:\n        raise HTTPException(404, \"Dataset bulunamadı\")\n    \n    df = pd.read_csv(dataset.file_path)\n    cleaner = DataCleaner(df)\n    cleaned_df, report = (\n        cleaner\n        .handle_missing_values(strategy=strategy)\n        .detect_outliers(method=outlier_method)\n        .clean()\n    )\n    \n    cleaned_path = dataset.file_path.replace(\".csv\", \"_cleaned.csv\")\n    cleaned_df.to_csv(cleaned_path, index=False)\n    \n    return {\"report\": report, \"cleaned_path\": cleaned_path}",
+              "position": "bottom",
+              "why": "Temizleme endpoint'i dataset ID'si ile çağrılır ve stratejiye göre veriyi temizler. Temizlenmiş veri ayrı dosyaya kaydedilir — orijinal veri korunur."
+            },
+            {
+              "order": "3.3",
+              "action": "Import'u ekle",
+              "type": "code_modify",
+              "file": "api/routers/datasets.py",
+              "code": "from api.services.data_cleaner import DataCleaner",
+              "position": "top",
+              "why": "Yeni servisi kullanabilmek için import etmek gerekir."
+            },
+            {
+              "order": "3.4",
+              "action": "Eksik değerli test verisi oluştur ve temizlemeyi test et",
+              "type": "terminal",
+              "command": "python -c \"\nimport pandas as pd\nimport numpy as np\ndf = pd.DataFrame({\n    'age': [25, np.nan, 35, 40, np.nan, 55, 200],\n    'salary': [50000, 60000, np.nan, 80000, 90000, np.nan, 70000],\n    'city': ['Istanbul', None, 'Ankara', 'Istanbul', 'Izmir', None, 'Ankara']\n})\ndf.to_csv('data/uploads/test_dirty.csv', index=False)\nprint('Test verisi olusturuldu')\n\"",
+              "expected_output": "Test verisi olusturuldu",
+              "why": "Gerçekçi kirli veri ile test etmek, temizleme algoritmasının her durumu doğru handle ettiğini doğrular. NaN, None ve outlier (200 yaş) içeren veri kullanıyoruz."
+            },
+            {
+              "order": "3.5",
+              "action": "Temizleme endpoint'ini test et",
+              "type": "terminal",
+              "command": "curl -X POST http://localhost:8000/api/datasets/1/clean?strategy=mean&outlier_method=iqr",
+              "expected_output": "{\"report\": {\"steps\": [...], \"outliers\": {...}, \"quality_score\": 100.0}, \"cleaned_path\": \"...\"}",
+              "why": "API üzerinden temizleme çağrısı yaparak tüm akışın çalıştığını doğruluyoruz. Rapordaki adımlar hangi sütunda ne yapıldığını gösterir."
+            },
+            {
+              "order": "3.6",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Temizleme raporunda: missing value'lar doldurulmuş olmalı, outlier'lar tespit edilmiş olmalı, quality_score 100'e yakın olmalı. Temizlenmiş CSV'de NaN kalmamalı.",
+              "why": "Veri temizleme sonucunu doğrulamak, modele kirli veri gitmesini önler. 'Garbage in, garbage out' prensibi ML'de en önemli kuraldır."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── models.py\n│   ├── database.py\n│   ├── schemas.py\n│   ├── routers/\n│   │   └── datasets.py\n│   └── services/\n│       ├── data_profiler.py\n│       └── data_cleaner.py\n├── data/\n│   └── uploads/\n│       ├── test_dirty.csv\n│       └── test_dirty_cleaned.csv\n├── workers/\n├── ml/\n├── features/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n├── Dockerfile.api\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "KeyError: 'column_name' veya ValueError: could not convert string to float",
+              "cause": "Kategorik sütunda sayısal işlem (mean, std) uygulanmaya çalışılıyor.",
+              "fix": "select_dtypes(include=[np.number]) ile sadece sayısal sütunları seç. Kategorik sütunlar için mode() kullan."
+            },
+            {
+              "error": "SettingWithCopyWarning: A value is trying to be set on a copy of a slice",
+              "cause": "DataFrame kopyalanmadan üzerinde değişiklik yapılıyor.",
+              "fix": "self.df = df.copy() ile başla. inplace=True yerine self.df[col] = self.df[col].fillna(...) kullan."
+            },
+            {
+              "error": "IndexError: index 0 is out of bounds - mode() boş döndü",
+              "cause": "Tüm değerleri NaN olan bir sütunda mode() çağrıldığında boş Series döner.",
+              "fix": "mode() çağırmadan önce if not df[col].mode().empty kontrolü ekle. Tamamı NaN olan sütunları drop etmeyi düşün."
+            }
+          ]
         },
         {
           "step": 4,
           "title": "Dataset Versioning",
           "why": "Hangi modelin hangi veri ile egitildigini bilmek reproducibility icin kritik.",
           "instructions": "Her yuklenen dataset'e versiyon ata. Metadata kaydet: boyut, column sayisi, tarih, quality score. Dataset compare ozeligi.",
-          "checkpoint": "Ayni dataset'in 2 versiyonunu karsilastirabiliyor musun?"
+          "checkpoint": "Ayni dataset'in 2 versiyonunu karsilastirabiliyor musun?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Dataset modeline versiyon desteği ekle",
+              "type": "code_modify",
+              "file": "api/models.py",
+              "code": "class DatasetVersion(Base):\n    __tablename__ = \"dataset_versions\"\n\n    id = Column(Integer, primary_key=True, index=True)\n    dataset_id = Column(Integer, nullable=False)\n    version = Column(Integer, nullable=False)\n    file_path = Column(String(500), nullable=False)\n    row_count = Column(Integer)\n    column_count = Column(Integer)\n    quality_score = Column(Float)\n    profile = Column(JSON)\n    changes_summary = Column(JSON)\n    created_at = Column(DateTime, default=datetime.utcnow)",
+              "position": "bottom",
+              "why": "Dataset versiyonlama, hangi modelin hangi veri ile eğitildiğini takip etmeyi sağlar. Reproducibility için kritik — aynı veriyle aynı sonucu almak lazım."
+            },
+            {
+              "order": "4.2",
+              "action": "Versiyon karşılaştırma servisini oluştur",
+              "type": "code_write",
+              "file": "api/services/dataset_versioner.py",
+              "code": "import pandas as pd\nfrom typing import Dict, Any\n\ndef compare_datasets(df1: pd.DataFrame, df2: pd.DataFrame) -> Dict[str, Any]:\n    comparison = {\n        \"shape_change\": {\n            \"rows\": {\"before\": len(df1), \"after\": len(df2), \"diff\": len(df2) - len(df1)},\n            \"cols\": {\"before\": len(df1.columns), \"after\": len(df2.columns), \"diff\": len(df2.columns) - len(df1.columns)}\n        },\n        \"added_columns\": list(set(df2.columns) - set(df1.columns)),\n        \"removed_columns\": list(set(df1.columns) - set(df2.columns)),\n        \"common_columns\": list(set(df1.columns) & set(df2.columns)),\n        \"stats_changes\": {}\n    }\n    for col in comparison[\"common_columns\"]:\n        if pd.api.types.is_numeric_dtype(df1[col]) and pd.api.types.is_numeric_dtype(df2[col]):\n            comparison[\"stats_changes\"][col] = {\n                \"mean_change\": round(float(df2[col].mean() - df1[col].mean()), 4),\n                \"std_change\": round(float(df2[col].std() - df1[col].std()), 4),\n                \"missing_change\": int(df2[col].isnull().sum() - df1[col].isnull().sum())\n            }\n    return comparison",
+              "why": "İki dataset versiyonunu karşılaştırmak, verideki değişimleri anlamayı sağlar. Sütun ekleme/çıkarma ve istatistiksel değişimler data drift'in erken belirtileridir."
+            },
+            {
+              "order": "4.3",
+              "action": "Versiyon endpoint'lerini ekle",
+              "type": "code_add",
+              "file": "api/routers/datasets.py",
+              "code": "from api.services.dataset_versioner import compare_datasets\nfrom api.models import DatasetVersion\n\n@router.post(\"/{dataset_id}/version\")\nasync def create_version(\n    dataset_id: int,\n    file: UploadFile = File(...),\n    db: Session = Depends(get_db)\n):\n    original = db.query(Dataset).filter(Dataset.id == dataset_id).first()\n    if not original:\n        raise HTTPException(404, \"Dataset bulunamadı\")\n    \n    latest_version = db.query(DatasetVersion).filter(\n        DatasetVersion.dataset_id == dataset_id\n    ).order_by(DatasetVersion.version.desc()).first()\n    \n    new_version_num = (latest_version.version + 1) if latest_version else 2\n    \n    file_path = f\"data/uploads/{original.name}_v{new_version_num}.csv\"\n    content = await file.read()\n    with open(file_path, \"wb\") as f:\n        f.write(content)\n    \n    new_df = pd.read_csv(file_path)\n    old_df = pd.read_csv(original.file_path)\n    profile = profile_dataset(new_df)\n    changes = compare_datasets(old_df, new_df)\n    \n    version = DatasetVersion(\n        dataset_id=dataset_id,\n        version=new_version_num,\n        file_path=file_path,\n        row_count=profile[\"row_count\"],\n        column_count=profile[\"column_count\"],\n        quality_score=profile[\"quality_score\"],\n        profile=profile,\n        changes_summary=changes\n    )\n    db.add(version)\n    db.commit()\n    \n    return {\"version\": new_version_num, \"changes\": changes}\n\n@router.get(\"/{dataset_id}/versions\")\nasync def list_versions(dataset_id: int, db: Session = Depends(get_db)):\n    return db.query(DatasetVersion).filter(DatasetVersion.dataset_id == dataset_id).all()",
+              "position": "bottom",
+              "why": "Versiyon endpoint'i yeni veri yüklendiğinde otomatik olarak önceki versiyonla karşılaştırır. Bu sayede veri değişimlerini anında görürsün."
+            },
+            {
+              "order": "4.4",
+              "action": "Versiyonlamayı test et",
+              "type": "terminal",
+              "command": "python -c \"\nimport pandas as pd\nimport numpy as np\ndf = pd.DataFrame({'age': [26, 31, 36, 41, 46, 56], 'salary': [52000, 62000, 72000, 82000, 92000, 72000], 'city': ['Istanbul','Ankara','Ankara','Istanbul','Izmir','Bursa']})\ndf.to_csv('data/uploads/test_v2.csv', index=False)\n\"\ncurl -X POST http://localhost:8000/api/datasets/1/version -F \"file=@data/uploads/test_v2.csv\"",
+              "expected_output": "{\"version\": 2, \"changes\": {\"shape_change\": {...}, \"stats_changes\": {...}}}",
+              "why": "İkinci versiyon yükleyerek karşılaştırma sonuçlarının doğru geldiğini test ediyoruz. Satır sayısı, istatistik değişimleri ve sütun farklılıkları görünmeli."
+            },
+            {
+              "order": "4.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "GET /api/datasets/1/versions endpoint'i ile tüm versiyonlar listelenmeli. changes_summary'de shape_change ve stats_changes doğru olmalı.",
+              "why": "Versiyonlama sistemi düzgün çalışmazsa, ileride hangi modelin hangi veriyle eğitildiğini takip edemezsin — bu reproducibility'yi bozar."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── models.py\n│   ├── database.py\n│   ├── schemas.py\n│   ├── routers/\n│   │   └── datasets.py\n│   └── services/\n│       ├── data_profiler.py\n│       ├── data_cleaner.py\n│       └── dataset_versioner.py\n├── data/\n│   └── uploads/\n│       ├── test_dirty.csv\n│       ├── test_dirty_cleaned.csv\n│       └── test_v2.csv\n├── workers/\n├── ml/\n├── features/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n├── Dockerfile.api\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "sqlalchemy.exc.ProgrammingError: relation \"dataset_versions\" does not exist",
+              "cause": "Yeni model eklendikten sonra veritabanı tablosu oluşturulmamış.",
+              "fix": "Base.metadata.create_all(bind=engine) komutunu çalıştır veya Alembic migration oluştur: alembic revision --autogenerate -m 'add dataset versions'"
+            },
+            {
+              "error": "FileNotFoundError: original dataset file not found",
+              "cause": "Orijinal dataset dosyası silinmiş veya file_path yanlış kaydedilmiş.",
+              "fix": "Dataset kaydederken mutlak yol kullan. Dosya silme işlemlerinde veritabanı kaydını da güncelle."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Veri validasyonu ONCE yap, training SONRA — kirli veri ile model egitme\n2. Dataset versioning model reproducibility icin ZORUNLU\n3. Pydantic schema'lari hem API validasyonu hem veri validasyonu icin kullan\n4. Buyuk veri setleri icin streaming upload kullan — RAM'i patlatma",
@@ -191,21 +499,201 @@
           "why": "Feature engineering'i tekrarlanabilir ve test edilebilir yapmak icin pipeline pattern sart.",
           "instructions": "scikit-learn Pipeline + ColumnTransformer:\n1. Numeric: StandardScaler, MinMaxScaler\n2. Categorical: OneHotEncoder, LabelEncoder\n3. Text: TF-IDF, CountVectorizer\n4. Custom transformer'lar",
           "code_snippet": "from sklearn.pipeline import Pipeline\nfrom sklearn.compose import ColumnTransformer\n\npreprocessor = ColumnTransformer([\n    ('num', StandardScaler(), numeric_cols),\n    ('cat', OneHotEncoder(), categorical_cols),\n    ('text', TfidfVectorizer(), text_col)\n])\n\npipeline = Pipeline([\n    ('preprocessor', preprocessor),\n    ('model', model)\n])",
-          "checkpoint": "Pipeline fit_transform dogru calisiyor mu? Farkli column tipleri dogru handle ediliyor mu?"
+          "checkpoint": "Pipeline fit_transform dogru calisiyor mu? Farkli column tipleri dogru handle ediliyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Features modülünü oluştur",
+              "type": "terminal",
+              "command": "mkdir -p features && touch features/__init__.py",
+              "expected_output": "Klasör ve __init__.py oluşturuldu",
+              "why": "Feature engineering kodunu ayrı modülde tutmak, hem API hem worker tarafından kullanılmasını sağlar."
+            },
+            {
+              "order": "1.2",
+              "action": "Feature transformer pipeline modülünü oluştur",
+              "type": "code_write",
+              "file": "features/transformers.py",
+              "code": "import pandas as pd\nimport numpy as np\nfrom sklearn.pipeline import Pipeline\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder, LabelEncoder\nfrom sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.base import BaseEstimator, TransformerMixin\nimport joblib\nfrom typing import List, Dict, Optional\n\nclass FeaturePipelineBuilder:\n    def __init__(self):\n        self.numeric_cols: List[str] = []\n        self.categorical_cols: List[str] = []\n        self.text_cols: List[str] = []\n        self.numeric_strategy: str = \"standard\"\n        self.pipeline: Optional[Pipeline] = None\n    \n    def detect_column_types(self, df: pd.DataFrame) -> 'FeaturePipelineBuilder':\n        for col in df.columns:\n            if pd.api.types.is_numeric_dtype(df[col]):\n                self.numeric_cols.append(col)\n            elif df[col].nunique() < 20:\n                self.categorical_cols.append(col)\n            else:\n                self.text_cols.append(col)\n        return self\n    \n    def set_columns(self, numeric: List[str] = None, categorical: List[str] = None, text: List[str] = None) -> 'FeaturePipelineBuilder':\n        if numeric: self.numeric_cols = numeric\n        if categorical: self.categorical_cols = categorical\n        if text: self.text_cols = text\n        return self\n    \n    def build(self) -> ColumnTransformer:\n        transformers = []\n        if self.numeric_cols:\n            scaler = StandardScaler() if self.numeric_strategy == \"standard\" else MinMaxScaler()\n            transformers.append(('num', scaler, self.numeric_cols))\n        if self.categorical_cols:\n            transformers.append(('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), self.categorical_cols))\n        if self.text_cols:\n            for col in self.text_cols:\n                transformers.append((f'text_{col}', TfidfVectorizer(max_features=100), col))\n        \n        self.pipeline = ColumnTransformer(transformers=transformers, remainder='drop')\n        return self.pipeline\n    \n    def save(self, path: str):\n        joblib.dump(self.pipeline, path)\n    \n    @staticmethod\n    def load(path: str) -> ColumnTransformer:\n        return joblib.load(path)",
+              "why": "FeaturePipelineBuilder, scikit-learn ColumnTransformer'ı saran bir builder pattern'idir. Otomatik sütun tipi tespiti yaparak doğru transformer'ı atar. Pipeline'ı serialize etmek (joblib) training-serving skew'u önler."
+            },
+            {
+              "order": "1.3",
+              "action": "Pipeline'ı test et",
+              "type": "terminal",
+              "command": "python -c \"\nimport pandas as pd\nfrom features.transformers import FeaturePipelineBuilder\n\ndf = pd.DataFrame({\n    'age': [25, 30, 35, 40],\n    'salary': [50000, 60000, 70000, 80000],\n    'city': ['Istanbul', 'Ankara', 'Istanbul', 'Izmir']\n})\n\nbuilder = FeaturePipelineBuilder()\nbuilder.detect_column_types(df)\nprint('Numeric:', builder.numeric_cols)\nprint('Categorical:', builder.categorical_cols)\n\npipeline = builder.build()\nresult = pipeline.fit_transform(df)\nprint('Transformed shape:', result.shape)\nprint('Transformed sample:', result[0])\n\"",
+              "expected_output": "Numeric: ['age', 'salary']\nCategorical: ['city']\nTransformed shape: (4, 5)\nTransformed sample: [-1.3416... -1.3416... 0. 1. 0.]",
+              "why": "Pipeline'ın sütun tiplerini doğru tespit edip doğru transformer'ı uyguladığını doğruluyoruz. Sayısal sütunlar scale edilmeli, kategorik sütunlar one-hot encode edilmeli."
+            },
+            {
+              "order": "1.4",
+              "action": "Pipeline serialize/deserialize testi",
+              "type": "terminal",
+              "command": "python -c \"\nimport pandas as pd\nfrom features.transformers import FeaturePipelineBuilder\nimport joblib\n\ndf = pd.DataFrame({'age': [25,30,35,40], 'salary': [50000,60000,70000,80000], 'city': ['Istanbul','Ankara','Istanbul','Izmir']})\nbuilder = FeaturePipelineBuilder()\nbuilder.detect_column_types(df)\npipeline = builder.build()\npipeline.fit(df)\nbuilder.save('features/test_pipeline.joblib')\n\nloaded = FeaturePipelineBuilder.load('features/test_pipeline.joblib')\nresult = loaded.transform(df)\nprint('Loaded pipeline works! Shape:', result.shape)\n\"",
+              "expected_output": "Loaded pipeline works! Shape: (4, 5)",
+              "why": "Pipeline'ı kaydedip yeniden yükleyerek training-serving tutarlılığını test ediyoruz. Training'de kullanılan transform aynı parametrelerle serving'de de uygulanmalı."
+            },
+            {
+              "order": "1.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) detect_column_types doğru ayırıyor mu? 2) fit_transform sonrası boyut doğru mu? 3) Kaydedilip yüklenen pipeline aynı sonucu veriyor mu?",
+              "why": "Feature pipeline ML sisteminin omurgasıdır. Burada hata yaparsan model yanlış öğrenir — 'training-serving skew' en yaygın production ML hatasıdır."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── models.py\n│   ├── database.py\n│   ├── schemas.py\n│   ├── routers/\n│   │   └── datasets.py\n│   └── services/\n│       ├── data_profiler.py\n│       ├── data_cleaner.py\n│       └── dataset_versioner.py\n├── features/\n│   ├── __init__.py\n│   ├── transformers.py\n│   └── test_pipeline.joblib\n├── data/\n│   └── uploads/\n├── workers/\n├── ml/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n├── Dockerfile.api\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "ValueError: A given column is not a column of the dataframe",
+              "cause": "ColumnTransformer'a verilen sütun isimleri DataFrame'de yok. Genellikle typo veya yanlış detect sonucu.",
+              "fix": "detect_column_types sonuçlarını print ederek kontrol et. Sütun isimlerinin tam eşleştiğinden emin ol."
+            },
+            {
+              "error": "NotFittedError: This ColumnTransformer instance is not fitted yet",
+              "cause": "Pipeline fit() çağrılmadan transform() yapılmaya çalışılıyor.",
+              "fix": "Önce pipeline.fit(df) veya pipeline.fit_transform(df) çağır. Kaydedilmiş pipeline zaten fit edilmiş olmalı."
+            },
+            {
+              "error": "sparse matrix / array dimension mismatch",
+              "cause": "OneHotEncoder sparse matrix dönerken diğer transformer'lar dense array dönüyor.",
+              "fix": "OneHotEncoder'da sparse_output=False parametresi ekle. Bu tüm çıktıları dense array yapar."
+            }
+          ]
         },
         {
           "step": 2,
           "title": "Feature Store Implementation",
           "why": "Feature'lari merkezi depoda tutmak reuse saglar ve training-serving skew'u onler.",
           "instructions": "Feature store:\n1. Feature tanimlari (isim, tip, transform)\n2. Feature hesaplama (batch mode)\n3. Feature versioning\n4. Feature lineage (hangi raw data'dan geldi)",
-          "checkpoint": "Ayni feature'i 2 farkli modelde kullanabiliyor musun?"
+          "checkpoint": "Ayni feature'i 2 farkli modelde kullanabiliyor musun?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Feature store veritabanı modelini oluştur",
+              "type": "code_add",
+              "file": "api/models.py",
+              "code": "class FeatureDefinition(Base):\n    __tablename__ = \"feature_definitions\"\n\n    id = Column(Integer, primary_key=True, index=True)\n    name = Column(String(255), unique=True, nullable=False)\n    description = Column(Text)\n    source_column = Column(String(255))\n    transform_type = Column(String(100))\n    dtype = Column(String(50))\n    version = Column(Integer, default=1)\n    created_at = Column(DateTime, default=datetime.utcnow)\n    metadata_ = Column(\"metadata\", JSON)\n\nclass FeatureValue(Base):\n    __tablename__ = \"feature_values\"\n\n    id = Column(Integer, primary_key=True, index=True)\n    feature_id = Column(Integer, nullable=False)\n    dataset_id = Column(Integer, nullable=False)\n    values_path = Column(String(500))\n    computed_at = Column(DateTime, default=datetime.utcnow)\n    stats = Column(JSON)",
+              "position": "bottom",
+              "why": "Feature store iki tablodan oluşur: tanımlar (ne tür transform) ve değerler (hesaplanmış sonuçlar). Bu ayırım feature reuse'u mümkün kılar — aynı feature farklı modellerde kullanılabilir."
+            },
+            {
+              "order": "2.2",
+              "action": "Feature store servisini oluştur",
+              "type": "code_write",
+              "file": "features/feature_store.py",
+              "code": "import pandas as pd\nimport numpy as np\nimport joblib\nimport os\nfrom typing import Dict, List, Any, Optional\nfrom datetime import datetime\n\nFEATURE_STORE_DIR = \"data/feature_store\"\nos.makedirs(FEATURE_STORE_DIR, exist_ok=True)\n\nclass FeatureStore:\n    def __init__(self, db_session=None):\n        self.db = db_session\n        self._registry: Dict[str, Dict] = {}\n    \n    def register_feature(self, name: str, source_column: str, transform_type: str, description: str = \"\") -> Dict:\n        feature_def = {\n            \"name\": name,\n            \"source_column\": source_column,\n            \"transform_type\": transform_type,\n            \"description\": description,\n            \"version\": 1,\n            \"created_at\": datetime.utcnow().isoformat()\n        }\n        self._registry[name] = feature_def\n        return feature_def\n    \n    def compute_feature(self, name: str, df: pd.DataFrame) -> pd.Series:\n        if name not in self._registry:\n            raise ValueError(f\"Feature '{name}' kayitli degil\")\n        \n        feature_def = self._registry[name]\n        source_col = feature_def[\"source_column\"]\n        transform = feature_def[\"transform_type\"]\n        \n        if transform == \"standard_scale\":\n            result = (df[source_col] - df[source_col].mean()) / df[source_col].std()\n        elif transform == \"min_max_scale\":\n            result = (df[source_col] - df[source_col].min()) / (df[source_col].max() - df[source_col].min())\n        elif transform == \"log_transform\":\n            result = np.log1p(df[source_col])\n        elif transform == \"bin_5\":\n            result = pd.cut(df[source_col], bins=5, labels=False)\n        elif transform == \"passthrough\":\n            result = df[source_col]\n        else:\n            raise ValueError(f\"Bilinmeyen transform: {transform}\")\n        \n        output_path = os.path.join(FEATURE_STORE_DIR, f\"{name}_v{feature_def['version']}.parquet\")\n        result.to_frame().to_parquet(output_path)\n        return result\n    \n    def get_feature(self, name: str) -> pd.Series:\n        if name not in self._registry:\n            raise ValueError(f\"Feature '{name}' kayitli degil\")\n        feature_def = self._registry[name]\n        path = os.path.join(FEATURE_STORE_DIR, f\"{name}_v{feature_def['version']}.parquet\")\n        return pd.read_parquet(path).iloc[:, 0]\n    \n    def list_features(self) -> List[Dict]:\n        return list(self._registry.values())",
+              "why": "Feature store, feature hesaplama mantığını merkezi bir yerde tutar. register → compute → get akışı ile feature'lar tekrarlanabilir ve paylaşılabilir olur."
+            },
+            {
+              "order": "2.3",
+              "action": "Feature store API endpoint'lerini oluştur",
+              "type": "code_write",
+              "file": "api/routers/features.py",
+              "code": "from fastapi import APIRouter, Depends, HTTPException\nfrom sqlalchemy.orm import Session\nfrom pydantic import BaseModel\nfrom typing import Optional\nfrom api.database import get_db\nfrom features.feature_store import FeatureStore\nimport pandas as pd\n\nrouter = APIRouter(prefix=\"/api/features\", tags=[\"features\"])\nstore = FeatureStore()\n\nclass FeatureRegisterRequest(BaseModel):\n    name: str\n    source_column: str\n    transform_type: str\n    description: Optional[str] = \"\"\n\n@router.post(\"/register\")\nasync def register_feature(request: FeatureRegisterRequest):\n    feature = store.register_feature(\n        name=request.name,\n        source_column=request.source_column,\n        transform_type=request.transform_type,\n        description=request.description\n    )\n    return feature\n\n@router.post(\"/compute/{feature_name}\")\nasync def compute_feature(feature_name: str, dataset_id: int, db: Session = Depends(get_db)):\n    from api.models import Dataset\n    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()\n    if not dataset:\n        raise HTTPException(404, \"Dataset bulunamadi\")\n    df = pd.read_csv(dataset.file_path)\n    result = store.compute_feature(feature_name, df)\n    return {\"feature\": feature_name, \"computed_rows\": len(result), \"sample\": result.head().tolist()}\n\n@router.get(\"/\")\nasync def list_features():\n    return store.list_features()",
+              "why": "REST API üzerinden feature kaydetmek ve hesaplamak, farklı istemcilerin (dashboard, training worker) aynı feature store'u kullanmasını sağlar."
+            },
+            {
+              "order": "2.4",
+              "action": "Feature router'ını ana uygulamaya ekle",
+              "type": "code_add",
+              "file": "api/main.py",
+              "code": "from api.routers import features\napp.include_router(features.router)",
+              "position": "bottom",
+              "why": "Yeni router'ı ana uygulamaya bağlamak, feature endpoint'lerinin erişilebilir olmasını sağlar."
+            },
+            {
+              "order": "2.5",
+              "action": "Feature store'u test et",
+              "type": "terminal",
+              "command": "curl -X POST http://localhost:8000/api/features/register -H 'Content-Type: application/json' -d '{\"name\": \"age_scaled\", \"source_column\": \"age\", \"transform_type\": \"standard_scale\", \"description\": \"Yaş sütunu standardize edilmiş\"}'\ncurl -X POST http://localhost:8000/api/features/compute/age_scaled?dataset_id=1\ncurl http://localhost:8000/api/features/",
+              "expected_output": "Register: {\"name\": \"age_scaled\", ...}\nCompute: {\"feature\": \"age_scaled\", \"computed_rows\": 7, \"sample\": [...]}\nList: [{\"name\": \"age_scaled\", ...}]",
+              "why": "Tüm feature store akışını test ediyoruz: kayıt → hesaplama → listeleme. Feature'ın doğru hesaplandığını sample değerlerinden doğrula."
+            },
+            {
+              "order": "2.6",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) Feature register edildikten sonra listede görünmeli 2) Compute sonrası parquet dosyası data/feature_store/ altında oluşmalı 3) Aynı feature'ı farklı dataset ile compute edebilmeli",
+              "why": "Feature store'un doğru çalışması, ileride model eğitiminde kullanılacak feature'ların tutarlı olmasını garanti eder."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── models.py\n│   ├── database.py\n│   ├── schemas.py\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   └── features.py\n│   └── services/\n│       ├── data_profiler.py\n│       ├── data_cleaner.py\n│       └── dataset_versioner.py\n├── features/\n│   ├── __init__.py\n│   ├── transformers.py\n│   └── feature_store.py\n├── data/\n│   ├── uploads/\n│   └── feature_store/\n│       └── age_scaled_v1.parquet\n├── workers/\n├── ml/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n├── Dockerfile.api\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "ValueError: Feature 'xyz' kayitli degil",
+              "cause": "Feature compute edilmeye çalışılıyor ama önce register edilmemiş.",
+              "fix": "Önce POST /api/features/register ile feature'ı kaydet, sonra compute et. Uygulama yeniden başlatıldığında in-memory registry sıfırlanır — veritabanına kaydet."
+            },
+            {
+              "error": "KeyError: 'column_name' — source_column DataFrame'de yok",
+              "cause": "Feature tanımındaki source_column, dataset'teki sütun ismiyle eşleşmiyor.",
+              "fix": "Dataset'in sütunlarını GET /api/datasets/ ile kontrol et. source_column'ı doğru isimle güncelle."
+            },
+            {
+              "error": "pyarrow.lib.ArrowInvalid: Casting from float64 to int64",
+              "cause": "Parquet dosyasına yazarken NaN içeren float sütun int'e cast edilmeye çalışılıyor.",
+              "fix": "NaN değerleri temizle veya sütun tipini float olarak bırak. to_parquet() öncesi dtypes kontrolü ekle."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Feature Importance & Selection",
           "why": "Cok feature = overfitting riski + yavas inference. Onemli feature'lari secmek model kalitesini arttirir.",
           "instructions": "Feature analizi:\n1. Correlation matrix\n2. Feature importance (tree-based)\n3. Recursive Feature Elimination (RFE)\n4. Sonuclari dashboard'da goster",
-          "checkpoint": "Feature importance grafigi cikariyor mu?"
+          "checkpoint": "Feature importance grafigi cikariyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Feature importance analiz modülünü oluştur",
+              "type": "code_write",
+              "file": "features/importance.py",
+              "code": "import pandas as pd\nimport numpy as np\nfrom sklearn.ensemble import RandomForestClassifier, RandomForestRegressor\nfrom sklearn.feature_selection import RFE\nfrom typing import Dict, List, Any, Optional\n\nclass FeatureAnalyzer:\n    def __init__(self, df: pd.DataFrame, target_col: str):\n        self.df = df\n        self.target_col = target_col\n        self.feature_cols = [c for c in df.select_dtypes(include=[np.number]).columns if c != target_col]\n        self.X = df[self.feature_cols].fillna(0)\n        self.y = df[target_col]\n    \n    def correlation_matrix(self) -> Dict[str, Any]:\n        corr = self.df[self.feature_cols + [self.target_col]].corr()\n        target_corr = corr[self.target_col].drop(self.target_col).to_dict()\n        return {\n            \"target_correlations\": {k: round(v, 4) for k, v in target_corr.items()},\n            \"high_correlations\": [\n                {\"feature\": k, \"correlation\": round(v, 4)}\n                for k, v in target_corr.items() if abs(v) > 0.5\n            ]\n        }\n    \n    def tree_importance(self, task: str = \"classification\") -> Dict[str, float]:\n        if task == \"classification\":\n            model = RandomForestClassifier(n_estimators=100, random_state=42)\n        else:\n            model = RandomForestRegressor(n_estimators=100, random_state=42)\n        model.fit(self.X, self.y)\n        importance = dict(zip(self.feature_cols, model.feature_importances_))\n        return {k: round(v, 4) for k, v in sorted(importance.items(), key=lambda x: x[1], reverse=True)}\n    \n    def rfe_ranking(self, n_features: int = 5, task: str = \"classification\") -> List[Dict]:\n        if task == \"classification\":\n            estimator = RandomForestClassifier(n_estimators=50, random_state=42)\n        else:\n            estimator = RandomForestRegressor(n_estimators=50, random_state=42)\n        rfe = RFE(estimator, n_features_to_select=min(n_features, len(self.feature_cols)))\n        rfe.fit(self.X, self.y)\n        return [\n            {\"feature\": col, \"rank\": int(rank), \"selected\": bool(selected)}\n            for col, rank, selected in zip(self.feature_cols, rfe.ranking_, rfe.support_)\n        ]\n    \n    def full_analysis(self, task: str = \"classification\") -> Dict[str, Any]:\n        return {\n            \"correlation\": self.correlation_matrix(),\n            \"tree_importance\": self.tree_importance(task),\n            \"rfe_ranking\": self.rfe_ranking(task=task)\n        }",
+              "why": "Feature importance analizi üç farklı yöntem kullanır: korelasyon (basit), tree-based importance (güçlü) ve RFE (en doğru). Birden fazla yöntem kullanmak, tek yöntemin yanıltıcı olma riskini azaltır."
+            },
+            {
+              "order": "3.2",
+              "action": "Feature importance endpoint'ini oluştur",
+              "type": "code_add",
+              "file": "api/routers/features.py",
+              "code": "from features.importance import FeatureAnalyzer\n\n@router.post(\"/importance/{dataset_id}\")\nasync def analyze_importance(\n    dataset_id: int,\n    target_column: str,\n    task: str = \"classification\",\n    db: Session = Depends(get_db)\n):\n    from api.models import Dataset\n    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()\n    if not dataset:\n        raise HTTPException(404, \"Dataset bulunamadi\")\n    df = pd.read_csv(dataset.file_path)\n    analyzer = FeatureAnalyzer(df, target_column)\n    return analyzer.full_analysis(task)",
+              "position": "bottom",
+              "why": "API üzerinden feature importance analizi yapmak, dashboard'da sonuçları görselleştirmeyi sağlar. target_column parametresi hangi sütunun hedef olduğunu belirtir."
+            },
+            {
+              "order": "3.3",
+              "action": "Feature importance'ı test et",
+              "type": "terminal",
+              "command": "python -c \"\nimport pandas as pd\nimport numpy as np\nnp.random.seed(42)\ndf = pd.DataFrame({\n    'feature_a': np.random.randn(100),\n    'feature_b': np.random.randn(100) * 2,\n    'feature_c': np.random.randn(100) * 0.1,\n    'target': np.random.randint(0, 2, 100)\n})\ndf['feature_a'] = df['feature_a'] + df['target'] * 2\ndf.to_csv('data/uploads/importance_test.csv', index=False)\nprint('Test verisi olusturuldu')\n\nfrom features.importance import FeatureAnalyzer\nanalyzer = FeatureAnalyzer(df, 'target')\nresult = analyzer.full_analysis()\nprint('Correlation:', result['correlation']['target_correlations'])\nprint('Tree importance:', result['tree_importance'])\nprint('RFE:', result['rfe_ranking'])\n\"",
+              "expected_output": "feature_a target ile yüksek korelasyon ve yüksek importance göstermeli (çünkü target ile bağlantılı oluşturduk)",
+              "why": "Bilinen ilişkili veri ile test ederek algoritmanın doğru feature'ı önemli bulduğunu doğruluyoruz. feature_a target ile ilişkili olarak oluşturuldu — en önemli feature olmalı."
+            },
+            {
+              "order": "3.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) Korelasyon matrisinde feature_a en yüksek korelasyona sahip olmalı 2) Tree importance'da feature_a en yüksek olmalı 3) RFE'de feature_a selected=True olmalı",
+              "why": "Üç farklı yöntem de aynı feature'ı önemli buluyorsa, analizimiz güvenilirdir. Tutarsızlık varsa veri yapısını incele."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   └── features.py\n│   └── services/\n│       ├── data_profiler.py\n│       ├── data_cleaner.py\n│       └── dataset_versioner.py\n├── features/\n│   ├── __init__.py\n│   ├── transformers.py\n│   ├── feature_store.py\n│   └── importance.py\n├── data/\n│   ├── uploads/\n│   │   └── importance_test.csv\n│   └── feature_store/\n├── workers/\n├── ml/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "ValueError: Unknown label type: 'continuous' for RandomForestClassifier",
+              "cause": "Hedef sütun sürekli (continuous) değer içeriyor ama classification görevi seçilmiş.",
+              "fix": "task parametresini 'regression' olarak değiştir veya hedef sütunu pd.cut ile kategorilere ayır."
+            },
+            {
+              "error": "ValueError: Input contains NaN — fit() başarısız",
+              "cause": "Feature sütunlarında NaN değerler var ve model NaN kabul etmiyor.",
+              "fix": "fillna(0) veya veri temizleme adımını önceden uygula. Analiz öncesi missing value kontrolü ekle."
+            },
+            {
+              "error": "MemoryError: Large dataset ile RandomForest çalıştırırken bellek yetersiz",
+              "cause": "Çok sayıda satır ve sütunla 100 ağaçlık RandomForest eğitmek fazla bellek tüketir.",
+              "fix": "n_estimators'ı 50'ye düşür veya verinin bir sample'ını kullan: df.sample(frac=0.1)"
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Training-serving skew en buyuk MLOps sorunu — ayni transform'u ikisinde de kullan\n2. Feature pipeline'ini SERIALIZE et (pickle/joblib) ve model ile birlikte kaydet\n3. Feature store'da metadata ZORUNLU: ne zaman hesaplandi, hangi kaynak, hangi transform\n4. One-hot encoding sonrasi boyut patlamasina dikkat — high cardinality'de target encoding kullan",
@@ -230,28 +718,296 @@
           "why": "Model egitimi dakikalar surer — API request icinde yapilamaz. Asenkron worker ile training job'lari arka planda calisir.",
           "instructions": "Celery worker:\n1. Training task tanimla\n2. Progress reporting (epoch/step bazli)\n3. Cancellation support\n4. Error handling ve retry\n5. Result storage",
           "code_snippet": "@celery_app.task(bind=True)\ndef train_model(self, config: dict):\n    self.update_state(state='TRAINING', meta={'progress': 0})\n    \n    with mlflow.start_run():\n        mlflow.log_params(config)\n        model = train(config)\n        mlflow.log_metrics(metrics)\n        mlflow.sklearn.log_model(model, 'model')\n    \n    self.update_state(state='COMPLETED', meta={'progress': 100})",
-          "checkpoint": "Training job'u baslatip progress'i takip edebiliyor musun?"
+          "checkpoint": "Training job'u baslatip progress'i takip edebiliyor musun?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Celery konfigürasyonunu oluştur",
+              "type": "code_write",
+              "file": "workers/__init__.py",
+              "code": "",
+              "why": "Workers modülünü Python paketi olarak tanımlamak için __init__.py gereklidir."
+            },
+            {
+              "order": "1.2",
+              "action": "Celery uygulamasını konfigure et",
+              "type": "code_write",
+              "file": "workers/celery_app.py",
+              "code": "import os\nfrom celery import Celery\n\nREDIS_URL = os.getenv(\"REDIS_URL\", \"redis://localhost:6379/0\")\n\ncelery_app = Celery(\n    \"ml_pipeline\",\n    broker=REDIS_URL,\n    backend=REDIS_URL,\n    include=[\"workers.training_tasks\"]\n)\n\ncelery_app.conf.update(\n    task_serializer=\"json\",\n    accept_content=[\"json\"],\n    result_serializer=\"json\",\n    timezone=\"UTC\",\n    enable_utc=True,\n    task_track_started=True,\n    task_acks_late=True,\n    worker_prefetch_multiplier=1,\n)",
+              "why": "Celery konfigürasyonu broker (Redis) ve result backend'i tanımlar. task_track_started progress takibi için, task_acks_late ise worker çökerse görevin kaybolmaması için gereklidir."
+            },
+            {
+              "order": "1.3",
+              "action": "Training task'ını oluştur",
+              "type": "code_write",
+              "file": "workers/training_tasks.py",
+              "code": "import os\nimport mlflow\nimport pandas as pd\nimport numpy as np\nfrom sklearn.model_selection import cross_val_score\nfrom sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score\nimport joblib\nfrom workers.celery_app import celery_app\nfrom features.transformers import FeaturePipelineBuilder\n\nMLFLOW_TRACKING_URI = os.getenv(\"MLFLOW_TRACKING_URI\", \"http://localhost:5000\")\nmlflow.set_tracking_uri(MLFLOW_TRACKING_URI)\n\nMODEL_MAP = {\n    \"random_forest\": RandomForestClassifier,\n    \"gradient_boosting\": GradientBoostingClassifier,\n    \"logistic_regression\": LogisticRegression\n}\n\n@celery_app.task(bind=True, name=\"train_model\")\ndef train_model(self, config: dict):\n    try:\n        self.update_state(state=\"LOADING_DATA\", meta={\"progress\": 10})\n        df = pd.read_csv(config[\"dataset_path\"])\n        target_col = config[\"target_column\"]\n        X = df.drop(columns=[target_col])\n        y = df[target_col]\n        \n        self.update_state(state=\"FEATURE_ENGINEERING\", meta={\"progress\": 25})\n        builder = FeaturePipelineBuilder()\n        builder.detect_column_types(X)\n        preprocessor = builder.build()\n        X_transformed = preprocessor.fit_transform(X)\n        \n        self.update_state(state=\"TRAINING\", meta={\"progress\": 50})\n        model_type = config.get(\"model_type\", \"random_forest\")\n        model_params = config.get(\"params\", {})\n        ModelClass = MODEL_MAP.get(model_type, RandomForestClassifier)\n        model = ModelClass(**model_params)\n        \n        experiment_name = config.get(\"experiment_name\", \"default\")\n        mlflow.set_experiment(experiment_name)\n        \n        with mlflow.start_run(run_name=config.get(\"run_name\", f\"{model_type}_run\")):\n            mlflow.log_params(config.get(\"params\", {}))\n            mlflow.log_param(\"model_type\", model_type)\n            mlflow.log_param(\"dataset\", config[\"dataset_path\"])\n            \n            self.update_state(state=\"CROSS_VALIDATION\", meta={\"progress\": 60})\n            cv_scores = cross_val_score(model, X_transformed, y, cv=5, scoring=\"accuracy\")\n            \n            model.fit(X_transformed, y)\n            predictions = model.predict(X_transformed)\n            \n            metrics = {\n                \"accuracy\": round(accuracy_score(y, predictions), 4),\n                \"f1_score\": round(f1_score(y, predictions, average=\"weighted\"), 4),\n                \"precision\": round(precision_score(y, predictions, average=\"weighted\"), 4),\n                \"recall\": round(recall_score(y, predictions, average=\"weighted\"), 4),\n                \"cv_mean\": round(float(cv_scores.mean()), 4),\n                \"cv_std\": round(float(cv_scores.std()), 4)\n            }\n            mlflow.log_metrics(metrics)\n            \n            self.update_state(state=\"SAVING_MODEL\", meta={\"progress\": 85})\n            mlflow.sklearn.log_model(model, \"model\")\n            \n            pipeline_path = f\"artifacts/pipeline_{model_type}.joblib\"\n            os.makedirs(\"artifacts\", exist_ok=True)\n            joblib.dump(preprocessor, pipeline_path)\n            mlflow.log_artifact(pipeline_path)\n            \n            run_id = mlflow.active_run().info.run_id\n        \n        self.update_state(state=\"COMPLETED\", meta={\"progress\": 100})\n        return {\n            \"status\": \"completed\",\n            \"run_id\": run_id,\n            \"metrics\": metrics,\n            \"model_type\": model_type\n        }\n    except Exception as e:\n        self.update_state(state=\"FAILED\", meta={\"error\": str(e)})\n        raise",
+              "why": "Training task'ı Celery worker'da asenkron çalışır. Her adımda progress günceller (LOADING_DATA → TRAINING → COMPLETED). MLflow ile tüm parametreler, metrikler ve model artifact'ı loglanır."
+            },
+            {
+              "order": "1.4",
+              "action": "Training API endpoint'ini oluştur",
+              "type": "code_write",
+              "file": "api/routers/training.py",
+              "code": "from fastapi import APIRouter, HTTPException\nfrom pydantic import BaseModel\nfrom typing import Optional, Dict, Any\nfrom workers.training_tasks import train_model\nfrom celery.result import AsyncResult\nfrom workers.celery_app import celery_app\n\nrouter = APIRouter(prefix=\"/api/training\", tags=[\"training\"])\n\nclass TrainingRequest(BaseModel):\n    dataset_path: str\n    target_column: str\n    model_type: str = \"random_forest\"\n    params: Dict[str, Any] = {}\n    experiment_name: str = \"default\"\n    run_name: Optional[str] = None\n\n@router.post(\"/start\")\nasync def start_training(request: TrainingRequest):\n    task = train_model.delay(request.model_dump())\n    return {\"task_id\": task.id, \"status\": \"started\"}\n\n@router.get(\"/status/{task_id}\")\nasync def get_training_status(task_id: str):\n    result = AsyncResult(task_id, app=celery_app)\n    response = {\n        \"task_id\": task_id,\n        \"status\": result.state,\n        \"progress\": 0\n    }\n    if result.state == \"COMPLETED\" or result.state == \"SUCCESS\":\n        response[\"result\"] = result.result\n        response[\"progress\"] = 100\n    elif result.state == \"FAILED\":\n        response[\"error\"] = str(result.info)\n    elif result.info:\n        response[\"progress\"] = result.info.get(\"progress\", 0)\n    return response\n\n@router.post(\"/cancel/{task_id}\")\nasync def cancel_training(task_id: str):\n    celery_app.control.revoke(task_id, terminate=True)\n    return {\"task_id\": task_id, \"status\": \"cancelled\"}",
+              "why": "Training endpoint'i asenkron yapıda çalışır: start → status takibi → sonuç alma. cancel endpoint'i ile uzun süren eğitimleri iptal edebilirsin."
+            },
+            {
+              "order": "1.5",
+              "action": "Training router'ını ana uygulamaya ekle",
+              "type": "code_add",
+              "file": "api/main.py",
+              "code": "from api.routers import training\napp.include_router(training.router)",
+              "position": "bottom",
+              "why": "Training endpoint'lerinin çalışması için router'ı ana uygulamaya bağlamak gerekir."
+            },
+            {
+              "order": "1.6",
+              "action": "Celery worker'ı başlat",
+              "type": "terminal",
+              "command": "celery -A workers.celery_app worker --loglevel=info --pool=solo",
+              "expected_output": "[2024-xx-xx] Connected to redis://localhost:6379/0\n[2024-xx-xx] celery@hostname ready.\n- ** ---------- [config]\n- ** ---------- .> transport: redis://localhost:6379/0",
+              "why": "Celery worker ayrı bir process olarak çalışır. --pool=solo development için uygundur, production'da prefork kullan."
+            },
+            {
+              "order": "1.7",
+              "action": "Training job'unu başlatıp test et",
+              "type": "terminal",
+              "command": "curl -X POST http://localhost:8000/api/training/start -H 'Content-Type: application/json' -d '{\"dataset_path\": \"data/uploads/importance_test.csv\", \"target_column\": \"target\", \"model_type\": \"random_forest\", \"experiment_name\": \"test_experiment\"}'",
+              "expected_output": "{\"task_id\": \"abc123...\", \"status\": \"started\"}",
+              "why": "Training job'unu API üzerinden başlatarak Celery → MLflow entegrasyonunun çalıştığını doğruluyoruz."
+            },
+            {
+              "order": "1.8",
+              "action": "Training durumunu takip et",
+              "type": "terminal",
+              "command": "curl http://localhost:8000/api/training/status/{task_id}",
+              "expected_output": "{\"task_id\": \"...\", \"status\": \"SUCCESS\", \"progress\": 100, \"result\": {\"metrics\": {\"accuracy\": 0.85, ...}}}",
+              "why": "Progress takibi ile training'in hangi aşamada olduğunu bilirsin. Dashboard'da kullanıcıya göstermek için bu bilgi gerekli."
+            },
+            {
+              "order": "1.9",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) Training başladığında task_id dönmeli 2) Status endpoint'inde progress artmalı 3) MLflow UI'da (http://localhost:5000) experiment ve run görünmeli 4) Metrikler (accuracy, f1) kaydedilmiş olmalı",
+              "why": "End-to-end akışı doğrulamak: API → Celery → scikit-learn → MLflow. Her bileşen doğru çalışmazsa production'da sorun yaşarsın."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   └── training.py\n│   └── services/\n├── workers/\n│   ├── __init__.py\n│   ├── celery_app.py\n│   └── training_tasks.py\n├── features/\n│   ├── __init__.py\n│   ├── transformers.py\n│   ├── feature_store.py\n│   └── importance.py\n├── ml/\n├── artifacts/\n│   └── pipeline_random_forest.joblib\n├── data/\n│   ├── uploads/\n│   └── feature_store/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "celery.exceptions.NotRegistered: 'train_model' is not a registered task",
+              "cause": "Celery worker başlatılırken task modülü include edilmemiş veya import hatası var.",
+              "fix": "celery_app.py'de include=[\"workers.training_tasks\"] olduğundan emin ol. Worker'ı proje kök dizininden başlat."
+            },
+            {
+              "error": "ConnectionError: Error 111 connecting to localhost:6379. Connection refused",
+              "cause": "Redis servisi çalışmıyor.",
+              "fix": "docker-compose up redis ile Redis'i başlat veya redis-server komutunu çalıştır."
+            },
+            {
+              "error": "mlflow.exceptions.MlflowException: Could not find experiment with name 'default'",
+              "cause": "MLflow'da experiment henüz oluşturulmamış.",
+              "fix": "mlflow.set_experiment() otomatik oluşturur ama MLflow server'ın çalıştığından emin ol. MLFLOW_TRACKING_URI doğru olmalı."
+            }
+          ]
         },
         {
           "step": 2,
           "title": "MLflow Experiment Tracking",
           "why": "Her experiment'in parametrelerini, metriklerini ve artifact'larini kaydetmek model secimi ve karsilastirmasi icin sart.",
           "instructions": "MLflow entegrasyonu:\n1. Experiment olustur\n2. Her run'da: parametreler, metrikler, modeli logla\n3. Artifact'lar: confusion matrix, feature importance plot\n4. Tag'ler: model tipi, dataset versiyonu\n5. Frontend'de experiment comparison",
-          "checkpoint": "MLflow UI'da experiment'leri karsilastirabiliyormusun?"
+          "checkpoint": "MLflow UI'da experiment'leri karsilastirabiliyormusun?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "MLflow experiment yönetim endpoint'lerini oluştur",
+              "type": "code_write",
+              "file": "api/routers/experiments.py",
+              "code": "import os\nimport mlflow\nfrom fastapi import APIRouter, HTTPException\nfrom typing import Optional, List\n\nMLFLOW_TRACKING_URI = os.getenv(\"MLFLOW_TRACKING_URI\", \"http://localhost:5000\")\nmlflow.set_tracking_uri(MLFLOW_TRACKING_URI)\n\nrouter = APIRouter(prefix=\"/api/experiments\", tags=[\"experiments\"])\n\n@router.get(\"/\")\nasync def list_experiments():\n    experiments = mlflow.search_experiments()\n    return [\n        {\n            \"id\": exp.experiment_id,\n            \"name\": exp.name,\n            \"artifact_location\": exp.artifact_location,\n            \"lifecycle_stage\": exp.lifecycle_stage\n        }\n        for exp in experiments\n    ]\n\n@router.get(\"/{experiment_id}/runs\")\nasync def list_runs(experiment_id: str, max_results: int = 50):\n    runs = mlflow.search_runs(\n        experiment_ids=[experiment_id],\n        max_results=max_results,\n        order_by=[\"metrics.accuracy DESC\"]\n    )\n    if runs.empty:\n        return []\n    return runs.to_dict(orient=\"records\")\n\n@router.get(\"/runs/{run_id}\")\nasync def get_run_details(run_id: str):\n    run = mlflow.get_run(run_id)\n    return {\n        \"run_id\": run_id,\n        \"status\": run.info.status,\n        \"params\": run.data.params,\n        \"metrics\": run.data.metrics,\n        \"tags\": run.data.tags,\n        \"start_time\": run.info.start_time,\n        \"end_time\": run.info.end_time,\n        \"artifact_uri\": run.info.artifact_uri\n    }\n\n@router.get(\"/compare\")\nasync def compare_runs(run_ids: str):\n    ids = run_ids.split(\",\")\n    results = []\n    for rid in ids:\n        run = mlflow.get_run(rid.strip())\n        results.append({\n            \"run_id\": rid.strip(),\n            \"params\": run.data.params,\n            \"metrics\": run.data.metrics\n        })\n    return results",
+              "why": "MLflow'un Python API'sini FastAPI endpoint'leriyle sararak frontend'in experiment verilerine erişmesini sağlıyoruz. compare endpoint'i farklı denemeleri yan yana karşılaştırmak için kritik."
+            },
+            {
+              "order": "2.2",
+              "action": "Experiments router'ını ana uygulamaya ekle",
+              "type": "code_add",
+              "file": "api/main.py",
+              "code": "from api.routers import experiments\napp.include_router(experiments.router)",
+              "position": "bottom",
+              "why": "Experiment endpoint'lerinin erişilebilir olması için router'ı bağla."
+            },
+            {
+              "order": "2.3",
+              "action": "Birden fazla experiment çalıştır",
+              "type": "terminal",
+              "command": "curl -X POST http://localhost:8000/api/training/start -H 'Content-Type: application/json' -d '{\"dataset_path\": \"data/uploads/importance_test.csv\", \"target_column\": \"target\", \"model_type\": \"gradient_boosting\", \"experiment_name\": \"model_comparison\", \"run_name\": \"gb_run1\", \"params\": {\"n_estimators\": 100, \"max_depth\": 5}}'\ncurl -X POST http://localhost:8000/api/training/start -H 'Content-Type: application/json' -d '{\"dataset_path\": \"data/uploads/importance_test.csv\", \"target_column\": \"target\", \"model_type\": \"logistic_regression\", \"experiment_name\": \"model_comparison\", \"run_name\": \"lr_run1\", \"params\": {\"C\": 1.0, \"max_iter\": 200}}'",
+              "expected_output": "İki task_id dönmeli — her biri farklı model tipi ile",
+              "why": "Birden fazla model tipini aynı experiment altında çalıştırarak karşılaştırma yapacağız. MLflow her run'ı ayrı kaydeder."
+            },
+            {
+              "order": "2.4",
+              "action": "Experiment'leri karşılaştır",
+              "type": "terminal",
+              "command": "curl http://localhost:8000/api/experiments/\ncurl http://localhost:8000/api/experiments/1/runs",
+              "expected_output": "Experiments listesi ve her run'ın metrikleri (accuracy, f1_score, cv_mean)",
+              "why": "Experiment listesi ve run'ları sorgulamak, frontend dashboard'da gösterilecek verileri sağlar."
+            },
+            {
+              "order": "2.5",
+              "action": "MLflow UI'da doğrula",
+              "type": "validate",
+              "validation": "http://localhost:5000 adresinde MLflow UI'ı aç. 1) Experiment'ler listede görünmeli 2) Her run'da parametreler ve metrikler kaydedilmiş olmalı 3) Model artifact'ı mevcut olmalı 4) İki run'ı seçip 'Compare' yapabilmelisin",
+              "why": "MLflow UI production'da Data Scientist'lerin en çok kullanacağı araçtır. Tüm verilerin doğru loglandığını burada doğrulamak şart."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   └── experiments.py\n│   └── services/\n├── workers/\n│   ├── __init__.py\n│   ├── celery_app.py\n│   └── training_tasks.py\n├── features/\n├── artifacts/\n├── data/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "mlflow.exceptions.RestException: RESOURCE_DOES_NOT_EXIST: No Experiment with id=1 exists",
+              "cause": "Belirtilen experiment ID'si MLflow'da mevcut değil.",
+              "fix": "Önce GET /api/experiments/ ile mevcut experiment'leri listele. ID'nin doğru olduğundan emin ol."
+            },
+            {
+              "error": "ConnectionError: HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded",
+              "cause": "MLflow server çalışmıyor.",
+              "fix": "docker-compose up mlflow ile MLflow'u başlat. MLFLOW_TRACKING_URI ortam değişkeninin doğru olduğunu kontrol et."
+            },
+            {
+              "error": "mlflow.search_runs returns empty DataFrame even though runs exist",
+              "cause": "Experiment ID string olarak bekleniyor ama integer gönderiliyor.",
+              "fix": "experiment_ids parametresine string listesi ver: [\"1\"] değil [1] — MLflow API string kabul eder."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Hyperparameter Optimization",
           "why": "Model performansi hyperparameter secimine baglidir. Otomatik search manual denemeden cok daha etkili.",
           "instructions": "Hyperparameter search:\n1. Grid search (az parametre)\n2. Random search (cok parametre)\n3. Her denemeyi MLflow'a logla\n4. En iyi modeli otomatik sec\n5. Search space ve strategy konfigurasyonu",
-          "checkpoint": "Random search ile 10 deneme yapip en iyisini seciyor mu?"
+          "checkpoint": "Random search ile 10 deneme yapip en iyisini seciyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Hyperparameter search modülünü oluştur",
+              "type": "code_write",
+              "file": "ml/__init__.py",
+              "code": "",
+              "why": "ML modülünü Python paketi olarak tanımla."
+            },
+            {
+              "order": "3.2",
+              "action": "Hyperparameter optimization modülü",
+              "type": "code_write",
+              "file": "ml/hyperparameter_search.py",
+              "code": "import itertools\nimport random\nimport mlflow\nimport numpy as np\nfrom sklearn.model_selection import cross_val_score\nfrom typing import Dict, List, Any, Optional\n\nclass HyperparameterSearch:\n    def __init__(self, model_class, param_space: Dict[str, List], experiment_name: str):\n        self.model_class = model_class\n        self.param_space = param_space\n        self.experiment_name = experiment_name\n        self.results: List[Dict] = []\n    \n    def grid_search(self, X, y, cv: int = 5) -> Dict[str, Any]:\n        keys = self.param_space.keys()\n        values = self.param_space.values()\n        best_score = -1\n        best_params = {}\n        \n        mlflow.set_experiment(self.experiment_name)\n        \n        for combo in itertools.product(*values):\n            params = dict(zip(keys, combo))\n            with mlflow.start_run(run_name=f\"grid_{hash(str(params)) % 10000}\"):\n                mlflow.log_params(params)\n                model = self.model_class(**params)\n                scores = cross_val_score(model, X, y, cv=cv, scoring=\"accuracy\")\n                mean_score = float(scores.mean())\n                mlflow.log_metric(\"cv_accuracy\", mean_score)\n                mlflow.log_metric(\"cv_std\", float(scores.std()))\n                \n                self.results.append({\"params\": params, \"score\": mean_score})\n                if mean_score > best_score:\n                    best_score = mean_score\n                    best_params = params\n        \n        return {\"best_params\": best_params, \"best_score\": round(best_score, 4), \"total_trials\": len(self.results)}\n    \n    def random_search(self, X, y, n_iter: int = 10, cv: int = 5) -> Dict[str, Any]:\n        best_score = -1\n        best_params = {}\n        \n        mlflow.set_experiment(self.experiment_name)\n        \n        for i in range(n_iter):\n            params = {k: random.choice(v) for k, v in self.param_space.items()}\n            with mlflow.start_run(run_name=f\"random_{i}\"):\n                mlflow.log_params(params)\n                model = self.model_class(**params)\n                scores = cross_val_score(model, X, y, cv=cv, scoring=\"accuracy\")\n                mean_score = float(scores.mean())\n                mlflow.log_metric(\"cv_accuracy\", mean_score)\n                mlflow.log_metric(\"cv_std\", float(scores.std()))\n                \n                self.results.append({\"params\": params, \"score\": mean_score})\n                if mean_score > best_score:\n                    best_score = mean_score\n                    best_params = params\n        \n        return {\"best_params\": best_params, \"best_score\": round(best_score, 4), \"total_trials\": n_iter}",
+              "why": "Grid search tüm kombinasyonları dener (az parametre için), random search rastgele örnekler (çok parametre için). Her deneme MLflow'a loglanır — sonra karşılaştırabilirsin."
+            },
+            {
+              "order": "3.3",
+              "action": "Hyperparameter search Celery task'ı oluştur",
+              "type": "code_add",
+              "file": "workers/training_tasks.py",
+              "code": "@celery_app.task(bind=True, name=\"hyperparameter_search\")\ndef hyperparameter_search(self, config: dict):\n    from ml.hyperparameter_search import HyperparameterSearch\n    \n    self.update_state(state=\"LOADING\", meta={\"progress\": 10})\n    df = pd.read_csv(config[\"dataset_path\"])\n    target_col = config[\"target_column\"]\n    X = df.drop(columns=[target_col])\n    y = df[target_col]\n    \n    builder = FeaturePipelineBuilder()\n    builder.detect_column_types(X)\n    preprocessor = builder.build()\n    X_transformed = preprocessor.fit_transform(X)\n    \n    ModelClass = MODEL_MAP.get(config[\"model_type\"], RandomForestClassifier)\n    search = HyperparameterSearch(\n        model_class=ModelClass,\n        param_space=config[\"param_space\"],\n        experiment_name=config.get(\"experiment_name\", \"hp_search\")\n    )\n    \n    self.update_state(state=\"SEARCHING\", meta={\"progress\": 30})\n    method = config.get(\"search_method\", \"random\")\n    if method == \"grid\":\n        result = search.grid_search(X_transformed, y)\n    else:\n        result = search.random_search(X_transformed, y, n_iter=config.get(\"n_iter\", 10))\n    \n    self.update_state(state=\"COMPLETED\", meta={\"progress\": 100})\n    return result",
+              "position": "bottom",
+              "why": "Hyperparameter search uzun süren bir işlem — Celery'de asenkron çalıştırarak API'nin bloklanmasını önlüyoruz."
+            },
+            {
+              "order": "3.4",
+              "action": "Hyperparameter search endpoint'ini ekle",
+              "type": "code_add",
+              "file": "api/routers/training.py",
+              "code": "from workers.training_tasks import hyperparameter_search\n\nclass HPSearchRequest(BaseModel):\n    dataset_path: str\n    target_column: str\n    model_type: str = \"random_forest\"\n    param_space: Dict[str, list]\n    search_method: str = \"random\"\n    n_iter: int = 10\n    experiment_name: str = \"hp_search\"\n\n@router.post(\"/hp-search\")\nasync def start_hp_search(request: HPSearchRequest):\n    task = hyperparameter_search.delay(request.model_dump())\n    return {\"task_id\": task.id, \"status\": \"started\"}",
+              "position": "bottom",
+              "why": "HP search endpoint'i parametre uzayını alır ve arama yapar. param_space dictionary'sinde her parametre için denenecek değerler listesi verilir."
+            },
+            {
+              "order": "3.5",
+              "action": "Hyperparameter search'ü test et",
+              "type": "terminal",
+              "command": "curl -X POST http://localhost:8000/api/training/hp-search -H 'Content-Type: application/json' -d '{\"dataset_path\": \"data/uploads/importance_test.csv\", \"target_column\": \"target\", \"model_type\": \"random_forest\", \"param_space\": {\"n_estimators\": [50, 100, 200], \"max_depth\": [3, 5, 10, null]}, \"search_method\": \"random\", \"n_iter\": 10, \"experiment_name\": \"rf_hp_search\"}'",
+              "expected_output": "{\"task_id\": \"...\", \"status\": \"started\"}",
+              "why": "10 farklı parametre kombinasyonunu test ederek en iyi modeli bulmayı hedefliyoruz."
+            },
+            {
+              "order": "3.6",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) Task tamamlandığında best_params ve best_score dönmeli 2) MLflow UI'da hp_search experiment'i altında 10 run görünmeli 3) Her run'da cv_accuracy metriki loglanmış olmalı",
+              "why": "Otomatik hyperparameter search, manual deneme-yanılmadan çok daha etkilidir. Her denemenin loglanması sonra analiz yapmayı kolaylaştırır."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   └── experiments.py\n│   └── services/\n├── workers/\n│   ├── __init__.py\n│   ├── celery_app.py\n│   └── training_tasks.py\n├── features/\n├── ml/\n│   ├── __init__.py\n│   └── hyperparameter_search.py\n├── artifacts/\n├── data/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "TypeError: __init__() got an unexpected keyword argument",
+              "cause": "param_space'te model sınıfının kabul etmediği bir parametre var.",
+              "fix": "Model sınıfının kabul ettiği parametreleri sklearn dokümantasyonundan kontrol et. Geçersiz parametreleri param_space'ten kaldır."
+            },
+            {
+              "error": "Grid search çok uzun sürüyor — kombinasyon patlaması",
+              "cause": "Çok sayıda parametre ve değer ile grid search yapılıyor (örn: 4x4x3x3 = 144 kombinasyon).",
+              "fix": "3+ parametre için random_search kullan. n_iter ile deneme sayısını sınırla. Budget limit koy."
+            },
+            {
+              "error": "celery.exceptions.WorkerLostError: Worker exited prematurely",
+              "cause": "Bellek yetersiz — büyük dataset ile çok sayıda model eğitimi belleği tüketiyor.",
+              "fix": "Worker'a bellek limiti koy: --max-memory-per-child=500000 (KB). Veya veriyi örnekle."
+            }
+          ]
         },
         {
           "step": 4,
           "title": "Model Registry & Versioning",
           "why": "Production'daki modelin hangi versiyon oldugunu bilmek ve kolayca rollback yapabilmek icin model registry sart.",
           "instructions": "MLflow Model Registry:\n1. Model kaydi (isim, versiyon, stage)\n2. Stage transitions: Staging -> Production -> Archived\n3. Model metadata: training config, dataset, metrics\n4. Model approval workflow\n5. API ile model yukle",
-          "checkpoint": "Modeli Staging'den Production'a gecirebildin mi?"
+          "checkpoint": "Modeli Staging'den Production'a gecirebildin mi?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Model registry endpoint'lerini oluştur",
+              "type": "code_write",
+              "file": "api/routers/model_registry.py",
+              "code": "import os\nimport mlflow\nfrom mlflow.tracking import MlflowClient\nfrom fastapi import APIRouter, HTTPException\nfrom pydantic import BaseModel\nfrom typing import Optional\n\nMLFLOW_TRACKING_URI = os.getenv(\"MLFLOW_TRACKING_URI\", \"http://localhost:5000\")\nmlflow.set_tracking_uri(MLFLOW_TRACKING_URI)\nclient = MlflowClient()\n\nrouter = APIRouter(prefix=\"/api/models\", tags=[\"model-registry\"])\n\nclass RegisterModelRequest(BaseModel):\n    run_id: str\n    model_name: str\n    description: Optional[str] = \"\"\n\nclass TransitionRequest(BaseModel):\n    model_name: str\n    version: int\n    stage: str  # Staging, Production, Archived\n\n@router.post(\"/register\")\nasync def register_model(request: RegisterModelRequest):\n    model_uri = f\"runs:/{request.run_id}/model\"\n    result = mlflow.register_model(model_uri, request.model_name)\n    if request.description:\n        client.update_model_version(\n            name=request.model_name,\n            version=result.version,\n            description=request.description\n        )\n    return {\n        \"name\": result.name,\n        \"version\": result.version,\n        \"status\": result.status\n    }\n\n@router.post(\"/transition\")\nasync def transition_model(request: TransitionRequest):\n    if request.stage not in [\"Staging\", \"Production\", \"Archived\"]:\n        raise HTTPException(400, \"Stage Staging, Production veya Archived olmali\")\n    client.transition_model_version_stage(\n        name=request.model_name,\n        version=request.version,\n        stage=request.stage\n    )\n    return {\"name\": request.model_name, \"version\": request.version, \"stage\": request.stage}\n\n@router.get(\"/\")\nasync def list_models():\n    models = client.search_registered_models()\n    return [\n        {\n            \"name\": m.name,\n            \"latest_versions\": [\n                {\"version\": v.version, \"stage\": v.current_stage, \"status\": v.status}\n                for v in m.latest_versions\n            ]\n        }\n        for m in models\n    ]\n\n@router.get(\"/{model_name}/production\")\nasync def get_production_model(model_name: str):\n    versions = client.get_latest_versions(model_name, stages=[\"Production\"])\n    if not versions:\n        raise HTTPException(404, f\"'{model_name}' icin Production modeli bulunamadi\")\n    v = versions[0]\n    run = mlflow.get_run(v.run_id)\n    return {\n        \"name\": model_name,\n        \"version\": v.version,\n        \"run_id\": v.run_id,\n        \"metrics\": run.data.metrics,\n        \"params\": run.data.params\n    }",
+              "why": "Model registry, modellerin yaşam döngüsünü yönetir: kayıt → Staging → Production → Archived. Production'daki modeli her zaman bilmek, rollback yapabilmek için kritik."
+            },
+            {
+              "order": "4.2",
+              "action": "Model registry router'ını bağla",
+              "type": "code_add",
+              "file": "api/main.py",
+              "code": "from api.routers import model_registry\napp.include_router(model_registry.router)",
+              "position": "bottom",
+              "why": "Model registry endpoint'lerini erişilebilir yap."
+            },
+            {
+              "order": "4.3",
+              "action": "Model kaydet ve stage geçişi yap",
+              "type": "terminal",
+              "command": "# Önce bir training run_id'sini al\ncurl http://localhost:8000/api/experiments/1/runs | python -c \"import sys,json; runs=json.load(sys.stdin); print(runs[0]['run_id'] if runs else 'No runs')\"\n\n# Modeli kaydet (run_id'yi yukarıdan al)\ncurl -X POST http://localhost:8000/api/models/register -H 'Content-Type: application/json' -d '{\"run_id\": \"RUN_ID_BURAYA\", \"model_name\": \"churn_predictor\", \"description\": \"Customer churn prediction model\"}'\n\n# Staging'e geçir\ncurl -X POST http://localhost:8000/api/models/transition -H 'Content-Type: application/json' -d '{\"model_name\": \"churn_predictor\", \"version\": 1, \"stage\": \"Staging\"}'\n\n# Production'a promote et\ncurl -X POST http://localhost:8000/api/models/transition -H 'Content-Type: application/json' -d '{\"model_name\": \"churn_predictor\", \"version\": 1, \"stage\": \"Production\"}'",
+              "expected_output": "Register: {\"name\": \"churn_predictor\", \"version\": 1}\nTransition: {\"stage\": \"Staging\"} → {\"stage\": \"Production\"}",
+              "why": "Model yaşam döngüsünü test ediyoruz: kayıt → Staging → Production. Bu akış production'da güvenli model deployment'ı sağlar."
+            },
+            {
+              "order": "4.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) GET /api/models/ ile kayıtlı modeller listelenmeli 2) GET /api/models/churn_predictor/production ile production modeli dönmeli 3) MLflow UI'da Model Registry sekmesinde model ve versiyonlar görünmeli",
+              "why": "Model registry doğru çalışmazsa yanlış model production'a çıkabilir. Stage geçişleri kontrollü olmalı."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   ├── experiments.py\n│   │   └── model_registry.py\n│   └── services/\n├── workers/\n├── features/\n├── ml/\n│   ├── __init__.py\n│   └── hyperparameter_search.py\n├── artifacts/\n├── data/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "mlflow.exceptions.MlflowException: RESOURCE_ALREADY_EXISTS: Registered Model 'name' already exists",
+              "cause": "Aynı isimle model zaten kayıtlı — ikinci kayıt hataya neden oluyor.",
+              "fix": "Aynı model adıyla yeni versiyon kaydetmek istiyorsan register_model otomatik yeni versiyon oluşturur. Hata farklı bir nedenden ise model adını değiştir."
+            },
+            {
+              "error": "INVALID_PARAMETER_VALUE: Invalid stage 'production' — büyük/küçük harf",
+              "cause": "MLflow stage isimleri büyük harfle başlamalı: 'Production', 'Staging', 'Archived'.",
+              "fix": "Stage değerini capitalize et: stage.capitalize() veya sabit değerler kullan."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. HER experiment'i logla — 'sonra loglarim' dersen unutursun\n2. Model artifact'inda feature pipeline'i da kaydet — yoksa inference'da transform uyusmazligi olur\n3. Hyperparameter search'te budget limit koy — sinirsiz arama kaynak israf eder\n4. Model Registry'de approval zorunlulugu koy — test edilmemis model production'a cikmasin",
@@ -275,28 +1031,249 @@
           "why": "Modeli API olarak sunmak diger sistemlerin kullanmasini saglar.",
           "instructions": "FastAPI inference endpoint:\n1. Model registry'den aktif modeli yukle\n2. Input validasyonu (Pydantic)\n3. Feature transform uygula\n4. Prediction yap ve dondur\n5. Response'a confidence score ekle",
           "code_snippet": "@app.post('/api/predict')\nasync def predict(request: PredictionRequest):\n    model = load_production_model()\n    features = transform_input(request.data)\n    prediction = model.predict(features)\n    probability = model.predict_proba(features)\n    return {\n        'prediction': prediction[0],\n        'confidence': float(max(probability[0])),\n        'model_version': model.version\n    }",
-          "checkpoint": "API'ya istek gonderip dogru prediction aliyor musun?"
+          "checkpoint": "API'ya istek gonderip dogru prediction aliyor musun?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Model serving modülünü oluştur",
+              "type": "code_write",
+              "file": "ml/model_server.py",
+              "code": "import os\nimport mlflow\nimport joblib\nimport numpy as np\nfrom typing import Dict, Any, Optional\n\nMLFLOW_TRACKING_URI = os.getenv(\"MLFLOW_TRACKING_URI\", \"http://localhost:5000\")\nmlflow.set_tracking_uri(MLFLOW_TRACKING_URI)\n\nclass ModelServer:\n    def __init__(self):\n        self._model = None\n        self._pipeline = None\n        self._model_version = None\n        self._model_name = None\n    \n    def load_production_model(self, model_name: str) -> bool:\n        try:\n            model_uri = f\"models:/{model_name}/Production\"\n            self._model = mlflow.sklearn.load_model(model_uri)\n            \n            client = mlflow.tracking.MlflowClient()\n            versions = client.get_latest_versions(model_name, stages=[\"Production\"])\n            if versions:\n                self._model_version = versions[0].version\n                run = mlflow.get_run(versions[0].run_id)\n                artifact_uri = run.info.artifact_uri\n            \n            self._model_name = model_name\n            return True\n        except Exception as e:\n            print(f\"Model yukleme hatasi: {e}\")\n            return False\n    \n    def predict(self, features: np.ndarray) -> Dict[str, Any]:\n        if self._model is None:\n            raise RuntimeError(\"Model yuklenmemis\")\n        \n        prediction = self._model.predict(features)\n        result = {\"prediction\": prediction.tolist(), \"model_version\": self._model_version}\n        \n        if hasattr(self._model, 'predict_proba'):\n            probabilities = self._model.predict_proba(features)\n            result[\"confidence\"] = float(np.max(probabilities, axis=1)[0])\n            result[\"probabilities\"] = probabilities.tolist()\n        \n        return result\n    \n    @property\n    def is_loaded(self) -> bool:\n        return self._model is not None\n\nmodel_server = ModelServer()",
+              "why": "ModelServer sınıfı modeli bellekte tutar ve predict çağrılarını işler. Singleton pattern ile tüm istekler aynı model instance'ını kullanır — her istekte diskten yükleme yapmaz."
+            },
+            {
+              "order": "1.2",
+              "action": "Inference API endpoint'ini oluştur",
+              "type": "code_write",
+              "file": "api/routers/inference.py",
+              "code": "import time\nimport numpy as np\nfrom fastapi import APIRouter, HTTPException\nfrom pydantic import BaseModel\nfrom typing import List, Dict, Any\nfrom ml.model_server import model_server\nfrom features.transformers import FeaturePipelineBuilder\n\nrouter = APIRouter(prefix=\"/api/predict\", tags=[\"inference\"])\n\nclass PredictionRequest(BaseModel):\n    model_name: str = \"churn_predictor\"\n    features: Dict[str, Any]\n\nclass PredictionResponse(BaseModel):\n    prediction: Any\n    confidence: float = 0.0\n    model_version: str = \"\"\n    latency_ms: float = 0.0\n\n@router.post(\"/\", response_model=PredictionResponse)\nasync def predict(request: PredictionRequest):\n    start = time.time()\n    \n    if not model_server.is_loaded:\n        loaded = model_server.load_production_model(request.model_name)\n        if not loaded:\n            raise HTTPException(503, \"Model yuklenemedi. Production modeli kontrol edin.\")\n    \n    try:\n        import pandas as pd\n        input_df = pd.DataFrame([request.features])\n        builder = FeaturePipelineBuilder()\n        builder.detect_column_types(input_df)\n        preprocessor = builder.build()\n        transformed = preprocessor.fit_transform(input_df)\n    except Exception as e:\n        raise HTTPException(400, f\"Feature transform hatasi: {str(e)}\")\n    \n    result = model_server.predict(transformed)\n    latency = (time.time() - start) * 1000\n    \n    return PredictionResponse(\n        prediction=result[\"prediction\"][0] if isinstance(result[\"prediction\"], list) else result[\"prediction\"],\n        confidence=result.get(\"confidence\", 0.0),\n        model_version=str(result.get(\"model_version\", \"\")),\n        latency_ms=round(latency, 2)\n    )\n\n@router.post(\"/load/{model_name}\")\nasync def load_model(model_name: str):\n    loaded = model_server.load_production_model(model_name)\n    if not loaded:\n        raise HTTPException(503, f\"Model '{model_name}' yuklenemedi\")\n    return {\"status\": \"loaded\", \"model_name\": model_name}",
+              "why": "Inference endpoint modeli lazy-load eder (ilk istek geldiğinde yükler). Latency ölçümü her response'a eklenir — performance monitoring için kritik."
+            },
+            {
+              "order": "1.3",
+              "action": "Inference router'ını bağla",
+              "type": "code_add",
+              "file": "api/main.py",
+              "code": "from api.routers import inference\napp.include_router(inference.router)",
+              "position": "bottom",
+              "why": "Inference endpoint'ini ana uygulamaya bağlamak, dışarıdan erişilebilir olmasını sağlar."
+            },
+            {
+              "order": "1.4",
+              "action": "Inference API'yi test et",
+              "type": "terminal",
+              "command": "# Önce modeli yükle\ncurl -X POST http://localhost:8000/api/predict/load/churn_predictor\n\n# Prediction yap\ncurl -X POST http://localhost:8000/api/predict/ -H 'Content-Type: application/json' -d '{\"model_name\": \"churn_predictor\", \"features\": {\"feature_a\": 1.5, \"feature_b\": 2.3, \"feature_c\": 0.1}}'",
+              "expected_output": "{\"prediction\": 1, \"confidence\": 0.85, \"model_version\": \"1\", \"latency_ms\": 12.5}",
+              "why": "Inference API'nin doğru çalıştığını test ediyoruz. Confidence score modelin tahmininden ne kadar emin olduğunu gösterir."
+            },
+            {
+              "order": "1.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) /api/predict/ endpoint'i prediction, confidence ve latency_ms dönmeli 2) Latency < 100ms olmalı (model yüklendikten sonra) 3) Geçersiz features gönderildiğinde 400 hatası dönmeli",
+              "why": "Production inference API'nin güvenilir ve hızlı çalışması kritik. < 100ms latency SLA'sı çoğu real-time uygulama için yeterlidir."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   ├── experiments.py\n│   │   ├── model_registry.py\n│   │   └── inference.py\n│   └── services/\n├── workers/\n├── features/\n├── ml/\n│   ├── __init__.py\n│   ├── hyperparameter_search.py\n│   └── model_server.py\n├── artifacts/\n├── data/\n├── monitoring/\n├── frontend/\n├── docker-compose.yml\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "RuntimeError: Model yuklenmemis — predict çağrıldı ama model yok",
+              "cause": "Model load endpoint'i çağrılmadan predict yapılmaya çalışılıyor veya model registry'de Production model yok.",
+              "fix": "Önce /api/predict/load/{model_name} çağır. Model registry'de Production stage'inde model olduğundan emin ol."
+            },
+            {
+              "error": "ValueError: X has N features, but model is expecting M features",
+              "cause": "Inference'da gönderilen feature sayısı training'deki ile eşleşmiyor — training-serving skew.",
+              "fix": "Training'de kullanılan feature pipeline'ı (preprocessor) model ile birlikte kaydet ve inference'da aynı pipeline'ı kullan."
+            },
+            {
+              "error": "503 Service Unavailable — model yuklenemedi",
+              "cause": "MLflow server'a erişilemiyor veya model artifact'ı bozuk.",
+              "fix": "MLFLOW_TRACKING_URI'yi kontrol et. MLflow server'ın çalıştığını doğrula. Model artifact'ının var olduğunu MLflow UI'dan kontrol et."
+            }
+          ]
         },
         {
           "step": 2,
           "title": "Model Caching & Warmup",
           "why": "Her istekte modeli diskten yuklemek yavas. Cache'te tutmak latency'i dramatik dusurur.",
           "instructions": "Model cache:\n1. Startup'ta modeli memory'ye yukle\n2. Model degistiginde cache invalidation\n3. Lazy loading: ilk istek geldiginde yukle\n4. Multiple model version support",
-          "checkpoint": "Ilk istekten sonra inference latency < 50ms mi?"
+          "checkpoint": "Ilk istekten sonra inference latency < 50ms mi?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Model cache mekanizmasını geliştir",
+              "type": "code_modify",
+              "file": "ml/model_server.py",
+              "code": "import time\nfrom threading import Lock\n\nclass ModelCache:\n    def __init__(self, ttl_seconds: int = 3600):\n        self._cache: Dict[str, Any] = {}\n        self._timestamps: Dict[str, float] = {}\n        self._ttl = ttl_seconds\n        self._lock = Lock()\n    \n    def get(self, key: str) -> Optional[Any]:\n        with self._lock:\n            if key in self._cache:\n                if time.time() - self._timestamps[key] < self._ttl:\n                    return self._cache[key]\n                else:\n                    del self._cache[key]\n                    del self._timestamps[key]\n        return None\n    \n    def set(self, key: str, value: Any):\n        with self._lock:\n            self._cache[key] = value\n            self._timestamps[key] = time.time()\n    \n    def invalidate(self, key: str = None):\n        with self._lock:\n            if key:\n                self._cache.pop(key, None)\n                self._timestamps.pop(key, None)\n            else:\n                self._cache.clear()\n                self._timestamps.clear()\n\nmodel_cache = ModelCache(ttl_seconds=3600)",
+              "position": "top",
+              "why": "Model cache thread-safe olmalı (Lock) çünkü FastAPI async istekleri farklı thread'lerde çalıştırabilir. TTL ile eski cache otomatik temizlenir — model güncellendiğinde eski modeli kullanmayı önler."
+            },
+            {
+              "order": "2.2",
+              "action": "ModelServer'a cache entegre et",
+              "type": "code_modify",
+              "file": "ml/model_server.py",
+              "code": "    def load_production_model(self, model_name: str) -> bool:\n        cached = model_cache.get(f\"model_{model_name}\")\n        if cached:\n            self._model = cached[\"model\"]\n            self._model_version = cached[\"version\"]\n            self._model_name = model_name\n            return True\n        \n        try:\n            model_uri = f\"models:/{model_name}/Production\"\n            self._model = mlflow.sklearn.load_model(model_uri)\n            \n            client = mlflow.tracking.MlflowClient()\n            versions = client.get_latest_versions(model_name, stages=[\"Production\"])\n            if versions:\n                self._model_version = versions[0].version\n            \n            model_cache.set(f\"model_{model_name}\", {\n                \"model\": self._model,\n                \"version\": self._model_version\n            })\n            self._model_name = model_name\n            return True\n        except Exception as e:\n            print(f\"Model yukleme hatasi: {e}\")\n            return False",
+              "position": "bottom",
+              "why": "Cache ile ilk yüklemeden sonra model bellekte tutulur — sonraki isteklerde diskten/MLflow'dan yükleme yapılmaz. Bu latency'yi dramatik düşürür."
+            },
+            {
+              "order": "2.3",
+              "action": "Cache invalidation endpoint'i ekle",
+              "type": "code_add",
+              "file": "api/routers/inference.py",
+              "code": "from ml.model_server import model_cache\n\n@router.post(\"/cache/invalidate\")\nasync def invalidate_cache(model_name: str = None):\n    if model_name:\n        model_cache.invalidate(f\"model_{model_name}\")\n    else:\n        model_cache.invalidate()\n    return {\"status\": \"cache invalidated\", \"model_name\": model_name or \"all\"}",
+              "position": "bottom",
+              "why": "Model güncellendiğinde (yeni versiyon Production'a geçtiğinde) cache temizlenmeli. Aksi halde eski model ile prediction yapmaya devam edersin."
+            },
+            {
+              "order": "2.4",
+              "action": "Latency benchmark testi",
+              "type": "terminal",
+              "command": "python -c \"\nimport requests, time\n\n# Warmup - ilk istek modeli yukler\nrequests.post('http://localhost:8000/api/predict/load/churn_predictor')\n\n# 10 istek ile latency olc\nlatencies = []\nfor i in range(10):\n    start = time.time()\n    r = requests.post('http://localhost:8000/api/predict/', json={'model_name': 'churn_predictor', 'features': {'feature_a': 1.5, 'feature_b': 2.3, 'feature_c': 0.1}})\n    latencies.append((time.time() - start) * 1000)\n\nprint(f'Avg latency: {sum(latencies)/len(latencies):.1f}ms')\nprint(f'P95 latency: {sorted(latencies)[8]:.1f}ms')\nprint(f'Min: {min(latencies):.1f}ms, Max: {max(latencies):.1f}ms')\n\"",
+              "expected_output": "Avg latency: ~15-30ms\nP95 latency: < 50ms\nMin: ~5ms, Max: ~50ms",
+              "why": "Latency benchmark ile cache'in etkisini ölçüyoruz. İlk istek (cold start) yavaş olur ama sonraki istekler < 50ms olmalı."
+            },
+            {
+              "order": "2.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) İlk istekten sonraki isteklerde latency dramatik düşmeli (10x+) 2) Cache invalidation sonrası model tekrar yüklenmeli 3) TTL süresi dolduğunda cache otomatik temizlenmeli",
+              "why": "Model caching production inference'ın performansını belirler. Cache olmadan her istek diskten model yüklerse latency kabul edilemez olur."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   ├── experiments.py\n│   │   ├── model_registry.py\n│   │   └── inference.py\n│   └── services/\n├── ml/\n│   ├── __init__.py\n│   ├── hyperparameter_search.py\n│   └── model_server.py\n├── (rest unchanged)",
+          "common_errors": [
+            {
+              "error": "Stale cache — eski model ile prediction yapılıyor",
+              "cause": "Model güncellendikten sonra cache invalidate edilmemiş.",
+              "fix": "Model transition endpoint'inde otomatik cache invalidation çağrısı ekle. Webhook pattern kullan."
+            },
+            {
+              "error": "MemoryError — çok fazla model cache'de tutuluyor",
+              "cause": "Birden fazla büyük model bellekte tutuluyor.",
+              "fix": "Cache'e maxsize sınırı ekle. LRU (Least Recently Used) eviction policy uygula."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Batch Prediction Endpoint",
           "why": "Buyuk veri setleri icin tek tek prediction yapmak verimsiz. Batch endpoint toplu isleme saglar.",
           "instructions": "Batch prediction:\n1. CSV upload ile toplu prediction\n2. Celery worker'da calistir\n3. Sonuclari indirilebilir CSV olarak sun\n4. Progress tracking",
-          "checkpoint": "1000 satirlik CSV ile batch prediction calisiyor mu?"
+          "checkpoint": "1000 satirlik CSV ile batch prediction calisiyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Batch prediction Celery task'ını oluştur",
+              "type": "code_add",
+              "file": "workers/training_tasks.py",
+              "code": "@celery_app.task(bind=True, name=\"batch_predict\")\ndef batch_predict(self, config: dict):\n    import time\n    self.update_state(state=\"LOADING\", meta={\"progress\": 10})\n    \n    df = pd.read_csv(config[\"input_path\"])\n    total_rows = len(df)\n    \n    model_name = config[\"model_name\"]\n    model_uri = f\"models:/{model_name}/Production\"\n    model = mlflow.sklearn.load_model(model_uri)\n    \n    self.update_state(state=\"PREDICTING\", meta={\"progress\": 30})\n    \n    target_col = config.get(\"target_column\")\n    if target_col and target_col in df.columns:\n        X = df.drop(columns=[target_col])\n    else:\n        X = df\n    \n    builder = FeaturePipelineBuilder()\n    builder.detect_column_types(X)\n    preprocessor = builder.build()\n    X_transformed = preprocessor.fit_transform(X)\n    \n    predictions = model.predict(X_transformed)\n    df[\"prediction\"] = predictions\n    \n    if hasattr(model, 'predict_proba'):\n        probabilities = model.predict_proba(X_transformed)\n        df[\"confidence\"] = np.max(probabilities, axis=1)\n    \n    output_path = config[\"input_path\"].replace(\".csv\", \"_predictions.csv\")\n    df.to_csv(output_path, index=False)\n    \n    self.update_state(state=\"COMPLETED\", meta={\"progress\": 100})\n    return {\n        \"status\": \"completed\",\n        \"total_rows\": total_rows,\n        \"output_path\": output_path\n    }",
+              "position": "bottom",
+              "why": "Batch prediction büyük veri setleri için tek tek API çağrısı yerine toplu işlem yapar. Celery'de çalıştırarak API'nin bloklanmasını önlüyoruz."
+            },
+            {
+              "order": "3.2",
+              "action": "Batch prediction endpoint'ini oluştur",
+              "type": "code_add",
+              "file": "api/routers/inference.py",
+              "code": "from workers.training_tasks import batch_predict\n\n@router.post(\"/batch\")\nasync def start_batch_prediction(\n    file: UploadFile = File(...),\n    model_name: str = \"churn_predictor\"\n):\n    import os\n    file_path = f\"data/uploads/batch_{file.filename}\"\n    content = await file.read()\n    with open(file_path, \"wb\") as f:\n        f.write(content)\n    \n    task = batch_predict.delay({\"input_path\": file_path, \"model_name\": model_name})\n    return {\"task_id\": task.id, \"status\": \"started\"}\n\n@router.get(\"/batch/status/{task_id}\")\nasync def batch_status(task_id: str):\n    from celery.result import AsyncResult\n    from workers.celery_app import celery_app\n    result = AsyncResult(task_id, app=celery_app)\n    if result.state == \"SUCCESS\":\n        return {\"status\": \"completed\", \"result\": result.result}\n    return {\"status\": result.state, \"progress\": result.info.get(\"progress\", 0) if result.info else 0}",
+              "position": "bottom",
+              "why": "Batch endpoint CSV dosyası kabul eder, Celery'de işletir ve sonuçları indirilebilir CSV olarak sunar."
+            },
+            {
+              "order": "3.3",
+              "action": "Import ekle",
+              "type": "code_modify",
+              "file": "api/routers/inference.py",
+              "code": "from fastapi import APIRouter, HTTPException, UploadFile, File",
+              "position": "top",
+              "why": "UploadFile ve File import'larını eklemek batch endpoint'inin çalışması için gerekli."
+            },
+            {
+              "order": "3.4",
+              "action": "Batch prediction test et",
+              "type": "terminal",
+              "command": "curl -X POST http://localhost:8000/api/predict/batch -F \"file=@data/uploads/importance_test.csv\" -F \"model_name=churn_predictor\"",
+              "expected_output": "{\"task_id\": \"...\", \"status\": \"started\"}",
+              "why": "Toplu prediction'ın doğru çalıştığını test ediyoruz."
+            },
+            {
+              "order": "3.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) Batch task tamamlandığında output CSV'de prediction ve confidence sütunları olmalı 2) 1000 satırlık veri ile test et — süre makul olmalı (< 30sn) 3) Progress takibi çalışmalı",
+              "why": "Batch prediction production'da büyük veri setleri için kullanılır. Performans ve doğruluk kritik."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   ├── experiments.py\n│   │   ├── model_registry.py\n│   │   └── inference.py\n│   └── services/\n├── workers/\n│   ├── __init__.py\n│   ├── celery_app.py\n│   └── training_tasks.py\n├── (rest unchanged)",
+          "common_errors": [
+            {
+              "error": "MemoryError: Unable to allocate array — büyük CSV ile batch prediction",
+              "cause": "Tüm veriyi tek seferde belleğe almak çok büyük dosyalarda belleği tüketir.",
+              "fix": "pd.read_csv(chunksize=1000) ile parça parça oku ve predict et. Sonuçları birleştir."
+            },
+            {
+              "error": "FileNotFoundError: batch_filename_predictions.csv — output dosyası oluşturulamıyor",
+              "cause": "Output dizini yok veya yazma izni yok.",
+              "fix": "os.makedirs(os.path.dirname(output_path), exist_ok=True) ile dizini oluştur."
+            }
+          ]
         },
         {
           "step": 4,
           "title": "A/B Testing Framework",
           "why": "Yeni modelin eskisinden iyi oldugunu production'da test etmek gerekir.",
           "instructions": "A/B testing:\n1. Traffic split (% bazli)\n2. Her model version'a giden istekleri logla\n3. Metric karsilastirma (accuracy, latency)\n4. Otomatik winner selection",
-          "checkpoint": "Trafik %80/%20 bolunup iki model karsilastiriliyor mu?"
+          "checkpoint": "Trafik %80/%20 bolunup iki model karsilastiriliyor mu?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "A/B testing modülünü oluştur",
+              "type": "code_write",
+              "file": "ml/ab_testing.py",
+              "code": "import random\nimport time\nfrom typing import Dict, List, Any, Optional\nfrom collections import defaultdict\nimport numpy as np\nfrom scipy import stats\n\nclass ABTestManager:\n    def __init__(self):\n        self.tests: Dict[str, Dict] = {}\n        self.results: Dict[str, List[Dict]] = defaultdict(list)\n    \n    def create_test(self, test_name: str, model_a: str, model_b: str, traffic_split: float = 0.8) -> Dict:\n        self.tests[test_name] = {\n            \"name\": test_name,\n            \"model_a\": model_a,\n            \"model_b\": model_b,\n            \"traffic_split\": traffic_split,\n            \"created_at\": time.time(),\n            \"status\": \"active\"\n        }\n        return self.tests[test_name]\n    \n    def route_request(self, test_name: str) -> str:\n        if test_name not in self.tests:\n            raise ValueError(f\"Test '{test_name}' bulunamadi\")\n        test = self.tests[test_name]\n        if random.random() < test[\"traffic_split\"]:\n            return test[\"model_a\"]\n        return test[\"model_b\"]\n    \n    def log_result(self, test_name: str, model_used: str, prediction: Any, actual: Any = None, latency_ms: float = 0):\n        self.results[test_name].append({\n            \"model\": model_used,\n            \"prediction\": prediction,\n            \"actual\": actual,\n            \"latency_ms\": latency_ms,\n            \"timestamp\": time.time()\n        })\n    \n    def get_statistics(self, test_name: str) -> Dict[str, Any]:\n        if test_name not in self.results:\n            return {\"error\": \"Sonuc bulunamadi\"}\n        \n        results = self.results[test_name]\n        test = self.tests[test_name]\n        \n        model_a_results = [r for r in results if r[\"model\"] == test[\"model_a\"]]\n        model_b_results = [r for r in results if r[\"model\"] == test[\"model_b\"]]\n        \n        stats_data = {\n            \"test_name\": test_name,\n            \"total_requests\": len(results),\n            \"model_a\": {\n                \"name\": test[\"model_a\"],\n                \"requests\": len(model_a_results),\n                \"avg_latency_ms\": np.mean([r[\"latency_ms\"] for r in model_a_results]) if model_a_results else 0\n            },\n            \"model_b\": {\n                \"name\": test[\"model_b\"],\n                \"requests\": len(model_b_results),\n                \"avg_latency_ms\": np.mean([r[\"latency_ms\"] for r in model_b_results]) if model_b_results else 0\n            }\n        }\n        \n        a_correct = [r for r in model_a_results if r[\"actual\"] is not None and r[\"prediction\"] == r[\"actual\"]]\n        b_correct = [r for r in model_b_results if r[\"actual\"] is not None and r[\"prediction\"] == r[\"actual\"]]\n        \n        if model_a_results and model_b_results:\n            a_latencies = [r[\"latency_ms\"] for r in model_a_results]\n            b_latencies = [r[\"latency_ms\"] for r in model_b_results]\n            t_stat, p_value = stats.ttest_ind(a_latencies, b_latencies)\n            stats_data[\"latency_significance\"] = {\n                \"t_statistic\": round(float(t_stat), 4),\n                \"p_value\": round(float(p_value), 4),\n                \"significant\": p_value < 0.05\n            }\n        \n        return stats_data\n\nab_manager = ABTestManager()",
+              "why": "A/B testing framework trafik bölme, sonuç loglama ve istatistiksel karşılaştırma yapar. t-test ile latency farkının anlamlı olup olmadığını ölçer — az veri ile karar vermekten kaçınır."
+            },
+            {
+              "order": "4.2",
+              "action": "A/B testing endpoint'lerini oluştur",
+              "type": "code_add",
+              "file": "api/routers/inference.py",
+              "code": "from ml.ab_testing import ab_manager\nfrom pydantic import BaseModel as PydanticBaseModel\n\nclass ABTestCreateRequest(PydanticBaseModel):\n    test_name: str\n    model_a: str\n    model_b: str\n    traffic_split: float = 0.8\n\n@router.post(\"/ab-test/create\")\nasync def create_ab_test(request: ABTestCreateRequest):\n    test = ab_manager.create_test(\n        request.test_name, request.model_a, request.model_b, request.traffic_split\n    )\n    return test\n\n@router.get(\"/ab-test/{test_name}/stats\")\nasync def get_ab_stats(test_name: str):\n    return ab_manager.get_statistics(test_name)",
+              "position": "bottom",
+              "why": "A/B test yönetim endpoint'leri ile testleri oluşturabilir ve sonuçları sorgulayabilirsin."
+            },
+            {
+              "order": "4.3",
+              "action": "A/B test oluştur ve trafik gönder",
+              "type": "terminal",
+              "command": "curl -X POST http://localhost:8000/api/predict/ab-test/create -H 'Content-Type: application/json' -d '{\"test_name\": \"v1_vs_v2\", \"model_a\": \"churn_predictor_v1\", \"model_b\": \"churn_predictor_v2\", \"traffic_split\": 0.8}'",
+              "expected_output": "{\"name\": \"v1_vs_v2\", \"model_a\": \"churn_predictor_v1\", \"model_b\": \"churn_predictor_v2\", \"traffic_split\": 0.8, \"status\": \"active\"}",
+              "why": "%80/%20 trafik bölme ile mevcut model trafiğin çoğunu alır, yeni model az trafikle test edilir. Riskli değişiklikleri güvenle test etmenin yolu budur."
+            },
+            {
+              "order": "4.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) A/B test oluşturulmalı 2) Trafik split oranına uygun dağılmalı 3) İstatistikler endpoint'inde request sayıları ve latency karşılaştırması görünmeli 4) p_value < 0.05 ise fark anlamlı",
+              "why": "A/B testing olmadan yeni modeli körü körüne production'a almak risklidir. İstatistiksel anlamlılık testleri şans eseri farkları gerçek farklardan ayırır."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   ├── experiments.py\n│   │   ├── model_registry.py\n│   │   └── inference.py\n│   └── services/\n├── ml/\n│   ├── __init__.py\n│   ├── hyperparameter_search.py\n│   ├── model_server.py\n│   └── ab_testing.py\n├── (rest unchanged)",
+          "common_errors": [
+            {
+              "error": "KeyError: test_name — A/B test mevcut değil",
+              "cause": "Uygulama yeniden başlatıldığında in-memory testler kayboldu.",
+              "fix": "A/B test konfigürasyonlarını veritabanında sakla. Uygulama başlangıcında yükle."
+            },
+            {
+              "error": "İstatistiksel anlamsız sonuçlar — p_value her zaman > 0.05",
+              "cause": "Yeterli sayıda request yok. İstatistiksel güç (power) düşük.",
+              "fix": "En az 100+ request'ten sonra istatistik değerlendir. Sample size hesaplama ekle."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Model serving'de input validation ZORUNLU — production'da beklenmedik input gelir\n2. Model cache invalidation dogru calismali — eski model ile prediction yapmak tehlikeli\n3. A/B test sonuclarinda istatistiksel anlamlilik kontrol et — az veri ile karar verme\n4. Inference latency'yi MONITOR et — model buyurse latency artar",
@@ -320,7 +1297,71 @@
           "title": "Prediction Logging & Monitoring",
           "why": "Production'daki model performansini bilmeden iyilestirme yapamazsin.",
           "instructions": "Her prediction icin logla:\n1. Input features\n2. Prediction + confidence\n3. Latency\n4. Model version\n5. Timestamp\n\nDashboard'da goster: avg confidence, prediction distribution, latency percentiles",
-          "checkpoint": "Son 1 saatin prediction istatistikleri gorunuyor mu?"
+          "checkpoint": "Son 1 saatin prediction istatistikleri gorunuyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Prediction logging modülünü oluştur",
+              "type": "code_write",
+              "file": "monitoring/__init__.py",
+              "code": "",
+              "why": "Monitoring modülünü Python paketi olarak tanımla."
+            },
+            {
+              "order": "1.2",
+              "action": "Prediction logger servisini oluştur",
+              "type": "code_write",
+              "file": "monitoring/prediction_logger.py",
+              "code": "import time\nimport numpy as np\nfrom typing import Dict, List, Any, Optional\nfrom collections import deque\nfrom datetime import datetime, timedelta\n\nclass PredictionLogger:\n    def __init__(self, max_logs: int = 10000):\n        self.logs: deque = deque(maxlen=max_logs)\n    \n    def log_prediction(self, input_features: Dict, prediction: Any, confidence: float, \n                       model_version: str, latency_ms: float):\n        self.logs.append({\n            \"timestamp\": datetime.utcnow().isoformat(),\n            \"input_features\": input_features,\n            \"prediction\": prediction,\n            \"confidence\": confidence,\n            \"model_version\": model_version,\n            \"latency_ms\": latency_ms\n        })\n    \n    def get_stats(self, minutes: int = 60) -> Dict[str, Any]:\n        cutoff = datetime.utcnow() - timedelta(minutes=minutes)\n        recent = [l for l in self.logs if datetime.fromisoformat(l[\"timestamp\"]) > cutoff]\n        \n        if not recent:\n            return {\"total_predictions\": 0}\n        \n        latencies = [l[\"latency_ms\"] for l in recent]\n        confidences = [l[\"confidence\"] for l in recent]\n        predictions = [l[\"prediction\"] for l in recent]\n        \n        return {\n            \"total_predictions\": len(recent),\n            \"period_minutes\": minutes,\n            \"latency\": {\n                \"avg\": round(np.mean(latencies), 2),\n                \"p50\": round(np.percentile(latencies, 50), 2),\n                \"p95\": round(np.percentile(latencies, 95), 2),\n                \"p99\": round(np.percentile(latencies, 99), 2),\n                \"max\": round(max(latencies), 2)\n            },\n            \"confidence\": {\n                \"avg\": round(np.mean(confidences), 4),\n                \"min\": round(min(confidences), 4),\n                \"low_confidence_count\": sum(1 for c in confidences if c < 0.5)\n            },\n            \"prediction_distribution\": {\n                str(k): predictions.count(k) for k in set(predictions)\n            }\n        }\n\nprediction_logger = PredictionLogger()",
+              "why": "Prediction logger her tahmin sonucunu kaydeder. deque ile bellek sınırlı tutulur. İstatistikler (latency percentiles, confidence distribution) monitoring dashboard'da gösterilecek."
+            },
+            {
+              "order": "1.3",
+              "action": "Prediction logging'i inference endpoint'ine entegre et",
+              "type": "code_add",
+              "file": "api/routers/inference.py",
+              "code": "from monitoring.prediction_logger import prediction_logger\n\n@router.get(\"/monitoring/stats\")\nasync def get_prediction_stats(minutes: int = 60):\n    return prediction_logger.get_stats(minutes)",
+              "position": "bottom",
+              "why": "Monitoring endpoint'i son N dakikanın prediction istatistiklerini döner. Dashboard'da real-time gösterim için kullanılır."
+            },
+            {
+              "order": "1.4",
+              "action": "Predict endpoint'ine logging ekle",
+              "type": "code_modify",
+              "file": "api/routers/inference.py",
+              "code": "    # predict fonksiyonunun return'ünden once ekle:\n    prediction_logger.log_prediction(\n        input_features=request.features,\n        prediction=result[\"prediction\"][0] if isinstance(result[\"prediction\"], list) else result[\"prediction\"],\n        confidence=result.get(\"confidence\", 0.0),\n        model_version=str(result.get(\"model_version\", \"\")),\n        latency_ms=latency\n    )",
+              "position": "bottom",
+              "why": "Her prediction sonrası otomatik loglama — ayrı bir monitoring çağrısı gerekmez. Bu 'push-based' monitoring yaklaşımıdır."
+            },
+            {
+              "order": "1.5",
+              "action": "Monitoring istatistiklerini test et",
+              "type": "terminal",
+              "command": "# Birkaç prediction yap\nfor i in $(seq 1 20); do curl -s -X POST http://localhost:8000/api/predict/ -H 'Content-Type: application/json' -d '{\"model_name\": \"churn_predictor\", \"features\": {\"feature_a\": '$(echo \"scale=1; $i/10\" | bc)', \"feature_b\": 2.3, \"feature_c\": 0.1}}'; done\n\n# İstatistikleri al\ncurl http://localhost:8000/api/predict/monitoring/stats?minutes=5",
+              "expected_output": "{\"total_predictions\": 20, \"latency\": {\"avg\": 15.5, \"p95\": 35.2, ...}, \"confidence\": {\"avg\": 0.78, ...}, \"prediction_distribution\": {...}}",
+              "why": "20 prediction yapıp istatistikleri sorgulamak monitoring akışının doğru çalıştığını doğrular."
+            },
+            {
+              "order": "1.6",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) /monitoring/stats endpoint'i latency percentiles dönmeli 2) prediction_distribution doğru olmalı 3) low_confidence_count 0.5 altındaki tahminleri saymalı",
+              "why": "Production monitoring olmadan model performansını bilemezsin. Latency spike veya confidence düşüşü erken alarm işaretidir."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   ├── experiments.py\n│   │   ├── model_registry.py\n│   │   └── inference.py\n│   └── services/\n├── monitoring/\n│   ├── __init__.py\n│   └── prediction_logger.py\n├── (rest unchanged)",
+          "common_errors": [
+            {
+              "error": "deque maxlen aşıldığında eski loglar kayboluyor",
+              "cause": "In-memory deque sabit boyutlu — eski loglar otomatik silinir.",
+              "fix": "Uzun vadeli loglama için veritabanına veya dosyaya yaz. Sampling stratejisi kullan — her 10. prediction'ı logla."
+            },
+            {
+              "error": "np.percentile boş array'de hata veriyor",
+              "cause": "Son N dakikada hiç prediction yapılmamış.",
+              "fix": "if not recent: kontrolü ile boş durumu handle et. Varsayılan istatistikler dön."
+            }
+          ]
         },
         {
           "step": 2,
@@ -328,21 +1369,188 @@
           "why": "Input veri dagilimai degisirse model yanlis prediction yapar. Erken tespit etmek kritik.",
           "instructions": "Data drift:\n1. Training data distribution'ini baseline olarak kaydet\n2. Production input'larinin dagilimini hesapla\n3. KS test veya PSI ile drift olc\n4. Feature bazinda drift raporu\n5. Threshold asildiginda alert",
           "code_snippet": "from scipy.stats import ks_2samp\n\ndef detect_drift(baseline, current, threshold=0.05):\n    statistic, p_value = ks_2samp(baseline, current)\n    return {\n        'drifted': p_value < threshold,\n        'statistic': statistic,\n        'p_value': p_value\n    }",
-          "checkpoint": "Dagilimi degistirmis veri ile drift algilaniyor mu?"
+          "checkpoint": "Dagilimi degistirmis veri ile drift algilaniyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Data drift detection modülünü oluştur",
+              "type": "code_write",
+              "file": "monitoring/drift_detector.py",
+              "code": "import numpy as np\nimport pandas as pd\nfrom scipy.stats import ks_2samp\nfrom typing import Dict, Any, List, Optional\n\nclass DriftDetector:\n    def __init__(self):\n        self.baseline_stats: Dict[str, Dict] = {}\n    \n    def set_baseline(self, df: pd.DataFrame, feature_columns: List[str]):\n        for col in feature_columns:\n            if pd.api.types.is_numeric_dtype(df[col]):\n                self.baseline_stats[col] = {\n                    \"values\": df[col].dropna().values,\n                    \"mean\": float(df[col].mean()),\n                    \"std\": float(df[col].std()),\n                    \"min\": float(df[col].min()),\n                    \"max\": float(df[col].max())\n                }\n    \n    def detect_drift_ks(self, current_df: pd.DataFrame, threshold: float = 0.05) -> Dict[str, Any]:\n        results = {\"drifted_features\": [], \"feature_results\": {}, \"overall_drift\": False}\n        \n        for col, baseline in self.baseline_stats.items():\n            if col not in current_df.columns:\n                continue\n            current_values = current_df[col].dropna().values\n            if len(current_values) == 0:\n                continue\n            \n            statistic, p_value = ks_2samp(baseline[\"values\"], current_values)\n            is_drifted = p_value < threshold\n            \n            results[\"feature_results\"][col] = {\n                \"ks_statistic\": round(float(statistic), 4),\n                \"p_value\": round(float(p_value), 6),\n                \"drifted\": is_drifted,\n                \"baseline_mean\": round(baseline[\"mean\"], 4),\n                \"current_mean\": round(float(current_df[col].mean()), 4),\n                \"mean_shift\": round(float(current_df[col].mean()) - baseline[\"mean\"], 4)\n            }\n            if is_drifted:\n                results[\"drifted_features\"].append(col)\n        \n        results[\"overall_drift\"] = len(results[\"drifted_features\"]) > 0\n        results[\"drift_ratio\"] = len(results[\"drifted_features\"]) / max(len(self.baseline_stats), 1)\n        return results\n    \n    def calculate_psi(self, baseline: np.ndarray, current: np.ndarray, bins: int = 10) -> float:\n        baseline_counts, bin_edges = np.histogram(baseline, bins=bins)\n        current_counts, _ = np.histogram(current, bins=bin_edges)\n        \n        baseline_pct = (baseline_counts + 1) / (len(baseline) + bins)\n        current_pct = (current_counts + 1) / (len(current) + bins)\n        \n        psi = np.sum((current_pct - baseline_pct) * np.log(current_pct / baseline_pct))\n        return round(float(psi), 4)\n    \n    def detect_drift_psi(self, current_df: pd.DataFrame, psi_threshold: float = 0.2) -> Dict[str, Any]:\n        results = {\"drifted_features\": [], \"feature_results\": {}}\n        \n        for col, baseline in self.baseline_stats.items():\n            if col not in current_df.columns:\n                continue\n            current_values = current_df[col].dropna().values\n            if len(current_values) == 0:\n                continue\n            \n            psi = self.calculate_psi(baseline[\"values\"], current_values)\n            is_drifted = psi > psi_threshold\n            \n            results[\"feature_results\"][col] = {\n                \"psi\": psi,\n                \"drifted\": is_drifted,\n                \"interpretation\": \"significant shift\" if psi > 0.25 else \"moderate shift\" if psi > 0.1 else \"no shift\"\n            }\n            if is_drifted:\n                results[\"drifted_features\"].append(col)\n        \n        results[\"overall_drift\"] = len(results[\"drifted_features\"]) > 0\n        return results\n\ndrift_detector = DriftDetector()",
+              "why": "İki drift detection yöntemi: KS test (istatistiksel) ve PSI (Population Stability Index). KS test dağılım farkını, PSI ise dağılım kaymasının büyüklüğünü ölçer. İkisini birlikte kullanmak daha güvenilir sonuç verir."
+            },
+            {
+              "order": "2.2",
+              "action": "Drift detection endpoint'lerini oluştur",
+              "type": "code_write",
+              "file": "api/routers/monitoring.py",
+              "code": "import pandas as pd\nfrom fastapi import APIRouter, Depends, HTTPException\nfrom sqlalchemy.orm import Session\nfrom pydantic import BaseModel\nfrom typing import List, Optional\nfrom api.database import get_db\nfrom monitoring.drift_detector import drift_detector\n\nrouter = APIRouter(prefix=\"/api/monitoring\", tags=[\"monitoring\"])\n\nclass SetBaselineRequest(BaseModel):\n    dataset_id: int\n    feature_columns: List[str]\n\n@router.post(\"/drift/baseline\")\nasync def set_drift_baseline(request: SetBaselineRequest, db: Session = Depends(get_db)):\n    from api.models import Dataset\n    dataset = db.query(Dataset).filter(Dataset.id == request.dataset_id).first()\n    if not dataset:\n        raise HTTPException(404, \"Dataset bulunamadi\")\n    df = pd.read_csv(dataset.file_path)\n    drift_detector.set_baseline(df, request.feature_columns)\n    return {\"status\": \"baseline set\", \"features\": request.feature_columns}\n\n@router.post(\"/drift/detect\")\nasync def detect_drift(dataset_id: int, method: str = \"ks\", db: Session = Depends(get_db)):\n    from api.models import Dataset\n    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()\n    if not dataset:\n        raise HTTPException(404, \"Dataset bulunamadi\")\n    df = pd.read_csv(dataset.file_path)\n    \n    if method == \"ks\":\n        return drift_detector.detect_drift_ks(df)\n    elif method == \"psi\":\n        return drift_detector.detect_drift_psi(df)\n    else:\n        raise HTTPException(400, \"Method 'ks' veya 'psi' olmali\")",
+              "why": "Drift detection API ile baseline ayarlayıp yeni verinin kaydığını kontrol edebilirsin. İki yöntem sunarak kullanıcıya seçenek veriyoruz."
+            },
+            {
+              "order": "2.3",
+              "action": "Monitoring router'ını bağla",
+              "type": "code_add",
+              "file": "api/main.py",
+              "code": "from api.routers import monitoring\napp.include_router(monitoring.router)",
+              "position": "bottom",
+              "why": "Monitoring endpoint'lerini ana uygulamaya bağlamak, drift tespiti için dışarıdan erişim sağlar."
+            },
+            {
+              "order": "2.4",
+              "action": "Drift detection'ı test et",
+              "type": "terminal",
+              "command": "python -c \"\nimport pandas as pd\nimport numpy as np\nnp.random.seed(42)\nbaseline = pd.DataFrame({'feature_a': np.random.normal(0, 1, 200), 'feature_b': np.random.normal(5, 2, 200)})\nbaseline.to_csv('data/uploads/baseline.csv', index=False)\n\ndrifted = pd.DataFrame({'feature_a': np.random.normal(2, 1, 200), 'feature_b': np.random.normal(5, 2, 200)})\ndrifted.to_csv('data/uploads/drifted.csv', index=False)\nprint('Test verileri olusturuldu: baseline (mean=0) vs drifted (mean=2 for feature_a)')\n\"",
+              "expected_output": "Test verileri olusturuldu",
+              "why": "feature_a'nın ortalamasını 0'dan 2'ye kaydırarak bilinen bir drift oluşturuyoruz. feature_b değişmedi — sadece feature_a'da drift algılanmalı."
+            },
+            {
+              "order": "2.5",
+              "action": "Drift detection API'yi çağır",
+              "type": "terminal",
+              "command": "# Baseline ayarla\ncurl -X POST http://localhost:8000/api/monitoring/drift/baseline -H 'Content-Type: application/json' -d '{\"dataset_id\": BASELINE_ID, \"feature_columns\": [\"feature_a\", \"feature_b\"]}'\n\n# Drift tespit et\ncurl -X POST 'http://localhost:8000/api/monitoring/drift/detect?dataset_id=DRIFTED_ID&method=ks'",
+              "expected_output": "{\"drifted_features\": [\"feature_a\"], \"feature_results\": {\"feature_a\": {\"drifted\": true, \"p_value\": 0.0001}, \"feature_b\": {\"drifted\": false}}, \"overall_drift\": true}",
+              "why": "Bilinen drift ile test ederek algoritmanın doğru feature'da drift algıladığını doğruluyoruz."
+            },
+            {
+              "order": "2.6",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) feature_a'da drift algılanmalı (drifted: true) 2) feature_b'de drift algılanmamalı (drifted: false) 3) PSI yöntemi de aynı sonucu vermeli 4) p_value < 0.05 olmalı drift olan feature için",
+              "why": "Drift detection yanlış alarm (false positive) veya kaçırma (false negative) vermemeli. Bilinen drift ile kalibre etmek güvenilirliği artırır."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   ├── experiments.py\n│   │   ├── model_registry.py\n│   │   ├── inference.py\n│   │   └── monitoring.py\n│   └── services/\n├── monitoring/\n│   ├── __init__.py\n│   ├── prediction_logger.py\n│   └── drift_detector.py\n├── (rest unchanged)",
+          "common_errors": [
+            {
+              "error": "ValueError: sample is not large enough — KS test başarısız",
+              "cause": "Baseline veya current verisi çok az satır içeriyor.",
+              "fix": "En az 30+ satır veri ile test et. Küçük örneklemlerde KS test güvenilir sonuç vermez."
+            },
+            {
+              "error": "RuntimeWarning: divide by zero in log — PSI hesaplamasında",
+              "cause": "Histogram'da sıfır count olan bin var.",
+              "fix": "Laplace smoothing ekle: (count + 1) / (total + bins). Koda zaten ekli ama threshold'u kontrol et."
+            },
+            {
+              "error": "Drift her zaman True dönüyor — çok hassas threshold",
+              "cause": "KS test threshold (0.05) çok düşük veya veri çok gürültülü.",
+              "fix": "Threshold'u 0.01'e düşür veya Bonferroni correction uygula (çok feature test edince false positive artar)."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Model Performance Degradation",
           "why": "Model accuracy zamanla duser (concept drift). Ground truth geldikce performansi karsilastir.",
           "instructions": "Model drift:\n1. Ground truth (gercek sonuclar) toplama mekanizmasi\n2. Periyodik accuracy hesaplama\n3. Baseline accuracy ile karsilastir\n4. Performance drop alert\n5. Trend grafigi",
-          "checkpoint": "Accuracy dustugunde alert tetikleniyor mu?"
+          "checkpoint": "Accuracy dustugunde alert tetikleniyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Model performance monitor modülünü oluştur",
+              "type": "code_write",
+              "file": "monitoring/performance_monitor.py",
+              "code": "import numpy as np\nfrom typing import Dict, List, Any, Optional\nfrom datetime import datetime, timedelta\nfrom collections import deque\nfrom sklearn.metrics import accuracy_score, f1_score\n\nclass PerformanceMonitor:\n    def __init__(self, baseline_accuracy: float = 0.0, alert_threshold: float = 0.05):\n        self.baseline_accuracy = baseline_accuracy\n        self.alert_threshold = alert_threshold\n        self.ground_truth_log: deque = deque(maxlen=10000)\n        self.alerts: List[Dict] = []\n    \n    def set_baseline(self, accuracy: float):\n        self.baseline_accuracy = accuracy\n    \n    def log_ground_truth(self, prediction: Any, actual: Any, model_version: str):\n        self.ground_truth_log.append({\n            \"prediction\": prediction,\n            \"actual\": actual,\n            \"model_version\": model_version,\n            \"timestamp\": datetime.utcnow().isoformat()\n        })\n    \n    def calculate_performance(self, window_hours: int = 24) -> Dict[str, Any]:\n        cutoff = datetime.utcnow() - timedelta(hours=window_hours)\n        recent = [\n            l for l in self.ground_truth_log\n            if datetime.fromisoformat(l[\"timestamp\"]) > cutoff\n        ]\n        \n        if len(recent) < 10:\n            return {\"status\": \"insufficient_data\", \"count\": len(recent)}\n        \n        predictions = [l[\"prediction\"] for l in recent]\n        actuals = [l[\"actual\"] for l in recent]\n        \n        current_accuracy = accuracy_score(actuals, predictions)\n        current_f1 = f1_score(actuals, predictions, average=\"weighted\", zero_division=0)\n        \n        accuracy_drop = self.baseline_accuracy - current_accuracy\n        degraded = accuracy_drop > self.alert_threshold\n        \n        if degraded:\n            alert = {\n                \"type\": \"model_degradation\",\n                \"message\": f\"Accuracy {accuracy_drop:.2%} dustu (baseline: {self.baseline_accuracy:.2%}, current: {current_accuracy:.2%})\",\n                \"severity\": \"high\" if accuracy_drop > 0.1 else \"medium\",\n                \"timestamp\": datetime.utcnow().isoformat()\n            }\n            self.alerts.append(alert)\n        \n        return {\n            \"current_accuracy\": round(current_accuracy, 4),\n            \"baseline_accuracy\": round(self.baseline_accuracy, 4),\n            \"accuracy_drop\": round(accuracy_drop, 4),\n            \"current_f1\": round(current_f1, 4),\n            \"degraded\": degraded,\n            \"sample_count\": len(recent),\n            \"window_hours\": window_hours\n        }\n    \n    def get_alerts(self, limit: int = 20) -> List[Dict]:\n        return list(self.alerts)[-limit:]\n\nperformance_monitor = PerformanceMonitor()",
+              "why": "Performance monitor, ground truth (gerçek sonuçlar) geldikçe modelin doğruluğunu hesaplar. Baseline'dan sapma olursa alert oluşturur. Bu 'concept drift' tespiti için temel mekanizmadır."
+            },
+            {
+              "order": "3.2",
+              "action": "Performance monitoring endpoint'lerini ekle",
+              "type": "code_add",
+              "file": "api/routers/monitoring.py",
+              "code": "from monitoring.performance_monitor import performance_monitor\n\nclass GroundTruthRequest(BaseModel):\n    prediction: int\n    actual: int\n    model_version: str = \"1\"\n\n@router.post(\"/performance/baseline\")\nasync def set_performance_baseline(accuracy: float):\n    performance_monitor.set_baseline(accuracy)\n    return {\"baseline_accuracy\": accuracy}\n\n@router.post(\"/performance/ground-truth\")\nasync def log_ground_truth(request: GroundTruthRequest):\n    performance_monitor.log_ground_truth(request.prediction, request.actual, request.model_version)\n    return {\"status\": \"logged\"}\n\n@router.get(\"/performance/stats\")\nasync def get_performance_stats(window_hours: int = 24):\n    return performance_monitor.calculate_performance(window_hours)\n\n@router.get(\"/alerts\")\nasync def get_alerts(limit: int = 20):\n    return performance_monitor.get_alerts(limit)",
+              "position": "bottom",
+              "why": "Ground truth endpoint'i ile gerçek sonuçları sisteme besleyerek model performansını sürekli ölçebilirsin. Alerts endpoint'i tüm uyarıları listeler."
+            },
+            {
+              "order": "3.3",
+              "action": "Performance monitoring'i test et",
+              "type": "terminal",
+              "command": "# Baseline ayarla\ncurl -X POST 'http://localhost:8000/api/monitoring/performance/baseline?accuracy=0.90'\n\n# Ground truth logla (bazıları yanlış)\nfor i in $(seq 1 30); do\n  pred=$((RANDOM % 2))\n  if [ $((RANDOM % 5)) -eq 0 ]; then actual=$((1 - pred)); else actual=$pred; fi\n  curl -s -X POST http://localhost:8000/api/monitoring/performance/ground-truth -H 'Content-Type: application/json' -d \"{\\\"prediction\\\": $pred, \\\"actual\\\": $actual}\"\ndone\n\n# Performans istatistiklerini al\ncurl http://localhost:8000/api/monitoring/performance/stats?window_hours=1",
+              "expected_output": "{\"current_accuracy\": 0.80, \"baseline_accuracy\": 0.90, \"accuracy_drop\": 0.10, \"degraded\": true}",
+              "why": "%20 hata oranı ile baseline (%90) arasında fark oluşturarak degradation alert'inin tetiklendiğini doğruluyoruz."
+            },
+            {
+              "order": "3.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) current_accuracy doğru hesaplanmalı 2) accuracy_drop > threshold ise degraded=true olmalı 3) Alert oluşturulmuş olmalı ve GET /alerts'te görünmeli",
+              "why": "Model performans düşüşünü otomatik tespit etmek, production'da kötü tahminleri erken yakalamak için kritik."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── monitoring/\n│   ├── __init__.py\n│   ├── prediction_logger.py\n│   ├── drift_detector.py\n│   └── performance_monitor.py\n├── api/\n│   ├── routers/\n│   │   └── monitoring.py\n├── (rest unchanged)",
+          "common_errors": [
+            {
+              "error": "insufficient_data — yeterli ground truth yok",
+              "cause": "Minimum 10 ground truth kaydı gerekiyor ama daha az var.",
+              "fix": "Daha fazla ground truth logla. Production'da ground truth gecikmeli gelebilir — bunu göz önünde bulundur."
+            },
+            {
+              "error": "ValueError: y_true ve y_pred farklı uzunlukta",
+              "cause": "Ground truth loglarında eksik veri var.",
+              "fix": "Log kaydı yaparken her zaman prediction ve actual çiftini birlikte kaydet."
+            }
+          ]
         },
         {
           "step": 4,
           "title": "Auto-retraining Pipeline",
           "why": "Drift tespit edildiginde modeli otomatik yeniden egitmek downtime'i minimuma indirir.",
           "instructions": "Auto-retraining:\n1. Drift alert -> retraining trigger\n2. Son N gunun verisi ile yeni model egit\n3. Yeni modeli staging'e kaydet\n4. Validation testleri calistir\n5. Testler gecerse auto-promote (opsiyonel) veya insan onayi bekle",
-          "checkpoint": "Drift tetikleyip otomatik yeni model egitiliyor mu?"
+          "checkpoint": "Drift tetikleyip otomatik yeni model egitiliyor mu?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Auto-retraining modülünü oluştur",
+              "type": "code_write",
+              "file": "monitoring/auto_retrain.py",
+              "code": "from typing import Dict, Any, Optional\nfrom datetime import datetime\n\nclass AutoRetrainManager:\n    def __init__(self):\n        self.config = {\n            \"enabled\": False,\n            \"drift_threshold\": 0.05,\n            \"performance_drop_threshold\": 0.05,\n            \"min_samples_for_retrain\": 100,\n            \"auto_promote\": False,\n            \"validation_accuracy_min\": 0.80\n        }\n        self.retrain_history: list = []\n    \n    def configure(self, **kwargs):\n        self.config.update(kwargs)\n        return self.config\n    \n    def should_retrain(self, drift_result: Dict, performance_result: Dict) -> Dict[str, Any]:\n        reasons = []\n        \n        if drift_result.get(\"overall_drift\", False):\n            drifted = drift_result.get(\"drifted_features\", [])\n            reasons.append(f\"Data drift detected in: {', '.join(drifted)}\")\n        \n        if performance_result.get(\"degraded\", False):\n            drop = performance_result.get(\"accuracy_drop\", 0)\n            reasons.append(f\"Performance degradation: accuracy dropped by {drop:.2%}\")\n        \n        should = len(reasons) > 0 and self.config[\"enabled\"]\n        \n        return {\n            \"should_retrain\": should,\n            \"reasons\": reasons,\n            \"auto_retrain_enabled\": self.config[\"enabled\"],\n            \"timestamp\": datetime.utcnow().isoformat()\n        }\n    \n    def validate_new_model(self, new_accuracy: float, old_accuracy: float) -> Dict[str, Any]:\n        is_better = new_accuracy > old_accuracy\n        meets_minimum = new_accuracy >= self.config[\"validation_accuracy_min\"]\n        approved = is_better and meets_minimum\n        \n        result = {\n            \"approved\": approved,\n            \"new_accuracy\": round(new_accuracy, 4),\n            \"old_accuracy\": round(old_accuracy, 4),\n            \"improvement\": round(new_accuracy - old_accuracy, 4),\n            \"meets_minimum_threshold\": meets_minimum,\n            \"auto_promote\": approved and self.config[\"auto_promote\"]\n        }\n        \n        self.retrain_history.append({\n            **result,\n            \"timestamp\": datetime.utcnow().isoformat()\n        })\n        \n        return result\n\nauto_retrain_manager = AutoRetrainManager()",
+              "why": "Auto-retrain manager drift ve performance degradation'ı birleştirerek retraining kararı verir. Validation guardrail'leri yeni modelin eskisinden daha kötü olmasını engeller."
+            },
+            {
+              "order": "4.2",
+              "action": "Auto-retrain endpoint'lerini ekle",
+              "type": "code_add",
+              "file": "api/routers/monitoring.py",
+              "code": "from monitoring.auto_retrain import auto_retrain_manager\nfrom monitoring.drift_detector import drift_detector\n\nclass RetrainConfig(BaseModel):\n    enabled: bool = True\n    drift_threshold: float = 0.05\n    performance_drop_threshold: float = 0.05\n    auto_promote: bool = False\n    validation_accuracy_min: float = 0.80\n\n@router.post(\"/retrain/configure\")\nasync def configure_retrain(config: RetrainConfig):\n    return auto_retrain_manager.configure(**config.model_dump())\n\n@router.post(\"/retrain/check\")\nasync def check_retrain(dataset_id: int, db: Session = Depends(get_db)):\n    from api.models import Dataset\n    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()\n    if not dataset:\n        raise HTTPException(404, \"Dataset bulunamadi\")\n    df = pd.read_csv(dataset.file_path)\n    \n    drift_result = drift_detector.detect_drift_ks(df)\n    performance_result = performance_monitor.calculate_performance()\n    retrain_decision = auto_retrain_manager.should_retrain(drift_result, performance_result)\n    \n    return {\n        \"drift\": drift_result,\n        \"performance\": performance_result,\n        \"retrain_decision\": retrain_decision\n    }\n\n@router.post(\"/retrain/trigger\")\nasync def trigger_retrain(dataset_path: str, target_column: str, model_name: str = \"churn_predictor\"):\n    from workers.training_tasks import train_model\n    task = train_model.delay({\n        \"dataset_path\": dataset_path,\n        \"target_column\": target_column,\n        \"model_type\": \"random_forest\",\n        \"experiment_name\": \"auto_retrain\",\n        \"run_name\": f\"retrain_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}\"\n    })\n    return {\"task_id\": task.id, \"status\": \"retraining_started\"}\n\n@router.get(\"/retrain/history\")\nasync def retrain_history():\n    return auto_retrain_manager.retrain_history",
+              "position": "bottom",
+              "why": "Auto-retrain endpoint'leri konfigürasyon, kontrol, tetikleme ve geçmiş sorgulama sağlar. check endpoint'i drift + performance'ı birlikte değerlendirir."
+            },
+            {
+              "order": "4.3",
+              "action": "Auto-retrain akışını test et",
+              "type": "terminal",
+              "command": "# Auto-retrain'i aktifleştir\ncurl -X POST http://localhost:8000/api/monitoring/retrain/configure -H 'Content-Type: application/json' -d '{\"enabled\": true, \"auto_promote\": false}'\n\n# Retrain gerekip gerekmediğini kontrol et\ncurl -X POST 'http://localhost:8000/api/monitoring/retrain/check?dataset_id=DRIFTED_ID'",
+              "expected_output": "{\"drift\": {\"overall_drift\": true, ...}, \"performance\": {...}, \"retrain_decision\": {\"should_retrain\": true, \"reasons\": [\"Data drift detected...\"]}}",
+              "why": "Drift tespit edildiğinde auto-retrain mekanizmasının doğru karar verdiğini doğruluyoruz."
+            },
+            {
+              "order": "4.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) Drift varken should_retrain=true dönmeli 2) Retrain tetiklendiğinde yeni training job başlamalı 3) Yeni model validation'dan geçmeli (accuracy > baseline) 4) auto_promote=false ise insan onayı beklemeli",
+              "why": "Auto-retraining güvenlik guardrail'leri olmadan tehlikelidir — yeni model daha kötü olabilir. Validation zorunlu, auto-promote opsiyonel olmalı."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── monitoring/\n│   ├── __init__.py\n│   ├── prediction_logger.py\n│   ├── drift_detector.py\n│   ├── performance_monitor.py\n│   └── auto_retrain.py\n├── api/\n│   ├── routers/\n│   │   └── monitoring.py\n├── (rest unchanged)",
+          "common_errors": [
+            {
+              "error": "Auto-retrain sonsuz döngüye girdi — sürekli retrain tetikleniyor",
+              "cause": "Retrain sonrası drift hala tespit ediliyor çünkü baseline güncellenmemiş.",
+              "fix": "Retrain sonrası baseline'ı yeni training verisi ile güncelle. Cooldown period ekle (örn: 24 saat içinde max 1 retrain)."
+            },
+            {
+              "error": "Yeni model eskisinden daha kötü — validation başarısız",
+              "cause": "Yeni veri kalitesi düşük veya data drift modelin öğrenemeyeceği bir değişiklik.",
+              "fix": "Validation guardrail'i bunu yakalar (approved=false). Veri kalitesini kontrol et, gerekirse farklı model dene."
+            },
+            {
+              "error": "Retrain çok kaynak tüketiyor — CPU/memory spike",
+              "cause": "Büyük dataset ile otomatik retrain tetikleniyor.",
+              "fix": "Rate limiting ekle. Celery worker'a kaynak limiti koy. Retrain saatlerini off-peak'e planla."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Monitoring OLMADAN model deploy etme — kör ucus gibi\n2. Data drift != model drift — ikisini ayri olc\n3. Auto-retraining'de validation ZORUNLU — yeni model daha kotu olabilir\n4. Alert fatigue'a dikkat — cok fazla false alarm durumunda alert'ler ignore edilir",
@@ -365,28 +1573,240 @@
           "title": "ML Dashboard — Training & Experiments",
           "why": "Data scientist'lerin experiment'leri goruntulemesi, karsilastirmasi ve yeni training baslatmasi icin UI sart.",
           "instructions": "Dashboard sayfalari:\n1. Dataset listesi ve profil\n2. Training job'lari (aktif, tamamlanan, basarisiz)\n3. Experiment comparison (metrik grafikleri)\n4. Model registry (versiyonlar, stage'ler)",
-          "checkpoint": "Training baslatip progress'i dashboard'da takip edebiliyor musun?"
+          "checkpoint": "Training baslatip progress'i dashboard'da takip edebiliyor musun?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "React frontend projesini oluştur",
+              "type": "terminal",
+              "command": "cd frontend && npx create-react-app . --template typescript\nnpm install axios recharts @tanstack/react-query react-router-dom",
+              "expected_output": "Success! Created frontend\nAdded: axios, recharts, @tanstack/react-query, react-router-dom",
+              "why": "React + TypeScript ile type-safe frontend oluşturuyoruz. recharts grafik kütüphanesi, react-query veri fetching, axios HTTP istekleri için kullanılır."
+            },
+            {
+              "order": "1.2",
+              "action": "API client modülünü oluştur",
+              "type": "code_write",
+              "file": "frontend/src/api/client.ts",
+              "code": "import axios from 'axios';\n\nconst API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';\n\nexport const api = axios.create({\n  baseURL: API_BASE,\n  headers: { 'Content-Type': 'application/json' }\n});\n\nexport const fetchExperiments = () => api.get('/api/experiments/');\nexport const fetchRuns = (expId: string) => api.get(`/api/experiments/${expId}/runs`);\nexport const fetchModels = () => api.get('/api/models/');\nexport const startTraining = (config: any) => api.post('/api/training/start', config);\nexport const getTrainingStatus = (taskId: string) => api.get(`/api/training/status/${taskId}`);\nexport const fetchPredictionStats = (minutes: number) => api.get(`/api/predict/monitoring/stats?minutes=${minutes}`);\nexport const fetchDriftResults = (datasetId: number) => api.post(`/api/monitoring/drift/detect?dataset_id=${datasetId}&method=ks`);\nexport const fetchAlerts = () => api.get('/api/monitoring/alerts');",
+              "why": "Merkezi API client ile tüm backend çağrıları tek yerden yönetilir. URL değiştiğinde sadece burayı güncellersen yeter."
+            },
+            {
+              "order": "1.3",
+              "action": "Training dashboard sayfasını oluştur",
+              "type": "code_write",
+              "file": "frontend/src/pages/TrainingDashboard.tsx",
+              "code": "import React, { useState, useEffect } from 'react';\nimport { startTraining, getTrainingStatus, fetchExperiments, fetchRuns } from '../api/client';\n\nconst TrainingDashboard: React.FC = () => {\n  const [experiments, setExperiments] = useState<any[]>([]);\n  const [activeTask, setActiveTask] = useState<string | null>(null);\n  const [progress, setProgress] = useState(0);\n  const [trainingConfig, setTrainingConfig] = useState({\n    dataset_path: '',\n    target_column: '',\n    model_type: 'random_forest',\n    experiment_name: 'default'\n  });\n\n  useEffect(() => {\n    loadExperiments();\n  }, []);\n\n  useEffect(() => {\n    if (!activeTask) return;\n    const interval = setInterval(async () => {\n      const { data } = await getTrainingStatus(activeTask);\n      setProgress(data.progress || 0);\n      if (data.status === 'SUCCESS' || data.status === 'FAILED') {\n        clearInterval(interval);\n        setActiveTask(null);\n        loadExperiments();\n      }\n    }, 2000);\n    return () => clearInterval(interval);\n  }, [activeTask]);\n\n  const loadExperiments = async () => {\n    const { data } = await fetchExperiments();\n    setExperiments(data);\n  };\n\n  const handleStartTraining = async () => {\n    const { data } = await startTraining(trainingConfig);\n    setActiveTask(data.task_id);\n  };\n\n  return (\n    <div className=\"p-6 bg-gray-900 min-h-screen text-gray-300\">\n      <h1 className=\"text-2xl font-bold text-emerald-400 mb-6\">Training Dashboard</h1>\n      {/* Training form and progress will be rendered here */}\n      {activeTask && (\n        <div className=\"bg-gray-800 p-4 rounded-lg mb-6\">\n          <p>Training in progress... {progress}%</p>\n          <div className=\"w-full bg-gray-700 rounded-full h-2\">\n            <div className=\"bg-emerald-500 h-2 rounded-full\" style={{width: `${progress}%`}} />\n          </div>\n        </div>\n      )}\n      <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">\n        {experiments.map((exp: any) => (\n          <div key={exp.id} className=\"bg-gray-800 p-4 rounded-lg border border-gray-700\">\n            <h3 className=\"text-lg text-emerald-400\">{exp.name}</h3>\n            <p className=\"text-sm text-gray-400\">ID: {exp.id}</p>\n          </div>\n        ))}\n      </div>\n    </div>\n  );\n};\n\nexport default TrainingDashboard;",
+              "why": "Training dashboard experiment'leri listeler, yeni training başlatır ve progress bar ile ilerlemeyi gösterir. Dark tema (gray-900 arka plan) proje stiline uygun."
+            },
+            {
+              "order": "1.4",
+              "action": "Router yapısını kur",
+              "type": "code_write",
+              "file": "frontend/src/App.tsx",
+              "code": "import React from 'react';\nimport { BrowserRouter, Routes, Route, Link } from 'react-router-dom';\nimport TrainingDashboard from './pages/TrainingDashboard';\n\nconst App: React.FC = () => (\n  <BrowserRouter>\n    <div className=\"bg-gray-900 min-h-screen\">\n      <nav className=\"bg-gray-800 border-b border-gray-700 p-4\">\n        <div className=\"flex space-x-6\">\n          <Link to=\"/\" className=\"text-emerald-400 font-bold text-lg\">ML Pipeline</Link>\n          <Link to=\"/training\" className=\"text-gray-300 hover:text-emerald-400\">Training</Link>\n          <Link to=\"/models\" className=\"text-gray-300 hover:text-emerald-400\">Models</Link>\n          <Link to=\"/monitoring\" className=\"text-gray-300 hover:text-emerald-400\">Monitoring</Link>\n        </div>\n      </nav>\n      <Routes>\n        <Route path=\"/\" element={<TrainingDashboard />} />\n        <Route path=\"/training\" element={<TrainingDashboard />} />\n      </Routes>\n    </div>\n  </BrowserRouter>\n);\n\nexport default App;",
+              "why": "React Router ile sayfa navigasyonu kuruyoruz. Dark tema navigation bar ile tutarlı görünüm sağlanır."
+            },
+            {
+              "order": "1.5",
+              "action": "Frontend'i başlat ve test et",
+              "type": "terminal",
+              "command": "cd frontend && npm start",
+              "expected_output": "Compiled successfully!\nLocal: http://localhost:3000",
+              "why": "Frontend'in derlenip doğru çalıştığını doğruluyoruz."
+            },
+            {
+              "order": "1.6",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) http://localhost:5173'te dark tema dashboard görünmeli 2) Experiment listesi API'den yüklenmeli 3) Training başlat butonuna basınca progress bar çalışmalı 4) Navigation linkler çalışmalı",
+              "why": "Frontend-backend entegrasyonunu doğrulamak, kullanıcı deneyiminin çalıştığını garanti eder."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── frontend/\n│   ├── public/\n│   ├── src/\n│   │   ├── api/\n│   │   │   └── client.ts\n│   │   ├── pages/\n│   │   │   └── TrainingDashboard.tsx\n│   │   ├── App.tsx\n│   │   └── index.tsx\n│   ├── package.json\n│   └── tsconfig.json\n├── api/\n├── workers/\n├── features/\n├── ml/\n├── monitoring/\n├── docker-compose.yml\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "CORS error: Access-Control-Allow-Origin missing",
+              "cause": "FastAPI CORS middleware'i frontend URL'ini kabul etmiyor.",
+              "fix": "api/main.py'de allow_origins listesine frontend URL'ini ekle: [\"http://localhost:3000\", \"http://localhost:5173\"]"
+            },
+            {
+              "error": "TypeError: Cannot read properties of undefined (reading 'map') — experiments.map hatası",
+              "cause": "API yanıtı beklenen formatta değil veya henüz yüklenmemiş.",
+              "fix": "experiments state'ine varsayılan değer olarak boş array ver ve API yanıtını kontrol et."
+            },
+            {
+              "error": "net::ERR_CONNECTION_REFUSED — API'ya bağlanamıyor",
+              "cause": "Backend servisi çalışmıyor veya yanlış port kullanılıyor.",
+              "fix": "Backend'in çalıştığını doğrula: curl http://localhost:8000/health. VITE_API_URL ortam değişkenini kontrol et."
+            }
+          ]
         },
         {
           "step": 2,
           "title": "Monitoring Dashboard",
           "why": "Prediction istatistikleri, drift alertleri ve model performansini gozlemlemek operasyonel kararlari bilgilendirir.",
           "instructions": "Monitoring goruntuleri:\n1. Real-time prediction stats (avg confidence, volume)\n2. Data drift heatmap (feature bazli)\n3. Model performance trend (accuracy over time)\n4. Active alerts ve alert gecmisi",
-          "checkpoint": "Drift gerceklestiginde dashboard'da gorunuyor mu?"
+          "checkpoint": "Drift gerceklestiginde dashboard'da gorunuyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Monitoring dashboard sayfasını oluştur",
+              "type": "code_write",
+              "file": "frontend/src/pages/MonitoringDashboard.tsx",
+              "code": "import React, { useState, useEffect } from 'react';\nimport { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';\nimport { fetchPredictionStats, fetchAlerts } from '../api/client';\n\nconst MonitoringDashboard: React.FC = () => {\n  const [stats, setStats] = useState<any>(null);\n  const [alerts, setAlerts] = useState<any[]>([]);\n\n  useEffect(() => {\n    const loadData = async () => {\n      const [statsRes, alertsRes] = await Promise.all([\n        fetchPredictionStats(60),\n        fetchAlerts()\n      ]);\n      setStats(statsRes.data);\n      setAlerts(alertsRes.data);\n    };\n    loadData();\n    const interval = setInterval(loadData, 30000);\n    return () => clearInterval(interval);\n  }, []);\n\n  return (\n    <div className=\"p-6 bg-gray-900 min-h-screen text-gray-300\">\n      <h1 className=\"text-2xl font-bold text-emerald-400 mb-6\">Monitoring Dashboard</h1>\n      \n      {stats && (\n        <div className=\"grid grid-cols-1 md:grid-cols-4 gap-4 mb-6\">\n          <div className=\"bg-gray-800 p-4 rounded-lg\">\n            <p className=\"text-sm text-gray-400\">Total Predictions</p>\n            <p className=\"text-2xl text-emerald-400\">{stats.total_predictions}</p>\n          </div>\n          <div className=\"bg-gray-800 p-4 rounded-lg\">\n            <p className=\"text-sm text-gray-400\">Avg Latency</p>\n            <p className=\"text-2xl text-blue-400\">{stats.latency?.avg || 0}ms</p>\n          </div>\n          <div className=\"bg-gray-800 p-4 rounded-lg\">\n            <p className=\"text-sm text-gray-400\">P95 Latency</p>\n            <p className=\"text-2xl text-blue-400\">{stats.latency?.p95 || 0}ms</p>\n          </div>\n          <div className=\"bg-gray-800 p-4 rounded-lg\">\n            <p className=\"text-sm text-gray-400\">Avg Confidence</p>\n            <p className=\"text-2xl text-emerald-400\">{((stats.confidence?.avg || 0) * 100).toFixed(1)}%</p>\n          </div>\n        </div>\n      )}\n\n      {alerts.length > 0 && (\n        <div className=\"bg-red-900/20 border border-red-700 rounded-lg p-4 mb-6\">\n          <h2 className=\"text-lg text-red-400 mb-2\">Active Alerts</h2>\n          {alerts.map((alert: any, i: number) => (\n            <div key={i} className=\"text-sm text-gray-300 py-1\">\n              <span className=\"text-red-400\">[{alert.severity}]</span> {alert.message}\n            </div>\n          ))}\n        </div>\n      )}\n    </div>\n  );\n};\n\nexport default MonitoringDashboard;",
+              "why": "Monitoring dashboard real-time istatistikleri gösterir: prediction sayısı, latency metrikleri, confidence ortalaması ve aktif alert'ler. 30 saniyede bir otomatik güncellenir."
+            },
+            {
+              "order": "2.2",
+              "action": "Monitoring sayfasını router'a ekle",
+              "type": "code_modify",
+              "file": "frontend/src/App.tsx",
+              "code": "import MonitoringDashboard from './pages/MonitoringDashboard';\n// Routes içine ekle:\n<Route path=\"/monitoring\" element={<MonitoringDashboard />} />",
+              "position": "bottom",
+              "why": "Monitoring sayfasını navigation'dan erişilebilir yap."
+            },
+            {
+              "order": "2.3",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) /monitoring sayfasında prediction stats kartları görünmeli 2) Latency metrikleri (avg, p95) doğru olmalı 3) Alert'ler kırmızı banner'da görünmeli 4) 30 saniyede bir güncellenmeli",
+              "why": "Monitoring dashboard, ML sisteminizin sağlığını gösteren tek penceredir. Doğru çalışması operasyonel kararlar için kritik."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── frontend/\n│   ├── src/\n│   │   ├── api/\n│   │   │   └── client.ts\n│   │   ├── pages/\n│   │   │   ├── TrainingDashboard.tsx\n│   │   │   └── MonitoringDashboard.tsx\n│   │   ├── App.tsx\n│   │   └── index.tsx\n├── (rest unchanged)",
+          "common_errors": [
+            {
+              "error": "recharts module not found",
+              "cause": "recharts paketi kurulmamış.",
+              "fix": "npm install recharts komutunu çalıştır."
+            },
+            {
+              "error": "TypeError: stats.latency is undefined — optional chaining eksik",
+              "cause": "API yanıtı henüz gelmeden render ediliyor.",
+              "fix": "Optional chaining kullan: stats?.latency?.avg ve null kontrolü ekle."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Docker & Production Config",
           "why": "Tum bilesenleri container olarak paketlemek deployment tutarliligini saglar.",
           "instructions": "Production:\n1. Multi-stage Dockerfile (API, worker, frontend)\n2. docker-compose.prod.yml\n3. Health checks (her servis)\n4. Environment variables (.env)\n5. Volume mounts (model artifacts, data)",
-          "checkpoint": "docker-compose -f docker-compose.prod.yml up ile her sey calisiyor mu?"
+          "checkpoint": "docker-compose -f docker-compose.prod.yml up ile her sey calisiyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Production docker-compose dosyasını oluştur",
+              "type": "code_write",
+              "file": "docker-compose.prod.yml",
+              "code": "version: '3.8'\n\nservices:\n  api:\n    build:\n      context: .\n      dockerfile: Dockerfile.api\n      target: production\n    ports:\n      - \"8000:8000\"\n    environment:\n      - DATABASE_URL=${DATABASE_URL}\n      - REDIS_URL=${REDIS_URL}\n      - MLFLOW_TRACKING_URI=http://mlflow:5000\n    depends_on:\n      db:\n        condition: service_healthy\n      redis:\n        condition: service_healthy\n    healthcheck:\n      test: [\"CMD\", \"curl\", \"-f\", \"http://localhost:8000/health\"]\n      interval: 30s\n      timeout: 10s\n      retries: 3\n    restart: unless-stopped\n\n  worker:\n    build:\n      context: .\n      dockerfile: Dockerfile.worker\n    environment:\n      - DATABASE_URL=${DATABASE_URL}\n      - REDIS_URL=${REDIS_URL}\n      - MLFLOW_TRACKING_URI=http://mlflow:5000\n    depends_on:\n      - db\n      - redis\n    restart: unless-stopped\n    deploy:\n      resources:\n        limits:\n          memory: 2G\n\n  mlflow:\n    image: ghcr.io/mlflow/mlflow:v2.9.2\n    ports:\n      - \"5000:5000\"\n    environment:\n      - BACKEND_STORE_URI=${DATABASE_URL}\n      - ARTIFACT_ROOT=/mlflow/artifacts\n    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri ${DATABASE_URL} --default-artifact-root /mlflow/artifacts\n    depends_on:\n      db:\n        condition: service_healthy\n    volumes:\n      - mlflow_artifacts:/mlflow/artifacts\n    healthcheck:\n      test: [\"CMD\", \"curl\", \"-f\", \"http://localhost:5000/health\"]\n      interval: 30s\n      timeout: 10s\n      retries: 3\n    restart: unless-stopped\n\n  db:\n    image: postgres:16-alpine\n    environment:\n      - POSTGRES_USER=${POSTGRES_USER}\n      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}\n      - POSTGRES_DB=${POSTGRES_DB}\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U ${POSTGRES_USER}\"]\n      interval: 10s\n      timeout: 5s\n      retries: 5\n    restart: unless-stopped\n\n  redis:\n    image: redis:7-alpine\n    healthcheck:\n      test: [\"CMD\", \"redis-cli\", \"ping\"]\n      interval: 10s\n      timeout: 5s\n      retries: 5\n    restart: unless-stopped\n\n  frontend:\n    build:\n      context: ./frontend\n      dockerfile: Dockerfile\n      target: production\n    ports:\n      - \"80:80\"\n    depends_on:\n      - api\n    restart: unless-stopped\n\nvolumes:\n  pgdata:\n  mlflow_artifacts:",
+              "why": "Production docker-compose development'tan farklıdır: health check'ler, restart policy, memory limit ve environment variable'lar ile güvenli ve kararlı çalışmayı sağlar."
+            },
+            {
+              "order": "3.2",
+              "action": ".env.example dosyası oluştur",
+              "type": "code_write",
+              "file": ".env.example",
+              "code": "DATABASE_URL=postgresql://mluser:strongpassword@db:5432/mlpipeline\nREDIS_URL=redis://redis:6379/0\nPOSTGRES_USER=mluser\nPOSTGRES_PASSWORD=strongpassword\nPOSTGRES_DB=mlpipeline\nVITE_API_URL=http://localhost:8000\nMLFLOW_TRACKING_URI=http://mlflow:5000",
+              "why": "Environment variable'ları .env.example'da belgelemek, başka geliştiricilerin projeyi kurmasını kolaylaştırır. Gerçek .env dosyası git'e eklenmemeli."
+            },
+            {
+              "order": "3.3",
+              "action": "Production deployment'ı test et",
+              "type": "terminal",
+              "command": "cp .env.example .env && docker-compose -f docker-compose.prod.yml up -d && docker-compose -f docker-compose.prod.yml ps",
+              "expected_output": "Tüm servisler 'Up (healthy)' durumunda",
+              "why": "Production konfigürasyonunun çalıştığını doğrulamak deployment sorunlarını erken yakalar."
+            },
+            {
+              "order": "3.4",
+              "action": "Health check'leri doğrula",
+              "type": "terminal",
+              "command": "curl http://localhost:8000/health\ncurl http://localhost:5000/health\ndocker-compose -f docker-compose.prod.yml exec redis redis-cli ping\ndocker-compose -f docker-compose.prod.yml exec db pg_isready -U mluser",
+              "expected_output": "API: {\"status\": \"healthy\"}\nMLflow: OK\nRedis: PONG\nPostgreSQL: accepting connections",
+              "why": "Her servisin sağlıklı olduğunu doğrulamak, production'da sorunların erken tespitini sağlar."
+            },
+            {
+              "order": "3.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) Tüm servisler healthy durumda 2) API istekleri çalışıyor 3) MLflow UI erişilebilir 4) Frontend 80 portunda çalışıyor 5) Restart sonrası veri korunuyor (volume'lar)",
+              "why": "Production deployment doğrulaması, canlı ortamda sorun yaşamamak için şart. Bir servis çökerse restart policy devreye girmeli."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n├── workers/\n├── features/\n├── ml/\n├── monitoring/\n├── frontend/\n├── data/\n├── artifacts/\n├── docker-compose.yml\n├── docker-compose.prod.yml\n├── Dockerfile.api\n├── Dockerfile.worker\n├── .env.example\n├── .gitignore\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "Health check failing: container keeps restarting",
+              "cause": "Servis başlangıcı health check timeout'undan uzun sürüyor.",
+              "fix": "start_period parametresi ekle: start_period: 40s. Bu süre içinde health check başarısızlıkları sayılmaz."
+            },
+            {
+              "error": "Volume permission denied — PostgreSQL data erişilemiyor",
+              "cause": "Docker volume'undaki dosya izinleri container'ın user'ı ile uyuşmuyor.",
+              "fix": "docker volume rm pgdata ile volume'u sil ve yeniden oluştur. Veya Dockerfile'da doğru user ayarla."
+            },
+            {
+              "error": "Model artifacts kayboldu — container yeniden oluşturulduğunda",
+              "cause": "Model artifact'ları volume mount edilmemiş, container'ın ephemeral filesystem'inde kalmış.",
+              "fix": "docker-compose.prod.yml'de mlflow_artifacts ve model_artifacts volume'larının doğru mount edildiğini kontrol et."
+            }
+          ]
         },
         {
           "step": 4,
           "title": "Model Card & Documentation",
           "why": "Her modelin ne yaptigi, limitasyonlari ve kullanim kilavuzu dokumante edilmeli.",
           "instructions": "Model card sablonu:\n1. Model amaci ve kapsam\n2. Training data aciklamasi\n3. Performance metrikleri\n4. Limitasyonlar ve bias'lar\n5. Kullanim talimatlari\n6. Versiyon gecmisi",
-          "checkpoint": "Her model icin model card olusturulmus mu?"
+          "checkpoint": "Her model icin model card olusturulmus mu?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Model card şablonunu oluştur",
+              "type": "code_write",
+              "file": "ml/model_card.py",
+              "code": "from typing import Dict, List, Any, Optional\nfrom datetime import datetime\nimport json\nimport os\n\nclass ModelCard:\n    def __init__(self, model_name: str):\n        self.card = {\n            \"model_name\": model_name,\n            \"created_at\": datetime.utcnow().isoformat(),\n            \"model_details\": {},\n            \"intended_use\": {},\n            \"training_data\": {},\n            \"performance_metrics\": {},\n            \"limitations\": [],\n            \"ethical_considerations\": [],\n            \"version_history\": []\n        }\n    \n    def set_model_details(self, model_type: str, framework: str, version: str, description: str):\n        self.card[\"model_details\"] = {\n            \"type\": model_type,\n            \"framework\": framework,\n            \"version\": version,\n            \"description\": description\n        }\n        return self\n    \n    def set_intended_use(self, primary_use: str, users: List[str], out_of_scope: List[str]):\n        self.card[\"intended_use\"] = {\n            \"primary_use\": primary_use,\n            \"intended_users\": users,\n            \"out_of_scope_uses\": out_of_scope\n        }\n        return self\n    \n    def set_training_data(self, description: str, size: int, features: List[str], preprocessing: str):\n        self.card[\"training_data\"] = {\n            \"description\": description,\n            \"size\": size,\n            \"features\": features,\n            \"preprocessing\": preprocessing\n        }\n        return self\n    \n    def set_metrics(self, metrics: Dict[str, float]):\n        self.card[\"performance_metrics\"] = metrics\n        return self\n    \n    def add_limitation(self, limitation: str):\n        self.card[\"limitations\"].append(limitation)\n        return self\n    \n    def save(self, output_dir: str = \"model_cards\"):\n        os.makedirs(output_dir, exist_ok=True)\n        path = os.path.join(output_dir, f\"{self.card['model_name']}_card.json\")\n        with open(path, \"w\", encoding=\"utf-8\") as f:\n            json.dump(self.card, f, indent=2, ensure_ascii=False)\n        return path\n    \n    def to_markdown(self) -> str:\n        md = f\"# Model Card: {self.card['model_name']}\\n\\n\"\n        md += f\"**Olusturulma Tarihi:** {self.card['created_at']}\\n\\n\"\n        md += \"## Model Detaylari\\n\"\n        for k, v in self.card['model_details'].items():\n            md += f\"- **{k}:** {v}\\n\"\n        md += \"\\n## Performans Metrikleri\\n\"\n        for k, v in self.card['performance_metrics'].items():\n            md += f\"- **{k}:** {v}\\n\"\n        md += \"\\n## Limitasyonlar\\n\"\n        for l in self.card['limitations']:\n            md += f\"- {l}\\n\"\n        return md",
+              "why": "Model card, modelin amacını, performansını, limitasyonlarını ve kullanım talimatlarını belgeler. Google'ın Responsible AI standartlarına uygun — regulatory compliance için gerekebilir."
+            },
+            {
+              "order": "4.2",
+              "action": "Model card endpoint'ini oluştur",
+              "type": "code_add",
+              "file": "api/routers/model_registry.py",
+              "code": "from ml.model_card import ModelCard\n\n@router.post(\"/{model_name}/card\")\nasync def create_model_card(\n    model_name: str,\n    description: str = \"ML model\",\n    primary_use: str = \"Prediction\"\n):\n    versions = client.get_latest_versions(model_name, stages=[\"Production\"])\n    if not versions:\n        raise HTTPException(404, \"Production modeli bulunamadi\")\n    \n    v = versions[0]\n    run = mlflow.get_run(v.run_id)\n    \n    card = ModelCard(model_name)\n    card.set_model_details(\n        model_type=run.data.params.get(\"model_type\", \"unknown\"),\n        framework=\"scikit-learn\",\n        version=str(v.version),\n        description=description\n    )\n    card.set_metrics(run.data.metrics)\n    card.add_limitation(\"Model sadece egitim verisine benzer dagilimdaki veriler icin gecerlidir\")\n    card.add_limitation(\"Data drift durumunda performans dusebilir\")\n    \n    path = card.save()\n    return {\"card\": card.card, \"saved_path\": path}",
+              "position": "bottom",
+              "why": "Model card otomatik olarak MLflow'daki bilgilerle doldurulur. Her modelin dokümantasyonunu oluşturmak production'da şeffaflık sağlar."
+            },
+            {
+              "order": "4.3",
+              "action": "Model card oluştur ve test et",
+              "type": "terminal",
+              "command": "curl -X POST 'http://localhost:8000/api/models/churn_predictor/card?description=Customer%20churn%20prediction&primary_use=Churn%20risk%20scoring'",
+              "expected_output": "{\"card\": {\"model_name\": \"churn_predictor\", \"model_details\": {...}, \"performance_metrics\": {...}}, \"saved_path\": \"model_cards/churn_predictor_card.json\"}",
+              "why": "Model card'ın doğru oluşturulduğunu ve MLflow'dan metriklerin çekildiğini doğruluyoruz."
+            },
+            {
+              "order": "4.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "1) Model card JSON dosyası oluşmuş olmalı 2) Performance metrikleri MLflow'dan doğru çekilmeli 3) Limitasyonlar eklenmiş olmalı 4) to_markdown() okunabilir format üretmeli",
+              "why": "Model card her modelin 'pasaportu'dur — ne yapar, ne kadar iyi yapar, nerede başarısız olabilir. Responsible AI için zorunlu bir pratik."
+            }
+          ],
+          "folder_structure_after": "ml-pipeline-platform/\n├── api/\n│   ├── routers/\n│   │   ├── datasets.py\n│   │   ├── features.py\n│   │   ├── training.py\n│   │   ├── experiments.py\n│   │   ├── model_registry.py\n│   │   ├── inference.py\n│   │   └── monitoring.py\n│   └── services/\n├── workers/\n├── features/\n├── ml/\n│   ├── __init__.py\n│   ├── hyperparameter_search.py\n│   ├── model_server.py\n│   ├── ab_testing.py\n│   └── model_card.py\n├── monitoring/\n│   ├── __init__.py\n│   ├── prediction_logger.py\n│   ├── drift_detector.py\n│   ├── performance_monitor.py\n│   └── auto_retrain.py\n├── model_cards/\n│   └── churn_predictor_card.json\n├── frontend/\n│   ├── src/\n│   │   ├── api/\n│   │   ├── pages/\n│   │   └── App.tsx\n├── data/\n├── artifacts/\n├── docker-compose.yml\n├── docker-compose.prod.yml\n├── .env.example\n└── requirements.txt",
+          "common_errors": [
+            {
+              "error": "Model card metrikleri boş — MLflow'dan çekilemedi",
+              "cause": "Run ID yanlış veya MLflow server'a erişilemiyor.",
+              "fix": "MLflow bağlantısını kontrol et. run_id'nin doğru olduğundan emin ol."
+            },
+            {
+              "error": "FileNotFoundError: model_cards dizini oluşturulamıyor",
+              "cause": "Docker container'da yazma izni yok.",
+              "fix": "Dockerfile'da WORKDIR ayarla ve volume mount ekle. os.makedirs(exist_ok=True) kullan."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Dashboard'da 'Deploy to Production' butonu koymadan once approval workflow kur\n2. Docker volume mount'lari dogru yapilandir — model artifact'lari kaybolmasin\n3. Model card yazmak sikici ama ZORUNLU — regulatory compliance icin gerekebilir\n4. Health check'ler sadece 200 donmemeli — model'in yuklu oldugunu da dogrulamali",

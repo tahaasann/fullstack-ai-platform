@@ -155,7 +155,113 @@
           "why": "Multi-service projeler icin tekrarlanabilir ortam sart. docker-compose ile tum servisleri tek komutla ayaga kaldirabilmek gelistirme hizini artirir.",
           "instructions": "Proje yapisini olustur:\n- /frontend (React + TypeScript)\n- /gateway (Node.js WebSocket server)\n- /orchestrator (FastAPI + LangGraph)\n- /shared (ortak tipler ve config)\n\ndocker-compose.yml ile PostgreSQL, Redis, gateway ve orchestrator servislerini tanimla.",
           "code_snippet": "# docker-compose.yml\nservices:\n  postgres:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: support\n      POSTGRES_PASSWORD: dev123\n    ports: ['5432:5432']\n  redis:\n    image: redis:7-alpine\n    ports: ['6379:6379']\n  orchestrator:\n    build: ./orchestrator\n    ports: ['8000:8000']\n    depends_on: [postgres, redis]",
-          "checkpoint": "docker-compose up ile tum servisler hatasiz ayaga kalkiyor mu?"
+          "checkpoint": "docker-compose up ile tum servisler hatasiz ayaga kalkiyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Proje kök dizinini oluştur",
+              "type": "terminal",
+              "command": "mkdir multi-agent-support && cd multi-agent-support && mkdir frontend gateway orchestrator shared",
+              "expected_output": "Klasörler oluşturuldu",
+              "why": "Multi-service projede her servis kendi klasöründe yaşar. Monorepo yapısı tüm kodun tek repoda yönetilmesini sağlar — bağımlılık yönetimi ve CI/CD kolaylaşır."
+            },
+            {
+              "order": "1.2",
+              "action": "Orchestrator için Python ortamını hazırla",
+              "type": "terminal",
+              "command": "cd orchestrator && python -m venv venv && source venv/bin/activate && pip install fastapi uvicorn langchain langgraph langchain-openai redis asyncpg pydantic python-dotenv",
+              "expected_output": "Successfully installed fastapi uvicorn langchain langgraph ...",
+              "why": "FastAPI, AI orchestration katmanı olarak kullanılacak. LangGraph multi-agent workflow'u, LangChain ise LLM entegrasyonu için gerekli. Virtual environment projeye özel bağımlılıkları izole eder."
+            },
+            {
+              "order": "1.3",
+              "action": "Orchestrator requirements dosyasını oluştur",
+              "type": "terminal",
+              "command": "pip freeze > requirements.txt",
+              "expected_output": "requirements.txt dosyası oluşturuldu",
+              "why": "requirements.txt, Docker build sırasında ve diğer geliştiricilerin ortamını kurarken kullanılır. Tüm bağımlılıkların sabit versiyonlarını içerir."
+            },
+            {
+              "order": "1.4",
+              "action": "Gateway için Node.js projesini başlat",
+              "type": "terminal",
+              "command": "cd ../gateway && npm init -y && npm install ws redis dotenv uuid",
+              "expected_output": "added X packages",
+              "why": "Node.js WebSocket gateway, event-driven yapısıyla binlerce eşzamanlı bağlantıyı verimli yönetir. ws kütüphanesi hafif ve production-ready bir WebSocket implementasyonudur."
+            },
+            {
+              "order": "1.5",
+              "action": "Frontend React projesini oluştur",
+              "type": "terminal",
+              "command": "cd ../frontend && npm create vite@latest . -- --template react-ts && npm install",
+              "expected_output": "Scaffolding project in ./ ... Done",
+              "why": "Vite, React + TypeScript projesi için en hızlı geliştirme ortamını sağlar. Hot Module Replacement ile değişiklikler anında yansır."
+            },
+            {
+              "order": "1.6",
+              "action": "docker-compose.yml dosyasını oluştur",
+              "type": "file_open",
+              "file": "docker-compose.yml",
+              "why": "Docker Compose, tüm servisleri (PostgreSQL, Redis, Gateway, Orchestrator) tek komutla ayağa kaldırmayı sağlar. Her geliştiricinin aynı ortamda çalışmasını garanti eder."
+            },
+            {
+              "order": "1.7",
+              "action": "Docker Compose konfigürasyonunu yaz",
+              "type": "code_write",
+              "file": "docker-compose.yml",
+              "code": "version: '3.8'\nservices:\n  postgres:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: support\n      POSTGRES_USER: admin\n      POSTGRES_PASSWORD: dev123\n    ports:\n      - '5432:5432'\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n\n  redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'\n\n  orchestrator:\n    build: ./orchestrator\n    ports:\n      - '8000:8000'\n    environment:\n      - DATABASE_URL=postgresql://admin:dev123@postgres:5432/support\n      - REDIS_URL=redis://redis:6379\n      - OPENAI_API_KEY=${OPENAI_API_KEY}\n    depends_on:\n      - postgres\n      - redis\n\n  gateway:\n    build: ./gateway\n    ports:\n      - '3001:3001'\n    environment:\n      - REDIS_URL=redis://redis:6379\n      - ORCHESTRATOR_URL=http://orchestrator:8000\n    depends_on:\n      - redis\n      - orchestrator\n\nvolumes:\n  pgdata:",
+              "why": "Docker Compose ile tüm servisler birbirine bağlı şekilde tanımlanır. depends_on ile başlatma sırası belirlenir, volumes ile veritabanı verisi kalıcı tutulur."
+            },
+            {
+              "order": "1.8",
+              "action": "Orchestrator Dockerfile oluştur",
+              "type": "code_write",
+              "file": "orchestrator/Dockerfile",
+              "code": "FROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nCMD [\"uvicorn\", \"main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]",
+              "why": "Python slim imajı küçük boyutludur. Önce requirements.txt kopyalanır çünkü Docker layer caching ile bağımlılıklar sadece değiştiğinde yeniden kurulur."
+            },
+            {
+              "order": "1.9",
+              "action": "Orchestrator ana dosyasını oluştur",
+              "type": "code_write",
+              "file": "orchestrator/main.py",
+              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI(title=\"Multi-Agent Support Orchestrator\")\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n\n@app.get(\"/health\")\nasync def health():\n    return {\"status\": \"ok\", \"service\": \"orchestrator\"}",
+              "why": "Health endpoint, Docker ve load balancer'ların servisin ayakta olduğunu kontrol etmesi için standart bir pratiktir. CORS middleware frontend'den gelen isteklere izin verir."
+            },
+            {
+              "order": "1.10",
+              "action": "Docker Compose ile servisleri başlat",
+              "type": "terminal",
+              "command": "docker-compose up --build -d && docker-compose ps",
+              "expected_output": "NAME                STATUS\npostgres            Up\nredis               Up\norchestrator        Up\ngateway             Up",
+              "why": "--build flag'i image'ları yeniden oluşturur, -d arka planda çalıştırır. docker-compose ps ile tüm servislerin durumunu kontrol ediyoruz."
+            },
+            {
+              "order": "1.11",
+              "action": "Servislerin çalıştığını doğrula",
+              "type": "validate",
+              "validation": "curl http://localhost:8000/health komutu {\"status\":\"ok\"} dönmeli. redis-cli ping komutu PONG dönmeli. PostgreSQL bağlantısı docker exec ile test edilmeli.",
+              "why": "Her servisin bağımsız olarak çalıştığını doğrulamak, entegrasyon hatalarını erkenden yakalar. Sorun varsa docker-compose logs <servis> ile logları incele."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── frontend/\n│   ├── src/\n│   │   ├── App.tsx\n│   │   └── main.tsx\n│   ├── package.json\n│   └── vite.config.ts\n├── gateway/\n│   ├── Dockerfile\n│   ├── package.json\n│   └── index.js\n├── orchestrator/\n│   ├── Dockerfile\n│   ├── main.py\n│   ├── requirements.txt\n│   └── venv/\n├── shared/\n├── docker-compose.yml\n└── .env",
+          "common_errors": [
+            {
+              "error": "docker-compose: command not found",
+              "cause": "Docker Desktop kurulu değil veya PATH'e eklenmemiş.",
+              "fix": "Docker Desktop'ı kur ve başlat. Terminal'i yeniden aç. docker --version ile kontrol et."
+            },
+            {
+              "error": "Error: port 5432 already in use",
+              "cause": "Yerel PostgreSQL zaten 5432 portunda çalışıyor.",
+              "fix": "sudo service postgresql stop ile yerel PostgreSQL'i durdur veya docker-compose.yml'de port mapping'i '5433:5432' olarak değiştir."
+            },
+            {
+              "error": "orchestrator exited with code 1 — ModuleNotFoundError",
+              "cause": "requirements.txt Dockerfile'a doğru kopyalanmamış veya bağımlılık eksik.",
+              "fix": "Dockerfile'da COPY requirements.txt . satırının doğru yerde olduğunu kontrol et. docker-compose build --no-cache orchestrator ile temiz build yap."
+            }
+          ]
         },
         {
           "step": 2,
@@ -163,7 +269,88 @@
           "why": "Agent'lar arasi gecis mantigi basinda dogru tasarlanmazsa sonradan degistirmek cok zor olur. Graph-based yaklasimayla agent workflow'u gorunur ve test edilebilir hale gelir.",
           "instructions": "LangGraph ile temel agent graph'ini olustur:\n1. State schema tanimla (messages, current_agent, metadata)\n2. Router node: intent classification\n3. FAQ node: knowledge base lookup\n4. Tech Support node: step-by-step troubleshooting\n5. Escalation node: human handoff\n6. Conditional edges: router'dan diger agent'lara gecis kurallari",
           "code_snippet": "from langgraph.graph import StateGraph, END\nfrom typing import TypedDict, List\n\nclass AgentState(TypedDict):\n    messages: List[dict]\n    current_agent: str\n    intent: str\n    confidence: float\n    context: dict\n\ngraph = StateGraph(AgentState)\ngraph.add_node('router', router_agent)\ngraph.add_node('faq', faq_agent)\ngraph.add_node('tech', tech_agent)\ngraph.add_node('escalation', escalation_agent)\n\ngraph.add_conditional_edges('router', route_decision, {\n    'faq': 'faq',\n    'technical': 'tech',\n    'escalation': 'escalation'\n})",
-          "checkpoint": "Graph compile edip basit bir mesajla router -> faq akisi calisiyor mu?"
+          "checkpoint": "Graph compile edip basit bir mesajla router -> faq akisi calisiyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "LangGraph state schema dosyasını oluştur",
+              "type": "file_open",
+              "file": "orchestrator/agents/state.py",
+              "why": "State schema, tüm agent'ların paylaştığı veri yapısını tanımlar. LangGraph'te state immutable'dır — her node yeni state döndürür."
+            },
+            {
+              "order": "2.2",
+              "action": "AgentState TypedDict tanımını yaz",
+              "type": "code_write",
+              "file": "orchestrator/agents/state.py",
+              "code": "from typing import TypedDict, List, Optional, Annotated\nfrom langgraph.graph.message import add_messages\n\nclass AgentState(TypedDict):\n    messages: Annotated[list, add_messages]\n    current_agent: str\n    intent: str\n    confidence: float\n    context: dict\n    customer_sentiment: int  # 1-5\n    attempted_solutions: List[str]\n    escalation_reason: Optional[str]",
+              "why": "TypedDict ile state yapısı tip güvenli olur. Annotated[list, add_messages] LangGraph'in mesajları otomatik birleştirmesini sağlar — her node sadece yeni mesajı döndürür, LangGraph listeye ekler."
+            },
+            {
+              "order": "2.3",
+              "action": "Agents __init__.py oluştur",
+              "type": "terminal",
+              "command": "mkdir -p orchestrator/agents && touch orchestrator/agents/__init__.py",
+              "expected_output": "Dosya oluşturuldu",
+              "why": "Python'da bir klasörü paket olarak tanıtmak için __init__.py gerekir. Bu sayede from agents.state import AgentState şeklinde import yapılabilir."
+            },
+            {
+              "order": "2.4",
+              "action": "Agent graph yapısını oluştur",
+              "type": "file_open",
+              "file": "orchestrator/agents/graph.py",
+              "why": "Graph dosyası tüm agent'ların ve aralarındaki geçişlerin tanımlandığı ana dosyadır. LangGraph StateGraph bu dosyada compile edilir."
+            },
+            {
+              "order": "2.5",
+              "action": "LangGraph StateGraph tanımını yaz",
+              "type": "code_write",
+              "file": "orchestrator/agents/graph.py",
+              "code": "from langgraph.graph import StateGraph, END\nfrom .state import AgentState\n\n\nasync def router_agent(state: AgentState) -> dict:\n    \"\"\"Intent classification — mesajı doğru agent'a yönlendirir\"\"\"\n    return {\"current_agent\": \"router\", \"intent\": \"faq\", \"confidence\": 0.9}\n\n\nasync def faq_agent(state: AgentState) -> dict:\n    \"\"\"FAQ sorularını knowledge base'den cevaplar\"\"\"\n    return {\"messages\": [{\"role\": \"assistant\", \"content\": \"FAQ cevabı\"}]}\n\n\nasync def tech_agent(state: AgentState) -> dict:\n    \"\"\"Teknik sorunları adım adım çözer\"\"\"\n    return {\"messages\": [{\"role\": \"assistant\", \"content\": \"Teknik destek cevabı\"}]}\n\n\nasync def escalation_agent(state: AgentState) -> dict:\n    \"\"\"İnsan agent'a aktarım yapar\"\"\"\n    return {\"messages\": [{\"role\": \"assistant\", \"content\": \"İnsan agent'a aktarılıyor...\"}]}\n\n\ndef route_decision(state: AgentState) -> str:\n    intent = state.get(\"intent\", \"escalation\")\n    confidence = state.get(\"confidence\", 0.0)\n    if confidence < 0.7:\n        return \"escalation\"\n    return intent if intent in [\"faq\", \"technical\", \"escalation\"] else \"escalation\"\n\n\ndef build_graph() -> StateGraph:\n    graph = StateGraph(AgentState)\n    graph.add_node(\"router\", router_agent)\n    graph.add_node(\"faq\", faq_agent)\n    graph.add_node(\"tech\", tech_agent)\n    graph.add_node(\"escalation\", escalation_agent)\n\n    graph.set_entry_point(\"router\")\n    graph.add_conditional_edges(\"router\", route_decision, {\n        \"faq\": \"faq\",\n        \"technical\": \"tech\",\n        \"escalation\": \"escalation\",\n    })\n    graph.add_edge(\"faq\", END)\n    graph.add_edge(\"tech\", END)\n    graph.add_edge(\"escalation\", END)\n\n    return graph.compile()",
+              "why": "StateGraph, agent'lar arası geçişleri bir graf olarak modeller. set_entry_point router'ı başlangıç noktası yapar. conditional_edges, router'ın intent'ine göre hangi agent'a gidileceğini belirler. Her agent sonunda END'e gider — ileride bu değişecek."
+            },
+            {
+              "order": "2.6",
+              "action": "Graph'i test eden basit script yaz",
+              "type": "code_write",
+              "file": "orchestrator/test_graph.py",
+              "code": "import asyncio\nfrom agents.graph import build_graph\n\nasync def main():\n    graph = build_graph()\n    result = await graph.ainvoke({\n        \"messages\": [{\"role\": \"user\", \"content\": \"Şifremi nasıl değiştirebilirim?\"}],\n        \"current_agent\": \"\",\n        \"intent\": \"\",\n        \"confidence\": 0.0,\n        \"context\": {},\n        \"customer_sentiment\": 3,\n        \"attempted_solutions\": [],\n        \"escalation_reason\": None,\n    })\n    print(\"Final state:\", result)\n    print(\"Agent response:\", result[\"messages\"][-1])\n\nasyncio.run(main())",
+              "why": "Graph'i compile edip basit bir mesajla test etmek, agent geçişlerinin doğru çalıştığını erken aşamada doğrular. Hata varsa burada yakalarız."
+            },
+            {
+              "order": "2.7",
+              "action": "Graph testini çalıştır",
+              "type": "terminal",
+              "command": "cd orchestrator && python test_graph.py",
+              "expected_output": "Final state: {..., 'intent': 'faq', ...}\nAgent response: {'role': 'assistant', 'content': 'FAQ cevabı'}",
+              "why": "Graph'in compile olduğunu ve router -> faq akışının çalıştığını doğruluyoruz. Hata alırsan state schema veya edge tanımlarını kontrol et."
+            },
+            {
+              "order": "2.8",
+              "action": "Graph yapısını doğrula",
+              "type": "validate",
+              "validation": "test_graph.py çalışmalı ve router -> faq geçişi yapmalı. 'technical' ve 'escalation' intent'leri için de test et — route_decision fonksiyonundaki intent değerini değiştirerek.",
+              "why": "Tüm geçiş yollarının test edilmesi, production'da beklenmeyen davranışları önler. Her conditional edge en az bir kez test edilmeli."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   ├── __init__.py\n│   │   ├── state.py          ← YENİ\n│   │   └── graph.py          ← YENİ\n│   ├── main.py\n│   ├── test_graph.py         ← YENİ\n│   ├── Dockerfile\n│   └── requirements.txt\n├── gateway/\n├── frontend/\n├── shared/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "ImportError: cannot import name 'StateGraph' from 'langgraph.graph'",
+              "cause": "LangGraph versiyonu çok eski veya yanlış paket kurulu.",
+              "fix": "pip install --upgrade langgraph ile güncel versiyonu kur. langgraph>=0.2.0 gerekli."
+            },
+            {
+              "error": "TypeError: 'AgentState' object is not subscriptable",
+              "cause": "State'e doğrudan erişim yerine TypedDict syntax kullanılmamış.",
+              "fix": "Agent fonksiyonlarında state['messages'] şeklinde dict erişimi kullan. state.messages değil, state['messages'] olmalı."
+            },
+            {
+              "error": "langgraph.errors.InvalidUpdateError: Invalid state update",
+              "cause": "Agent fonksiyonu state'in tamamını döndürüyor — LangGraph partial update bekler.",
+              "fix": "Agent fonksiyonları sadece değiştirdikleri alanları döndürmeli: return {'intent': 'faq'} şeklinde, tüm state'i değil."
+            }
+          ]
         },
         {
           "step": 3,
@@ -171,14 +358,165 @@
           "why": "Router agent tum sistemin giris noktasi — dogru siniflandirma yapmasi kritik. Yanlis yonlendirme kullanici deneyimini dogrudan etkiler.",
           "instructions": "Router agent icin:\n1. Intent categories tanimla (faq, technical, billing, escalation)\n2. Few-shot prompt ile LLM-based classification\n3. Confidence threshold — dusukse clarification sor\n4. Fallback: siniflandirma yapalamazsa escalation'a yonlendir",
           "code_snippet": "ROUTER_PROMPT = '''\nSen bir musteri destek router'isin. Gelen mesaji siniflandir.\n\nKategoriler:\n- faq: Sik sorulan sorular, genel bilgi\n- technical: Teknik sorun, hata, bug\n- billing: Odeme, fatura, abonelik\n- escalation: Kizgin musteri, karmasik sorun\n\nMesaj: {message}\n\nJSON formatinda yanit ver:\n{{\"intent\": \"...\", \"confidence\": 0.0-1.0, \"reason\": \"...\"}}\n'''",
-          "checkpoint": "5 farkli mesaj tipi ile test et — dogru siniflandirma yapiyor mu?"
+          "checkpoint": "5 farkli mesaj tipi ile test et — dogru siniflandirma yapiyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Router agent prompt dosyasını oluştur",
+              "type": "file_open",
+              "file": "orchestrator/agents/prompts.py",
+              "why": "Prompt'ları ayrı dosyada tutmak, versiyon kontrolü ve A/B testing için kritik. Production'da prompt değişikliği = kod değişikliği kadar risklidir."
+            },
+            {
+              "order": "3.2",
+              "action": "Router system prompt'unu yaz",
+              "type": "code_write",
+              "file": "orchestrator/agents/prompts.py",
+              "code": "ROUTER_SYSTEM_PROMPT = \"\"\"\nSen bir müşteri destek router'ısın. Gelen mesajı analiz et ve doğru kategoriye yönlendir.\n\nKategoriler:\n- faq: Sık sorulan sorular, genel bilgi talepleri, nasıl yapılır soruları\n- technical: Teknik sorun, hata, bug raporu, çalışmıyor şikayeti\n- billing: Ödeme, fatura, abonelik, iade sorunları\n- escalation: Kızgın müşteri, karmaşık sorun, birden fazla kategori, insan talebi\n\nJSON formatında yanıt ver:\n{\"intent\": \"faq|technical|billing|escalation\", \"confidence\": 0.0-1.0, \"reason\": \"kısa açıklama\"}\n\"\"\"\n\nFAQ_SYSTEM_PROMPT = \"\"\"\nSen bir FAQ uzman agent'ısın. Knowledge base'den gelen bilgileri kullanarak müşteri sorularını cevapla.\nCevabın yoksa 'Bu konuda yardımcı olamıyorum, sizi teknik destek ekibine yönlendiriyorum' de.\n\"\"\"\n\nTECH_SYSTEM_PROMPT = \"\"\"\nSen bir teknik destek agent'ısın. Müşterinin teknik sorununu adım adım çöz.\n1. Önce sorunu anla — gerekirse ek soru sor\n2. Knowledge base'den ilgili çözümü bul\n3. Adım adım çözüm sun\n4. Her adımda müşteriden geri bildirim al\nMaksimum 5 adım dene. Çözemezsen insan desteğine yönlendir.\n\"\"\"",
+              "why": "Her agent'ın system prompt'u kısa ve odaklı olmalı — 500 token'dan fazla olmamalı. Router prompt'unda JSON çıktı formatı belirtmek, yapılandırılmış yanıt almayı garanti eder."
+            },
+            {
+              "order": "3.3",
+              "action": "Router agent'ı LLM ile implement et",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "import json\nfrom langchain_openai import ChatOpenAI\nfrom langchain_core.messages import SystemMessage, HumanMessage\nfrom .prompts import ROUTER_SYSTEM_PROMPT\n\nllm = ChatOpenAI(model=\"gpt-4o-mini\", temperature=0)\n\nasync def router_agent(state: AgentState) -> dict:\n    last_message = state[\"messages\"][-1]\n    user_msg = last_message.content if hasattr(last_message, 'content') else last_message[\"content\"]\n    \n    response = await llm.ainvoke([\n        SystemMessage(content=ROUTER_SYSTEM_PROMPT),\n        HumanMessage(content=user_msg),\n    ])\n    \n    try:\n        result = json.loads(response.content)\n        return {\n            \"current_agent\": \"router\",\n            \"intent\": result[\"intent\"],\n            \"confidence\": result[\"confidence\"],\n        }\n    except (json.JSONDecodeError, KeyError):\n        return {\n            \"current_agent\": \"router\",\n            \"intent\": \"escalation\",\n            \"confidence\": 0.0,\n        }",
+              "position": "top",
+              "why": "Router agent few-shot prompt ile LLM'den yapılandırılmış JSON yanıt alır. JSON parse hatası olursa fallback olarak escalation'a yönlendirir — sistem asla çökmemeli."
+            },
+            {
+              "order": "3.4",
+              "action": ".env dosyasına API key ekle",
+              "type": "code_write",
+              "file": "orchestrator/.env",
+              "code": "OPENAI_API_KEY=sk-your-api-key-here\nREDIS_URL=redis://localhost:6379\nDATABASE_URL=postgresql://admin:dev123@localhost:5432/support",
+              "why": "API key'ler asla koda gömülmemeli — .env dosyasında tutulur. .gitignore'a .env eklemeyi unutma!"
+            },
+            {
+              "order": "3.5",
+              "action": ".env'i load eden config dosyası oluştur",
+              "type": "code_write",
+              "file": "orchestrator/config.py",
+              "code": "from dotenv import load_dotenv\nimport os\n\nload_dotenv()\n\nOPENAI_API_KEY = os.getenv(\"OPENAI_API_KEY\")\nREDIS_URL = os.getenv(\"REDIS_URL\", \"redis://localhost:6379\")\nDATABASE_URL = os.getenv(\"DATABASE_URL\")",
+              "why": "Config modülü, ortam değişkenlerini merkezi bir yerden yönetir. Varsayılan değerler geliştirme ortamı için kolaylık sağlar."
+            },
+            {
+              "order": "3.6",
+              "action": "Router'ı farklı mesaj tipleriyle test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"import asyncio; from agents.graph import build_graph; ...\"",
+              "expected_output": "Şifremi nasıl değiştirebilirim?    -> intent=faq       confidence=0.95\nUygulama açılmıyor, hata veriyor   -> intent=technical confidence=0.9\nFaturamda yanlışlık var            -> intent=billing   confidence=0.85\nBu berbat hizmetinize son...       -> intent=escalation confidence=0.9\nİnsan ile görüşmek istiyorum       -> intent=escalation confidence=0.95",
+              "why": "5 farklı kategori mesajı ile router'ın doğru sınıflandırma yapıp yapmadığını test ediyoruz. %90+ doğruluk hedeflenmeli."
+            },
+            {
+              "order": "3.7",
+              "action": "Test sonuçlarını doğrula",
+              "type": "validate",
+              "validation": "5 test mesajının en az 4'ü doğru sınıflandırılmalı. Confidence 0.7 altında olan mesajlar escalation'a yönlendirilmeli. JSON parse hatası oluşursa fallback çalışmalı.",
+              "why": "Router agent tüm sistemin giriş noktası — yanlış sınıflandırma kullanıcı deneyimini doğrudan etkiler. Doğruluk oranı %90 altında ise prompt'u iyileştir."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   ├── __init__.py\n│   │   ├── state.py\n│   │   ├── graph.py          ← GÜNCELLENDİ\n│   │   └── prompts.py        ← YENİ\n│   ├── config.py             ← YENİ\n│   ├── main.py\n│   ├── test_graph.py\n│   ├── .env                  ← YENİ\n│   ├── Dockerfile\n│   └── requirements.txt\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "openai.AuthenticationError: Incorrect API key",
+              "cause": ".env dosyasındaki OPENAI_API_KEY geçersiz veya yüklenmemiş.",
+              "fix": ".env dosyasında API key'i kontrol et. load_dotenv() çağrıldığından emin ol. echo $OPENAI_API_KEY ile ortam değişkenini doğrula."
+            },
+            {
+              "error": "json.JSONDecodeError: Expecting value",
+              "cause": "LLM JSON formatında yanıt vermedi — bazen açıklama metni ile birlikte döndürür.",
+              "fix": "Prompt'a 'SADECE JSON döndür, başka hiçbir şey ekleme' ekle. response.content'ten JSON bloğunu regex ile ayıkla."
+            },
+            {
+              "error": "RateLimitError: Rate limit reached for gpt-4o-mini",
+              "cause": "Kısa sürede çok fazla API çağrısı yapıldı.",
+              "fix": "Testler arasına asyncio.sleep(1) ekle. Production'da retry with exponential backoff uygula. tenacity kütüphanesini kullan."
+            }
+          ]
         },
         {
           "step": 4,
           "title": "Temel API Endpoints",
           "why": "Frontend ile iletisim icin REST API gerekli. WebSocket henuz yok — once REST ile temel akisi dogrula, sonra real-time ekle.",
           "instructions": "FastAPI endpoints:\n- POST /api/conversations — yeni konusma baslat\n- POST /api/conversations/{id}/messages — mesaj gonder\n- GET /api/conversations/{id} — konusma detayi\n- GET /api/conversations — liste",
-          "checkpoint": "Postman/curl ile mesaj gonderip agent cevabi aliyor musun?"
+          "checkpoint": "Postman/curl ile mesaj gonderip agent cevabi aliyor musun?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "API models dosyasını oluştur",
+              "type": "code_write",
+              "file": "orchestrator/models.py",
+              "code": "from pydantic import BaseModel\nfrom typing import List, Optional\nfrom datetime import datetime\n\nclass MessageRequest(BaseModel):\n    content: str\n    role: str = \"user\"\n\nclass MessageResponse(BaseModel):\n    id: str\n    role: str\n    content: str\n    agent: Optional[str] = None\n    timestamp: datetime\n\nclass ConversationCreate(BaseModel):\n    customer_name: Optional[str] = None\n    metadata: dict = {}\n\nclass ConversationResponse(BaseModel):\n    id: str\n    messages: List[MessageResponse]\n    current_agent: str\n    status: str\n    created_at: datetime",
+              "why": "Pydantic modelleri API request/response yapısını tanımlar ve otomatik validasyon sağlar. FastAPI bu modelleri kullanarak Swagger dokümantasyonu da oluşturur."
+            },
+            {
+              "order": "4.2",
+              "action": "API router dosyasını oluştur",
+              "type": "code_write",
+              "file": "orchestrator/api/conversations.py",
+              "code": "from fastapi import APIRouter, HTTPException\nfrom uuid import uuid4\nfrom datetime import datetime\nfrom ..models import MessageRequest, ConversationCreate\nfrom ..agents.graph import build_graph\n\nrouter = APIRouter(prefix=\"/api/conversations\", tags=[\"conversations\"])\nconversations = {}\ngraph = build_graph()\n\n@router.post(\"\", status_code=201)\nasync def create_conversation(data: ConversationCreate):\n    conv_id = str(uuid4())\n    conversations[conv_id] = {\n        \"id\": conv_id, \"messages\": [],\n        \"current_agent\": \"\", \"status\": \"active\",\n        \"created_at\": datetime.utcnow(),\n    }\n    return conversations[conv_id]\n\n@router.post(\"/{conv_id}/messages\")\nasync def send_message(conv_id: str, msg: MessageRequest):\n    if conv_id not in conversations:\n        raise HTTPException(status_code=404, detail=\"Conversation not found\")\n    conv = conversations[conv_id]\n    conv[\"messages\"].append({\"role\": msg.role, \"content\": msg.content})\n    result = await graph.ainvoke({\n        \"messages\": conv[\"messages\"], \"current_agent\": conv[\"current_agent\"],\n        \"intent\": \"\", \"confidence\": 0.0, \"context\": {},\n        \"customer_sentiment\": 3, \"attempted_solutions\": [], \"escalation_reason\": None,\n    })\n    assistant_msg = result[\"messages\"][-1]\n    conv[\"messages\"].append(assistant_msg)\n    conv[\"current_agent\"] = result.get(\"current_agent\", \"\")\n    return {\"response\": assistant_msg, \"agent\": result.get(\"intent\", \"\")}\n\n@router.get(\"/{conv_id}\")\nasync def get_conversation(conv_id: str):\n    if conv_id not in conversations:\n        raise HTTPException(status_code=404, detail=\"Conversation not found\")\n    return conversations[conv_id]\n\n@router.get(\"\")\nasync def list_conversations():\n    return list(conversations.values())",
+              "why": "REST API, frontend ile iletişim için temel katmandır. Önce in-memory store ile hızlıca çalışır hale getiriyoruz — veritabanı entegrasyonu sonra yapılacak."
+            },
+            {
+              "order": "4.3",
+              "action": "API __init__.py oluştur",
+              "type": "terminal",
+              "command": "mkdir -p orchestrator/api && touch orchestrator/api/__init__.py",
+              "expected_output": "Dosya oluşturuldu",
+              "why": "API modülünü Python paketi olarak tanıtmak için __init__.py gerekli."
+            },
+            {
+              "order": "4.4",
+              "action": "main.py'ye router'ı ekle",
+              "type": "code_modify",
+              "file": "orchestrator/main.py",
+              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom api.conversations import router as conv_router\n\napp = FastAPI(title=\"Multi-Agent Support Orchestrator\")\napp.add_middleware(CORSMiddleware, allow_origins=[\"*\"], allow_credentials=True, allow_methods=[\"*\"], allow_headers=[\"*\"])\napp.include_router(conv_router)\n\n@app.get(\"/health\")\nasync def health():\n    return {\"status\": \"ok\", \"service\": \"orchestrator\"}",
+              "position": "top",
+              "why": "FastAPI'nin include_router metodu, modüler API yapısı sağlar. Her endpoint grubu ayrı dosyada tanımlanır ve ana app'e eklenir."
+            },
+            {
+              "order": "4.5",
+              "action": "API'yi başlat ve Swagger UI'da test et",
+              "type": "terminal",
+              "command": "cd orchestrator && uvicorn main:app --reload --port 8000",
+              "expected_output": "Uvicorn running on http://127.0.0.1:8000",
+              "why": "--reload flag'i dosya değişikliklerinde otomatik yeniden başlatma sağlar."
+            },
+            {
+              "order": "4.6",
+              "action": "curl ile API endpoint'lerini test et",
+              "type": "terminal",
+              "command": "curl -X POST http://localhost:8000/api/conversations -H 'Content-Type: application/json' -d '{}'",
+              "expected_output": "{\"id\": \"<uuid>\", \"messages\": [], \"current_agent\": \"\", \"status\": \"active\", ...}",
+              "why": "API'nin çalıştığını doğrulamak için curl ile test ediyoruz. Swagger UI (http://localhost:8000/docs) da kullanılabilir."
+            },
+            {
+              "order": "4.7",
+              "action": "Swagger UI'ı kontrol et",
+              "type": "validate",
+              "validation": "http://localhost:8000/docs adresini tarayıcıda aç. Tüm endpoint'ler listelenmiş olmalı. 'Try it out' ile interaktif test yap.",
+              "why": "FastAPI otomatik Swagger dokümantasyonu oluşturur. Frontend geliştiricisinin API'yi anlaması için çok değerli."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   ├── __init__.py\n│   │   ├── state.py\n│   │   ├── graph.py\n│   │   └── prompts.py\n│   ├── api/\n│   │   ├── __init__.py       ← YENİ\n│   │   └── conversations.py  ← YENİ\n│   ├── config.py\n│   ├── models.py             ← YENİ\n│   ├── main.py               ← GÜNCELLENDİ\n│   ├── .env\n│   ├── Dockerfile\n│   └── requirements.txt\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "ModuleNotFoundError: No module named 'api'",
+              "cause": "Uvicorn'u yanlış dizinden çalıştırıyorsun veya __init__.py eksik.",
+              "fix": "orchestrator/ dizininin içinden çalıştır: cd orchestrator && uvicorn main:app --reload"
+            },
+            {
+              "error": "422 Unprocessable Entity",
+              "cause": "Request body Pydantic modeline uymuyor — eksik veya yanlış tip alan var.",
+              "fix": "Swagger UI'da beklenen request body formatını kontrol et. Content-Type: application/json header'ını eklemeyi unutma."
+            },
+            {
+              "error": "TypeError: Object of type datetime is not JSON serializable",
+              "cause": "FastAPI datetime serialization ayarı yapılmamış.",
+              "fix": "Pydantic modellerinde datetime kullanıyorsan response_model kullan veya json_encoders ayarla."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. LangGraph'te state IMMUTABLE olmali — her node yeni state dondurur\n2. Router agent'in confidence threshold'u cok onemli — 0.7 altinda clarification sor\n3. Agent graph'ini once kagit uzerinde ciz, sonra koda dok\n4. Her agent'in fallback davranisi OLMALI — hata durumunda sistem cokmemeli",
@@ -202,28 +540,279 @@
           "why": "FAQ'lar musterilerin %60-70'ini kapsar. Bu agent'i iyi yapmak toplam destek kalitesini dramatik artirir.",
           "instructions": "FAQ Agent icin:\n1. FAQ veritabani olustur (soru-cevap ciftleri)\n2. Semantic search ile en alakali FAQ'lari bul\n3. Bulunan FAQ'larla LLM'e cevap urettir\n4. Cevap bulunamazsa Tech Agent'a yonlendir",
           "code_snippet": "async def faq_agent(state: AgentState) -> AgentState:\n    query = state['messages'][-1]['content']\n    \n    # Semantic search in FAQ database\n    relevant_faqs = await search_faqs(query, top_k=3)\n    \n    if not relevant_faqs or relevant_faqs[0].score < 0.7:\n        return {**state, 'current_agent': 'tech', 'intent': 'needs_escalation'}\n    \n    context = '\\n'.join([f.answer for f in relevant_faqs])\n    response = await llm.ainvoke(FAQ_PROMPT.format(\n        question=query, context=context\n    ))\n    \n    return {**state, 'messages': state['messages'] + [{'role': 'assistant', 'content': response}]}",
-          "checkpoint": "3 farkli FAQ sorusu ile dogru cevap donuyor mu?"
+          "checkpoint": "3 farkli FAQ sorusu ile dogru cevap donuyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "FAQ verilerini içeren JSON dosyasını oluştur",
+              "type": "code_write",
+              "file": "orchestrator/data/faqs.json",
+              "code": "[\n  {\"id\":\"faq-001\",\"question\":\"Şifremi nasıl değiştirebilirim?\",\"answer\":\"Profil ayarlarına gidin > Güvenlik > Şifre Değiştir butonuna tıklayın.\",\"category\":\"account\",\"keywords\":[\"şifre\",\"parola\",\"password\",\"değiştir\"]},\n  {\"id\":\"faq-002\",\"question\":\"Aboneliğimi nasıl iptal edebilirim?\",\"answer\":\"Ayarlar > Abonelik > İptal Et yolunu izleyin. İptal işlemi dönem sonunda geçerli olur.\",\"category\":\"billing\",\"keywords\":[\"abonelik\",\"iptal\",\"cancel\"]},\n  {\"id\":\"faq-003\",\"question\":\"Hangi ödeme yöntemlerini kabul ediyorsunuz?\",\"answer\":\"Kredi kartı (Visa, Mastercard), banka havalesi ve PayPal ile ödeme yapabilirsiniz.\",\"category\":\"billing\",\"keywords\":[\"ödeme\",\"payment\",\"kredi kartı\"]},\n  {\"id\":\"faq-004\",\"question\":\"Mobil uygulama hangi platformlarda mevcut?\",\"answer\":\"iOS (App Store) ve Android (Google Play Store) platformlarında mevcuttur.\",\"category\":\"general\",\"keywords\":[\"mobil\",\"uygulama\",\"ios\",\"android\"]},\n  {\"id\":\"faq-005\",\"question\":\"Verilerim güvende mi?\",\"answer\":\"Tüm veriler AES-256 ile şifrelenir. GDPR ve KVKK uyumlu altyapı kullanıyoruz.\",\"category\":\"security\",\"keywords\":[\"güvenlik\",\"veri\",\"şifreleme\",\"KVKK\"]}\n]",
+              "why": "FAQ veritabanı başlangıçta JSON dosyası olarak tutulur. İleride ChromaDB'ye embedding ile kaydedilecek. Her FAQ'a keywords eklemek basit arama için kullanışlıdır."
+            },
+            {
+              "order": "1.2",
+              "action": "Data klasörünü oluştur",
+              "type": "terminal",
+              "command": "mkdir -p orchestrator/data",
+              "expected_output": "Klasör oluşturuldu",
+              "why": "FAQ verileri ve knowledge base dosyaları data/ klasöründe organize edilir."
+            },
+            {
+              "order": "1.3",
+              "action": "FAQ arama servisi oluştur",
+              "type": "code_write",
+              "file": "orchestrator/services/faq_service.py",
+              "code": "import json\nfrom pathlib import Path\nfrom dataclasses import dataclass\nfrom typing import List\n\n@dataclass\nclass FAQResult:\n    id: str\n    question: str\n    answer: str\n    score: float\n\ndef load_faqs() -> list:\n    faq_path = Path(__file__).parent.parent / \"data\" / \"faqs.json\"\n    with open(faq_path, \"r\", encoding=\"utf-8\") as f:\n        return json.load(f)\n\nasync def search_faqs(query: str, top_k: int = 3) -> List[FAQResult]:\n    faqs = load_faqs()\n    results = []\n    query_lower = query.lower()\n    for faq in faqs:\n        score = 0.0\n        for kw in faq.get(\"keywords\", []):\n            if kw.lower() in query_lower:\n                score += 0.3\n        if score > 0:\n            results.append(FAQResult(id=faq[\"id\"], question=faq[\"question\"], answer=faq[\"answer\"], score=min(score, 1.0)))\n    results.sort(key=lambda x: x.score, reverse=True)\n    return results[:top_k]",
+              "why": "İlk aşamada basit keyword matching kullanılır — hızlı sonuç verir. İleride embedding-based semantic search eklenecek. Hybrid approach: keyword + semantic en iyi sonucu verir."
+            },
+            {
+              "order": "1.4",
+              "action": "Services __init__.py oluştur",
+              "type": "terminal",
+              "command": "mkdir -p orchestrator/services && touch orchestrator/services/__init__.py",
+              "expected_output": "Dosya oluşturuldu",
+              "why": "Services modülünü Python paketi olarak tanıtmak için gerekli."
+            },
+            {
+              "order": "1.5",
+              "action": "FAQ agent'ı graph.py'de LLM ile implement et",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "from ..services.faq_service import search_faqs\nfrom .prompts import FAQ_SYSTEM_PROMPT\n\nasync def faq_agent(state: AgentState) -> dict:\n    query = state[\"messages\"][-1][\"content\"]\n    relevant_faqs = await search_faqs(query, top_k=3)\n    if not relevant_faqs or relevant_faqs[0].score < 0.3:\n        return {\"current_agent\": \"faq\", \"intent\": \"needs_escalation\",\n                \"messages\": [{\"role\": \"assistant\", \"content\": \"Bu konuda bilgim yeterli değil. Sizi teknik destek ekibine yönlendiriyorum.\"}]}\n    context = \"\\n\".join([f\"S: {f.question}\\nC: {f.answer}\" for f in relevant_faqs])\n    response = await llm.ainvoke([SystemMessage(content=FAQ_SYSTEM_PROMPT), HumanMessage(content=f\"Soru: {query}\\nBilgiler:\\n{context}\")])\n    return {\"current_agent\": \"faq\", \"messages\": [{\"role\": \"assistant\", \"content\": response.content}]}",
+              "position": "top",
+              "why": "FAQ agent önce knowledge base'de arama yapar. Sonuç skoru düşükse tech agent'a yönlendirir. Bulunan FAQ'ları LLM'e context olarak vererek doğal dilde yanıt üretir."
+            },
+            {
+              "order": "1.6",
+              "action": "FAQ agent'ı 3 farklı soru ile test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"import asyncio; from agents.graph import build_graph; ...\"",
+              "expected_output": "Q: Şifremi değiştirmek istiyorum -> Doğru FAQ cevabı\nQ: Hangi kartlarla ödeme yapabilirim? -> Doğru FAQ cevabı\nQ: Uzay gemisi nasıl yapılır? -> 'Bilgim yeterli değil'",
+              "why": "FAQ'da karşılığı olan sorulara doğru cevap vermeli. Karşılığı olmayan sorularda 'bilgim yeterli değil' demeli."
+            },
+            {
+              "order": "1.7",
+              "action": "Sonuçları doğrula",
+              "type": "validate",
+              "validation": "FAQ'da karşılığı olan sorulara doğru ve anlaşılır cevap verilmeli. Karşılığı olmayan sorularda 'bilgim yeterli değil' mesajı görünmeli.",
+              "why": "Agent'ın hem doğru bilgi vermesini hem de bilmediğini kabul etmesini test etmek kritik — hallucination yapmamalı."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   ├── state.py\n│   │   ├── graph.py          ← GÜNCELLENDİ\n│   │   └── prompts.py\n│   ├── data/\n│   │   └── faqs.json         ← YENİ\n│   ├── services/\n│   │   ├── __init__.py       ← YENİ\n│   │   └── faq_service.py    ← YENİ\n│   ├── api/\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "FileNotFoundError: faqs.json not found",
+              "cause": "Dosya yolu yanlış veya çalışma dizini farklı.",
+              "fix": "Path(__file__).parent.parent kullanarak dosya yolunu göreceli oluştur. Mutlak yol kullanma."
+            },
+            {
+              "error": "FAQ agent hiçbir soruda sonuç bulamıyor",
+              "cause": "Keyword matching çok katı veya Türkçe karakter sorunu var.",
+              "fix": "query.lower() ile karşılaştırma yap. Score threshold'u 0.3'ten 0.2'ye düşür."
+            },
+            {
+              "error": "LLM cevabı çok uzun ve gereksiz detay içeriyor",
+              "cause": "FAQ system prompt'u yeterince kısıtlayıcı değil.",
+              "fix": "Prompt'a 'Kısa ve öz cevap ver. Maksimum 2-3 cümle.' ekle. temperature=0 kullan."
+            }
+          ]
         },
         {
           "step": 2,
           "title": "Tech Support Agent — Step-by-Step Troubleshooting",
           "why": "Teknik sorunlar adim adim cozum gerektirir. Agent multi-turn konusmada onceki adimlari hatirlamali ve bir sonraki adimi onermelidir.",
           "instructions": "Tech Agent:\n1. Sorun tespiti icin soru sor (diagnostic questions)\n2. Knowledge base'den ilgili troubleshooting guide'i cek\n3. Adim adim cozum sun\n4. Her adimda kullanicidan feedback al\n5. Cozulemezse escalation'a yonlendir",
-          "checkpoint": "Bir teknik sorunu 3 adimda cozebildi mi? Cozemezse escalation'a yonlendirdi mi?"
+          "checkpoint": "Bir teknik sorunu 3 adimda cozebildi mi? Cozemezse escalation'a yonlendirdi mi?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Troubleshooting guide veritabanı oluştur",
+              "type": "code_write",
+              "file": "orchestrator/data/troubleshooting.json",
+              "code": "[\n  {\"id\":\"ts-001\",\"issue\":\"Uygulama açılmıyor\",\"steps\":[\"1. Uygulamayı tamamen kapatıp yeniden açın\",\"2. Cihazınızı yeniden başlatın\",\"3. Uygulamayı güncelleyin\",\"4. Uygulamayı silip yeniden yükleyin\",\"5. Ekran görüntüsü ile destek ekibine ulaşın\"],\"category\":\"app\",\"keywords\":[\"açılmıyor\",\"crash\",\"çöküyor\",\"kapanıyor\"]},\n  {\"id\":\"ts-002\",\"issue\":\"Giriş yapamıyorum\",\"steps\":[\"1. E-posta adresinizi doğru yazdığınızdan emin olun\",\"2. Caps Lock kapalı mı kontrol edin\",\"3. Şifremi Unuttum ile sıfırlayın\",\"4. Farklı bir tarayıcı deneyin\",\"5. 15 dakika bekleyin — hesap kilitlenmiş olabilir\"],\"category\":\"auth\",\"keywords\":[\"giriş\",\"login\",\"oturum\",\"giremiyorum\"]}\n]",
+              "why": "Troubleshooting guide'lar adım adım çözüm sunar. Her issue için sıralı adımlar tanımlanır — agent bu adımları müşteriye sunar."
+            },
+            {
+              "order": "2.2",
+              "action": "Tech agent fonksiyonunu implement et",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "from .prompts import TECH_SYSTEM_PROMPT\n\nasync def tech_agent(state: AgentState) -> dict:\n    query = state[\"messages\"][-1][\"content\"]\n    attempted = state.get(\"attempted_solutions\", [])\n    context = \"\"\n    if attempted:\n        context = f\"\\nDaha önce denenen çözümler:\\n\" + \"\\n\".join(f\"- {s}\" for s in attempted)\n    response = await llm.ainvoke([SystemMessage(content=TECH_SYSTEM_PROMPT), HumanMessage(content=f\"Sorun: {query}{context}\\nBir sonraki adımı öner.\")])\n    new_attempted = attempted + [response.content[:100]]\n    if len(new_attempted) >= 5:\n        return {\"current_agent\": \"tech\", \"intent\": \"escalation\", \"attempted_solutions\": new_attempted,\n                \"escalation_reason\": \"5 adım sonra çözülemedi\",\n                \"messages\": [{\"role\": \"assistant\", \"content\": response.content + \"\\n\\nSorununuz devam ediyorsa sizi uzman ekibimize yönlendiriyorum.\"}]}\n    return {\"current_agent\": \"tech\", \"attempted_solutions\": new_attempted,\n            \"messages\": [{\"role\": \"assistant\", \"content\": response.content}]}",
+              "position": "top",
+              "why": "Tech agent, önceki denemeleri takip eder ve tekrar etmez. 5 adım sonra çözemezse otomatik escalation yapar."
+            },
+            {
+              "order": "2.3",
+              "action": "Tech agent'ı test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"import asyncio; from agents.graph import build_graph; ...\"",
+              "expected_output": "Tech response: Uygulamayı tamamen kapatıp yeniden açın...\nAttempted: ['Uygulamayı tamamen kapatıp...']",
+              "why": "Tech agent'ın ilk soruya doğru adımı önerdiğini ve attempted_solutions'a eklediğini doğruluyoruz."
+            },
+            {
+              "order": "2.4",
+              "action": "Sonuçları doğrula",
+              "type": "validate",
+              "validation": "Tech agent soruna uygun adım önermiş olmalı. attempted_solutions listesi dolu olmalı. Cevap teknik ve adım adım olmalı.",
+              "why": "Teknik destek agent'ı her seferinde farklı bir çözüm adımı sunmalı. Önceki adımları tekrarlamamalı."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   ├── state.py\n│   │   ├── graph.py          ← GÜNCELLENDİ (tech_agent)\n│   │   └── prompts.py\n│   ├── data/\n│   │   ├── faqs.json\n│   │   └── troubleshooting.json  ← YENİ\n│   ├── services/\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "Tech agent her seferinde aynı çözümü öneriyor",
+              "cause": "attempted_solutions state'e doğru aktarılmıyor.",
+              "fix": "Agent fonksiyonunda attempted_solutions'ı return dict'inde döndüğünden emin ol."
+            },
+            {
+              "error": "KeyError: 'attempted_solutions'",
+              "cause": "İlk çağrıda state'te bu alan henüz yok.",
+              "fix": "state.get('attempted_solutions', []) kullan — KeyError yerine boş liste döner."
+            },
+            {
+              "error": "Tech agent 5 adım sınırına hiç ulaşmıyor",
+              "cause": "Multi-turn state korunmuyor — her API çağrısı yeni state oluşturuyor.",
+              "fix": "Conversations store'da attempted_solutions'ı da sakla ve sonraki mesajlarda state'e ekle."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Agent Gecis Mantigi (Conditional Edges)",
           "why": "Agent'lar arasi gecis kurallari sistemin beynini olusturur. Yanlis gecis = yanlis agent = mutsuz musteri.",
           "instructions": "LangGraph conditional edges:\n1. Router -> FAQ: confidence > 0.8 ve intent='faq'\n2. Router -> Tech: intent='technical'\n3. FAQ -> Tech: FAQ cevap bulamadiysa\n4. Tech -> Escalation: 3 adim sonra cozulemediyse\n5. Any -> Escalation: kullanici kizginlik seviyesi yuksekse",
-          "checkpoint": "Tum gecis senaryolarini test et — dogru agent'a yonleniyor mu?"
+          "checkpoint": "Tum gecis senaryolarini test et — dogru agent'a yonleniyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "route_decision fonksiyonunu genişlet — sentiment ve confidence kontrolü ekle",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "def route_decision(state: AgentState) -> str:\n    intent = state.get(\"intent\", \"escalation\")\n    confidence = state.get(\"confidence\", 0.0)\n    sentiment = state.get(\"customer_sentiment\", 3)\n    if confidence < 0.7:\n        return \"escalation\"\n    if sentiment <= 2:\n        return \"escalation\"\n    intent_map = {\"faq\": \"faq\", \"technical\": \"tech\", \"billing\": \"escalation\", \"escalation\": \"escalation\"}\n    return intent_map.get(intent, \"escalation\")",
+              "position": "top",
+              "why": "Route decision birden fazla faktörü değerlendirir: intent, confidence ve sentiment. Bilinmeyen intent'ler her zaman escalation'a gider — fail-safe yaklaşım."
+            },
+            {
+              "order": "3.2",
+              "action": "FAQ → Tech ve Tech → Escalation conditional edge fonksiyonlarını ekle",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "def faq_needs_escalation(state: AgentState) -> str:\n    if state.get(\"intent\") == \"needs_escalation\":\n        return \"tech\"\n    return \"end\"\n\ndef tech_needs_escalation(state: AgentState) -> str:\n    if state.get(\"intent\") == \"escalation\":\n        return \"escalation\"\n    return \"end\"",
+              "position": "top",
+              "why": "Agent'lar arası zincirleme geçiş: FAQ cevap bulamazsa Tech'e, Tech çözemezse Escalation'a. Bu kademeli yükseltme müşteri deneyimini iyileştirir."
+            },
+            {
+              "order": "3.3",
+              "action": "Graph'a yeni conditional edge'leri ekle",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "# build_graph içinde:\ngraph.add_conditional_edges(\"faq\", faq_needs_escalation, {\"tech\": \"tech\", \"end\": END})\ngraph.add_conditional_edges(\"tech\", tech_needs_escalation, {\"escalation\": \"escalation\", \"end\": END})",
+              "position": "top",
+              "why": "Conditional edge'ler agent'lar arası dinamik geçişi sağlar. Her agent sonrası koşullu karar verilir."
+            },
+            {
+              "order": "3.4",
+              "action": "Tüm geçiş senaryolarını test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"import asyncio; ...\"",
+              "expected_output": "FAQ direkt cevap: agent=faq\nFAQ → Tech: agent=tech\nRouter → Escalation (kızgın): agent=escalation",
+              "why": "Her geçiş senaryosunun doğru çalıştığını doğrulamak kritik."
+            },
+            {
+              "order": "3.5",
+              "action": "Geçiş mantığını doğrula",
+              "type": "validate",
+              "validation": "Her senaryo doğru agent'a yönlenmeli. FAQ cevap bulamazsa Tech'e geçmeli. Kızgın müşteri escalation'a gitmeli.",
+              "why": "Conditional edge'ler sistemin en kritik noktası. Bir hata tüm müşteri akışını bozar."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   ├── state.py\n│   │   ├── graph.py          ← GÜNCELLENDİ (conditional edges)\n│   │   └── prompts.py\n│   ├── data/\n│   ├── services/\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "langgraph.errors.InvalidUpdateError: Node 'faq' returned invalid edge",
+              "cause": "faq_needs_escalation tanımlı olmayan bir edge döndürüyor.",
+              "fix": "add_conditional_edges mapping dict'inde tüm dönüş değerlerini tanımla. 'end' → END eşlemesini unutma."
+            },
+            {
+              "error": "Sonsuz döngü — graph hiç END'e gelmiyor",
+              "cause": "Conditional edge fonksiyonu her zaman başka bir node'a yönlendiriyor.",
+              "fix": "Her conditional edge fonksiyonunun en az bir 'end' dönüşü olmalı."
+            },
+            {
+              "error": "FAQ → Tech geçişi çalışmıyor, direkt END'e gidiyor",
+              "cause": "faq_agent 'needs_escalation' intent'ini state'e yazmıyor.",
+              "fix": "faq_agent return dict'inde 'intent': 'needs_escalation' olduğunu kontrol et."
+            }
+          ]
         },
         {
           "step": 4,
           "title": "Conversation State Management",
           "why": "Multi-turn konusmalarda context kaybi en buyuk sorun. Her agent, onceki agent'in ne yaptigini bilmeli.",
           "instructions": "State'e metadata ekle:\n- conversation_summary: uzun konusmalarda ozet\n- attempted_solutions: denenimis cozumler\n- customer_sentiment: musteri duygu durumu\n- escalation_reason: neden eskale edildi",
-          "checkpoint": "5 mesajlik bir konusmada context korunuyor mu? Agent onceki mesajlari hatirlıyor mu?"
+          "checkpoint": "5 mesajlik bir konusmada context korunuyor mu? Agent onceki mesajlari hatirlıyor mu?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "State'e yeni metadata alanları ekle",
+              "type": "code_modify",
+              "file": "orchestrator/agents/state.py",
+              "code": "class AgentState(TypedDict):\n    messages: Annotated[list, add_messages]\n    current_agent: str\n    intent: str\n    confidence: float\n    context: dict\n    customer_sentiment: int\n    attempted_solutions: List[str]\n    escalation_reason: Optional[str]\n    conversation_summary: str\n    turn_count: int\n    agent_history: List[str]",
+              "position": "top",
+              "why": "conversation_summary uzun konuşmalarda özet tutar. turn_count konuşma uzunluğunu izler. agent_history geçiş tarihçesini korur."
+            },
+            {
+              "order": "4.2",
+              "action": "Sentiment analiz servisi oluştur",
+              "type": "code_write",
+              "file": "orchestrator/services/sentiment.py",
+              "code": "from langchain_openai import ChatOpenAI\nfrom langchain_core.messages import SystemMessage, HumanMessage\n\nllm = ChatOpenAI(model=\"gpt-4o-mini\", temperature=0)\n\nSENTIMENT_PROMPT = \"Müşteri mesajının duygu durumunu 1-5 arası puanla. 1:Çok kızgın 3:Nötr 5:Çok memnun. Sadece sayı döndür.\"\n\nasync def analyze_sentiment(message: str) -> int:\n    try:\n        response = await llm.ainvoke([SystemMessage(content=SENTIMENT_PROMPT), HumanMessage(content=message)])\n        return max(1, min(5, int(response.content.strip())))\n    except:\n        return 3",
+              "why": "Sentiment analizi basit tutulur: LLM'e 'müşteri kızgın mı?' diye sor, 1-5 skor al. Karmaşık NLP modeli gerekmez."
+            },
+            {
+              "order": "4.3",
+              "action": "Router agent'a sentiment analizi ve turn tracking entegre et",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "from ..services.sentiment import analyze_sentiment\n\n# router_agent içinde:\n    sentiment = await analyze_sentiment(user_msg)\n    # return dict'e ekle:\n    \"customer_sentiment\": sentiment,\n    \"turn_count\": state.get(\"turn_count\", 0) + 1,\n    \"agent_history\": state.get(\"agent_history\", []) + [\"router\"],",
+              "position": "top",
+              "why": "Router artık her mesajda sentiment analizi yapıyor. Kızgın müşteri (sentiment ≤ 2) otomatik escalation'a yönlendirilir."
+            },
+            {
+              "order": "4.4",
+              "action": "Kızgın müşteri mesajı ile state management'ı test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"import asyncio; ...\"",
+              "expected_output": "Sentiment: 1\nAgent: escalation\nAgent history: ['router', 'escalation']",
+              "why": "Kızgın müşteri mesajı sentiment 1-2 almalı ve doğrudan escalation'a yönlendirilmeli."
+            },
+            {
+              "order": "4.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Kızgın mesaj → escalation gitmeli. Nötr mesaj → normal akış. turn_count artmalı. agent_history tüm geçişleri içermeli.",
+              "why": "State management doğru çalışmadan multi-turn konuşma ve agent geçişleri düzgün işlemez."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   ├── state.py          ← GÜNCELLENDİ (yeni alanlar)\n│   │   ├── graph.py          ← GÜNCELLENDİ (sentiment)\n│   │   └── prompts.py\n│   ├── services/\n│   │   ├── faq_service.py\n│   │   └── sentiment.py      ← YENİ\n│   ├── data/\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "Sentiment her zaman 3 (nötr) dönüyor",
+              "cause": "LLM yanıtı parse edilemiyor — sayı dışında metin de döndürüyor.",
+              "fix": "Prompt'a 'SADECE bir sayı döndür' ekle. int() parse başarısız olursa regex ile sayıyı çıkar."
+            },
+            {
+              "error": "agent_history boş kalıyor",
+              "cause": "Agent fonksiyonları agent_history'yi state'e eklemiyor.",
+              "fix": "Her agent return dict'inde 'agent_history': state.get('agent_history', []) + ['agent_name'] olmalı."
+            },
+            {
+              "error": "TypeError: unsupported operand type(s) for +: 'NoneType' and 'list'",
+              "cause": "State'te agent_history None olarak başlatılmış.",
+              "fix": "state.get('agent_history', []) kullan. İlk state'te agent_history: [] olarak başlat."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Her agent'in system prompt'u KISA ve ODAKLI olmali — 500 token'dan fazla olmasin\n2. Agent gecislerinde TÜÜM context aktarilmali — kullanici kendini tekrarlamak zorunda kalmamali\n3. Sentiment analysis basit olabilir: LLM'e 'musteri kizgin mi?' diye sor, 1-5 skor al\n4. Tech agent max 5 adim denemeli — sonra insan devralmali",
@@ -247,21 +836,205 @@
           "title": "Document Processing Pipeline",
           "why": "Knowledge base'e girecek dokumanlar (FAQ, troubleshooting guide, product docs) islenip chunk'lanmali. Dogru chunking = dogru retrieval.",
           "instructions": "1. Markdown/text dokumanlar icin parser yaz\n2. Semantic chunking uygula (heading-based)\n3. Her chunk'a metadata ekle (source, category, last_updated)\n4. ChromaDB'ye embedding ile kaydet",
-          "checkpoint": "10 dokuman yukleyip semantic search ile dogru chunk donuyor mu?"
+          "checkpoint": "10 dokuman yukleyip semantic search ile dogru chunk donuyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "ChromaDB ve embedding bağımlılıklarını kur",
+              "type": "terminal",
+              "command": "cd orchestrator && pip install chromadb langchain-community tiktoken",
+              "expected_output": "Successfully installed chromadb langchain-community tiktoken",
+              "why": "ChromaDB hafif bir vektör veritabanıdır — kurulumu kolay ve embedded modda çalışır. tiktoken token sayma için kullanılır."
+            },
+            {
+              "order": "1.2",
+              "action": "Knowledge base dokümanlarını oluştur",
+              "type": "code_write",
+              "file": "orchestrator/data/knowledge_base/getting-started.md",
+              "code": "# Başlangıç Rehberi\n\n## Hesap Oluşturma\nWeb sitemize giderek 'Kayıt Ol' butonuna tıklayın. E-posta ve şifrenizi girin.\n\n## İlk Kurulum\n1. Profil bilgilerinizi doldurun\n2. Tercihlerinizi ayarlayın\n3. Bildirim ayarlarını yapın\n\n## Temel Özellikler\n- Dashboard: Genel bakış ve istatistikler\n- Projeler: Proje yönetimi ve takip\n- Raporlar: Detaylı analiz ve raporlama",
+              "why": "Knowledge base Markdown formatında tutulur — yazması ve düzenlemesi kolay. Heading-based chunking için ideal yapıdır."
+            },
+            {
+              "order": "1.3",
+              "action": "Document processor servisi oluştur",
+              "type": "code_write",
+              "file": "orchestrator/services/document_processor.py",
+              "code": "import json\nfrom pathlib import Path\nfrom typing import List\nfrom dataclasses import dataclass\nfrom datetime import datetime\n\n@dataclass\nclass DocumentChunk:\n    content: str\n    metadata: dict\n    chunk_id: str\n\ndef chunk_markdown(text: str, source: str, max_tokens: int = 400) -> List[DocumentChunk]:\n    sections = []\n    current_section = \"\"\n    current_heading = \"\"\n    for line in text.split(\"\\n\"):\n        if line.startswith(\"#\"):\n            if current_section.strip():\n                sections.append((current_heading, current_section.strip()))\n            current_heading = line.strip(\"# \").strip()\n            current_section = line + \"\\n\"\n        else:\n            current_section += line + \"\\n\"\n    if current_section.strip():\n        sections.append((current_heading, current_section.strip()))\n    chunks = []\n    for i, (heading, content) in enumerate(sections):\n        chunks.append(DocumentChunk(content=content, metadata={\"source\": source, \"heading\": heading, \"chunk_index\": i, \"last_updated\": datetime.utcnow().isoformat()}, chunk_id=f\"{source}_{i}\"))\n    return chunks\n\ndef load_knowledge_base(kb_dir: str) -> List[DocumentChunk]:\n    all_chunks = []\n    kb_path = Path(kb_dir)\n    for md_file in kb_path.glob(\"*.md\"):\n        text = md_file.read_text(encoding=\"utf-8\")\n        chunks = chunk_markdown(text, source=md_file.stem)\n        all_chunks.extend(chunks)\n    return all_chunks",
+              "why": "Heading-based chunking, Markdown dokümanları için en uygun stratejidir. Her bölüm bağımsız chunk olur — semantik bütünlük korunur. Metadata retrieval sonuçlarında kaynak göstermek için kullanılır."
+            },
+            {
+              "order": "1.4",
+              "action": "ChromaDB vektör store servisi oluştur",
+              "type": "code_write",
+              "file": "orchestrator/services/vector_store.py",
+              "code": "import chromadb\nfrom typing import List\nfrom .document_processor import DocumentChunk, load_knowledge_base\n\nclass VectorStore:\n    def __init__(self, persist_dir: str = \"./chroma_db\"):\n        self.client = chromadb.Client()\n        self.collection = self.client.get_or_create_collection(name=\"knowledge_base\", metadata={\"hnsw:space\": \"cosine\"})\n    \n    def add_documents(self, chunks: List[DocumentChunk]):\n        self.collection.add(documents=[c.content for c in chunks], metadatas=[c.metadata for c in chunks], ids=[c.chunk_id for c in chunks])\n    \n    def search(self, query: str, top_k: int = 3) -> list:\n        results = self.collection.query(query_texts=[query], n_results=top_k)\n        return [{\"content\": doc, \"metadata\": meta, \"score\": 1 - dist}\n                for doc, meta, dist in zip(results[\"documents\"][0], results[\"metadatas\"][0], results[\"distances\"][0])]\n    \n    def initialize_from_directory(self, kb_dir: str):\n        chunks = load_knowledge_base(kb_dir)\n        if chunks:\n            self.add_documents(chunks)\n        return len(chunks)\n\nvector_store = VectorStore()",
+              "why": "ChromaDB embedded modda çalışır — ayrı sunucu gerekmez. Cosine similarity ile semantic search yapar. Singleton pattern ile uygulama boyunca tek instance kullanılır."
+            },
+            {
+              "order": "1.5",
+              "action": "Knowledge base'i yükle ve semantic search test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"from services.vector_store import vector_store; count = vector_store.initialize_from_directory('data/knowledge_base'); print(f'{count} chunk yüklendi'); results = vector_store.search('hesap nasıl oluşturulur'); print(results[0]['metadata']['source'] if results else 'No results')\"",
+              "expected_output": "5 chunk yüklendi\ngetting-started",
+              "why": "Knowledge base'in doğru yüklendiğini ve semantic search'ün çalıştığını doğruluyoruz."
+            },
+            {
+              "order": "1.6",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Dokümanlar chunk'lanıp ChromaDB'ye yüklenmeli. Semantic search alakalı chunk döndürmeli. Alakasız sorularda düşük skor gelmeli.",
+              "why": "RAG pipeline'ın kalitesi doğrudan retrieval kalitesine bağlıdır. Yanlış chunk = yanlış cevap."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   ├── data/\n│   │   ├── faqs.json\n│   │   ├── troubleshooting.json\n│   │   └── knowledge_base/       ← YENİ\n│   │       └── getting-started.md\n│   ├── services/\n│   │   ├── faq_service.py\n│   │   ├── sentiment.py\n│   │   ├── document_processor.py  ← YENİ\n│   │   └── vector_store.py        ← YENİ\n│   ├── chroma_db/                 ← YENİ (otomatik)\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "chromadb.errors.InvalidDimensionException: Embedding dimension mismatch",
+              "cause": "Koleksiyona farklı boyutlarda embedding eklenmiş.",
+              "fix": "Koleksiyonu sil ve yeniden oluştur: client.delete_collection('knowledge_base'). Tüm dokümanları aynı model ile yükle."
+            },
+            {
+              "error": "UnicodeDecodeError: 'utf-8' codec can't decode",
+              "cause": "Markdown dosyası UTF-8 encoding ile kaydedilmemiş.",
+              "fix": "Dosyaları UTF-8 ile kaydet. open(file, 'r', encoding='utf-8') kullan."
+            },
+            {
+              "error": "Tüm arama sonuçları çok düşük skor veriyor",
+              "cause": "ChromaDB varsayılan embedding modeli Türkçe'de zayıf.",
+              "fix": "OpenAI embedding kullan veya multilingual model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+            }
+          ]
         },
         {
           "step": 2,
           "title": "Hybrid Retrieval (Dense + Sparse)",
           "why": "Sadece embedding-based arama bazen keyword match'i kacirır. Hybrid approach ikisinin gucunu birlestirir.",
           "instructions": "1. Dense retrieval: embedding similarity\n2. Sparse retrieval: BM25 keyword matching\n3. Reciprocal Rank Fusion ile sonuclari birlesir\n4. Top-K sonucu agent'a context olarak ver",
-          "checkpoint": "Keyword-agirlikli ve semantic-agirlikli sorularda ikisi de iyi sonuc veriyor mu?"
+          "checkpoint": "Keyword-agirlikli ve semantic-agirlikli sorularda ikisi de iyi sonuc veriyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "BM25 bağımlılığını kur",
+              "type": "terminal",
+              "command": "cd orchestrator && pip install rank-bm25",
+              "expected_output": "Successfully installed rank-bm25",
+              "why": "BM25, keyword-based arama algoritmasıdır. Embedding'in yakalayamadığı exact keyword match'leri yakalar."
+            },
+            {
+              "order": "2.2",
+              "action": "Hybrid retrieval servisi oluştur — dense + sparse + RRF",
+              "type": "code_write",
+              "file": "orchestrator/services/hybrid_retrieval.py",
+              "code": "from typing import List, Dict\nfrom rank_bm25 import BM25Okapi\nfrom .vector_store import vector_store\nfrom .document_processor import load_knowledge_base\n\nclass HybridRetriever:\n    def __init__(self):\n        self.chunks = []\n        self.bm25 = None\n    \n    def initialize(self, kb_dir: str):\n        self.chunks = load_knowledge_base(kb_dir)\n        tokenized = [c.content.lower().split() for c in self.chunks]\n        self.bm25 = BM25Okapi(tokenized)\n        vector_store.initialize_from_directory(kb_dir)\n    \n    def search(self, query: str, top_k: int = 5) -> List[Dict]:\n        dense_results = vector_store.search(query, top_k=top_k)\n        sparse_results = []\n        if self.bm25 and self.chunks:\n            scores = self.bm25.get_scores(query.lower().split())\n            sparse_results = sorted([{\"content\": self.chunks[i].content, \"metadata\": self.chunks[i].metadata, \"score\": float(s)} for i, s in enumerate(scores)], key=lambda x: x[\"score\"], reverse=True)[:top_k]\n        return self._rrf_merge(dense_results, sparse_results, top_k)\n    \n    def _rrf_merge(self, dense, sparse, top_k, k=60):\n        scores = {}\n        data = {}\n        for rank, r in enumerate(dense):\n            key = r[\"content\"][:100]\n            scores[key] = scores.get(key, 0) + 1/(k+rank+1)\n            data[key] = r\n        for rank, r in enumerate(sparse):\n            key = r[\"content\"][:100]\n            scores[key] = scores.get(key, 0) + 1/(k+rank+1)\n            if key not in data: data[key] = r\n        results = []\n        for key in sorted(scores, key=scores.get, reverse=True)[:top_k]:\n            d2 = data[key].copy()\n            d2[\"rrf_score\"] = scores[key]\n            results.append(d2)\n        return results\n\nhybrid_retriever = HybridRetriever()",
+              "why": "Reciprocal Rank Fusion (RRF) dense ve sparse sonuçları birleştirir. Her iki yöntemin güçlü yanlarını alır: semantic anlam + exact keyword match."
+            },
+            {
+              "order": "2.3",
+              "action": "FAQ agent'ı hybrid retrieval kullanacak şekilde güncelle",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "from ..services.hybrid_retrieval import hybrid_retriever\n\n# faq_agent içinde search_faqs yerine:\n    results = hybrid_retriever.search(query, top_k=3)\n    if not results or results[0].get('rrf_score', 0) < 0.01:\n        return {\"current_agent\": \"faq\", \"intent\": \"needs_escalation\", ...}",
+              "position": "top",
+              "why": "Hybrid retrieval ile FAQ agent artık hem keyword match hem semantic similarity kullanarak en alakalı bilgiyi buluyor."
+            },
+            {
+              "order": "2.4",
+              "action": "Hybrid retrieval'ı farklı sorgu tipleriyle test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"from services.hybrid_retrieval import hybrid_retriever; hybrid_retriever.initialize('data/knowledge_base'); results = hybrid_retriever.search('hesap oluşturma'); print(len(results), 'sonuç')\"",
+              "expected_output": "3 sonuç",
+              "why": "Her sorgu için en alakalı chunk'ların döndüğünü doğruluyoruz."
+            },
+            {
+              "order": "2.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Keyword-ağırlıklı sorgularda BM25 iyi sonuç vermeli. Semantic sorgularda embedding iyi sonuç vermeli. İkisi birlikte daha iyi çalışmalı.",
+              "why": "Hybrid yaklaşımın tek başına dense veya sparse'dan daha iyi performans gösterdiğini doğrulamak önemli."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   └── graph.py          ← GÜNCELLENDİ (hybrid retrieval)\n│   ├── services/\n│   │   ├── document_processor.py\n│   │   ├── vector_store.py\n│   │   └── hybrid_retrieval.py  ← YENİ\n│   ├── data/\n│   │   └── knowledge_base/\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "rank_bm25 IndexError: list index out of range",
+              "cause": "BM25'e boş token listesi verilmiş.",
+              "fix": "Boş chunk'ları filtrele: [c for c in chunks if c.content.strip()]"
+            },
+            {
+              "error": "RRF sonuçları hep aynı sırada",
+              "cause": "Dense ve sparse sonuçlar aynı — RRF fark yaratmıyor.",
+              "fix": "Daha fazla ve çeşitli doküman ekle. k parametresini ayarla."
+            },
+            {
+              "error": "MemoryError: ChromaDB çok fazla bellek kullanıyor",
+              "cause": "Çok büyük dokümanlar chunk'lanmadan yüklenmiş.",
+              "fix": "max_tokens=400 ile chunk boyutunu sınırla. Chunk overlap %10-20 ekle."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Citation & Source Tracking",
           "why": "Agent'in verdigi cevapın kaynagini gostermek guveni artirir. 'Bu bilgiyi nereden aldin?' sorusuna cevap verebilmeli.",
           "instructions": "Her RAG cevabina:\n1. Kaynak dokuman adi ve bolum\n2. Confidence score\n3. Son guncelleme tarihi ekle\n4. Frontend'de citation goruntulemesi",
-          "checkpoint": "Agent cevaplarinda kaynak bilgisi gorunuyor mu?"
+          "checkpoint": "Agent cevaplarinda kaynak bilgisi gorunuyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Citation ve AgentResponse modellerini ekle",
+              "type": "code_modify",
+              "file": "orchestrator/models.py",
+              "code": "class Citation(BaseModel):\n    source: str\n    heading: str\n    confidence: float\n    last_updated: Optional[str] = None\n\nclass AgentResponse(BaseModel):\n    content: str\n    agent: str\n    citations: List[Citation] = []\n    confidence: float = 0.0",
+              "position": "bottom",
+              "why": "Citation modeli, agent cevaplarının hangi kaynaklardan geldiğini yapılandırılmış şekilde tutar. Güveni artırır."
+            },
+            {
+              "order": "3.2",
+              "action": "FAQ agent return'üne citation bilgisi ekle",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "# faq_agent return'ünde:\n    citations = [{\"source\": r[\"metadata\"][\"source\"], \"heading\": r[\"metadata\"].get(\"heading\", \"\"), \"confidence\": r.get(\"rrf_score\", 0)} for r in results]\n    return {\"current_agent\": \"faq\", \"context\": {\"citations\": citations}, \"messages\": [...]}",
+              "position": "top",
+              "why": "Her FAQ cevabına kaynak bilgisi eklenir. Müşteri 'bu bilgiyi nereden aldın?' diye sorduğunda gösterilebilir."
+            },
+            {
+              "order": "3.3",
+              "action": "API response'a citation ekle",
+              "type": "code_modify",
+              "file": "orchestrator/api/conversations.py",
+              "code": "# send_message return'ünde:\n    citations = result.get(\"context\", {}).get(\"citations\", [])\n    return {\"response\": assistant_msg, \"agent\": result.get(\"intent\", \"\"), \"citations\": citations}",
+              "position": "top",
+              "why": "API response'unda citation bilgisi frontend'e iletilir."
+            },
+            {
+              "order": "3.4",
+              "action": "Citation'lı cevabı test et",
+              "type": "terminal",
+              "command": "curl -s http://localhost:8000/api/conversations/<id>/messages -X POST -H 'Content-Type: application/json' -d '{\"content\": \"Hesap nasıl oluşturulur?\"}'",
+              "expected_output": "{\"response\": {...}, \"agent\": \"faq\", \"citations\": [{\"source\": \"getting-started\", ...}]}",
+              "why": "Citation bilgisinin API response'unda döndüğünü doğruluyoruz."
+            },
+            {
+              "order": "3.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Agent cevaplarında citations dizisi dolu olmalı. Her citation source ve heading içermeli. Alakasız sorgularda citations boş olmalı.",
+              "why": "Citation tracking, RAG sisteminin şeffaflığı için kritik."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   └── graph.py          ← GÜNCELLENDİ (citations)\n│   ├── api/\n│   │   └── conversations.py  ← GÜNCELLENDİ\n│   ├── models.py             ← GÜNCELLENDİ (Citation model)\n│   └── services/\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "citations dizisi her zaman boş dönüyor",
+              "cause": "faq_agent context'i state'e yazmıyor.",
+              "fix": "faq_agent return dict'inde 'context': {'citations': citations} olduğunu kontrol et."
+            },
+            {
+              "error": "TypeError: Object of type Citation is not JSON serializable",
+              "cause": "Pydantic modeli serialize edilemiyor.",
+              "fix": "citation.model_dump() kullanarak dict'e çevir veya FastAPI response_model kullan."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Chunk boyutu 200-500 token arasi optimal\n2. Chunk overlap %10-20 olmali — bilgi kaybi onlenir\n3. Metadata ZORUNLU: category, source, date — filtreleme icin kullanacaksin\n4. RAG pipeline'da retrieval kalitesini OLCMELISIN — rasgele sorularla test et",
@@ -284,21 +1057,177 @@
           "title": "Sliding Window + Summary Memory",
           "why": "LLM context window sinirli. 20+ mesajlik konusmada tum mesajlari gondermek hem yavas hem pahali.",
           "instructions": "Memory stratejisi:\n1. Son 5 mesaji tam gonder (recent context)\n2. Onceki mesajlari ozetlerle (rolling summary)\n3. Onemli bilgileri ayri key-value store'da tut\n4. Agent gecislerinde summary otomatik guncelle",
-          "checkpoint": "20 mesajlik bir konusmada agent hala ilk mesajihatirliyor mu (summary uzerinden)?"
+          "checkpoint": "20 mesajlik bir konusmada agent hala ilk mesajihatirliyor mu (summary uzerinden)?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Memory management servisi oluştur",
+              "type": "code_write",
+              "file": "orchestrator/services/memory.py",
+              "code": "from typing import List, Dict\nfrom langchain_openai import ChatOpenAI\nfrom langchain_core.messages import SystemMessage, HumanMessage\n\nllm = ChatOpenAI(model=\"gpt-4o-mini\", temperature=0)\nSUMMARY_PROMPT = \"Aşağıdaki konuşmayı kısa özetle. Müşteri adı, sorun detayı, denenen çözümleri koru. Maks 3 cümle.\"\n\nclass ConversationMemory:\n    def __init__(self, window_size=5):\n        self.window_size = window_size\n    \n    async def get_context(self, messages: List[Dict], summary: str = \"\") -> List[Dict]:\n        if len(messages) <= self.window_size:\n            return messages\n        recent = messages[-self.window_size:]\n        if not summary:\n            old = messages[:-self.window_size]\n            summary = await self._summarize(old)\n        return [{\"role\": \"system\", \"content\": f\"Önceki konuşma özeti: {summary}\"}] + recent\n    \n    async def _summarize(self, messages: List[Dict]) -> str:\n        conv = \"\\n\".join([f\"{m['role']}: {m['content']}\" for m in messages])\n        response = await llm.ainvoke([SystemMessage(content=SUMMARY_PROMPT), HumanMessage(content=conv)])\n        return response.content\n    \n    def count_tokens(self, messages: List[Dict]) -> int:\n        return int(sum(len(m.get('content', '').split()) * 1.3 for m in messages))\n\nmemory_manager = ConversationMemory()",
+              "why": "Sliding window son 5 mesajı tam gönderir — güncel context korunur. Önceki mesajlar özetlenir — token maliyeti düşer. Bu strateji token kullanımını %50 azaltır."
+            },
+            {
+              "order": "1.2",
+              "action": "Graph'a memory entegrasyonu ekle",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "from ..services.memory import memory_manager\n\n# Her agent başında:\n    context_messages = await memory_manager.get_context(state[\"messages\"], state.get(\"conversation_summary\", \"\"))",
+              "position": "top",
+              "why": "Memory manager her agent çağrısında context'i optimize eder. Uzun konuşmalarda tüm mesajları göndermek yerine özet + son mesajlar gönderilir."
+            },
+            {
+              "order": "1.3",
+              "action": "20 mesajlık konuşma ile memory test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"import asyncio; from services.memory import memory_manager; messages = [{'role': 'user' if i%2==0 else 'assistant', 'content': f'Mesaj {i}'} for i in range(20)]; ctx = asyncio.run(memory_manager.get_context(messages)); print(f'Orijinal: {len(messages)}, Context: {len(ctx)} mesaj')\"",
+              "expected_output": "Orijinal: 20, Context: 6 mesaj",
+              "why": "20 mesajlık konuşmanın 6 mesaja indirildiğini ve özetin doğru oluşturulduğunu doğruluyoruz."
+            },
+            {
+              "order": "1.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "20 mesajlık konuşmada agent hâlâ ilk mesajı hatırlamalı (summary üzerinden). Token sayısı dramatik şekilde düşmeli.",
+              "why": "Memory management LLM uygulamalarının gizli karmaşıklığıdır. Context window dolmadan ÖNCE summarize edilmeli."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   └── graph.py          ← GÜNCELLENDİ\n│   ├── services/\n│   │   ├── memory.py          ← YENİ\n│   │   └── hybrid_retrieval.py\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "Summarization çok uzun sürüyor — her mesajda 2-3 saniye ekleniyor",
+              "cause": "Her mesajda tüm eski mesajları yeniden özetliyor.",
+              "fix": "Rolling summary kullan: her 5 mesajda bir özetle ve state'te sakla."
+            },
+            {
+              "error": "Summary çok kısa — önemli bilgiler kayboluyor",
+              "cause": "Summary prompt'u yeterince detay istemiyor.",
+              "fix": "Prompt'a 'Müşteri adı, sorun detayı, denenen çözümleri mutlaka koru' ekle."
+            },
+            {
+              "error": "Token count hatalı",
+              "cause": "Yaklaşık hesaplama yeterli değil.",
+              "fix": "tiktoken kütüphanesini kullan: enc = tiktoken.encoding_for_model('gpt-4o-mini'); len(enc.encode(text))"
+            }
+          ]
         },
         {
           "step": 2,
           "title": "Redis Session Store",
           "why": "Conversation state Redis'te tutmak server restart ve horizontal scaling'e dayanikli yapar.",
           "instructions": "Redis'e kaydet:\n- conversation_id: tum state\n- TTL: 24 saat (otomatik temizlik)\n- Agent gecislerinde state guncelle\n- Reconnect durumunda state'i Redis'ten yukle",
-          "checkpoint": "Server restart sonrasi konusma kaldigi yerden devam ediyor mu?"
+          "checkpoint": "Server restart sonrasi konusma kaldigi yerden devam ediyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Redis session servisi oluştur",
+              "type": "code_write",
+              "file": "orchestrator/services/session_store.py",
+              "code": "import json\nimport redis.asyncio as redis\nfrom typing import Optional\n\nclass SessionStore:\n    def __init__(self, redis_url='redis://localhost:6379'):\n        self.redis = redis.from_url(redis_url, decode_responses=True)\n        self.ttl = 86400  # 24 saat\n    \n    async def save_session(self, conv_id: str, state: dict):\n        await self.redis.setex(f\"session:{conv_id}\", self.ttl, json.dumps(state, default=str))\n    \n    async def get_session(self, conv_id: str) -> Optional[dict]:\n        data = await self.redis.get(f\"session:{conv_id}\")\n        return json.loads(data) if data else None\n    \n    async def delete_session(self, conv_id: str):\n        await self.redis.delete(f\"session:{conv_id}\")\n    \n    async def extend_ttl(self, conv_id: str):\n        await self.redis.expire(f\"session:{conv_id}\", self.ttl)\n\nsession_store = SessionStore()",
+              "why": "Redis'te session tutmak, server restart ve horizontal scaling'e dayanıklı yapar. TTL ile eski session'lar otomatik temizlenir."
+            },
+            {
+              "order": "2.2",
+              "action": "API'yi Redis session ile güncelle",
+              "type": "code_modify",
+              "file": "orchestrator/api/conversations.py",
+              "code": "from ..services.session_store import session_store\n\n# send_message içinde:\n    state = await session_store.get_session(conv_id)\n    # ... graph.ainvoke ...\n    await session_store.save_session(conv_id, result)\n    await session_store.extend_ttl(conv_id)",
+              "position": "top",
+              "why": "In-memory dict yerine Redis kullanarak state kalıcı hale geliyor. Server restart sonrası konuşma kaldığı yerden devam eder."
+            },
+            {
+              "order": "2.3",
+              "action": "Redis CRUD operasyonlarını test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"import asyncio; from services.session_store import session_store; asyncio.run(session_store.save_session('test-1', {'messages': []})); result = asyncio.run(session_store.get_session('test-1')); print('Loaded:', result)\"",
+              "expected_output": "Loaded: {'messages': []}",
+              "why": "Redis save/get/delete operasyonlarının doğru çalıştığını doğruluyoruz."
+            },
+            {
+              "order": "2.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Server restart sonrası konuşma kaldığı yerden devam etmeli. TTL süresi dolunca session otomatik silinmeli.",
+              "why": "Production'da Redis olmadan session kaybolur. Horizontal scaling'de her instance aynı session'a erişebilmeli."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── services/\n│   │   ├── memory.py\n│   │   ├── session_store.py   ← YENİ\n│   │   └── hybrid_retrieval.py\n│   ├── api/\n│   │   └── conversations.py  ← GÜNCELLENDİ\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "redis.exceptions.ConnectionError: Error connecting to localhost:6379",
+              "cause": "Redis servisi çalışmıyor.",
+              "fix": "docker-compose up redis ile Redis'i başlat. redis-cli ping ile test et."
+            },
+            {
+              "error": "TypeError: Object of type HumanMessage is not JSON serializable",
+              "cause": "LangChain message objeleri serialize edilemiyor.",
+              "fix": "json.dumps(state, default=str) kullan veya mesajları dict'e çevir."
+            },
+            {
+              "error": "Redis session çok büyük — performans düşüyor",
+              "cause": "Tüm mesaj geçmişi session'da tutuluyor.",
+              "fix": "Session'da sadece son 20 mesaj + summary tut. Tam geçmişi PostgreSQL'de sakla."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Context-Aware Agent Handoff",
           "why": "Agent degistiginde kullanici 'tekrar anlatmak zorunda kalmamali'. Onceki agent'in ozeti yeni agent'a aktarilmali.",
           "instructions": "Handoff protocol:\n1. Cikan agent: conversation summary olustur\n2. Transfer metadata: neden gecis yapildi, ne denendi\n3. Giren agent: summary'yi oku ve 'Anliyorum, [ozet]. Simdi [yeni yaklasiM]' de\n4. Kullaniciya seffaf gecis bildirimi",
-          "checkpoint": "FAQ -> Tech gecisinde Tech agent onceki konusmayi biliyor mu?"
+          "checkpoint": "FAQ -> Tech gecisinde Tech agent onceki konusmayi biliyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Handoff protokolü servisi oluştur",
+              "type": "code_write",
+              "file": "orchestrator/services/handoff.py",
+              "code": "from langchain_openai import ChatOpenAI\nfrom langchain_core.messages import SystemMessage, HumanMessage\nfrom typing import Dict\n\nllm = ChatOpenAI(model=\"gpt-4o-mini\", temperature=0)\nHANDOFF_PROMPT = \"Müşteri destek konuşmasını özetle: 1.Asıl sorun 2.Denenen çözümler 3.Duygu durumu 4.Geçiş nedeni. Maks 4 cümle.\"\n\nasync def create_handoff_summary(state: dict) -> Dict:\n    msgs = \"\\n\".join([f\"{m.get('role')}: {m.get('content')}\" for m in state.get('messages', [])[-10:]])\n    response = await llm.ainvoke([SystemMessage(content=HANDOFF_PROMPT), HumanMessage(content=msgs)])\n    return {\"summary\": response.content, \"from_agent\": state.get(\"current_agent\", \"unknown\"),\n            \"attempted_solutions\": state.get(\"attempted_solutions\", []),\n            \"sentiment\": state.get(\"customer_sentiment\", 3), \"escalation_reason\": state.get(\"escalation_reason\", \"\")}",
+              "why": "Handoff özeti, giren agent'ın konuşmayı sıfırdan anlamasını sağlar. Müşteri 'tekrar anlatmak zorunda kalmamalı' — en önemli UX kuralı."
+            },
+            {
+              "order": "3.2",
+              "action": "Agent'lara handoff giriş mesajı ekle",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "from ..services.handoff import create_handoff_summary\n\n# tech_agent başında:\n    handoff = state.get('context', {}).get('handoff')\n    if handoff:\n        intro = f\"Anlıyorum, {handoff['summary']} Şimdi teknik olarak inceliyorum.\"",
+              "position": "top",
+              "why": "Giren agent handoff özetini okuyup 'Anlıyorum, [özet]' diyerek müşteriye geçişi bildirir."
+            },
+            {
+              "order": "3.3",
+              "action": "Handoff özetini test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"import asyncio; from services.handoff import create_handoff_summary; state = {'messages': [{'role': 'user', 'content': 'Giriş yapamıyorum'}], 'current_agent': 'faq', 'attempted_solutions': ['FAQ arandı'], 'customer_sentiment': 2, 'escalation_reason': 'FAQ bulamadı'}; result = asyncio.run(create_handoff_summary(state)); print('Summary:', result['summary'][:100])\"",
+              "expected_output": "Summary: Müşteri giriş yapma sorunu yaşıyor...",
+              "why": "Handoff özetinin sorun, çözümler ve geçiş nedenini doğru içerdiğini doğruluyoruz."
+            },
+            {
+              "order": "3.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "FAQ → Tech geçişinde Tech agent önceki konuşmayı bilmeli. Handoff özeti müşterinin sorununu içermeli. Müşteriye geçiş bildirimi yapılmalı.",
+              "why": "Context kayıpsız geçiş, multi-agent sisteminin en kritik UX gereksinimidir."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   └── graph.py          ← GÜNCELLENDİ\n│   ├── services/\n│   │   ├── memory.py\n│   │   ├── session_store.py\n│   │   ├── handoff.py         ← YENİ\n│   │   └── hybrid_retrieval.py\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "Handoff summary boş geliyor",
+              "cause": "state['messages'] boş veya formatı yanlış.",
+              "fix": "Messages listesinde en az 1 mesaj olmalı. Her mesajda 'role' ve 'content' olmalı."
+            },
+            {
+              "error": "Agent geçişinde önceki agent'ın bilgisi kaybolmuş",
+              "cause": "Handoff summary state context'ine yazılmamış.",
+              "fix": "faq_agent return dict'inde context: {'handoff': handoff_data} eklenmeli."
+            },
+            {
+              "error": "Müşteriye iki kez aynı soru soruluyor",
+              "cause": "Tech agent handoff özetini okumadan intro gönderiyor.",
+              "fix": "Tech agent başında handoff kontrolü yap: if handoff varsa direkt çözüme geç."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Token sayma ZORUNLU — her LLM cagrisinda kac token kullandigini bil\n2. Summary prompt'u kisa tut — summary icin cok token harcama\n3. Redis TTL'ini kullanim pattern'ine gore ayarla — 24 saat cok olabilir\n4. Context window dolmadan ONCE summarize et — son anda yapmak riskli",
@@ -321,21 +1250,175 @@
           "title": "Escalation Karar Mantigi",
           "why": "Ne zaman insana aktarilacagi kritik bir karar. Cok erken = AI'in faydasiz olmasi. Cok gec = mutsuz musteri.",
           "instructions": "Escalation triggers:\n1. Musteri acikca insan talep etti\n2. Sentiment score < 2/5 (kizgin musteri)\n3. Agent 3+ denemede cozemedi\n4. Confidence score surekli dusuk\n5. Hassas konu (guvenlik, odeme sorunlari)",
-          "checkpoint": "Tum escalation trigger'lari calisiyor mu? False positive orani kabul edilebilir mi?"
+          "checkpoint": "Tum escalation trigger'lari calisiyor mu? False positive orani kabul edilebilir mi?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Escalation servisi oluştur — priority ve trigger mantığı",
+              "type": "code_write",
+              "file": "orchestrator/services/escalation.py",
+              "code": "from typing import Dict, Optional\nfrom enum import Enum\n\nclass Priority(str, Enum):\n    P1 = \"p1\"  # Acil\n    P2 = \"p2\"  # Yüksek\n    P3 = \"p3\"  # Normal\n    P4 = \"p4\"  # Düşük\n\ndef determine_escalation(state: dict) -> Optional[Dict]:\n    triggers = []\n    priority = Priority.P4\n    sentiment = state.get(\"customer_sentiment\", 3)\n    attempts = len(state.get(\"attempted_solutions\", []))\n    confidence = state.get(\"confidence\", 1.0)\n    last_msg = (state.get(\"messages\", [])[-1].get(\"content\", \"\") if state.get(\"messages\") else \"\").lower()\n    human_kw = [\"insan\", \"gerçek kişi\", \"yönetici\", \"müdür\", \"temsilci\"]\n    if any(kw in last_msg for kw in human_kw):\n        triggers.append(\"Müşteri insan talep etti\")\n        priority = Priority.P2\n    if sentiment <= 2:\n        triggers.append(f\"Düşük sentiment: {sentiment}/5\")\n        priority = Priority.P1\n    if attempts >= 3:\n        triggers.append(f\"{attempts} çözüm denemesi başarısız\")\n        if priority.value > Priority.P3.value: priority = Priority.P3\n    if confidence < 0.5:\n        triggers.append(f\"Düşük confidence: {confidence}\")\n        if priority.value > Priority.P3.value: priority = Priority.P3\n    if not triggers: return None\n    return {\"should_escalate\": True, \"priority\": priority.value, \"triggers\": triggers, \"reason\": \"; \".join(triggers)}",
+              "why": "Escalation kararı birden fazla faktöre dayanır: sentiment, deneme sayısı, confidence ve anahtar kelimeler. Priority sistemi (P1-P4) insan agent'ların en acil vakaları önce görmesini sağlar."
+            },
+            {
+              "order": "1.2",
+              "action": "Escalation agent'ı implement et — handoff özeti ve bilgilendirme mesajı",
+              "type": "code_modify",
+              "file": "orchestrator/agents/graph.py",
+              "code": "from ..services.escalation import determine_escalation\nfrom ..services.handoff import create_handoff_summary\n\nasync def escalation_agent(state: AgentState) -> dict:\n    handoff = await create_handoff_summary(state)\n    esc = determine_escalation(state) or {\"priority\": \"p3\", \"reason\": \"Genel escalation\"}\n    message = f\"Sizi uzman ekibimize yönlendiriyorum. Öncelik: {'Acil' if esc['priority']=='p1' else 'Normal'}. Tahmini bekleme: {'< 2 dk' if esc['priority'] in ['p1','p2'] else '< 10 dk'}. Konuşma özetiniz aktarılacak.\"\n    return {\"current_agent\": \"escalation\", \"escalation_reason\": esc[\"reason\"],\n            \"context\": {\"handoff\": handoff, \"escalation\": esc},\n            \"messages\": [{\"role\": \"assistant\", \"content\": message}]}",
+              "position": "top",
+              "why": "Escalation agent müşteriye bilgi verir: öncelik, bekleme süresi ve özetin aktarılacağı. Bu şeffaflık müşteri memnuniyetini artırır."
+            },
+            {
+              "order": "1.3",
+              "action": "Escalation trigger'larını 4 senaryo ile test et",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"from services.escalation import determine_escalation; scenarios = [{'customer_sentiment':1,'messages':[{'content':'berbat'}],'attempted_solutions':[],'confidence':0.9}, {'customer_sentiment':3,'messages':[{'content':'insan istiyorum'}],'attempted_solutions':[],'confidence':0.8}, {'customer_sentiment':3,'messages':[{'content':'hala bozuk'}],'attempted_solutions':['a','b','c','d'],'confidence':0.7}, {'customer_sentiment':4,'messages':[{'content':'teşekkürler'}],'attempted_solutions':[],'confidence':0.9}]; [print(f'S{i+1}: {\\\"esc\\\" if determine_escalation(s) else \\\"no\\\"}', determine_escalation(s)) for i,s in enumerate(scenarios)]\"",
+              "expected_output": "S1: esc {'priority': 'p1', ...}\nS2: esc {'priority': 'p2', ...}\nS3: esc {'priority': 'p3', ...}\nS4: no None",
+              "why": "Her escalation trigger'ının çalıştığını ve memnun müşterinin escalate edilmediğini doğruluyoruz."
+            },
+            {
+              "order": "1.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Tüm escalation trigger'ları çalışmalı. False positive olmamalı (memnun müşteri escalate edilmemeli). Priority doğru atanmalı.",
+              "why": "Yanlış escalation = gereksiz yük. Geciken escalation = mutsuz müşteri. Dengeyi bulmak kritik."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── agents/\n│   │   └── graph.py          ← GÜNCELLENDİ\n│   ├── services/\n│   │   ├── escalation.py      ← YENİ\n│   │   ├── handoff.py\n│   │   └── memory.py\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "Her mesaj escalation'a gidiyor",
+              "cause": "Confidence threshold çok yüksek veya sentiment sürekli düşük çıkıyor.",
+              "fix": "Confidence threshold'u 0.5'e düşür. Sentiment analiz fonksiyonunu kontrol et."
+            },
+            {
+              "error": "Kızgın müşteri normal akışta kalıyor",
+              "cause": "route_decision'da sentiment kontrolü yok.",
+              "fix": "route_decision'da sentiment <= 2 kontrolü ekle."
+            },
+            {
+              "error": "Priority sıralaması yanlış",
+              "cause": "String karşılaştırma 'p1' > 'p4' True döndürür.",
+              "fix": "Enum value yerine numeric priority kullan veya mapping dict kullan."
+            }
+          ]
         },
         {
           "step": 2,
           "title": "Context Transfer & Queue",
           "why": "Insan agent'a geciste tum bilgi aktarilmali. 'Tekrar anlatir misiniz?' demek kabul edilemez.",
           "instructions": "Handoff package:\n1. Konusma ozeti (AI tarafindan olusturulmus)\n2. Musteri bilgileri\n3. Denenmis cozumler listesi\n4. Escalation nedeni\n5. Oncelik seviyesi (P1-P4)\n\nQueue sistemi:\n- Priority queue (P1 once)\n- Agent skill-based routing\n- Estimated wait time",
-          "checkpoint": "Insan agent handoff'u aldiginda tum context'i goruyor mu?"
+          "checkpoint": "Insan agent handoff'u aldiginda tum context'i goruyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Redis-based priority queue servisi oluştur",
+              "type": "code_write",
+              "file": "orchestrator/services/queue.py",
+              "code": "import json\nfrom datetime import datetime\nfrom typing import Optional, Dict\nimport redis.asyncio as redis\n\nclass EscalationQueue:\n    def __init__(self, redis_url='redis://localhost:6379'):\n        self.redis = redis.from_url(redis_url, decode_responses=True)\n    \n    async def enqueue(self, conv_id: str, handoff: dict, escalation: dict):\n        ticket = {\"conv_id\": conv_id, \"priority\": escalation.get(\"priority\", \"p4\"),\n                  \"reason\": escalation.get(\"reason\", \"\"), \"summary\": handoff.get(\"summary\", \"\"),\n                  \"attempted_solutions\": handoff.get(\"attempted_solutions\", []),\n                  \"sentiment\": handoff.get(\"sentiment\", 3),\n                  \"created_at\": datetime.utcnow().isoformat(), \"status\": \"waiting\"}\n        score = {\"p1\":4,\"p2\":3,\"p3\":2,\"p4\":1}.get(ticket[\"priority\"], 1)\n        await self.redis.zadd(\"escalation_queue\", {json.dumps(ticket): score})\n        return ticket\n    \n    async def dequeue(self) -> Optional[Dict]:\n        results = await self.redis.zrevrange(\"escalation_queue\", 0, 0)\n        if not results: return None\n        ticket = json.loads(results[0])\n        await self.redis.zrem(\"escalation_queue\", results[0])\n        return ticket\n    \n    async def get_queue_status(self) -> Dict:\n        total = await self.redis.zcard(\"escalation_queue\")\n        return {\"total_waiting\": total, \"estimated_wait\": f\"{total * 3} dakika\"}\n\nescalation_queue = EscalationQueue()",
+              "why": "Redis Sorted Set ile priority queue oluşturulur — P1 ticket'lar otomatik olarak önce işlenir. Kuyruk durumu real-time görüntülenebilir."
+            },
+            {
+              "order": "2.2",
+              "action": "Escalation API endpoint'leri oluştur",
+              "type": "code_write",
+              "file": "orchestrator/api/escalation.py",
+              "code": "from fastapi import APIRouter\nfrom ..services.queue import escalation_queue\nimport json\n\nrouter = APIRouter(prefix=\"/api/escalation\", tags=[\"escalation\"])\n\n@router.get(\"/queue\")\nasync def get_queue():\n    return await escalation_queue.get_queue_status()\n\n@router.post(\"/dequeue\")\nasync def dequeue_ticket():\n    ticket = await escalation_queue.dequeue()\n    return ticket or {\"message\": \"Kuyruk boş\"}\n\n@router.get(\"/queue/tickets\")\nasync def list_tickets():\n    tickets = await escalation_queue.redis.zrevrange(\"escalation_queue\", 0, -1, withscores=True)\n    return [{\"ticket\": json.loads(t), \"priority_score\": s} for t, s in tickets]",
+              "why": "İnsan agent'lar bu endpoint'ler ile kuyruktan ticket alır. Queue status dashboard'da gösterilir."
+            },
+            {
+              "order": "2.3",
+              "action": "Escalation API'yi main.py'ye ekle",
+              "type": "code_modify",
+              "file": "orchestrator/main.py",
+              "code": "from api.escalation import router as esc_router\napp.include_router(esc_router)",
+              "position": "bottom",
+              "why": "Yeni escalation endpoint'lerini ana uygulamaya ekliyoruz."
+            },
+            {
+              "order": "2.4",
+              "action": "Priority queue'yu test et — P1 önce çıkmalı",
+              "type": "terminal",
+              "command": "cd orchestrator && python -c \"import asyncio; from services.queue import escalation_queue; asyncio.run(escalation_queue.enqueue('c1', {'summary':'Teknik'}, {'priority':'p3','reason':'test'})); asyncio.run(escalation_queue.enqueue('c2', {'summary':'Acil'}, {'priority':'p1','reason':'kızgın'})); t = asyncio.run(escalation_queue.dequeue()); print('İlk çıkan (P1 olmalı):', t['priority'], t['summary'])\"",
+              "expected_output": "İlk çıkan (P1 olmalı): p1 Acil",
+              "why": "P1 ticket'ın P3'ten önce çıkmasını doğruluyoruz. Priority queue doğru çalışmalı."
+            },
+            {
+              "order": "2.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "P1 ticket her zaman P4'ten önce çıkmalı. Queue status doğru toplam göstermeli. Boş kuyrukta dequeue None dönmeli.",
+              "why": "Öncelik sıralaması müşteri memnuniyeti için kritik."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── api/\n│   │   ├── conversations.py\n│   │   └── escalation.py      ← YENİ\n│   ├── services/\n│   │   ├── escalation.py\n│   │   ├── queue.py           ← YENİ\n│   │   └── handoff.py\n│   └── main.py               ← GÜNCELLENDİ\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "redis.exceptions.ResponseError: WRONGTYPE Operation",
+              "cause": "escalation_queue key'i farklı tipte oluşturulmuş.",
+              "fix": "redis-cli DEL escalation_queue ile key'i sil ve yeniden oluştur."
+            },
+            {
+              "error": "Queue sıralaması yanlış — P4 P1'den önce çıkıyor",
+              "cause": "zadd score'u ters ayarlanmış.",
+              "fix": "P1=4, P4=1 olmalı. zrevrange (reverse) kullandığından emin ol."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "Real-time Agent Dashboard",
           "why": "Insan agent'larin aktif konusmalari, kuyrugu ve agent performansini gormesi operasyonel verimlilik icin sart.",
           "instructions": "Dashboard:\n1. Aktif konusmalar listesi (AI + insan)\n2. Kuyruk durumu ve bekleme sureleri\n3. Agent musaitlik durumu\n4. Quick actions: devral, ata, kapat",
-          "checkpoint": "Dashboard real-time gunceleniyor mu? Konusma devralma calisiyor mu?"
+          "checkpoint": "Dashboard real-time gunceleniyor mu? Konusma devralma calisiyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Dashboard API endpoint'leri oluştur",
+              "type": "code_write",
+              "file": "orchestrator/api/dashboard.py",
+              "code": "from fastapi import APIRouter\nfrom ..services.queue import escalation_queue\nfrom ..services.session_store import session_store\n\nrouter = APIRouter(prefix=\"/api/dashboard\", tags=[\"dashboard\"])\n\n@router.get(\"/stats\")\nasync def get_stats():\n    queue_status = await escalation_queue.get_queue_status()\n    return {\"queue\": queue_status, \"agents\": {\"online\": 0, \"busy\": 0, \"available\": 0}}\n\n@router.get(\"/active-conversations\")\nasync def get_active_conversations():\n    keys = []\n    async for key in session_store.redis.scan_iter(\"session:*\"):\n        keys.append(key)\n    return {\"active_count\": len(keys), \"conversations\": keys[:20]}",
+              "why": "Dashboard API'si insan agent'ların kuyruk durumunu, aktif konuşmaları ve metrikleri görmesini sağlar."
+            },
+            {
+              "order": "3.2",
+              "action": "Dashboard API'yi main.py'ye ekle",
+              "type": "code_modify",
+              "file": "orchestrator/main.py",
+              "code": "from api.dashboard import router as dash_router\napp.include_router(dash_router)",
+              "position": "bottom",
+              "why": "Dashboard endpoint'lerini ana uygulamaya ekliyoruz."
+            },
+            {
+              "order": "3.3",
+              "action": "Dashboard endpoint'lerini test et",
+              "type": "terminal",
+              "command": "curl -s http://localhost:8000/api/dashboard/stats",
+              "expected_output": "{\"queue\":{\"total_waiting\":0,\"estimated_wait\":\"0 dakika\"},\"agents\":{\"online\":0,...}}",
+              "why": "Dashboard API'sinin çalıştığını doğruluyoruz."
+            },
+            {
+              "order": "3.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Stats endpoint kuyruk ve agent verilerini dönmeli. Active conversations Redis'ten konuşma sayısını almalı.",
+              "why": "Dashboard operasyonel verimlilik için şart."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── api/\n│   │   ├── conversations.py\n│   │   ├── escalation.py\n│   │   └── dashboard.py       ← YENİ\n│   ├── services/\n│   └── main.py               ← GÜNCELLENDİ\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "scan_iter çok yavaş — timeout oluyor",
+              "cause": "Binlerce key varken SCAN yavaş.",
+              "fix": "scan_iter count=100 ekle veya ayrı 'active_sessions' set tut."
+            },
+            {
+              "error": "Dashboard verileri eski — güncellenmiyor",
+              "cause": "REST polling ile gecikme var.",
+              "fix": "WebSocket veya SSE ile real-time güncelleme ekle."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Escalation HER ZAMAN mumkun olmali — AI'i zorla kullandirma\n2. Context transfer'de PII (kisisel bilgi) filtreleme gerekebilir\n3. Kuyruk bosken bile tahmini bekleme suresi goster\n4. Insan agent AI ozetini duzenleyebilmeli — AI yanlis ozetlerse",
@@ -359,28 +1442,249 @@
           "title": "Agent Performance Metrics",
           "why": "Olcemezsen iyilestiremezsin. Her agent'in ne kadar etkili oldugunu bilmek optimizasyon icin sart.",
           "instructions": "Metrikler:\n1. Resolution rate (agent basina)\n2. Average response time\n3. Customer satisfaction score\n4. Escalation rate\n5. Token usage per conversation\n6. Intent classification accuracy",
-          "checkpoint": "Dashboard'da tum metrikler gorunuyor mu?"
+          "checkpoint": "Dashboard'da tum metrikler gorunuyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Analytics servisi oluştur — Redis hash ile günlük metrikler",
+              "type": "code_write",
+              "file": "orchestrator/services/analytics.py",
+              "code": "import json\nfrom datetime import datetime, timedelta\nfrom typing import Dict, List\nimport redis.asyncio as redis\n\nclass AnalyticsService:\n    def __init__(self, redis_url='redis://localhost:6379'):\n        self.redis = redis.from_url(redis_url, decode_responses=True)\n    \n    async def track_event(self, event_type: str, data: dict):\n        event = {\"type\": event_type, \"data\": data, \"timestamp\": datetime.utcnow().isoformat()}\n        await self.redis.lpush(\"analytics:events\", json.dumps(event))\n        date_key = datetime.utcnow().strftime(\"%Y-%m-%d\")\n        await self.redis.hincrby(f\"analytics:daily:{date_key}\", event_type, 1)\n    \n    async def get_agent_metrics(self) -> Dict:\n        date_key = datetime.utcnow().strftime(\"%Y-%m-%d\")\n        daily = await self.redis.hgetall(f\"analytics:daily:{date_key}\")\n        return {\"date\": date_key, \"total_conversations\": int(daily.get(\"conversation_start\", 0)),\n                \"total_messages\": int(daily.get(\"message_sent\", 0)),\n                \"escalations\": int(daily.get(\"escalation\", 0)),\n                \"faq_resolved\": int(daily.get(\"faq_resolved\", 0)),\n                \"tech_resolved\": int(daily.get(\"tech_resolved\", 0))}\n    \n    async def get_weekly_trends(self) -> List[Dict]:\n        trends = []\n        for i in range(7):\n            date = (datetime.utcnow() - timedelta(days=i)).strftime(\"%Y-%m-%d\")\n            data = await self.redis.hgetall(f\"analytics:daily:{date}\")\n            trends.append({\"date\": date, **{k: int(v) for k, v in data.items()}})\n        return trends\n\nanalytics_service = AnalyticsService()",
+              "why": "Redis hash'leri ile günlük metrikler tutulur. hincrby ile atomik sayaçlar. Haftalık trend analizi geçmiş 7 günü gösterir."
+            },
+            {
+              "order": "1.2",
+              "action": "API'ye metrik tracking ekle",
+              "type": "code_modify",
+              "file": "orchestrator/api/conversations.py",
+              "code": "from ..services.analytics import analytics_service\n\n# send_message içinde graph.ainvoke sonrası:\n    await analytics_service.track_event(\"message_sent\", {\"conv_id\": conv_id, \"agent\": result.get(\"current_agent\", \"\")})",
+              "position": "top",
+              "why": "Her mesaj ve çözüm olayını takip ederek agent performansını ölçüyoruz."
+            },
+            {
+              "order": "1.3",
+              "action": "Analytics API endpoint'lerini oluştur",
+              "type": "code_write",
+              "file": "orchestrator/api/analytics.py",
+              "code": "from fastapi import APIRouter\nfrom ..services.analytics import analytics_service\n\nrouter = APIRouter(prefix=\"/api/analytics\", tags=[\"analytics\"])\n\n@router.get(\"/metrics\")\nasync def get_metrics():\n    return await analytics_service.get_agent_metrics()\n\n@router.get(\"/trends\")\nasync def get_trends():\n    return await analytics_service.get_weekly_trends()",
+              "why": "Analytics endpoint'leri dashboard'da performans metriklerini ve trendleri göstermek için kullanılır."
+            },
+            {
+              "order": "1.4",
+              "action": "Analytics API'yi main.py'ye ekle ve test et",
+              "type": "terminal",
+              "command": "curl -s http://localhost:8000/api/analytics/metrics",
+              "expected_output": "{\"date\": \"2026-03-21\", \"total_conversations\": 0, ...}",
+              "why": "Analytics endpoint'inin çalıştığını doğruluyoruz."
+            },
+            {
+              "order": "1.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Metrics endpoint günlük verileri doğru göstermeli. Trends endpoint son 7 günü içermeli. Mesaj gönderildiğinde sayaçlar artmalı.",
+              "why": "Analytics verileri agent iyileştirme döngüsünün temelidir."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── api/\n│   │   ├── conversations.py  ← GÜNCELLENDİ\n│   │   ├── escalation.py\n│   │   ├── dashboard.py\n│   │   └── analytics.py      ← YENİ\n│   ├── services/\n│   │   ├── analytics.py       ← YENİ\n│   │   └── ...\n│   └── main.py               ← GÜNCELLENDİ\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "Redis hincrby TypeError",
+              "cause": "hincrby integer bekler ama string verilmiş.",
+              "fix": "Key değerini kontrol et. Önceden string olarak set edildiyse sil."
+            },
+            {
+              "error": "Analytics verileri sıfır gösteriyor ama konuşmalar var",
+              "cause": "track_event çağrısı endpoint'e eklenmemiş.",
+              "fix": "send_message fonksiyonunda await analytics_service.track_event() çağrısını ekle."
+            }
+          ]
         },
         {
           "step": 2,
           "title": "Conversation Analytics",
           "why": "Pattern analizi ile en sik sorulan sorular, sik escalation edilen konular ve iyilestirme firsatlarini tespit et.",
           "instructions": "Analitikler:\n1. En sik intent categorileri\n2. Ortalama konusma suresi (tur sayisi)\n3. Peak saatleri\n4. Unresolved conversation pattern'leri\n5. Haftalik/aylik trend grafikleri",
-          "checkpoint": "Son 7 gunun analitikleri dogru gosteriliyor mu?"
+          "checkpoint": "Son 7 gunun analitikleri dogru gosteriliyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Intent dağılımı ve ortalama konuşma uzunluğu fonksiyonlarını ekle",
+              "type": "code_modify",
+              "file": "orchestrator/services/analytics.py",
+              "code": "    async def get_intent_distribution(self) -> Dict:\n        events = await self.redis.lrange(\"analytics:events\", 0, 999)\n        intents = {}\n        for e in events:\n            event = json.loads(e)\n            if event[\"type\"] == \"message_sent\":\n                intent = event[\"data\"].get(\"agent\", \"unknown\")\n                intents[intent] = intents.get(intent, 0) + 1\n        return dict(sorted(intents.items(), key=lambda x: x[1], reverse=True))\n    \n    async def get_avg_conversation_length(self) -> float:\n        events = await self.redis.lrange(\"analytics:events\", 0, 999)\n        conv_lengths = {}\n        for e in events:\n            event = json.loads(e)\n            if event[\"type\"] == \"message_sent\":\n                cid = event[\"data\"].get(\"conv_id\", \"\")\n                conv_lengths[cid] = conv_lengths.get(cid, 0) + 1\n        return sum(conv_lengths.values()) / max(len(conv_lengths), 1)",
+              "position": "bottom",
+              "why": "Intent dağılımı en sık sorulan sorun tiplerini gösterir. Ortalama konuşma uzunluğu agent verimliliğinin göstergesidir."
+            },
+            {
+              "order": "2.2",
+              "action": "Analytics endpoint'lerini genişlet",
+              "type": "code_modify",
+              "file": "orchestrator/api/analytics.py",
+              "code": "@router.get(\"/intents\")\nasync def get_intents():\n    return await analytics_service.get_intent_distribution()\n\n@router.get(\"/conversation-length\")\nasync def get_conv_length():\n    avg = await analytics_service.get_avg_conversation_length()\n    return {\"average_messages_per_conversation\": round(avg, 1)}",
+              "position": "bottom",
+              "why": "Pattern analizi ile iyileştirme fırsatları tespit edilir."
+            },
+            {
+              "order": "2.3",
+              "action": "Analytics endpoint'lerini test et",
+              "type": "terminal",
+              "command": "curl -s http://localhost:8000/api/analytics/intents && echo && curl -s http://localhost:8000/api/analytics/conversation-length",
+              "expected_output": "{\"faq\": 5, \"tech\": 3}\n{\"average_messages_per_conversation\": 4.2}",
+              "why": "Analitik verilerin doğru hesaplandığını doğruluyoruz."
+            },
+            {
+              "order": "2.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Intent dağılımı mevcut konuşmaları yansıtmalı. Ortalama konuşma uzunluğu makul olmalı.",
+              "why": "Analitik veriler ile agent performansını sürekli iyileştirme döngüsü kurulabilir."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── api/\n│   │   └── analytics.py      ← GÜNCELLENDİ\n│   ├── services/\n│   │   └── analytics.py      ← GÜNCELLENDİ\n│   └── main.py\n├── gateway/\n├── frontend/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "lrange çok yavaş — binlerce event var",
+              "cause": "Tüm eventleri RAM'e yükleyip filtrelemek verimsiz.",
+              "fix": "Günlük bazda ayrı listeler tut: analytics:events:2026-03-21"
+            },
+            {
+              "error": "Intent dağılımı hep 'unknown' gösteriyor",
+              "cause": "track_event'te agent bilgisi gönderilmemiş.",
+              "fix": "track_event data dict'ine 'agent': result.get('current_agent') ekle."
+            }
+          ]
         },
         {
           "step": 3,
           "title": "WebSocket Integration",
           "why": "Production chat deneyimi icin real-time iletisim sart. REST polling kabul edilemez.",
           "instructions": "WebSocket:\n1. Node.js WS gateway\n2. Connection lifecycle (connect, auth, disconnect)\n3. Message format standardization\n4. Reconnection logic (client-side)\n5. Heartbeat/ping-pong",
-          "checkpoint": "Chat mesajlari aninda iletiyor mu? Baglanti kopunca reconnect calisiyor mu?"
+          "checkpoint": "Chat mesajlari aninda iletiyor mu? Baglanti kopunca reconnect calisiyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Gateway WebSocket server'ı oluştur — connection, heartbeat, message routing",
+              "type": "code_write",
+              "file": "gateway/index.js",
+              "code": "const WebSocket = require('ws');\nconst http = require('http');\nconst { v4: uuidv4 } = require('uuid');\nrequire('dotenv').config();\n\nconst server = http.createServer();\nconst wss = new WebSocket.Server({ server });\nconst ORCHESTRATOR_URL = process.env.ORCHESTRATOR_URL || 'http://localhost:8000';\nconst connections = new Map();\n\nwss.on('connection', (ws) => {\n  const clientId = uuidv4();\n  connections.set(clientId, { ws, convId: null });\n  ws.isAlive = true;\n  ws.on('pong', () => { ws.isAlive = true; });\n  ws.on('message', async (data) => {\n    try {\n      const msg = JSON.parse(data);\n      if (msg.type === 'start_conversation') {\n        const res = await fetch(`${ORCHESTRATOR_URL}/api/conversations`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' });\n        const conv = await res.json();\n        connections.get(clientId).convId = conv.id;\n        ws.send(JSON.stringify({ type: 'conversation_started', data: conv }));\n      } else if (msg.type === 'send_message') {\n        const convId = connections.get(clientId)?.convId;\n        if (!convId) { ws.send(JSON.stringify({type:'error',message:'No conversation'})); return; }\n        const res = await fetch(`${ORCHESTRATOR_URL}/api/conversations/${convId}/messages`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({content: msg.content}) });\n        ws.send(JSON.stringify({ type: 'agent_response', data: await res.json() }));\n      }\n    } catch (err) { ws.send(JSON.stringify({type:'error',message:err.message})); }\n  });\n  ws.on('close', () => connections.delete(clientId));\n});\n\nsetInterval(() => { wss.clients.forEach(ws => { if (!ws.isAlive) return ws.terminate(); ws.isAlive = false; ws.ping(); }); }, 30000);\n\nserver.listen(process.env.PORT || 3001, () => console.log('WS Gateway running'));",
+              "why": "WebSocket gateway Node.js'in event-driven yapısı ile binlerce eşzamanlı bağlantıyı verimli yönetir. Heartbeat kopan bağlantıları tespit eder. Gateway sadece yönlendirme yapar — iş mantığı orchestrator'da."
+            },
+            {
+              "order": "3.2",
+              "action": "Gateway Dockerfile oluştur",
+              "type": "code_write",
+              "file": "gateway/Dockerfile",
+              "code": "FROM node:20-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --only=production\nCOPY . .\nCMD [\"node\", \"index.js\"]",
+              "why": "Alpine imajı küçük boyutludur. npm ci deterministic install yapar."
+            },
+            {
+              "order": "3.3",
+              "action": "Frontend WebSocket custom hook oluştur — reconnection dahil",
+              "type": "code_write",
+              "file": "frontend/src/hooks/useWebSocket.ts",
+              "code": "import { useEffect, useRef, useState, useCallback } from 'react';\n\nexport function useWebSocket(url: string) {\n  const wsRef = useRef<WebSocket | null>(null);\n  const [isConnected, setIsConnected] = useState(false);\n  const [messages, setMessages] = useState<any[]>([]);\n  const reconnectRef = useRef<NodeJS.Timeout>();\n\n  const connect = useCallback(() => {\n    const ws = new WebSocket(url);\n    wsRef.current = ws;\n    ws.onopen = () => setIsConnected(true);\n    ws.onmessage = (e) => setMessages(prev => [...prev, JSON.parse(e.data)]);\n    ws.onclose = () => { setIsConnected(false); reconnectRef.current = setTimeout(connect, 3000); };\n    ws.onerror = (err) => console.error('WS error:', err);\n  }, [url]);\n\n  useEffect(() => { connect(); return () => { clearTimeout(reconnectRef.current); wsRef.current?.close(); }; }, [connect]);\n\n  const send = useCallback((msg: any) => {\n    if (wsRef.current?.readyState === WebSocket.OPEN) wsRef.current.send(JSON.stringify(msg));\n  }, []);\n\n  return { isConnected, messages, send };\n}",
+              "why": "Custom hook WebSocket bağlantısını yönetir. Otomatik reconnection mobilde kritik — bağlantı sık kopar."
+            },
+            {
+              "order": "3.4",
+              "action": "Gateway'i başlat ve WebSocket bağlantısını test et",
+              "type": "terminal",
+              "command": "cd gateway && node index.js",
+              "expected_output": "WS Gateway running",
+              "why": "WebSocket server'ın başladığını ve bağlantı kabul ettiğini doğruluyoruz."
+            },
+            {
+              "order": "3.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "WebSocket bağlantısı kurulmalı. Mesaj gönderildiğinde agent yanıtı gelmeli. Bağlantı kopunca 3 saniye sonra reconnect olmalı. Heartbeat çalışmalı.",
+              "why": "Real-time chat deneyimi için WebSocket stabilitesi kritik."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n├── gateway/\n│   ├── index.js              ← GÜNCELLENDİ\n│   ├── Dockerfile            ← GÜNCELLENDİ\n│   ├── package.json\n│   └── .env\n├── frontend/\n│   └── src/\n│       └── hooks/\n│           └── useWebSocket.ts  ← YENİ\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "WebSocket connection failed: ERR_CONNECTION_REFUSED",
+              "cause": "Gateway server çalışmıyor veya yanlış port.",
+              "fix": "gateway klasöründen node index.js çalıştır. PORT=3001 kontrolü yap."
+            },
+            {
+              "error": "fetch is not defined (Node.js 18 altı)",
+              "cause": "Eski Node.js versiyonunda global fetch yok.",
+              "fix": "Node.js 18+ kullan veya npm install node-fetch ekle."
+            },
+            {
+              "error": "WebSocket sürekli reconnect döngüsünde",
+              "cause": "Server bağlantıyı hemen kapatıyor — genellikle auth hatası.",
+              "fix": "Gateway loglarını kontrol et. ws.on('error') handler'ına detaylı loglama ekle."
+            }
+          ]
         },
         {
           "step": 4,
           "title": "Docker & Production Hardening",
           "why": "Tum servislerin container'da calismasi deployment tutarliligini ve olceklenebilirligini saglar.",
           "instructions": "Production checklist:\n1. Multi-stage Dockerfile (her servis)\n2. docker-compose.prod.yml\n3. Environment variable management\n4. Health checks\n5. Logging (structured JSON)\n6. Rate limiting\n7. Error tracking (Sentry)",
-          "checkpoint": "docker-compose -f docker-compose.prod.yml up ile tum sistem hatasiz calisiyor mu?"
+          "checkpoint": "docker-compose -f docker-compose.prod.yml up ile tum sistem hatasiz calisiyor mu?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Multi-stage production Dockerfile oluştur",
+              "type": "code_write",
+              "file": "orchestrator/Dockerfile.prod",
+              "code": "FROM python:3.11-slim AS builder\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir --user -r requirements.txt\n\nFROM python:3.11-slim\nWORKDIR /app\nCOPY --from=builder /root/.local /root/.local\nCOPY . .\nENV PATH=/root/.local/bin:$PATH\nHEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\"\nCMD [\"uvicorn\", \"main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\", \"--workers\", \"4\"]",
+              "why": "Multi-stage build final image boyutunu küçültür. Health check orchestrator'ın Docker tarafından izlenmesini sağlar. 4 worker production trafiği için."
+            },
+            {
+              "order": "4.2",
+              "action": "docker-compose.prod.yml oluştur — health checks, restart policy, memory limits",
+              "type": "code_write",
+              "file": "docker-compose.prod.yml",
+              "code": "version: '3.8'\nservices:\n  postgres:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: support\n      POSTGRES_USER: admin\n      POSTGRES_PASSWORD: ${DB_PASSWORD}\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    restart: unless-stopped\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U admin']\n      interval: 10s\n      timeout: 5s\n      retries: 5\n  redis:\n    image: redis:7-alpine\n    restart: unless-stopped\n    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru\n  orchestrator:\n    build: {context: ./orchestrator, dockerfile: Dockerfile.prod}\n    environment:\n      - DATABASE_URL=postgresql://admin:${DB_PASSWORD}@postgres:5432/support\n      - REDIS_URL=redis://redis:6379\n      - OPENAI_API_KEY=${OPENAI_API_KEY}\n    depends_on:\n      postgres: {condition: service_healthy}\n    restart: unless-stopped\n  gateway:\n    build: ./gateway\n    environment:\n      - REDIS_URL=redis://redis:6379\n      - ORCHESTRATOR_URL=http://orchestrator:8000\n    depends_on: [orchestrator]\n    restart: unless-stopped\nvolumes:\n  pgdata:",
+              "why": "Production compose health check'ler, restart policy, memory limit'ler ve env var yönetimi içerir."
+            },
+            {
+              "order": "4.3",
+              "action": "Structured JSON logging modülü oluştur",
+              "type": "code_write",
+              "file": "orchestrator/logging_config.py",
+              "code": "import logging, json\nfrom datetime import datetime\n\nclass JSONFormatter(logging.Formatter):\n    def format(self, record):\n        return json.dumps({\"timestamp\": datetime.utcnow().isoformat(), \"level\": record.levelname,\n                          \"message\": record.getMessage(), \"module\": record.module})\n\ndef setup_logging():\n    handler = logging.StreamHandler()\n    handler.setFormatter(JSONFormatter())\n    logging.basicConfig(level=logging.INFO, handlers=[handler])",
+              "why": "Structured JSON logging, production'da log analiz araçları ile uyumludur. Her log satırı parse edilebilir."
+            },
+            {
+              "order": "4.4",
+              "action": "Production build'i test et",
+              "type": "terminal",
+              "command": "docker-compose -f docker-compose.prod.yml build && docker-compose -f docker-compose.prod.yml up -d && docker-compose -f docker-compose.prod.yml ps",
+              "expected_output": "NAME              STATUS\npostgres          Up (healthy)\nredis             Up\norchestrator      Up (healthy)\ngateway           Up",
+              "why": "Production build'in hatasız çalıştığını doğruluyoruz."
+            },
+            {
+              "order": "4.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Tüm servisler hatasız çalışmalı. Health check'ler geçmeli. Structured log formatı JSON olmalı.",
+              "why": "Production deployment öncesi tüm bileşenlerin birlikte çalıştığını doğrulamak kritik."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── orchestrator/\n│   ├── Dockerfile\n│   ├── Dockerfile.prod       ← YENİ\n│   ├── logging_config.py     ← YENİ\n│   ├── agents/\n│   ├── api/\n│   └── services/\n├── gateway/\n├── frontend/\n├── docker-compose.yml\n├── docker-compose.prod.yml   ← YENİ\n└── .env.example",
+          "common_errors": [
+            {
+              "error": "docker-compose build failed — COPY not found",
+              "cause": "Build context yanlış ayarlanmış.",
+              "fix": "docker-compose.yml'de build context'i doğru ayarla: context: ./orchestrator"
+            },
+            {
+              "error": "Health check failing — curl not found",
+              "cause": "Python slim image'da curl yüklü değil.",
+              "fix": "HEALTHCHECK'te python kullan: CMD python -c 'import urllib.request; urllib.request.urlopen(...)'"
+            },
+            {
+              "error": "PostgreSQL password authentication failed",
+              "cause": "Env variable'lar yüklenmiyor.",
+              "fix": "docker-compose.prod.yml yanına .env dosyası oluştur veya --env-file kullan."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Her LLM cagrisini logla — maliyet takibi icin kritik\n2. WebSocket reconnection client'ta ZORUNLU — mobilde baglanti sik kopar\n3. Production'da her zaman structured logging kullan — JSON format\n4. Rate limiting hem API hem WebSocket icin ayri ayri kur",
@@ -394,19 +1698,182 @@
         {
           "title": "Production Build",
           "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
-          "code_snippet": "pnpm build && pnpm test"
+          "code_snippet": "pnpm build && pnpm test",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Frontend production build al",
+              "type": "terminal",
+              "command": "cd frontend && npm run build",
+              "expected_output": "vite v5.x.x building for production...\n✓ built in X.XXs",
+              "why": "Production build kodu minify eder, tree-shaking yapar ve optimize eder."
+            },
+            {
+              "order": "1.2",
+              "action": "Build çıktısını kontrol et",
+              "type": "terminal",
+              "command": "ls -la frontend/dist/ && du -sh frontend/dist/",
+              "expected_output": "dist/\n├── assets/\n└── index.html\nTotal: ~500KB",
+              "why": "Build çıktısının boyutunu kontrol ediyoruz. 1MB'dan büyükse code splitting gerekebilir."
+            },
+            {
+              "order": "1.3",
+              "action": "Tüm API endpoint'lerini test et",
+              "type": "terminal",
+              "command": "curl -s http://localhost:8000/health && curl -s http://localhost:8000/api/analytics/metrics",
+              "expected_output": "{\"status\":\"ok\"}\n{\"date\":\"...\"}",
+              "why": "Deploy öncesi tüm endpoint'lerin çalıştığını doğrulamak kritik."
+            },
+            {
+              "order": "1.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Frontend build hatasız tamamlanmalı. Tüm API endpoint'leri çalışmalı. Build boyutu < 2MB olmalı.",
+              "why": "Production'a deploy etmeden önce her şeyin çalıştığından emin ol."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── frontend/\n│   ├── dist/                  ← YENİ (build çıktısı)\n│   │   ├── assets/\n│   │   └── index.html\n│   └── src/\n├── orchestrator/\n├── gateway/\n└── docker-compose.prod.yml",
+          "common_errors": [
+            {
+              "error": "Build failed: TypeScript type errors",
+              "cause": "TypeScript tip hataları production build'de katı kontrol edilir.",
+              "fix": "Hata mesajlarını oku ve tipleri düzelt. Acil: tsconfig.json'da strict: false (geçici çözüm)."
+            },
+            {
+              "error": "Build çıktısı çok büyük (> 5MB)",
+              "cause": "Gereksiz bağımlılıklar bundle'a dahil olmuş.",
+              "fix": "npx vite-bundle-analyzer ile büyük kütüphaneleri bul. Code splitting ve lazy loading uygula."
+            }
+          ]
         },
         {
           "title": "Deploy",
-          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et"
+          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Neon PostgreSQL ve Upstash Redis oluştur",
+              "type": "explain",
+              "why": "Serverless veritabanları otomatik ölçeklenir ve bakım gerektirmez. Ücretsiz tier ile başlanabilir."
+            },
+            {
+              "order": "2.2",
+              "action": "Railway'de orchestrator deploy et",
+              "type": "terminal",
+              "command": "cd orchestrator && railway up",
+              "expected_output": "Deploying... Done!\nService URL: https://xxx.railway.app",
+              "why": "Railway Docker container'larını kolayca deploy eder. Env var'lar dashboard'dan ayarlanır."
+            },
+            {
+              "order": "2.3",
+              "action": "Railway'de gateway deploy et",
+              "type": "terminal",
+              "command": "cd gateway && railway up",
+              "expected_output": "Deploying... Done!\nService URL: wss://xxx.railway.app",
+              "why": "Gateway ayrı servis olarak deploy edilir — WebSocket bağlantıları için dedicated instance gerekir."
+            },
+            {
+              "order": "2.4",
+              "action": "Vercel'e frontend deploy et",
+              "type": "terminal",
+              "command": "cd frontend && pnpm dlx vercel --yes",
+              "expected_output": "Deployed to: https://multi-agent-support.vercel.app",
+              "why": "Vercel, React uygulamaları için en kolay deployment platformu. Otomatik HTTPS ve CDN sağlar."
+            },
+            {
+              "order": "2.5",
+              "action": "Tüm servislerin çalıştığını doğrula",
+              "type": "validate",
+              "validation": "Frontend URL açılmalı. WebSocket bağlantısı kurulmalı. Mesaj gönderildiğinde agent yanıt vermeli. Tüm env var'lar doğru ayarlanmalı.",
+              "why": "Deploy sonrası smoke test ile production ortamında her şeyin çalıştığını doğruluyoruz."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── frontend/          → Vercel'de deploy\n├── orchestrator/      → Railway'de deploy\n├── gateway/           → Railway'de deploy\n├── docker-compose.yml\n└── .env.example",
+          "common_errors": [
+            {
+              "error": "Railway deploy failed — Dockerfile not found",
+              "cause": "Railway kök dizinde Dockerfile arıyor ama servis alt dizinde.",
+              "fix": "Railway dashboard'da Root Directory ayarını orchestrator/ veya gateway/ olarak değiştir."
+            },
+            {
+              "error": "WebSocket production'da çalışmıyor",
+              "cause": "wss:// yerine ws:// kullanılıyor veya CORS eksik.",
+              "fix": "Production'da wss:// kullan. VITE_WS_URL'i wss://gateway-url.railway.app yap."
+            }
+          ]
         },
         {
           "title": "Profesyonel README",
-          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz"
+          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "README.md dosyasını oluştur",
+              "type": "file_open",
+              "file": "README.md",
+              "why": "Profesyonel README, projenin ilk izlenimini belirler. Recruiter ve hiring manager ilk olarak README'ye bakar."
+            },
+            {
+              "order": "3.2",
+              "action": "README içeriğini yaz — badges, features, tech stack, getting started",
+              "type": "code_write",
+              "file": "README.md",
+              "code": "# Multi-Agent Customer Support System\n\n> AI-powered customer support with LangGraph orchestration, 4 specialized agents, real-time WebSocket chat, and human handoff.\n\n## Features\n- 4 Specialized Agents (Router, FAQ, Tech Support, Escalation)\n- LangGraph State Machine Orchestration\n- Real-time WebSocket Chat\n- RAG Knowledge Base with Hybrid Retrieval\n- Human Handoff with Full Context Transfer\n- Analytics Dashboard\n\n## Tech Stack\n| Layer | Technologies |\n|-------|-------------|\n| Frontend | React, TypeScript |\n| Gateway | Node.js, WebSocket |\n| Orchestrator | FastAPI, LangGraph, LangChain |\n| Database | PostgreSQL, Redis, ChromaDB |\n\n## Getting Started\ngit clone, docker-compose up, env vars\n\n## Architecture\n[Mimari diyagram]\n\n## License\nMIT",
+              "why": "README badge'ler, screenshot'lar, kurulum talimatları ve mimari diyagram içermelidir."
+            },
+            {
+              "order": "3.3",
+              "action": "Screenshot'lar ekle",
+              "type": "validate",
+              "validation": "En az 3 screenshot ekle: chat UI, agent routing, analytics dashboard. README'de görseller görünmeli.",
+              "why": "Görsel içerik README'yi çok daha etkili yapar. Recruiter'lar genellikle kodu okumaz, screenshot'lara bakar."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── README.md                  ← YENİ\n├── docs/\n│   └── screenshots/           ← YENİ\n│       ├── chat-ui.png\n│       ├── dashboard.png\n│       └── architecture.png\n├── frontend/\n├── orchestrator/\n├── gateway/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "README'deki resimler GitHub'da görünmüyor",
+              "cause": "Resim yolları yanlış veya dosyalar commit edilmemiş.",
+              "fix": "Göreceli yol kullan: ![Screenshot](./docs/screenshots/chat-ui.png). git add ile ekle."
+            },
+            {
+              "error": "Badge'ler kırık görünüyor",
+              "cause": "shields.io URL'leri yanlış formatlanmış.",
+              "fix": "shields.io'da badge URL'ini oluştur ve doğru format kullan."
+            }
+          ]
         },
         {
           "title": "Demo Video (Opsiyonel)",
-          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla"
+          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Demo senaryosu hazırla",
+              "type": "explain",
+              "why": "Demo video 2-3 dakikayı geçmemeli. Senaryo: 1) Chat arayüzü, 2) FAQ sorusu, 3) Teknik sorun, 4) Escalation akışı, 5) Dashboard metrikleri."
+            },
+            {
+              "order": "4.2",
+              "action": "Ekran kaydı al ve README'ye ekle",
+              "type": "validate",
+              "validation": "OBS Studio veya Loom ile 2-3 dakikalık kayıt al. GIF olarak README'ye ekle veya YouTube'a yükle.",
+              "why": "Demo video projenin canlı çalışmasını gösterir. GIF formatı tıklama gerektirmez — en etkili yöntem."
+            }
+          ],
+          "folder_structure_after": "multi-agent-support/\n├── README.md\n├── docs/\n│   ├── screenshots/\n│   └── demo.gif               ← YENİ (opsiyonel)\n├── frontend/\n├── orchestrator/\n├── gateway/\n└── docker-compose.yml",
+          "common_errors": [
+            {
+              "error": "GIF dosyası çok büyük (> 10MB)",
+              "cause": "Ekran kaydı çok uzun veya çözünürlük yüksek.",
+              "fix": "ffmpeg ile optimize et: ffmpeg -i demo.mp4 -vf 'fps=10,scale=800:-1' -loop 0 demo.gif"
+            },
+            {
+              "error": "Demo sırasında API hatası oluyor",
+              "cause": "Demo ortamı hazır değil veya API key süresi dolmuş.",
+              "fix": "Demo öncesi tüm servisleri başlat ve test et. Seed data ile önceden konuşma oluştur."
+            }
+          ]
         }
       ],
       "checkpoint": "Proje canli URL'den erisilebilir, README profesyonel, screenshot'lar ekli, GitHub repo public"

@@ -64,6 +64,27 @@ def parse_directive(block: str) -> dict:
         section["type"] = "comparison"
         section["content"] = body
 
+    # Special parsing for architecture diagrams
+    if dtype == "architecture":
+        section["type"] = "architecture"
+        # First line of body can be description (non-code line)
+        body_lines = body.split("\n")
+        desc_lines = []
+        diagram_lines = []
+        in_diagram = False
+        for line in body_lines:
+            if not in_diagram and (line.startswith("┌") or line.startswith("╔") or line.startswith("+") or line.startswith("│") or line.startswith("║") or line.startswith("|") or line.startswith("[") or line.strip().startswith("Client")):
+                in_diagram = True
+            if in_diagram:
+                diagram_lines.append(line)
+            else:
+                desc_lines.append(line)
+        if diagram_lines:
+            section["description"] = "\n".join(desc_lines).strip()
+            section["content"] = "\n".join(diagram_lines)
+        if label:
+            section["title"] = label
+
     return section
 
 

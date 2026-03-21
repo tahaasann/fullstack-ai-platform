@@ -5,13 +5,14 @@ import { getProject, startProject, toggleMilestone } from '../api/client';
 import type { ProjectDetail, Milestone } from '../types';
 import BookmarkButton from '../components/common/BookmarkButton';
 import MarkdownRenderer from '../components/common/MarkdownRenderer';
+import SubstepRenderer from '../components/project/SubstepRenderer';
 
 interface MilestoneDetail {
   id: string;
   estimated_hours?: number;
   overview?: string;
   concepts_covered?: string[];
-  steps?: { step: number; title: string; why?: string; instructions?: string; code_snippet?: string; deep_dive?: string; checkpoint?: string }[];
+  steps?: { step: number; title: string; why?: string; instructions?: string; code_snippet?: string; deep_dive?: string; checkpoint?: string; substeps?: any[]; folder_structure_after?: string; common_errors?: { error: string; cause: string; fix: string }[] }[];
   must_note?: string;
   senior_learns?: string;
 }
@@ -305,14 +306,21 @@ export default function ProjectPage() {
                         )}
                       </div>
 
-                      {step.instructions && (
-                        <MarkdownRenderer content={step.instructions} className="text-sm" />
-                      )}
+                      {/* Substeps (build-along format) */}
+                      {step.substeps && step.substeps.length > 0 ? (
+                        <SubstepRenderer step={step} />
+                      ) : (
+                        <>
+                          {step.instructions && (
+                            <MarkdownRenderer content={step.instructions} className="text-sm" />
+                          )}
 
-                      {step.code_snippet && (
-                        <pre className="bg-gray-800/70 rounded-lg p-4 text-xs text-gray-300 font-mono overflow-x-auto">
-                          {step.code_snippet}
-                        </pre>
+                          {step.code_snippet && (
+                            <pre className="bg-gray-800/70 rounded-lg p-4 text-xs text-gray-300 font-mono overflow-x-auto">
+                              {step.code_snippet}
+                            </pre>
+                          )}
+                        </>
                       )}
 
                       {step.deep_dive && (

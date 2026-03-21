@@ -164,7 +164,89 @@
           "instructions": "pnpm init ile root package.json oluştur. pnpm-workspace.yaml dosyası oluştur (packages: ['packages/*'] tanımı ile) — bu dosya pnpm'e monorepo yapısını bildirir. packages/api ve packages/dashboard dizinleri oluştur. Concurrently ile iki servisi aynı anda başlat.",
           "code_snippet": "// package.json\n{\n  \"scripts\": {\n    \"dev\": \"concurrently \\\"pnpm run dev:api\\\" \\\"pnpm run dev:dashboard\\\"\",\n    \"dev:api\": \"cd packages/api && pnpm run dev\",\n    \"dev:dashboard\": \"cd packages/dashboard && pnpm run dev\"\n  }\n}",
           "deep_dive": "Monorepo vs polyrepo: Küçük-orta projelerde monorepo daha pratik. Büyük organizasyonlarda (100+ developer) polyrepo tercih edilir. Turborepo ve Nx gibi araçlar monorepo yönetimini kolaylaştırır.",
-          "checkpoint": "pnpm run dev komutu ile hem API hem dashboard aynı anda başlıyor mu?"
+          "checkpoint": "pnpm run dev komutu ile hem API hem dashboard aynı anda başlıyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Proje kök dizinini oluştur",
+              "type": "terminal",
+              "command": "mkdir analytics-dashboard && cd analytics-dashboard",
+              "expected_output": "Klasör oluşturuldu",
+              "why": "Projenin tüm dosyalarını barındıracak ana dizini oluşturuyoruz. Temiz bir başlangıç noktası sağlar."
+            },
+            {
+              "order": "1.2",
+              "action": "pnpm ile root package.json oluştur",
+              "type": "terminal",
+              "command": "pnpm init",
+              "expected_output": "Wrote to /path/to/analytics-dashboard/package.json",
+              "why": "pnpm init komutu projenin kök package.json dosyasını oluşturur. Monorepo yönetimi için ana manifest dosyası bu."
+            },
+            {
+              "order": "1.3",
+              "action": "pnpm-workspace.yaml dosyasını oluştur",
+              "type": "file_open",
+              "file": "pnpm-workspace.yaml",
+              "why": "Bu dosya pnpm'e monorepo yapısını bildirir. packages dizini altındaki tüm alt paketleri tanımasını sağlar."
+            },
+            {
+              "order": "1.4",
+              "action": "Workspace konfigürasyonunu yaz",
+              "type": "code_write",
+              "file": "pnpm-workspace.yaml",
+              "code": "packages:\n  - \"packages/*\"",
+              "why": "packages/* pattern'ı ile packages/ altındaki her klasörü bağımsız bir paket olarak tanımlıyoruz. pnpm bu sayede her paketin bağımlılıklarını ayrı yönetir."
+            },
+            {
+              "order": "1.5",
+              "action": "Alt paket dizinlerini oluştur",
+              "type": "terminal",
+              "command": "mkdir -p packages/api packages/dashboard",
+              "expected_output": "Dizinler oluşturuldu",
+              "why": "API (Express backend) ve dashboard (React frontend) için ayrı paket dizinleri oluşturuyoruz. Her biri bağımsız package.json'a sahip olacak."
+            },
+            {
+              "order": "1.6",
+              "action": "Root package.json'a script'leri ekle",
+              "type": "code_write",
+              "file": "package.json",
+              "code": "{\n  \"name\": \"analytics-dashboard\",\n  \"private\": true,\n  \"scripts\": {\n    \"dev\": \"concurrently \\\"pnpm run dev:api\\\" \\\"pnpm run dev:dashboard\\\"\",\n    \"dev:api\": \"cd packages/api && pnpm run dev\",\n    \"dev:dashboard\": \"cd packages/dashboard && pnpm run dev\"\n  }\n}",
+              "why": "concurrently paketi ile hem API hem dashboard'u tek komutla başlatıyoruz. Geliştirme sırasında iki terminal açmaya gerek kalmaz."
+            },
+            {
+              "order": "1.7",
+              "action": "concurrently paketini kur",
+              "type": "terminal",
+              "command": "pnpm add -D concurrently -w",
+              "expected_output": "devDependencies:\n+ concurrently",
+              "why": "concurrently birden fazla komutu paralel çalıştırır. -w flag'i root workspace'e kurulmasını sağlar."
+            },
+            {
+              "order": "1.8",
+              "action": "Kurulumu doğrula",
+              "type": "validate",
+              "validation": "pnpm-workspace.yaml dosyasının var olduğunu ve packages/api, packages/dashboard dizinlerinin oluşturulduğunu kontrol et. ls packages/ komutu ile iki klasörü görmelisin.",
+              "why": "Her adımdan sonra doğrulama yapmak, ileride hata bulmayı kolaylaştırır."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   └── dashboard/\n├── package.json\n├── pnpm-lock.yaml\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "ERR_PNPM_ADDING_TO_ROOT",
+              "cause": "pnpm monorepo'da root'a paket eklerken -w flag'i kullanılmamış.",
+              "fix": "pnpm add -D concurrently -w komutu ile -w (workspace root) flag'ini ekle."
+            },
+            {
+              "error": "pnpm-workspace.yaml parse error",
+              "cause": "YAML dosyasındaki indentation (girinti) hatalı. YAML tab karakteri kabul etmez.",
+              "fix": "Dosyayı 2 boşluk indentation ile yeniden yaz. Tab kullanma, sadece space kullan."
+            },
+            {
+              "error": "concurrently: command not found",
+              "cause": "concurrently paketi kurulmamış veya yanlış konuma kurulmuş.",
+              "fix": "pnpm add -D concurrently -w ile root workspace'e kur. Sonra pnpm run dev ile çalıştır."
+            }
+          ]
         },
         {
           "step": 2,
@@ -173,7 +255,89 @@
           "instructions": "metrics tablosu oluştur: id, source, metric_name, value, timestamp, metadata (JSONB). Timestamp üzerinde index oluştur. Partition by range (monthly) ekle.",
           "code_snippet": "-- migrations/001_create_metrics.sql\nCREATE TABLE metrics (\n  id BIGSERIAL PRIMARY KEY,\n  source VARCHAR(100) NOT NULL,\n  metric_name VARCHAR(200) NOT NULL,\n  value DOUBLE PRECISION NOT NULL,\n  timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n  metadata JSONB DEFAULT '{}',\n  -- Composite index for common queries\n  CONSTRAINT idx_source_metric_time\n    UNIQUE (source, metric_name, timestamp)\n);\n\n-- Time-based index for range queries\nCREATE INDEX idx_metrics_timestamp\n  ON metrics (timestamp DESC);\n\n-- Source filtering index\nCREATE INDEX idx_metrics_source\n  ON metrics (source, timestamp DESC);",
           "deep_dive": "TIMESTAMPTZ kullanımı: Timezone-aware timestamp kullan, TIMESTAMP kullanma. Global kullanıcılar farklı timezone'larda olabilir. PostgreSQL TIMESTAMPTZ'yi UTC olarak saklar ve sorgu zamanında timezone dönüşümü yapar.",
-          "checkpoint": "psql ile metrics tablosuna test verisi ekleyip timestamp range query yapabiliyor musun?"
+          "checkpoint": "psql ile metrics tablosuna test verisi ekleyip timestamp range query yapabiliyor musun?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "PostgreSQL veritabanını oluştur",
+              "type": "terminal",
+              "command": "createdb analytics_dashboard",
+              "expected_output": "Veritabanı oluşturuldu (çıktı yok ise başarılı)",
+              "why": "Dashboard verilerini saklayacak PostgreSQL veritabanını oluşturuyoruz. Her proje kendi veritabanına sahip olmalı."
+            },
+            {
+              "order": "2.2",
+              "action": "Migrations dizinini oluştur",
+              "type": "terminal",
+              "command": "mkdir -p packages/api/migrations",
+              "expected_output": "Dizin oluşturuldu",
+              "why": "Veritabanı şema değişikliklerini migration dosyalarında takip etmek profesyonel bir pratiktir. Versiyon kontrollü şema yönetimi sağlar."
+            },
+            {
+              "order": "2.3",
+              "action": "İlk migration dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/api/migrations/001_create_metrics.sql",
+              "why": "SQL migration dosyası veritabanı şemasını kod olarak tanımlar. Bu sayede şema değişiklikleri git ile takip edilir."
+            },
+            {
+              "order": "2.4",
+              "action": "Metrics tablosu SQL'ini yaz",
+              "type": "code_write",
+              "file": "packages/api/migrations/001_create_metrics.sql",
+              "code": "CREATE TABLE metrics (\n  id BIGSERIAL PRIMARY KEY,\n  source VARCHAR(100) NOT NULL,\n  metric_name VARCHAR(200) NOT NULL,\n  value DOUBLE PRECISION NOT NULL,\n  timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n  metadata JSONB DEFAULT '{}',\n  CONSTRAINT idx_source_metric_time\n    UNIQUE (source, metric_name, timestamp)\n);\n\nCREATE INDEX idx_metrics_timestamp\n  ON metrics (timestamp DESC);\n\nCREATE INDEX idx_metrics_source\n  ON metrics (source, timestamp DESC);",
+              "why": "BIGSERIAL büyük veri setleri için uygun. TIMESTAMPTZ timezone-aware timestamp saklar — global kullanıcılar için şart. JSONB esnek metadata depolama sağlar. Composite UNIQUE constraint tekrarlanan veri girişini önler."
+            },
+            {
+              "order": "2.5",
+              "action": "Migration'ı çalıştır",
+              "type": "terminal",
+              "command": "psql -d analytics_dashboard -f packages/api/migrations/001_create_metrics.sql",
+              "expected_output": "CREATE TABLE\nCREATE INDEX\nCREATE INDEX",
+              "why": "SQL dosyasını PostgreSQL'de çalıştırarak tabloyu ve index'leri oluşturuyoruz."
+            },
+            {
+              "order": "2.6",
+              "action": "Tabloyu doğrula",
+              "type": "terminal",
+              "command": "psql -d analytics_dashboard -c \"\\d metrics\"",
+              "expected_output": "Table \"public.metrics\" ile sütun listesi görünmeli",
+              "why": "Tablonun doğru oluşturulduğunu doğrulamak için PostgreSQL'in describe komutunu kullanıyoruz."
+            },
+            {
+              "order": "2.7",
+              "action": "Test verisi ekleyip sorgula",
+              "type": "terminal",
+              "command": "psql -d analytics_dashboard -c \"INSERT INTO metrics (source, metric_name, value) VALUES ('web-app', 'cpu_usage', 45.2); SELECT * FROM metrics;\"",
+              "expected_output": "INSERT 0 1 ve eklenen satır görünmeli",
+              "why": "Tabloya test verisi ekleyip sorgulayarak şemanın doğru çalıştığını kanıtlıyoruz."
+            },
+            {
+              "order": "2.8",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "psql ile metrics tablosunda test verisi görünmeli. timestamp otomatik olarak NOW() ile dolmuş olmalı. Index'ler \\di komutu ile listelenebilmeli.",
+              "why": "Schema doğru çalışmazsa ileride aggregation sorguları hata verir. Şimdi doğrulamak zaman kazandırır."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   └── migrations/\n│   │       └── 001_create_metrics.sql\n│   └── dashboard/\n├── package.json\n├── pnpm-lock.yaml\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "FATAL: database \"analytics_dashboard\" does not exist",
+              "cause": "createdb komutu çalıştırılmamış veya farklı isimle oluşturulmuş.",
+              "fix": "createdb analytics_dashboard komutu ile veritabanını oluştur. PostgreSQL servisinin çalıştığından emin ol."
+            },
+            {
+              "error": "ERROR: relation \"metrics\" already exists",
+              "cause": "Migration dosyası daha önce çalıştırılmış.",
+              "fix": "DROP TABLE IF EXISTS metrics; ekleyerek migration'ı yeniden çalıştır veya CREATE TABLE IF NOT EXISTS kullan."
+            },
+            {
+              "error": "psql: command not found",
+              "cause": "PostgreSQL client araçları PATH'e eklenmemiş.",
+              "fix": "PostgreSQL'i kur ve bin dizinini PATH'e ekle. Windows'ta: C:\\Program Files\\PostgreSQL\\16\\bin"
+            }
+          ]
         },
         {
           "step": 3,
@@ -182,7 +346,128 @@
           "instructions": "GET /api/metrics endpoint'i oluştur. Query parametreleri: source, metric_name, from, to, interval (1h, 1d, 1w). PostgreSQL date_trunc ile aggregation yap.",
           "code_snippet": "// routes/metrics.ts\n\n// date_trunc PostgreSQL uyumlu interval değerleri gerektirir\n// Kullanıcı dostu kısaltmaları PostgreSQL formatına çeviriyoruz\nconst INTERVAL_MAP: Record<string, string> = {\n  '1h': 'hour',\n  '1d': 'day',\n  '1w': 'week',\n  '1m': 'month',\n};\n\nrouter.get('/metrics', async (req, res) => {\n  const { source, metric, from, to, interval = '1h' } = req.query;\n  \n  const pgInterval = INTERVAL_MAP[interval as string];\n  if (!pgInterval) {\n    return res.status(400).json({ error: `Geçersiz interval: ${interval}. Desteklenen: ${Object.keys(INTERVAL_MAP).join(', ')}` });\n  }\n  \n  const result = await pool.query(`\n    SELECT \n      date_trunc($1, timestamp) as bucket,\n      AVG(value) as avg_value,\n      MIN(value) as min_value,\n      MAX(value) as max_value,\n      COUNT(*) as count\n    FROM metrics\n    WHERE source = $2\n      AND metric_name = $3\n      AND timestamp BETWEEN $4 AND $5\n    GROUP BY bucket\n    ORDER BY bucket ASC\n  `, [pgInterval, source, metric, from, to]);\n  \n  res.json(result.rows);\n});",
           "deep_dive": "date_trunc PostgreSQL'in en güçlü time-series fonksiyonlarından biri. '1 hour', '1 day', '1 week' gibi interval'ler destekler. Milyonlarca satırı saniyeler içinde aggregate eder.",
-          "checkpoint": "curl ile /api/metrics endpoint'ini çağırıp aggregated veri alabiliyor musun?"
+          "checkpoint": "curl ile /api/metrics endpoint'ini çağırıp aggregated veri alabiliyor musun?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "API paketini başlat",
+              "type": "terminal",
+              "command": "cd packages/api && pnpm init",
+              "expected_output": "Wrote to packages/api/package.json",
+              "why": "API paketi kendi package.json'ına sahip olacak. Monorepo yapısında her paket bağımsız bağımlılık yönetimine sahiptir."
+            },
+            {
+              "order": "3.2",
+              "action": "Express ve bağımlılıkları kur",
+              "type": "terminal",
+              "command": "cd packages/api && pnpm add express pg dotenv cors && pnpm add -D typescript ts-node @types/express @types/cors @types/pg nodemon",
+              "expected_output": "dependencies:\n+ express\n+ pg\n+ dotenv\n+ cors",
+              "why": "Express web framework, pg PostgreSQL client, dotenv ortam değişkenleri, cors cross-origin istekler için. TypeScript ve nodemon geliştirme araçları."
+            },
+            {
+              "order": "3.3",
+              "action": "TypeScript konfigürasyonunu oluştur",
+              "type": "file_open",
+              "file": "packages/api/tsconfig.json",
+              "why": "TypeScript derleyici ayarlarını tanımlıyoruz. strict mod ile tip güvenliği maksimum seviyede olacak."
+            },
+            {
+              "order": "3.4",
+              "action": "tsconfig.json içeriğini yaz",
+              "type": "code_write",
+              "file": "packages/api/tsconfig.json",
+              "code": "{\n  \"compilerOptions\": {\n    \"target\": \"ES2020\",\n    \"module\": \"commonjs\",\n    \"outDir\": \"./dist\",\n    \"rootDir\": \"./src\",\n    \"strict\": true,\n    \"esModuleInterop\": true,\n    \"resolveJsonModule\": true\n  },\n  \"include\": [\"src/**/*\"]\n}",
+              "why": "target ES2020 modern JavaScript özelliklerini destekler. strict mod tüm tip kontrollerini aktif eder. esModuleInterop CommonJS modüllerini ES modül sözdizimi ile import etmeyi sağlar."
+            },
+            {
+              "order": "3.5",
+              "action": "Kaynak kod dizinini ve route dizinini oluştur",
+              "type": "terminal",
+              "command": "mkdir -p packages/api/src/routes",
+              "expected_output": "Dizinler oluşturuldu",
+              "why": "src/ altında kaynak kodlar, routes/ altında API endpoint tanımları yer alacak. Bu yapı Express projelerinde standart."
+            },
+            {
+              "order": "3.6",
+              "action": "Express sunucu giriş dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/api/src/index.ts",
+              "why": "Express uygulamasının başlangıç noktası. Middleware'ler, route'lar ve veritabanı bağlantısı burada yapılandırılır."
+            },
+            {
+              "order": "3.7",
+              "action": "Express sunucu kodunu yaz",
+              "type": "code_write",
+              "file": "packages/api/src/index.ts",
+              "code": "import express from 'express';\nimport cors from 'cors';\nimport { Pool } from 'pg';\nimport dotenv from 'dotenv';\n\ndotenv.config();\n\nconst app = express();\nexport const pool = new Pool({ connectionString: process.env.DATABASE_URL });\n\napp.use(cors());\napp.use(express.json());\n\napp.get('/health', (req, res) => res.json({ status: 'ok' }));\n\nconst PORT = process.env.PORT || 4000;\napp.listen(PORT, () => console.log(`API running on port ${PORT}`));\n\nexport { app };",
+              "why": "Pool singleton pattern'ı ile veritabanı bağlantı havuzu yönetiliyor. Health endpoint monitoring için gerekli. dotenv ile ortam değişkenleri yükleniyor."
+            },
+            {
+              "order": "3.8",
+              "action": "Metrics route dosyasını oluştur ve kodunu yaz",
+              "type": "code_write",
+              "file": "packages/api/src/routes/metrics.ts",
+              "code": "import { Router } from 'express';\nimport { pool } from '../index';\n\nconst router = Router();\n\nconst INTERVAL_MAP: Record<string, string> = {\n  '1h': 'hour',\n  '1d': 'day',\n  '1w': 'week',\n  '1m': 'month',\n};\n\nrouter.get('/metrics', async (req, res) => {\n  const { source, metric, from, to, interval = '1h' } = req.query;\n  const pgInterval = INTERVAL_MAP[interval as string];\n  if (!pgInterval) {\n    return res.status(400).json({\n      error: `Geçersiz interval: ${interval}. Desteklenen: ${Object.keys(INTERVAL_MAP).join(', ')}`\n    });\n  }\n  const result = await pool.query(\n    `SELECT date_trunc($1, timestamp) as bucket, AVG(value) as avg_value,\n     MIN(value) as min_value, MAX(value) as max_value, COUNT(*) as count\n     FROM metrics WHERE source = $2 AND metric_name = $3\n     AND timestamp BETWEEN $4 AND $5\n     GROUP BY bucket ORDER BY bucket ASC`,\n    [pgInterval, source, metric, from, to]\n  );\n  res.json(result.rows);\n});\n\nexport default router;",
+              "why": "date_trunc PostgreSQL'in time-series aggregation için en güçlü fonksiyonu. Parametreli sorgular ($1, $2...) SQL injection'a karşı koruma sağlar. INTERVAL_MAP kullanıcı dostu kısaltmaları PostgreSQL formatına çevirir."
+            },
+            {
+              "order": "3.9",
+              "action": ".env dosyasını oluştur",
+              "type": "code_write",
+              "file": "packages/api/.env",
+              "code": "DATABASE_URL=postgresql://localhost:5432/analytics_dashboard\nPORT=4000",
+              "why": "Ortam değişkenlerini .env dosyasında tutmak güvenlik best practice'idir. Veritabanı bağlantı bilgisi kod içinde hardcode edilmemeli."
+            },
+            {
+              "order": "3.10",
+              "action": "package.json'a dev script ekle",
+              "type": "code_modify",
+              "file": "packages/api/package.json",
+              "code": "\"scripts\": {\n  \"dev\": \"nodemon --exec ts-node src/index.ts\",\n  \"build\": \"tsc\",\n  \"start\": \"node dist/index.js\"\n}",
+              "why": "nodemon dosya değişikliklerinde otomatik restart yapar. ts-node TypeScript dosyalarını derleme adımı olmadan çalıştırır."
+            },
+            {
+              "order": "3.11",
+              "action": "API'yi başlat ve test et",
+              "type": "terminal",
+              "command": "cd packages/api && pnpm run dev",
+              "expected_output": "API running on port 4000",
+              "why": "API sunucusunun sorunsuz başladığını doğruluyoruz."
+            },
+            {
+              "order": "3.12",
+              "action": "Endpoint'i curl ile test et",
+              "type": "terminal",
+              "command": "curl http://localhost:4000/health",
+              "expected_output": "{\"status\":\"ok\"}",
+              "why": "Health check endpoint'inin çalıştığını doğruluyoruz. Bu endpoint monitoring araçları tarafından kullanılır."
+            },
+            {
+              "order": "3.13",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "curl http://localhost:4000/health komutu {\"status\":\"ok\"} döndürmeli. /api/metrics endpoint'i parametre eksikliğinde hata mesajı döndürmeli.",
+              "why": "Health check ve error handling'in çalıştığını doğrulamak production readiness için kritik."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── src/\n│   │   │   ├── routes/\n│   │   │   │   └── metrics.ts\n│   │   │   └── index.ts\n│   │   ├── migrations/\n│   │   │   └── 001_create_metrics.sql\n│   │   ├── .env\n│   │   ├── package.json\n│   │   └── tsconfig.json\n│   └── dashboard/\n├── package.json\n├── pnpm-lock.yaml\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "Error: connect ECONNREFUSED 127.0.0.1:5432",
+              "cause": "PostgreSQL servisi çalışmıyor veya bağlantı bilgileri yanlış.",
+              "fix": "PostgreSQL servisini başlat. DATABASE_URL ortam değişkenini kontrol et. Port'un doğru olduğundan emin ol."
+            },
+            {
+              "error": "TypeError: Cannot read property 'query' of undefined",
+              "cause": "Pool nesnesi doğru oluşturulmamış veya export/import hatası var.",
+              "fix": "pool nesnesinin index.ts'den doğru export edildiğini ve routes dosyasında doğru import edildiğini kontrol et."
+            },
+            {
+              "error": "ts-node: command not found",
+              "cause": "ts-node paketi kurulmamış veya PATH'te değil.",
+              "fix": "pnpm add -D ts-node typescript ile kur. npx ts-node ile de çalıştırabilirsin."
+            }
+          ]
         },
         {
           "step": 4,
@@ -191,7 +476,89 @@
           "instructions": "Vite + React + TypeScript projesi oluştur. Recharts ve react-grid-layout kur. DashboardLayout component'i oluştur. ChartWidget wrapper component'i yaz.",
           "code_snippet": "// components/ChartWidget.tsx\nimport { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';\n\ninterface ChartWidgetProps {\n  title: string;\n  data: Array<{ bucket: string; avg_value: number }>;\n  color?: string;\n}\n\nexport function ChartWidget({ title, data, color = '#8884d8' }: ChartWidgetProps) {\n  return (\n    <div className=\"bg-gray-800 rounded-lg shadow p-4\">\n      <h3 className=\"text-sm font-medium text-gray-300 mb-2\">{title}</h3>\n      <ResponsiveContainer width=\"100%\" height={200}>\n        <LineChart data={data}>\n          <XAxis dataKey=\"bucket\" />\n          <YAxis />\n          <Tooltip />\n          <Line type=\"monotone\" dataKey=\"avg_value\" stroke={color} dot={false} />\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}",
           "deep_dive": "ResponsiveContainer Recharts'ın en önemli component'i — parent container boyutuna göre otomatik resize yapar. Width ve height'ı percentage olarak ver, pixel kullanma.",
-          "checkpoint": "Dashboard sayfası açılıyor ve mock veriyle bir line chart görünüyor mu?"
+          "checkpoint": "Dashboard sayfası açılıyor ve mock veriyle bir line chart görünüyor mu?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Vite + React + TypeScript projesi oluştur",
+              "type": "terminal",
+              "command": "cd packages && pnpm create vite dashboard --template react-ts",
+              "expected_output": "Scaffolding project in packages/dashboard",
+              "why": "Vite modern ve hızlı bir build aracı. react-ts template'i TypeScript desteği ile React projesi oluşturur. CRA'ya göre 10x daha hızlı dev server başlatır."
+            },
+            {
+              "order": "4.2",
+              "action": "Dashboard bağımlılıklarını kur",
+              "type": "terminal",
+              "command": "cd packages/dashboard && pnpm install && pnpm add recharts react-grid-layout && pnpm add -D @types/react-grid-layout",
+              "expected_output": "dependencies:\n+ recharts\n+ react-grid-layout",
+              "why": "Recharts React ekosistemiyle tam uyumlu chart kütüphanesi. react-grid-layout dashboard widget'larını sürükle-bırak ile düzenlemeyi sağlar."
+            },
+            {
+              "order": "4.3",
+              "action": "Temel klasör yapısını oluştur",
+              "type": "terminal",
+              "command": "cd packages/dashboard && mkdir -p src/components src/hooks src/pages src/utils src/types",
+              "expected_output": "Dizinler oluşturuldu",
+              "why": "components UI bileşenleri, hooks özel React hook'ları, pages sayfa bileşenleri, utils yardımcı fonksiyonlar, types TypeScript tip tanımları için ayrı dizinler oluşturuyoruz."
+            },
+            {
+              "order": "4.4",
+              "action": "ChartWidget component dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/dashboard/src/components/ChartWidget.tsx",
+              "why": "Dashboard'daki her grafik için tekrar kullanılabilir bir wrapper component oluşturuyoruz. DRY prensibi."
+            },
+            {
+              "order": "4.5",
+              "action": "ChartWidget kodunu yaz",
+              "type": "code_write",
+              "file": "packages/dashboard/src/components/ChartWidget.tsx",
+              "code": "import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';\n\ninterface ChartWidgetProps {\n  title: string;\n  data: Array<{ bucket: string; avg_value: number }>;\n  color?: string;\n}\n\nexport function ChartWidget({ title, data, color = '#8884d8' }: ChartWidgetProps) {\n  return (\n    <div className=\"bg-gray-800 rounded-lg shadow p-4\">\n      <h3 className=\"text-sm font-medium text-gray-300 mb-2\">{title}</h3>\n      <ResponsiveContainer width=\"100%\" height={200}>\n        <LineChart data={data}>\n          <XAxis dataKey=\"bucket\" />\n          <YAxis />\n          <Tooltip />\n          <Line type=\"monotone\" dataKey=\"avg_value\" stroke={color} dot={false} />\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}",
+              "why": "ResponsiveContainer parent container boyutuna göre otomatik resize yapar — sabit pixel değeri kullanmıyoruz. TypeScript interface ile prop tipleri güvenli hale geliyor. Dark tema renkleri (gray-800, gray-300) kullanıyoruz."
+            },
+            {
+              "order": "4.6",
+              "action": "Mock veri ile test sayfası oluştur",
+              "type": "code_write",
+              "file": "packages/dashboard/src/App.tsx",
+              "code": "import { ChartWidget } from './components/ChartWidget';\n\nconst mockData = Array.from({ length: 24 }, (_, i) => ({\n  bucket: String(i).padStart(2, '0') + ':00',\n  avg_value: 40 + Math.random() * 40,\n}));\n\nfunction App() {\n  return (\n    <div className=\"min-h-screen bg-gray-900 p-6\">\n      <h1 className=\"text-2xl font-bold text-white mb-6\">Analytics Dashboard</h1>\n      <div className=\"grid grid-cols-2 gap-4\">\n        <ChartWidget title=\"CPU Usage\" data={mockData} color=\"#8884d8\" />\n        <ChartWidget title=\"Memory\" data={mockData} color=\"#82ca9d\" />\n      </div>\n    </div>\n  );\n}\n\nexport default App;",
+              "why": "Mock veri ile component'in doğru render olduğunu hemen görebiliriz. Backend hazır olmadan frontend geliştirmeye başlamak paralel çalışmayı mümkün kılar."
+            },
+            {
+              "order": "4.7",
+              "action": "Dashboard'u başlat ve tarayıcıda kontrol et",
+              "type": "terminal",
+              "command": "cd packages/dashboard && pnpm run dev",
+              "expected_output": "Local: http://localhost:5173",
+              "why": "Vite dev server'ı başlatarak dashboard'un tarayıcıda doğru görüntülendiğini kontrol ediyoruz."
+            },
+            {
+              "order": "4.8",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "http://localhost:5173 adresinde koyu arka planlı dashboard sayfası açılmalı. İki line chart mock veri ile görünmeli. Tarayıcı konsolunda hata olmamalı.",
+              "why": "Görsel doğrulama yaparak Recharts'ın ResponsiveContainer ile doğru render ettiğini kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── src/\n│   │   │   ├── routes/\n│   │   │   │   └── metrics.ts\n│   │   │   └── index.ts\n│   │   ├── migrations/\n│   │   │   └── 001_create_metrics.sql\n│   │   ├── .env\n│   │   ├── package.json\n│   │   └── tsconfig.json\n│   └── dashboard/\n│       ├── src/\n│       │   ├── components/\n│       │   │   └── ChartWidget.tsx\n│       │   ├── hooks/\n│       │   ├── pages/\n│       │   ├── types/\n│       │   ├── utils/\n│       │   └── App.tsx\n│       ├── package.json\n│       ├── tsconfig.json\n│       └── vite.config.ts\n├── package.json\n├── pnpm-lock.yaml\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "ResponsiveContainer width(0) or height(0)",
+              "cause": "ResponsiveContainer'ın parent element'ının genişliği veya yüksekliği 0. Chart görünmez.",
+              "fix": "Parent div'e sabit bir width/height veya Tailwind class'ı (w-full, min-h-[200px]) ekle. ResponsiveContainer kendi boyutunu parent'tan alır."
+            },
+            {
+              "error": "Module not found: Can't resolve 'recharts'",
+              "cause": "recharts paketi kurulmamış veya yanlış dizine kurulmuş.",
+              "fix": "cd packages/dashboard && pnpm add recharts komutu ile dashboard paketine kur."
+            },
+            {
+              "error": "Blank white page, no console errors",
+              "cause": "Tailwind CSS yapılandırması eksik veya CSS dosyası import edilmemiş.",
+              "fix": "tailwind.config.ts'de content dizinlerini kontrol et. main.tsx'de CSS dosyasının import edildiğinden emin ol."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Time-series veride TIMESTAMPTZ kullan, asla TIMESTAMP kullanma\n2. Aggregation'ı frontend'de yapma, PostgreSQL date_trunc ile DB seviyesinde yap\n3. Dashboard widget'ları birbirinden bağımsız olmalı — Error Boundary kullan\n4. Recharts'ta ResponsiveContainer ZORUNLU, yoksa chart render olmaz",
@@ -215,7 +582,90 @@
           "instructions": "seed.ts scripti oluştur. 3 farklı source (web-app, mobile-app, api-gateway) ve 5 metrik (cpu_usage, memory, response_time, error_rate, request_count) için son 30 günlük veri üret.",
           "code_snippet": "// scripts/seed.ts\nasync function seedMetrics() {\n  const sources = ['web-app', 'mobile-app', 'api-gateway'];\n  const metrics = ['cpu_usage', 'memory_usage', 'response_time', 'error_rate', 'request_count'];\n  \n  const now = Date.now();\n  const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;\n  \n  for (const source of sources) {\n    for (const metric of metrics) {\n      const baseValue = getBaseValue(metric); // cpu: 40-80, memory: 60-90, etc.\n      for (let ts = thirtyDaysAgo; ts < now; ts += 5 * 60 * 1000) {\n        // Add realistic variation: daily pattern + noise + occasional spikes\n        const hourOfDay = new Date(ts).getHours();\n        const dailyPattern = Math.sin((hourOfDay - 6) * Math.PI / 12) * 0.2; // Peak at noon\n        const noise = (Math.random() - 0.5) * 0.1;\n        const spike = Math.random() > 0.995 ? Math.random() * 0.5 : 0; // Rare spikes\n        const value = baseValue * (1 + dailyPattern + noise + spike);\n        \n        await insertMetric(source, metric, value, new Date(ts));\n      }\n    }\n  }\n}",
           "deep_dive": "Realistic mock veri oluşturma sanatı: Gerçek metrikler günlük pattern gösterir (gündüz yüksek, gece düşük), haftalık pattern (pazartesi yüksek, pazar düşük), ve occasional anomaliler. Bu pattern'ları seed'e eklemek dashboard'un gerçekçi görünmesini sağlar.",
-          "checkpoint": "Seed çalıştıktan sonra metrics tablosunda en az 100K satır var mı?"
+          "checkpoint": "Seed çalıştıktan sonra metrics tablosunda en az 100K satır var mı?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Scripts dizinini oluştur",
+              "type": "terminal",
+              "command": "mkdir -p packages/api/scripts",
+              "expected_output": "Dizin oluşturuldu",
+              "why": "Seed ve migration script'lerini ayrı bir dizinde tutmak proje organizasyonunu temiz tutar."
+            },
+            {
+              "order": "1.2",
+              "action": "Seed script dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/api/scripts/seed.ts",
+              "why": "Gerçekçi mock veri oluşturacak seed script'ini yazacağız. Dashboard geliştirmek için veri şart."
+            },
+            {
+              "order": "1.3",
+              "action": "Seed script kodunu yaz",
+              "type": "code_write",
+              "file": "packages/api/scripts/seed.ts",
+              "code": "import { Pool } from 'pg';\nimport dotenv from 'dotenv';\n\ndotenv.config();\n\nconst pool = new Pool({ connectionString: process.env.DATABASE_URL });\n\nconst sources = ['web-app', 'mobile-app', 'api-gateway'];\nconst metrics = ['cpu_usage', 'memory_usage', 'response_time', 'error_rate', 'request_count'];\n\nfunction getBaseValue(metric: string): number {\n  const bases: Record<string, number> = {\n    cpu_usage: 55, memory_usage: 70, response_time: 150,\n    error_rate: 2, request_count: 1000,\n  };\n  return bases[metric] || 50;\n}\n\nasync function seedMetrics() {\n  const now = Date.now();\n  const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;\n  let count = 0;\n\n  for (const source of sources) {\n    for (const metric of metrics) {\n      const baseValue = getBaseValue(metric);\n      const values: string[] = [];\n      for (let ts = thirtyDaysAgo; ts < now; ts += 5 * 60 * 1000) {\n        const hourOfDay = new Date(ts).getHours();\n        const dailyPattern = Math.sin((hourOfDay - 6) * Math.PI / 12) * 0.2;\n        const noise = (Math.random() - 0.5) * 0.1;\n        const spike = Math.random() > 0.995 ? Math.random() * 0.5 : 0;\n        const value = baseValue * (1 + dailyPattern + noise + spike);\n        values.push(`('${source}', '${metric}', ${value.toFixed(4)}, '${new Date(ts).toISOString()}')`);\n        count++;\n      }\n      // Batch insert for performance\n      const batchSize = 1000;\n      for (let i = 0; i < values.length; i += batchSize) {\n        const batch = values.slice(i, i + batchSize);\n        await pool.query(\n          `INSERT INTO metrics (source, metric_name, value, timestamp) VALUES ${batch.join(',')}\n           ON CONFLICT DO NOTHING`\n        );\n      }\n    }\n  }\n  console.log(`Seeded ${count} metrics`);\n  await pool.end();\n}\n\nseedMetrics().catch(console.error);",
+              "why": "Gerçekçi veri oluşturma: günlük pattern (sin fonksiyonu ile gündüz yüksek, gece düşük), rastgele gürültü ve nadir spike'lar ekliyoruz. Batch insert ile 100K+ satırı hızlıca ekliyoruz."
+            },
+            {
+              "order": "1.4",
+              "action": "package.json'a seed script'i ekle",
+              "type": "code_modify",
+              "file": "packages/api/package.json",
+              "code": "\"seed\": \"ts-node scripts/seed.ts\"",
+              "position": "bottom",
+              "why": "pnpm run seed komutu ile seed script'ini kolayca çalıştırabilmek için package.json'a ekliyoruz."
+            },
+            {
+              "order": "1.5",
+              "action": "Seed script'ini çalıştır",
+              "type": "terminal",
+              "command": "cd packages/api && pnpm run seed",
+              "expected_output": "Seeded 129600 metrics (yaklaşık bu sayı)",
+              "why": "3 source x 5 metric x 8640 zaman noktası (30 gün, 5 dk aralık) = ~129600 satır. Bu kadar veri dashboard'un gerçekçi görünmesi için yeterli."
+            },
+            {
+              "order": "1.6",
+              "action": "Veri sayısını doğrula",
+              "type": "terminal",
+              "command": "psql -d analytics_dashboard -c \"SELECT COUNT(*) FROM metrics;\"",
+              "expected_output": "count: 100000+ satır",
+              "why": "Seed'in başarıyla çalıştığını ve yeterli veri oluşturulduğunu doğruluyoruz."
+            },
+            {
+              "order": "1.7",
+              "action": "Veri dağılımını kontrol et",
+              "type": "terminal",
+              "command": "psql -d analytics_dashboard -c \"SELECT source, metric_name, COUNT(*), AVG(value)::numeric(10,2) FROM metrics GROUP BY source, metric_name ORDER BY source, metric_name;\"",
+              "expected_output": "15 satır (3 source x 5 metric) ile her birinin count ve ortalama değeri",
+              "why": "Her source-metric kombinasyonunun eşit miktarda veriye sahip olduğunu ve değerlerin mantıklı aralıkta olduğunu kontrol ediyoruz."
+            },
+            {
+              "order": "1.8",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "metrics tablosunda en az 100K satır olmalı. Her source-metric kombinasyonu yaklaşık eşit sayıda satıra sahip olmalı. Spike'lar (anomaliler) veri içinde mevcut olmalı.",
+              "why": "Dashboard ve anomali tespiti için yeterli ve gerçekçi veri olduğunu kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── src/\n│   │   │   ├── routes/\n│   │   │   │   └── metrics.ts\n│   │   │   └── index.ts\n│   │   ├── migrations/\n│   │   │   └── 001_create_metrics.sql\n│   │   ├── scripts/\n│   │   │   └── seed.ts\n│   │   ├── .env\n│   │   ├── package.json\n│   │   └── tsconfig.json\n│   └── dashboard/\n│       ├── src/\n│       │   ├── components/\n│       │   │   └── ChartWidget.tsx\n│       │   └── App.tsx\n│       └── package.json\n├── package.json\n├── pnpm-lock.yaml\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "ERROR: duplicate key value violates unique constraint",
+              "cause": "Seed script daha önce çalıştırılmış ve aynı timestamp'li veriler zaten var.",
+              "fix": "ON CONFLICT DO NOTHING ekle veya seed öncesi TRUNCATE metrics; ile tabloyu temizle."
+            },
+            {
+              "error": "JavaScript heap out of memory",
+              "cause": "Tüm verileri tek seferde belleğe yüklemek bellek limitini aşıyor.",
+              "fix": "Batch insert kullan (1000'er satır). NODE_OPTIONS=--max-old-space-size=4096 ile bellek limitini artır."
+            },
+            {
+              "error": "ERROR: value too long for type character varying(100)",
+              "cause": "source veya metric_name değeri VARCHAR limitini aşıyor.",
+              "fix": "String değerlerinin uzunluğunu kontrol et. Gerekirse VARCHAR limitini artır."
+            }
+          ]
         },
         {
           "step": 2,
@@ -224,7 +674,98 @@
           "instructions": "Redis client kur (ioredis). Cache middleware oluştur. TTL stratejisi: son 1 saat verisi 30sn cache, son 1 gün 5dk, son 1 hafta 30dk, son 1 ay 2 saat.",
           "code_snippet": "// middleware/cache.ts\nimport Redis from 'ioredis';\n\nconst redis = new Redis(process.env.REDIS_URL);\n\nexport function cacheMiddleware(ttlFn: (req: Request) => number) {\n  return async (req: Request, res: Response, next: NextFunction) => {\n    const key = `dashboard:${req.originalUrl}`;\n    \n    const cached = await redis.get(key);\n    if (cached) {\n      res.setHeader('X-Cache', 'HIT');\n      return res.json(JSON.parse(cached));\n    }\n    \n    // Override res.json to cache the response\n    const originalJson = res.json.bind(res);\n    res.json = (body: any) => {\n      const ttl = ttlFn(req);\n      redis.setex(key, ttl, JSON.stringify(body));\n      res.setHeader('X-Cache', 'MISS');\n      return originalJson(body);\n    };\n    \n    next();\n  };\n}\n\n// Usage\nrouter.get('/metrics', cacheMiddleware(req => {\n  const range = req.query.to - req.query.from;\n  if (range < 3600000) return 30;     // Son 1 saat: 30sn cache\n  if (range < 86400000) return 300;    // Son 1 gün: 5dk cache  \n  return 1800;                          // Daha eski: 30dk cache\n}), getMetrics);",
           "deep_dive": "Cache invalidation bilgisayar biliminin en zor 2 probleminden biri. Dashboard'larda TTL-based cache en pratik çözüm çünkü verinin biraz eski olması kabul edilebilir. Ancak alert'ler için cache bypass edilmeli.",
-          "checkpoint": "İlk istekte X-Cache: MISS, ikinci istekte X-Cache: HIT header'ı dönüyor mu?"
+          "checkpoint": "İlk istekte X-Cache: MISS, ikinci istekte X-Cache: HIT header'ı dönüyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Redis'i kur ve başlat",
+              "type": "terminal",
+              "command": "redis-server --daemonize yes",
+              "expected_output": "Redis server started veya zaten çalışıyor mesajı",
+              "why": "Redis in-memory veri deposu olarak cache katmanı görevi görecek. Dashboard sorgularının tekrar tekrar DB'ye gitmesini engelleyecek."
+            },
+            {
+              "order": "2.2",
+              "action": "ioredis paketini kur",
+              "type": "terminal",
+              "command": "cd packages/api && pnpm add ioredis && pnpm add -D @types/ioredis",
+              "expected_output": "dependencies:\n+ ioredis",
+              "why": "ioredis Node.js için en performanslı Redis client'ı. Built-in TypeScript desteği ve otomatik reconnect özelliği var."
+            },
+            {
+              "order": "2.3",
+              "action": ".env dosyasına Redis URL ekle",
+              "type": "code_modify",
+              "file": "packages/api/.env",
+              "code": "REDIS_URL=redis://localhost:6379",
+              "position": "bottom",
+              "why": "Redis bağlantı bilgisini ortam değişkeni olarak saklıyoruz. Production'da farklı bir Redis adresi kullanılacak."
+            },
+            {
+              "order": "2.4",
+              "action": "Cache middleware dizinini oluştur",
+              "type": "terminal",
+              "command": "mkdir -p packages/api/src/middleware",
+              "expected_output": "Dizin oluşturuldu",
+              "why": "Middleware'leri ayrı dizinde tutmak Express uygulamasının organizasyonunu temiz tutar."
+            },
+            {
+              "order": "2.5",
+              "action": "Cache middleware dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/api/src/middleware/cache.ts",
+              "why": "Redis cache middleware'ini yazacağız. Bu middleware her API isteğinde önce cache'e bakar, yoksa DB'den çeker ve cache'e yazar."
+            },
+            {
+              "order": "2.6",
+              "action": "Cache middleware kodunu yaz",
+              "type": "code_write",
+              "file": "packages/api/src/middleware/cache.ts",
+              "code": "import Redis from 'ioredis';\nimport { Request, Response, NextFunction } from 'express';\n\nconst redis = new Redis(process.env.REDIS_URL);\n\nexport function cacheMiddleware(ttlFn: (req: Request) => number) {\n  return async (req: Request, res: Response, next: NextFunction) => {\n    const key = `dashboard:${req.originalUrl}`;\n    const cached = await redis.get(key);\n    if (cached) {\n      res.setHeader('X-Cache', 'HIT');\n      return res.json(JSON.parse(cached));\n    }\n    const originalJson = res.json.bind(res);\n    res.json = (body: any) => {\n      const ttl = ttlFn(req);\n      redis.setex(key, ttl, JSON.stringify(body));\n      res.setHeader('X-Cache', 'MISS');\n      return originalJson(body);\n    };\n    next();\n  };\n}\n\nexport { redis };",
+              "why": "X-Cache header'ı ile cache HIT/MISS durumunu izleyebiliyoruz — debug için çok önemli. TTL fonksiyonu ile farklı endpoint'ler için farklı cache süresi belirleyebiliyoruz. res.json override pattern'ı ile mevcut route kodunu değiştirmeden cache ekliyoruz."
+            },
+            {
+              "order": "2.7",
+              "action": "Metrics route'a cache middleware'ini ekle",
+              "type": "code_modify",
+              "file": "packages/api/src/routes/metrics.ts",
+              "code": "import { cacheMiddleware } from '../middleware/cache';\n\nrouter.get('/metrics', cacheMiddleware(req => {\n  const from = new Date(req.query.from as string).getTime();\n  const to = new Date(req.query.to as string).getTime();\n  const range = to - from;\n  if (range < 3600000) return 30;      // Son 1 saat: 30sn cache\n  if (range < 86400000) return 300;     // Son 1 gün: 5dk cache\n  return 1800;                          // Daha eski: 30dk cache\n}), async (req, res) => { /* existing handler */ });",
+              "why": "Kısa tarih aralıkları sık değişir (30sn cache), uzun aralıklar nadiren değişir (30dk cache). Bu strateji hem veri tazeliğini hem performansı dengeler."
+            },
+            {
+              "order": "2.8",
+              "action": "Cache'in çalıştığını test et",
+              "type": "terminal",
+              "command": "curl -v http://localhost:4000/api/metrics?source=web-app&metric=cpu_usage&from=2024-01-01&to=2024-01-02&interval=1h 2>&1 | grep X-Cache",
+              "expected_output": "İlk istekte X-Cache: MISS, ikinci istekte X-Cache: HIT",
+              "why": "X-Cache header'ını kontrol ederek cache'in doğru çalıştığını kanıtlıyoruz."
+            },
+            {
+              "order": "2.9",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "İlk API isteğinde X-Cache: MISS header'ı görünmeli. Aynı isteği tekrar yapınca X-Cache: HIT görünmeli. redis-cli KEYS 'dashboard:*' komutu ile cache key'lerini görebilmelisin.",
+              "why": "Cache mekanizmasının doğru çalıştığını hem header hem Redis CLI ile doğruluyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── src/\n│   │   │   ├── middleware/\n│   │   │   │   └── cache.ts\n│   │   │   ├── routes/\n│   │   │   │   └── metrics.ts\n│   │   │   └── index.ts\n│   │   ├── migrations/\n│   │   │   └── 001_create_metrics.sql\n│   │   ├── scripts/\n│   │   │   └── seed.ts\n│   │   ├── .env\n│   │   ├── package.json\n│   │   └── tsconfig.json\n│   └── dashboard/\n│       └── ...\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "Error: connect ECONNREFUSED 127.0.0.1:6379",
+              "cause": "Redis servisi çalışmıyor.",
+              "fix": "redis-server komutu ile Redis'i başlat. Docker kullanıyorsan: docker run -d -p 6379:6379 redis:7-alpine"
+            },
+            {
+              "error": "SyntaxError: Unexpected token in JSON at position 0",
+              "cause": "Cache'ten okunan veri geçerli JSON değil veya bozulmuş.",
+              "fix": "redis-cli FLUSHALL ile cache'i temizle. JSON.stringify/parse işlemlerini kontrol et."
+            },
+            {
+              "error": "TypeError: res.json is not a function",
+              "cause": "res.json override edilirken this context kayboluyor.",
+              "fix": "const originalJson = res.json.bind(res) ile this context'i bağla."
+            }
+          ]
         },
         {
           "step": 3,
@@ -233,7 +774,82 @@
           "instructions": "GET /api/dashboard/overview endpoint'i oluştur — tüm source'ların son durumunu, trend yönünü, ve anomali sayısını döndürsün.",
           "code_snippet": "// routes/dashboard.ts\nrouter.get('/overview', async (req, res) => {\n  const { from, to } = req.query;\n  \n  // Parallel queries for each metric\n  const [cpuData, memData, errorData, latencyData] = await Promise.all([\n    getAggregatedMetric('cpu_usage', from, to),\n    getAggregatedMetric('memory_usage', from, to),\n    getAggregatedMetric('error_rate', from, to),\n    getAggregatedMetric('response_time', from, to),\n  ]);\n  \n  res.json({\n    summary: {\n      cpu: { current: cpuData.latest, trend: cpuData.trend, status: getStatus(cpuData) },\n      memory: { current: memData.latest, trend: memData.trend, status: getStatus(memData) },\n      errors: { current: errorData.latest, trend: errorData.trend, status: getStatus(errorData) },\n      latency: { current: latencyData.latest, trend: latencyData.trend, status: getStatus(latencyData) },\n    },\n    charts: { cpu: cpuData.series, memory: memData.series, errors: errorData.series, latency: latencyData.series }\n  });\n});",
           "deep_dive": "Promise.all ile paralel DB sorguları: 4 sequential sorgu 4x sürer (örn. 4x200ms = 800ms), ama Promise.all ile hepsi paralel çalışır ve toplam süre en yavaş sorgu kadar olur (~200ms). Dashboard API'lerinde bu pattern ZORUNLU.",
-          "checkpoint": "overview endpoint'i 4 metriğin summary ve chart verisini tek response'ta dönüyor mu?"
+          "checkpoint": "overview endpoint'i 4 metriğin summary ve chart verisini tek response'ta dönüyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Dashboard route dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/api/src/routes/dashboard.ts",
+              "why": "Overview endpoint'i tüm metriklerin özetini tek bir API çağrısında döndürecek. Dashboard'un ilk yüklemesinde kullanılacak."
+            },
+            {
+              "order": "3.2",
+              "action": "Helper fonksiyonunu yaz",
+              "type": "code_write",
+              "file": "packages/api/src/utils/metrics.ts",
+              "code": "import { pool } from '../index';\n\nexport async function getAggregatedMetric(metricName: string, from: string, to: string) {\n  const result = await pool.query(\n    `SELECT date_trunc('hour', timestamp) as bucket, AVG(value) as avg_value\n     FROM metrics WHERE metric_name = $1 AND timestamp BETWEEN $2 AND $3\n     GROUP BY bucket ORDER BY bucket ASC`,\n    [metricName, from, to]\n  );\n  const series = result.rows;\n  const latest = series.length > 0 ? series[series.length - 1].avg_value : 0;\n  const prev = series.length > 1 ? series[series.length - 2].avg_value : latest;\n  const trend = latest - prev;\n  const status = metricName === 'error_rate'\n    ? (latest > 5 ? 'critical' : latest > 2 ? 'warning' : 'healthy')\n    : (latest > 90 ? 'critical' : latest > 75 ? 'warning' : 'healthy');\n  return { latest, trend, status, series };\n}",
+              "why": "Her metrik için aggregation, trend hesaplama ve status belirleme logic'ini tek bir yerde topluyoruz. DRY prensibi — aynı kodu tekrar yazmıyoruz."
+            },
+            {
+              "order": "3.3",
+              "action": "Overview endpoint kodunu yaz",
+              "type": "code_write",
+              "file": "packages/api/src/routes/dashboard.ts",
+              "code": "import { Router } from 'express';\nimport { getAggregatedMetric } from '../utils/metrics';\nimport { cacheMiddleware } from '../middleware/cache';\n\nconst router = Router();\n\nrouter.get('/overview', cacheMiddleware(() => 60), async (req, res) => {\n  const { from = new Date(Date.now() - 86400000).toISOString(), to = new Date().toISOString() } = req.query;\n  const [cpuData, memData, errorData, latencyData] = await Promise.all([\n    getAggregatedMetric('cpu_usage', from as string, to as string),\n    getAggregatedMetric('memory_usage', from as string, to as string),\n    getAggregatedMetric('error_rate', from as string, to as string),\n    getAggregatedMetric('response_time', from as string, to as string),\n  ]);\n  res.json({\n    summary: {\n      cpu: { current: cpuData.latest, trend: cpuData.trend, status: cpuData.status },\n      memory: { current: memData.latest, trend: memData.trend, status: memData.status },\n      errors: { current: errorData.latest, trend: errorData.trend, status: errorData.status },\n      latency: { current: latencyData.latest, trend: latencyData.trend, status: latencyData.status },\n    },\n    charts: {\n      cpu: cpuData.series, memory: memData.series,\n      errors: errorData.series, latency: latencyData.series\n    }\n  });\n});\n\nexport default router;",
+              "why": "Promise.all ile 4 DB sorgusunu paralel çalıştırıyoruz — sequential'e göre 4x hızlı. Dashboard API'lerinde bu pattern zorunlu."
+            },
+            {
+              "order": "3.4",
+              "action": "Route'u Express app'e bağla",
+              "type": "code_modify",
+              "file": "packages/api/src/index.ts",
+              "code": "import dashboardRouter from './routes/dashboard';\napp.use('/api/dashboard', dashboardRouter);",
+              "position": "bottom",
+              "why": "Dashboard route'unu /api/dashboard prefix'i altına mount ediyoruz. URL yapısı: /api/dashboard/overview"
+            },
+            {
+              "order": "3.5",
+              "action": "Utils dizinini oluştur (eğer yoksa)",
+              "type": "terminal",
+              "command": "mkdir -p packages/api/src/utils",
+              "expected_output": "Dizin oluşturuldu",
+              "why": "Yardımcı fonksiyonları utils dizininde tutuyoruz."
+            },
+            {
+              "order": "3.6",
+              "action": "Overview endpoint'ini test et",
+              "type": "terminal",
+              "command": "curl http://localhost:4000/api/dashboard/overview | head -c 500",
+              "expected_output": "JSON response: summary ve charts objesi ile 4 metrik verisi",
+              "why": "Endpoint'in 4 metriğin hem summary hem chart verisini tek response'ta döndürdüğünü doğruluyoruz."
+            },
+            {
+              "order": "3.7",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "overview endpoint'i summary (current, trend, status) ve charts (series array) döndürmeli. Response süresi cache ile 5ms civarında olmalı (X-Cache: HIT durumunda).",
+              "why": "Tüm metriklerin tek endpoint'ten alınabilmesi dashboard'un ilk yükleme performansı için kritik."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── src/\n│   │   │   ├── middleware/\n│   │   │   │   └── cache.ts\n│   │   │   ├── routes/\n│   │   │   │   ├── dashboard.ts\n│   │   │   │   └── metrics.ts\n│   │   │   ├── utils/\n│   │   │   │   └── metrics.ts\n│   │   │   └── index.ts\n│   │   ├── migrations/\n│   │   │   └── 001_create_metrics.sql\n│   │   ├── scripts/\n│   │   │   └── seed.ts\n│   │   ├── .env\n│   │   ├── package.json\n│   │   └── tsconfig.json\n│   └── dashboard/\n│       └── ...\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "TypeError: Cannot destructure property 'from' of 'req.query'",
+              "cause": "Query parametreleri undefined geliyor veya tip dönüşümü eksik.",
+              "fix": "Default değerler ekle: const { from = defaultFrom, to = defaultTo } = req.query; ve as string ile tip dönüşümü yap."
+            },
+            {
+              "error": "UnhandledPromiseRejection: pool.query error",
+              "cause": "Promise.all içindeki sorgulardan biri hata veriyor ama catch edilmiyor.",
+              "fix": "try-catch ile Promise.all'ı sar. Hangi sorgunun hata verdiğini logla."
+            },
+            {
+              "error": "Response time çok yüksek (> 1 saniye)",
+              "cause": "Index'ler eksik veya sorgu optimize değil. Tüm tablo taranıyor.",
+              "fix": "EXPLAIN ANALYZE ile sorgu planını incele. metric_name ve timestamp üzerinde composite index olduğundan emin ol."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Redis TTL'i veri aralığına göre ayarla — kısa aralık kısa TTL, uzun aralık uzun TTL\n2. Cache key'lere request URL'ini kullan — farklı filtreler farklı cache entry'leri oluşturur\n3. Promise.all ile paralel DB sorguları dashboard performansını dramatik artırır\n4. X-Cache header'ı ekle — debug için çok önemli",
@@ -258,7 +874,72 @@
           "instructions": "useMetrics hook'u oluştur: source, metric, dateRange parametre alır, data/loading/error döndürür. SWR benzeri stale-while-revalidate pattern'ı uygula.",
           "code_snippet": "// hooks/useMetrics.ts\nimport { useState, useEffect, useRef } from 'react';\n\ninterface UseMetricsOptions {\n  source: string;\n  metric: string;\n  from: Date;\n  to: Date;\n  interval?: string;\n  refreshInterval?: number;\n}\n\nexport function useMetrics(options: UseMetricsOptions) {\n  const [data, setData] = useState<MetricPoint[]>([]);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<Error | null>(null);\n  const staleData = useRef<MetricPoint[]>([]);\n  \n  useEffect(() => {\n    const fetchData = async () => {\n      try {\n        // Show stale data while fetching (SWR pattern)\n        if (staleData.current.length > 0) {\n          setData(staleData.current);\n          setLoading(false);\n        }\n        \n        const params = new URLSearchParams({\n          source: options.source,\n          metric: options.metric,\n          from: options.from.toISOString(),\n          to: options.to.toISOString(),\n          interval: options.interval || '1h',\n        });\n        \n        const res = await fetch(`/api/metrics?${params}`);\n        const json = await res.json();\n        setData(json);\n        staleData.current = json;\n        setError(null);\n      } catch (err) {\n        setError(err as Error);\n      } finally {\n        setLoading(false);\n      }\n    };\n    \n    fetchData();\n    \n    if (options.refreshInterval) {\n      const timer = setInterval(fetchData, options.refreshInterval);\n      return () => clearInterval(timer);\n    }\n  }, [options.source, options.metric, options.from.getTime(), options.to.getTime()]);\n  \n  return { data, loading, error };\n}",
           "deep_dive": "SWR (Stale-While-Revalidate) pattern dashboard'larda çok önemli. Kullanıcı filtre değiştirdiğinde eski veriyi gösterirken yeni veri yüklenir — bu UX'i dramatik iyileştirir çünkü kullanıcı boş ekran görmez.",
-          "checkpoint": "useMetrics hook'u ile bir chart data çekebiliyor ve loading state doğru çalışıyor mu?"
+          "checkpoint": "useMetrics hook'u ile bir chart data çekebiliyor ve loading state doğru çalışıyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "TypeScript tip tanımlarını oluştur",
+              "type": "file_open",
+              "file": "packages/dashboard/src/types/metrics.ts",
+              "why": "Tip tanımlarını ayrı dosyada tutmak TypeScript projelerinde standart pratik. Tüm component'ler aynı tipleri kullanacak."
+            },
+            {
+              "order": "1.2",
+              "action": "Metric tipleri kodunu yaz",
+              "type": "code_write",
+              "file": "packages/dashboard/src/types/metrics.ts",
+              "code": "export interface MetricPoint {\n  bucket: string;\n  avg_value: number;\n  min_value?: number;\n  max_value?: number;\n  count?: number;\n}\n\nexport interface MetricSummary {\n  current: number;\n  trend: number;\n  status: 'healthy' | 'warning' | 'critical';\n}\n\nexport interface DashboardOverview {\n  summary: Record<string, MetricSummary>;\n  charts: Record<string, MetricPoint[]>;\n}",
+              "why": "TypeScript interface'leri API response yapısını tanımlar. Bu sayede yanlış property erişimi derleme zamanında yakalanır. status union type ile sadece geçerli değerler kabul edilir."
+            },
+            {
+              "order": "1.3",
+              "action": "useMetrics hook dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/dashboard/src/hooks/useMetrics.ts",
+              "why": "Custom hook ile veri çekme, loading/error state yönetimi ve SWR pattern'ını tek yerde kapsüllüyoruz."
+            },
+            {
+              "order": "1.4",
+              "action": "useMetrics hook kodunu yaz",
+              "type": "code_write",
+              "file": "packages/dashboard/src/hooks/useMetrics.ts",
+              "code": "import { useState, useEffect, useRef } from 'react';\nimport { MetricPoint } from '../types/metrics';\n\ninterface UseMetricsOptions {\n  source: string;\n  metric: string;\n  from: Date;\n  to: Date;\n  interval?: string;\n  refreshInterval?: number;\n}\n\nexport function useMetrics(options: UseMetricsOptions) {\n  const [data, setData] = useState<MetricPoint[]>([]);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<Error | null>(null);\n  const staleData = useRef<MetricPoint[]>([]);\n\n  useEffect(() => {\n    const fetchData = async () => {\n      try {\n        if (staleData.current.length > 0) {\n          setData(staleData.current);\n          setLoading(false);\n        }\n        const params = new URLSearchParams({\n          source: options.source,\n          metric: options.metric,\n          from: options.from.toISOString(),\n          to: options.to.toISOString(),\n          interval: options.interval || '1h',\n        });\n        const res = await fetch(`/api/metrics?${params}`);\n        if (!res.ok) throw new Error(`HTTP ${res.status}`);\n        const json = await res.json();\n        setData(json);\n        staleData.current = json;\n        setError(null);\n      } catch (err) {\n        setError(err as Error);\n      } finally {\n        setLoading(false);\n      }\n    };\n    fetchData();\n    if (options.refreshInterval) {\n      const timer = setInterval(fetchData, options.refreshInterval);\n      return () => clearInterval(timer);\n    }\n  }, [options.source, options.metric, options.from.getTime(), options.to.getTime()]);\n\n  return { data, loading, error };\n}",
+              "why": "SWR pattern: eski veriyi göster, arkada yeni veri çek — kullanıcı boş ekran görmez. useRef ile stale data saklıyoruz. Dependency array'de Date.getTime() kullanıyoruz çünkü Date objeleri referans karşılaştırması yapar."
+            },
+            {
+              "order": "1.5",
+              "action": "Hook'u ChartWidget'ta kullan",
+              "type": "code_modify",
+              "file": "packages/dashboard/src/components/ChartWidget.tsx",
+              "code": "// ChartWidget'a useMetrics entegrasyonu ekle\n// data prop yerine source ve metric prop'ları al\n// useMetrics hook'u ile veriyi otomatik çek",
+              "why": "ChartWidget artık kendi verisini kendi çekecek. Parent component'in veri yönetimi ile uğraşmasına gerek kalmayacak."
+            },
+            {
+              "order": "1.6",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "useMetrics hook'u ile bir chart veri çekebilmeli. Loading spinner görünmeli, sonra veri gelince chart render olmalı. Network tab'da API isteği görünmeli.",
+              "why": "Custom hook'un loading, error ve data state'lerini doğru yönettiğini kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   └── ...\n│   └── dashboard/\n│       ├── src/\n│       │   ├── components/\n│       │   │   └── ChartWidget.tsx\n│       │   ├── hooks/\n│       │   │   └── useMetrics.ts\n│       │   ├── pages/\n│       │   ├── types/\n│       │   │   └── metrics.ts\n│       │   ├── utils/\n│       │   └── App.tsx\n│       ├── package.json\n│       └── vite.config.ts\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "Too many re-renders. React limits the number of renders",
+              "cause": "useEffect dependency array'de Date objesi var. Her render'da yeni Date oluşturuluyor.",
+              "fix": "Dependency array'de options.from.getTime() kullan, options.from değil. getTime() number döndürür ve referans karşılaştırma sorunu olmaz."
+            },
+            {
+              "error": "Failed to fetch: CORS error",
+              "cause": "Frontend ve API farklı portlarda çalışıyor ve CORS ayarlanmamış.",
+              "fix": "Vite config'e proxy ekle: server.proxy: { '/api': 'http://localhost:4000' } veya API'de cors() middleware kullan."
+            },
+            {
+              "error": "Cannot read properties of undefined (reading 'map')",
+              "cause": "data henüz yüklenmeden array olarak kullanılmaya çalışılıyor.",
+              "fix": "useState([]) ile boş array başlangıç değeri ver. Component'te data && data.map() kontrolü ekle."
+            }
+          ]
         },
         {
           "step": 2,
@@ -267,7 +948,81 @@
           "instructions": "4 chart widget'ı yan yana göster: CPU Usage (Line), Memory (Area), Error Rate (Bar), Response Time (Line). Tarih aralığı filter ekle (son 1 saat, 6 saat, 24 saat, 7 gün, 30 gün). Source filter ekle.",
           "code_snippet": "// pages/Dashboard.tsx\nexport function Dashboard() {\n  const [dateRange, setDateRange] = useState(DATE_RANGES['24h']);\n  const [source, setSource] = useState('all');\n  \n  return (\n    <div className=\"min-h-screen bg-gray-900 p-6\">\n      {/* Filters */}\n      <div className=\"flex items-center gap-4 mb-6\">\n        <DateRangePicker value={dateRange} onChange={setDateRange} />\n        <SourceFilter value={source} onChange={setSource} />\n      </div>\n      \n      {/* Summary Cards */}\n      <div className=\"grid grid-cols-4 gap-4 mb-6\">\n        <SummaryCard title=\"CPU\" value=\"45%\" trend=\"+2.3%\" status=\"healthy\" />\n        <SummaryCard title=\"Memory\" value=\"72%\" trend=\"-1.1%\" status=\"warning\" />\n        <SummaryCard title=\"Errors\" value=\"0.3%\" trend=\"-0.5%\" status=\"healthy\" />\n        <SummaryCard title=\"Latency\" value=\"142ms\" trend=\"+12ms\" status=\"healthy\" />\n      </div>\n      \n      {/* Charts Grid */}\n      <div className=\"grid grid-cols-2 gap-4\">\n        <ChartWidget title=\"CPU Usage\" metric=\"cpu_usage\" type=\"line\" />\n        <ChartWidget title=\"Memory\" metric=\"memory_usage\" type=\"area\" />\n        <ChartWidget title=\"Error Rate\" metric=\"error_rate\" type=\"bar\" />\n        <ChartWidget title=\"Response Time\" metric=\"response_time\" type=\"line\" />\n      </div>\n    </div>\n  );\n}",
           "deep_dive": "Dashboard'ların en önemli UX kuralı: Summary card'lar en üstte (hızlı bakış), detaylı chart'lar altta. Kullanıcı önce genel durumu görür, sorun varsa chart'a tıklayıp detaya iner. Bu pattern'a 'Information Hierarchy' denir.",
-          "checkpoint": "4 chart ve 4 summary card düzgün grid layout'ta görünüyor mu? Filtreleme çalışıyor mu?"
+          "checkpoint": "4 chart ve 4 summary card düzgün grid layout'ta görünüyor mu? Filtreleme çalışıyor mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "SummaryCard component'ini oluştur",
+              "type": "file_open",
+              "file": "packages/dashboard/src/components/SummaryCard.tsx",
+              "why": "Dashboard'un üst kısmında metrik özetlerini gösteren kartlar oluşturuyoruz. Hızlı bakışta genel durumu görmeyi sağlar."
+            },
+            {
+              "order": "2.2",
+              "action": "SummaryCard kodunu yaz",
+              "type": "code_write",
+              "file": "packages/dashboard/src/components/SummaryCard.tsx",
+              "code": "interface SummaryCardProps {\n  title: string;\n  value: string;\n  trend: string;\n  status: 'healthy' | 'warning' | 'critical';\n}\n\nconst statusColors = {\n  healthy: 'text-emerald-400',\n  warning: 'text-yellow-400',\n  critical: 'text-red-400',\n};\n\nexport function SummaryCard({ title, value, trend, status }: SummaryCardProps) {\n  return (\n    <div className=\"bg-gray-800 rounded-lg p-4 border border-gray-700\">\n      <p className=\"text-sm text-gray-400\">{title}</p>\n      <p className={`text-2xl font-bold ${statusColors[status]}`}>{value}</p>\n      <p className=\"text-xs text-gray-500\">{trend}</p>\n    </div>\n  );\n}",
+              "why": "Status bazlı renk kodlaması ile kullanıcı bir bakışta sorunlu metrikleri görebilir. emerald-400 sağlıklı, yellow-400 uyarı, red-400 kritik durumu temsil eder."
+            },
+            {
+              "order": "2.3",
+              "action": "DateRangePicker component'ini oluştur",
+              "type": "code_write",
+              "file": "packages/dashboard/src/components/DateRangePicker.tsx",
+              "code": "interface DateRangePickerProps {\n  value: string;\n  onChange: (range: string) => void;\n}\n\nconst ranges = [\n  { label: '1 Saat', value: '1h' },\n  { label: '6 Saat', value: '6h' },\n  { label: '24 Saat', value: '24h' },\n  { label: '7 Gün', value: '7d' },\n  { label: '30 Gün', value: '30d' },\n];\n\nexport function DateRangePicker({ value, onChange }: DateRangePickerProps) {\n  return (\n    <div className=\"flex gap-2\">\n      {ranges.map(r => (\n        <button\n          key={r.value}\n          onClick={() => onChange(r.value)}\n          className={`px-3 py-1 rounded text-sm ${\n            value === r.value\n              ? 'bg-blue-600 text-white'\n              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'\n          }`}\n        >\n          {r.label}\n        </button>\n      ))}\n    </div>\n  );\n}",
+              "why": "Tarih aralığı seçimi dashboard'ların en temel özelliği. Button grubu ile kullanıcı tek tıkla zaman aralığını değiştirebilir. Seçili buton farklı renkle vurgulanır."
+            },
+            {
+              "order": "2.4",
+              "action": "SourceFilter component'ini oluştur",
+              "type": "code_write",
+              "file": "packages/dashboard/src/components/SourceFilter.tsx",
+              "code": "interface SourceFilterProps {\n  value: string;\n  onChange: (source: string) => void;\n}\n\nconst sources = ['all', 'web-app', 'mobile-app', 'api-gateway'];\n\nexport function SourceFilter({ value, onChange }: SourceFilterProps) {\n  return (\n    <select\n      value={value}\n      onChange={e => onChange(e.target.value)}\n      className=\"bg-gray-700 text-gray-300 rounded px-3 py-1 text-sm border border-gray-600\"\n    >\n      {sources.map(s => (\n        <option key={s} value={s}>{s === 'all' ? 'Tüm Kaynaklar' : s}</option>\n      ))}\n    </select>\n  );\n}",
+              "why": "Source filter ile kullanıcı belirli bir kaynağın metriklerini izole edebilir. 'all' seçeneği tüm kaynakları gösterir."
+            },
+            {
+              "order": "2.5",
+              "action": "Ana Dashboard sayfasını güncelle",
+              "type": "code_write",
+              "file": "packages/dashboard/src/pages/Dashboard.tsx",
+              "code": "import { useState } from 'react';\nimport { ChartWidget } from '../components/ChartWidget';\nimport { SummaryCard } from '../components/SummaryCard';\nimport { DateRangePicker } from '../components/DateRangePicker';\nimport { SourceFilter } from '../components/SourceFilter';\n\nexport function Dashboard() {\n  const [dateRange, setDateRange] = useState('24h');\n  const [source, setSource] = useState('all');\n\n  return (\n    <div className=\"min-h-screen bg-gray-900 p-6\">\n      <div className=\"flex items-center justify-between mb-6\">\n        <h1 className=\"text-2xl font-bold text-white\">Analytics Dashboard</h1>\n        <div className=\"flex items-center gap-4\">\n          <DateRangePicker value={dateRange} onChange={setDateRange} />\n          <SourceFilter value={source} onChange={setSource} />\n        </div>\n      </div>\n      <div className=\"grid grid-cols-4 gap-4 mb-6\">\n        <SummaryCard title=\"CPU\" value=\"45%\" trend=\"+2.3%\" status=\"healthy\" />\n        <SummaryCard title=\"Memory\" value=\"72%\" trend=\"-1.1%\" status=\"warning\" />\n        <SummaryCard title=\"Errors\" value=\"0.3%\" trend=\"-0.5%\" status=\"healthy\" />\n        <SummaryCard title=\"Latency\" value=\"142ms\" trend=\"+12ms\" status=\"healthy\" />\n      </div>\n      <div className=\"grid grid-cols-2 gap-4\">\n        <ChartWidget title=\"CPU Usage\" data={[]} color=\"#8884d8\" />\n        <ChartWidget title=\"Memory\" data={[]} color=\"#82ca9d\" />\n        <ChartWidget title=\"Error Rate\" data={[]} color=\"#ef4444\" />\n        <ChartWidget title=\"Response Time\" data={[]} color=\"#ffc658\" />\n      </div>\n    </div>\n  );\n}",
+              "why": "Grid layout ile 4 summary card üstte, 4 chart altta düzenleniyor. Information Hierarchy prensibi: önce genel bakış, sonra detay. Dark tema renkleri tutarlı."
+            },
+            {
+              "order": "2.6",
+              "action": "App.tsx'i Dashboard sayfasını kullanacak şekilde güncelle",
+              "type": "code_modify",
+              "file": "packages/dashboard/src/App.tsx",
+              "code": "import { Dashboard } from './pages/Dashboard';\n\nfunction App() {\n  return <Dashboard />;\n}\n\nexport default App;",
+              "why": "App.tsx sadece routing ve global layout için kullanılmalı. Sayfa logic'i pages/ altında olmalı."
+            },
+            {
+              "order": "2.7",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Dashboard sayfasında 4 summary card ve 4 chart grid layout'ta görünmeli. DateRangePicker ve SourceFilter çalışmalı. Responsive: tarayıcı daraltınca grid tek sütuna düşmeli.",
+              "why": "Layout'un hem desktop hem mobilde doğru görüntülendiğini doğruluyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   └── ...\n│   └── dashboard/\n│       ├── src/\n│       │   ├── components/\n│       │   │   ├── ChartWidget.tsx\n│       │   │   ├── DateRangePicker.tsx\n│       │   │   ├── SourceFilter.tsx\n│       │   │   └── SummaryCard.tsx\n│       │   ├── hooks/\n│       │   │   └── useMetrics.ts\n│       │   ├── pages/\n│       │   │   └── Dashboard.tsx\n│       │   ├── types/\n│       │   │   └── metrics.ts\n│       │   └── App.tsx\n│       └── package.json\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "Grid layout bozuk, kartlar üst üste biniyor",
+              "cause": "Tailwind grid sınıfları yanlış veya parent container genişliği yetersiz.",
+              "fix": "grid-cols-4 yerine responsive sınıf kullan: grid-cols-1 md:grid-cols-2 lg:grid-cols-4. gap-4 ile kartlar arası boşluk bırak."
+            },
+            {
+              "error": "SummaryCard renkleri görünmüyor (hepsi beyaz)",
+              "cause": "Tailwind JIT modu dinamik class isimlerini algılamıyor. Template literal ile oluşturulan class'lar purge ediliyor.",
+              "fix": "Dinamik class yerine statusColors objesi kullan ve class isimlerini tam yaz. Tailwind safelist'e ekle."
+            },
+            {
+              "error": "DateRangePicker tıklanınca sayfa refresh oluyor",
+              "cause": "Button type belirtilmemiş, form içinde default olarak submit oluyor.",
+              "fix": "Button'a type=\"button\" ekle: <button type=\"button\" onClick={...}>"
+            }
+          ]
         },
         {
           "step": 3,
@@ -276,7 +1031,65 @@
           "instructions": "Recharts Brush component'i ile chart'lara zoom özelliği ekle. Custom tooltip component oluştur. Birden fazla source'u aynı chart'ta overlay olarak göster.",
           "code_snippet": "// components/AdvancedChart.tsx\nimport { LineChart, Line, XAxis, YAxis, Tooltip, Brush, Legend, ResponsiveContainer } from 'recharts';\n\nconst COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c43'];\n\nexport function AdvancedChart({ data, sources, metric }: Props) {\n  return (\n    <ResponsiveContainer width=\"100%\" height={300}>\n      <LineChart data={data}>\n        <XAxis \n          dataKey=\"timestamp\" \n          tickFormatter={(ts) => format(new Date(ts), 'HH:mm')}\n        />\n        <YAxis />\n        <Tooltip content={<CustomTooltip />} />\n        <Legend />\n        \n        {/* Multiple sources as separate lines */}\n        {sources.map((source, i) => (\n          <Line\n            key={source}\n            type=\"monotone\"\n            dataKey={source}\n            stroke={COLORS[i % COLORS.length]}\n            dot={false}\n            strokeWidth={2}\n          />\n        ))}\n        \n        {/* Brush for zoom */}\n        <Brush dataKey=\"timestamp\" height={30} stroke=\"#8884d8\" />\n      </LineChart>\n    </ResponsiveContainer>\n  );\n}\n\nfunction CustomTooltip({ active, payload, label }: any) {\n  if (!active || !payload) return null;\n  return (\n    <div className=\"bg-gray-800 shadow-lg rounded p-3 border border-gray-700\">\n      <p className=\"text-sm text-gray-500\">{format(new Date(label), 'PPp')}</p>\n      {payload.map((entry: any) => (\n        <p key={entry.name} style={{ color: entry.color }}>\n          {entry.name}: {entry.value.toFixed(2)}\n        </p>\n      ))}\n    </div>\n  );\n}",
           "deep_dive": "Recharts Brush component'i kullanıcının chart'ta bir aralık seçmesini sağlar — zoom gibi çalışır. Production dashboard'larda bu ZORUNLU çünkü 30 günlük veriyi gösterirken 2 saatlik spike'ı incelemek gerekebilir.",
-          "checkpoint": "Chart'larda brush ile zoom yapabiliyor musun? Tooltip özelleştirilmiş mi?"
+          "checkpoint": "Chart'larda brush ile zoom yapabiliyor musun? Tooltip özelleştirilmiş mi?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "AdvancedChart component dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/dashboard/src/components/AdvancedChart.tsx",
+              "why": "Brush (zoom), custom tooltip ve multi-source overlay özelliklerini içeren gelişmiş chart component'i oluşturuyoruz."
+            },
+            {
+              "order": "3.2",
+              "action": "AdvancedChart kodunu yaz",
+              "type": "code_write",
+              "file": "packages/dashboard/src/components/AdvancedChart.tsx",
+              "code": "import { LineChart, Line, XAxis, YAxis, Tooltip, Brush, Legend, ResponsiveContainer } from 'recharts';\nimport { format } from 'date-fns';\n\nconst COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c43'];\n\ninterface AdvancedChartProps {\n  data: any[];\n  sources: string[];\n  metric: string;\n  height?: number;\n}\n\nexport function AdvancedChart({ data, sources, metric, height = 300 }: AdvancedChartProps) {\n  return (\n    <div className=\"bg-gray-800 rounded-lg p-4\">\n      <h3 className=\"text-sm font-medium text-gray-300 mb-2\">{metric}</h3>\n      <ResponsiveContainer width=\"100%\" height={height}>\n        <LineChart data={data}>\n          <XAxis dataKey=\"timestamp\" tickFormatter={ts => format(new Date(ts), 'HH:mm')} stroke=\"#9ca3af\" />\n          <YAxis stroke=\"#9ca3af\" />\n          <Tooltip content={<CustomTooltip />} />\n          <Legend />\n          {sources.map((source, i) => (\n            <Line key={source} type=\"monotone\" dataKey={source} stroke={COLORS[i % COLORS.length]} dot={false} strokeWidth={2} />\n          ))}\n          <Brush dataKey=\"timestamp\" height={30} stroke=\"#8884d8\" />\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n\nfunction CustomTooltip({ active, payload, label }: any) {\n  if (!active || !payload) return null;\n  return (\n    <div className=\"bg-gray-800 shadow-lg rounded p-3 border border-gray-700\">\n      <p className=\"text-sm text-gray-400\">{label ? format(new Date(label), 'PPp') : ''}</p>\n      {payload.map((entry: any) => (\n        <p key={entry.name} style={{ color: entry.color }} className=\"text-sm\">\n          {entry.name}: {Number(entry.value).toFixed(2)}\n        </p>\n      ))}\n    </div>\n  );\n}",
+              "why": "Brush component kullanıcının chart'ta zoom yapmasını sağlar — 30 günlük veriyi gösterirken 2 saatlik spike'ı incelemek için şart. Custom Tooltip dark tema ile uyumlu ve formatlı değerler gösteriyor."
+            },
+            {
+              "order": "3.3",
+              "action": "date-fns kütüphanesini kur",
+              "type": "terminal",
+              "command": "cd packages/dashboard && pnpm add date-fns",
+              "expected_output": "dependencies:\n+ date-fns",
+              "why": "date-fns tarih formatlama için lightweight ve tree-shakeable bir kütüphane. moment.js'e göre çok daha küçük bundle size."
+            },
+            {
+              "order": "3.4",
+              "action": "Dashboard sayfasında AdvancedChart'ı kullan",
+              "type": "code_modify",
+              "file": "packages/dashboard/src/pages/Dashboard.tsx",
+              "code": "import { AdvancedChart } from '../components/AdvancedChart';\n// ChartWidget yerine AdvancedChart kullan",
+              "why": "Dashboard'daki basit chart'ları gelişmiş versiyonla değiştiriyoruz. Zoom ve multi-source overlay artık aktif."
+            },
+            {
+              "order": "3.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Chart'larda Brush bölümü görünmeli ve sürükleyerek zoom yapabilmelisin. Tooltip hover'da dark temalı ve formatlı görünmeli. Birden fazla source aynı chart'ta farklı renklerle görünmeli.",
+              "why": "İnteraktif özelliklerin kullanıcı deneyimini gerçekten iyileştirdiğini doğruluyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   └── ...\n│   └── dashboard/\n│       ├── src/\n│       │   ├── components/\n│       │   │   ├── AdvancedChart.tsx\n│       │   │   ├── ChartWidget.tsx\n│       │   │   ├── DateRangePicker.tsx\n│       │   │   ├── SourceFilter.tsx\n│       │   │   └── SummaryCard.tsx\n│       │   ├── hooks/\n│       │   │   └── useMetrics.ts\n│       │   ├── pages/\n│       │   │   └── Dashboard.tsx\n│       │   ├── types/\n│       │   │   └── metrics.ts\n│       │   └── App.tsx\n│       └── package.json\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "Brush render error: Cannot read property 'length' of undefined",
+              "cause": "Chart data boş veya undefined. Brush component veri olmadan render olamaz.",
+              "fix": "data.length > 0 kontrolü ekle. Veri yüklenene kadar loading skeleton göster."
+            },
+            {
+              "error": "date-fns format error: Invalid time value",
+              "cause": "timestamp değeri geçerli bir tarih formatında değil.",
+              "fix": "API'den gelen timestamp'i new Date() ile parse etmeden önce kontrol et. ISO 8601 formatında olduğundan emin ol."
+            },
+            {
+              "error": "Chart performansı çok düşük (render > 1 saniye)",
+              "cause": "Çok fazla data point render ediliyor. 8000+ nokta chart'ı yavaşlatır.",
+              "fix": "Veriyi downsample et — LTTB algoritması ile ekran genişliğine uygun sayıda nokta göster. dot={false} ile nokta render'ını kapat."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Custom hook'larda dependency array'e Date objesi değil, getTime() değeri koy — Date referans karşılaştırması yapar\n2. SWR pattern: Eski veriyi göster, arkada yeni veri çek — kullanıcı boş ekran görmemeli\n3. Recharts Brush component'i zoom için ZORUNLU, onsuz büyük veri setleri kullanılamaz\n4. Chart'lara Error Boundary sar — bir chart hata verince tüm dashboard çökmemeli",
@@ -301,7 +1114,82 @@
           "instructions": "Her metrik için rolling window z-score hesapla. |z| > 3 olanları anomali olarak işaretle. Window size: 24 saat (288 data point).",
           "code_snippet": "// services/anomaly/zscore.ts\nexport function detectAnomaliesZScore(\n  data: MetricPoint[],\n  windowSize = 288, // 24h of 5-min intervals\n  threshold = 3\n): AnomalyResult[] {\n  const anomalies: AnomalyResult[] = [];\n  \n  for (let i = windowSize; i < data.length; i++) {\n    const window = data.slice(i - windowSize, i);\n    const values = window.map(d => d.value);\n    \n    const mean = values.reduce((a, b) => a + b, 0) / values.length;\n    const std = Math.sqrt(\n      values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length\n    );\n    \n    if (std === 0) continue; // Constant values\n    \n    const zScore = (data[i].value - mean) / std;\n    \n    if (Math.abs(zScore) > threshold) {\n      anomalies.push({\n        timestamp: data[i].timestamp,\n        value: data[i].value,\n        expected: mean,\n        zScore,\n        severity: Math.abs(zScore) > 5 ? 'critical' : 'warning',\n        type: zScore > 0 ? 'spike' : 'drop',\n      });\n    }\n  }\n  \n  return anomalies;\n}",
           "deep_dive": "Z-score'un limitasyonları: Normal dağılım varsayar, seasonal pattern'ları anlamaz, multivariate anomalileri yakalayamaz. Ama basitliği ve açıklanabilirliği nedeniyle production'da ilk savunma hattı olarak kullanılır. Daha karmaşık anomaliler için Isolation Forest kullanacağız.",
-          "checkpoint": "Seed verideki spike'ları z-score ile yakalayabiliyor musun? Threshold 3 ile kaç anomali bulunuyor?"
+          "checkpoint": "Seed verideki spike'ları z-score ile yakalayabiliyor musun? Threshold 3 ile kaç anomali bulunuyor?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Anomaly services dizinini oluştur",
+              "type": "terminal",
+              "command": "mkdir -p packages/api/src/services/anomaly",
+              "expected_output": "Dizin oluşturuldu",
+              "why": "Anomali tespit modüllerini ayrı bir servis dizininde tutuyoruz. İleride ML servisi de buraya eklenecek."
+            },
+            {
+              "order": "1.2",
+              "action": "Z-score anomali tespit dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/api/src/services/anomaly/zscore.ts",
+              "why": "İstatistiksel anomali tespiti ile başlıyoruz. Z-score basit, anlaşılması kolay ve çoğu basit anomaliyi yakalar."
+            },
+            {
+              "order": "1.3",
+              "action": "Z-score anomali tespiti kodunu yaz",
+              "type": "code_write",
+              "file": "packages/api/src/services/anomaly/zscore.ts",
+              "code": "import { MetricPoint } from '../../types';\n\nexport interface AnomalyResult {\n  timestamp: string;\n  value: number;\n  expected: number;\n  zScore: number;\n  severity: 'warning' | 'critical';\n  type: 'spike' | 'drop';\n}\n\nexport function detectAnomaliesZScore(\n  data: MetricPoint[],\n  windowSize = 288,\n  threshold = 3\n): AnomalyResult[] {\n  const anomalies: AnomalyResult[] = [];\n  for (let i = windowSize; i < data.length; i++) {\n    const window = data.slice(i - windowSize, i);\n    const values = window.map(d => d.avg_value);\n    const mean = values.reduce((a, b) => a + b, 0) / values.length;\n    const std = Math.sqrt(\n      values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length\n    );\n    if (std === 0) continue;\n    const zScore = (data[i].avg_value - mean) / std;\n    if (Math.abs(zScore) > threshold) {\n      anomalies.push({\n        timestamp: data[i].bucket,\n        value: data[i].avg_value,\n        expected: mean,\n        zScore,\n        severity: Math.abs(zScore) > 5 ? 'critical' : 'warning',\n        type: zScore > 0 ? 'spike' : 'drop',\n      });\n    }\n  }\n  return anomalies;\n}",
+              "why": "Rolling window z-score: Son 24 saatlik verinin ortalaması ve standart sapmasına göre mevcut değerin ne kadar sapma gösterdiğini ölçüyoruz. |z| > 3 istatistiksel olarak anormal kabul edilir (%0.3 olasılık). |z| > 5 ise kritik."
+            },
+            {
+              "order": "1.4",
+              "action": "Anomali API endpoint'ini oluştur",
+              "type": "code_write",
+              "file": "packages/api/src/routes/anomalies.ts",
+              "code": "import { Router } from 'express';\nimport { pool } from '../index';\nimport { detectAnomaliesZScore } from '../services/anomaly/zscore';\n\nconst router = Router();\n\nrouter.get('/detect', async (req, res) => {\n  const { source, metric, from, to, threshold = '3' } = req.query;\n  const result = await pool.query(\n    `SELECT date_trunc('5 minutes', timestamp) as bucket, AVG(value) as avg_value\n     FROM metrics WHERE source = $1 AND metric_name = $2\n     AND timestamp BETWEEN $3 AND $4\n     GROUP BY bucket ORDER BY bucket ASC`,\n    [source, metric, from, to]\n  );\n  const anomalies = detectAnomaliesZScore(result.rows, 288, Number(threshold));\n  res.json({ total: anomalies.length, anomalies });\n});\n\nexport default router;",
+              "why": "Anomali tespiti endpoint'i veriyi DB'den çeker, z-score analizi yapar ve sonuçları döndürür. Threshold parametresi configurable — duyarlılık ayarlanabilir."
+            },
+            {
+              "order": "1.5",
+              "action": "Route'u Express app'e bağla",
+              "type": "code_modify",
+              "file": "packages/api/src/index.ts",
+              "code": "import anomalyRouter from './routes/anomalies';\napp.use('/api/anomalies', anomalyRouter);",
+              "position": "bottom",
+              "why": "Anomali tespiti route'unu /api/anomalies prefix'i altına mount ediyoruz."
+            },
+            {
+              "order": "1.6",
+              "action": "Z-score tespitini test et",
+              "type": "terminal",
+              "command": "curl \"http://localhost:4000/api/anomalies/detect?source=web-app&metric=cpu_usage&from=2024-01-01&to=2024-02-01&threshold=3\"",
+              "expected_output": "JSON: { total: N, anomalies: [...] } — seed verideki spike'lar yakalanmalı",
+              "why": "Z-score'un seed verideki kasıtlı spike'ları yakalayıp yakalamadığını doğruluyoruz."
+            },
+            {
+              "order": "1.7",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "threshold=3 ile anomali sayısı makul olmalı (çok fazla değil, çok az değil). Spike type anomaliler seed verideki kasıtlı spike'larla örtüşmeli.",
+              "why": "Z-score'un doğru çalıştığını ve false positive oranının kabul edilebilir olduğunu kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── src/\n│   │   │   ├── middleware/\n│   │   │   │   └── cache.ts\n│   │   │   ├── routes/\n│   │   │   │   ├── anomalies.ts\n│   │   │   │   ├── dashboard.ts\n│   │   │   │   └── metrics.ts\n│   │   │   ├── services/\n│   │   │   │   └── anomaly/\n│   │   │   │       └── zscore.ts\n│   │   │   ├── utils/\n│   │   │   │   └── metrics.ts\n│   │   │   └── index.ts\n│   │   └── ...\n│   └── dashboard/\n│       └── ...\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "Tüm veriler anomali olarak işaretleniyor",
+              "cause": "threshold değeri çok düşük ayarlanmış veya window size çok küçük.",
+              "fix": "threshold=3 ve windowSize=288 (24 saat) ile başla. Veri dağılımına göre ayarla."
+            },
+            {
+              "error": "Hiç anomali bulunamıyor",
+              "cause": "Seed veride spike'lar oluşmamış veya threshold çok yüksek.",
+              "fix": "Seed script'teki spike olasılığını artır (0.995 yerine 0.99). Veya threshold'u 2'ye düşür."
+            },
+            {
+              "error": "std === 0, division by zero",
+              "cause": "Window içindeki tüm değerler aynı. Sabit veri için z-score hesaplanamaz.",
+              "fix": "std === 0 kontrolü ekle ve bu durumda anomali olarak işaretleme. Kodda zaten bu kontrol var."
+            }
+          ]
         },
         {
           "step": 2,
@@ -310,7 +1198,113 @@
           "instructions": "Python ML service oluştur (FastAPI). scikit-learn Isolation Forest modeli eğit. Feature'lar: value, hour_of_day, day_of_week, rolling_mean, rolling_std. contamination=0.01 ile başla.",
           "code_snippet": "# ml_service/anomaly_detector.py\nfrom sklearn.ensemble import IsolationForest\nimport numpy as np\nimport pandas as pd\n\nclass AnomalyDetector:\n    def __init__(self, contamination=0.01):\n        self.model = IsolationForest(\n            contamination=contamination,\n            n_estimators=100,\n            random_state=42\n        )\n        self.fitted = False\n    \n    def _extract_features(self, df: pd.DataFrame) -> np.ndarray:\n        \"\"\"Feature engineering for time-series anomaly detection.\"\"\"\n        features = pd.DataFrame()\n        features['value'] = df['value']\n        features['hour'] = pd.to_datetime(df['timestamp']).dt.hour\n        features['day_of_week'] = pd.to_datetime(df['timestamp']).dt.dayofweek\n        features['rolling_mean_1h'] = df['value'].rolling(12).mean()\n        features['rolling_std_1h'] = df['value'].rolling(12).std()\n        features['rolling_mean_24h'] = df['value'].rolling(288).mean()\n        features['diff'] = df['value'].diff()  # Rate of change\n        features['diff_abs'] = features['diff'].abs()\n        return features.dropna().values\n    \n    def fit(self, df: pd.DataFrame):\n        X = self._extract_features(df)\n        self.model.fit(X)\n        self.fitted = True\n    \n    def predict(self, df: pd.DataFrame) -> list:\n        X = self._extract_features(df)\n        # -1 = anomaly, 1 = normal\n        predictions = self.model.predict(X)\n        scores = self.model.score_samples(X)\n        \n        anomalies = []\n        for i, (pred, score) in enumerate(zip(predictions, scores)):\n            if pred == -1:\n                anomalies.append({\n                    'index': i,\n                    'score': float(score),\n                    'severity': 'critical' if score < -0.6 else 'warning'\n                })\n        return anomalies",
           "deep_dive": "Feature engineering anomali tespitinin en kritik kısmı. Raw value tek başına yeterli değil — saate göre beklenen değer farklı (gece düşük, gündüz yüksek). Rolling statistics trend'i yakalar, diff rate-of-change'i yakalar. contamination parametresi verinin kaçının anomali olduğunu belirtir — başlangıçta 0.01 (1%) iyi bir değer.",
-          "checkpoint": "ML service çalışıyor ve seed verideki anomalileri tespit edebiliyor mu? Z-score sonuçlarıyla karşılaştır."
+          "checkpoint": "ML service çalışıyor ve seed verideki anomalileri tespit edebiliyor mu? Z-score sonuçlarıyla karşılaştır.",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "ML service dizinini oluştur",
+              "type": "terminal",
+              "command": "mkdir -p packages/ml-service",
+              "expected_output": "Dizin oluşturuldu",
+              "why": "Python ML servisini ayrı bir pakette tutuyoruz. Node.js API ve Python ML servisi bağımsız çalışacak."
+            },
+            {
+              "order": "2.2",
+              "action": "Python sanal ortam oluştur ve bağımlılıkları kur",
+              "type": "terminal",
+              "command": "cd packages/ml-service && python -m venv venv && source venv/bin/activate && pip install fastapi uvicorn scikit-learn pandas numpy psycopg2-binary python-dotenv",
+              "expected_output": "Successfully installed fastapi scikit-learn pandas ...",
+              "why": "Sanal ortam proje bağımlılıklarını sistem Python'undan izole eder. FastAPI hızlı ve modern bir Python web framework'ü."
+            },
+            {
+              "order": "2.3",
+              "action": "requirements.txt oluştur",
+              "type": "code_write",
+              "file": "packages/ml-service/requirements.txt",
+              "code": "fastapi==0.104.1\nuvicorn==0.24.0\nscikit-learn==1.3.2\npandas==2.1.4\nnumpy==1.26.2\npsycopg2-binary==2.9.9\npython-dotenv==1.0.0",
+              "why": "Bağımlılıkları requirements.txt'te sabitlemek reproducible build sağlar. Versiyon numaraları ile uyumsuzluk riski azalır."
+            },
+            {
+              "order": "2.4",
+              "action": "Anomali dedektör sınıfını oluştur",
+              "type": "file_open",
+              "file": "packages/ml-service/anomaly_detector.py",
+              "why": "Isolation Forest modelini kapsülleyen sınıfı yazacağız. Feature engineering ve model eğitimi burada yapılacak."
+            },
+            {
+              "order": "2.5",
+              "action": "AnomalyDetector sınıf kodunu yaz",
+              "type": "code_write",
+              "file": "packages/ml-service/anomaly_detector.py",
+              "code": "from sklearn.ensemble import IsolationForest\nimport numpy as np\nimport pandas as pd\n\nclass AnomalyDetector:\n    def __init__(self, contamination=0.01):\n        self.model = IsolationForest(\n            contamination=contamination,\n            n_estimators=100,\n            random_state=42\n        )\n        self.fitted = False\n\n    def _extract_features(self, df: pd.DataFrame) -> np.ndarray:\n        features = pd.DataFrame()\n        features['value'] = df['value']\n        features['hour'] = pd.to_datetime(df['timestamp']).dt.hour\n        features['day_of_week'] = pd.to_datetime(df['timestamp']).dt.dayofweek\n        features['rolling_mean_1h'] = df['value'].rolling(12).mean()\n        features['rolling_std_1h'] = df['value'].rolling(12).std()\n        features['rolling_mean_24h'] = df['value'].rolling(288).mean()\n        features['diff'] = df['value'].diff()\n        features['diff_abs'] = features['diff'].abs()\n        return features.dropna()\n\n    def fit(self, df: pd.DataFrame):\n        features = self._extract_features(df)\n        self.model.fit(features.values)\n        self.fitted = True\n        return self\n\n    def predict(self, df: pd.DataFrame) -> list:\n        features = self._extract_features(df)\n        predictions = self.model.predict(features.values)\n        scores = self.model.score_samples(features.values)\n        anomalies = []\n        for i, (pred, score) in enumerate(zip(predictions, scores)):\n            if pred == -1:\n                anomalies.append({\n                    'index': int(features.index[i]),\n                    'score': float(score),\n                    'severity': 'critical' if score < -0.6 else 'warning'\n                })\n        return anomalies",
+              "why": "Feature engineering anomali tespitinin en kritik kısmı. Ham değer yanında saat, gün, rolling istatistikler ve değişim hızı da feature olarak ekleniyor. contamination=0.01 verinin %1'inin anomali olduğunu varsayar."
+            },
+            {
+              "order": "2.6",
+              "action": "FastAPI uygulama dosyasını oluştur",
+              "type": "code_write",
+              "file": "packages/ml-service/main.py",
+              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nimport pandas as pd\nimport psycopg2\nimport os\nfrom dotenv import load_dotenv\nfrom anomaly_detector import AnomalyDetector\n\nload_dotenv()\napp = FastAPI(title='Anomaly Detection Service')\napp.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])\n\ndetector = AnomalyDetector(contamination=0.01)\n\n@app.post('/train')\nasync def train(source: str = 'web-app', metric: str = 'cpu_usage'):\n    conn = psycopg2.connect(os.getenv('DATABASE_URL'))\n    df = pd.read_sql(\n        'SELECT value, timestamp FROM metrics WHERE source = %s AND metric_name = %s ORDER BY timestamp',\n        conn, params=(source, metric)\n    )\n    conn.close()\n    detector.fit(df)\n    return {'status': 'trained', 'samples': len(df)}\n\n@app.post('/predict')\nasync def predict(source: str = 'web-app', metric: str = 'cpu_usage', hours: int = 24):\n    conn = psycopg2.connect(os.getenv('DATABASE_URL'))\n    df = pd.read_sql(\n        f\"SELECT value, timestamp FROM metrics WHERE source = %s AND metric_name = %s AND timestamp > NOW() - INTERVAL '{hours} hours' ORDER BY timestamp\",\n        conn, params=(source, metric)\n    )\n    conn.close()\n    if not detector.fitted:\n        return {'error': 'Model not trained. Call /train first.'}\n    anomalies = detector.predict(df)\n    return {'total': len(anomalies), 'anomalies': anomalies}\n\n@app.get('/health')\nasync def health():\n    return {'status': 'ok', 'model_fitted': detector.fitted}",
+              "why": "FastAPI ile REST API oluşturuyoruz. /train endpoint'i modeli eğitir, /predict anomalileri tespit eder. Separation of concerns: eğitim ve tahmin ayrı endpoint'ler."
+            },
+            {
+              "order": "2.7",
+              "action": ".env dosyasını oluştur",
+              "type": "code_write",
+              "file": "packages/ml-service/.env",
+              "code": "DATABASE_URL=postgresql://localhost:5432/analytics_dashboard",
+              "why": "ML servisi de aynı veritabanına bağlanacak. Ortam değişkeni ile bağlantı bilgisi yapılandırılıyor."
+            },
+            {
+              "order": "2.8",
+              "action": "ML servisini başlat",
+              "type": "terminal",
+              "command": "cd packages/ml-service && source venv/bin/activate && uvicorn main:app --port 5000 --reload",
+              "expected_output": "Uvicorn running on http://0.0.0.0:5000",
+              "why": "FastAPI uygulamasını uvicorn ile başlatıyoruz. --reload geliştirme sırasında dosya değişikliklerinde otomatik restart sağlar."
+            },
+            {
+              "order": "2.9",
+              "action": "Modeli eğit ve test et",
+              "type": "terminal",
+              "command": "curl -X POST \"http://localhost:5000/train?source=web-app&metric=cpu_usage\"",
+              "expected_output": "{\"status\":\"trained\",\"samples\":8640}",
+              "why": "Modeli seed verisi ile eğitiyoruz. Eğitim tamamlandıktan sonra predict endpoint'i kullanılabilir."
+            },
+            {
+              "order": "2.10",
+              "action": "Anomali tahminini test et",
+              "type": "terminal",
+              "command": "curl -X POST \"http://localhost:5000/predict?source=web-app&metric=cpu_usage&hours=168\"",
+              "expected_output": "JSON: { total: N, anomalies: [...] }",
+              "why": "Son 7 günlük veride anomali tespiti yaparak modelin çalıştığını doğruluyoruz."
+            },
+            {
+              "order": "2.11",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "ML service /health endpoint'i model_fitted: true döndürmeli. /predict endpoint'i anomali listesi döndürmeli. Z-score sonuçlarıyla karşılaştır — ML daha az false positive üretmeli.",
+              "why": "İki yöntemin sonuçlarını karşılaştırarak Isolation Forest'ın z-score'a göre avantajlarını gösteriyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   └── ...\n│   ├── dashboard/\n│   │   └── ...\n│   └── ml-service/\n│       ├── venv/\n│       ├── anomaly_detector.py\n│       ├── main.py\n│       ├── requirements.txt\n│       └── .env\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "ModuleNotFoundError: No module named 'sklearn'",
+              "cause": "scikit-learn paketi kurulmamış veya sanal ortam aktif değil.",
+              "fix": "source venv/bin/activate ile sanal ortamı aktif et. pip install scikit-learn ile kur."
+            },
+            {
+              "error": "ValueError: Found array with 0 sample(s)",
+              "cause": "Veritabanından veri çekilemedi veya feature extraction sonucu boş DataFrame.",
+              "fix": "DB bağlantısını ve sorguyu kontrol et. Rolling window boyutu veri sayısından küçük olmalı."
+            },
+            {
+              "error": "psycopg2.OperationalError: could not connect to server",
+              "cause": "PostgreSQL bağlantısı başarısız. DATABASE_URL yanlış veya DB çalışmıyor.",
+              "fix": ".env dosyasındaki DATABASE_URL'i kontrol et. PostgreSQL servisinin çalıştığından emin ol."
+            }
+          ]
         },
         {
           "step": 3,
@@ -319,7 +1313,65 @@
           "instructions": "Chart'larda anomali noktalarını kırmızı dot olarak göster. Anomali tıklandığında detay popup göster. Slack/email alert endpoint'i oluştur.",
           "code_snippet": "// components/AnomalyOverlay.tsx\nimport { ScatterChart, Scatter, Cell, ReferenceLine } from 'recharts';\n\nexport function AnomalyChart({ data, anomalies }: Props) {\n  return (\n    <ResponsiveContainer width=\"100%\" height={300}>\n      <ComposedChart data={data}>\n        <Line type=\"monotone\" dataKey=\"value\" stroke=\"#8884d8\" dot={false} />\n        \n        {/* Anomaly points as red dots */}\n        <Scatter data={anomalies} fill=\"red\">\n          {anomalies.map((a, i) => (\n            <Cell\n              key={i}\n              fill={a.severity === 'critical' ? '#ef4444' : '#f59e0b'}\n              onClick={() => showAnomalyDetail(a)}\n              cursor=\"pointer\"\n            />\n          ))}\n        </Scatter>\n        \n        {/* Expected range band */}\n        <ReferenceArea y1={lowerBound} y2={upperBound} fill=\"#8884d8\" fillOpacity={0.1} />\n      </ComposedChart>\n    </ResponsiveContainer>\n  );\n}",
           "deep_dive": "Alert fatigue production'da en büyük sorun. Çok fazla alert gönderirsen ekip hepsini ignore eder. Anomali severity'sini doğru belirlemek ve grouping yapmak (aynı root cause'tan gelen anomalileri birleştirmek) critical.",
-          "checkpoint": "Chart'larda anomali noktaları kırmızı/sarı olarak görünüyor mu? Tıklayınca detay açılıyor mu?"
+          "checkpoint": "Chart'larda anomali noktaları kırmızı/sarı olarak görünüyor mu? Tıklayınca detay açılıyor mu?",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "AnomalyChart component dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/dashboard/src/components/AnomalyChart.tsx",
+              "why": "Anomali noktalarını normal veri üzerine overlay olarak gösteren chart component'i oluşturuyoruz."
+            },
+            {
+              "order": "3.2",
+              "action": "AnomalyChart kodunu yaz",
+              "type": "code_write",
+              "file": "packages/dashboard/src/components/AnomalyChart.tsx",
+              "code": "import { ComposedChart, Line, Scatter, Cell, ReferenceArea, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';\n\ninterface AnomalyChartProps {\n  data: any[];\n  anomalies: any[];\n  lowerBound: number;\n  upperBound: number;\n}\n\nexport function AnomalyChart({ data, anomalies, lowerBound, upperBound }: AnomalyChartProps) {\n  return (\n    <div className=\"bg-gray-800 rounded-lg p-4\">\n      <h3 className=\"text-sm font-medium text-gray-300 mb-2\">Anomali Tespiti</h3>\n      <ResponsiveContainer width=\"100%\" height={300}>\n        <ComposedChart data={data}>\n          <XAxis dataKey=\"timestamp\" stroke=\"#9ca3af\" />\n          <YAxis stroke=\"#9ca3af\" />\n          <Tooltip />\n          <ReferenceArea y1={lowerBound} y2={upperBound} fill=\"#8884d8\" fillOpacity={0.1} />\n          <Line type=\"monotone\" dataKey=\"value\" stroke=\"#8884d8\" dot={false} />\n          <Scatter data={anomalies} fill=\"red\">\n            {anomalies.map((a, i) => (\n              <Cell key={i} fill={a.severity === 'critical' ? '#ef4444' : '#f59e0b'} cursor=\"pointer\" />\n            ))}\n          </Scatter>\n        </ComposedChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}",
+              "why": "ComposedChart Line ve Scatter'ı birleştirir. ReferenceArea beklenen aralığı gösterir, bu aralığın dışındakiler anomali. Kırmızı noktalar critical, sarı noktalar warning anomalileri temsil eder."
+            },
+            {
+              "order": "3.3",
+              "action": "Anomali detay popup component'ini oluştur",
+              "type": "code_write",
+              "file": "packages/dashboard/src/components/AnomalyDetail.tsx",
+              "code": "interface AnomalyDetailProps {\n  anomaly: {\n    timestamp: string;\n    value: number;\n    expected: number;\n    severity: string;\n    type: string;\n    zScore?: number;\n    score?: number;\n  } | null;\n  onClose: () => void;\n}\n\nexport function AnomalyDetail({ anomaly, onClose }: AnomalyDetailProps) {\n  if (!anomaly) return null;\n  return (\n    <div className=\"fixed inset-0 bg-black/50 flex items-center justify-center z-50\">\n      <div className=\"bg-gray-800 rounded-lg p-6 max-w-md border border-gray-700\">\n        <h3 className=\"text-lg font-bold text-white mb-4\">Anomali Detayı</h3>\n        <div className=\"space-y-2 text-gray-300\">\n          <p><span className=\"text-gray-500\">Zaman:</span> {anomaly.timestamp}</p>\n          <p><span className=\"text-gray-500\">Değer:</span> {anomaly.value.toFixed(2)}</p>\n          <p><span className=\"text-gray-500\">Beklenen:</span> {anomaly.expected.toFixed(2)}</p>\n          <p><span className=\"text-gray-500\">Şiddet:</span>\n            <span className={anomaly.severity === 'critical' ? 'text-red-400' : 'text-yellow-400'}>\n              {' '}{anomaly.severity}\n            </span>\n          </p>\n          <p><span className=\"text-gray-500\">Tip:</span> {anomaly.type}</p>\n        </div>\n        <button onClick={onClose} className=\"mt-4 px-4 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600\">\n          Kapat\n        </button>\n      </div>\n    </div>\n  );\n}",
+              "why": "Anomali noktasına tıklayınca detay bilgisi gösteren modal. Kullanıcı anomalinin ne zaman, ne kadar ve ne tür olduğunu görebilir."
+            },
+            {
+              "order": "3.4",
+              "action": "useAnomalies hook'u oluştur",
+              "type": "code_write",
+              "file": "packages/dashboard/src/hooks/useAnomalies.ts",
+              "code": "import { useState, useEffect } from 'react';\n\nexport function useAnomalies(source: string, metric: string) {\n  const [anomalies, setAnomalies] = useState([]);\n  const [loading, setLoading] = useState(true);\n\n  useEffect(() => {\n    const fetchAnomalies = async () => {\n      try {\n        const res = await fetch(\n          `/api/anomalies/detect?source=${source}&metric=${metric}&from=${new Date(Date.now() - 7 * 86400000).toISOString()}&to=${new Date().toISOString()}`\n        );\n        const data = await res.json();\n        setAnomalies(data.anomalies || []);\n      } catch (err) {\n        console.error('Anomaly fetch error:', err);\n      } finally {\n        setLoading(false);\n      }\n    };\n    fetchAnomalies();\n  }, [source, metric]);\n\n  return { anomalies, loading };\n}",
+              "why": "Anomali verisi çekme logic'ini custom hook'ta kapsülleyerek component'lerin temiz kalmasını sağlıyoruz."
+            },
+            {
+              "order": "3.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Chart üzerinde anomali noktaları kırmızı (critical) ve sarı (warning) olarak görünmeli. Beklenen aralık band'ı yarı saydam olarak gösterilmeli. Anomali noktasına tıklayınca detay popup açılmalı.",
+              "why": "Anomali görselleştirmesinin kullanıcıya anlamlı ve eyleme dönüştürülebilir bilgi verdiğini kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   └── ...\n│   ├── dashboard/\n│   │   ├── src/\n│   │   │   ├── components/\n│   │   │   │   ├── AdvancedChart.tsx\n│   │   │   │   ├── AnomalyChart.tsx\n│   │   │   │   ├── AnomalyDetail.tsx\n│   │   │   │   ├── ChartWidget.tsx\n│   │   │   │   ├── DateRangePicker.tsx\n│   │   │   │   ├── SourceFilter.tsx\n│   │   │   │   └── SummaryCard.tsx\n│   │   │   ├── hooks/\n│   │   │   │   ├── useAnomalies.ts\n│   │   │   │   └── useMetrics.ts\n│   │   │   └── ...\n│   │   └── ...\n│   └── ml-service/\n│       └── ...\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "Scatter points not visible on chart",
+              "cause": "Anomali verisi chart'ın veri formatıyla uyuşmuyor. dataKey eşleşmesi yanlış.",
+              "fix": "Scatter data'sında timestamp ve value alanlarının chart data ile aynı formatta olduğundan emin ol."
+            },
+            {
+              "error": "ReferenceArea renders but bounds are wrong",
+              "cause": "lowerBound ve upperBound değerleri yanlış hesaplanmış.",
+              "fix": "mean +/- (threshold * std) formülü ile bound'ları hesapla. Veri aralığına uygun olduğunu kontrol et."
+            },
+            {
+              "error": "Modal backdrop click closes and reopens",
+              "cause": "Event bubbling sorunu — Cell onClick ve backdrop onClick çakışıyor.",
+              "fix": "Modal backdrop'a onClick eklerken e.stopPropagation() kullan. Veya portal kullanarak modal'ı DOM tree dışına taşı."
+            }
+          ]
         },
         {
           "step": 4,
@@ -328,7 +1380,66 @@
           "instructions": "Precision, recall, F1 score hesapla. Confusion matrix görselleştir. A/B test framework'ü oluştur: z-score vs Isolation Forest karşılaştır.",
           "code_snippet": "# ml_service/evaluation.py\ndef evaluate_detector(detector, test_data, known_anomalies):\n    predictions = detector.predict(test_data)\n    pred_indices = set(p['index'] for p in predictions)\n    true_indices = set(known_anomalies)\n    \n    tp = len(pred_indices & true_indices)\n    fp = len(pred_indices - true_indices)\n    fn = len(true_indices - pred_indices)\n    \n    precision = tp / (tp + fp) if (tp + fp) > 0 else 0\n    recall = tp / (tp + fn) if (tp + fn) > 0 else 0\n    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0\n    \n    return {\n        'precision': precision,\n        'recall': recall,\n        'f1_score': f1,\n        'true_positives': tp,\n        'false_positives': fp,\n        'false_negatives': fn,\n        'false_positive_rate': fp / (fp + (len(test_data) - len(true_indices)))\n    }",
           "deep_dive": "Anomali tespitinde precision vs recall trade-off: Precision yüksek = az false alarm ama bazı gerçek anomalileri kaçırırsın. Recall yüksek = hiçbir anomaliyi kaçırmazsın ama çok false alarm gelir. Production'da genelde precision > recall tercih edilir çünkü false alarm'lar güveni azaltır.",
-          "checkpoint": "F1 score 0.7'nin üzerinde mi? False positive rate %5'in altında mı?"
+          "checkpoint": "F1 score 0.7'nin üzerinde mi? False positive rate %5'in altında mı?",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Evaluation modülünü oluştur",
+              "type": "file_open",
+              "file": "packages/ml-service/evaluation.py",
+              "why": "ML modelinin performansını ölçmek için precision, recall ve F1 score hesaplayan modül yazacağız."
+            },
+            {
+              "order": "4.2",
+              "action": "Evaluation kodunu yaz",
+              "type": "code_write",
+              "file": "packages/ml-service/evaluation.py",
+              "code": "def evaluate_detector(detector, test_data, known_anomalies):\n    predictions = detector.predict(test_data)\n    pred_indices = set(p['index'] for p in predictions)\n    true_indices = set(known_anomalies)\n\n    tp = len(pred_indices & true_indices)\n    fp = len(pred_indices - true_indices)\n    fn = len(true_indices - pred_indices)\n\n    precision = tp / (tp + fp) if (tp + fp) > 0 else 0\n    recall = tp / (tp + fn) if (tp + fn) > 0 else 0\n    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0\n\n    return {\n        'precision': precision,\n        'recall': recall,\n        'f1_score': f1,\n        'true_positives': tp,\n        'false_positives': fp,\n        'false_negatives': fn,\n        'false_positive_rate': fp / (fp + (len(test_data) - len(true_indices))) if (fp + (len(test_data) - len(true_indices))) > 0 else 0\n    }",
+              "why": "Precision: tespit ettiklerimizin kaçı gerçek anomali. Recall: gerçek anomalilerin kaçını yakaladık. F1: ikisinin harmonik ortalaması. Production'da precision > recall tercih edilir çünkü false alarm güveni azaltır."
+            },
+            {
+              "order": "4.3",
+              "action": "Evaluation endpoint'ini FastAPI'ye ekle",
+              "type": "code_modify",
+              "file": "packages/ml-service/main.py",
+              "code": "from evaluation import evaluate_detector\n\n@app.post('/evaluate')\nasync def evaluate(source: str = 'web-app', metric: str = 'cpu_usage'):\n    # Known anomalies from seed (spike indices)\n    conn = psycopg2.connect(os.getenv('DATABASE_URL'))\n    df = pd.read_sql(\n        'SELECT value, timestamp FROM metrics WHERE source = %s AND metric_name = %s ORDER BY timestamp',\n        conn, params=(source, metric)\n    )\n    conn.close()\n    if not detector.fitted:\n        return {'error': 'Model not trained'}\n    # Use z-score as ground truth for comparison\n    mean = df['value'].mean()\n    std = df['value'].std()\n    known = set(df.index[abs(df['value'] - mean) > 4 * std].tolist())\n    result = evaluate_detector(detector, df, known)\n    return result",
+              "position": "bottom",
+              "why": "z > 4 olan noktaları ground truth olarak kullanıyoruz (kesinlikle anomali). Isolation Forest'ın bu noktaları yakalayıp yakalamadığını ölçüyoruz."
+            },
+            {
+              "order": "4.4",
+              "action": "Evaluation'ı çalıştır",
+              "type": "terminal",
+              "command": "curl -X POST \"http://localhost:5000/evaluate?source=web-app&metric=cpu_usage\"",
+              "expected_output": "JSON: { precision: 0.8+, recall: 0.7+, f1_score: 0.7+, false_positive_rate: <0.05 }",
+              "why": "Model performans metriklerini kontrol ediyoruz. F1 > 0.7 ve FPR < 5% hedefliyoruz."
+            },
+            {
+              "order": "4.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "F1 score 0.7'nin üzerinde olmalı. False positive rate %5'in altında olmalı. Precision ve recall değerleri makul aralıkta olmalı.",
+              "why": "ML modelinin production'a alınabilecek kalitede olduğunu kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   └── ...\n│   ├── dashboard/\n│   │   └── ...\n│   └── ml-service/\n│       ├── venv/\n│       ├── anomaly_detector.py\n│       ├── evaluation.py\n│       ├── main.py\n│       ├── requirements.txt\n│       └── .env\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "F1 score çok düşük (< 0.5)",
+              "cause": "Ground truth tanımı yanlış veya model parametreleri uygun değil.",
+              "fix": "Ground truth için z > 4 yerine z > 3.5 dene. contamination parametresini 0.02'ye çıkar. Feature'ları gözden geçir."
+            },
+            {
+              "error": "ZeroDivisionError: division by zero",
+              "cause": "tp + fp veya tp + fn sıfır. Model hiç anomali bulamadı veya ground truth boş.",
+              "fix": "Sıfır kontrolü ekle (kodda zaten var). Veri setinde yeterli anomali olduğundan emin ol."
+            },
+            {
+              "error": "False positive rate çok yüksek (> 10%)",
+              "cause": "contamination parametresi çok yüksek ayarlanmış.",
+              "fix": "contamination=0.005 ile başla ve kademeli olarak artır. n_estimators'ı 200'e çıkarmayı dene."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Her zaman basit yöntemle (z-score) başla, sonra ML'e geç — basit çözüm yetebilir\n2. Feature engineering model performansının %80'ini belirler — doğru feature'lar seç\n3. contamination parametresi domain knowledge gerektirir — verinin kaçı anomali?\n4. Alert fatigue production'un en büyük düşmanı — severity doğru belirle",
@@ -353,7 +1464,73 @@
           "instructions": "CSV export: Papa Parse ile client-side CSV oluştur. PDF export: jsPDF + html2canvas ile chart'ları PDF'e çevir. Download butonları ekle.",
           "code_snippet": "// utils/export.ts\nimport Papa from 'papaparse';\nimport jsPDF from 'jspdf';\nimport html2canvas from 'html2canvas';\n\nexport function exportCSV(data: any[], filename: string) {\n  const csv = Papa.unparse(data);\n  const blob = new Blob([csv], { type: 'text/csv' });\n  const url = URL.createObjectURL(blob);\n  const a = document.createElement('a');\n  a.href = url;\n  a.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`;\n  a.click();\n  URL.revokeObjectURL(url);\n}\n\nexport async function exportPDF(elementId: string, title: string) {\n  const element = document.getElementById(elementId);\n  if (!element) return;\n  \n  const canvas = await html2canvas(element, { scale: 2 });\n  const pdf = new jsPDF('landscape', 'mm', 'a4');\n  \n  pdf.setFontSize(18);\n  pdf.text(title, 15, 15);\n  pdf.setFontSize(10);\n  pdf.text(`Generated: ${format(new Date(), 'PPp')}`, 15, 22);\n  \n  const imgWidth = 267; // A4 landscape width - margins\n  const imgHeight = (canvas.height * imgWidth) / canvas.width;\n  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 30, imgWidth, imgHeight);\n  \n  pdf.save(`${title}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);\n}",
           "deep_dive": "html2canvas chart'ları pixel-perfect PNG'ye çevirir. scale: 2 ile retina kalitesi elde edersin. Dikkat: SVG-based chart'lar (Recharts) bazen html2canvas ile sorun yaşar — foreignObject kullanılıyorsa. Bu durumda chart'ı önce canvas-based kütüphaneye çevirmek gerekebilir.",
-          "checkpoint": "CSV ve PDF butonları çalışıyor mu? İndirilen dosyalar doğru veriyi içeriyor mu?"
+          "checkpoint": "CSV ve PDF butonları çalışıyor mu? İndirilen dosyalar doğru veriyi içeriyor mu?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Export kütüphanelerini kur",
+              "type": "terminal",
+              "command": "cd packages/dashboard && pnpm add papaparse jspdf html2canvas && pnpm add -D @types/papaparse",
+              "expected_output": "dependencies:\n+ papaparse\n+ jspdf\n+ html2canvas",
+              "why": "papaparse CSV oluşturma, jspdf PDF oluşturma, html2canvas DOM elementlerini canvas'a çevirme için kullanılacak."
+            },
+            {
+              "order": "1.2",
+              "action": "Export utility dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/dashboard/src/utils/export.ts",
+              "why": "CSV ve PDF export fonksiyonlarını utils dizininde merkezi olarak tanımlıyoruz."
+            },
+            {
+              "order": "1.3",
+              "action": "Export fonksiyonlarını yaz",
+              "type": "code_write",
+              "file": "packages/dashboard/src/utils/export.ts",
+              "code": "import Papa from 'papaparse';\nimport jsPDF from 'jspdf';\nimport html2canvas from 'html2canvas';\nimport { format } from 'date-fns';\n\nexport function exportCSV(data: any[], filename: string) {\n  const csv = Papa.unparse(data);\n  const blob = new Blob([csv], { type: 'text/csv' });\n  const url = URL.createObjectURL(blob);\n  const a = document.createElement('a');\n  a.href = url;\n  a.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`;\n  a.click();\n  URL.revokeObjectURL(url);\n}\n\nexport async function exportPDF(elementId: string, title: string) {\n  const element = document.getElementById(elementId);\n  if (!element) return;\n  const canvas = await html2canvas(element, { scale: 2 });\n  const pdf = new jsPDF('landscape', 'mm', 'a4');\n  pdf.setFontSize(18);\n  pdf.text(title, 15, 15);\n  pdf.setFontSize(10);\n  pdf.text(`Oluşturulma: ${format(new Date(), 'PPp')}`, 15, 22);\n  const imgWidth = 267;\n  const imgHeight = (canvas.height * imgWidth) / canvas.width;\n  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 30, imgWidth, imgHeight);\n  pdf.save(`${title}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);\n}",
+              "why": "CSV export client-side yapılıyor — server'a yük bindirmiyor. PDF export html2canvas ile chart'ları görsel olarak yakalar. scale: 2 retina kalitesi sağlar. Dosya adına tarih ekliyoruz."
+            },
+            {
+              "order": "1.4",
+              "action": "Export butonlarını Dashboard'a ekle",
+              "type": "code_modify",
+              "file": "packages/dashboard/src/pages/Dashboard.tsx",
+              "code": "import { exportCSV, exportPDF } from '../utils/export';\n\n// Header'a export butonları ekle:\n<button onClick={() => exportCSV(chartData, 'metrics')} className=\"px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm hover:bg-gray-600\">CSV İndir</button>\n<button onClick={() => exportPDF('dashboard-charts', 'Analytics Report')} className=\"px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm hover:bg-gray-600\">PDF İndir</button>",
+              "why": "Export butonlarını Dashboard header'ına ekliyoruz. Kullanıcı tek tıkla mevcut görünümü CSV veya PDF olarak indirebilir."
+            },
+            {
+              "order": "1.5",
+              "action": "Chart container'a id ekle",
+              "type": "code_modify",
+              "file": "packages/dashboard/src/pages/Dashboard.tsx",
+              "code": "<div id=\"dashboard-charts\" className=\"grid grid-cols-2 gap-4\">",
+              "why": "html2canvas belirli bir DOM elementini yakalar. id attribute ile hedef elementi belirtiyoruz."
+            },
+            {
+              "order": "1.6",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "CSV butonu tıklandığında .csv dosyası indirilmeli ve doğru veri içermeli. PDF butonu tıklandığında .pdf dosyası indirilmeli ve chart'lar görsel olarak doğru olmalı.",
+              "why": "Export fonksiyonlarının eksiksiz çalıştığını ve dosya formatlarının doğru olduğunu kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   └── ...\n│   ├── dashboard/\n│   │   ├── src/\n│   │   │   ├── components/\n│   │   │   │   └── ...\n│   │   │   ├── hooks/\n│   │   │   │   └── ...\n│   │   │   ├── pages/\n│   │   │   │   └── Dashboard.tsx\n│   │   │   ├── utils/\n│   │   │   │   └── export.ts\n│   │   │   └── App.tsx\n│   │   └── package.json\n│   └── ml-service/\n│       └── ...\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "html2canvas: Failed to load image",
+              "cause": "Chart'lardaki SVG elementleri veya cross-origin resimler html2canvas tarafından yakalanamıyor.",
+              "fix": "html2canvas options'a useCORS: true ve allowTaint: true ekle. SVG bazlı chart'lar için foreignObject sorunlarını kontrol et."
+            },
+            {
+              "error": "PDF dosyası açılmıyor veya bozuk",
+              "cause": "jsPDF canvas boyutunu yanlış hesaplıyor veya bellek yetersiz.",
+              "fix": "Canvas scale'i 2'den 1'e düşür. Element boyutunun A4'e sığdığından emin ol. Çok büyük elementleri bölümlere ayır."
+            },
+            {
+              "error": "CSV'de Türkçe karakterler bozuk görünüyor",
+              "cause": "UTF-8 BOM (Byte Order Mark) eksik. Excel UTF-8'i otomatik algılamıyor.",
+              "fix": "CSV string'inin başına BOM ekle: '\\ufeff' + csv. Veya Blob type'ı 'text/csv;charset=utf-8' yap."
+            }
+          ]
         },
         {
           "step": 2,
@@ -362,7 +1539,82 @@
           "instructions": "7x24 heatmap grid oluştur (günler x saatler). Renk intensity metrik değerine göre değişsin. Tooltip'te detay göster.",
           "code_snippet": "// components/Heatmap.tsx\nimport { Fragment } from 'react';\n\nexport function Heatmap({ data }: { data: HeatmapCell[][] }) {\n  const getColor = (value: number, max: number) => {\n    const intensity = value / max;\n    if (intensity > 0.8) return 'bg-red-500';\n    if (intensity > 0.6) return 'bg-orange-400';\n    if (intensity > 0.4) return 'bg-yellow-300';\n    if (intensity > 0.2) return 'bg-green-300';\n    return 'bg-green-100';\n  };\n  \n  const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];\n  \n  return (\n    <div className=\"bg-gray-800 rounded-lg p-4\">\n      <h3 className=\"font-medium text-gray-300 mb-4\">İş Yükü Heatmap</h3>\n      <div className=\"grid gap-1\" style={{ gridTemplateColumns: 'auto repeat(24, 1fr)' }}>\n        <div /> {/* Empty corner */}\n        {Array.from({length: 24}, (_, h) => (\n          <div key={h} className=\"text-xs text-gray-400 text-center\">{h}</div>\n        ))}\n        {days.map((day, d) => (\n          <Fragment key={d}>\n            <div className=\"text-xs text-gray-500 flex items-center\">{day}</div>\n            {data[d]?.map((cell, h) => (\n              <div\n                key={`${d}-${h}`}\n                className={`w-4 h-4 rounded-sm ${getColor(cell.value, cell.max)} cursor-pointer`}\n                title={`${day} ${h}:00 - ${cell.value.toFixed(1)}`}\n              />\n            ))}\n          </Fragment>\n        ))}\n      </div>\n    </div>\n  );\n}",
           "deep_dive": "GitHub'ın contribution graph'ı da bir heatmap. Bu pattern kullanıcıların hızla 'en yoğun zamanlar neresi?' sorusunu cevaplamasını sağlar. Heatmap tasarımında renk seçimi çok önemli — renk körlüğü olan kullanıcılar için red-green yerine sequential renk paletleri (beyaz→mavi→koyu mavi) tercih et.",
-          "checkpoint": "Heatmap 7x24 grid olarak doğru render ediliyor mu? Renk yoğunluğu veriyle uyumlu mu?"
+          "checkpoint": "Heatmap 7x24 grid olarak doğru render ediliyor mu? Renk yoğunluğu veriyle uyumlu mu?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Heatmap veri hazırlama endpoint'i oluştur",
+              "type": "code_write",
+              "file": "packages/api/src/routes/heatmap.ts",
+              "code": "import { Router } from 'express';\nimport { pool } from '../index';\n\nconst router = Router();\n\nrouter.get('/heatmap', async (req, res) => {\n  const { source, metric, days = '30' } = req.query;\n  const result = await pool.query(\n    `SELECT EXTRACT(DOW FROM timestamp)::int as day_of_week,\n     EXTRACT(HOUR FROM timestamp)::int as hour_of_day,\n     AVG(value) as avg_value, MAX(value) as max_value\n     FROM metrics WHERE source = $1 AND metric_name = $2\n     AND timestamp > NOW() - ($3 || ' days')::interval\n     GROUP BY day_of_week, hour_of_day\n     ORDER BY day_of_week, hour_of_day`,\n    [source, metric, days]\n  );\n  res.json(result.rows);\n});\n\nexport default router;",
+              "why": "Heatmap için gün-saat bazında aggregate edilmiş veri gerekiyor. PostgreSQL EXTRACT fonksiyonu ile gün ve saat bilgisini çıkarıyoruz."
+            },
+            {
+              "order": "2.2",
+              "action": "Heatmap route'unu app'e bağla",
+              "type": "code_modify",
+              "file": "packages/api/src/index.ts",
+              "code": "import heatmapRouter from './routes/heatmap';\napp.use('/api', heatmapRouter);",
+              "position": "bottom",
+              "why": "Heatmap endpoint'ini API'ye ekliyoruz."
+            },
+            {
+              "order": "2.3",
+              "action": "Heatmap component dosyasını oluştur",
+              "type": "file_open",
+              "file": "packages/dashboard/src/components/Heatmap.tsx",
+              "why": "7x24 grid heatmap component'ini oluşturacağız. Gün ve saat bazında metrik yoğunluğunu gösterecek."
+            },
+            {
+              "order": "2.4",
+              "action": "Heatmap kodunu yaz",
+              "type": "code_write",
+              "file": "packages/dashboard/src/components/Heatmap.tsx",
+              "code": "import { Fragment } from 'react';\n\ninterface HeatmapCell {\n  day_of_week: number;\n  hour_of_day: number;\n  avg_value: number;\n  max_value: number;\n}\n\ninterface HeatmapProps {\n  data: HeatmapCell[];\n  title: string;\n}\n\nconst days = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];\n\nexport function Heatmap({ data, title }: HeatmapProps) {\n  const maxVal = Math.max(...data.map(d => d.avg_value), 1);\n\n  const getColor = (value: number) => {\n    const intensity = value / maxVal;\n    if (intensity > 0.8) return 'bg-red-500';\n    if (intensity > 0.6) return 'bg-orange-400';\n    if (intensity > 0.4) return 'bg-yellow-300';\n    if (intensity > 0.2) return 'bg-green-300';\n    return 'bg-green-100';\n  };\n\n  const getCell = (day: number, hour: number) =>\n    data.find(d => d.day_of_week === day && d.hour_of_day === hour);\n\n  return (\n    <div className=\"bg-gray-800 rounded-lg p-4\">\n      <h3 className=\"font-medium text-gray-300 mb-4\">{title}</h3>\n      <div className=\"grid gap-1\" style={{ gridTemplateColumns: 'auto repeat(24, 1fr)' }}>\n        <div />\n        {Array.from({ length: 24 }, (_, h) => (\n          <div key={h} className=\"text-xs text-gray-400 text-center\">{h}</div>\n        ))}\n        {days.map((day, d) => (\n          <Fragment key={d}>\n            <div className=\"text-xs text-gray-500 flex items-center pr-2\">{day}</div>\n            {Array.from({ length: 24 }, (_, h) => {\n              const cell = getCell(d, h);\n              return (\n                <div\n                  key={`${d}-${h}`}\n                  className={`w-4 h-4 rounded-sm ${cell ? getColor(cell.avg_value) : 'bg-gray-700'} cursor-pointer`}\n                  title={`${day} ${h}:00 - ${cell ? cell.avg_value.toFixed(1) : 'N/A'}`}\n                />\n              );\n            })}\n          </Fragment>\n        ))}\n      </div>\n    </div>\n  );\n}",
+              "why": "7x24 grid ile haftanın her günü ve saati için metrik yoğunluğunu gösteriyoruz. Renk yoğunluğu değere göre değişir — bir bakışta en yoğun zamanları görmek mümkün. GitHub contribution graph benzeri pattern."
+            },
+            {
+              "order": "2.5",
+              "action": "Heatmap'i Dashboard sayfasına ekle",
+              "type": "code_modify",
+              "file": "packages/dashboard/src/pages/Dashboard.tsx",
+              "code": "import { Heatmap } from '../components/Heatmap';\n// Charts grid'in altına Heatmap ekle",
+              "why": "Heatmap'i dashboard layout'una entegre ediyoruz. Chart'ların altında tam genişlikte görünecek."
+            },
+            {
+              "order": "2.6",
+              "action": "useHeatmap hook'u oluştur",
+              "type": "code_write",
+              "file": "packages/dashboard/src/hooks/useHeatmap.ts",
+              "code": "import { useState, useEffect } from 'react';\n\nexport function useHeatmap(source: string, metric: string) {\n  const [data, setData] = useState([]);\n  const [loading, setLoading] = useState(true);\n\n  useEffect(() => {\n    fetch(`/api/heatmap?source=${source}&metric=${metric}&days=30`)\n      .then(res => res.json())\n      .then(setData)\n      .catch(console.error)\n      .finally(() => setLoading(false));\n  }, [source, metric]);\n\n  return { data, loading };\n}",
+              "why": "Heatmap verisini çekme logic'ini hook'ta kapsülleyerek component'in temiz kalmasını sağlıyoruz."
+            },
+            {
+              "order": "2.7",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Heatmap 7x24 grid olarak doğru render edilmeli. Renk yoğunluğu veri ile uyumlu olmalı — gündüz saatleri genelde daha yoğun. Tooltip hover'da değer göstermeli.",
+              "why": "Heatmap'in gerçek veriye dayalı anlamlı pattern'ları görselleştirdiğini kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── src/\n│   │   │   ├── middleware/\n│   │   │   │   └── cache.ts\n│   │   │   ├── routes/\n│   │   │   │   ├── anomalies.ts\n│   │   │   │   ├── dashboard.ts\n│   │   │   │   ├── heatmap.ts\n│   │   │   │   └── metrics.ts\n│   │   │   ├── services/\n│   │   │   │   └── anomaly/\n│   │   │   │       └── zscore.ts\n│   │   │   ├── utils/\n│   │   │   │   └── metrics.ts\n│   │   │   └── index.ts\n│   │   └── ...\n│   ├── dashboard/\n│   │   ├── src/\n│   │   │   ├── components/\n│   │   │   │   ├── AdvancedChart.tsx\n│   │   │   │   ├── AnomalyChart.tsx\n│   │   │   │   ├── AnomalyDetail.tsx\n│   │   │   │   ├── ChartWidget.tsx\n│   │   │   │   ├── DateRangePicker.tsx\n│   │   │   │   ├── Heatmap.tsx\n│   │   │   │   ├── SourceFilter.tsx\n│   │   │   │   └── SummaryCard.tsx\n│   │   │   ├── hooks/\n│   │   │   │   ├── useAnomalies.ts\n│   │   │   │   ├── useHeatmap.ts\n│   │   │   │   └── useMetrics.ts\n│   │   │   ├── pages/\n│   │   │   │   └── Dashboard.tsx\n│   │   │   ├── utils/\n│   │   │   │   └── export.ts\n│   │   │   └── App.tsx\n│   │   └── package.json\n│   └── ml-service/\n│       └── ...\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "Heatmap grid bozuk, hücreler yanlış pozisyonda",
+              "cause": "CSS Grid template columns sayısı yanlış veya veri day_of_week/hour_of_day eşleşmesi hatalı.",
+              "fix": "gridTemplateColumns: 'auto repeat(24, 1fr)' olduğundan emin ol. PostgreSQL EXTRACT(DOW) 0=Pazar ile başlar."
+            },
+            {
+              "error": "Heatmap'te bazı hücreler boş (gri)",
+              "cause": "O gün-saat kombinasyonu için veri yok. Seed veride bazı boşluklar olabilir.",
+              "fix": "Boş hücreler için fallback renk (bg-gray-700) göster. COALESCE ile boş değerleri 0'a çevir."
+            },
+            {
+              "error": "Renk körlüğü olan kullanıcılar heatmap'i okuyamıyor",
+              "cause": "Kırmızı-yeşil renk paleti kullanılmış.",
+              "fix": "Sequential renk paleti kullan: bg-blue-100 → bg-blue-300 → bg-blue-500 → bg-blue-700 → bg-blue-900"
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. CSV export client-side yap (Papa Parse), server'a yük bindirme\n2. PDF export için html2canvas scale: 2 kullan — düşük çözünürlük profesyonel görünmez\n3. Heatmap'te renk körlüğü için sequential palette kullan, red-green kullanma\n4. Export dosya adına tarih ekle — kullanıcı hangi rapor hangisi anlamalı",
@@ -387,7 +1639,96 @@
           "instructions": "docker-compose.yml oluştur. Frontend: Nginx serve. API: Node.js. PostgreSQL: volume persist. Redis: standalone. Health check'ler ekle.",
           "code_snippet": "# docker-compose.yml\nservices:\n  dashboard:\n    build: ./packages/dashboard\n    ports: ['3000:80']\n    depends_on: [api]\n    \n  api:\n    build: ./packages/api\n    ports: ['4000:4000']\n    environment:\n      DATABASE_URL: postgresql://user:pass@db:5432/analytics\n      REDIS_URL: redis://cache:6379\n    depends_on:\n      db: { condition: service_healthy }\n      cache: { condition: service_started }\n    healthcheck:\n      test: ['CMD', 'curl', '-f', 'http://localhost:4000/health']\n      interval: 10s\n      timeout: 5s\n      retries: 3\n    \n  db:\n    image: postgres:16-alpine\n    volumes: ['pgdata:/var/lib/postgresql/data']\n    environment:\n      POSTGRES_DB: analytics\n      POSTGRES_USER: user\n      POSTGRES_PASSWORD: pass\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U user']\n      interval: 5s\n    \n  ml:\n    build: ./packages/ml-service\n    ports: ['5000:5000']\n    environment:\n      DATABASE_URL: postgresql://user:pass@db:5432/analytics\n    depends_on:\n      db: { condition: service_healthy }\n    \n  cache:\n    image: redis:7-alpine\n    volumes: ['redisdata:/data']\n    \nvolumes:\n  pgdata:\n  redisdata:",
           "deep_dive": "Docker health check'ler ZORUNLU. depends_on tek başına yetmez — container start olması servisin hazır olması demek değil. PostgreSQL container 2-3 saniye start olur ama DB bağlantıları kabul etmeye başlaması 5-10 saniye sürer. condition: service_healthy bu farkı kapsar.",
-          "checkpoint": "docker-compose up ile tüm servisler başlıyor ve dashboard erişilebilir mi?"
+          "checkpoint": "docker-compose up ile tüm servisler başlıyor ve dashboard erişilebilir mi?",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "API Dockerfile'ını oluştur",
+              "type": "file_open",
+              "file": "packages/api/Dockerfile",
+              "why": "API servisini container'a almak için Dockerfile yazacağız. Multi-stage build ile production image boyutunu küçültüyoruz."
+            },
+            {
+              "order": "1.2",
+              "action": "API Dockerfile kodunu yaz",
+              "type": "code_write",
+              "file": "packages/api/Dockerfile",
+              "code": "FROM node:20-alpine AS builder\nWORKDIR /app\nCOPY package.json pnpm-lock.yaml ./\nRUN npm install -g pnpm && pnpm install --frozen-lockfile\nCOPY . .\nRUN pnpm build\n\nFROM node:20-alpine\nWORKDIR /app\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules ./node_modules\nCOPY --from=builder /app/package.json ./\nEXPOSE 4000\nCMD [\"node\", \"dist/index.js\"]",
+              "why": "Multi-stage build: builder aşamasında TypeScript derlenir, production aşamasında sadece derlenmiş JS ve node_modules kopyalanır. Image boyutu önemli ölçüde küçülür."
+            },
+            {
+              "order": "1.3",
+              "action": "Dashboard Dockerfile'ını oluştur",
+              "type": "code_write",
+              "file": "packages/dashboard/Dockerfile",
+              "code": "FROM node:20-alpine AS builder\nWORKDIR /app\nCOPY package.json pnpm-lock.yaml ./\nRUN npm install -g pnpm && pnpm install --frozen-lockfile\nCOPY . .\nRUN pnpm build\n\nFROM nginx:alpine\nCOPY --from=builder /app/dist /usr/share/nginx/html\nCOPY nginx.conf /etc/nginx/conf.d/default.conf\nEXPOSE 80\nCMD [\"nginx\", \"-g\", \"daemon off;\"]",
+              "why": "Frontend build çıktısı statik dosyalar. Nginx ile serve etmek Node.js'e göre çok daha performanslı ve güvenli."
+            },
+            {
+              "order": "1.4",
+              "action": "ML service Dockerfile'ını oluştur",
+              "type": "code_write",
+              "file": "packages/ml-service/Dockerfile",
+              "code": "FROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nEXPOSE 5000\nCMD [\"uvicorn\", \"main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"5000\"]",
+              "why": "python:3.11-slim minimal Python image. --no-cache-dir ile pip cache'i temizleyerek image boyutunu küçültüyoruz."
+            },
+            {
+              "order": "1.5",
+              "action": "docker-compose.yml dosyasını oluştur",
+              "type": "file_open",
+              "file": "docker-compose.yml",
+              "why": "Tüm servisleri (frontend, API, DB, Redis, ML) tek dosyada tanımlayıp tek komutla ayağa kaldıracağız."
+            },
+            {
+              "order": "1.6",
+              "action": "Docker Compose konfigürasyonunu yaz",
+              "type": "code_write",
+              "file": "docker-compose.yml",
+              "code": "services:\n  dashboard:\n    build: ./packages/dashboard\n    ports: ['3000:80']\n    depends_on: [api]\n\n  api:\n    build: ./packages/api\n    ports: ['4000:4000']\n    environment:\n      DATABASE_URL: postgresql://user:pass@db:5432/analytics\n      REDIS_URL: redis://cache:6379\n    depends_on:\n      db: { condition: service_healthy }\n      cache: { condition: service_started }\n    healthcheck:\n      test: ['CMD', 'curl', '-f', 'http://localhost:4000/health']\n      interval: 10s\n      timeout: 5s\n      retries: 3\n\n  db:\n    image: postgres:16-alpine\n    volumes: ['pgdata:/var/lib/postgresql/data']\n    environment:\n      POSTGRES_DB: analytics\n      POSTGRES_USER: user\n      POSTGRES_PASSWORD: pass\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U user']\n      interval: 5s\n\n  ml:\n    build: ./packages/ml-service\n    ports: ['5000:5000']\n    environment:\n      DATABASE_URL: postgresql://user:pass@db:5432/analytics\n    depends_on:\n      db: { condition: service_healthy }\n\n  cache:\n    image: redis:7-alpine\n    volumes: ['redisdata:/data']\n\nvolumes:\n  pgdata:\n  redisdata:",
+              "why": "Health check'ler servisin gerçekten hazır olduğunu doğrular — depends_on tek başına yetmez. Volume'ler veri kalıcılığını sağlar. Service discovery ile container isimleri DNS olarak kullanılır (db, cache)."
+            },
+            {
+              "order": "1.7",
+              "action": "Docker Compose ile başlat",
+              "type": "terminal",
+              "command": "docker-compose up --build -d",
+              "expected_output": "Creating analytics-dashboard_db_1 ... done\nCreating analytics-dashboard_cache_1 ... done\n...\nAll services started",
+              "why": "Tüm servisleri build edip arka planda başlatıyoruz. --build flag'i Dockerfile değişikliklerini algılar."
+            },
+            {
+              "order": "1.8",
+              "action": "Servislerin durumunu kontrol et",
+              "type": "terminal",
+              "command": "docker-compose ps",
+              "expected_output": "Tüm servisler 'Up' durumunda ve health check'ler 'healthy' olmalı",
+              "why": "Tüm container'ların başarıyla çalıştığını ve health check'lerin geçtiğini doğruluyoruz."
+            },
+            {
+              "order": "1.9",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "docker-compose ps ile tüm servisler Up durumunda olmalı. http://localhost:3000 dashboard erişilebilir olmalı. http://localhost:4000/health API yanıt vermeli.",
+              "why": "Tüm servislerin Docker ortamında sorunsuz çalıştığını kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── Dockerfile\n│   │   └── ...\n│   ├── dashboard/\n│   │   ├── Dockerfile\n│   │   ├── nginx.conf\n│   │   └── ...\n│   └── ml-service/\n│       ├── Dockerfile\n│       └── ...\n├── docker-compose.yml\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "db: health check failing, API cannot connect",
+              "cause": "PostgreSQL container başladı ama bağlantı kabul etmeye hazır değil. depends_on tek başına yetmiyor.",
+              "fix": "depends_on'a condition: service_healthy ekle. PostgreSQL healthcheck: pg_isready -U user kullan."
+            },
+            {
+              "error": "ECONNREFUSED when API tries to connect to db:5432",
+              "cause": "Container içinde 'localhost' yerine service adı kullanılmalı.",
+              "fix": "DATABASE_URL'de localhost yerine db (service adı) kullan: postgresql://user:pass@db:5432/analytics"
+            },
+            {
+              "error": "nginx: [emerg] open() 'nginx.conf' failed",
+              "cause": "nginx.conf dosyası oluşturulmamış veya COPY path yanlış.",
+              "fix": "packages/dashboard/nginx.conf dosyasını oluştur. Dockerfile'daki COPY path'ini kontrol et."
+            }
+          ]
         },
         {
           "step": 2,
@@ -396,7 +1737,81 @@
           "instructions": "Lighthouse audit çalıştır. Chart lazy loading ekle (IntersectionObserver). Bundle size analiz et. Gereksiz re-render'ları React.memo ile engelle.",
           "code_snippet": "// components/LazyChart.tsx\nimport { useRef, useState, useEffect, memo } from 'react';\n\nexport const LazyChart = memo(function LazyChart({ children }: { children: React.ReactNode }) {\n  const ref = useRef<HTMLDivElement>(null);\n  const [visible, setVisible] = useState(false);\n  \n  useEffect(() => {\n    const observer = new IntersectionObserver(\n      ([entry]) => {\n        if (entry.isIntersecting) {\n          setVisible(true);\n          observer.disconnect();\n        }\n      },\n      { rootMargin: '100px' } // Start loading 100px before visible\n    );\n    \n    if (ref.current) observer.observe(ref.current);\n    return () => observer.disconnect();\n  }, []);\n  \n  return (\n    <div ref={ref} style={{ minHeight: 300 }}>\n      {visible ? children : <div className=\"animate-pulse bg-gray-200 h-full rounded\" />}\n    </div>\n  );\n});",
           "deep_dive": "Intersection Observer ile lazy loading dashboard'larda game changer. Ekranda görünmeyen chart'lar için API call yapılmaz — bu hem bandwidth hem DB yükünü azaltır. rootMargin: '100px' ile kullanıcı scroll etmeden 100px önce yüklemeye başla ki gecikme hissedilmesin.",
-          "checkpoint": "Lighthouse Performance skoru 80+ mı? İlk yüklemede sadece görünen chart'lar mı render ediliyor?"
+          "checkpoint": "Lighthouse Performance skoru 80+ mı? İlk yüklemede sadece görünen chart'lar mı render ediliyor?",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "LazyChart component'ini oluştur",
+              "type": "file_open",
+              "file": "packages/dashboard/src/components/LazyChart.tsx",
+              "why": "Ekranda görünmeyen chart'lar için API call ve render yapmamak dashboard performansını dramatik artırır."
+            },
+            {
+              "order": "2.2",
+              "action": "LazyChart kodunu yaz",
+              "type": "code_write",
+              "file": "packages/dashboard/src/components/LazyChart.tsx",
+              "code": "import { useRef, useState, useEffect, memo, ReactNode } from 'react';\n\nexport const LazyChart = memo(function LazyChart({ children }: { children: ReactNode }) {\n  const ref = useRef<HTMLDivElement>(null);\n  const [visible, setVisible] = useState(false);\n\n  useEffect(() => {\n    const observer = new IntersectionObserver(\n      ([entry]) => {\n        if (entry.isIntersecting) {\n          setVisible(true);\n          observer.disconnect();\n        }\n      },\n      { rootMargin: '100px' }\n    );\n    if (ref.current) observer.observe(ref.current);\n    return () => observer.disconnect();\n  }, []);\n\n  return (\n    <div ref={ref} style={{ minHeight: 300 }}>\n      {visible ? children : (\n        <div className=\"animate-pulse bg-gray-700 h-full rounded-lg\" />\n      )}\n    </div>\n  );\n});",
+              "why": "IntersectionObserver ile element viewport'a girene kadar render etmiyoruz. rootMargin: 100px ile 100px öncesinden yüklemeye başlayarak gecikme hissi azaltılıyor. React.memo ile gereksiz re-render engelleniyor."
+            },
+            {
+              "order": "2.3",
+              "action": "Dashboard'daki chart'ları LazyChart ile sar",
+              "type": "code_modify",
+              "file": "packages/dashboard/src/pages/Dashboard.tsx",
+              "code": "import { LazyChart } from '../components/LazyChart';\n\n// Her chart'ı LazyChart ile sar:\n<LazyChart><ChartWidget ... /></LazyChart>",
+              "why": "Mevcut chart'ları LazyChart wrapper ile sararak lazy loading aktif ediyoruz. Mevcut kodda minimal değişiklik."
+            },
+            {
+              "order": "2.4",
+              "action": "Bundle size analiz et",
+              "type": "terminal",
+              "command": "cd packages/dashboard && pnpm add -D rollup-plugin-visualizer && pnpm build",
+              "expected_output": "Build başarılı, stats.html oluşturuldu",
+              "why": "Bundle analyzer ile hangi kütüphanelerin ne kadar yer kapladığını görselleştiriyoruz. Gereksiz büyük bağımlılıkları tespit edebiliriz."
+            },
+            {
+              "order": "2.5",
+              "action": "React.memo ile gereksiz re-render'ları engelle",
+              "type": "code_modify",
+              "file": "packages/dashboard/src/components/SummaryCard.tsx",
+              "code": "import { memo } from 'react';\n\nexport const SummaryCard = memo(function SummaryCard(...) { ... });",
+              "why": "React.memo ile component prop'ları değişmediğinde re-render engellenir. Dashboard'da filtre değiştiğinde tüm card'lar yeniden render olmamalı."
+            },
+            {
+              "order": "2.6",
+              "action": "Lighthouse audit çalıştır",
+              "type": "terminal",
+              "command": "npx lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json --chrome-flags=\"--headless\"",
+              "expected_output": "Performance score ve detaylı rapor",
+              "why": "Lighthouse ile web vitals metriklerini ölçüyoruz: LCP, FID, CLS. 80+ puan hedefliyoruz."
+            },
+            {
+              "order": "2.7",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Lighthouse Performance skoru 80+ olmalı. İlk yüklemede sadece görünen chart'lar render edilmeli (Network tab ile kontrol et). Bundle size makul olmalı (< 500KB gzipped).",
+              "why": "Performance optimizasyonlarının gerçekten etkili olduğunu somut metriklerle kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── Dockerfile\n│   │   └── ...\n│   ├── dashboard/\n│   │   ├── src/\n│   │   │   ├── components/\n│   │   │   │   ├── AdvancedChart.tsx\n│   │   │   │   ├── AnomalyChart.tsx\n│   │   │   │   ├── AnomalyDetail.tsx\n│   │   │   │   ├── ChartWidget.tsx\n│   │   │   │   ├── DateRangePicker.tsx\n│   │   │   │   ├── Heatmap.tsx\n│   │   │   │   ├── LazyChart.tsx\n│   │   │   │   ├── SourceFilter.tsx\n│   │   │   │   └── SummaryCard.tsx\n│   │   │   ├── hooks/\n│   │   │   │   ├── useAnomalies.ts\n│   │   │   │   ├── useHeatmap.ts\n│   │   │   │   └── useMetrics.ts\n│   │   │   ├── pages/\n│   │   │   │   └── Dashboard.tsx\n│   │   │   ├── types/\n│   │   │   │   └── metrics.ts\n│   │   │   ├── utils/\n│   │   │   │   └── export.ts\n│   │   │   └── App.tsx\n│   │   ├── Dockerfile\n│   │   └── package.json\n│   └── ml-service/\n│       ├── Dockerfile\n│       ├── anomaly_detector.py\n│       ├── evaluation.py\n│       ├── main.py\n│       └── requirements.txt\n├── docker-compose.yml\n├── package.json\n└── pnpm-workspace.yaml",
+          "common_errors": [
+            {
+              "error": "IntersectionObserver is not defined",
+              "cause": "SSR ortamında veya eski tarayıcılarda IntersectionObserver desteklenmiyor.",
+              "fix": "typeof window !== 'undefined' kontrolü ekle. Polyfill olarak intersection-observer paketini kur."
+            },
+            {
+              "error": "React.memo çalışmıyor, hala re-render oluyor",
+              "cause": "Parent component her render'da yeni callback veya obje prop geçiriyor.",
+              "fix": "useCallback ile callback'leri memoize et. useMemo ile obje prop'larını memoize et."
+            },
+            {
+              "error": "Lighthouse score çok düşük (< 50)",
+              "cause": "Büyük bundle size, render-blocking CSS/JS, optimize edilmemiş resimler.",
+              "fix": "Code splitting ile lazy import kullan. CSS'i critical/non-critical olarak ayır. Resimleri WebP formatına çevir."
+            }
+          ]
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Docker health check ZORUNLU — depends_on tek başına yetmez\n2. Chart'ları lazy load et — görünmeyen chart için API call yapma\n3. React.memo ile gereksiz re-render'ları engelle — dashboard'da her state değişikliğinde tüm chart'lar re-render olmamalı\n4. Bundle analyzer ile büyük dependency'leri tespit et",
@@ -410,19 +1825,195 @@
         {
           "title": "Production Build",
           "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
-          "code_snippet": "pnpm build && pnpm test"
+          "code_snippet": "pnpm build && pnpm test",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Frontend production build al",
+              "type": "terminal",
+              "command": "cd packages/dashboard && pnpm build",
+              "expected_output": "dist/ klasörü oluşturuldu, build başarılı",
+              "why": "Vite production build TypeScript derler, tree-shaking yapar, code splitting uygular ve dosyaları minify eder."
+            },
+            {
+              "order": "1.2",
+              "action": "API production build al",
+              "type": "terminal",
+              "command": "cd packages/api && pnpm build",
+              "expected_output": "dist/ klasörü oluşturuldu",
+              "why": "TypeScript kodunu JavaScript'e derleyerek production ortamında çalışır hale getiriyoruz."
+            },
+            {
+              "order": "1.3",
+              "action": "Testleri çalıştır",
+              "type": "terminal",
+              "command": "pnpm test",
+              "expected_output": "Tüm testler geçmeli (passed)",
+              "why": "Production'a deploy etmeden önce tüm testlerin geçtiğinden emin olmak zorunlu."
+            },
+            {
+              "order": "1.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Build hatasız tamamlanmalı. Testler geçmeli. dist/ klasörleri oluşmuş olmalı.",
+              "why": "Production build'in başarılı olduğunu ve kodun deploy edilmeye hazır olduğunu kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   │   ├── dist/\n│   │   │   └── ... (compiled JS)\n│   │   └── ...\n│   ├── dashboard/\n│   │   ├── dist/\n│   │   │   └── ... (static files)\n│   │   └── ...\n│   └── ml-service/\n│       └── ...\n├── docker-compose.yml\n└── package.json",
+          "common_errors": [
+            {
+              "error": "TypeScript build error: Type errors found",
+              "cause": "Geliştirme sırasında görmezden gelinen tip hataları build'de yakalanıyor.",
+              "fix": "tsc --noEmit ile tip hatalarını listele ve düzelt. any kullanımlarını azalt."
+            },
+            {
+              "error": "Build out of memory",
+              "cause": "Büyük proje veya çok sayıda bağımlılık bellek limitini aşıyor.",
+              "fix": "NODE_OPTIONS=--max-old-space-size=4096 ile bellek limitini artır."
+            }
+          ]
         },
         {
           "title": "Deploy",
-          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et"
+          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Neon veritabanı oluştur",
+              "type": "explain",
+              "why": "Neon serverless PostgreSQL sağlar. Ücretsiz tier ile başlayabilirsin. neon.tech adresinden yeni proje oluştur."
+            },
+            {
+              "order": "2.2",
+              "action": "Upstash Redis oluştur",
+              "type": "explain",
+              "why": "Upstash serverless Redis sağlar. Ücretsiz tier günde 10K komut destekler. upstash.com adresinden yeni veritabanı oluştur."
+            },
+            {
+              "order": "2.3",
+              "action": "Railway'e backend deploy et",
+              "type": "terminal",
+              "command": "railway login && railway init && railway up",
+              "expected_output": "Deployment successful. URL: https://your-api.railway.app",
+              "why": "Railway Node.js ve Python servislerini otomatik algılar ve deploy eder. Env vars arayüzden ayarlanabilir."
+            },
+            {
+              "order": "2.4",
+              "action": "Vercel'e frontend deploy et",
+              "type": "terminal",
+              "command": "cd packages/dashboard && pnpm dlx vercel --yes",
+              "expected_output": "Production: https://analytics-dashboard.vercel.app",
+              "why": "Vercel statik site hosting için en iyi seçenek. Otomatik SSL, CDN ve preview deployments sağlar."
+            },
+            {
+              "order": "2.5",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Canlı URL'den dashboard erişilebilir olmalı. API health check çalışmalı. Grafikler veri yüklemeli.",
+              "why": "Deploy'un başarılı olduğunu ve tüm servislerin production ortamında çalıştığını kanıtlıyoruz."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   ├── dashboard/\n│   └── ml-service/\n├── docker-compose.yml\n├── .gitignore\n├── package.json\n└── README.md",
+          "common_errors": [
+            {
+              "error": "Railway deployment failed: build error",
+              "cause": "Procfile eksik veya build komutu yapılandırılmamış.",
+              "fix": "Procfile ekle: web: node dist/index.js. Veya Railway dashboard'dan build komutunu ayarla."
+            },
+            {
+              "error": "CORS error in production",
+              "cause": "API'deki CORS ayarı sadece localhost'a izin veriyor.",
+              "fix": "cors({ origin: process.env.FRONTEND_URL }) ile production frontend URL'ini ekle."
+            }
+          ]
         },
         {
           "title": "Profesyonel README",
-          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz"
+          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "README.md dosyasını oluştur",
+              "type": "file_open",
+              "file": "README.md",
+              "why": "Profesyonel README proje hakkında ilk izlenimi oluşturur. GitHub'da dikkat çekmek için şart."
+            },
+            {
+              "order": "3.2",
+              "action": "README içeriğini yaz",
+              "type": "code_write",
+              "file": "README.md",
+              "code": "# Analytics Dashboard + AI Anomaly Detection\n\n> Real-time analytics dashboard with AI-powered anomaly detection\n\n## Features\n- Interactive charts (Line, Area, Bar, Heatmap)\n- AI anomaly detection (Isolation Forest + Z-score)\n- Redis caching (200ms → 5ms response time)\n- CSV/PDF export\n- Responsive design\n\n## Tech Stack\n| Frontend | Backend | AI/ML | DevOps |\n|----------|---------|-------|--------|\n| React | Node.js | Python | Docker |\n| TypeScript | Express | scikit-learn | Redis |\n| Recharts | PostgreSQL | FastAPI | Nginx |\n\n## Getting Started\n```bash\ngit clone <repo-url>\npnpm install\ndocker-compose up -d\npnpm run seed\npnpm run dev\n```\n\n## Architecture\n...\n\n## License\nMIT",
+              "why": "README'de proje açıklaması, özellikler, tech stack tablosu, kurulum talimatları ve mimari diyagram olmalı. Bu format recruiter'ların ve geliştiricilerin ilgisini çeker."
+            },
+            {
+              "order": "3.3",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "README.md GitHub'da düzgün render edilmeli. Tüm bölümler mevcut olmalı: açıklama, özellikler, tech stack, kurulum, mimari.",
+              "why": "README projenin vitrini — eksik veya bozuk README kötü izlenim yaratır."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── packages/\n│   ├── api/\n│   ├── dashboard/\n│   └── ml-service/\n├── docker-compose.yml\n├── .gitignore\n├── package.json\n└── README.md",
+          "common_errors": [
+            {
+              "error": "Markdown tablolar GitHub'da bozuk görünüyor",
+              "cause": "Tablo hücrelerinde pipe (|) karakteri escape edilmemiş veya hizalama çizgileri eksik.",
+              "fix": "Tablo başlık satırının altına | --- | --- | hizalama satırı ekle."
+            },
+            {
+              "error": "Screenshot'lar README'de görünmüyor",
+              "cause": "Resim dosyaları repo'ya eklenmemiş veya path yanlış.",
+              "fix": "Resimleri docs/ veya .github/ dizinine ekle. Relative path kullan: ![Screenshot](./docs/screenshot.png)"
+            }
+          ]
         },
         {
           "title": "Demo Video (Opsiyonel)",
-          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla"
+          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Ekran kaydı planla",
+              "type": "explain",
+              "why": "Demo video 2-3 dakika olmalı. Gösterilecekler: dashboard açılışı, grafik etkileşimleri, filtreleme, anomali tespiti, export, heatmap."
+            },
+            {
+              "order": "4.2",
+              "action": "Ekran kaydı al",
+              "type": "explain",
+              "why": "OBS Studio (ücretsiz) veya Loom ile ekran kaydı al. Sesi kapatabilir veya mimari kararları açıklayabilirsin."
+            },
+            {
+              "order": "4.3",
+              "action": "Video'yu README'ye ekle",
+              "type": "code_modify",
+              "file": "README.md",
+              "code": "## Demo\n[![Demo Video](./docs/demo-thumbnail.png)](https://youtube.com/watch?v=...)",
+              "position": "top",
+              "why": "Video thumbnail'i README'nin en dikkat çekici kısmı olur. YouTube veya Loom linki ile video paylaş."
+            },
+            {
+              "order": "4.4",
+              "action": "Doğrulama",
+              "type": "validate",
+              "validation": "Demo video linki çalışmalı. 2-3 dakika süreli olmalı. Tüm ana özellikleri göstermeli.",
+              "why": "Demo video projenin canlı çalıştığını kanıtlar ve recruiter'ların ilgisini çeker."
+            }
+          ],
+          "folder_structure_after": "analytics-dashboard/\n├── docs/\n│   ├── demo-thumbnail.png\n│   └── screenshots/\n│       ├── dashboard.png\n│       ├── anomaly-detection.png\n│       └── heatmap.png\n├── packages/\n│   ├── api/\n│   ├── dashboard/\n│   └── ml-service/\n├── docker-compose.yml\n├── .gitignore\n├── package.json\n└── README.md",
+          "common_errors": [
+            {
+              "error": "Video dosyası çok büyük, GitHub'a yüklenemiyor",
+              "cause": "GitHub 100MB dosya limiti var. Video dosyaları genelde bu limiti aşar.",
+              "fix": "Video'yu YouTube veya Loom'a yükle ve README'de link olarak paylaş. GitHub'a sadece thumbnail yükle."
+            },
+            {
+              "error": "GIF çok büyük ve yavaş yükleniyor",
+              "cause": "GIF formatı video için verimsiz, dosya boyutu çok büyük olabilir.",
+              "fix": "GIF yerine MP4 formatında video kullan ve YouTube/Loom'a yükle. Veya GIF'i 10-15 saniye ile sınırla."
+            }
+          ]
         }
       ],
       "checkpoint": "Proje canli URL'den erisilebilir, README profesyonel, screenshot'lar ekli, GitHub repo public"

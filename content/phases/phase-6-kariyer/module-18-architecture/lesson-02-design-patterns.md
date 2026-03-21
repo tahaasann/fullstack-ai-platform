@@ -139,6 +139,52 @@ class AnalyticsTracker:
     """Sadece analytics"""
     def track(self, event, data): ...
 ```
+
+```javascript
+// JavaScript — SRP Uygulanmış ✅
+
+// BAD — Tek class her şeyi yapıyor ❌
+class UserService {
+  createUser(name, email) {
+    const user = { name, email };
+    db.save(user);                    // DB
+    sendEmail(email, 'Welcome!');     // Notification
+    console.log(`User created: ${email}`); // Logging
+    analytics.track('user_created');  // Analytics
+    return user;
+  }
+}
+
+// GOOD — Her class tek sorumluluk ✅
+class UserRepository {
+  save(user) { /* DB işlemi */ }
+  findById(id) { /* DB sorgusu */ }
+}
+
+class EmailNotifier {
+  sendWelcome(user) { /* Email gönderimi */ }
+}
+
+class AppLogger {
+  info(message) { console.log(`[INFO] ${message}`); }
+}
+
+class UserService {
+  constructor(repo, notifier, logger) {
+    this.repo = repo;
+    this.notifier = notifier;
+    this.logger = logger;
+  }
+
+  createUser(name, email) {
+    const user = { name, email };
+    this.repo.save(user);
+    this.notifier.sendWelcome(user);
+    this.logger.info(`User created: ${email}`);
+    return user;
+  }
+}
+```
 :::
 
 ### 1.2 O — Open/Closed Principle (OCP)
@@ -210,6 +256,44 @@ class PaymentProcessor:
     def process_payment(self, method: PaymentMethod, amount: float):
         return method.process(amount)
 ```
+
+```javascript
+// JavaScript — OCP Uygulanmış ✅
+
+// BAD — Her yeni ödeme yöntemi için if/else eklenmeli ❌
+class PaymentProcessor {
+  process(type, amount) {
+    if (type === 'credit_card') { /* ... */ }
+    else if (type === 'paypal') { /* ... */ }
+    // Sonsuz if/else!
+  }
+}
+
+// GOOD — Yeni ödeme yöntemi = yeni class ✅
+class CreditCardPayment {
+  process(amount) { console.log(`CC payment: ${amount}`); return true; }
+  refund(amount) { console.log(`CC refund: ${amount}`); return true; }
+}
+
+class PayPalPayment {
+  process(amount) { console.log(`PayPal payment: ${amount}`); return true; }
+  refund(amount) { console.log(`PayPal refund: ${amount}`); return true; }
+}
+
+// Yeni ödeme yöntemi eklemek = yeni class yazmak
+class CryptoPayment {
+  process(amount) { console.log(`Crypto payment: ${amount}`); return true; }
+  refund(amount) { console.log(`Crypto refund: ${amount}`); return true; }
+}
+
+function processPayment(method, amount) {
+  return method.process(amount);
+}
+
+// Kullanim
+processPayment(new CreditCardPayment(), 100);
+processPayment(new CryptoPayment(), 50);
+```
 :::
 
 ### 1.3 L — Liskov Substitution Principle (LSP)
@@ -271,6 +355,50 @@ class Penguin(SwimmingBird):
 def make_bird_move(bird: Bird):
     print(bird.move())  # Her Bird move edebilir, sorun yok!
 ```
+
+```javascript
+// JavaScript — LSP Uyumlu ✅
+
+// BAD — LSP ihlali ❌
+class Bird {
+  fly() { return "Flying!"; }
+}
+
+class Penguin extends Bird {
+  fly() { throw new Error("Penguins can't fly!"); } // LSP ihlali!
+}
+
+// GOOD — LSP uyumlu ✅
+class Bird {
+  move() { throw new Error("Subclass must implement"); }
+}
+
+class FlyingBird extends Bird {
+  move() { return "Flying!"; }
+  fly() { return "Taking off!"; }
+}
+
+class SwimmingBird extends Bird {
+  move() { return "Swimming!"; }
+  swim() { return "Diving in!"; }
+}
+
+class Eagle extends FlyingBird {
+  move() { return "Soaring through the sky!"; }
+}
+
+class Penguin extends SwimmingBird {
+  move() { return "Waddling and swimming!"; }
+}
+
+// Her Bird move() edebilir — sorun yok!
+function makeBirdMove(bird) {
+  console.log(bird.move());
+}
+
+makeBirdMove(new Eagle());   // "Soaring through the sky!"
+makeBirdMove(new Penguin()); // "Waddling and swimming!"
+```
 :::
 
 ### 1.4 I — Interface Segregation Principle (ISP)
@@ -330,6 +458,48 @@ class Human(Workable, Eatable, Sleepable):
 class Robot(Workable):  # Sadece work!
     def work(self): return "Robot working 24/7"
 ```
+
+```javascript
+// JavaScript — ISP Uygulanmış ✅
+
+// BAD — Fat interface ❌
+class Robot {
+  work() { return "Working..."; }
+  eat() { throw new Error("Robots don't eat!"); }  // Gereksiz!
+  sleep() { throw new Error("Robots don't sleep!"); }  // Gereksiz!
+}
+
+// GOOD — Segregated interfaces (mixin pattern ile) ✅
+const Workable = {
+  work() { return `${this.name} working`; }
+};
+
+const Eatable = {
+  eat() { return `${this.name} eating`; }
+};
+
+const Sleepable = {
+  sleep() { return `${this.name} sleeping`; }
+};
+
+class Human {
+  constructor(name) { this.name = name; }
+}
+Object.assign(Human.prototype, Workable, Eatable, Sleepable);
+
+class Robot {
+  constructor(name) { this.name = name; }
+}
+Object.assign(Robot.prototype, Workable); // Sadece work!
+
+const human = new Human("Ali");
+console.log(human.work());  // "Ali working"
+console.log(human.eat());   // "Ali eating"
+
+const robot = new Robot("R2D2");
+console.log(robot.work());  // "R2D2 working"
+// robot.eat() → undefined (zorunlu değil, hata fırlatmaz)
+```
 :::
 
 ### 1.5 D — Dependency Inversion Principle (DIP)
@@ -384,6 +554,42 @@ class UserService:
 # İstediğin DB'yi inject et
 service_mysql = UserService(MySQLDatabase())
 service_pg = UserService(PostgreSQLDatabase())
+```
+
+```javascript
+// JavaScript — DIP Uygulanmış ✅
+
+// BAD — High-level doğrudan low-level'a bağımlı ❌
+class UserService {
+  constructor() {
+    this.db = new MySQLDatabase(); // Doğrudan MySQL'e bağımlı!
+  }
+  getUser(id) { return this.db.query(`SELECT * FROM users WHERE id=${id}`); }
+}
+
+// GOOD — Abstraction'a bağımlı ✅
+// Database "interface" (duck typing ile)
+class MySQLDatabase {
+  query(sql) { return `MySQL: ${sql}`; }
+}
+
+class PostgreSQLDatabase {
+  query(sql) { return `PostgreSQL: ${sql}`; }
+}
+
+class UserService {
+  constructor(db) {  // Abstraction inject edilir
+    this.db = db;
+  }
+  getUser(id) { return this.db.query(`SELECT * FROM users WHERE id=${id}`); }
+}
+
+// İstediğin DB'yi inject et
+const mysqlService = new UserService(new MySQLDatabase());
+const pgService = new UserService(new PostgreSQLDatabase());
+
+console.log(mysqlService.getUser(1));  // "MySQL: SELECT..."
+console.log(pgService.getUser(1));     // "PostgreSQL: SELECT..."
 ```
 :::
 
@@ -1655,19 +1861,76 @@ assert repo.get_all() == [user1, user2]
 :::
 
 :::interview
-## Mülakat Soruları
+## Mülakat Soruları — Junior vs Senior Cevap Karşılaştırması
 
 **S1**: "SOLID prensiplerini açıklayın ve gerçek bir projede nasıl uyguladığınızı anlatın."
 
-**Beklenen cevap**: Her prensibi kısaca açıklar + bir gerçek örnek verir. SRP: "User class'ını UserService ve UserRepository olarak ayırdım." OCP: "Yeni ödeme yöntemi eklerken PaymentStrategy interface'i kullandım." DIP: "Database'e doğrudan bağlanmak yerine Repository interface'i inject ettim."
+**Junior cevap**: "S single responsibility, O open closed..." (tanımları sayar ama gerçek örnek veremez)
+
+**Senior cevap**: Her prensibi kısaca açıklar + bir gerçek örnek verir. SRP: "User class'ını UserService ve UserRepository olarak ayırdım — test yazarken DB'yi mock'lamak çok kolaylaştı." OCP: "Yeni ödeme yöntemi eklerken PaymentStrategy interface'i kullandım, mevcut koda dokunmadan iyzico entegrasyonunu 2 saatte bitirdim." DIP: "Database'e doğrudan bağlanmak yerine Repository interface'i inject ettim — PostgreSQL'den MongoDB'ye geçişte sadece adapter değiştirdim."
+
+---
 
 **S2**: "Strategy pattern ne zaman kullanılır? Observer pattern'dan farkı nedir?"
 
-**Beklenen cevap**: Strategy: Birden fazla algoritma arasında runtime'da seçim. Observer: Bir değişikliği birden fazla yere bildirme. Strategy 1-1 ilişki (bir algoritma seçilir), Observer 1-N ilişki (birden fazla listener bilgilendirilir).
+**Junior cevap**: "Strategy if/else yerine kullanılır. Observer event'ler için."
+
+**Senior cevap**: Strategy: Birden fazla algoritma arasında runtime'da seçim. 1-1 ilişki — bir context bir strategy kullanır. Observer: Bir değişikliği birden fazla yere bildirme. 1-N ilişki — bir subject'in birden fazla observer'ı olabilir. Gerçek dünyada ikisi birlikte kullanılır: Strategy ile pricing algoritması seçilir, Observer ile fiyat değişikliği analytics, notification ve inventory service'lerine bildirilir.
+
+---
 
 **S3**: "Over-engineering nedir? Nasıl önlersin?"
 
-**Beklenen cevap**: Basit bir probleme gereksiz karmaşık çözüm uygulamak. YAGNI prensibi ile önlerim — şu an ihtiyaç yoksa yapmam. Refactoring to patterns yaklaşımını tercih ederim: önce basit yaz, karmaşıklık arttığında pattern uygula.
+**Junior cevap**: "Çok fazla kod yazmak."
+
+**Senior cevap**: "Basit bir probleme gereksiz karmaşık çözüm uygulamak. Örneğin 3 endpoint'lik bir API'ye Abstract Factory + Strategy + Observer + CQRS uygulamak. YAGNI (You Aren't Gonna Need It) prensibi ile önlerim. Refactoring-to-patterns yaklaşımını tercih ederim: önce basit yaz, karmaşıklık arttığında pattern uygula. Martin Fowler'ın dediği gibi: 'Rule of three — aynı şeyi 3. kez yaparken refactor et.'"
+
+---
+
+**S4**: "Dependency Injection nedir? Neden önemlidir?"
+
+**Junior cevap**: "Constructor'a parametre geçmek."
+
+**Senior cevap**: "DI, bağımlılıkları dışarıdan inject etme prensibidir. Bunu yapmazsanız class'lar birbirine sıkı bağlı olur (tight coupling) ve test edemezsiniz. DI ile UserService'in database'ini test ortamında InMemoryRepository ile değiştirebilirim — gerçek DB'ye ihtiyaç duymadan. Production'da ise PostgresRepository inject ederim. DI container'lar (Python'da dependency-injector, JS'de InversifyJS) bunu otomatize eder."
+:::
+
+:::exercise
+## Ek Pratik Alıştırmalar
+
+### Alıştırma 4: Decorator Pattern — API Middleware
+Bir REST API için Decorator pattern ile middleware zinciri oluşturun. Her decorator bağımsız ve compose edilebilir olmalı:
+
+```python
+# Aşağıdaki decorator'ları implement edin:
+# 1. AuthDecorator — JWT token kontrolü
+# 2. LoggingDecorator — request/response logging
+# 3. CachingDecorator — GET request sonuçlarını cache'leme
+# 4. RateLimitDecorator — IP bazlı rate limiting
+#
+# Compose edilmiş hali:
+# handler = RateLimitDecorator(
+#     AuthDecorator(
+#         CachingDecorator(
+#             LoggingDecorator(actual_handler)
+#         )
+#     )
+# )
+#
+# Her decorator'ın sorumluluğu tekil olmalı (SRP)
+# Yeni decorator eklemek mevcut kodu değiştirmemeli (OCP)
+```
+
+### Alıştırma 5: Pattern Tanıma
+Aşağıdaki gerçek dünya senaryolarında hangi design pattern kullanılmalı? Her biri için neden o pattern'ı seçtiğinizi açıklayın:
+
+1. E-ticaret sitesinde farklı kargo firmaları (Yurtiçi, MNG, Aras) arasında seçim
+2. Bir text editor'de Ctrl+Z ile geri alma özelliği
+3. Birden fazla log kaynağından (file, console, database) aynı anda log yazma
+4. Farklı veritabanları (MySQL, PostgreSQL, MongoDB) ile çalışabilen bir ORM katmanı
+5. Bir e-posta gönderme sisteminde retry mekanizması ve rate limiting ekleme
+6. Kullanıcı kaydı sonrası email gönderme, analytics kaydetme ve stok güncelleme
+
+**Beklenen cevaplar:** (1) Strategy, (2) Command, (3) Observer veya Strategy, (4) Adapter + Factory, (5) Decorator, (6) Observer/Event-driven
 :::
 
 :::knowledge-check

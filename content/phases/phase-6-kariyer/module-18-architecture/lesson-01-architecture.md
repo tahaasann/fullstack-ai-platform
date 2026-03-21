@@ -1125,9 +1125,343 @@ print(f"Events: {order.domain_events}")
 - **Traefik**: Container-native, auto-discovery
 :::
 
+:::architecture[API Gateway ile Microservice Routing]
+```
+                    ┌──────────────────────────────────────┐
+                    │         API Gateway (Kong/Nginx)      │
+                    │                                       │
+                    │  ┌─────────┐ ┌──────────┐ ┌────────┐ │
+                    │  │  Auth   │ │  Rate    │ │  Log   │ │
+                    │  │ Plugin  │ │ Limiter  │ │ Plugin │ │
+                    │  └────┬────┘ └────┬─────┘ └────┬───┘ │
+                    │       └───────────┴────────────┘     │
+                    └──────────────┬────────────────────────┘
+                                  │
+                    ┌─────────────┼─────────────────┐
+                    │             │                  │
+              /api/users    /api/orders      /api/products
+                    │             │                  │
+              ┌─────▼────┐ ┌─────▼────┐  ┌──────────▼──┐
+              │  User    │ │  Order   │  │  Product    │
+              │  Service │ │  Service │  │  Service    │
+              │  :8001   │ │  :8002   │  │  :8003      │
+              └──────────┘ └──────────┘  └─────────────┘
+```
+:::
+
+:::code
+## API Gateway — Nginx Konfigürasyonu Örneği
+
+```nginx
+# /etc/nginx/conf.d/api-gateway.conf
+upstream user_service {
+    server user-svc:8001;
+    server user-svc-2:8001;  # Load balancing
+}
+
+upstream order_service {
+    server order-svc:8002;
+}
+
+upstream product_service {
+    server product-svc:8003;
+}
+
+server {
+    listen 80;
+    server_name api.example.com;
+
+    # Rate Limiting
+    limit_req_zone $binary_remote_addr zone=api:10m rate=100r/s;
+
+    # User Service
+    location /api/users {
+        limit_req zone=api burst=20;
+        proxy_pass http://user_service;
+        proxy_set_header X-Request-ID $request_id;
+    }
+
+    # Order Service
+    location /api/orders {
+        limit_req zone=api burst=10;
+        proxy_pass http://order_service;
+    }
+
+    # Product Service
+    location /api/products {
+        limit_req zone=api burst=50;
+        proxy_pass http://product_service;
+        proxy_cache api_cache;
+        proxy_cache_valid 200 5m;  # GET response 5dk cache
+    }
+
+    # Health check endpoint
+    location /health {
+        return 200 '{"status": "ok"}';
+        add_header Content-Type application/json;
+    }
+}
+```
+:::
+
 ---
 
-## 9. Architectural Decision Records (ADR)
+## 9. Service Mesh
+
+:::concept
+## Service Mesh (Istio Sidecar Pattern)
+
+**Service Mesh**, microservice'ler arası iletişimi yöneten **altyapı katmanıdır**. Her service'in yanına bir **sidecar proxy** (genellikle Envoy) eklenir. Bu proxy tüm gelen ve giden trafiği yakalar.
+
+**API Gateway vs Service Mesh:**
+- **API Gateway**: Dış dünya ile microservice'ler arasındaki iletişim (North-South traffic)
+- **Service Mesh**: Microservice'ler arası iletişim (East-West traffic)
+:::
+
+:::architecture[Service Mesh — Istio Sidecar Pattern]
+```
+                    ┌──────────────────────────────────────┐
+                    │          Control Plane (istiod)       │
+                    │   ┌─────────┐ ┌──────┐ ┌──────────┐ │
+                    │   │ Config  │ │ Cert │ │ Telemetry│ │
+                    │   │ Manager │ │  CA  │ │ Collector│ │
+                    │   └─────────┘ └──────┘ └──────────┘ │
+                    └──────────┬───────────────────────────┘
+                               │ (config push)
+                    ┌──────────┼───────────────────────────┐
+                    │          │   Data Plane               │
+                    │  ┌───────▼────────┐  ┌──────────────┐│
+                    │  │   Pod A        │  │   Pod B      ││
+                    │  │ ┌────────────┐ │  │ ┌──────────┐ ││
+                    │  │ │ User       │ │  │ │ Order    │ ││
+                    │  │ │ Service    │ │  │ │ Service  │ ││
+                    │  │ └─────┬──────┘ │  │ └────┬─────┘ ││
+                    │  │       │        │  │      │       ││
+                    │  │ ┌─────▼──────┐ │  │ ┌────▼─────┐ ││
+                    │  │ │  Envoy     │◄├──┤►│  Envoy   │ ││
+                    │  │ │  Sidecar   │ │  │ │  Sidecar │ ││
+                    │  │ └────────────┘ │  │ └──────────┘ ││
+                    │  └────────────────┘  └──────────────┘│
+                    └──────────────────────────────────────┘
+```
+:::
+
+:::comparison
+## API Gateway vs Service Mesh
+
+| Kriter | API Gateway | Service Mesh |
+|--------|-------------|--------------|
+| **Trafik yönü** | North-South (dış → iç) | East-West (iç → iç) |
+| **Konum** | Sistemin girişinde | Her service'in yanında |
+| **Sorumluluk** | Routing, auth, rate limit | mTLS, retry, circuit breaker |
+| **Örnek araçlar** | Kong, Nginx, AWS API GW | Istio, Linkerd, Consul Connect |
+| **Karmaşıklık** | Orta | Yüksek |
+| **Ne zaman** | Her microservice projede | 10+ service olduğunda |
+:::
+
+:::realworld
+## Netflix — Service Mesh Kullanımı
+
+Netflix, yüzlerce microservice'i yönetmek için kendi service mesh altyapısını geliştirdi. Zuul (API Gateway) ile dış trafiği yönetir, dahili iletişimde ise Envoy proxy kullanır. Her service çağrısında otomatik retry, circuit breaking ve load balancing sağlanır. Bu sayede bir service'in yavaşlaması tüm sistemi etkilemez.
+:::
+
+---
+
+## 10. Observability Trio: Logs + Metrics + Traces
+
+:::concept
+## Observability Nedir?
+
+**Observability**, bir sistemin dış çıktılarına bakarak iç durumunu anlama yeteneğidir. Üç temel sütunu vardır:
+
+1. **Logs** (Ne oldu?): Event kayıtları — hata mesajları, info logları
+2. **Metrics** (Ne kadar?): Sayısal ölçümler — CPU, latency, request count
+3. **Traces** (Nasıl aktı?): Bir request'in tüm service'lerden geçiş yolculuğu
+:::
+
+:::architecture[Observability Stack]
+```
+  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+  │ User Service│  │Order Service│  │Payment Svc  │
+  │             │  │             │  │             │
+  │ app.log()   │  │ app.log()   │  │ app.log()   │  ← LOGS
+  │ metrics.inc │  │ metrics.inc │  │ metrics.inc │  ← METRICS
+  │ span.start  │  │ span.start  │  │ span.start  │  ← TRACES
+  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘
+         │                │                │
+    ┌────▼────┐     ┌─────▼────┐     ┌─────▼────┐
+    │Filebeat │     │Filebeat  │     │Filebeat  │
+    │Prom exp.│     │Prom exp. │     │Prom exp. │
+    │OTel SDK │     │OTel SDK  │     │OTel SDK  │
+    └────┬────┘     └────┬─────┘     └────┬─────┘
+         │               │                │
+    ┌────▼───────────────▼────────────────▼────┐
+    │            Collection Layer               │
+    │  ┌────────────┐ ┌───────────┐ ┌────────┐ │
+    │  │ELK Stack   │ │Prometheus │ │ Jaeger │ │
+    │  │(Logs)      │ │(Metrics)  │ │(Traces)│ │
+    │  └─────┬──────┘ └─────┬─────┘ └───┬────┘ │
+    └────────┼──────────────┼────────────┼──────┘
+             │              │            │
+    ┌────────▼──────────────▼────────────▼──────┐
+    │              Grafana Dashboard             │
+    │  ┌──────────┐ ┌──────────┐ ┌────────────┐ │
+    │  │ Log      │ │ Metric   │ │ Trace      │ │
+    │  │ Panel    │ │ Graphs   │ │ Waterfall  │ │
+    │  └──────────┘ └──────────┘ └────────────┘ │
+    └────────────────────────────────────────────┘
+```
+:::
+
+:::code
+## Observability — Python Implementasyon
+
+```python
+import logging
+import time
+import uuid
+from functools import wraps
+
+# ============================================
+# 1. STRUCTURED LOGGING (ELK Stack ile)
+# ============================================
+import json
+
+class StructuredLogger:
+    """JSON formatında structured log"""
+
+    def __init__(self, service_name: str):
+        self.service = service_name
+        self.logger = logging.getLogger(service_name)
+
+    def _log(self, level: str, message: str, **kwargs):
+        log_entry = {
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "service": self.service,
+            "level": level,
+            "message": message,
+            **kwargs
+        }
+        print(json.dumps(log_entry))
+
+    def info(self, msg, **kwargs):
+        self._log("INFO", msg, **kwargs)
+
+    def error(self, msg, **kwargs):
+        self._log("ERROR", msg, **kwargs)
+
+    def warn(self, msg, **kwargs):
+        self._log("WARN", msg, **kwargs)
+
+# Kullanim
+log = StructuredLogger("order-service")
+log.info("Order created", order_id="ord_123", user_id="u_456")
+# {"timestamp": "...", "service": "order-service", "level": "INFO",
+#  "message": "Order created", "order_id": "ord_123", "user_id": "u_456"}
+
+
+# ============================================
+# 2. METRICS (Prometheus compatible)
+# ============================================
+class MetricsCollector:
+    """Basit Prometheus-uyumlu metrics collector"""
+
+    def __init__(self):
+        self._counters: dict[str, float] = {}
+        self._histograms: dict[str, list[float]] = {}
+
+    def increment(self, name: str, labels: dict = None, value: float = 1):
+        key = f"{name}_{labels}" if labels else name
+        self._counters[key] = self._counters.get(key, 0) + value
+
+    def observe(self, name: str, value: float):
+        if name not in self._histograms:
+            self._histograms[name] = []
+        self._histograms[name].append(value)
+
+    def get_counter(self, name: str) -> float:
+        return self._counters.get(name, 0)
+
+metrics = MetricsCollector()
+
+def track_request(func):
+    """Request metric decorator"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        try:
+            result = func(*args, **kwargs)
+            metrics.increment("http_requests_total",
+                            {"method": "GET", "status": "200"})
+            return result
+        except Exception as e:
+            metrics.increment("http_requests_total",
+                            {"method": "GET", "status": "500"})
+            raise
+        finally:
+            duration = time.time() - start
+            metrics.observe("http_request_duration_seconds", duration)
+    return wrapper
+
+
+# ============================================
+# 3. DISTRIBUTED TRACING (Jaeger/OpenTelemetry)
+# ============================================
+class Span:
+    """Basit trace span"""
+
+    def __init__(self, name: str, trace_id: str = None, parent_id: str = None):
+        self.name = name
+        self.trace_id = trace_id or str(uuid.uuid4())[:8]
+        self.span_id = str(uuid.uuid4())[:8]
+        self.parent_id = parent_id
+        self.start_time = time.time()
+        self.end_time = None
+        self.tags: dict = {}
+
+    def set_tag(self, key: str, value):
+        self.tags[key] = value
+        return self
+
+    def finish(self):
+        self.end_time = time.time()
+        duration_ms = (self.end_time - self.start_time) * 1000
+        print(f"[TRACE] {self.trace_id} | {self.name} "
+              f"({duration_ms:.1f}ms) tags={self.tags}")
+
+    def child(self, name: str) -> "Span":
+        return Span(name, trace_id=self.trace_id, parent_id=self.span_id)
+
+# Kullanim — request'in tum service'lerden gecis yolculugu
+root = Span("POST /api/orders")
+root.set_tag("user_id", "u_123")
+
+db_span = root.child("db.query")
+db_span.set_tag("query", "INSERT INTO orders")
+time.sleep(0.01)  # simule
+db_span.finish()
+
+cache_span = root.child("redis.set")
+cache_span.set_tag("key", "order:456")
+time.sleep(0.002)
+cache_span.finish()
+
+root.finish()
+# [TRACE] a1b2c3d4 | db.query (10.1ms)
+# [TRACE] a1b2c3d4 | redis.set (2.0ms)
+# [TRACE] a1b2c3d4 | POST /api/orders (12.5ms)
+```
+:::
+
+:::realworld
+## Uber — Observability ile Sorun Tespiti
+
+Uber, Jaeger adlı distributed tracing aracını geliştirdi (open source). Bir kullanicinin ride request'i 20+ microservice'den gecer. Jaeger ile her request'in hangi service'te ne kadar zaman harcadigini gorebilirler. Bir service yavaslayinca dakikalar icinde bottleneck tespit edilir. Prometheus + Grafana ile CPU, memory, request rate gibi metrikleri izler ve anomali durumunda otomatik alert olusturur.
+:::
+
+---
+
+## 11. Architectural Decision Records (ADR)
 
 :::concept
 ## ADR — Mimari Kararları Dokümante Et
@@ -1179,7 +1513,7 @@ Kural: "Bu kararı 6 ay sonra sorgulayabilir miyiz?" → Evet ise, ADR yaz.
 
 ---
 
-## 10. Real-World Architecture Örneği
+## 12. Real-World Architecture Örneği
 
 :::realworld
 ## E-Commerce System Architecture
@@ -1216,19 +1550,72 @@ Kural: "Bu kararı 6 ay sonra sorgulayabilir miyiz?" → Evet ise, ADR yaz.
 :::
 
 :::interview
-## Mülakat Soruları
+## Mülakat Soruları — Junior vs Senior Cevap Karşılaştırması
 
 **S1**: "Monolith vs Microservices — yeni bir projeye hangisiyle başlarsın?"
 
-**Beklenen cevap**: Monolith ile başlarım. Domain boundary'ler henüz net değilken microservices'e bölmek premature decomposition'dır. Monolith ile başlayıp, darboğazlar oluştuğunda veya domain net ayrıştığında modüler monolith veya microservices'e geçerim.
+**Junior cevap**: "Microservices ile başlarım çünkü daha modern ve ölçeklenebilir."
+
+**Senior cevap**: "Monolith ile başlarım. Domain boundary'ler henüz net değilken microservices'e bölmek premature decomposition'dır. Monolith-first yaklaşımını tercih ederim. Domain netleştikçe modüler monolith'e, ardından Strangler Fig pattern ile kademeli microservices geçişi yaparım. Conway's Law gereği takım yapısı da mimariyi belirler — 3 kişilik takımda microservices overhead'dir."
+
+---
 
 **S2**: "CQRS ne zaman kullanılır?"
 
-**Beklenen cevap**: Read/write pattern'leri çok farklı olduğunda. Mesela e-ticaret'te ürün katalog okuma çok yoğun ama ürün güncelleme nadir. Read model'i denormalize edip cache'leyerek okuma performansını artırabilirim, write model'i domain logic'e odaklandırabilirim.
+**Junior cevap**: "Read ve write ayrı olsun diye her projede kullanırım."
+
+**Senior cevap**: "Read/write pattern'leri çok farklı olduğunda. Mesela e-ticaret'te ürün katalog okuma çok yoğun ama ürün güncelleme nadir. Read model'i Elasticsearch'te denormalize edip cache'leyerek okuma performansını artırabilirim, write model'i PostgreSQL'de domain logic'e odaklandırabilirim. Ancak basit CRUD uygulamalarında CQRS gereksiz karmaşıklık ekler — trade-off'u iyi değerlendirmek lazım."
+
+---
 
 **S3**: "Event Sourcing'in dezavantajları neler?"
 
-**Beklenen cevap**: Complexity artışı, event versioning zorluğu, eventual consistency, storage büyümesi, ve event schema evolution'ı yönetme zorluğu. Basit CRUD uygulamalarında gereksiz karmaşıklık ekler.
+**Junior cevap**: "Biraz daha fazla kod yazmak gerekiyor."
+
+**Senior cevap**: "Dört temel zorluk var: (1) Event versioning — schema değiştiğinde eski event'leri nasıl okuyacaksın? (2) Storage büyümesi — event'ler asla silinmez, snapshot mekanizması lazım. (3) Eventual consistency — read model her zaman güncel olmayabilir. (4) Debugging zorluğu — state'i görmek için event'leri replay etmen gerekir. Basit CRUD uygulamalarında kesinlikle kullanılmamalı."
+
+---
+
+**S4**: "Service Mesh nedir ve ne zaman kullanılır?"
+
+**Junior cevap**: "Bilmiyorum / Istio kullanırız."
+
+**Senior cevap**: "Service mesh, microservice'ler arası iletişimi yöneten altyapı katmanıdır. Her pod'a sidecar proxy (Envoy) eklenir. mTLS ile servisler arası güvenli iletişim, otomatik retry, circuit breaking ve distributed tracing sağlar. API Gateway North-South trafiği yönetirken, service mesh East-West trafiği yönetir. 10+ service olduğunda değer katmaya başlar, altında operational overhead'i haklı çıkarmaz."
+
+---
+
+**S5**: "Observability ve monitoring arasındaki fark nedir?"
+
+**Junior cevap**: "İkisi de aynı şey — sistemi izlemek."
+
+**Senior cevap**: "Monitoring bilinen sorunları tespit eder: CPU %90'ın üstünde mi? Request latency threshold'u aştı mı? Observability ise bilinmeyen sorunları teşhis etmeyi sağlar: Logs, metrics ve traces birlikte kullanılarak daha önce görülmemiş bir hatanın kök nedenine ulaşılır. Monitoring 'ne oldu?' sorusunu cevaplar, observability 'neden oldu?' sorusunu cevaplar."
+:::
+
+:::exercise
+## Ek Pratik Alıştırmalar
+
+### Alıştırma 4: Service Mesh Tasarımı
+3 microservice'ten oluşan bir e-ticaret sistemi için service mesh konfigürasyonu tasarlayın:
+- **User Service**, **Order Service**, **Payment Service**
+- Service'ler arası iletişimde mutual TLS (mTLS) aktif olmalı
+- Payment Service'e yapılan çağrılarda circuit breaker tanımlayın (5 ardışık hata → devre açık, 30sn sonra half-open)
+- Order Service → Payment Service arasında retry policy tanımlayın (max 3 retry, exponential backoff)
+- Tüm service'lerden gelen metrikler Prometheus'a gönderilmeli
+
+### Alıştırma 5: Observability Stack Kurulumu
+Bir Node.js uygulaması için observability stack planlayın:
+1. **Logging**: Structured JSON log formatı tasarlayın (hangi field'lar olmalı?)
+2. **Metrics**: Hangi metrikleri toplamalısınız? (RED method: Rate, Errors, Duration)
+3. **Tracing**: Bir sipariş oluşturma akışının trace waterfall'ını çizin (hangi span'ler olacak?)
+4. **Alerting**: Hangi durumlar için alert kurarsınız? (SLO: %99.9 availability, p99 latency < 500ms)
+
+### Alıştırma 6: Mimari Evrim Senaryosu
+Bir startup'ın büyüme aşamalarına göre mimari evrim planı yazın:
+- **0-1K kullanıcı**: Monolith + single DB
+- **1K-100K kullanıcı**: Hangi değişiklikler gerekir?
+- **100K-1M kullanıcı**: Hangi component'ler ayrılmalı?
+- **1M+ kullanıcı**: Full microservices'e geçiş stratejisi nedir?
+Her aşamada trade-off'ları ve geçiş maliyetlerini belirtin.
 :::
 
 :::knowledge-check

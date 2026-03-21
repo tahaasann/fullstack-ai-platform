@@ -148,7 +148,74 @@
           "instructions": "Terminal'de proje klasörüne git ve aşağıdaki komutu çalıştır. Tüm sorulara 'Yes' de (TypeScript, ESLint, Tailwind CSS, src/ directory, App Router, import alias).",
           "code_snippet": "pnpm dlx create-next-app@latest portfolio-blog --tailwind --eslint --src-dir --import-alias \"@/*\"\ncd portfolio-blog\n\n# Proje yapısını kontrol et\nls -la src/app/",
           "deep_dive": "Next.js 16App Router, React Server Components (RSC) üzerine inşa edilmiştir. Bu, component'lerin varsayılan olarak server'da render edildiği anlamına gelir. Client-side interaktivite gereken yerlerde 'use client' directive'i kullanılır. Bu mimari, JavaScript bundle size'ı dramatik şekilde azaltır çünkü server component'lerin JS'i client'a gönderilmez.",
-          "checkpoint": "pnpm run dev komutu ile http://localhost:3000 açıldığında Next.js varsayılan sayfası görünmeli. Terminal'de hata olmamalı."
+          "checkpoint": "pnpm run dev komutu ile http://localhost:3000 açıldığında Next.js varsayılan sayfası görünmeli. Terminal'de hata olmamalı.",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Terminali ac ve proje klasorune git",
+              "type": "terminal",
+              "command": "cd ~/Desktop && mkdir portfolio-blog-project && cd portfolio-blog-project",
+              "expected_output": "Klasor olusturuldu ve icine gecildi",
+              "why": "Projeyi olusturmadan once calisma dizinini belirliyoruz. Masaustunde temiz bir klasor acmak, dosyalarin dagılmasını onler."
+            },
+            {
+              "order": "1.2",
+              "action": "Next.js projesini create-next-app ile olustur",
+              "type": "terminal",
+              "command": "pnpm dlx create-next-app@latest portfolio-blog --tailwind --eslint --src-dir --import-alias \"@/*\"",
+              "expected_output": "Success! Created portfolio-blog at /path/to/portfolio-blog",
+              "why": "create-next-app, Next.js'in resmi scaffolding aracidir. --tailwind, --eslint, --src-dir flag'leri ile tum best practice'ler otomatik konfigure edilir. Manuel kurulum yerine bu arac kullanılır cunku tum bagımlılıklar uyumlu versiyonlarla kurulur."
+            },
+            {
+              "order": "1.3",
+              "action": "Proje klasorune gir",
+              "type": "terminal",
+              "command": "cd portfolio-blog",
+              "expected_output": "Proje klasorune gecildi",
+              "why": "Bundan sonraki tum komutlar proje kok dizininde calisacak."
+            },
+            {
+              "order": "1.4",
+              "action": "Proje yapisini kontrol et",
+              "type": "terminal",
+              "command": "ls -la src/app/",
+              "expected_output": "favicon.ico  globals.css  layout.tsx  page.tsx",
+              "why": "Dosya yapisinin dogru olusturuldugunu dogrulamak icin kontrol ediyoruz. App Router yapisi src/app/ altinda olmali."
+            },
+            {
+              "order": "1.5",
+              "action": "Gelistirme sunucusunu baslat ve test et",
+              "type": "terminal",
+              "command": "pnpm run dev",
+              "expected_output": "- Local: http://localhost:3000\n- Ready in X.Xs",
+              "why": "Projenin sorunsuz calıstigini dogrulamak icin dev server'i baslatiyoruz. http://localhost:3000 adresinde Next.js varsayilan sayfasi gorunmeli."
+            },
+            {
+              "order": "1.6",
+              "action": "Tarayicida kontrol et",
+              "type": "validate",
+              "validation": "http://localhost:3000 adresini tarayicida ac. Next.js varsayilan karsilama sayfasini gormelisin. Terminal'de hata olmamali.",
+              "why": "Her adimdan sonra calistigindan emin olmak, ileride hata bulmayı kolaylastirir. 'Yesil isik' gorunce bir sonraki adima gec."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── public/\n│   ├── file.svg\n│   ├── globe.svg\n│   ├── next.svg\n│   ├── vercel.svg\n│   └── window.svg\n├── src/\n│   └── app/\n│       ├── favicon.ico\n│       ├── globals.css\n│       ├── layout.tsx\n│       └── page.tsx\n├── .eslintrc.json\n├── .gitignore\n├── next.config.mjs\n├── package.json\n├── pnpm-lock.yaml\n├── postcss.config.mjs\n├── tailwind.config.ts\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "pnpm: command not found",
+              "cause": "pnpm paket yoneticisi sisteme kurulu degil.",
+              "fix": "npm install -g pnpm komutu ile pnpm'i global olarak kur. Node.js 18+ gereklidir."
+            },
+            {
+              "error": "EACCES: permission denied",
+              "cause": "Dosya/klasor izinleri yetersiz. Genellikle Linux/Mac'te sudo ile kurulum yapildiginda olusur.",
+              "fix": "sudo chown -R $(whoami) ~/.pnpm-store komutu ile izinleri duzelt. Asla sudo ile pnpm install yapma."
+            },
+            {
+              "error": "Port 3000 already in use",
+              "cause": "Baska bir uygulama 3000 portunu kullaniyor.",
+              "fix": "lsof -i :3000 ile hangi uygulamanin kullandigini bul ve kapat. Veya pnpm run dev -- --port 3001 ile farkli port kullan."
+            }
+          ]
         },
         {
           "step": 2,
@@ -157,7 +224,75 @@
           "instructions": "Prettier ve gerekli eklentileri kur. Ardından konfigürasyon dosyalarını oluştur.",
           "code_snippet": "pnpm install -D prettier eslint-config-prettier prettier-plugin-tailwindcss\n\n# .prettierrc dosyası oluştur\ncat > .prettierrc << 'EOF'\n{\n  \"semi\": true,\n  \"trailingComma\": \"es5\",\n  \"singleQuote\": true,\n  \"tabWidth\": 2,\n  \"plugins\": [\"prettier-plugin-tailwindcss\"]\n}\nEOF\n\n# .prettierignore dosyası\ncat > .prettierignore << 'EOF'\nnode_modules\n.next\nout\npublic\nEOF",
           "deep_dive": "prettier-plugin-tailwindcss eklentisi, Tailwind class'larını resmi önerilen sıraya göre otomatik sıralar. Bu, class isimlerinin tutarlı olmasını sağlar ve code review'da gereksiz diff'leri önler. ESLint ile Prettier çakışmasını önlemek için eslint-config-prettier kullanılır — bu, ESLint'in formatlama kurallarını devre dışı bırakır ve formatlama işini tamamen Prettier'a bırakır.",
-          "checkpoint": "pnpm dlx prettier --check src/ komutu çalıştırıldığında hata vermemeli. VS Code'da dosya kaydedildiğinde otomatik format uygulanmalı."
+          "checkpoint": "pnpm dlx prettier --check src/ komutu çalıştırıldığında hata vermemeli. VS Code'da dosya kaydedildiğinde otomatik format uygulanmalı.",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Prettier ve eklentilerini kur",
+              "type": "terminal",
+              "command": "pnpm install -D prettier eslint-config-prettier prettier-plugin-tailwindcss",
+              "expected_output": "devDependencies:\n+ prettier\n+ eslint-config-prettier\n+ prettier-plugin-tailwindcss",
+              "why": "Prettier kod formatlama, eslint-config-prettier ESLint ile cakismayi onler, prettier-plugin-tailwindcss ise Tailwind class'larini resmi sıraya gore otomatik siralar."
+            },
+            {
+              "order": "2.2",
+              "action": ".prettierrc dosyasi olustur",
+              "type": "file_open",
+              "file": ".prettierrc",
+              "why": "Prettier konfigurasyonu proje kokunde .prettierrc dosyasinda tanimlanir. Tum takim uyelerinin ayni formatlama kurallarini kullanmasini saglar."
+            },
+            {
+              "order": "2.3",
+              "action": "Prettier konfigurasyonunu yaz",
+              "type": "code_write",
+              "file": ".prettierrc",
+              "code": "{\n  \"semi\": true,\n  \"trailingComma\": \"es5\",\n  \"singleQuote\": true,\n  \"tabWidth\": 2,\n  \"plugins\": [\"prettier-plugin-tailwindcss\"]\n}",
+              "why": "semi: noktalı virgul kullan, singleQuote: tek tirnak tercih et, trailingComma: ES5 uyumlu trailing virgul ekle. Bu ayarlar endustri standartlaridir."
+            },
+            {
+              "order": "2.4",
+              "action": ".prettierignore dosyasi olustur",
+              "type": "file_open",
+              "file": ".prettierignore",
+              "why": "Prettier'in formatlamasi gerekmeyen dosyalari (build ciktilari, node_modules) belirtmek icin ignore dosyasi olusturuyoruz."
+            },
+            {
+              "order": "2.5",
+              "action": "Ignore kurallarini yaz",
+              "type": "code_write",
+              "file": ".prettierignore",
+              "code": "node_modules\n.next\nout\npublic",
+              "why": "Bu klasorler build ciktilari ve bagimliliklari icerir. Bunlari formatlamak gereksiz islem yukudur ve hata cikarabilir."
+            },
+            {
+              "order": "2.6",
+              "action": "Prettier'in calistigini dogrula",
+              "type": "terminal",
+              "command": "pnpm dlx prettier --check src/",
+              "expected_output": "Checking formatting...\nAll matched files use Prettier code style!",
+              "why": "Kurulumun dogru calistigini dogrulamak icin --check flag'i ile tum src/ dosyalarini kontrol ediyoruz."
+            },
+            {
+              "order": "2.7",
+              "action": "VS Code ayarlarini kontrol et",
+              "type": "validate",
+              "validation": "VS Code'da bir .tsx dosyasi ac ve kaydet (Ctrl+S). Dosya otomatik formatlanmali. Eger formatlanmiyorsa, VS Code Settings'ten 'Format On Save' ayarini aktif et ve Default Formatter olarak Prettier sec.",
+              "why": "Otomatik formatlama, her kayitte tutarli kod stili saglar. Manuel formatlama gerektirmez."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   └── app/\n│       ├── favicon.ico\n│       ├── globals.css\n│       ├── layout.tsx\n│       └── page.tsx\n├── .eslintrc.json\n├── .prettierrc          ← YENİ\n├── .prettierignore       ← YENİ\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Prettier ve ESLint cakisiyor, cift formatlama yapiliyor",
+              "cause": "ESLint'in kendi formatlama kurallari Prettier ile catisiyor.",
+              "fix": ".eslintrc.json'da extends dizisinin sonuna 'prettier' ekle: \"extends\": [\"next/core-web-vitals\", \"prettier\"]. eslint-config-prettier ESLint'in formatlama kurallarini devre disi birakir."
+            },
+            {
+              "error": "Tailwind class'lari siralanmiyor",
+              "cause": "prettier-plugin-tailwindcss eklentisi .prettierrc'de tanimlanmamis.",
+              "fix": ".prettierrc dosyasinda \"plugins\": [\"prettier-plugin-tailwindcss\"] satirinin oldugunu dogrula."
+            }
+          ]
         },
         {
           "step": 3,
@@ -166,7 +301,57 @@
           "instructions": "Tailwind CSS v4, CSS-first konfigürasyon kullanır. tailwind.config.ts yerine CSS dosyasında @theme direktifi ile tasarım token'larını tanımla.",
           "code_snippet": "/* src/app/globals.css */\n@import \"tailwindcss\";\n@import \"tailwindcss/theme\" layer(theme);\n\n/* Dark mode: class stratejisi */\n@custom-variant dark (&:where(.dark, .dark *));\n\n@theme {\n  --color-primary-50: #eff6ff;\n  --color-primary-100: #dbeafe;\n  --color-primary-200: #bfdbfe;\n  --color-primary-300: #93c5fd;\n  --color-primary-400: #60a5fa;\n  --color-primary-500: #3b82f6;\n  --color-primary-600: #2563eb;\n  --color-primary-700: #1d4ed8;\n  --color-primary-800: #1e40af;\n  --color-primary-900: #1e3a8a;\n\n  --color-dark-bg: #0f172a;\n  --color-dark-card: #1e293b;\n  --color-dark-text: #e2e8f0;\n\n  --font-sans: 'Inter', system-ui, sans-serif;\n  --font-mono: 'JetBrains Mono', monospace;\n}\n\n/* @tailwindcss/typography eklentisi icin */\n@plugin \"@tailwindcss/typography\";",
           "deep_dive": "Tailwind CSS v4'te konfigürasyon CSS-first yapılır — tailwind.config.ts yerine @theme direktifi ile CSS dosyasında design token'lar tanımlanır. @custom-variant dark ile class-based dark mode aktifleştirilir. @plugin direktifi ile eklentiler (typography gibi) doğrudan CSS'te yüklenir. Bu yaklaşım, build tooling'den bağımsızdır ve daha hızlı build süreleri sağlar.",
-          "checkpoint": "globals.css dosyasında @theme ve @import 'tailwindcss' tanımlı olmalı. pnpm run dev çalıştırıldığında hata vermemeli."
+          "checkpoint": "globals.css dosyasında @theme ve @import 'tailwindcss' tanımlı olmalı. pnpm run dev çalıştırıldığında hata vermemeli.",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Tailwind CSS Typography eklentisini kur",
+              "type": "terminal",
+              "command": "pnpm install @tailwindcss/typography",
+              "expected_output": "dependencies:\n+ @tailwindcss/typography",
+              "why": "@tailwindcss/typography, MDX blog iceriklerine otomatik guzel tipografi ekler. prose class'i ile basliklar, paragraflar ve kod bloklari stilize edilir."
+            },
+            {
+              "order": "3.2",
+              "action": "globals.css dosyasini ac",
+              "type": "file_open",
+              "file": "src/app/globals.css",
+              "why": "Tailwind CSS v4'te tasarim token'lari dogrudan CSS dosyasinda @theme direktifi ile tanimlanir. Bu, CSS-first konfigürasyon yaklasımidir."
+            },
+            {
+              "order": "3.3",
+              "action": "globals.css icerigini tamamen yeniden yaz",
+              "type": "code_write",
+              "file": "src/app/globals.css",
+              "code": "@import \"tailwindcss\";\n@import \"tailwindcss/theme\" layer(theme);\n\n/* Dark mode: class stratejisi */\n@custom-variant dark (&:where(.dark, .dark *));\n\n@theme {\n  --color-primary-50: #eff6ff;\n  --color-primary-100: #dbeafe;\n  --color-primary-200: #bfdbfe;\n  --color-primary-300: #93c5fd;\n  --color-primary-400: #60a5fa;\n  --color-primary-500: #3b82f6;\n  --color-primary-600: #2563eb;\n  --color-primary-700: #1d4ed8;\n  --color-primary-800: #1e40af;\n  --color-primary-900: #1e3a8a;\n\n  --color-dark-bg: #0f172a;\n  --color-dark-card: #1e293b;\n  --color-dark-text: #e2e8f0;\n\n  --font-sans: 'Inter', system-ui, sans-serif;\n  --font-mono: 'JetBrains Mono', monospace;\n}\n\n/* @tailwindcss/typography eklentisi icin */\n@plugin \"@tailwindcss/typography\";",
+              "why": "Tailwind v4'te @theme ile design token'lar (renkler, fontlar) tanimlanir. @custom-variant dark ile class-based dark mode aktiflestirilir. Bu yaklasim tailwind.config.ts'ye ihtiyac duymayi ortadan kaldirir."
+            },
+            {
+              "order": "3.4",
+              "action": "Tasarim token'larinin calistigini dogrula",
+              "type": "validate",
+              "validation": "pnpm run dev ile sunucuyu baslat. Herhangi bir component'te bg-primary-600 veya text-dark-text class'ini kullanarak renklerin dogru uygulandigini kontrol et. Konsolda Tailwind hatasi olmamali.",
+              "why": "Design token'larin dogru tanimlandigini ve Tailwind'in bunlari tanıdıgını dogrulamak, ilerideki stil sorunlarini onler."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   └── app/\n│       ├── favicon.ico\n│       ├── globals.css     ← GÜNCELLENDİ (@theme ile design tokens)\n│       ├── layout.tsx\n│       └── page.tsx\n├── .prettierrc\n├── .prettierignore\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Cannot find module '@tailwindcss/typography'",
+              "cause": "Typography eklentisi kurulmamis veya yanlis import edilmis.",
+              "fix": "pnpm install @tailwindcss/typography komutunu calistir. globals.css'te @plugin \"@tailwindcss/typography\"; satirinin oldugunu dogrula."
+            },
+            {
+              "error": "@theme icindeki renkler uygulanmiyor",
+              "cause": "Tailwind v4 CSS-first konfigürasyon kullanır, ama proje hala tailwind.config.ts ile kurulmus olabilir.",
+              "fix": "Tailwind v4 kullandigindan emin ol: package.json'da tailwindcss versiyonunu kontrol et. v4+ olmali."
+            },
+            {
+              "error": "Dark mode calismiyor, class degisikligi etkisiz",
+              "cause": "@custom-variant dark tanimlanmamis veya HTML elementine 'dark' class'i eklenmemis.",
+              "fix": "globals.css'te @custom-variant dark (&:where(.dark, .dark *)); satirinin oldugunu dogrula. Dark mode toggle henuz implement edilmedi, ileride next-themes ile yapilacak."
+            }
+          ]
         },
         {
           "step": 4,
@@ -175,7 +360,77 @@
           "instructions": "src/app/layout.tsx dosyasında fontları kur ve global stilleri ayarla.",
           "code_snippet": "// src/app/layout.tsx\nimport type { Metadata } from 'next';\nimport { Inter, JetBrains_Mono } from 'next/font/google';\nimport './globals.css';\nimport { ThemeProvider } from '@/components/theme-provider';\n\nconst inter = Inter({\n  subsets: ['latin'],\n  variable: '--font-sans',\n  display: 'swap',\n});\n\nconst jetbrainsMono = JetBrains_Mono({\n  subsets: ['latin'],\n  variable: '--font-mono',\n  display: 'swap',\n});\n\nexport const metadata: Metadata = {\n  title: {\n    default: 'Adın Soyadın | Full Stack Developer',\n    template: '%s | Adın Soyadın',\n  },\n  description: 'Full Stack Developer portfolio ve teknik blog',\n  keywords: ['Full Stack Developer', 'React', 'Next.js', 'TypeScript'],\n};\n\nexport default function RootLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <html lang=\"tr\" suppressHydrationWarning>\n      <body\n        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}\n      >\n        <ThemeProvider>{children}</ThemeProvider>\n      </body>\n    </html>\n  );\n}",
           "deep_dive": "display: 'swap' font-display stratejisi, font yüklenene kadar system fontu gösterir ve yüklendikten sonra değiştirir. Bu, FOIT (Flash of Invisible Text) sorununu önler. variable font özelliği, CSS custom property olarak font ailesini tanımlar — böylece Tailwind config'de bu değişkeni kullanabilirsin. suppressHydrationWarning, dark mode class'ının server/client uyumsuzluğu uyarısını bastırır.",
-          "checkpoint": "Sayfada Inter fontu düzgün yüklenmiş olmalı. DevTools'ta Network sekmesinde font dosyaları self-hosted olarak görünmeli (Google CDN'den değil)."
+          "checkpoint": "Sayfada Inter fontu düzgün yüklenmiş olmalı. DevTools'ta Network sekmesinde font dosyaları self-hosted olarak görünmeli (Google CDN'den değil).",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "src/app/layout.tsx dosyasini ac",
+              "type": "file_open",
+              "file": "src/app/layout.tsx",
+              "why": "layout.tsx, Next.js App Router'da tum sayfalari saran root layout dosyasidir. Fontlar, global stiller ve provider'lar burada tanimlanir."
+            },
+            {
+              "order": "4.2",
+              "action": "Font import'larini dosyanin basina ekle",
+              "type": "code_add",
+              "file": "src/app/layout.tsx",
+              "position": "top",
+              "code": "import type { Metadata } from 'next';\nimport { Inter, JetBrains_Mono } from 'next/font/google';\nimport './globals.css';",
+              "why": "next/font/google, Google Fonts'u build time'da indirir ve self-host eder. Bu, CDN bagimlılıgını ortadan kaldirir, GDPR uyumlu olur ve layout shift'i onler."
+            },
+            {
+              "order": "4.3",
+              "action": "Font konfigurasyonlarini tanimla",
+              "type": "code_add",
+              "file": "src/app/layout.tsx",
+              "position": "after_imports",
+              "code": "const inter = Inter({\n  subsets: ['latin'],\n  variable: '--font-sans',\n  display: 'swap',\n});\n\nconst jetbrainsMono = JetBrains_Mono({\n  subsets: ['latin'],\n  variable: '--font-mono',\n  display: 'swap',\n});",
+              "why": "display: 'swap' font yuklenene kadar system fontunu gosterir (FOIT onleme). variable ile CSS custom property olarak font tanimlanir ve Tailwind'de kullanilir."
+            },
+            {
+              "order": "4.4",
+              "action": "Metadata objesini tanimla",
+              "type": "code_add",
+              "file": "src/app/layout.tsx",
+              "position": "after_fonts",
+              "code": "export const metadata: Metadata = {\n  title: {\n    default: 'Adin Soyadin | Full Stack Developer',\n    template: '%s | Adin Soyadin',\n  },\n  description: 'Full Stack Developer portfolio ve teknik blog',\n  keywords: ['Full Stack Developer', 'React', 'Next.js', 'TypeScript'],\n};",
+              "why": "Next.js Metadata API, her sayfa icin SEO meta tag'lerini yonetir. template ile alt sayfalar otomatik 'Sayfa Adi | Adin Soyadin' formatinda title alir."
+            },
+            {
+              "order": "4.5",
+              "action": "RootLayout component'ini yaz",
+              "type": "code_add",
+              "file": "src/app/layout.tsx",
+              "position": "bottom",
+              "code": "export default function RootLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <html lang=\"tr\" suppressHydrationWarning>\n      <body\n        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}\n      >\n        {children}\n      </body>\n    </html>\n  );\n}",
+              "why": "lang='tr' Turkce icerik icin onemli (SEO ve screen reader). suppressHydrationWarning, dark mode class uyumsuzlugu uyarisini bastirir. antialiased font rendering'i yumusatir."
+            },
+            {
+              "order": "4.6",
+              "action": "Fontlarin yuklendigini dogrula",
+              "type": "validate",
+              "validation": "Tarayicida sayfayi ac, DevTools > Network sekmesinde font dosyalarinin self-hosted olarak yuklendigini gor (Google CDN'den degil, kendi domain'inden). Elements sekmesinde body'de font-family'nin Inter oldugunu kontrol et.",
+              "why": "Self-hosted fontlar, GDPR uyumlu ve performans acısından ustundur. Google CDN'e bagimlılık yok."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   └── app/\n│       ├── favicon.ico\n│       ├── globals.css\n│       ├── layout.tsx      ← GÜNCELLENDİ (fontlar + metadata)\n│       └── page.tsx\n├── .prettierrc\n├── .prettierignore\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Font not loading / FOUT (Flash of Unstyled Text)",
+              "cause": "Font konfigurasyonunda display: 'swap' eksik veya variable ismi globals.css'teki ile uyusmuyor.",
+              "fix": "Inter'da variable: '--font-sans' oldugunu ve globals.css'te --font-sans: 'Inter', system-ui, sans-serif; tanimli oldugunu dogrula."
+            },
+            {
+              "error": "Hydration mismatch warning in console",
+              "cause": "html elementinde suppressHydrationWarning eksik. Dark mode class'i server ve client'ta farkli.",
+              "fix": "<html> elementine suppressHydrationWarning prop'u ekle. Bu, next-themes kullanildiginda zorunludur."
+            },
+            {
+              "error": "Module not found: Can't resolve '@/components/theme-provider'",
+              "cause": "ThemeProvider component'i henuz olusturulmadi ama layout.tsx'te import ediliyor.",
+              "fix": "Su an icin ThemeProvider import'unu kaldir. Bu component Milestone 3'te olusturulacak. Simdilik children'i dogrudan body icine yaz."
+            }
+          ]
         },
         {
           "step": 5,
@@ -184,7 +439,89 @@
           "instructions": "Component klasör yapısını ve temel shared component'leri oluştur.",
           "code_snippet": "// src/components/header.tsx\n'use client';\n\nimport Link from 'next/link';\nimport { usePathname } from 'next/navigation';\nimport { ThemeToggle } from './theme-toggle';\n\nconst navigation = [\n  { name: 'Ana Sayfa', href: '/' },\n  { name: 'Hakkımda', href: '/about' },\n  { name: 'Projeler', href: '/projects' },\n  { name: 'Blog', href: '/blog' },\n  { name: 'İletişim', href: '/contact' },\n];\n\nexport function Header() {\n  const pathname = usePathname();\n\n  return (\n    <header className=\"sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-dark-bg/80\">\n      <nav className=\"mx-auto flex max-w-5xl items-center justify-between px-4 py-4\">\n        <Link\n          href=\"/\"\n          className=\"text-xl font-bold text-primary-600 dark:text-primary-400\"\n        >\n          {'<AD />'}\n        </Link>\n\n        <div className=\"flex items-center gap-6\">\n          {navigation.map((item) => (\n            <Link\n              key={item.href}\n              href={item.href}\n              className={`text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${\n                pathname === item.href\n                  ? 'font-semibold text-primary-600 dark:text-primary-400'\n                  : 'text-gray-600 dark:text-gray-400'\n              }`}\n            >\n              {item.name}\n            </Link>\n          ))}\n          <ThemeToggle />\n        </div>\n      </nav>\n    </header>\n  );\n}\n\n// src/components/footer.tsx\nexport function Footer() {\n  return (\n    <footer className=\"border-t border-gray-200 dark:border-gray-800\">\n      <div className=\"mx-auto max-w-5xl px-4 py-8\">\n        <div className=\"flex flex-col items-center justify-between gap-4 sm:flex-row\">\n          <p className=\"text-sm text-gray-500 dark:text-gray-400\">\n            &copy; {new Date().getFullYear()} Adın Soyadın. Tüm hakları saklıdır.\n          </p>\n          <div className=\"flex gap-4\">\n            <a href=\"https://github.com/username\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-gray-500 transition-colors hover:text-primary-600\">\n              GitHub\n            </a>\n            <a href=\"https://linkedin.com/in/username\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-gray-500 transition-colors hover:text-primary-600\">\n              LinkedIn\n            </a>\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}",
           "deep_dive": "sticky top-0 + backdrop-blur-md kombinasyonu, modern web sitelerinde yaygın bir pattern'dır — header sayfayla birlikte kayar ama her zaman görünür kalır, arkasını hafif bulanıklaştırarak (glassmorphism). bg-white/80 ile %80 opacity verilerek arka plandaki içerik hafifçe görünür. 'use client' directive'i zorunludur çünkü usePathname hook'u client-side state kullanır.",
-          "checkpoint": "Tüm component dosyaları oluşturulmuş olmalı. pnpm run dev ile hata vermemeli. Header ve Footer sayfada görünmeli."
+          "checkpoint": "Tüm component dosyaları oluşturulmuş olmalı. pnpm run dev ile hata vermemeli. Header ve Footer sayfada görünmeli.",
+          "substeps": [
+            {
+              "order": "5.1",
+              "action": "Component klasor yapisini olustur",
+              "type": "terminal",
+              "command": "mkdir -p src/components",
+              "expected_output": "Klasor olusturuldu",
+              "why": "Tum paylasilan component'ler src/components/ altinda tutulur. Bu, Atomic Design prensibine uygun bir yapidir."
+            },
+            {
+              "order": "5.2",
+              "action": "Header component dosyasini olustur",
+              "type": "file_open",
+              "file": "src/components/header.tsx",
+              "why": "Header, tum sayfalarda gorunen navigation component'idir. 'use client' directive'i gerektirir cunku usePathname hook'u kullanir."
+            },
+            {
+              "order": "5.3",
+              "action": "'use client' directive'ini ve import'lari yaz",
+              "type": "code_write",
+              "file": "src/components/header.tsx",
+              "code": "'use client';\n\nimport Link from 'next/link';\nimport { usePathname } from 'next/navigation';",
+              "why": "'use client' dosyanin en ustunde olmali — bu component client-side hook (usePathname) kullandigi icin Client Component olmali. Link, Next.js'in optimized navigation component'idir."
+            },
+            {
+              "order": "5.4",
+              "action": "Navigation veri yapisini ve Header component'ini ekle",
+              "type": "code_add",
+              "file": "src/components/header.tsx",
+              "position": "bottom",
+              "code": "\nconst navigation = [\n  { name: 'Ana Sayfa', href: '/' },\n  { name: 'Hakkımda', href: '/about' },\n  { name: 'Projeler', href: '/projects' },\n  { name: 'Blog', href: '/blog' },\n  { name: 'İletişim', href: '/contact' },\n];\n\nexport function Header() {\n  const pathname = usePathname();\n\n  return (\n    <header className=\"sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-dark-bg/80\">\n      <nav className=\"mx-auto flex max-w-5xl items-center justify-between px-4 py-4\">\n        <Link\n          href=\"/\"\n          className=\"text-xl font-bold text-primary-600 dark:text-primary-400\"\n        >\n          {'<AD />'}\n        </Link>\n\n        <div className=\"flex items-center gap-6\">\n          {navigation.map((item) => (\n            <Link\n              key={item.href}\n              href={item.href}\n              className={`text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${\n                pathname === item.href\n                  ? 'font-semibold text-primary-600 dark:text-primary-400'\n                  : 'text-gray-600 dark:text-gray-400'\n              }`}\n            >\n              {item.name}\n            </Link>\n          ))}\n        </div>\n      </nav>\n    </header>\n  );\n}",
+              "why": "Navigation verisini dizi olarak tanimlamak, DRY prensibine uyar. usePathname ile aktif sayfa vurgulanir. sticky + backdrop-blur glassmorphism efekti verir."
+            },
+            {
+              "order": "5.5",
+              "action": "Footer component dosyasini olustur",
+              "type": "file_open",
+              "file": "src/components/footer.tsx",
+              "why": "Footer, sayfanin altinda copyright ve sosyal medya linklerini gosterir. Server Component olarak calisir (hook kullanmiyor)."
+            },
+            {
+              "order": "5.6",
+              "action": "Footer component'ini yaz",
+              "type": "code_write",
+              "file": "src/components/footer.tsx",
+              "code": "export function Footer() {\n  return (\n    <footer className=\"border-t border-gray-200 dark:border-gray-800\">\n      <div className=\"mx-auto max-w-5xl px-4 py-8\">\n        <div className=\"flex flex-col items-center justify-between gap-4 sm:flex-row\">\n          <p className=\"text-sm text-gray-500 dark:text-gray-400\">\n            &copy; {new Date().getFullYear()} Adın Soyadın. Tüm hakları saklıdır.\n          </p>\n          <div className=\"flex gap-4\">\n            <a href=\"https://github.com/username\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-gray-500 transition-colors hover:text-primary-600\">\n              GitHub\n            </a>\n            <a href=\"https://linkedin.com/in/username\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-gray-500 transition-colors hover:text-primary-600\">\n              LinkedIn\n            </a>\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}",
+              "why": "Footer'da 'use client' gerekmez cunku hook kullanmiyor. noopener noreferrer, target='_blank' linklerde guvenlik acigini (tabnabbing) onler."
+            },
+            {
+              "order": "5.7",
+              "action": "Layout'a Header ve Footer'i ekle",
+              "type": "code_modify",
+              "file": "src/app/layout.tsx",
+              "code": "// body icine Header ve Footer import et ve ekle:\nimport { Header } from '@/components/header';\nimport { Footer } from '@/components/footer';\n\n// body icindeki children'i sar:\n<Header />\n<main className=\"min-h-screen\">{children}</main>\n<Footer />",
+              "why": "Root layout'ta Header ve Footer'i eklemek, tum sayfalarda bu component'lerin gorulmesini saglar. main elementi min-h-screen ile en az tam ekran yuksekligi alir."
+            },
+            {
+              "order": "5.8",
+              "action": "Component'lerin goruntulendigini dogrula",
+              "type": "validate",
+              "validation": "Tarayicida sayfayi yenile. Ustte Header (logo + navigation linkleri), altta Footer (copyright + sosyal linkler) gorunmeli. Linklere tiklayinca URL degismeli (henuz sayfalar yok, 404 normal).",
+              "why": "Her component eklendikten sonra gorunumunu dogrulamak, hatalari erken yakalamani saglar."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── favicon.ico\n│   │   ├── globals.css\n│   │   ├── layout.tsx      ← GÜNCELLENDİ (Header + Footer eklendi)\n│   │   └── page.tsx\n│   └── components/          ← YENİ KLASÖR\n│       ├── header.tsx       ← YENİ\n│       └── footer.tsx       ← YENİ\n├── .prettierrc\n├── .prettierignore\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Error: usePathname() can only be used in a Client Component",
+              "cause": "Header dosyasinin basinda 'use client' directive'i eksik.",
+              "fix": "src/components/header.tsx dosyasinin ilk satiri 'use client'; olmali. Bu olmadan React hook'lari kullanilamaz."
+            },
+            {
+              "error": "Module not found: Can't resolve '@/components/header'",
+              "cause": "Dosya ismi yanlis veya tsconfig.json'daki path alias yanlis konfigure edilmis.",
+              "fix": "tsconfig.json'da paths: { \"@/*\": [\"./src/*\"] } oldugunu dogrula. Dosya isminin header.tsx (kucuk harf) oldugundan emin ol."
+            },
+            {
+              "error": "Header/Footer gorunmuyor veya stiller uygulanmiyor",
+              "cause": "layout.tsx'te import veya JSX yapisi yanlis.",
+              "fix": "layout.tsx'te Header ve Footer'in body > icinde, children'in etrafinda dogru siralamayla yerlestirildigini kontrol et."
+            }
+          ]
         }
       ],
       "must_note": "📝 MUTLAKA NOT AL:\n- Next.js App Router'da tüm component'ler varsayılan olarak Server Component'tir. Client-side hook (useState, useEffect, usePathname vb.) kullanacaksan dosyanın en üstüne 'use client' eklemelisin.\n- next/font ile fontlar self-host edilir — GDPR uyumlu, performans dostu.\n- Tailwind v4'te @custom-variant dark ile dark mode class-based kontrol edilir (CSS-first konfigürasyon).\n- Prettier + ESLint birlikte kullanılırken eslint-config-prettier ile çakışma önlenir.",
@@ -210,7 +547,53 @@
           "instructions": "src/app/page.tsx dosyasında ana sayfayı oluştur. Hero section, öne çıkan projeler ve son blog yazıları bölümlerini ekle.",
           "code_snippet": "// src/app/page.tsx\nimport Link from 'next/link';\nimport { getRecentPosts } from '@/lib/mdx';\n\nexport default async function HomePage() {\n  const recentPosts = await getRecentPosts(3);\n\n  return (\n    <main>\n      {/* Hero Section */}\n      <section className=\"mx-auto max-w-5xl px-4 py-20\">\n        <div className=\"space-y-6\">\n          <p className=\"text-lg text-primary-600 dark:text-primary-400\">\n            Merhaba, ben\n          </p>\n          <h1 className=\"text-5xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl\">\n            Adın Soyadın\n          </h1>\n          <h2 className=\"text-2xl text-gray-600 dark:text-gray-400 sm:text-3xl\">\n            Full Stack Developer\n          </h2>\n          <p className=\"max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400\">\n            React, Node.js ve AI teknolojileriyle modern web uygulamaları\n            geliştiriyorum. Temiz kod, iyi mimari ve kullanıcı deneyimine\n            önem veren bir geliştirici olarak sürekli öğrenmeye devam ediyorum.\n          </p>\n          <div className=\"flex gap-4\">\n            <Link\n              href=\"/projects\"\n              className=\"rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700\"\n            >\n              Projelerimi Gör\n            </Link>\n            <Link\n              href=\"/contact\"\n              className=\"rounded-lg border border-gray-300 px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800\"\n            >\n              İletişime Geç\n            </Link>\n          </div>\n        </div>\n      </section>\n\n      {/* Son Blog Yazıları */}\n      <section className=\"mx-auto max-w-5xl px-4 py-16\">\n        <h2 className=\"mb-8 text-2xl font-bold text-gray-900 dark:text-white\">\n          Son Yazılar\n        </h2>\n        <div className=\"grid gap-6 md:grid-cols-3\">\n          {recentPosts.map((post) => (\n            <article\n              key={post.slug}\n              className=\"rounded-xl border border-gray-200 p-6 transition-shadow hover:shadow-lg dark:border-gray-800\"\n            >\n              <time className=\"text-sm text-gray-500\">{post.date}</time>\n              <h3 className=\"mt-2 text-lg font-semibold text-gray-900 dark:text-white\">\n                <Link href={`/blog/${post.slug}`}>{post.title}</Link>\n              </h3>\n              <p className=\"mt-2 text-sm text-gray-600 dark:text-gray-400\">\n                {post.summary}\n              </p>\n            </article>\n          ))}\n        </div>\n      </section>\n    </main>\n  );\n}",
           "deep_dive": "Bu component bir Server Component (varsayılan) olduğu için, async/await doğrudan kullanılabilir. getRecentPosts fonksiyonu server'da çalışır ve sonucu HTML olarak client'a gönderilir — JavaScript bundle'a dahil olmaz. tracking-tight class'ı, büyük başlıklarda harfler arası boşluğu azaltır ve daha profesyonel tipografi sağlar. leading-relaxed ise paragraf satır yüksekliğini artırarak okunabilirliği iyileştirir.",
-          "checkpoint": "Ana sayfa tasarımı görselde profesyonel görünmeli. Hero section, CTA butonları ve blog kartları düzgün render edilmeli."
+          "checkpoint": "Ana sayfa tasarımı görselde profesyonel görünmeli. Hero section, CTA butonları ve blog kartları düzgün render edilmeli.",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "src/app/page.tsx dosyasini ac",
+              "type": "file_open",
+              "file": "src/app/page.tsx",
+              "why": "page.tsx, App Router'da route'un sayfa component'idir. src/app/page.tsx = ana sayfa (/)."
+            },
+            {
+              "order": "1.2",
+              "action": "Mevcut varsayilan icerigi sil ve import'lari ekle",
+              "type": "code_write",
+              "file": "src/app/page.tsx",
+              "code": "import Link from 'next/link';",
+              "why": "Next.js varsayilan karsilama sayfasini kendi ana sayfamizla degistiriyoruz. Link component'i client-side navigation saglar."
+            },
+            {
+              "order": "1.3",
+              "action": "HomePage component'ini olustur — Hero Section",
+              "type": "code_add",
+              "file": "src/app/page.tsx",
+              "position": "bottom",
+              "code": "\nexport default function HomePage() {\n  return (\n    <main>\n      {/* Hero Section */}\n      <section className=\"mx-auto max-w-5xl px-4 py-20\">\n        <div className=\"space-y-6\">\n          <p className=\"text-lg text-primary-600 dark:text-primary-400\">\n            Merhaba, ben\n          </p>\n          <h1 className=\"text-5xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl\">\n            Adın Soyadın\n          </h1>\n          <h2 className=\"text-2xl text-gray-600 dark:text-gray-400 sm:text-3xl\">\n            Full Stack Developer\n          </h2>\n          <p className=\"max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400\">\n            React, Node.js ve AI teknolojileriyle modern web uygulamaları\n            geliştiriyorum. Temiz kod, iyi mimari ve kullanıcı deneyimine\n            önem veren bir geliştirici olarak sürekli öğrenmeye devam ediyorum.\n          </p>\n          <div className=\"flex gap-4\">\n            <Link\n              href=\"/projects\"\n              className=\"rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700\"\n            >\n              Projelerimi Gör\n            </Link>\n            <Link\n              href=\"/contact\"\n              className=\"rounded-lg border border-gray-300 px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800\"\n            >\n              İletişime Geç\n            </Link>\n          </div>\n        </div>\n      </section>\n    </main>\n  );\n}",
+              "why": "Hero section, ziyaretcinin ilk gordugu alandir. tracking-tight buyuk basliklarda harf aralıgını azaltır. CTA butonlari ziyaretciyi yonlendirir. Bu bir Server Component — 'use client' gerekmiyor."
+            },
+            {
+              "order": "1.4",
+              "action": "Ana sayfayi tarayicida kontrol et",
+              "type": "validate",
+              "validation": "http://localhost:3000 adresinde Hero section gorunmeli: isim, unvan, aciklama ve iki CTA butonu. Mobil ve desktop gorunumu kontrol et.",
+              "why": "Her buyuk degisiklikten sonra gorsel kontrol yapmak, tasarim sorunlarini erken yakalatir."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── favicon.ico\n│   │   ├── globals.css\n│   │   ├── layout.tsx\n│   │   └── page.tsx         ← GÜNCELLENDİ (Hero Section)\n│   └── components/\n│       ├── header.tsx\n│       └── footer.tsx\n├── .prettierrc\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Sayfa bos gorunuyor veya eski Next.js varsayilan sayfasi",
+              "cause": "page.tsx dosyasi kaydedilmemis veya dev server yeniden baslatilmamis.",
+              "fix": "Dosyayi kaydet (Ctrl+S). Dev server'in terminalde hata verip vermedigini kontrol et. Gerekirse pnpm run dev ile yeniden baslat."
+            },
+            {
+              "error": "Tailwind class'lari uygulanmiyor, ham HTML gorunuyor",
+              "cause": "globals.css dosyasinda @import 'tailwindcss' eksik veya layout.tsx'te globals.css import edilmemis.",
+              "fix": "layout.tsx'te import './globals.css'; satirinin oldugunu ve globals.css'te @import \"tailwindcss\"; satirinin oldugunu dogrula."
+            }
+          ]
         },
         {
           "step": 2,
@@ -219,7 +602,79 @@
           "instructions": "MDX işleme kütüphanelerini kur ve content yönetim sistemini oluştur.",
           "code_snippet": "pnpm install next-mdx-remote gray-matter reading-time rehype-highlight rehype-slug\n\n// src/lib/mdx.ts\nimport fs from 'fs';\nimport path from 'path';\nimport matter from 'gray-matter';\nimport readingTime from 'reading-time';\n\nconst POSTS_PATH = path.join(process.cwd(), 'content/blog');\n\nexport interface Post {\n  slug: string;\n  title: string;\n  date: string;\n  summary: string;\n  tags: string[];\n  readingTime: string;\n  content: string;\n}\n\nexport async function getAllPosts(): Promise<Post[]> {\n  const files = fs.readdirSync(POSTS_PATH);\n\n  const posts = files\n    .filter((file) => file.endsWith('.mdx'))\n    .map((file) => {\n      const slug = file.replace('.mdx', '');\n      const source = fs.readFileSync(path.join(POSTS_PATH, file), 'utf-8');\n      const { data, content } = matter(source);\n      const stats = readingTime(content);\n\n      return {\n        slug,\n        title: data.title,\n        date: data.date,\n        summary: data.summary,\n        tags: data.tags || [],\n        readingTime: stats.text,\n        content,\n      };\n    })\n    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());\n\n  return posts;\n}\n\nexport async function getPostBySlug(slug: string): Promise<Post | null> {\n  const filePath = path.join(POSTS_PATH, `${slug}.mdx`);\n  if (!fs.existsSync(filePath)) return null;\n\n  const source = fs.readFileSync(filePath, 'utf-8');\n  const { data, content } = matter(source);\n  const stats = readingTime(content);\n\n  return {\n    slug,\n    title: data.title,\n    date: data.date,\n    summary: data.summary,\n    tags: data.tags || [],\n    readingTime: stats.text,\n    content,\n  };\n}\n\nexport async function getRecentPosts(count: number): Promise<Post[]> {\n  const posts = await getAllPosts();\n  return posts.slice(0, count);\n}",
           "deep_dive": "gray-matter kütüphanesi, MDX dosyasının üstündeki frontmatter (YAML metadata) kısmını parse eder. reading-time, içeriğin kelime sayısına göre tahmini okuma süresi hesaplar (ortalama 200 kelime/dakika). rehype-highlight, code bloklarına syntax highlighting ekler. rehype-slug, başlıklara otomatik ID ekleyerek anchor link'ler oluşturur. Bu yaklaşıma 'file-based CMS' denir — içerik Git reposunda Markdown dosyaları olarak tutulur.",
-          "checkpoint": "content/blog/ klasörüne örnek bir .mdx dosyası eklendiğinde, getAllPosts fonksiyonu doğru çalışmalı. TypeScript hataları olmamalı."
+          "checkpoint": "content/blog/ klasörüne örnek bir .mdx dosyası eklendiğinde, getAllPosts fonksiyonu doğru çalışmalı. TypeScript hataları olmamalı.",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "MDX islem kutuphanelerini kur",
+              "type": "terminal",
+              "command": "pnpm install next-mdx-remote gray-matter reading-time rehype-highlight rehype-slug",
+              "expected_output": "dependencies:\n+ next-mdx-remote\n+ gray-matter\n+ reading-time\n+ rehype-highlight\n+ rehype-slug",
+              "why": "next-mdx-remote: MDX'i Server Component'te render eder. gray-matter: frontmatter (YAML metadata) parse eder. reading-time: okuma suresi hesaplar. rehype-highlight: syntax highlighting. rehype-slug: basliklara otomatik ID ekler."
+            },
+            {
+              "order": "2.2",
+              "action": "Content klasor yapisini olustur",
+              "type": "terminal",
+              "command": "mkdir -p content/blog && mkdir -p src/lib",
+              "expected_output": "Klasorler olusturuldu",
+              "why": "content/blog/ MDX dosyalarinin tutulacagi yer. src/lib/ ise yardimci fonksiyonlarin (utility functions) bulundugu klasor."
+            },
+            {
+              "order": "2.3",
+              "action": "MDX yardimci fonksiyonlari dosyasini olustur",
+              "type": "file_open",
+              "file": "src/lib/mdx.ts",
+              "why": "Bu dosya, MDX dosyalarini okumak, parse etmek ve listelemek icin kullanilacak fonksiyonlari icerecek."
+            },
+            {
+              "order": "2.4",
+              "action": "Import'lari ve Post interface'ini yaz",
+              "type": "code_write",
+              "file": "src/lib/mdx.ts",
+              "code": "import fs from 'fs';\nimport path from 'path';\nimport matter from 'gray-matter';\nimport readingTime from 'reading-time';\n\nconst POSTS_PATH = path.join(process.cwd(), 'content/blog');\n\nexport interface Post {\n  slug: string;\n  title: string;\n  date: string;\n  summary: string;\n  tags: string[];\n  readingTime: string;\n  content: string;\n}",
+              "why": "TypeScript interface ile Post tipini tanimlamak, tum fonksiyonlarda tip guvenligini saglar. POSTS_PATH, blog dosyalarinin bulundugu dizini gosterir."
+            },
+            {
+              "order": "2.5",
+              "action": "getAllPosts fonksiyonunu ekle",
+              "type": "code_add",
+              "file": "src/lib/mdx.ts",
+              "position": "bottom",
+              "code": "\nexport async function getAllPosts(): Promise<Post[]> {\n  if (!fs.existsSync(POSTS_PATH)) return [];\n\n  const files = fs.readdirSync(POSTS_PATH);\n\n  const posts = files\n    .filter((file) => file.endsWith('.mdx'))\n    .map((file) => {\n      const slug = file.replace('.mdx', '');\n      const source = fs.readFileSync(path.join(POSTS_PATH, file), 'utf-8');\n      const { data, content } = matter(source);\n      const stats = readingTime(content);\n\n      return {\n        slug,\n        title: data.title,\n        date: data.date,\n        summary: data.summary,\n        tags: data.tags || [],\n        readingTime: stats.text,\n        content,\n      };\n    })\n    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());\n\n  return posts;\n}",
+              "why": "getAllPosts, content/blog/ altindaki tum .mdx dosyalarini okur, frontmatter'i parse eder ve tarihe gore siralar. Server-side calisir, client'a gonderilmez."
+            },
+            {
+              "order": "2.6",
+              "action": "getPostBySlug ve getRecentPosts fonksiyonlarini ekle",
+              "type": "code_add",
+              "file": "src/lib/mdx.ts",
+              "position": "bottom",
+              "code": "\nexport async function getPostBySlug(slug: string): Promise<Post | null> {\n  const filePath = path.join(POSTS_PATH, `${slug}.mdx`);\n  if (!fs.existsSync(filePath)) return null;\n\n  const source = fs.readFileSync(filePath, 'utf-8');\n  const { data, content } = matter(source);\n  const stats = readingTime(content);\n\n  return {\n    slug,\n    title: data.title,\n    date: data.date,\n    summary: data.summary,\n    tags: data.tags || [],\n    readingTime: stats.text,\n    content,\n  };\n}\n\nexport async function getRecentPosts(count: number): Promise<Post[]> {\n  const posts = await getAllPosts();\n  return posts.slice(0, count);\n}",
+              "why": "getPostBySlug tek bir yaziyi slug ile bulur (blog detay sayfasi icin). getRecentPosts son N yaziyi dondurur (ana sayfada gosterim icin). Bu fonksiyonlar bir 'data access layer' olusturur."
+            },
+            {
+              "order": "2.7",
+              "action": "TypeScript hatasi olmadigini dogrula",
+              "type": "terminal",
+              "command": "pnpm tsc --noEmit",
+              "expected_output": "Hata yok (cikti bos olmali)",
+              "why": "TypeScript derleyicisi ile tip hatalarini kontrol etmek, runtime hatalarini onler. --noEmit flag'i sadece kontrol yapar, dosya uretmez."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── content/\n│   └── blog/                ← YENİ (MDX dosyaları buraya gelecek)\n├── src/\n│   ├── app/\n│   │   ├── globals.css\n│   │   ├── layout.tsx\n│   │   └── page.tsx\n│   ├── components/\n│   │   ├── header.tsx\n│   │   └── footer.tsx\n│   └── lib/                 ← YENİ\n│       └── mdx.ts           ← YENİ (MDX yardımcı fonksiyonlar)\n├── .prettierrc\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Cannot find module 'gray-matter' veya 'reading-time'",
+              "cause": "Paketler kurulmamis veya TypeScript tipleri eksik.",
+              "fix": "pnpm install next-mdx-remote gray-matter reading-time rehype-highlight rehype-slug komutunu tekrar calistir. Gerekirse @types/... paketlerini de kur."
+            },
+            {
+              "error": "ENOENT: no such file or directory 'content/blog'",
+              "cause": "content/blog/ klasoru olusturulmamis.",
+              "fix": "mkdir -p content/blog komutu ile klasoru olustur. getAllPosts fonksiyonunda fs.existsSync kontrolu ekle."
+            }
+          ]
         },
         {
           "step": 3,
@@ -228,7 +683,73 @@
           "instructions": "Blog listesi ve dinamik blog detay sayfalarını oluştur.",
           "code_snippet": "// src/app/blog/page.tsx\nimport Link from 'next/link';\nimport { getAllPosts } from '@/lib/mdx';\nimport type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Blog',\n  description: 'Yazılım geliştirme, React, Node.js ve AI hakkında teknik yazılar',\n};\n\nexport default async function BlogPage() {\n  const posts = await getAllPosts();\n\n  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">\n        Blog\n      </h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Yazılım geliştirme deneyimlerimi ve öğrendiklerimi paylaştığım teknik blog.\n      </p>\n\n      <div className=\"space-y-8\">\n        {posts.map((post) => (\n          <article key={post.slug} className=\"group\">\n            <Link href={`/blog/${post.slug}`} className=\"block\">\n              <div className=\"flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400\">\n                <time>{post.date}</time>\n                <span>·</span>\n                <span>{post.readingTime}</span>\n              </div>\n              <h2 className=\"mt-2 text-xl font-semibold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400\">\n                {post.title}\n              </h2>\n              <p className=\"mt-2 text-gray-600 dark:text-gray-400\">\n                {post.summary}\n              </p>\n              <div className=\"mt-3 flex gap-2\">\n                {post.tags.map((tag) => (\n                  <span\n                    key={tag}\n                    className=\"rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300\"\n                  >\n                    {tag}\n                  </span>\n                ))}\n              </div>\n            </Link>\n          </article>\n        ))}\n      </div>\n    </main>\n  );\n}\n\n// src/app/blog/[slug]/page.tsx\nimport { notFound } from 'next/navigation';\nimport { MDXRemote } from 'next-mdx-remote/rsc';\nimport { getAllPosts, getPostBySlug } from '@/lib/mdx';\nimport rehypeHighlight from 'rehype-highlight';\nimport rehypeSlug from 'rehype-slug';\nimport type { Metadata } from 'next';\n\ninterface Props {\n  params: Promise<{ slug: string }>;\n}\n\nexport async function generateStaticParams() {\n  const posts = await getAllPosts();\n  return posts.map((post) => ({ slug: post.slug }));\n}\n\nexport async function generateMetadata({ params }: Props): Promise<Metadata> {\n  const { slug } = await params;\n  const post = await getPostBySlug(slug);\n  if (!post) return {};\n  return {\n    title: post.title,\n    description: post.summary,\n  };\n}\n\nexport default async function BlogPostPage({ params }: Props) {\n  const { slug } = await params;\n  const post = await getPostBySlug(slug);\n  if (!post) notFound();\n\n  return (\n    <article className=\"mx-auto max-w-3xl px-4 py-16\">\n      <header className=\"mb-8\">\n        <div className=\"flex items-center gap-3 text-sm text-gray-500\">\n          <time>{post.date}</time>\n          <span>·</span>\n          <span>{post.readingTime}</span>\n        </div>\n        <h1 className=\"mt-4 text-4xl font-bold tracking-tight text-gray-900 dark:text-white\">\n          {post.title}\n        </h1>\n      </header>\n      <div className=\"prose prose-lg dark:prose-invert max-w-none\">\n        <MDXRemote\n          source={post.content}\n          options={{\n            mdxOptions: {\n              rehypePlugins: [rehypeHighlight, rehypeSlug],\n            },\n          }}\n        />\n      </div>\n    </article>\n  );\n}",
           "deep_dive": "generateStaticParams fonksiyonu, Next.js'e build time'da hangi slug'lar için sayfa oluşturması gerektiğini söyler. Bu, Static Site Generation (SSG) ile tüm blog sayfalarının önceden HTML olarak üretilmesini sağlar — her sayfa ziyaretinde server-side işlem gerekmez. MDXRemote RSC versiyonu, Server Component olarak çalışır ve client-side JavaScript göndermez. prose class'ı, @tailwindcss/typography eklentisinin sağladığı güzel tipografi stillerini uygular.",
-          "checkpoint": "content/blog/ klasöründe örnek MDX dosyası ile /blog sayfası liste, /blog/[slug] sayfası detay göstermeli. generateStaticParams ile build başarılı olmalı."
+          "checkpoint": "content/blog/ klasöründe örnek MDX dosyası ile /blog sayfası liste, /blog/[slug] sayfası detay göstermeli. generateStaticParams ile build başarılı olmalı.",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Blog listesi sayfasi icin klasor olustur",
+              "type": "terminal",
+              "command": "mkdir -p src/app/blog",
+              "expected_output": "Klasor olusturuldu",
+              "why": "App Router'da src/app/blog/page.tsx dosyasi /blog route'unu olusturur. Dosya yapisi = URL yapisi."
+            },
+            {
+              "order": "3.2",
+              "action": "Blog listesi sayfasini olustur",
+              "type": "file_open",
+              "file": "src/app/blog/page.tsx",
+              "why": "Bu sayfa tum blog yazilarini listeleyecek. Server Component olarak calısır — veritabanı/dosya okuma server'da yapılır."
+            },
+            {
+              "order": "3.3",
+              "action": "Blog listesi sayfasinin icerigini yaz",
+              "type": "code_write",
+              "file": "src/app/blog/page.tsx",
+              "code": "import Link from 'next/link';\nimport { getAllPosts } from '@/lib/mdx';\nimport type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Blog',\n  description: 'Yazılım geliştirme, React, Node.js ve AI hakkında teknik yazılar',\n};\n\nexport default async function BlogPage() {\n  const posts = await getAllPosts();\n\n  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">\n        Blog\n      </h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Yazılım geliştirme deneyimlerimi ve öğrendiklerimi paylaştığım teknik blog.\n      </p>\n\n      <div className=\"space-y-8\">\n        {posts.map((post) => (\n          <article key={post.slug} className=\"group\">\n            <Link href={`/blog/${post.slug}`} className=\"block\">\n              <div className=\"flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400\">\n                <time>{post.date}</time>\n                <span>·</span>\n                <span>{post.readingTime}</span>\n              </div>\n              <h2 className=\"mt-2 text-xl font-semibold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400\">\n                {post.title}\n              </h2>\n              <p className=\"mt-2 text-gray-600 dark:text-gray-400\">\n                {post.summary}\n              </p>\n              <div className=\"mt-3 flex gap-2\">\n                {post.tags.map((tag) => (\n                  <span\n                    key={tag}\n                    className=\"rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300\"\n                  >\n                    {tag}\n                  </span>\n                ))}\n              </div>\n            </Link>\n          </article>\n        ))}\n      </div>\n    </main>\n  );\n}",
+              "why": "async function olarak tanimlanir cunku Server Component'te dogrudan await kullanilir. metadata export'u bu sayfanin SEO bilgilerini belirler."
+            },
+            {
+              "order": "3.4",
+              "action": "Blog detay sayfasi icin dinamik route klasoru olustur",
+              "type": "terminal",
+              "command": "mkdir -p src/app/blog/[slug]",
+              "expected_output": "Klasor olusturuldu",
+              "why": "[slug] klasor adi, Next.js'te dynamic route'u temsil eder. /blog/nextjs-rehberi gibi URL'ler icin slug='nextjs-rehberi' olur."
+            },
+            {
+              "order": "3.5",
+              "action": "Blog detay sayfasini olustur",
+              "type": "code_write",
+              "file": "src/app/blog/[slug]/page.tsx",
+              "code": "import { notFound } from 'next/navigation';\nimport { MDXRemote } from 'next-mdx-remote/rsc';\nimport { getAllPosts, getPostBySlug } from '@/lib/mdx';\nimport rehypeHighlight from 'rehype-highlight';\nimport rehypeSlug from 'rehype-slug';\nimport type { Metadata } from 'next';\n\ninterface Props {\n  params: Promise<{ slug: string }>;\n}\n\nexport async function generateStaticParams() {\n  const posts = await getAllPosts();\n  return posts.map((post) => ({ slug: post.slug }));\n}\n\nexport async function generateMetadata({ params }: Props): Promise<Metadata> {\n  const { slug } = await params;\n  const post = await getPostBySlug(slug);\n  if (!post) return {};\n  return {\n    title: post.title,\n    description: post.summary,\n  };\n}\n\nexport default async function BlogPostPage({ params }: Props) {\n  const { slug } = await params;\n  const post = await getPostBySlug(slug);\n  if (!post) notFound();\n\n  return (\n    <article className=\"mx-auto max-w-3xl px-4 py-16\">\n      <header className=\"mb-8\">\n        <div className=\"flex items-center gap-3 text-sm text-gray-500\">\n          <time>{post.date}</time>\n          <span>·</span>\n          <span>{post.readingTime}</span>\n        </div>\n        <h1 className=\"mt-4 text-4xl font-bold tracking-tight text-gray-900 dark:text-white\">\n          {post.title}\n        </h1>\n      </header>\n      <div className=\"prose prose-lg dark:prose-invert max-w-none\">\n        <MDXRemote\n          source={post.content}\n          options={{\n            mdxOptions: {\n              rehypePlugins: [rehypeHighlight, rehypeSlug],\n            },\n          }}\n        />\n      </div>\n    </article>\n  );\n}",
+              "why": "generateStaticParams build time'da tum blog sayfalari icin statik HTML uretir (SSG). MDXRemote RSC versiyonu server'da calisir, client JS gondermez. prose class'i otomatik tipografi saglar."
+            },
+            {
+              "order": "3.6",
+              "action": "Blog sayfalarinin calistigini dogrula",
+              "type": "validate",
+              "validation": "/blog sayfasinda blog yazilari listesi gorunmeli. Bir yaziya tiklandiginda /blog/[slug] sayfasi MDX icerigini render etmeli. Syntax highlighting calismali.",
+              "why": "Blog sistemi projenin en kritik ozelliklerinden biri. Hem listeleme hem detay sayfasinin dogru calistigini dogrulamak onemli."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── content/\n│   └── blog/\n├── src/\n│   ├── app/\n│   │   ├── blog/              ← YENİ\n│   │   │   ├── [slug]/        ← YENİ (dinamik route)\n│   │   │   │   └── page.tsx   ← YENİ\n│   │   │   └── page.tsx       ← YENİ\n│   │   ├── globals.css\n│   │   ├── layout.tsx\n│   │   └── page.tsx\n│   ├── components/\n│   │   ├── header.tsx\n│   │   └── footer.tsx\n│   └── lib/\n│       └── mdx.ts\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Error: Expected a module but got a string",
+              "cause": "next-mdx-remote/rsc import'u yanlis veya eski versiyon kullaniliyor.",
+              "fix": "pnpm install next-mdx-remote@latest ile en son versiyonu kur. Import'un 'next-mdx-remote/rsc' (RSC versiyonu) oldugunu dogrula."
+            },
+            {
+              "error": "generateStaticParams bos dizi donuyor",
+              "cause": "content/blog/ klasorunde henuz .mdx dosyasi yok.",
+              "fix": "Bir sonraki adimda ornek blog yazilari olusturulacak. Simdilik bos liste normal."
+            },
+            {
+              "error": "404 Not Found on /blog/[slug]",
+              "cause": "Klasor adi [slug] yerine slug olarak olusturulmus (koseli parantez olmadan).",
+              "fix": "Klasor adinin tam olarak [slug] oldugunu dogrula (koseli parantezler dahil). Bu, Next.js'in dynamic route convention'idir."
+            }
+          ]
         },
         {
           "step": 4,
@@ -237,7 +758,77 @@
           "instructions": "Hakkımda ve Projeler sayfalarını oluştur. Projeler için bir veri yapısı tanımla ve kart grid'i ile listele.",
           "code_snippet": "// src/data/projects.ts\nexport interface Project {\n  title: string;\n  description: string;\n  tech: string[];\n  github: string;\n  demo?: string;\n  image?: string;\n  featured: boolean;\n}\n\nexport const projects: Project[] = [\n  {\n    title: 'Portfolio & Blog',\n    description: 'Next.js 16ile oluşturulmuş kişisel portfolio ve MDX blog sitesi.',\n    tech: ['Next.js', 'TypeScript', 'Tailwind CSS', 'MDX'],\n    github: 'https://github.com/username/portfolio',\n    demo: 'https://portfolio.vercel.app',\n    featured: true,\n  },\n  // Diğer projeler...\n];\n\n// src/app/projects/page.tsx\nimport { projects } from '@/data/projects';\nimport type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Projeler',\n  description: 'Geliştirdiğim açık kaynak projeler ve uygulamalar',\n};\n\nexport default function ProjectsPage() {\n  return (\n    <main className=\"mx-auto max-w-5xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">\n        Projeler\n      </h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Üzerinde çalıştığım bazı projeler. Tamamı açık kaynaklıdır.\n      </p>\n\n      <div className=\"grid gap-6 md:grid-cols-2\">\n        {projects.map((project) => (\n          <div\n            key={project.title}\n            className=\"group rounded-xl border border-gray-200 p-6 transition-all hover:border-primary-300 hover:shadow-lg dark:border-gray-800 dark:hover:border-primary-700\"\n          >\n            <h2 className=\"text-xl font-semibold text-gray-900 dark:text-white\">\n              {project.title}\n            </h2>\n            <p className=\"mt-2 text-gray-600 dark:text-gray-400\">\n              {project.description}\n            </p>\n            <div className=\"mt-4 flex flex-wrap gap-2\">\n              {project.tech.map((t) => (\n                <span\n                  key={t}\n                  className=\"rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-700 dark:bg-gray-800 dark:text-gray-300\"\n                >\n                  {t}\n                </span>\n              ))}\n            </div>\n            <div className=\"mt-4 flex gap-4\">\n              <a\n                href={project.github}\n                target=\"_blank\"\n                rel=\"noopener noreferrer\"\n                className=\"text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400\"\n              >\n                GitHub &rarr;\n              </a>\n              {project.demo && (\n                <a\n                  href={project.demo}\n                  target=\"_blank\"\n                  rel=\"noopener noreferrer\"\n                  className=\"text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400\"\n                >\n                  Demo &rarr;\n                </a>\n              )}\n            </div>\n          </div>\n        ))}\n      </div>\n    </main>\n  );\n}",
           "deep_dive": "Proje verilerini ayrı bir data dosyasında tutmak, Single Responsibility prensibine uyar — component sadece render'dan, data dosyası sadece veriden sorumludur. featured flag'i, ana sayfada hangi projelerin öne çıkacağını belirler. noopener noreferrer, target='_blank' ile açılan linklerde güvenlik açığını (tabnabbing) önler. group/group-hover Tailwind pattern'ı, parent'a hover edildiğinde child'ların stilini değiştirmeyi sağlar.",
-          "checkpoint": "Projeler sayfasında kartlar düzgün grid'de gösterilmeli. Responsive tasarım mobilde tek sütun, desktop'ta iki sütun olmalı."
+          "checkpoint": "Projeler sayfasında kartlar düzgün grid'de gösterilmeli. Responsive tasarım mobilde tek sütun, desktop'ta iki sütun olmalı.",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Proje veri dosyasini olustur",
+              "type": "terminal",
+              "command": "mkdir -p src/data",
+              "expected_output": "Klasor olusturuldu",
+              "why": "Proje verilerini ayri bir data dosyasinda tutmak, Single Responsibility prensibine uyar — component sadece render'dan sorumludur."
+            },
+            {
+              "order": "4.2",
+              "action": "Proje veri yapisini ve ornek verileri yaz",
+              "type": "code_write",
+              "file": "src/data/projects.ts",
+              "code": "export interface Project {\n  title: string;\n  description: string;\n  tech: string[];\n  github: string;\n  demo?: string;\n  image?: string;\n  featured: boolean;\n}\n\nexport const projects: Project[] = [\n  {\n    title: 'Portfolio & Blog',\n    description: 'Next.js 16 ile oluşturulmuş kişisel portfolio ve MDX blog sitesi.',\n    tech: ['Next.js', 'TypeScript', 'Tailwind CSS', 'MDX'],\n    github: 'https://github.com/username/portfolio',\n    demo: 'https://portfolio.vercel.app',\n    featured: true,\n  },\n];",
+              "why": "TypeScript interface ile proje tipini tanimlamak, hatalari derleme zamaninda yakalar. featured flag'i ana sayfada one cikan projeleri belirler."
+            },
+            {
+              "order": "4.3",
+              "action": "Projeler sayfasini olustur",
+              "type": "terminal",
+              "command": "mkdir -p src/app/projects",
+              "expected_output": "Klasor olusturuldu",
+              "why": "src/app/projects/page.tsx dosyasi /projects route'unu olusturacak."
+            },
+            {
+              "order": "4.4",
+              "action": "Projeler sayfasinin icerigini yaz",
+              "type": "code_write",
+              "file": "src/app/projects/page.tsx",
+              "code": "import { projects } from '@/data/projects';\nimport type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Projeler',\n  description: 'Geliştirdiğim açık kaynak projeler ve uygulamalar',\n};\n\nexport default function ProjectsPage() {\n  return (\n    <main className=\"mx-auto max-w-5xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">\n        Projeler\n      </h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Üzerinde çalıştığım bazı projeler. Tamamı açık kaynaklıdır.\n      </p>\n      <div className=\"grid gap-6 md:grid-cols-2\">\n        {projects.map((project) => (\n          <div key={project.title} className=\"group rounded-xl border border-gray-200 p-6 transition-all hover:border-primary-300 hover:shadow-lg dark:border-gray-800 dark:hover:border-primary-700\">\n            <h2 className=\"text-xl font-semibold text-gray-900 dark:text-white\">{project.title}</h2>\n            <p className=\"mt-2 text-gray-600 dark:text-gray-400\">{project.description}</p>\n            <div className=\"mt-4 flex flex-wrap gap-2\">\n              {project.tech.map((t) => (\n                <span key={t} className=\"rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-700 dark:bg-gray-800 dark:text-gray-300\">{t}</span>\n              ))}\n            </div>\n            <div className=\"mt-4 flex gap-4\">\n              <a href={project.github} target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400\">GitHub →</a>\n              {project.demo && <a href={project.demo} target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400\">Demo →</a>}\n            </div>\n          </div>\n        ))}\n      </div>\n    </main>\n  );\n}",
+              "why": "Grid layout mobilde tek sutun, tablet/desktop'ta iki sutun gosterir. group/group-hover pattern'i parent hover'da child stilini degistirir."
+            },
+            {
+              "order": "4.5",
+              "action": "Hakkimda sayfasini olustur",
+              "type": "terminal",
+              "command": "mkdir -p src/app/about",
+              "expected_output": "Klasor olusturuldu",
+              "why": "src/app/about/page.tsx dosyasi /about route'unu olusturacak."
+            },
+            {
+              "order": "4.6",
+              "action": "Hakkimda sayfasinin temel icerigini yaz",
+              "type": "code_write",
+              "file": "src/app/about/page.tsx",
+              "code": "import type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Hakkımda',\n  description: 'Full Stack Developer olarak becerilerim, deneyimim ve hikayem',\n};\n\nexport default function AboutPage() {\n  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">\n        Hakkımda\n      </h1>\n      <div className=\"prose prose-lg dark:prose-invert\">\n        <p>\n          Merhaba! Ben bir Full Stack Developer'ım. React, Next.js, Node.js ve\n          TypeScript ile modern web uygulamaları geliştiriyorum.\n        </p>\n        <p>\n          Temiz kod, iyi mimari ve kullanıcı deneyimine önem veriyorum.\n          Sürekli öğrenmeye ve kendimi geliştirmeye devam ediyorum.\n        </p>\n      </div>\n    </main>\n  );\n}",
+              "why": "Hakkimda sayfasi recruiter'larin en cok ziyaret ettigi ikinci sayfadir. prose class'i otomatik tipografi saglar."
+            },
+            {
+              "order": "4.7",
+              "action": "Sayfalari tarayicida kontrol et",
+              "type": "validate",
+              "validation": "/projects sayfasinda proje kartlari grid'de gorunmeli. /about sayfasinda biyografi metni okunakli olmali. Her iki sayfada da metadata (sayfa basligi) dogru gorunmeli.",
+              "why": "Her yeni sayfa eklendikten sonra hem icerik hem responsive tasarimi kontrol etmek gerekir."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── content/\n│   └── blog/\n├── src/\n│   ├── app/\n│   │   ├── about/             ← YENİ\n│   │   │   └── page.tsx       ← YENİ\n│   │   ├── blog/\n│   │   │   ├── [slug]/\n│   │   │   │   └── page.tsx\n│   │   │   └── page.tsx\n│   │   ├── projects/          ← YENİ\n│   │   │   └── page.tsx       ← YENİ\n│   │   ├── globals.css\n│   │   ├── layout.tsx\n│   │   └── page.tsx\n│   ├── components/\n│   │   ├── header.tsx\n│   │   └── footer.tsx\n│   ├── data/                  ← YENİ\n│   │   └── projects.ts        ← YENİ\n│   └── lib/\n│       └── mdx.ts\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Proje kartlari tek sutun gorunuyor, grid calismiyor",
+              "cause": "md:grid-cols-2 class'i eklenmemis veya ekran genisligi 768px'in altinda.",
+              "fix": "Tarayiciyi genislet (768px+). Grid class'inin grid gap-6 md:grid-cols-2 oldugunu dogrula."
+            },
+            {
+              "error": "Module not found: Can't resolve '@/data/projects'",
+              "cause": "src/data/ klasoru veya projects.ts dosyasi olusturulmamis.",
+              "fix": "Dosyanin src/data/projects.ts yolunda oldugunu dogrula. tsconfig.json'da @/* alias'inin ./src/* oldugunu kontrol et."
+            }
+          ]
         },
         {
           "step": 5,
@@ -246,7 +837,61 @@
           "instructions": "İletişim sayfası ve form component'ini oluştur. Client-side validation ekle.",
           "code_snippet": "// src/app/contact/page.tsx\n'use client';\n\nimport { useState, FormEvent } from 'react';\n\ninterface FormState {\n  name: string;\n  email: string;\n  message: string;\n}\n\nexport default function ContactPage() {\n  const [form, setForm] = useState<FormState>({\n    name: '',\n    email: '',\n    message: '',\n  });\n  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');\n\n  const handleSubmit = async (e: FormEvent) => {\n    e.preventDefault();\n    setStatus('loading');\n\n    try {\n      const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {\n        method: 'POST',\n        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify(form),\n      });\n\n      if (res.ok) {\n        setStatus('success');\n        setForm({ name: '', email: '', message: '' });\n      } else {\n        setStatus('error');\n      }\n    } catch {\n      setStatus('error');\n    }\n  };\n\n  return (\n    <main className=\"mx-auto max-w-2xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">\n        İletişim\n      </h1>\n      <p className=\"mb-8 text-gray-600 dark:text-gray-400\">\n        Benimle iletişime geçmek için aşağıdaki formu doldurabilir veya\n        sosyal medya hesaplarımdan ulaşabilirsin.\n      </p>\n\n      <form onSubmit={handleSubmit} className=\"space-y-6\">\n        <div>\n          <label htmlFor=\"name\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">\n            İsim\n          </label>\n          <input\n            id=\"name\"\n            type=\"text\"\n            required\n            value={form.name}\n            onChange={(e) => setForm({ ...form, name: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-dark-card dark:text-white\"\n          />\n        </div>\n        <div>\n          <label htmlFor=\"email\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">\n            E-posta\n          </label>\n          <input\n            id=\"email\"\n            type=\"email\"\n            required\n            value={form.email}\n            onChange={(e) => setForm({ ...form, email: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-dark-card dark:text-white\"\n          />\n        </div>\n        <div>\n          <label htmlFor=\"message\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">\n            Mesaj\n          </label>\n          <textarea\n            id=\"message\"\n            required\n            rows={5}\n            value={form.message}\n            onChange={(e) => setForm({ ...form, message: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-dark-card dark:text-white\"\n          />\n        </div>\n        <button\n          type=\"submit\"\n          disabled={status === 'loading'}\n          className=\"w-full rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-50\"\n        >\n          {status === 'loading' ? 'Gönderiliyor...' : 'Gönder'}\n        </button>\n        {status === 'success' && (\n          <p className=\"text-center text-green-600\">Mesajın gönderildi!</p>\n        )}\n        {status === 'error' && (\n          <p className=\"text-center text-red-600\">Bir hata oluştu, tekrar dene.</p>\n        )}\n      </form>\n    </main>\n  );\n}",
           "deep_dive": "Bu component 'use client' gerektirir çünkü useState ve form event handling kullanır. Formspree, backend kodu yazmadan form submission'ı e-postaya çevirir — ücretsiz planı ayda 50 submission destekler. focus:ring-2 focus:ring-primary-500/20 ile input'a focus olunduğunda hafif bir glow efekti oluşur (accessibility için önemli). disabled:opacity-50 ile loading state'te buton görsel olarak devre dışı bırakılır.",
-          "checkpoint": "Form alanları düzgün çalışmalı, validation aktif olmalı. Formspree ID girildiğinde form gerçekten mail göndermeli. Loading ve success state'leri görünmeli."
+          "checkpoint": "Form alanları düzgün çalışmalı, validation aktif olmalı. Formspree ID girildiğinde form gerçekten mail göndermeli. Loading ve success state'leri görünmeli.",
+          "substeps": [
+            {
+              "order": "5.1",
+              "action": "Iletisim sayfasi klasorunu olustur",
+              "type": "terminal",
+              "command": "mkdir -p src/app/contact",
+              "expected_output": "Klasor olusturuldu",
+              "why": "src/app/contact/page.tsx dosyasi /contact route'unu olusturacak."
+            },
+            {
+              "order": "5.2",
+              "action": "Iletisim sayfasi dosyasini olustur",
+              "type": "file_open",
+              "file": "src/app/contact/page.tsx",
+              "why": "Bu sayfa 'use client' directive'i gerektirir cunku form state yonetimi (useState) ve event handling kullaniyor."
+            },
+            {
+              "order": "5.3",
+              "action": "'use client' ve import'lari yaz",
+              "type": "code_write",
+              "file": "src/app/contact/page.tsx",
+              "code": "'use client';\n\nimport { useState, FormEvent } from 'react';\n\ninterface FormState {\n  name: string;\n  email: string;\n  message: string;\n}",
+              "why": "'use client' zorunlu cunku useState hook'u kullaniliyor. FormState interface'i form verilerinin tipini tanimlar."
+            },
+            {
+              "order": "5.4",
+              "action": "ContactPage component'ini ve form logic'ini ekle",
+              "type": "code_add",
+              "file": "src/app/contact/page.tsx",
+              "position": "bottom",
+              "code": "\nexport default function ContactPage() {\n  const [form, setForm] = useState<FormState>({ name: '', email: '', message: '' });\n  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');\n\n  const handleSubmit = async (e: FormEvent) => {\n    e.preventDefault();\n    setStatus('loading');\n    try {\n      const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {\n        method: 'POST',\n        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify(form),\n      });\n      if (res.ok) { setStatus('success'); setForm({ name: '', email: '', message: '' }); }\n      else { setStatus('error'); }\n    } catch { setStatus('error'); }\n  };\n\n  return (\n    <main className=\"mx-auto max-w-2xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">İletişim</h1>\n      <p className=\"mb-8 text-gray-600 dark:text-gray-400\">\n        Benimle iletişime geçmek için aşağıdaki formu doldurabilir veya sosyal medya hesaplarımdan ulaşabilirsin.\n      </p>\n      <form onSubmit={handleSubmit} className=\"space-y-6\">\n        <div>\n          <label htmlFor=\"name\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">İsim</label>\n          <input id=\"name\" type=\"text\" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-dark-card dark:text-white\" />\n        </div>\n        <div>\n          <label htmlFor=\"email\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">E-posta</label>\n          <input id=\"email\" type=\"email\" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-dark-card dark:text-white\" />\n        </div>\n        <div>\n          <label htmlFor=\"message\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">Mesaj</label>\n          <textarea id=\"message\" required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-dark-card dark:text-white\" />\n        </div>\n        <button type=\"submit\" disabled={status === 'loading'}\n          className=\"w-full rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-50\">\n          {status === 'loading' ? 'Gönderiliyor...' : 'Gönder'}\n        </button>\n        {status === 'success' && <p className=\"text-center text-green-600\">Mesajın gönderildi!</p>}\n        {status === 'error' && <p className=\"text-center text-red-600\">Bir hata oluştu, tekrar dene.</p>}\n      </form>\n    </main>\n  );\n}",
+              "why": "Form state yonetimi useState ile yapilir. Formspree backend yazmadan form submission'i e-postaya cevirir. htmlFor ile label-input iliskisi accessibility icin onemlidir."
+            },
+            {
+              "order": "5.5",
+              "action": "Formu test et",
+              "type": "validate",
+              "validation": "/contact sayfasini ac. Form alanlarini doldur ve 'Gonder' butonuna tikla. Formspree ID henuz girilmediyse hata mesaji gorunecektir — bu normal. Label'lara tiklayinca ilgili input'a focus olmali.",
+              "why": "Form calismasini dogrulamak onemli. Accessibility (label-input iliskisi) ve state yonetimi dogru calismali."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── about/\n│   │   │   └── page.tsx\n│   │   ├── blog/\n│   │   │   ├── [slug]/\n│   │   │   │   └── page.tsx\n│   │   │   └── page.tsx\n│   │   ├── contact/           ← YENİ\n│   │   │   └── page.tsx       ← YENİ\n│   │   ├── projects/\n│   │   │   └── page.tsx\n│   │   ├── globals.css\n│   │   ├── layout.tsx\n│   │   └── page.tsx\n│   ├── components/\n│   ├── data/\n│   └── lib/\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Form submit edilince sayfa yenileniyor",
+              "cause": "e.preventDefault() cagirilmamis veya form action attribute'u var.",
+              "fix": "handleSubmit fonksiyonunun ilk satirinda e.preventDefault() oldugunu dogrula. form elementinde action attribute'u olmamali."
+            },
+            {
+              "error": "422 Unprocessable Entity (Formspree hatasi)",
+              "cause": "YOUR_FORM_ID placeholder'i degistirilmemis.",
+              "fix": "formspree.io'da ucretsiz hesap olustur, yeni form ekle ve verilen ID'yi YOUR_FORM_ID yerine yaz."
+            }
+          ]
         },
         {
           "step": 6,
@@ -255,7 +900,57 @@
           "instructions": "content/blog/ klasöründe 2 örnek MDX blog yazısı oluştur.",
           "code_snippet": "---\ntitle: 'Next.js 16App Router ile Portfolio Sitesi Oluşturma'\ndate: '2026-01-15'\nsummary: 'Next.js 16App Router, Server Components ve MDX kullanarak modern bir portfolio sitesi nasıl oluşturulur?'\ntags: ['Next.js', 'React', 'TypeScript']\n---\n\n# Next.js 16App Router ile Portfolio Sitesi Oluşturma\n\nBu yazıda, Next.js 16'ün yeni App Router yapısıyla nasıl bir portfolio\nsitesi oluşturabileceğini adım adım anlatacağım.\n\n## Neden Next.js?\n\nNext.js, React tabanlı framework'ler arasında en popüleridir.\nServer Components desteği ile performans avantajı sağlar...\n\n## Kurulum\n\n```bash\npnpm dlx create-next-app@latest my-portfolio --tailwind\n```\n\n## Server Components vs Client Components\n\nApp Router'da tüm component'ler varsayılan olarak Server Component'tir...\n\n## Sonuç\n\nNext.js 16, modern web geliştirme için güçlü araçlar sunar...",
           "deep_dive": "Frontmatter (--- arasındaki YAML), blog yazısının metadata'sıdır. gray-matter kütüphanesi bu kısmı parse eder. İyi bir blog yazısı: 1) Problemi tanımlar, 2) Çözümü açıklar, 3) Kod örnekleri verir, 4) Sonuç ve next steps belirtir. Teknik blog yazarken 'öğretirken öğrenme' (Feynman Technique) yöntemini uygularsın.",
-          "checkpoint": "content/blog/ klasöründe en az 2 .mdx dosyası olmalı. /blog sayfasında liste görünmeli, detay sayfasında syntax highlighting çalışmalı."
+          "checkpoint": "content/blog/ klasöründe en az 2 .mdx dosyası olmalı. /blog sayfasında liste görünmeli, detay sayfasında syntax highlighting çalışmalı.",
+          "substeps": [
+            {
+              "order": "6.1",
+              "action": "Ilk blog yazisini olustur",
+              "type": "file_open",
+              "file": "content/blog/nextjs-portfolio-rehberi.mdx",
+              "why": "Dosya adi URL slug'i olacak: /blog/nextjs-portfolio-rehberi. Kucuk harf ve tire kullan, Turkce karakter kullanma."
+            },
+            {
+              "order": "6.2",
+              "action": "Blog yazisinin frontmatter ve icerigini yaz",
+              "type": "code_write",
+              "file": "content/blog/nextjs-portfolio-rehberi.mdx",
+              "code": "---\ntitle: 'Next.js 16 App Router ile Portfolio Sitesi Oluşturma'\ndate: '2026-01-15'\nsummary: 'Next.js 16 App Router, Server Components ve MDX kullanarak modern bir portfolio sitesi nasıl oluşturulur?'\ntags: ['Next.js', 'React', 'TypeScript']\n---\n\n# Next.js 16 App Router ile Portfolio Sitesi Oluşturma\n\nBu yazıda, Next.js 16'ün yeni App Router yapısıyla nasıl bir portfolio sitesi oluşturabileceğini adım adım anlatacağım.\n\n## Neden Next.js?\n\nNext.js, React tabanlı framework'ler arasında en popüleridir. Server Components desteği ile performans avantajı sağlar...\n\n## Kurulum\n\n```bash\npnpm dlx create-next-app@latest my-portfolio --tailwind\n```\n\n## Server Components vs Client Components\n\nApp Router'da tüm component'ler varsayılan olarak Server Component'tir...\n\n## Sonuç\n\nNext.js 16, modern web geliştirme için güçlü araçlar sunar...",
+              "why": "Frontmatter (--- arasindaki YAML) blog yazisinin metadata'sidir. gray-matter bu kismi parse eder. Iyi bir blog yazisi: problemi tanimlar, cozumu aciklar, kod ornekleri verir."
+            },
+            {
+              "order": "6.3",
+              "action": "Ikinci blog yazisini olustur",
+              "type": "code_write",
+              "file": "content/blog/typescript-temelleri.mdx",
+              "code": "---\ntitle: 'TypeScript Temelleri: Neden ve Nasıl?'\ndate: '2026-01-20'\nsummary: 'TypeScript nedir, neden kullanmalısın ve JavaScript projelerinde nasıl entegre edilir?'\ntags: ['TypeScript', 'JavaScript']\n---\n\n# TypeScript Temelleri: Neden ve Nasıl?\n\nTypeScript, JavaScript'in tip güvenli bir süper kümesidir. Bu yazıda TypeScript'in temellerini ve neden kullanman gerektiğini anlatacağım.\n\n## TypeScript Nedir?\n\nTypeScript, Microsoft tarafından geliştirilen, JavaScript'e statik tip sistemi ekleyen bir programlama dilidir...\n\n## Temel Tipler\n\n```typescript\nlet name: string = 'John';\nlet age: number = 25;\nlet isActive: boolean = true;\n```\n\n## Interface ve Type\n\n```typescript\ninterface User {\n  name: string;\n  email: string;\n  age?: number;\n}\n```\n\n## Sonuç\n\nTypeScript, daha güvenilir ve bakımı kolay kod yazmayı sağlar...",
+              "why": "En az 2 blog yazisi olmali — bos blog kotu izlenim birakir. Farkli konularda yazmak ceşitlilik gosterir."
+            },
+            {
+              "order": "6.4",
+              "action": "Blog yazilarinin dogru goruntulendigini dogrula",
+              "type": "validate",
+              "validation": "/blog sayfasinda iki yazi listelenmeli (son tarih ustte). Yazilara tiklandiginda MDX icerik render edilmeli ve syntax highlighting calismali.",
+              "why": "Blog sistemi uctan uca calistigini dogrulamak: dosya okuma → parse → listeleme → detay render."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── content/\n│   └── blog/\n│       ├── nextjs-portfolio-rehberi.mdx   ← YENİ\n│       └── typescript-temelleri.mdx        ← YENİ\n├── src/\n│   ├── app/\n│   │   ├── about/\n│   │   ├── blog/\n│   │   │   ├── [slug]/\n│   │   │   └── page.tsx\n│   │   ├── contact/\n│   │   ├── projects/\n│   │   ├── globals.css\n│   │   ├── layout.tsx\n│   │   └── page.tsx\n│   ├── components/\n│   ├── data/\n│   └── lib/\n│       └── mdx.ts\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Blog yazisi gorunmuyor, liste bos",
+              "cause": "MDX dosyasi content/blog/ klasorune kaydedilmemis veya dosya uzantisi .mdx degil.",
+              "fix": "Dosyanin content/blog/nextjs-portfolio-rehberi.mdx yolunda oldugunu ve .mdx uzantili oldugunu dogrula."
+            },
+            {
+              "error": "Frontmatter parse hatasi",
+              "cause": "YAML frontmatter formatı yanlis — eksik --- veya hatali girintileme.",
+              "fix": "Dosyanin ilk ve son --- isareti arasindaki YAML'in dogru formatlandigini kontrol et. title, date, summary alanlari zorunlu."
+            },
+            {
+              "error": "Syntax highlighting calismiyor",
+              "cause": "rehype-highlight eklentisi kurulmamis veya MDXRemote options'ta tanimlanmamis.",
+              "fix": "pnpm install rehype-highlight komutunu calistir. Blog detay sayfasinda rehypePlugins: [rehypeHighlight] oldugunu dogrula."
+            }
+          ]
         }
       ],
       "must_note": "📝 MUTLAKA NOT AL:\n- generateStaticParams, build time'da hangi dynamic route'ların oluşturulacağını belirler — SSG için şarttır.\n- MDXRemote RSC versiyonu server'da çalışır, client JS göndermez — performans için kritik.\n- prose class'ı (@tailwindcss/typography), MDX içeriğine otomatik güzel tipografi ekler.\n- Her sayfanın kendi metadata'sı olmalı (SEO için). generateMetadata ile dinamik metadata oluşturulur.\n- noopener noreferrer güvenlik için target='_blank' linklerinde zorunludur.",
@@ -281,7 +976,74 @@
           "instructions": "next-themes kütüphanesini kullanarak dark mode toggle'ı implement et. ThemeProvider ve ThemeToggle component'lerini oluştur.",
           "code_snippet": "pnpm install next-themes\n\n// src/components/theme-provider.tsx\n'use client';\n\nimport { ThemeProvider as NextThemesProvider } from 'next-themes';\n\nexport function ThemeProvider({ children }: { children: React.ReactNode }) {\n  return (\n    <NextThemesProvider attribute=\"class\" defaultTheme=\"system\" enableSystem>\n      {children}\n    </NextThemesProvider>\n  );\n}\n\n// src/components/theme-toggle.tsx\n'use client';\n\nimport { useTheme } from 'next-themes';\nimport { useEffect, useState } from 'react';\n\nexport function ThemeToggle() {\n  const { theme, setTheme } = useTheme();\n  const [mounted, setMounted] = useState(false);\n\n  useEffect(() => setMounted(true), []);\n\n  if (!mounted) return <div className=\"h-9 w-9\" />;\n\n  return (\n    <button\n      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}\n      className=\"rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800\"\n      aria-label=\"Tema değiştir\"\n    >\n      {theme === 'dark' ? (\n        <svg className=\"h-5 w-5 text-yellow-500\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path fillRule=\"evenodd\" d=\"M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z\" clipRule=\"evenodd\" />\n        </svg>\n      ) : (\n        <svg className=\"h-5 w-5 text-gray-700\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path d=\"M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z\" />\n        </svg>\n      )}\n    </button>\n  );\n}",
           "deep_dive": "mounted state kontrolü, hydration mismatch hatasını önler. Server'da render edilen HTML ile client'ta render edilen HTML aynı olmalıdır — ama tema bilgisi client'ta localStorage'dan okunur. Bu yüzden component mount olana kadar placeholder gösterilir. next-themes kütüphanesi localStorage persistence, system preference detection ve FOUC (Flash of Unstyled Content) prevention'ı built-in olarak sağlar.",
-          "checkpoint": "Dark/light mode toggle çalışmalı. Sayfa yenilendiğinde tercih korunmalı. System preference'a göre varsayılan tema uygulanmalı."
+          "checkpoint": "Dark/light mode toggle çalışmalı. Sayfa yenilendiğinde tercih korunmalı. System preference'a göre varsayılan tema uygulanmalı.",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "next-themes kutuphanesini kur",
+              "type": "terminal",
+              "command": "pnpm install next-themes",
+              "expected_output": "dependencies:\n+ next-themes",
+              "why": "next-themes, Next.js icin optimize edilmis tema yonetim kutuphanesidir. localStorage persistence, system preference detection ve FOUC onleme built-in olarak gelir."
+            },
+            {
+              "order": "1.2",
+              "action": "ThemeProvider component'ini olustur",
+              "type": "code_write",
+              "file": "src/components/theme-provider.tsx",
+              "code": "'use client';\n\nimport { ThemeProvider as NextThemesProvider } from 'next-themes';\n\nexport function ThemeProvider({ children }: { children: React.ReactNode }) {\n  return (\n    <NextThemesProvider attribute=\"class\" defaultTheme=\"system\" enableSystem>\n      {children}\n    </NextThemesProvider>\n  );\n}",
+              "why": "attribute='class' ile dark mode HTML'e 'dark' class'i eklenerek aktiflestirilir. defaultTheme='system' kullanicinin isletim sistemi tercihini varsayilan yapar."
+            },
+            {
+              "order": "1.3",
+              "action": "ThemeToggle component'ini olustur",
+              "type": "code_write",
+              "file": "src/components/theme-toggle.tsx",
+              "code": "'use client';\n\nimport { useTheme } from 'next-themes';\nimport { useEffect, useState } from 'react';\n\nexport function ThemeToggle() {\n  const { theme, setTheme } = useTheme();\n  const [mounted, setMounted] = useState(false);\n\n  useEffect(() => setMounted(true), []);\n\n  if (!mounted) return <div className=\"h-9 w-9\" />;\n\n  return (\n    <button\n      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}\n      className=\"rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800\"\n      aria-label=\"Tema değiştir\"\n    >\n      {theme === 'dark' ? (\n        <svg className=\"h-5 w-5 text-yellow-500\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path fillRule=\"evenodd\" d=\"M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z\" clipRule=\"evenodd\" />\n        </svg>\n      ) : (\n        <svg className=\"h-5 w-5 text-gray-700\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path d=\"M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z\" />\n        </svg>\n      )}\n    </button>\n  );\n}",
+              "why": "mounted state kontrolu hydration mismatch hatasini onler. Server'da tema bilinmez (localStorage server'da yok), bu yuzden mount olana kadar placeholder gosterilir. aria-label screen reader kullanıcıları icin onemli."
+            },
+            {
+              "order": "1.4",
+              "action": "Layout'a ThemeProvider'i ekle",
+              "type": "code_modify",
+              "file": "src/app/layout.tsx",
+              "code": "// Import ekle:\nimport { ThemeProvider } from '@/components/theme-provider';\n\n// body icinde children'i ThemeProvider ile sar:\n<ThemeProvider>\n  <Header />\n  <main className=\"min-h-screen\">{children}</main>\n  <Footer />\n</ThemeProvider>",
+              "why": "ThemeProvider root layout'ta olmali ki tum sayfalar tema degisikliginden etkilensin. Body'nin en disindaki sarmalayıcı olmali."
+            },
+            {
+              "order": "1.5",
+              "action": "Header'a ThemeToggle ekle",
+              "type": "code_modify",
+              "file": "src/components/header.tsx",
+              "code": "// Import ekle:\nimport { ThemeToggle } from './theme-toggle';\n\n// Navigation linklerin yanina ekle:\n<ThemeToggle />",
+              "why": "Tema degistirme butonu Header'da olmali ki her sayfadan erisilebilir olsun."
+            },
+            {
+              "order": "1.6",
+              "action": "Dark mode'u test et",
+              "type": "validate",
+              "validation": "Tema degistirme butonuna tikla. Sayfa dark/light mode arasinda gecis yapmali. Sayfayi yenilediginde tercih korunmali. Sistem tercihine gore varsayilan tema dogru olmali.",
+              "why": "Dark mode'un localStorage persistence, system preference detection ve FOUC onleme ozelliklerinin hepsinin calistigini dogrulamak gerekir."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── about/\n│   │   ├── blog/\n│   │   ├── contact/\n│   │   ├── projects/\n│   │   ├── globals.css\n│   │   ├── layout.tsx      ← GÜNCELLENDİ (ThemeProvider eklendi)\n│   │   └── page.tsx\n│   ├── components/\n│   │   ├── footer.tsx\n│   │   ├── header.tsx       ← GÜNCELLENDİ (ThemeToggle eklendi)\n│   │   ├── theme-provider.tsx ← YENİ\n│   │   └── theme-toggle.tsx   ← YENİ\n│   ├── data/\n│   └── lib/\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Hydration mismatch: Text content does not match",
+              "cause": "ThemeToggle'da mounted state kontrolu eksik. Server ve client farkli icerik render ediyor.",
+              "fix": "ThemeToggle component'inde useEffect(() => setMounted(true), []) ve if (!mounted) return <div className='h-9 w-9' /> satirlarinin oldugunu dogrula."
+            },
+            {
+              "error": "Dark mode class ekleniyor ama stiller uygulanmiyor",
+              "cause": "globals.css'te @custom-variant dark tanimlanmamis.",
+              "fix": "globals.css'te @custom-variant dark (&:where(.dark, .dark *)); satirinin oldugunu dogrula."
+            },
+            {
+              "error": "Tema tercihi sayfa yenilendiginde sifırlaniyor",
+              "cause": "ThemeProvider'da enableSystem prop'u eksik veya localStorage erisim sorunu.",
+              "fix": "ThemeProvider'da attribute='class' defaultTheme='system' enableSystem prop'larinin oldugunu dogrula."
+            }
+          ]
         },
         {
           "step": 2,
@@ -290,7 +1052,52 @@
           "instructions": "Header component'ine mobil hamburger menu ekle. CSS transition'lar ile smooth açılma/kapanma animasyonu ekle.",
           "code_snippet": "// src/components/mobile-nav.tsx\n'use client';\n\nimport { useState } from 'react';\nimport Link from 'next/link';\nimport { usePathname } from 'next/navigation';\n\nconst navigation = [\n  { name: 'Ana Sayfa', href: '/' },\n  { name: 'Hakkımda', href: '/about' },\n  { name: 'Projeler', href: '/projects' },\n  { name: 'Blog', href: '/blog' },\n  { name: 'İletişim', href: '/contact' },\n];\n\nexport function MobileNav() {\n  const [isOpen, setIsOpen] = useState(false);\n  const pathname = usePathname();\n\n  return (\n    <div className=\"md:hidden\">\n      <button\n        onClick={() => setIsOpen(!isOpen)}\n        className=\"rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800\"\n        aria-label=\"Menüyü aç\"\n        aria-expanded={isOpen}\n      >\n        <svg className=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          {isOpen ? (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M6 18L18 6M6 6l12 12\" />\n          ) : (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M4 6h16M4 12h16M4 18h16\" />\n          )}\n        </svg>\n      </button>\n\n      {isOpen && (\n        <div className=\"absolute left-0 right-0 top-full border-b border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-dark-bg\">\n          <nav className=\"flex flex-col space-y-3\">\n            {navigation.map((item) => (\n              <Link\n                key={item.href}\n                href={item.href}\n                onClick={() => setIsOpen(false)}\n                className={`rounded-lg px-4 py-2 text-sm transition-colors ${\n                  pathname === item.href\n                    ? 'bg-primary-50 font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'\n                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'\n                }`}\n              >\n                {item.name}\n              </Link>\n            ))}\n          </nav>\n        </div>\n      )}\n    </div>\n  );\n}",
           "deep_dive": "md:hidden class'ı, medium breakpoint'ten (768px) itibaren elementi gizler — mobil menü sadece küçük ekranlarda görünür. aria-expanded attribute'u, screen reader kullanıcılarına menünün açık/kapalı durumunu bildirir. Link click handler'ında setIsOpen(false) çağrısı, navigasyon sonrası menüyü otomatik kapatır. Daha gelişmiş bir implementasyonda, Framer Motion ile animasyon eklenebilir.",
-          "checkpoint": "Tarayıcıyı 768px'in altına daraltıldığında hamburger menü görünmeli. Menü açılıp kapanmalı. Link'e tıklandığında menü kapanmalı."
+          "checkpoint": "Tarayıcıyı 768px'in altına daraltıldığında hamburger menü görünmeli. Menü açılıp kapanmalı. Link'e tıklandığında menü kapanmalı.",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "MobileNav component dosyasini olustur",
+              "type": "file_open",
+              "file": "src/components/mobile-nav.tsx",
+              "why": "Mobil navigasyon ayri bir component olarak olusturulur. Single Responsibility prensibi: desktop nav ve mobil nav ayri sorumluluklar."
+            },
+            {
+              "order": "2.2",
+              "action": "MobileNav component'ini yaz",
+              "type": "code_write",
+              "file": "src/components/mobile-nav.tsx",
+              "code": "'use client';\n\nimport { useState } from 'react';\nimport Link from 'next/link';\nimport { usePathname } from 'next/navigation';\n\nconst navigation = [\n  { name: 'Ana Sayfa', href: '/' },\n  { name: 'Hakkımda', href: '/about' },\n  { name: 'Projeler', href: '/projects' },\n  { name: 'Blog', href: '/blog' },\n  { name: 'İletişim', href: '/contact' },\n];\n\nexport function MobileNav() {\n  const [isOpen, setIsOpen] = useState(false);\n  const pathname = usePathname();\n\n  return (\n    <div className=\"md:hidden\">\n      <button\n        onClick={() => setIsOpen(!isOpen)}\n        className=\"rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800\"\n        aria-label=\"Menüyü aç\"\n        aria-expanded={isOpen}\n      >\n        <svg className=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          {isOpen ? (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M6 18L18 6M6 6l12 12\" />\n          ) : (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M4 6h16M4 12h16M4 18h16\" />\n          )}\n        </svg>\n      </button>\n\n      {isOpen && (\n        <div className=\"absolute left-0 right-0 top-full border-b border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-dark-bg\">\n          <nav className=\"flex flex-col space-y-3\">\n            {navigation.map((item) => (\n              <Link\n                key={item.href}\n                href={item.href}\n                onClick={() => setIsOpen(false)}\n                className={`rounded-lg px-4 py-2 text-sm transition-colors ${\n                  pathname === item.href\n                    ? 'bg-primary-50 font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'\n                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'\n                }`}\n              >\n                {item.name}\n              </Link>\n            ))}\n          </nav>\n        </div>\n      )}\n    </div>\n  );\n}",
+              "why": "md:hidden ile 768px ustunde gizlenir. aria-expanded screen reader'lara menu durumunu bildirir. Link tiklaninca setIsOpen(false) ile menu kapanir."
+            },
+            {
+              "order": "2.3",
+              "action": "Header'i guncelle: desktop nav'i gizle, MobileNav ekle",
+              "type": "code_modify",
+              "file": "src/components/header.tsx",
+              "code": "// Desktop navigasyon linklerine 'hidden md:flex' ekle:\n<div className=\"hidden md:flex items-center gap-6\">\n  {/* navigation links */}\n</div>\n\n// MobileNav import et ve ekle:\nimport { MobileNav } from './mobile-nav';\n// nav icine ekle:\n<MobileNav />",
+              "why": "hidden md:flex ile desktop linkler mobilde gizlenir. MobileNav sadece mobilde gorunur (md:hidden). Bu responsive navigation'in standart pattern'idir."
+            },
+            {
+              "order": "2.4",
+              "action": "Mobil gorunumu test et",
+              "type": "validate",
+              "validation": "DevTools'ta responsive mode'u ac (Ctrl+Shift+M). 768px altinda hamburger menu ikonu gorunmeli. Tiklandiginda menu acilmali. Bir linke tiklandiginda menu kapanmali ve sayfa degismeli.",
+              "why": "Mobil kullanıcı deneyimini dogrulamak kritik — web trafiginin %60'indan fazlasi mobilden gelir."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   └── ... (degisiklik yok)\n│   ├── components/\n│   │   ├── footer.tsx\n│   │   ├── header.tsx         ← GÜNCELLENDİ (responsive nav)\n│   │   ├── mobile-nav.tsx     ← YENİ\n│   │   ├── theme-provider.tsx\n│   │   └── theme-toggle.tsx\n│   ├── data/\n│   └── lib/\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Hamburger menu gorunmuyor",
+              "cause": "md:hidden class'i eklenmemis veya header'da MobileNav import edilmemis.",
+              "fix": "MobileNav'in root div'inde className='md:hidden' oldugunu ve Header'da <MobileNav /> ekledigini dogrula."
+            },
+            {
+              "error": "Menu acildikta icerik arkada kaliyor, menu gorunmuyor",
+              "cause": "Header'da position relative veya z-index eksik.",
+              "fix": "Header'in position: relative olmali ve menu dropdown'un z-50 class'ina sahip oldugunu dogrula."
+            }
+          ]
         },
         {
           "step": 3,
@@ -299,7 +1106,53 @@
           "instructions": "Skills section ve experience timeline component'lerini oluştur.",
           "code_snippet": "// src/components/skills-section.tsx\nconst skillCategories = [\n  {\n    title: 'Frontend',\n    skills: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'HTML5/CSS3'],\n  },\n  {\n    title: 'Backend',\n    skills: ['Node.js', 'Express', 'PostgreSQL', 'MongoDB', 'Redis'],\n  },\n  {\n    title: 'DevOps & Araçlar',\n    skills: ['Docker', 'Git', 'GitHub Actions', 'Vercel', 'Linux'],\n  },\n  {\n    title: 'AI & ML',\n    skills: ['Python', 'OpenAI API', 'LangChain', 'Scikit-learn'],\n  },\n];\n\nexport function SkillsSection() {\n  return (\n    <section className=\"py-12\">\n      <h2 className=\"mb-8 text-2xl font-bold text-gray-900 dark:text-white\">\n        Teknik Beceriler\n      </h2>\n      <div className=\"grid gap-6 sm:grid-cols-2\">\n        {skillCategories.map((category) => (\n          <div\n            key={category.title}\n            className=\"rounded-xl border border-gray-200 p-6 dark:border-gray-800\"\n          >\n            <h3 className=\"mb-4 font-semibold text-gray-900 dark:text-white\">\n              {category.title}\n            </h3>\n            <div className=\"flex flex-wrap gap-2\">\n              {category.skills.map((skill) => (\n                <span\n                  key={skill}\n                  className=\"rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-primary-900/30 dark:text-primary-300\"\n                >\n                  {skill}\n                </span>\n              ))}\n            </div>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n\n// src/components/timeline.tsx\nconst experiences = [\n  {\n    period: '2024 - Devam',\n    title: 'Full Stack Developer',\n    company: 'Freelance / Kişisel Projeler',\n    description: 'React, Next.js, Node.js ile modern web uygulamaları geliştirme.',\n  },\n];\n\nexport function Timeline() {\n  return (\n    <section className=\"py-12\">\n      <h2 className=\"mb-8 text-2xl font-bold text-gray-900 dark:text-white\">\n        Deneyim\n      </h2>\n      <div className=\"space-y-8\">\n        {experiences.map((exp, i) => (\n          <div key={i} className=\"relative border-l-2 border-primary-200 pl-6 dark:border-primary-800\">\n            <div className=\"absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 border-primary-500 bg-white dark:bg-dark-bg\" />\n            <p className=\"text-sm text-gray-500 dark:text-gray-400\">{exp.period}</p>\n            <h3 className=\"mt-1 font-semibold text-gray-900 dark:text-white\">{exp.title}</h3>\n            <p className=\"text-sm text-primary-600 dark:text-primary-400\">{exp.company}</p>\n            <p className=\"mt-2 text-gray-600 dark:text-gray-400\">{exp.description}</p>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}",
           "deep_dive": "Timeline component'i, CSS border-left ve absolute positioning ile oluşturulur. Bu yaklaşım, library dependency olmadan temiz bir visual timeline sağlar. Skills section'da flex-wrap ile beceri etiketleri otomatik olarak alt satıra geçer. Renk seçimlerinde dark mode'da okunabilirliği korumak için /30 opacity kullanılır (dark:bg-primary-900/30).",
-          "checkpoint": "Hakkımda sayfasında beceriler kategorize edilmiş görünmeli. Timeline'da deneyimler kronolojik sırada ve görsel olarak bağlantılı olmalı."
+          "checkpoint": "Hakkımda sayfasında beceriler kategorize edilmiş görünmeli. Timeline'da deneyimler kronolojik sırada ve görsel olarak bağlantılı olmalı.",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "SkillsSection component'ini olustur",
+              "type": "code_write",
+              "file": "src/components/skills-section.tsx",
+              "code": "const skillCategories = [\n  {\n    title: 'Frontend',\n    skills: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'HTML5/CSS3'],\n  },\n  {\n    title: 'Backend',\n    skills: ['Node.js', 'Express', 'PostgreSQL', 'MongoDB', 'Redis'],\n  },\n  {\n    title: 'DevOps & Araçlar',\n    skills: ['Docker', 'Git', 'GitHub Actions', 'Vercel', 'Linux'],\n  },\n  {\n    title: 'AI & ML',\n    skills: ['Python', 'OpenAI API', 'LangChain', 'Scikit-learn'],\n  },\n];\n\nexport function SkillsSection() {\n  return (\n    <section className=\"py-12\">\n      <h2 className=\"mb-8 text-2xl font-bold text-gray-900 dark:text-white\">Teknik Beceriler</h2>\n      <div className=\"grid gap-6 sm:grid-cols-2\">\n        {skillCategories.map((category) => (\n          <div key={category.title} className=\"rounded-xl border border-gray-200 p-6 dark:border-gray-800\">\n            <h3 className=\"mb-4 font-semibold text-gray-900 dark:text-white\">{category.title}</h3>\n            <div className=\"flex flex-wrap gap-2\">\n              {category.skills.map((skill) => (\n                <span key={skill} className=\"rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-primary-900/30 dark:text-primary-300\">{skill}</span>\n              ))}\n            </div>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}",
+              "why": "Becerileri kategorize etmek, recruiter'larin teknik stack'ini hizla gormesini saglar. Grid layout responsive olarak mobilde tek, tablette iki sutun gosterir."
+            },
+            {
+              "order": "3.2",
+              "action": "Timeline component'ini olustur",
+              "type": "code_write",
+              "file": "src/components/timeline.tsx",
+              "code": "const experiences = [\n  {\n    period: '2024 - Devam',\n    title: 'Full Stack Developer',\n    company: 'Freelance / Kişisel Projeler',\n    description: 'React, Next.js, Node.js ile modern web uygulamaları geliştirme.',\n  },\n];\n\nexport function Timeline() {\n  return (\n    <section className=\"py-12\">\n      <h2 className=\"mb-8 text-2xl font-bold text-gray-900 dark:text-white\">Deneyim</h2>\n      <div className=\"space-y-8\">\n        {experiences.map((exp, i) => (\n          <div key={i} className=\"relative border-l-2 border-primary-200 pl-6 dark:border-primary-800\">\n            <div className=\"absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 border-primary-500 bg-white dark:bg-dark-bg\" />\n            <p className=\"text-sm text-gray-500 dark:text-gray-400\">{exp.period}</p>\n            <h3 className=\"mt-1 font-semibold text-gray-900 dark:text-white\">{exp.title}</h3>\n            <p className=\"text-sm text-primary-600 dark:text-primary-400\">{exp.company}</p>\n            <p className=\"mt-2 text-gray-600 dark:text-gray-400\">{exp.description}</p>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}",
+              "why": "Timeline component'i CSS border-left ve absolute positioning ile olusturulur. Library dependency olmadan temiz gorsel timeline saglar."
+            },
+            {
+              "order": "3.3",
+              "action": "Hakkimda sayfasina SkillsSection ve Timeline ekle",
+              "type": "code_modify",
+              "file": "src/app/about/page.tsx",
+              "code": "// Import'lari ekle:\nimport { SkillsSection } from '@/components/skills-section';\nimport { Timeline } from '@/components/timeline';\n\n// JSX'in sonuna ekle (prose div'inden sonra):\n<SkillsSection />\n<Timeline />",
+              "why": "Hakkimda sayfasinda beceriler ve deneyim bolumlerini gostermek, recruiter'lara kapsamli bir profil sunar."
+            },
+            {
+              "order": "3.4",
+              "action": "Sayfalari dogrula",
+              "type": "validate",
+              "validation": "/about sayfasinda beceriler kategorize edilmis ve timeline gorsel olarak baglantili gorunmeli. Mobil ve desktop gorunumleri kontrol et.",
+              "why": "Component'lerin farkli ekran boyutlarinda duzgun gorunmesi onemli."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── about/\n│   │   │   └── page.tsx       ← GÜNCELLENDİ (Skills + Timeline eklendi)\n│   │   └── ... (digerleri ayni)\n│   ├── components/\n│   │   ├── footer.tsx\n│   │   ├── header.tsx\n│   │   ├── mobile-nav.tsx\n│   │   ├── skills-section.tsx ← YENİ\n│   │   ├── theme-provider.tsx\n│   │   ├── theme-toggle.tsx\n│   │   └── timeline.tsx       ← YENİ\n│   ├── data/\n│   └── lib/\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Timeline noktasi (dot) yanlis konumda gorunuyor",
+              "cause": "absolute positioning degerlerinin parent relative container'a gore hesaplanmasi gerekiyor.",
+              "fix": "Parent div'de relative class'inin oldugunu dogrula. Nokta icin -left-[9px] degeri border kalinligina (2px) gore ayarlanmali."
+            },
+            {
+              "error": "SkillsSection ve Timeline import hatasi",
+              "cause": "Component dosyalari olusturulmamis veya export isimleri uyusmuyor.",
+              "fix": "Her iki dosyanin da src/components/ altinda oldugunu ve export function isimleriyle uyumlu import yapildigini dogrula."
+            }
+          ]
         },
         {
           "step": 4,
@@ -308,7 +1161,53 @@
           "instructions": "CSS transition ve basit animation'lar ekle. Fade-in ve slide-up efektleri için utility class'lar oluştur.",
           "code_snippet": "/* src/app/globals.css - ek stiller */\n@layer utilities {\n  .animate-fade-in {\n    animation: fadeIn 0.5s ease-out;\n  }\n\n  .animate-slide-up {\n    animation: slideUp 0.5s ease-out;\n  }\n}\n\n@keyframes fadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes slideUp {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n\n/* Erişilebilirlik: Animasyon tercihine saygı göster */\n@media (prefers-reduced-motion: reduce) {\n  .animate-fade-in,\n  .animate-slide-up {\n    animation: none;\n  }\n}",
           "deep_dive": "prefers-reduced-motion media query'si, kullanıcının işletim sistemi ayarlarında animasyonları azaltma tercihini kontrol eder. Bu, erişilebilirlik açısından çok önemlidir — vestibüler bozuklukları olan kullanıcılar için animasyonlar rahatsızlık yaratabilir. @layer utilities, Tailwind'in utility layer'ına custom class'lar ekler ve purge sürecinde korunmalarını sağlar.",
-          "checkpoint": "Sayfalar açıldığında yumuşak fade-in animasyonu görünmeli. Tarayıcı ayarlarından 'reduce motion' aktifleştirildiğinde animasyonlar devre dışı kalmalı."
+          "checkpoint": "Sayfalar açıldığında yumuşak fade-in animasyonu görünmeli. Tarayıcı ayarlarından 'reduce motion' aktifleştirildiğinde animasyonlar devre dışı kalmalı.",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "globals.css dosyasini ac",
+              "type": "file_open",
+              "file": "src/app/globals.css",
+              "why": "Animasyon tanimlarini global CSS dosyasina ekliyoruz. Tailwind'in @layer utilities ile custom utility class'lar olusturulur."
+            },
+            {
+              "order": "4.2",
+              "action": "Animasyon utility class'larini ve keyframe'leri ekle",
+              "type": "code_add",
+              "file": "src/app/globals.css",
+              "position": "bottom",
+              "code": "\n@layer utilities {\n  .animate-fade-in {\n    animation: fadeIn 0.5s ease-out;\n  }\n\n  .animate-slide-up {\n    animation: slideUp 0.5s ease-out;\n  }\n}\n\n@keyframes fadeIn {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@keyframes slideUp {\n  from { opacity: 0; transform: translateY(20px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n\n/* Erişilebilirlik: Animasyon tercihine saygı göster */\n@media (prefers-reduced-motion: reduce) {\n  .animate-fade-in,\n  .animate-slide-up {\n    animation: none;\n  }\n}\n\n/* Focus stili */\n*:focus-visible {\n  outline: 2px solid var(--color-primary-500);\n  outline-offset: 2px;\n}",
+              "why": "transform ve opacity animasyonlari GPU-accelerated'dir — performans dostu. prefers-reduced-motion media query'si, vestibular bozukluklari olan kullanıcılar icin animasyonları devre disi birakir (WCAG zorunlu)."
+            },
+            {
+              "order": "4.3",
+              "action": "Animasyonlari sayfalara uygula",
+              "type": "code_modify",
+              "file": "src/app/page.tsx",
+              "code": "// Hero section'a animate-fade-in ekle:\n<section className=\"mx-auto max-w-5xl px-4 py-20 animate-fade-in\">\n\n// Blog kartlarina animate-slide-up ekle:\n<div className=\"grid gap-6 md:grid-cols-3 animate-slide-up\">",
+              "why": "Animasyonlari az ve ozenli kullanmak onemli. Hero'da fade-in ve kartlarda slide-up, profesyonel bir his katar."
+            },
+            {
+              "order": "4.4",
+              "action": "Animasyonlari ve erisilebirligi test et",
+              "type": "validate",
+              "validation": "Sayfalar acildiginda yumusak fade-in animasyonu gorunmeli. Tarayici ayarlarindan veya isletim sisteminden 'reduce motion' aktif edildiginde animasyonlar devre disi kalmali.",
+              "why": "Animasyonlarin hem gorsel olarak calismasi hem de erisilebirlik acısından duzgun davranmasi gerekir."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── globals.css        ← GÜNCELLENDİ (animasyonlar + focus stili)\n│   │   ├── layout.tsx\n│   │   ├── page.tsx           ← GÜNCELLENDİ (animasyon class'ları eklendi)\n│   │   └── ... (diğerleri aynı)\n│   ├── components/\n│   │   └── ... (değişiklik yok)\n│   ├── data/\n│   └── lib/\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Animasyonlar gorunmuyor, sayfa direkt yukluyor",
+              "cause": "@layer utilities blogu globals.css'te eklenmemis veya class isimleri yanlis.",
+              "fix": "globals.css'te @layer utilities blogunun oldugunu ve component'lerde animate-fade-in / animate-slide-up class'larinin ekledigini dogrula."
+            },
+            {
+              "error": "prefers-reduced-motion calısmiyor",
+              "cause": "Media query globals.css'te tanimlanmamis.",
+              "fix": "@media (prefers-reduced-motion: reduce) blogunun globals.css'te animasyon tanimlarindan SONRA oldugunu dogrula."
+            }
+          ]
         }
       ],
       "must_note": "📝 MUTLAKA NOT AL:\n- next-themes ile dark mode: attribute='class', localStorage'da persist, system preference detect.\n- Hydration mismatch'i önlemek için mounted state kontrolü şart — server ve client render'ı uyuşmalı.\n- prefers-reduced-motion: animasyonları erişilebilir yapmak için ZORUNLU media query.\n- Mobile-first: md:hidden ile masaüstünde gizle, varsayılan mobil için tasarla.\n- aria-label ve aria-expanded: screen reader kullanıcıları için navigation erişilebilirliği.",
@@ -335,7 +1234,50 @@
           "instructions": "Her sayfa için uygun metadata tanımla. Open Graph ve Twitter Card meta tag'lerini ekle.",
           "code_snippet": "// src/app/layout.tsx - metadata genişletilmiş\nimport type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  metadataBase: new URL('https://your-domain.com'),\n  title: {\n    default: 'Adın Soyadın | Full Stack Developer',\n    template: '%s | Adın Soyadın',\n  },\n  description:\n    'Full Stack Developer. React, Next.js, Node.js ve AI teknolojileriyle modern web uygulamaları geliştiriyorum.',\n  keywords: [\n    'Full Stack Developer',\n    'React Developer',\n    'Next.js',\n    'TypeScript',\n    'Node.js',\n    'Portfolio',\n  ],\n  authors: [{ name: 'Adın Soyadın' }],\n  creator: 'Adın Soyadın',\n  openGraph: {\n    type: 'website',\n    locale: 'tr_TR',\n    url: 'https://your-domain.com',\n    siteName: 'Adın Soyadın',\n    title: 'Adın Soyadın | Full Stack Developer',\n    description: 'Full Stack Developer portfolio ve teknik blog.',\n    images: [\n      {\n        url: '/og-image.png',\n        width: 1200,\n        height: 630,\n        alt: 'Adın Soyadın Portfolio',\n      },\n    ],\n  },\n  twitter: {\n    card: 'summary_large_image',\n    title: 'Adın Soyadın | Full Stack Developer',\n    description: 'Full Stack Developer portfolio ve teknik blog.',\n    images: ['/og-image.png'],\n  },\n  robots: {\n    index: true,\n    follow: true,\n    googleBot: {\n      index: true,\n      follow: true,\n      'max-video-preview': -1,\n      'max-image-preview': 'large',\n      'max-snippet': -1,\n    },\n  },\n};",
           "deep_dive": "metadataBase, tüm relative URL'leri absolute URL'e çevirir. Open Graph image boyutu 1200x630px standarttır — Facebook, LinkedIn ve Twitter bu boyutu optimal şekilde gösterir. template: '%s | Adın Soyadın' ile alt sayfalar otomatik olarak 'Blog | Adın Soyadın' gibi title alır. robots konfigürasyonu, Google bot'una sayfayı indexlemesi ve link'leri takip etmesi gerektiğini söyler.",
-          "checkpoint": "DevTools'ta head içinde og:title, og:description, og:image tag'leri görünmeli. https://ogp.me/ adresinde Open Graph validator ile test edilmeli."
+          "checkpoint": "DevTools'ta head içinde og:title, og:description, og:image tag'leri görünmeli. https://ogp.me/ adresinde Open Graph validator ile test edilmeli.",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "src/app/layout.tsx dosyasini ac",
+              "type": "file_open",
+              "file": "src/app/layout.tsx",
+              "why": "Root layout'taki metadata export'u tum sayfalar icin varsayilan SEO bilgilerini belirler."
+            },
+            {
+              "order": "1.2",
+              "action": "Genisletilmis metadata objesini yaz",
+              "type": "code_modify",
+              "file": "src/app/layout.tsx",
+              "code": "export const metadata: Metadata = {\n  metadataBase: new URL('https://your-domain.com'),\n  title: {\n    default: 'Adın Soyadın | Full Stack Developer',\n    template: '%s | Adın Soyadın',\n  },\n  description: 'Full Stack Developer. React, Next.js, Node.js ve AI teknolojileriyle modern web uygulamaları geliştiriyorum.',\n  keywords: ['Full Stack Developer', 'React Developer', 'Next.js', 'TypeScript', 'Node.js', 'Portfolio'],\n  authors: [{ name: 'Adın Soyadın' }],\n  creator: 'Adın Soyadın',\n  openGraph: {\n    type: 'website',\n    locale: 'tr_TR',\n    url: 'https://your-domain.com',\n    siteName: 'Adın Soyadın',\n    title: 'Adın Soyadın | Full Stack Developer',\n    description: 'Full Stack Developer portfolio ve teknik blog.',\n    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Adın Soyadın Portfolio' }],\n  },\n  twitter: {\n    card: 'summary_large_image',\n    title: 'Adın Soyadın | Full Stack Developer',\n    description: 'Full Stack Developer portfolio ve teknik blog.',\n    images: ['/og-image.png'],\n  },\n  robots: {\n    index: true,\n    follow: true,\n    googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },\n  },\n};",
+              "why": "metadataBase tum relative URL'leri absolute yapar. Open Graph image 1200x630px standarttir (Facebook, LinkedIn, Twitter icin optimal). robots konfigurasyonu Google'a sayfalari indexlemesini soyler."
+            },
+            {
+              "order": "1.3",
+              "action": "Open Graph gorselini olustur",
+              "type": "explain",
+              "why": "1200x630px boyutunda bir OG image olustur (Figma, Canva veya baska bir aracla). public/og-image.png olarak kaydet. Bu gorsel sosyal medyada paylasildiginda onizleme karti olarak gosterilir."
+            },
+            {
+              "order": "1.4",
+              "action": "Meta tag'leri dogrula",
+              "type": "validate",
+              "validation": "DevTools > Elements > head icinde og:title, og:description, og:image meta tag'lerini gor. Her sayfanin kendi title'i olmali (template pattern sayesinde).",
+              "why": "SEO meta tag'lerinin dogru oldugunu dogrulamak, arama motoru gorunurlugu icin kritik."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── public/\n│   ├── og-image.png         ← YENİ (1200x630px Open Graph görseli)\n│   └── ... (diğer public dosyalar)\n├── src/\n│   ├── app/\n│   │   ├── layout.tsx        ← GÜNCELLENDİ (genişletilmiş metadata)\n│   │   └── ... (diğerleri aynı)\n│   └── ...\n├── next.config.mjs\n└── package.json",
+          "common_errors": [
+            {
+              "error": "Open Graph onizlemesi calismiyor",
+              "cause": "metadataBase tanimlanmamis veya og-image.png dosyasi public/ klasorunde yok.",
+              "fix": "metadataBase: new URL('https://your-domain.com') satirinin oldugunu dogrula. Gorselin public/og-image.png yolunda oldugunu kontrol et."
+            },
+            {
+              "error": "Twitter Card gorunmuyor",
+              "cause": "twitter.card tanimlanmamis veya images dizisi bos.",
+              "fix": "metadata'da twitter objesi icinde card: 'summary_large_image' ve images: ['/og-image.png'] oldugunu dogrula."
+            }
+          ]
         },
         {
           "step": 2,
@@ -344,7 +1286,52 @@
           "instructions": "Next.js sitemap ve robots fonksiyonlarını kullanarak otomatik üretim sağla.",
           "code_snippet": "// src/app/sitemap.ts\nimport { MetadataRoute } from 'next';\nimport { getAllPosts } from '@/lib/mdx';\n\nexport default async function sitemap(): Promise<MetadataRoute.Sitemap> {\n  const posts = await getAllPosts();\n  const baseUrl = 'https://your-domain.com';\n\n  const blogPosts = posts.map((post) => ({\n    url: `${baseUrl}/blog/${post.slug}`,\n    lastModified: new Date(post.date),\n    changeFrequency: 'monthly' as const,\n    priority: 0.7,\n  }));\n\n  const staticPages = [\n    { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 1.0 },\n    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },\n    { url: `${baseUrl}/projects`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.8 },\n    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },\n    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.5 },\n  ];\n\n  return [...staticPages, ...blogPosts];\n}\n\n// src/app/robots.ts\nimport { MetadataRoute } from 'next';\n\nexport default function robots(): MetadataRoute.Robots {\n  return {\n    rules: {\n      userAgent: '*',\n      allow: '/',\n      disallow: '/api/',\n    },\n    sitemap: 'https://your-domain.com/sitemap.xml',\n  };\n}",
           "deep_dive": "changeFrequency, arama motorlarına sayfanın ne sıklıkta güncellendiğini bildirir — ama Google bunu sadece 'hint' olarak kullanır, garanti değildir. priority, 0.0-1.0 arası, sayfanın sitenin diğer sayfalarına göre önemini belirtir. Ana sayfa genellikle 1.0 olur. /api/ yolunu disallow etmek, API endpoint'lerinin indexlenmesini önler.",
-          "checkpoint": "/sitemap.xml adresinde tüm sayfaların URL'leri ve blog yazıları listelenmeli. /robots.txt düzgün formatta olmalı."
+          "checkpoint": "/sitemap.xml adresinde tüm sayfaların URL'leri ve blog yazıları listelenmeli. /robots.txt düzgün formatta olmalı.",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Sitemap dosyasini olustur",
+              "type": "file_open",
+              "file": "src/app/sitemap.ts",
+              "why": "Next.js, src/app/sitemap.ts dosyasini otomatik olarak /sitemap.xml endpoint'ine donusturur. Manuel XML yazmaya gerek yok."
+            },
+            {
+              "order": "2.2",
+              "action": "Sitemap fonksiyonunu yaz",
+              "type": "code_write",
+              "file": "src/app/sitemap.ts",
+              "code": "import { MetadataRoute } from 'next';\nimport { getAllPosts } from '@/lib/mdx';\n\nexport default async function sitemap(): Promise<MetadataRoute.Sitemap> {\n  const posts = await getAllPosts();\n  const baseUrl = 'https://your-domain.com';\n\n  const blogPosts = posts.map((post) => ({\n    url: `${baseUrl}/blog/${post.slug}`,\n    lastModified: new Date(post.date),\n    changeFrequency: 'monthly' as const,\n    priority: 0.7,\n  }));\n\n  const staticPages = [\n    { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 1.0 },\n    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },\n    { url: `${baseUrl}/projects`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.8 },\n    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },\n    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.5 },\n  ];\n\n  return [...staticPages, ...blogPosts];\n}",
+              "why": "Sitemap arama motorlarina sitenin tum sayfalarini bildirir. priority ve changeFrequency degerlerini dogru ayarlamak, crawl onceliklendirmesi icin onemli."
+            },
+            {
+              "order": "2.3",
+              "action": "Robots.txt dosyasini olustur",
+              "type": "code_write",
+              "file": "src/app/robots.ts",
+              "code": "import { MetadataRoute } from 'next';\n\nexport default function robots(): MetadataRoute.Robots {\n  return {\n    rules: {\n      userAgent: '*',\n      allow: '/',\n      disallow: '/api/',\n    },\n    sitemap: 'https://your-domain.com/sitemap.xml',\n  };\n}",
+              "why": "robots.txt arama motorlarina hangi sayfalarin indexlenmesini kontrol eder. /api/ yolunu disallow etmek, API endpoint'lerinin indexlenmesini onler."
+            },
+            {
+              "order": "2.4",
+              "action": "Sitemap ve robots.txt'yi dogrula",
+              "type": "validate",
+              "validation": "http://localhost:3000/sitemap.xml adresinde tum sayfalar ve blog yazilari XML formatinda listelenmeli. http://localhost:3000/robots.txt duzgun formatta olmali.",
+              "why": "Sitemap ve robots.txt'nin dogru calistigini dogrulamak, SEO icin kritik."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── robots.ts          ← YENİ\n│   │   ├── sitemap.ts         ← YENİ\n│   │   ├── layout.tsx\n│   │   └── ... (diğerleri aynı)\n│   └── ...\n├── next.config.mjs\n└── package.json",
+          "common_errors": [
+            {
+              "error": "/sitemap.xml 404 donuyor",
+              "cause": "Dosya src/app/sitemap.ts yolunda degil veya fonksiyon default export degil.",
+              "fix": "Dosyanin tam olarak src/app/sitemap.ts yolunda oldugunu ve export default async function sitemap() seklinde export edildigini dogrula."
+            },
+            {
+              "error": "Sitemap'te blog yazilari gorunmuyor",
+              "cause": "getAllPosts fonksiyonu bos dizi donuyor veya import hatasi var.",
+              "fix": "content/blog/ klasorunde .mdx dosyalari oldugunu ve getAllPosts import'unun dogru oldugunu dogrula."
+            }
+          ]
         },
         {
           "step": 3,
@@ -353,7 +1340,43 @@
           "instructions": "Tüm görselleri next/image ile optimize et. Placeholder blur efekti ekle.",
           "code_snippet": "// src/components/optimized-image.tsx\nimport Image from 'next/image';\n\ninterface OptimizedImageProps {\n  src: string;\n  alt: string;\n  width: number;\n  height: number;\n  priority?: boolean;\n  className?: string;\n}\n\nexport function OptimizedImage({\n  src,\n  alt,\n  width,\n  height,\n  priority = false,\n  className,\n}: OptimizedImageProps) {\n  return (\n    <Image\n      src={src}\n      alt={alt}\n      width={width}\n      height={height}\n      priority={priority}\n      placeholder=\"blur\"\n      blurDataURL=\"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAABf/EAB8QAAICAgIDAQAAAAAAAAAAAAECAAMEIQUSEzFBUf/EABUBAQEAAAAAAAAAAAAAAAAAAAAB/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AmsRjkLJJTcmN2Y+yf0iIB//Z\"\n      className={className}\n      sizes=\"(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw\"\n    />\n  );\n}\n\n// Kullanım:\n// Hero'daki profil fotoğrafı\n<OptimizedImage\n  src=\"/images/profile.jpg\"\n  alt=\"Profil fotoğrafı\"\n  width={400}\n  height={400}\n  priority={true}\n  className=\"rounded-full\"\n/>",
           "deep_dive": "priority={true}, above-the-fold (ilk ekran) görseller için kullanılır — preload hint ekler ve lazy loading'i devre dışı bırakır. sizes attribute'u, tarayıcıya hangi breakpoint'te hangi boyutta görsel yüklemesi gerektiğini söyler. blurDataURL, görsel yüklenene kadar blurlanmış bir placeholder gösterir (Shimmer effect). Next.js otomatik olarak WebP/AVIF formatına dönüştürme yapar — orijinal dosya PNG/JPG olsa bile.",
-          "checkpoint": "DevTools Network sekmesinde görsellerin WebP formatında serve edildiği görünmeli. LCP görseli için preload tag'i HTML head'de olmalı."
+          "checkpoint": "DevTools Network sekmesinde görsellerin WebP formatında serve edildiği görünmeli. LCP görseli için preload tag'i HTML head'de olmalı.",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "OptimizedImage component'ini olustur",
+              "type": "code_write",
+              "file": "src/components/optimized-image.tsx",
+              "code": "import Image from 'next/image';\n\ninterface OptimizedImageProps {\n  src: string;\n  alt: string;\n  width: number;\n  height: number;\n  priority?: boolean;\n  className?: string;\n}\n\nexport function OptimizedImage({ src, alt, width, height, priority = false, className }: OptimizedImageProps) {\n  return (\n    <Image\n      src={src}\n      alt={alt}\n      width={width}\n      height={height}\n      priority={priority}\n      className={className}\n      sizes=\"(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw\"\n    />\n  );\n}",
+              "why": "next/image otomatik lazy loading, WebP/AVIF donusturme ve responsive srcset saglar. priority={true} above-the-fold gorseller icin preload hint ekler."
+            },
+            {
+              "order": "3.2",
+              "action": "Gorselleri public/ klasorune ekle",
+              "type": "explain",
+              "why": "Profil fotografi ve proje screenshot'larini public/images/ klasorune ekle. next/image bu dosyalari otomatik optimize eder."
+            },
+            {
+              "order": "3.3",
+              "action": "Gorsel optimizasyonunu dogrula",
+              "type": "validate",
+              "validation": "DevTools > Network sekmesinde gorsellerin WebP formatinda serve edildigini gor. LCP gorseli icin <link rel='preload'> tag'i HTML head'de olmali.",
+              "why": "Gorsel optimizasyonu, sayfa yukleme suresi ve Core Web Vitals icin kritik."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── public/\n│   ├── images/               ← YENİ\n│   │   └── profile.jpg        ← YENİ (profil fotoğrafı)\n│   ├── og-image.png\n│   └── ...\n├── src/\n│   ├── components/\n│   │   ├── optimized-image.tsx ← YENİ\n│   │   └── ... (diğerleri)\n│   └── ...\n├── next.config.mjs\n└── package.json",
+          "common_errors": [
+            {
+              "error": "Image optimization hatasi: Invalid src prop",
+              "cause": "Gorsel yolu yanlis veya dosya public/ klasorunde degil.",
+              "fix": "src='/images/profile.jpg' seklinde public/ icindeki yolu kullan. Dis URL'ler icin next.config.mjs'te images.remotePatterns tanimla."
+            },
+            {
+              "error": "LCP (Largest Contentful Paint) yuksek",
+              "cause": "Hero'daki ana gorsel icin priority={true} eklenmemis.",
+              "fix": "Sayfa yuklenmesinde ilk gorunen (above-the-fold) gorsele priority={true} prop'u ekle."
+            }
+          ]
         },
         {
           "step": 4,
@@ -362,7 +1385,45 @@
           "instructions": "Tüm sayfalarda erişilebilirlik kontrolü yap. ARIA attribute'ları, renk kontrastı ve klavye navigasyonu test et.",
           "code_snippet": "// Erişilebilirlik kontrol listesi ve düzeltmeler:\n\n// 1. Skip navigation link (keyboard kullanıcıları için)\n// src/components/skip-nav.tsx\nexport function SkipNav() {\n  return (\n    <a\n      href=\"#main-content\"\n      className=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white\"\n    >\n      İçeriğe atla\n    </a>\n  );\n}\n\n// 2. Her sayfanın main elementine id ekle\n<main id=\"main-content\">\n\n// 3. Tüm interactive elementlerde focus-visible stili\n// globals.css\n*:focus-visible {\n  outline: 2px solid theme('colors.primary.500');\n  outline-offset: 2px;\n}\n\n// 4. Form label'ları her zaman input ile ilişkili olmalı\n<label htmlFor=\"email\">E-posta</label>\n<input id=\"email\" type=\"email\" />\n\n// 5. Renk kontrastı: Minimum 4.5:1 oran (normal metin)\n// Küçük metin: text-gray-600 (dark mode: text-gray-400)\n// Kontrol: https://webaim.org/resources/contrastchecker/",
           "deep_dive": "sr-only class'ı, elementi görsel olarak gizler ama screen reader'lar tarafından okunmasını sağlar. focus:not-sr-only ile Tab tuşuna basıldığında skip link görünür hale gelir. Bu pattern, klavye kullanıcılarının her sayfa yüklenişinde tüm navigation link'lerini Tab'lamak zorunda kalmasını önler. WCAG 2.1 AA, renk kontrastı için normal metinde 4.5:1, büyük metinde 3:1 oran gerektirir.",
-          "checkpoint": "Lighthouse Accessibility skoru 95+ olmalı. Tab ile tüm interactive elementler arasında gezinebilmeli. Skip nav link'i Tab'a basınca görünmeli."
+          "checkpoint": "Lighthouse Accessibility skoru 95+ olmalı. Tab ile tüm interactive elementler arasında gezinebilmeli. Skip nav link'i Tab'a basınca görünmeli.",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "SkipNav component'ini olustur",
+              "type": "code_write",
+              "file": "src/components/skip-nav.tsx",
+              "code": "export function SkipNav() {\n  return (\n    <a\n      href=\"#main-content\"\n      className=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white\"\n    >\n      İçeriğe atla\n    </a>\n  );\n}",
+              "why": "Skip navigation link'i, klavye kullanıcılarının her sayfa yuklenisinde tum navigation link'lerini Tab'lamak zorunda kalmasini onler. WCAG zorunluluklarindan biridir."
+            },
+            {
+              "order": "4.2",
+              "action": "Layout'a SkipNav ekle ve main'e id ver",
+              "type": "code_modify",
+              "file": "src/app/layout.tsx",
+              "code": "// Import ekle:\nimport { SkipNav } from '@/components/skip-nav';\n\n// body icinde en uste ekle:\n<SkipNav />\n\n// main elementine id ekle:\n<main id=\"main-content\" className=\"min-h-screen\">{children}</main>",
+              "why": "SkipNav body'nin en ustunde olmali. main'e id='main-content' eklemek, skip link'in hedefini belirler."
+            },
+            {
+              "order": "4.3",
+              "action": "Tum sayfalarda erisilebirlik kontrolu yap",
+              "type": "validate",
+              "validation": "1) Tab tusu ile tum interactive elementler arasinda gezin. 2) Tab'a basinca skip link gorunmeli. 3) Her form input'unun label'i olmali. 4) Her buton ve link'in aria-label'i olmali. 5) Renk kontrastini https://webaim.org/resources/contrastchecker/ ile test et (minimum 4.5:1).",
+              "why": "WCAG 2.1 AA uyumu, bircok ulkede yasal zorunluluktur. Erisilebirlik ayni zamanda SEO'yu da iyilestirir."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── layout.tsx         ← GÜNCELLENDİ (SkipNav + main id)\n│   │   └── ...\n│   ├── components/\n│   │   ├── skip-nav.tsx       ← YENİ\n│   │   └── ...\n│   └── ...\n├── next.config.mjs\n└── package.json",
+          "common_errors": [
+            {
+              "error": "Skip nav link'i Tab'a basinca gorunmuyor",
+              "cause": "sr-only ve focus:not-sr-only class'lari eklenmemis veya z-index yetersiz.",
+              "fix": "SkipNav'da className'in sr-only focus:not-sr-only focus:fixed focus:z-50 icerigini dogrula."
+            },
+            {
+              "error": "Renk kontrasti WCAG AA standardını karsilamiyor",
+              "cause": "Metin rengi ve arka plan arasinda yeterli kontrast yok (minimum 4.5:1 gerekli).",
+              "fix": "text-gray-600 (dark: text-gray-400) kullan. Cok acik renklerden kacin. WebAIM kontrast checker ile test et."
+            }
+          ]
         },
         {
           "step": 5,
@@ -371,7 +1432,57 @@
           "instructions": "Chrome DevTools'ta Lighthouse audit çalıştır. Her kategoride 95+ skor hedefle. Eksikleri düzelt.",
           "code_snippet": "// next.config.mjs - performans optimizasyonları\n/** @type {import('next').NextConfig} */\nconst nextConfig = {\n  images: {\n    formats: ['image/avif', 'image/webp'],\n  },\n  optimizePackageImports: ['lucide-react'],\n  async headers() {\n    return [\n      {\n        source: '/(.*)',\n        headers: [\n          {\n            key: 'X-Content-Type-Options',\n            value: 'nosniff',\n          },\n          {\n            key: 'X-Frame-Options',\n            value: 'DENY',\n          },\n          // X-XSS-Protection kaldirildi (deprecated). Bunun yerine Content-Security-Policy kullanin.\n          {\n            key: 'Content-Security-Policy',\n            value: \"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';\",\n          },\n          {\n            key: 'Referrer-Policy',\n            value: 'origin-when-cross-origin',\n          },\n        ],\n      },\n    ];\n  },\n};\n\nexport default nextConfig;\n\n// Bundle analyzer ile kontrol (opsiyonel)\n// pnpm install @next/bundle-analyzer\n// ANALYZE=true pnpm run build",
           "deep_dive": "Security header'ları, Lighthouse Best Practices skorunu yükseltir. X-Content-Type-Options: nosniff, MIME type sniffing'i önler. X-Frame-Options: DENY, clickjacking saldırılarını engeller. Content-Security-Policy (CSP), XSS saldırılarını önler (eski X-XSS-Protection header'ı deprecated edildi). optimizePackageImports, kullanılmayan icon'ların bundle'a dahil edilmesini önler — lucide-react gibi büyük icon library'lerinde bundle size'ı dramatik şekilde azaltır.",
-          "checkpoint": "Lighthouse Performance >= 95, Accessibility >= 95, Best Practices >= 95, SEO >= 95. Core Web Vitals: LCP < 2.5s, CLS < 0.1, INP < 200ms."
+          "checkpoint": "Lighthouse Performance >= 95, Accessibility >= 95, Best Practices >= 95, SEO >= 95. Core Web Vitals: LCP < 2.5s, CLS < 0.1, INP < 200ms.",
+          "substeps": [
+            {
+              "order": "5.1",
+              "action": "next.config.mjs dosyasini guncelle",
+              "type": "file_open",
+              "file": "next.config.mjs",
+              "why": "Performans ve guvenlik optimizasyonlari Next.js konfigurasyonunda yapilir."
+            },
+            {
+              "order": "5.2",
+              "action": "Security header'lari ve performans ayarlarini ekle",
+              "type": "code_write",
+              "file": "next.config.mjs",
+              "code": "/** @type {import('next').NextConfig} */\nconst nextConfig = {\n  images: {\n    formats: ['image/avif', 'image/webp'],\n  },\n  async headers() {\n    return [\n      {\n        source: '/(.*)',\n        headers: [\n          { key: 'X-Content-Type-Options', value: 'nosniff' },\n          { key: 'X-Frame-Options', value: 'DENY' },\n          { key: 'Content-Security-Policy', value: \"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';\" },\n          { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },\n        ],\n      },\n    ];\n  },\n};\n\nexport default nextConfig;",
+              "why": "Security header'lari Lighthouse Best Practices skorunu yukseltir. CSP XSS saldirilari onler. X-Frame-Options clickjacking'i engeller. AVIF/WebP gorsel formatlari dosya boyutunu azaltir."
+            },
+            {
+              "order": "5.3",
+              "action": "Production build al ve test et",
+              "type": "terminal",
+              "command": "pnpm run build && pnpm run start",
+              "expected_output": "Route (app)   Size   First Load JS\n...\n✓ Generating static pages",
+              "why": "Lighthouse audit'i development mode'da degil, production build uzerinde yapilmali. Dev mode'da performans dusuktur."
+            },
+            {
+              "order": "5.4",
+              "action": "Lighthouse audit calistir",
+              "type": "validate",
+              "validation": "Chrome DevTools > Lighthouse sekmesini ac. 'Analyze page load' butonuna tikla. Hedefler: Performance >= 95, Accessibility >= 95, Best Practices >= 95, SEO >= 95. Dusuk skorlu alanlar icin onerileri uygula.",
+              "why": "Lighthouse skoru, projenin teknik kalitesinin objektif gostergesidir. 95+ skor, recruiterlara professional seviye isaret eder."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   └── ... (değişiklik yok)\n│   └── ...\n├── next.config.mjs            ← GÜNCELLENDİ (security headers + image formats)\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Lighthouse Performance skoru dusuk (< 90)",
+              "cause": "Buyuk JavaScript bundle, optimize edilmemis gorseller veya render-blocking kaynaklar.",
+              "fix": "1) next/image ile tum gorselleri optimize et. 2) Gereksiz client-side JavaScript'i azalt (Server Components kullan). 3) Font'larda display: 'swap' kullan."
+            },
+            {
+              "error": "CSP (Content-Security-Policy) nedeniyle stiller/scriptler calismiyor",
+              "cause": "CSP politikasi cok kısıtlayıcı.",
+              "fix": "script-src ve style-src'ye 'unsafe-inline' ekle (Next.js inline style/script kullanir). Production'da daha kısıtlayıcı CSP ile nonce-based yaklasim kullanilabilir."
+            },
+            {
+              "error": "Build hatasi: Module not found",
+              "cause": "Import'larda yanlis yol veya eksik bagimlılık.",
+              "fix": "Hata mesajindaki dosya yolunu kontrol et. Eksik paketi pnpm install ile kur."
+            }
+          ]
         }
       ],
       "must_note": "📝 MUTLAKA NOT AL:\n- Open Graph image boyutu: 1200x630px standart.\n- next/image otomatik WebP/AVIF dönüşümü yapar — orijinal format ne olursa olsun.\n- priority={true} sadece above-the-fold görseller için (LCP optimizasyonu).\n- sizes attribute'u responsive image loading için kritik — doğru tanımlanmazsa gereksiz büyük görseller yüklenir.\n- WCAG 2.1 AA: 4.5:1 kontrast oranı, skip nav, ARIA attribute'ları.\n- Security headers: nosniff, DENY, Content-Security-Policy (CSP) — Lighthouse Best Practices için şart.",
@@ -397,7 +1508,52 @@
           "instructions": "GitHub'da repository oluştur, README.md yaz ve ilk push'u yap.",
           "code_snippet": "# .gitignore kontrolü (Next.js create ile gelir ama doğrula)\nnode_modules\n.next\nout\n.env*.local\n\n# Git komutları\ngit init\ngit add .\ngit commit -m \"feat: initial portfolio setup with Next.js 16, TypeScript, Tailwind\"\n\n# GitHub'da repo oluştur ve push et\ngit remote add origin https://github.com/username/portfolio.git\ngit branch -M main\ngit push -u origin main",
           "deep_dive": "Commit message formatı Conventional Commits standardına uyar: feat: (yeni özellik), fix: (hata düzeltme), docs: (doküman), style: (formatlama), refactor: (yeniden yapılandırma). Bu format, otomatik changelog üretimi ve semantic versioning için kullanılır. .env*.local pattern'ı, tüm local environment dosyalarının Git'e eklenmesini önler — secret'lar asla repo'da olmamalıdır.",
-          "checkpoint": "GitHub'da repo public olarak görünmeli. README.md profesyonel olmalı. .env dosyaları commit edilmemiş olmalı."
+          "checkpoint": "GitHub'da repo public olarak görünmeli. README.md profesyonel olmalı. .env dosyaları commit edilmemiş olmalı.",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": ".gitignore dosyasini kontrol et",
+              "type": "file_open",
+              "file": ".gitignore",
+              "why": "Hassas dosyalarin (env, node_modules) Git'e eklenmediginden emin olmak gerekir."
+            },
+            {
+              "order": "1.2",
+              "action": "Git repository'sini baslat ve ilk commit'i yap",
+              "type": "terminal",
+              "command": "git init && git add . && git commit -m \"feat: initial portfolio setup with Next.js 16, TypeScript, Tailwind\"",
+              "expected_output": "[main (root-commit) xxxxxxx] feat: initial portfolio setup...",
+              "why": "Conventional Commits formatı: feat: yeni ozellik, fix: hata duzeltme, docs: dokuman. Bu format otomatik changelog uretimi icin standart."
+            },
+            {
+              "order": "1.3",
+              "action": "GitHub'da repo olustur ve push et",
+              "type": "terminal",
+              "command": "gh repo create portfolio-site --public --push --source=.",
+              "expected_output": "✓ Created repository username/portfolio-site on GitHub\n✓ Pushed commits to ...",
+              "why": "gh CLI ile GitHub repo'su olusturup tek komutta push edebilirsin. --public ile repo herkese acik olur (portfolio icin sart)."
+            },
+            {
+              "order": "1.4",
+              "action": "GitHub'da repo'yu dogrula",
+              "type": "validate",
+              "validation": "https://github.com/username/portfolio-site adresinde repo public olarak gorunmeli. .env dosyalari commit edilmemis olmali. Commit history temiz olmali.",
+              "why": "Hassas verilerin repo'ya eklenmedigini ve commit history'nin duzgun oldugunu dogrulamak onemli."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── .git/                      ← YENİ (Git repository)\n├── .gitignore\n├── content/\n├── public/\n├── src/\n├── next.config.mjs\n├── package.json\n├── pnpm-lock.yaml\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "gh: command not found",
+              "cause": "GitHub CLI (gh) sisteme kurulu degil.",
+              "fix": "https://cli.github.com/ adresinden gh CLI'yi kur. Ardindan gh auth login ile giris yap."
+            },
+            {
+              "error": ".env dosyasi yanlislikla commit edildi",
+              "cause": ".gitignore'da .env* pattern'i eksik.",
+              "fix": ".gitignore'a .env*.local ekle. Zaten commit edildiyse: git rm --cached .env.local && git commit -m 'fix: remove env file from tracking'"
+            }
+          ]
         },
         {
           "step": 2,
@@ -406,7 +1562,51 @@
           "instructions": "Vercel hesabı oluştur, GitHub repo'sunu bağla ve deploy et.",
           "code_snippet": "# Vercel CLI ile de deploy edilebilir\npnpm dlx vercel\n\n# İlk deploy\nvercel\n\n# Production deploy\nvercel --prod\n\n# Veya sadece GitHub'a push et - Vercel otomatik deploy eder\ngit push origin main\n\n# Environment variables (Vercel Dashboard'dan da eklenebilir)\n# vercel env add NEXT_PUBLIC_SITE_URL\n# vercel env add FORMSPREE_ID",
           "deep_dive": "Vercel, GitHub repository'sini izler ve her push'ta otomatik deploy yapar. main branch'e push = production deploy, diğer branch'ler = preview deploy. Preview deploy'lar, her PR için benzersiz URL oluşturur — code review sırasında değişiklikleri canlı olarak görmek mümkün olur. Edge network, içeriği kullanıcıya en yakın sunucudan serve eder.",
-          "checkpoint": "Vercel dashboard'da deploy başarılı olmalı. Production URL'de site düzgün görünmeli. Build loglarında hata olmamalı."
+          "checkpoint": "Vercel dashboard'da deploy başarılı olmalı. Production URL'de site düzgün görünmeli. Build loglarında hata olmamalı.",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Vercel hesabi olustur",
+              "type": "explain",
+              "why": "vercel.com adresine git ve GitHub hesabinla ucretsiz kaydol. Vercel, Next.js'in yaraticilari tarafindan gelistirildigi icin en optimize deploy deneyimini sunar."
+            },
+            {
+              "order": "2.2",
+              "action": "Vercel CLI ile deploy et",
+              "type": "terminal",
+              "command": "pnpm dlx vercel",
+              "expected_output": "Vercel CLI ... \n? Set up and deploy? [Y/n] Y\n✅ Production: https://portfolio-xxxx.vercel.app",
+              "why": "Vercel CLI ile tek komutta deploy edilir. GitHub repo'su otomatik baglanir ve her push'ta otomatik deploy baslar."
+            },
+            {
+              "order": "2.3",
+              "action": "Production deploy yap",
+              "type": "terminal",
+              "command": "vercel --prod",
+              "expected_output": "✅ Production: https://portfolio-site.vercel.app",
+              "why": "--prod flag'i production ortamina deploy eder. Bu URL canli sitenin adresidir."
+            },
+            {
+              "order": "2.4",
+              "action": "Deploy'u dogrula",
+              "type": "validate",
+              "validation": "Vercel dashboard'da deploy basarili olmali. Production URL'de site duzgun gorunmeli. Build loglarinda hata olmamali. Tum sayfalar calisiyor olmali.",
+              "why": "Production deploy sonrasi tum sayfalarin dogru calistigini dogrulamak kritik."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── .vercel/                   ← YENİ (Vercel konfigürasyon dosyaları)\n│   └── project.json\n├── .git/\n├── content/\n├── public/\n├── src/\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Build failed on Vercel",
+              "cause": "Lokal'de calisan ama production'da calismayan kodlar (genellikle environment variable eksikligi veya TypeScript strict mode hatalari).",
+              "fix": "Vercel dashboard'dan build loglarini incele. pnpm run build komutunu lokal'de calistirarak ayni hatayi yakala ve duzelt."
+            },
+            {
+              "error": "404 on deployed site",
+              "cause": "Routing veya output konfigurasyonu yanlis.",
+              "fix": "next.config.mjs'te output: 'export' kullaniyorsan kaldır (Vercel native Next.js destekler). Dosya yapisinin dogru oldugunu kontrol et."
+            }
+          ]
         },
         {
           "step": 3,
@@ -415,7 +1615,51 @@
           "instructions": "Aşağıdaki kontrol listesini madde madde doğrula. Her birini test et ve düzelt.",
           "code_snippet": "// Production Kontrol Listesi:\n\n// 1. Tüm sayfalar çalışıyor mu?\n// Ana sayfa, Hakkımda, Projeler, Blog listesi, Blog detay, İletişim\n\n// 2. Responsive kontrol\n// iPhone SE (375px), iPad (768px), Desktop (1280px) - DevTools ile test et\n\n// 3. Dark mode\n// Tüm sayfalarda dark mode düzgün görünüyor mu?\n\n// 4. SEO kontrol\n// Her sayfanın title ve description'ı var mı?\n// pnpm dlx next-sitemap (veya built-in sitemap) çalışıyor mu?\n\n// 5. Lighthouse audit\n// Performance >= 95, Accessibility >= 95, SEO >= 95, Best Practices >= 95\n\n// 6. Cross-browser test\n// Chrome, Firefox, Safari (mümkünse)\n\n// 7. 404 sayfası\n// src/app/not-found.tsx dosyası var mı?\n\n// 8. Favicon\n// public/favicon.ico ve app/favicon.ico\n\n// 9. Console hataları\n// DevTools Console'da hata var mı?\n\n// 10. Broken linkler\n// Tüm internal ve external linkler çalışıyor mu?",
           "deep_dive": "Production checklist, DevOps kültürünün temel taşıdır. Büyük şirketlerde 'deployment runbook' adı verilen detaylı kontrol listeleri vardır. Bu listeleri otomatize etmek (CI'da Lighthouse CI, broken link checker vb.) uzun vadede manual hataları önler. 404 sayfası customize edilmezse Next.js varsayılan 404 gösterir — bu, kullanıcı deneyimi açısından kötüdür.",
-          "checkpoint": "Tüm kontrol listesi maddeleri tamamlanmış olmalı. Production URL'de tüm sayfalar hatasız çalışmalı. Console'da hata olmamalı."
+          "checkpoint": "Tüm kontrol listesi maddeleri tamamlanmış olmalı. Production URL'de tüm sayfalar hatasız çalışmalı. Console'da hata olmamalı.",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "Tum sayfalari test et",
+              "type": "validate",
+              "validation": "Canli URL'den su sayfalari ac ve calistigini dogrula: Ana sayfa (/), Hakkimda (/about), Projeler (/projects), Blog (/blog), Blog detay (/blog/[slug]), Iletisim (/contact). Her sayfanin icerik ve stili duzgun olmali.",
+              "why": "Tum sayfalarin production'da calistigini tek tek dogrulamak, kacirilan hatalari yakalar."
+            },
+            {
+              "order": "3.2",
+              "action": "Responsive tasarimi test et",
+              "type": "validate",
+              "validation": "DevTools responsive mode ile su boyutlari test et: iPhone SE (375px), iPad (768px), Desktop (1280px). Her boyutta layout duzgun olmali, metin tasmamali, gorseller bozulmamali.",
+              "why": "Farkli cihaz boyutlarinda duzgun gorunum, profesyonel bir sitenin olmazsa olmazidir."
+            },
+            {
+              "order": "3.3",
+              "action": "404 sayfasi olustur",
+              "type": "code_write",
+              "file": "src/app/not-found.tsx",
+              "code": "import Link from 'next/link';\n\nexport default function NotFound() {\n  return (\n    <main className=\"mx-auto flex max-w-3xl flex-col items-center justify-center px-4 py-32 text-center\">\n      <h1 className=\"text-6xl font-bold text-gray-900 dark:text-white\">404</h1>\n      <p className=\"mt-4 text-xl text-gray-600 dark:text-gray-400\">Sayfa bulunamadı</p>\n      <Link href=\"/\" className=\"mt-8 rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700\">\n        Ana Sayfaya Dön\n      </Link>\n    </main>\n  );\n}",
+              "why": "Custom 404 sayfasi, kullanici deneyimini iyilestirir. Varsayilan Next.js 404 sayfasi profesyonel gorunmez."
+            },
+            {
+              "order": "3.4",
+              "action": "Console hatalarini kontrol et",
+              "type": "validate",
+              "validation": "DevTools > Console sekmesinde hata (kirmizi) olmamali. Warning'ler incelenmeli ve mumkunse duzeltilmeli.",
+              "why": "Console hatalari, kullanici goremese bile uygulamanin sagligini gosterir."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── not-found.tsx      ← YENİ (custom 404 sayfası)\n│   │   └── ... (diğerleri aynı)\n│   └── ...\n├── next.config.mjs\n└── package.json",
+          "common_errors": [
+            {
+              "error": "not-found.tsx calismiyor, varsayilan 404 gorunuyor",
+              "cause": "Dosya yanlis konumda (src/app/not-found.tsx olmali).",
+              "fix": "Dosyanin tam olarak src/app/not-found.tsx yolunda oldugunu ve default export oldugunu dogrula."
+            },
+            {
+              "error": "Console'da hydration mismatch uyarilari",
+              "cause": "Server ve client render sonuclari farkli (genellikle dark mode veya tarih ile ilgili).",
+              "fix": "Dinamik icerik icin (tarih, tema) mounted state kontrolu ekle veya suppressHydrationWarning kullan."
+            }
+          ]
         },
         {
           "step": 4,
@@ -424,7 +1668,52 @@
           "instructions": "Projenin GitHub README.md dosyasını profesyonel şekilde yaz.",
           "code_snippet": "# README.md yapısı:\n\n# Adın Soyadın - Portfolio & Blog\n\n## Kısa açıklama ve screenshot\n## Özellikler listesi\n## Teknoloji Stack'i (badge'ler ile)\n## Kurulum adımları\n## Proje yapısı\n## Lighthouse skorları (screenshot)\n## Deploy bilgileri\n## Lisans\n\n# Badge örnekleri:\n![Next.js](https://img.shields.io/badge/Next.js-16-black)\n![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)\n![Tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8)",
           "deep_dive": "README badge'leri, projenin teknoloji stack'ini bir bakışta gösterir. shields.io ile custom badge'ler oluşturulabilir. Lighthouse skor screenshot'ı, projenin performans kalitesini kanıtlar. Proje yapısı bölümü, code reviewer'ların projeyi hızla anlamasını sağlar. LICENSE dosyası (MIT önerilir), projenin açık kaynak olduğunu ve nasıl kullanılabileceğini belirtir.",
-          "checkpoint": "GitHub repo sayfasında README profesyonel görünmeli. Badge'ler düzgün render olmalı. Kurulum adımları ile projeyi sıfırdan klonlayıp çalıştırabilmeli."
+          "checkpoint": "GitHub repo sayfasında README profesyonel görünmeli. Badge'ler düzgün render olmalı. Kurulum adımları ile projeyi sıfırdan klonlayıp çalıştırabilmeli.",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "README.md dosyasini olustur",
+              "type": "file_open",
+              "file": "README.md",
+              "why": "README, projenin kapisidir. Recruiter'lar ve gelistiriciler once README'ye bakar. Profesyonel bir README seni diger adaylardan ayirir."
+            },
+            {
+              "order": "4.2",
+              "action": "README icerigini yaz",
+              "type": "code_write",
+              "file": "README.md",
+              "code": "# Portfolio & Blog\n\nNext.js 16, TypeScript ve Tailwind CSS ile oluşturulmuş kişisel portfolio ve MDX blog sitesi.\n\n## Özellikler\n\n- Next.js 16 App Router ile SSG\n- MDX blog sistemi\n- Dark/Light mode\n- Responsive tasarım\n- SEO optimizasyonu\n- Lighthouse 95+ skor\n- WCAG 2.1 AA uyumu\n\n## Teknoloji Stack'i\n\n![Next.js](https://img.shields.io/badge/Next.js-16-black)\n![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)\n![Tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8)\n\n## Kurulum\n\n```bash\ngit clone https://github.com/username/portfolio-site.git\ncd portfolio-site\npnpm install\npnpm run dev\n```\n\n## Lisans\n\nMIT",
+              "why": "Badge'ler teknoloji stack'ini bir bakista gosterir. Kurulum adimlari ile projeyi sifirdan klonlayip calistirilabilmeli. MIT lisansi acik kaynak standart lisansidir."
+            },
+            {
+              "order": "4.3",
+              "action": "Son commit'i yap ve push et",
+              "type": "terminal",
+              "command": "git add . && git commit -m \"docs: add professional README with badges and setup instructions\" && git push",
+              "expected_output": "[main xxxxxxx] docs: add professional README...",
+              "why": "Son degisiklikleri GitHub'a push etmek, canli repo'nun guncel olmasini saglar."
+            },
+            {
+              "order": "4.4",
+              "action": "GitHub repo sayfasini dogrula",
+              "type": "validate",
+              "validation": "GitHub repo sayfasinda README duzgun render edilmeli. Badge'ler gorunmeli. Kurulum adimlari acik olmali. Repo description ve topics eklenmis olmali.",
+              "why": "GitHub profili, dijital CV'nin onemli bir parcasidir. Temiz, profesyonel repo'lar dikkat ceker."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── content/\n│   └── blog/\n│       ├── nextjs-portfolio-rehberi.mdx\n│       └── typescript-temelleri.mdx\n├── public/\n│   ├── images/\n│   ├── og-image.png\n│   └── favicon.ico\n├── src/\n│   ├── app/\n│   │   ├── about/\n│   │   ├── blog/\n│   │   │   ├── [slug]/\n│   │   │   └── page.tsx\n│   │   ├── contact/\n│   │   ├── projects/\n│   │   ├── globals.css\n│   │   ├── layout.tsx\n│   │   ├── not-found.tsx\n│   │   ├── page.tsx\n│   │   ├── robots.ts\n│   │   └── sitemap.ts\n│   ├── components/\n│   │   ├── footer.tsx\n│   │   ├── header.tsx\n│   │   ├── mobile-nav.tsx\n│   │   ├── optimized-image.tsx\n│   │   ├── skills-section.tsx\n│   │   ├── skip-nav.tsx\n│   │   ├── theme-provider.tsx\n│   │   ├── theme-toggle.tsx\n│   │   └── timeline.tsx\n│   ├── data/\n│   │   └── projects.ts\n│   └── lib/\n│       └── mdx.ts\n├── .eslintrc.json\n├── .gitignore\n├── .prettierrc\n├── .prettierignore\n├── next.config.mjs\n├── package.json\n├── pnpm-lock.yaml\n├── README.md\n└── tsconfig.json",
+          "common_errors": [
+            {
+              "error": "Badge'ler GitHub'da gorunmuyor",
+              "cause": "Badge URL'leri yanlis veya shields.io erisilemez.",
+              "fix": "Badge URL formatini dogrula: ![Label](https://img.shields.io/badge/Label-Value-color). shields.io'nun calıstigini kontrol et."
+            },
+            {
+              "error": "git push rejected: failed to push",
+              "cause": "Remote branch ile local branch arasinda conflict var.",
+              "fix": "git pull --rebase origin main ile remote degisiklikleri cek, sonra tekrar push et."
+            }
+          ]
         }
       ],
       "must_note": "📝 MUTLAKA NOT AL:\n- Vercel deploy: GitHub'a push = otomatik deploy. Preview URL'ler her PR için oluşur.\n- Environment variables: Secret'lar ASLA Git repo'sunda olmamalı. Vercel Dashboard'dan ekle.\n- Conventional Commits: feat:, fix:, docs:, style:, refactor: — otomatik changelog için standart.\n- Production checklist: responsive, dark mode, SEO, Lighthouse, cross-browser, 404, favicon, console errors, broken links.\n- README badge'leri: shields.io ile teknoloji stack'ini görsel olarak göster.",
@@ -438,19 +1727,122 @@
         {
           "title": "Production Build",
           "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
-          "code_snippet": "pnpm build && pnpm test"
+          "code_snippet": "pnpm build && pnpm test",
+          "substeps": [
+            {
+              "order": "1.1",
+              "action": "Production build al",
+              "type": "terminal",
+              "command": "pnpm run build",
+              "expected_output": "✓ Generating static pages\n✓ Collecting build traces\nRoute (app)   Size   First Load JS",
+              "why": "Production build, tum sayfalari optimize eder ve statik HTML uretir. Build hatasi varsa deploy basarisiz olur."
+            },
+            {
+              "order": "1.2",
+              "action": "Build ciktisini ve hatalari kontrol et",
+              "type": "validate",
+              "validation": "Build loglarinda hata olmamali. Tum sayfalar icin statik HTML uretilmis olmali. Bundle size'larin makul oldugunu dogrula (First Load JS < 100KB ideal).",
+              "why": "Build asamasinda yakalanan hatalar, production'da sorun cikarabilecek problemlerin erken tespitidir."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── .next/                     ← YENİ (build çıktısı)\n│   ├── cache/\n│   ├── server/\n│   └── static/\n├── src/\n├── content/\n├── public/\n├── next.config.mjs\n└── package.json",
+          "common_errors": [
+            {
+              "error": "Build failed: Type error",
+              "cause": "TypeScript tip hatalari development'ta gorulmemis ama build sirasinda yakalaniyor.",
+              "fix": "Hata mesajindaki dosya ve satir numarasina git, tip hatasini duzelt. pnpm tsc --noEmit ile tum tip hatalarini kontrol et."
+            },
+            {
+              "error": "Build failed: Module not found",
+              "cause": "Import edilen modul kurulmamis veya dosya yolu yanlis.",
+              "fix": "Hata mesajindaki modul ismini kontrol et. pnpm install ile eksik bagimlılıkları kur."
+            }
+          ]
         },
         {
           "title": "Deploy",
-          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et"
+          "instructions": "deployment_guide bolumundeki adimlari takip et. Her servisi ayri deploy et, env var'lari kontrol et",
+          "substeps": [
+            {
+              "order": "2.1",
+              "action": "Vercel'e production deploy yap",
+              "type": "terminal",
+              "command": "git push origin main",
+              "expected_output": "GitHub push tetiklendi, Vercel otomatik deploy basladi",
+              "why": "GitHub'a push, Vercel'in otomatik deploy'unu tetikler. Her push = yeni deploy."
+            },
+            {
+              "order": "2.2",
+              "action": "Deploy durumunu kontrol et",
+              "type": "validate",
+              "validation": "Vercel dashboard'da deploy'un 'Ready' durumunda oldugunu dogrula. Production URL'de siteyi test et. Tum sayfalar ve ozellikler calisiyor olmali.",
+              "why": "Deploy sonrasi dogrulama, canli sitede sorun olmadigini garanti eder."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── (değişiklik yok — deploy sunucu tarafında gerçekleşir)\n└── Vercel dashboard'da yeni deployment görünür",
+          "common_errors": [
+            {
+              "error": "Vercel deploy basarisiz",
+              "cause": "Build hatasi veya environment variable eksikligi.",
+              "fix": "Vercel dashboard > Deployments > son deploy'un loglarini incele. Hatali satiri bul ve duzelt."
+            }
+          ]
         },
         {
           "title": "Profesyonel README",
-          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz"
+          "instructions": "portfolio_showcase.readme_must_haves listesindeki tum maddeleri iceren bir README.md yaz",
+          "substeps": [
+            {
+              "order": "3.1",
+              "action": "README'yi son haliyle guncelle",
+              "type": "code_modify",
+              "file": "README.md",
+              "code": "// Canli demo linkini, screenshot'lari ve Lighthouse skorlarini ekle.\n// portfolio_showcase.readme_must_haves listesindeki tum maddeleri icerecek sekilde README'yi guncelle.",
+              "why": "Profesyonel README, projenin ilk izlenimini belirler. Canli demo linki, screenshot'lar ve Lighthouse skorlari projenin kalitesini kanitlar."
+            },
+            {
+              "order": "3.2",
+              "action": "GitHub repo'sunu dogrula",
+              "type": "validate",
+              "validation": "README'de screenshot/GIF, canli demo linki, teknoloji badge'leri ve kurulum adimlari olmali. Repo description ve topics doldurulmus olmali.",
+              "why": "GitHub profili dijital CV'nin parcasidir. Temiz repo'lar recruiter dikkatini ceker."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── README.md                  ← GÜNCELLENDİ (screenshots + demo link)\n└── ... (diğerleri aynı)",
+          "common_errors": [
+            {
+              "error": "Screenshot'lar README'de gorunmuyor",
+              "cause": "Gorsel dosyalari repo'ya eklenmemis veya yol yanlis.",
+              "fix": "Screenshot'lari repo'nun kok dizinine veya docs/ klasorune ekle. Relative path kullan: ![Screenshot](./docs/screenshot.png)"
+            }
+          ]
         },
         {
           "title": "Demo Video (Opsiyonel)",
-          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla"
+          "instructions": "2-3 dakikalik ekran kaydi: uygulamayi goster, mimari kararlari acikla",
+          "substeps": [
+            {
+              "order": "4.1",
+              "action": "Demo video kaydi icin ekran kayit araci sec",
+              "type": "explain",
+              "why": "OBS Studio (ucretsiz), Loom veya QuickTime (Mac) ile 2-3 dakikalik ekran kaydi yap. Uygulamayi goster, mimari kararlari acikla. Video, portfolyo'ya eklenmese bile mulakat hazırlığı icin faydalidir."
+            },
+            {
+              "order": "4.2",
+              "action": "Demo videosu kaydet (opsiyonel)",
+              "type": "validate",
+              "validation": "2-3 dakikalik video: siteyi goster, responsive tasarimi goster, dark mode'u goster, blog yazilarini goster. Sesli aciklama ekle.",
+              "why": "Video demo, teknik iletisim becerisini gosterir ve recruiterlara projeyi canli olarak sunar."
+            }
+          ],
+          "folder_structure_after": "portfolio-blog/\n├── (değişiklik yok — video harici platformda barındırılır)\n└── README'ye video linki eklenebilir",
+          "common_errors": [
+            {
+              "error": "Video dosyasi cok buyuk, GitHub'a yuklenemiyor",
+              "cause": "GitHub 100MB dosya limiti var.",
+              "fix": "Videoyu YouTube veya Loom'a yukle, README'ye link olarak ekle. GitHub'a buyuk dosyalar yukleme."
+            }
+          ]
         }
       ],
       "checkpoint": "Proje canli URL'den erisilebilir, README profesyonel, screenshot'lar ekli, GitHub repo public"
