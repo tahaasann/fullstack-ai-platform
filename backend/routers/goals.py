@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from database import get_db
@@ -46,10 +46,10 @@ def get_goal_defaults(db: Session = Depends(get_db)) -> GoalDefaultsOut:
 
 @router.put("/goals/defaults", response_model=StatusResponse)
 def set_goal_defaults(
-    target_lessons: int = 3,
-    target_quizzes: int = 1,
-    target_challenges: int = 2,
-    target_time_minutes: int = 120,
+    target_lessons: int = Query(default=3, ge=0, le=100),
+    target_quizzes: int = Query(default=1, ge=0, le=100),
+    target_challenges: int = Query(default=2, ge=0, le=100),
+    target_time_minutes: int = Query(default=120, ge=0, le=1440),
     db: Session = Depends(get_db)
 ) -> StatusResponse:
     """Update default daily goal targets."""
@@ -100,10 +100,10 @@ def get_today_goal(db: Session = Depends(get_db)) -> TodayGoalOut:
 
 @router.put("/goals/today", response_model=StatusResponse)
 def update_today_goal(
-    target_lessons: int = 3,
-    target_quizzes: int = 1,
-    target_challenges: int = 2,
-    target_time_minutes: int = 120,
+    target_lessons: int = Query(default=3, ge=0, le=100),
+    target_quizzes: int = Query(default=1, ge=0, le=100),
+    target_challenges: int = Query(default=2, ge=0, le=100),
+    target_time_minutes: int = Query(default=120, ge=0, le=1440),
     db: Session = Depends(get_db)
 ) -> StatusResponse:
     """Update today's goal targets."""
@@ -125,13 +125,15 @@ def get_suggestions(db: Session = Depends(get_db)) -> list[GoalSuggestionOut]:
     """Get smart action suggestions based on progress."""
     suggestions = []
 
-    # 1. Next incomplete lesson
+    # 1. Next incomplete lesson - batch fetch all completed lesson IDs
+    completed_lesson_ids = set(lp.lesson_id for lp in
+        db.query(LessonProgress).filter(LessonProgress.status == "completed").all())
+
     all_lessons = db.query(Lesson).join(Module).join(Phase).order_by(
         Phase.order_index, Module.order_index, Lesson.order_index
     ).all()
     for lesson in all_lessons:
-        prog = db.query(LessonProgress).filter(LessonProgress.lesson_id == lesson.id).first()
-        if not prog or prog.status != "completed":
+        if lesson.id not in completed_lesson_ids:
             suggestions.append(GoalSuggestionOut(
                 type="lesson",
                 title=lesson.title,
@@ -142,8 +144,9 @@ def get_suggestions(db: Session = Depends(get_db)) -> list[GoalSuggestionOut]:
             break
 
     # 2. In-progress lessons (started but not completed)
-    in_progress = db.query(LessonProgress).filter(LessonProgress.status == "in_progress").all()
-    for prog in in_progress[:1]:
+    in_progress = db.query(LessonProgress).filter(LessonProgress.status == "in_progress").limit(1).all()
+    if in_progress:
+        prog = in_progress[0]
         lesson = db.query(Lesson).filter(Lesson.id == prog.lesson_id).first()
         if lesson:
             suggestions.append(GoalSuggestionOut(

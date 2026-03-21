@@ -37,12 +37,13 @@ export default function BookmarkButton({ itemType, itemId }: Props) {
   return (
     <button
       onClick={toggle}
-      className={`p-1.5 rounded-lg transition-colors ${
+      className={`p-1.5 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none ${
         bookmarked
           ? 'text-yellow-400 hover:text-yellow-300'
-          : 'text-gray-500 hover:text-gray-300'
+          : 'text-gray-400 hover:text-gray-300'
       }`}
       title={bookmarked ? 'Yer imini kaldir' : 'Yer imine ekle'}
+      aria-label={bookmarked ? 'Yer imini kaldır' : 'Yer imi ekle'}
     >
       {bookmarked ? <HiBookmark className="w-5 h-5" /> : <HiOutlineBookmark className="w-5 h-5" />}
     </button>

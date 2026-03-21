@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Lesson, Challenge, Project, EnglishVocabulary
@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get("/search", response_model=SearchResults)
-def search(q: str, db: Session = Depends(get_db)) -> SearchResults:
+def search(q: str = Query(min_length=2, max_length=200), db: Session = Depends(get_db)) -> SearchResults:
     """Search across lessons, challenges, projects, and vocabulary."""
     if len(q) < 2:
         return SearchResults()

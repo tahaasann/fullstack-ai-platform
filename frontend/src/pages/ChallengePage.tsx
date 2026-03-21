@@ -106,13 +106,13 @@ export default function ChallengePage() {
             {/* Test Cases */}
             {challengeWithTestCases.test_cases?.filter((t: ChallengeTestCase) => t.visible !== false).map((tc: ChallengeTestCase, i: number) => (
               <div key={i} className="bg-gray-950 rounded-lg p-3 mb-2">
-                <div className="text-xs text-gray-500 mb-1">Test {i + 1}</div>
+                <div className="text-xs text-gray-400 mb-1">Test {i + 1}</div>
                 <div className="font-mono text-sm">
-                  <span className="text-gray-500">Input: </span>
+                  <span className="text-gray-400">Input: </span>
                   <span className="text-blue-300">{JSON.stringify(tc.input)}</span>
                 </div>
                 <div className="font-mono text-sm">
-                  <span className="text-gray-500">Expected: </span>
+                  <span className="text-gray-400">Expected: </span>
                   <span className="text-green-300">{JSON.stringify(tc.expected)}</span>
                 </div>
               </div>
@@ -224,7 +224,7 @@ export default function ChallengePage() {
                       <span>{r.passed ? '✓' : '✗'}</span>
                       <span className="font-mono">
                         Input: {JSON.stringify(r.input)} → {JSON.stringify(r.actual)}
-                        {!r.passed && <span className="text-gray-500"> (beklenen: {JSON.stringify(r.expected)})</span>}
+                        {!r.passed && <span className="text-gray-400"> (beklenen: {JSON.stringify(r.expected)})</span>}
                       </span>
                     </div>
                   ))}

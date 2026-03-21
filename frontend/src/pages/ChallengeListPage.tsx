@@ -63,18 +63,18 @@ export default function ChallengeListPage() {
             <div className="flex items-center gap-4">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
                 ch.solved ? 'bg-green-600 text-white' :
-                'bg-gray-800 text-gray-500'
+                'bg-gray-800 text-gray-400'
               }`}>
                 {ch.solved ? '✓' : '?'}
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-200">{ch.title}</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{(ch as Challenge & { module_title?: string }).module_title}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{(ch as Challenge & { module_title?: string }).module_title}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               {ch.tags?.map((tag: string) => (
-                <span key={tag} className="px-2 py-0.5 bg-gray-800 text-gray-500 rounded text-xs">{tag}</span>
+                <span key={tag} className="px-2 py-0.5 bg-gray-800 text-gray-400 rounded text-xs">{tag}</span>
               ))}
               <span className={`text-xs font-medium ${diffColors[ch.difficulty] || 'text-gray-400'}`}>
                 {diffLabels[ch.difficulty] || ch.difficulty}
@@ -83,7 +83,7 @@ export default function ChallengeListPage() {
           </Link>
         ))}
         {challenges.length === 0 && (
-          <p className="text-gray-500 text-sm text-center py-8">Henüz challenge eklenmedi.</p>
+          <p className="text-gray-400 text-sm text-center py-8">Henüz challenge eklenmedi.</p>
         )}
       </div>
     </div>

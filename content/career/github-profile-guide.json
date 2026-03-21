@@ -45,13 +45,41 @@
   "pinned_repos_strategy": {
     "description": "GitHub profilinde 6 repo pinleyebilirsin. En etkileyici projeleri pinle.",
     "recommended_order": [
-      {"priority": 1, "repo": "ml-pipeline-model-serving", "reason": "En etkileyici MLOps projesi — AI Engineer rolü için güçlü"},
-      {"priority": 1, "repo": "ai-code-review-tool", "reason": "Capstone proje — tüm becerileri gösterir (ikisinden birini seç)"},
-      {"priority": 2, "repo": "rag-document-qa-system", "reason": "RAG + Vector DB — AI trendinin merkezinde"},
-      {"priority": 3, "repo": "multi-agent-support-system", "reason": "Multi-agent AI — cutting edge"},
-      {"priority": 4, "repo": "ai-content-platform-llm", "reason": "LLM integration + fine-tuning"},
-      {"priority": 5, "repo": "analytics-dashboard-ai", "reason": "Full stack + data visualization"},
-      {"priority": 6, "repo": "personal-portfolio-nextjs", "reason": "Kişisel marka — profesyonellik göstergesi"}
+      {
+        "priority": 1,
+        "repo": "ml-pipeline-model-serving",
+        "reason": "En etkileyici MLOps projesi — AI Engineer rolü için güçlü"
+      },
+      {
+        "priority": 1,
+        "repo": "ai-code-review-tool",
+        "reason": "Capstone proje — tüm becerileri gösterir (ikisinden birini seç)"
+      },
+      {
+        "priority": 2,
+        "repo": "rag-document-qa-system",
+        "reason": "RAG + Vector DB — AI trendinin merkezinde"
+      },
+      {
+        "priority": 3,
+        "repo": "multi-agent-support-system",
+        "reason": "Multi-agent AI — cutting edge"
+      },
+      {
+        "priority": 4,
+        "repo": "ai-content-platform-llm",
+        "reason": "LLM integration + fine-tuning"
+      },
+      {
+        "priority": 5,
+        "repo": "analytics-dashboard-ai",
+        "reason": "Full stack + data visualization"
+      },
+      {
+        "priority": 6,
+        "repo": "personal-portfolio-nextjs",
+        "reason": "Kişisel marka — profesyonellik göstergesi"
+      }
     ],
     "tips": [
       "AI Engineer pozisyonuna başvuruyorsan: Proje 9, 10, 7, 8 pinle",

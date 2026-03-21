@@ -17,9 +17,9 @@ interface JobApplication {
 }
 
 const COLUMNS: { key: JobApplication['status']; label: string; color: string }[] = [
-  { key: 'research', label: 'Arastirma', color: 'border-gray-500/30' },
-  { key: 'applied', label: 'Basvuruldu', color: 'border-blue-500/30' },
-  { key: 'interview', label: 'Mulakat', color: 'border-yellow-500/30' },
+  { key: 'research', label: 'Araştırma', color: 'border-gray-500/30' },
+  { key: 'applied', label: 'Başvuruldu', color: 'border-blue-500/30' },
+  { key: 'interview', label: 'Mülakat', color: 'border-yellow-500/30' },
   { key: 'offer', label: 'Teklif', color: 'border-green-500/30' },
   { key: 'rejected', label: 'Red', color: 'border-red-500/30' },
 ];
@@ -74,21 +74,21 @@ export default function JobTrackerPage() {
     <div className="max-w-full mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Is Basvuru Takibi</h1>
-          <p className="text-gray-400 text-sm mt-1">Basvurularini takip et, sureci yonet</p>
+          <h1 className="text-2xl font-bold text-white">İş Başvuru Takibi</h1>
+          <p className="text-gray-400 text-sm mt-1">Başvurularını takip et, süreci yönet</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={exportJSON}
             className="flex items-center gap-1 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors"
           >
-            <HiOutlineDownload className="w-4 h-4" /> JSON Indir
+            <HiOutlineDownload className="w-4 h-4" /> JSON İndir
           </button>
           <button
             onClick={() => { setEditingJob(null); setModalOpen(true); }}
             className="flex items-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
           >
-            <HiOutlinePlus className="w-4 h-4" /> Yeni Basvuru
+            <HiOutlinePlus className="w-4 h-4" /> Yeni Başvuru
           </button>
         </div>
       </div>
@@ -96,9 +96,9 @@ export default function JobTrackerPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatBox label="Toplam" value={total} color="text-white" />
-        <StatBox label="Basvuruldu" value={applied} color="text-blue-400" />
-        <StatBox label="Mulakat" value={interviews} color="text-yellow-400" />
-        <StatBox label="Yanit Orani" value={`%${responseRate}`} color="text-green-400" />
+        <StatBox label="Başvuruldu" value={applied} color="text-blue-400" />
+        <StatBox label="Mülakat" value={interviews} color="text-yellow-400" />
+        <StatBox label="Yanıt Oranı" value={`%${responseRate}`} color="text-green-400" />
       </div>
 
       {/* Kanban */}
@@ -117,19 +117,19 @@ export default function JobTrackerPage() {
                     <div className="flex items-start justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-white truncate">{job.company}</p>
-                        <p className="text-xs text-gray-500 truncate">{job.position}</p>
+                        <p className="text-xs text-gray-400 truncate">{job.position}</p>
                       </div>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => { setEditingJob(job); setModalOpen(true); }} className="text-gray-500 hover:text-white p-0.5">
+                        <button onClick={() => { setEditingJob(job); setModalOpen(true); }} className="text-gray-400 hover:text-white p-0.5">
                           <HiOutlinePencil className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => deleteJob(job.id)} className="text-gray-500 hover:text-red-400 p-0.5">
+                        <button onClick={() => deleteJob(job.id)} className="text-gray-400 hover:text-red-400 p-0.5">
                           <HiOutlineTrash className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
                     {job.dateApplied && <p className="text-xs text-gray-600 mt-1">{job.dateApplied}</p>}
-                    {job.notes && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{job.notes}</p>}
+                    {job.notes && <p className="text-xs text-gray-400 mt-1 line-clamp-2">{job.notes}</p>}
                     {/* Status change dropdown */}
                     <select
                       value={job.status}
@@ -170,7 +170,7 @@ export default function JobTrackerPage() {
 function StatBox({ label, value, color }: { label: string; value: number | string; color: string }) {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-      <div className="text-xs text-gray-500 uppercase">{label}</div>
+      <div className="text-xs text-gray-400 uppercase">{label}</div>
       <div className={`text-2xl font-bold ${color} mt-1`}>{value}</div>
     </div>
   );
@@ -199,11 +199,11 @@ function JobFormModal({ job, onSave, onClose }: {
       <div className="fixed inset-0 bg-black/60" />
       <div className="relative bg-gray-900 border border-gray-700 rounded-xl w-full max-w-md p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">{job ? 'Basvuru Duzenle' : 'Yeni Basvuru'}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-white"><HiOutlineX className="w-5 h-5" /></button>
+          <h2 className="text-lg font-bold text-white">{job ? 'Başvuru Düzenle' : 'Yeni Başvuru'}</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white"><HiOutlineX className="w-5 h-5" /></button>
         </div>
 
-        <Field label="Sirket" value={form.company} onChange={(v) => set('company', v)} required />
+        <Field label="Şirket" value={form.company} onChange={(v) => set('company', v)} required />
         <Field label="Pozisyon" value={form.position} onChange={(v) => set('position', v)} required />
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -216,10 +216,10 @@ function JobFormModal({ job, onSave, onClose }: {
               {COLUMNS.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
             </select>
           </div>
-          <Field label="Basvuru Tarihi" value={form.dateApplied} onChange={(v) => set('dateApplied', v)} type="date" />
+          <Field label="Başvuru Tarihi" value={form.dateApplied} onChange={(v) => set('dateApplied', v)} type="date" />
         </div>
         <Field label="CV Versiyonu" value={form.cvVersion} onChange={(v) => set('cvVersion', v)} placeholder="Full Stack v2" />
-        <Field label="Ilan Linki" value={form.link} onChange={(v) => set('link', v)} placeholder="https://..." />
+        <Field label="İlan Linki" value={form.link} onChange={(v) => set('link', v)} placeholder="https://..." />
         <Field label="Follow-up Tarihi" value={form.followUpDate} onChange={(v) => set('followUpDate', v)} type="date" />
         <div>
           <label className="block text-xs text-gray-400 mb-1">Notlar</label>
@@ -235,7 +235,7 @@ function JobFormModal({ job, onSave, onClose }: {
           onClick={() => { if (form.company && form.position) onSave(form); }}
           className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
         >
-          {job ? 'Guncelle' : 'Ekle'}
+          {job ? 'Güncelle' : 'Ekle'}
         </button>
       </div>
     </div>

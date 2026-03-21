@@ -30,7 +30,7 @@ export default function QuizPage() {
       const res = await submitQuiz(quizId, formattedAnswers, 0);
       setResult(res);
     } catch (err) {
-      toast.error('Quiz gonderilemedi. Tekrar deneyin.');
+      toast.error('Quiz gönderilemedi. Tekrar deneyin.');
     }
   };
 
@@ -67,7 +67,7 @@ export default function QuizPage() {
       {/* Question */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-gray-500">Soru {currentQ + 1} / {total}</span>
+          <span className="text-sm text-gray-400">Soru {currentQ + 1} / {total}</span>
           <span className="text-xs px-2 py-1 bg-gray-800 text-gray-400 rounded">{q.type}</span>
         </div>
 
@@ -81,14 +81,14 @@ export default function QuizPage() {
         <button
           onClick={() => setCurrentQ(Math.max(0, currentQ - 1))}
           disabled={currentQ === 0}
-          className="px-4 py-2 text-sm text-gray-400 hover:text-white disabled:opacity-30 transition-colors"
+          className="px-4 py-2 text-sm text-gray-400 hover:text-white disabled:opacity-30 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-lg"
         >
           ← Önceki
         </button>
         {currentQ < total - 1 ? (
           <button
             onClick={() => setCurrentQ(currentQ + 1)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
             Sonraki →
           </button>
@@ -96,7 +96,7 @@ export default function QuizPage() {
           <button
             onClick={handleSubmit}
             disabled={Object.keys(answers).length < total}
-            className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
+            className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
             Teslim Et
           </button>
@@ -119,11 +119,11 @@ function QuestionInput({ question, index, value, onChange }: {
               <button
                 key={i}
                 onClick={() => onChange(index, letter)}
-                className={`w-full text-left p-4 rounded-lg border transition-colors ${
+                className={`w-full text-left p-4 rounded-lg border transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none ${
                   value === letter ? 'border-blue-500 bg-blue-900/20' : 'border-gray-700 hover:border-gray-600'
                 }`}
               >
-                <span className="font-mono text-gray-500 mr-3">{letter}.</span>
+                <span className="font-mono text-gray-400 mr-3">{letter}.</span>
                 <span className="text-gray-300">{opt}</span>
               </button>
             );
@@ -138,7 +138,7 @@ function QuestionInput({ question, index, value, onChange }: {
             <button
               key={v}
               onClick={() => onChange(index, v)}
-              className={`flex-1 p-4 rounded-lg border text-center font-medium transition-colors ${
+              className={`flex-1 p-4 rounded-lg border text-center font-medium transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none ${
                 value === v ? 'border-blue-500 bg-blue-900/20 text-blue-400' : 'border-gray-700 hover:border-gray-600 text-gray-400'
               }`}
             >
@@ -188,7 +188,7 @@ function QuestionInput({ question, index, value, onChange }: {
       return <OrderSteps items={(question as QuizQuestion & { items?: string[] }).items || []} value={value as string[] | undefined} onChange={(v: string[]) => onChange(index, v)} />;
 
     default:
-      return <p className="text-gray-500">Bilinmeyen soru tipi: {question.type}</p>;
+      return <p className="text-gray-400">Bilinmeyen soru tipi: {question.type}</p>;
   }
 }
 
@@ -213,14 +213,14 @@ function OrderSteps({ items, value, onChange }: { items: string[]; value: string
 
   return (
     <div className="space-y-2">
-      <p className="text-sm text-gray-500 mb-3">Adımları doğru sıraya koyun (yukarı/aşağı butonlarını kullanın):</p>
+      <p className="text-sm text-gray-400 mb-3">Adımları doğru sıraya koyun (yukarı/aşağı butonlarını kullanın):</p>
       {order.map((item, i) => (
         <div key={item} className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
-          <span className="text-gray-500 font-mono text-sm w-6">{i + 1}.</span>
+          <span className="text-gray-400 font-mono text-sm w-6">{i + 1}.</span>
           <span className="flex-1 text-gray-300 text-sm">{item}</span>
           <div className="flex flex-col gap-1">
-            <button onClick={() => moveUp(i)} className="text-gray-500 hover:text-white text-xs px-1">▲</button>
-            <button onClick={() => moveDown(i)} className="text-gray-500 hover:text-white text-xs px-1">▼</button>
+            <button onClick={() => moveUp(i)} className="text-gray-400 hover:text-white text-xs px-1 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded" aria-label={`${i + 1}. adımı yukarı taşı`}>▲</button>
+            <button onClick={() => moveDown(i)} className="text-gray-400 hover:text-white text-xs px-1 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded" aria-label={`${i + 1}. adımı aşağı taşı`}>▼</button>
           </div>
         </div>
       ))}
@@ -260,7 +260,7 @@ function QuizResultView({ quiz, result, answers }: { quiz: Quiz; result: QuizRes
               <div className="flex-1">
                 <p className="text-gray-200 font-medium">{quiz.questions[i]?.question}</p>
                 <div className="mt-2 text-sm">
-                  <p className="text-gray-500">Sizin cevabınız: <span className="text-gray-300">{String(answers[i])}</span></p>
+                  <p className="text-gray-400">Sizin cevabınız: <span className="text-gray-300">{String(answers[i])}</span></p>
                   {!detail.correct && detail.correct_answer && (
                     <p className="text-green-400 mt-1">Doğru cevap: {detail.correct_answer}</p>
                   )}

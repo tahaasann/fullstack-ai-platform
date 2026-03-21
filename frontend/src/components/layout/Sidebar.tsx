@@ -24,20 +24,20 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    title: 'Ana Menu',
+    title: 'Ana Menü',
     items: [
       { to: '/', icon: HiOutlineHome, label: 'Dashboard' },
-      { to: '/modules', icon: HiOutlineBookOpen, label: 'Moduller' },
+      { to: '/modules', icon: HiOutlineBookOpen, label: 'Modüller' },
       { to: '/challenges', icon: HiOutlineCode, label: 'Challenges' },
       { to: '/projects', icon: HiOutlineBriefcase, label: 'Projeler' },
     ],
   },
   {
-    title: 'Ilerleme',
+    title: 'İlerleme',
     items: [
-      { to: '/progress', icon: HiOutlineChartBar, label: 'Ilerleme' },
-      { to: '/english', icon: HiOutlineGlobeAlt, label: 'Ingilizce' },
-      { to: '/bookmarks', icon: HiOutlineBookmark, label: 'Yer Imleri' },
+      { to: '/progress', icon: HiOutlineChartBar, label: 'İlerleme' },
+      { to: '/english', icon: HiOutlineGlobeAlt, label: 'İngilizce' },
+      { to: '/bookmarks', icon: HiOutlineBookmark, label: 'Yer İmleri' },
     ],
   },
   {
@@ -45,18 +45,18 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/cv-guide', icon: HiOutlineDocumentText, label: 'CV & GitHub' },
       { to: '/linkedin-guide', icon: HiOutlineSearch, label: 'LinkedIn Rehberi' },
-      { to: '/job-tracker', icon: HiOutlineClipboardList, label: 'Is Takip' },
-      { to: '/cv-templates', icon: HiOutlineTemplate, label: 'CV Sablonlari' },
-      { to: '/job-search-strategy', icon: HiOutlineSearch, label: 'Is Arama' },
-      { to: '/employment-gap-guide', icon: HiOutlineLightBulb, label: 'Bosluk Rehberi' },
+      { to: '/job-tracker', icon: HiOutlineClipboardList, label: 'İş Takip' },
+      { to: '/cv-templates', icon: HiOutlineTemplate, label: 'CV Şablonları' },
+      { to: '/job-search-strategy', icon: HiOutlineSearch, label: 'İş Arama' },
+      { to: '/employment-gap-guide', icon: HiOutlineLightBulb, label: 'Boşluk Rehberi' },
     ],
   },
   {
-    title: 'Araclar',
+    title: 'Araçlar',
     items: [
-      { to: '/ai-tools', icon: HiOutlineLightningBolt, label: 'AI Araclari' },
+      { to: '/ai-tools', icon: HiOutlineLightningBolt, label: 'AI Araçları' },
       { to: '/resources', icon: HiOutlineCollection, label: 'Kaynaklar' },
-      { to: '/roadmap', icon: HiOutlineMap, label: 'Yol Haritasi' },
+      { to: '/roadmap', icon: HiOutlineMap, label: 'Yol Haritası' },
     ],
   },
 ];
@@ -102,17 +102,18 @@ export default function Sidebar() {
           {/* Close button on mobile */}
           <button
             onClick={() => setSidebarOpen(false)}
-            className="text-gray-400 hover:text-white p-1 md:hidden"
+            className="text-gray-400 hover:text-white p-1 md:hidden focus:ring-2 focus:ring-blue-500 focus:outline-none rounded"
+            aria-label="Menüyü kapat"
           >
             <HiOutlineX className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-xs text-gray-500 px-4 pb-2">AI-Capable Full Stack</p>
+        <p className="text-xs text-gray-400 px-4 pb-2">AI-Capable Full Stack</p>
 
-        <nav className="flex-1 p-3 space-y-4">
+        <nav className="flex-1 p-3 space-y-4" role="navigation" aria-label="Ana navigasyon">
           {navGroups.map((group) => (
             <div key={group.title}>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 px-3">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 px-3">
                 {group.title}
               </h3>
               <div className="space-y-0.5">
@@ -121,7 +122,7 @@ export default function Sidebar() {
                     key={to}
                     to={to}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                      `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none ${
                         isActive
                           ? 'bg-blue-600/20 text-blue-400'
                           : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
@@ -138,7 +139,7 @@ export default function Sidebar() {
         </nav>
 
         <div className="p-3 border-t border-gray-800">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">
             Fazlar
           </h3>
           <div className="space-y-1">

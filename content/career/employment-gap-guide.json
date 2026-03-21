@@ -1,95 +1,95 @@
 {
   "id": "employment-gap-guide",
-  "title": "Istihdam Boslugu Rehberi",
-  "description": "3.5 yillik istihdam boslugunu avantaja cevirme rehberi. CV'de, mulakatta ve LinkedIn'de boslugu nasil yonetecegini, portfolyo ile nasil kanitlayacagini ogren.",
+  "title": "Istihdam Boşluğu Rehberi",
+  "description": "3.5 yıllık istihdam boşluğunu avantaja çevirme rehberi. CV'de, mülakatta ve LinkedIn'de boşluğu nasil yonetecegini, portfolyo ile nasil kanıtlayacağını öğren.",
   "sections": [
     {
-      "id": "boslugu-avantaja-cevirme",
-      "title": "Boslugu Avantaja Cevirme",
+      "id": "boşluğu-avantaja-çevirme",
+      "title": "Boşluğu Avantaja Çevirme",
       "icon": "🔄",
-      "content": "3.5 yillik bosluk bir zayiflik degil — stratejik bir karar. Cogu insan mezun olunca ilk buldugu ise girer, 2 yil CRUD yapar, hicbir sey ogrenmez. Sen ise bu sureyi 10+ production-ready proje gelistirmeye, modern teknolojileri derinlemesine ogrenmege ve senior muhendis gibi dusunmeyi ogrenmeye harcadin. Anlatim seklini degistir: 'issiz kaldim' degil, 'yatirim yaptim'.",
+      "content": "3.5 yıllık boşluk bir zayıflık değil — stratejik bir karar. Çoğu insan mezun olunca ilk buldugu işe girer, 2 yıl CRUD yapar, hicbir sey öğrenmez. Sen işe bu süreyi 10+ production-ready proje geliştirmeye, modern teknolojileri derinlemesine öğrenmeye ve senior mühendis gibi düşünmeyi öğrenmeye harcadin. Anlatım seklini değiştir: 'işsiz kaldım' değil, 'yatirim yaptim'.",
       "tips": [
-        "Boslugu ASLA 'issizlik' olarak tanimlama — 'intensive self-directed learning period' de",
-        "Karsilastirma yap: 'Bazi insanlar 3 yil sirketlerde CRUD yapar. Ben 3 yilda 10 farkli teknoloji, 10 farkli problem tipi ile calistim'",
-        "Projelerin siradan 'tutorial projesi' olmadigini vurgula: gerçek problemler, gerçek kullanicilar, gerçek deployment",
-        "Ogrenme hizini goster: 'Her 2-3 ayda yeni bir proje, yeni teknolojiler, artan karmasiklik'",
-        "Mental gucunu vurgula: '3.5 yil boyunca motivasyonumu kaybetmeden, surekli kendimi gelistirdim — bu dayaniklilik gosterir'",
-        "Framework degistir: 'Ben junior degilim. Junior 6 aydır CRUD yapiyor. Ben 3.5 yildir mimari kararlar veriyor, trade-off analizi yapiyor, production-ready sistemler kuruyor.'"
+        "Boşluğu ASLA 'işsizlik' olarak tanımlama — 'intensive self-directed learning period' de",
+        "Karşılaştırma yap: 'Bazi insanlar 3 yıl sirketlerde CRUD yapar. Ben 3 yılda 10 farklı teknoloji, 10 farklı problem tipi ile çalıştım'",
+        "Projelerin sıradan 'tutorial projesi' olmadigini vurgula: gerçek problemler, gerçek kullanıcılar, gerçek deployment",
+        "Öğrenme hızını göster: 'Her 2-3 ayda yeni bir proje, yeni teknolojiler, artan karmaşıklık'",
+        "Mental gücünü vurgula: '3.5 yıl boyunca motivasyonumu kaybetmeden, sürekli kendimi geliştirdim — bu dayanıklılık gösterir'",
+        "Framework değiştir: 'Ben junior degilim. Junior 6 aydır CRUD yapıyor. Ben 3.5 yıldır mimari kararlar veriyor, trade-off analizi yapıyor, production-ready sistemler kuruyor.'"
       ],
       "examples": [
         {
-          "label": "Zihinsel cerceve degisimi",
-          "template": "ESKI CERCEVE (zayiflik):\n'Mezun oldum ama is bulamadim. 3.5 yildir basvuruyorum ama olmadi. Deneyimim yok.'\n\nYENI CERCEVE (guc):\n'Mezuniyet sonrasi bilinçli bir karar verdim: piyasadaki ilk mediocre teklifi kabul etmek yerine, modern yazilim muhendisligini derinlemesine ogrenmek icin yogun bir ogrenim donemi gecirdim. Bu sure icinde 10+ production-ready proje gelistirdim, full-stack development'tan AI muhendisligine kadar genis bir yelpazede deneyim kazandim ve senior-level muhendislik pratiklerini (CI/CD, test-driven development, clean architecture) uyguladim.'\n\nNEDEN ISCILER:\n- Bilinçli karar vurgusu — kurban degil, stratejist\n- Somut sonuclar — laf degil, kanit\n- Genis yelpaze — tek trick pony degil\n- Senior pratikler — junior gibi dusunmuyor"
+          "label": "Zihinsel çerçeve değişimi",
+          "template": "ESKI ÇERÇEVE (zayıflık):\n'Mezun oldum ama is bulamadim. 3.5 yıldır başvuruyorum ama olmadi. Deneyimim yok.'\n\nYENI ÇERÇEVE (güç):\n'Mezuniyet sonrasi bilinçli bir karar verdim: piyasadaki ilk mediocre teklifi kabul etmek yerine, modern yazılım mühendisliğini derinlemesine öğrenmek için yogun bir öğrenim dönemi gecirdim. Bu süre içinde 10+ production-ready proje geliştirdim, full-stack development'tan AI mühendisliğine kadar geniş bir yelpazede deneyim kazandim ve senior-level mühendislik pratiklerini (CI/CD, test-driven development, clean architecture) uyguladim.'\n\nNEDEN ISCILER:\n- Bilinçli karar vurgusu — kurban değil, stratejist\n- Somut sonuçlar — laf değil, kanıt\n- Geniş yelpaze — tek trick pony değil\n- Senior pratikler — junior gibi düşünmüyor"
         },
         {
-          "label": "Karsilastirma argumani",
-          "template": "Mulakatta kullanilabilecek karsilastirma:\n\n'Tipik bir junior developer'in 3 yillik is deneyimine bakalim:\n- 1 sirket, 1 proje, 1 tech stack\n- Genellikle legacy kod uzerinde kucuk degisiklikler\n- Mimari kararlar baskasi tarafindan verilmis\n- Tek bir domain bilgisi\n\nBenim 3.5 yillik bagimisiz calisma donemim:\n- 10+ farkli proje, 10+ farkli teknoloji\n- Her projede mimari kararlari ben verdim\n- Frontend'den backend'e, AI'dan DevOps'a genis deneyim\n- Her projeyi sifirdan tasarladim, gelistirdim ve deploy ettim\n\nHangisi daha kapsamli bir ogrenme deneyimi?'"
+          "label": "Karşılaştırma argümanı",
+          "template": "Mülakatta kullanılabilecek karşılaştırma:\n\n'Tipik bir junior developer'in 3 yıllık is deneyimine bakalim:\n- 1 sirket, 1 proje, 1 tech stack\n- Genellikle legacy kod üzerinde küçük değişiklikler\n- Mimari kararlar başkası tarafindan verilmis\n- Tek bir domain bilgisi\n\nBenim 3.5 yıllık bagimisiz çalışma dönemim:\n- 10+ farklı proje, 10+ farklı teknoloji\n- Her projede mimari kararlari ben verdim\n- Frontend'den backend'e, AI'dan DevOps'a geniş deneyim\n- Her projeyi sifirdan tasarladim, geliştirdim ve deploy ettim\n\nHangisi daha kapsamli bir öğrenme deneyimi?'"
         }
       ],
       "checklist": [
-        "'Issizlik' ifadesi hicbir belgede/konusmada gecmiyor",
+        "'Işsizlik' ifadesi hicbir belgede/konusmada geçmiyor",
         "'Self-directed learning period' narratifi hazirlandi",
-        "Somut proje listesi ve basarilar hazirlandi",
-        "Karsilastirma argumani prova edildi",
-        "Mental cerceve degisimi icsellestirildi"
+        "Somut proje listesi ve başarılar hazirlandi",
+        "Karşılaştırma argümanı prova edildi",
+        "Mental çerçeve değişimi icsellestirildi"
       ]
     },
     {
-      "id": "cvde-nasil-gosterilir",
-      "title": "CV'de Nasil Gosterilir",
+      "id": "cvde-nasil-gösterilir",
+      "title": "CV'de Nasil Gösterilir",
       "icon": "📄",
-      "content": "CV'de bosluk gorunnce recruiter'in ilk dusuncesi: 'Bu adam 3.5 yil ne yapti?' Cevabi CV'nin kendisi vermeli — recruiter sormak zorunda kalmamali. Dogru formatlama ile bosluk gorunmez olur ve yerini surekli calisma izlenimi alir.",
+      "content": "CV'de boşluk gorunnce recruiter'in ilk düşüncesi: 'Bu adam 3.5 yıl ne yapti?' Cevabi CV'nin kendisi vermeli — recruiter sormak zorunda kalmamali. Doğru formatlama ile boşluk gorunmez olur ve yerini sürekli çalışma izlenimi alir.",
       "tips": [
-        "Mezuniyet ile su an arasini 'Independent Software Engineer' olarak goster",
+        "Mezuniyet ile su an arasini 'Independent Software Engineer' olarak göster",
         "Tarih araligi: 'Eylul 2022 - Devam Ediyor' — kesintisiz gorunsun",
         "Her projeyi ayri bir 'pozisyon' gibi listele — sirket adi yerine proje adi",
-        "Projeleri kronolojik siraya koy — surekli aktivite gorunsun",
-        "'Self-Employed' veya 'Freelance' kullabilirsin — yalan degil, kendi projelerini gelistirdin",
-        "Egitim tarihini sadece yil olarak yaz (2018-2022) — ay detayi gereksiz",
-        "ATS icin 'Employment Gap' kelimesini ASLA kullanma"
+        "Projeleri kronolojik sıraya koy — sürekli aktivite gorunsun",
+        "'Self-Employed' veya 'Freelance' kullabilirsin — yalan değil, kendi projelerini geliştirdin",
+        "Egitim tarihini sadece yıl olarak yaz (2018-2022) — ay detayi gereksiz",
+        "ATS için 'Employment Gap' kelimesini ASLA kullanma"
       ],
       "examples": [
         {
-          "label": "YANLIS — bosluk belli",
-          "template": "EDUCATION\nBSc Computer Engineering, KTU | Sep 2018 - Jun 2022\n\nPROJECTS\n- Todo App (React) — 2023\n- Chat App (Node.js) — 2024\n\n--> SORUN: 2022-2023 arasi bos, projeler tarihsiz ve ogrenci projesi gibi"
+          "label": "YANLIS — boşluk belli",
+          "template": "EDUCATION\nBSc Computer Engineering, KTU | Sep 2018 - Jun 2022\n\nPROJECTS\n- Todo App (React) — 2023\n- Chat App (Node.js) — 2024\n\n--> SORUN: 2022-2023 arasi bos, projeler tarihsiz ve öğrenci projesi gibi"
         },
         {
-          "label": "DOGRU — bosluk gorunmuyor",
-          "template": "PROFESSIONAL EXPERIENCE\n\nIndependent Software Engineer\nSep 2022 - Present | Remote\n\nAI-Powered Document Analysis Platform | Lead Developer\nFeb 2024 - Present | github.com/username/project | live-demo.com\n- Architected full-stack application using React, TypeScript, FastAPI, LangChain\n- Designed RAG pipeline processing 1000+ documents with 92% accuracy\n- Built CI/CD with GitHub Actions, 95%+ test coverage\n- 95+ Lighthouse score, Docker deployment on AWS\n\nReal-Time Collaboration Platform | Full Stack Developer\nSep 2023 - Jan 2024 | github.com/username/project\n- Developed using React, Node.js, WebSocket, Redis\n- PostgreSQL schema with 15 tables, Redis caching (85% faster)\n- 80+ tests, 96% code coverage\n\nE-Commerce Analytics Dashboard | Full Stack Developer\nMay 2023 - Aug 2023 | github.com/username/project\n- React + TypeScript frontend with complex data visualization\n- FastAPI backend with automated reporting pipeline\n- Role-based access control, comprehensive API docs\n\n[... daha fazla proje ...]\n\nEDUCATION\nBSc in Computer Engineering\nKaradeniz Technical University (KTU) | 2018 - 2022\n\n--> SONUC: 2022'den bu yana kesintisiz calisma gorunuyor"
+          "label": "DOĞRU — boşluk gorunmuyor",
+          "template": "PROFESSIONAL EXPERIENCE\n\nIndependent Software Engineer\nSep 2022 - Present | Remote\n\nAI-Powered Document Analysis Platform | Lead Developer\nFeb 2024 - Present | github.com/username/project | live-demo.com\n- Architected full-stack application using React, TypeScript, FastAPI, LangChain\n- Designed RAG pipeline processing 1000+ documents with 92% accuracy\n- Built CI/CD with GitHub Actions, 95%+ test coverage\n- 95+ Lighthouse score, Docker deployment on AWS\n\nReal-Time Collaboration Platform | Full Stack Developer\nSep 2023 - Jan 2024 | github.com/username/project\n- Developed using React, Node.js, WebSocket, Redis\n- PostgreSQL schema with 15 tables, Redis caching (85% faster)\n- 80+ tests, 96% code coverage\n\nE-Commerce Analytics Dashboard | Full Stack Developer\nMay 2023 - Aug 2023 | github.com/username/project\n- React + TypeScript frontend with complex data visualization\n- FastAPI backend with automated reporting pipeline\n- Role-based access control, comprehensive API docs\n\n[... daha fazla proje ...]\n\nEDUCATION\nBSc in Computer Engineering\nKaradeniz Technical University (KTU) | 2018 - 2022\n\n--> SONUÇ: 2022'den bu yana kesintisiz çalışma gorunuyor"
         },
         {
-          "label": "Alternatif baslik secenekleri",
-          "template": "CV'de kullanilabilecek basliklar (hepsi dogru ve etik):\n\n1. 'Independent Software Engineer' — en profesyonel\n2. 'Freelance Full Stack Developer' — freelance islerin varsa ideal\n3. 'Self-Employed Software Developer' — kendi projelerini gelistirdin\n4. 'Full Stack Developer (Independent)' — basit ve net\n5. 'Software Engineer — Independent Projects' — proje odakli\n\nKULLANMA:\n- 'Unemployed'\n- 'Job Seeker'\n- 'Career Break'\n- 'Gap Year'\n- 'Self-Taught Developer' (CS mezunusun, self-taught degilsin)"
+          "label": "Alternatif başlık secenekleri",
+          "template": "CV'de kullanılabilecek basliklar (hepsi doğru ve etik):\n\n1. 'Independent Software Engineer' — en profesyonel\n2. 'Freelance Full Stack Developer' — freelance islerin varsa ideal\n3. 'Self-Employed Software Developer' — kendi projelerini geliştirdin\n4. 'Full Stack Developer (Independent)' — basit ve net\n5. 'Software Engineer — Independent Projects' — proje odakli\n\nKULLANMA:\n- 'Unemployed'\n- 'Job Seeker'\n- 'Career Break'\n- 'Gap Year'\n- 'Self-Taught Developer' (CS mezunusun, self-taught degilsin)"
         }
       ],
       "checklist": [
-        "CV'de 'Independent Software Engineer' veya benzeri baslik kullanildi",
+        "CV'de 'Independent Software Engineer' veya benzeri başlık kullanildi",
         "2022'den itibaren kesintisiz tarih araligi var",
         "Her proje ayri pozisyon gibi listelendi",
-        "Projeler kronolojik sirada",
-        "'Employment Gap' ifadesi hicbir yerde gecmiyor",
-        "Egitim tarihi sadece yil olarak yazildi"
+        "Projeler kronolojik sırada",
+        "'Employment Gap' ifadesi hicbir yerde geçmiyor",
+        "Egitim tarihi sadece yıl olarak yazildi"
       ]
     },
     {
-      "id": "mulakatta-nasil-aciklanir",
-      "title": "Mulakatta Nasil Aciklanir",
+      "id": "mülakatta-nasil-aciklanir",
+      "title": "Mülakatta Nasil Aciklanir",
       "icon": "🎤",
-      "content": "Mulakatta 'Mezuniyetten bu yana ne yaptiniz?' sorusu GELECEK. Buna hazir olmalisin. Tereddut edersen, ozur dilersen veya savunmaya gecersen = zayif gorunursun. Guvenli, somut ve ileri bakisli bir cevap ver. Asagidaki scriptleri ezberle ve prova et.",
+      "content": "Mülakatta 'Mezuniyetten bu yana ne yaptiniz?' sorusu GELECEK. Buna hazir olmalisin. Tereddut edersen, ozur dilersen veya savunmaya gecersen = zayıf gorunursun. Güvenli, somut ve ileri bakisli bir cevap ver. Asagidaki scriptleri ezberle ve prova et.",
       "tips": [
-        "Cevabini 60-90 saniye icinde ver — kisa ve net",
+        "Cevabini 60-90 saniye içinde ver — kisa ve net",
         "ASLA ozur dileme veya savunmaya gecme",
-        "Somut projelere referans ver — laf degil, kanit",
-        "Ileri bakisli bitir: 'Bu yuzden simdi X pozisyonuna cok uygun oldugumu dusunuyorum'",
-        "Enerjik ve guvenli konusun — ses tonun onemli",
-        "Boslugu soran kisinin onyargilarini proaktif olarak adresle",
-        "En az 3 kere ayna karsisinda prova et — dogallik onemli",
+        "Somut projelere referans ver — laf değil, kanıt",
+        "Ileri bakisli bitir: 'Bu yuzden simdi X pozisyonuna çok uygun olduğumu düşünüyorum'",
+        "Enerjik ve güvenli konusun — ses tonun önemli",
+        "Boşluğu soran kisinin onyargilarini proaktif olarak adresle",
+        "En az 3 kere ayna karşısında prova et — dogallik önemli",
         "Arkadaşına veya aile uyene prova et — geri bildirim al"
       ],
       "examples": [
         {
-          "label": "Turkce mulakat scripti — Kisa versiyon",
-          "template": "Soru: 'Mezuniyetten bu yana ne yaptiniz?'\n\nCevap:\n'Mezun olduktan sonra bilinçli bir karar verdim: ilk bulduğum ise girip stagnant olmak yerine, modern yazilim muhendisligini derinlemesine ogrenmeye odaklanmak istedim.\n\nBu sure zarfinda 10'dan fazla production-ready proje gelistirdim. React, TypeScript, Python, FastAPI ile full-stack uygulamalar kurdum. LangChain ve RAG mimarileri ile AI projeleri gelistirdim. Her projede CI/CD pipeline, Docker deployment ve kapsamli test coverage uyguladim.\n\nOrnegin, [proje adi] projesinde [spesifik basari — ornegin: 1000+ dokumani isleyen bir RAG sistemi kurdum ve %92 dogruluk orani elde ettim].\n\nBu donemin bana kattigi en onemli sey: sadece kod yazmak degil, mimari kararlar vermek, trade-off analizi yapmak ve bir projeyi sifirdan production'a tasimak. Simdi bu birikimi bir takim icinde uygulamak icin hazirim.'"
+          "label": "Turkce mülakat scripti — Kisa versiyon",
+          "template": "Soru: 'Mezuniyetten bu yana ne yaptiniz?'\n\nCevap:\n'Mezun olduktan sonra bilinçli bir karar verdim: ilk bulduğum işe girip stagnant olmak yerine, modern yazılım mühendisliğini derinlemesine öğrenmeye odaklanmak istedim.\n\nBu süre zarfinda 10'dan fazla production-ready proje geliştirdim. React, TypeScript, Python, FastAPI ile full-stack uygulamalar kurdum. LangChain ve RAG mimarileri ile AI projeleri geliştirdim. Her projede CI/CD pipeline, Docker deployment ve kapsamli test coverage uyguladim.\n\nÖrneğin, [proje adi] projesinde [spesifik başarı — örneğin: 1000+ dokümanı isleyen bir RAG sistemi kurdum ve %92 doğruluk orani elde ettim].\n\nBu dönemin bana kattigi en önemli sey: sadece kod yazmak değil, mimari kararlar vermek, trade-off analizi yapmak ve bir projeyi sifirdan production'a tasimak. Simdi bu birikimi bir takim içinde uygulamak için hazirim.'"
         },
         {
           "label": "English interview script — Short version",
@@ -97,86 +97,86 @@
         },
         {
           "label": "Zorlayici takip sorularina cevaplar",
-          "template": "Soru: 'Neden 3.5 yil boyunca hic calismadin?'\nCevap: 'Aslinda surekli calistim — sadece bir sirkette degil, kendi projelerimde. Her biri farkli bir problemi cozen, farkli teknolojiler kullanan 10+ proje gelistirdim. Bu, cok sayida sirketin farkli departmanlarinda calismayi taklit eden cok yogun bir donem oldu.'\n\nSoru: 'Takim deneyimin yok, bu bir sorun degil mi?'\nCevap: 'Open source projelere katki yaparak code review sureci yasadim. Projelerimde Git workflow, PR-based development ve CI/CD kullandim. Ayrica, bu projeleri tek basima yonetmek bana bagimsiz calisma ve proaktif problem cozme becerisi kazandirdi. Bir takima katildigimda, bu bagimsizlik degerli olacak — surekli yonlendirilmeye ihtiyac duymayacagim.'\n\nSoru: 'Freelance is yaptin mi?'\nCevap: '[Eger yaptiysan] Evet, Upwork uzerinden X proje tamamladim. [Eger yapamadiysan] Ana odagim kapsamli projeler gelistirmek ve derinlemesine ogrenme oldu. Her projem bir freelance is kadar kapsamli — gerçek kullanicilar, gerçek deployment, gerçek problemler.'\n\nSoru: 'Bu projeler gerçek dunya deneyiminin yerini tutar mi?'\nCevap: 'Projelerim tutorial projeleri degil. Her birinde gerçek bir problemi cozdüm, mimari kararlar verdim, performans optimizasyonu yaptim ve production'a deploy ettim. Tek fark, bir musteriye degil kendime hesap vermem. Ama teknik zorluk seviyesi ayni — hatta bazi projelerde cogu junior developer'in sirketlerde karsilasacagindan daha yuksek.'"
+          "template": "Soru: 'Neden 3.5 yıl boyunca hic çalışmadın?'\nCevap: 'Aslinda sürekli çalıştım — sadece bir sirkette değil, kendi projelerimde. Her biri farklı bir problemi cozen, farklı teknolojiler kullanan 10+ proje geliştirdim. Bu, çok sayıda sirketin farklı departmanlarinda çalışmayı taklit eden çok yogun bir dönem oldu.'\n\nSoru: 'Takim deneyimin yok, bu bir sorun değil mi?'\nCevap: 'Open source projelere katkı yaparak code review süreci yasadim. Projelerimde Git workflow, PR-based development ve CI/CD kullandim. Ayrica, bu projeleri tek basima yönetmek bana bağımsız çalışma ve proaktif problem çözme becerisi kazandirdi. Bir takima katildigimda, bu bagimsizlik değerli olacak — sürekli yonlendirilmeye ihtiyaç duymayacagim.'\n\nSoru: 'Freelance is yaptin mi?'\nCevap: '[Eger yaptiysan] Evet, Upwork üzerinden X proje tamamladim. [Eger yapamadiysan] Ana odagim kapsamli projeler geliştirmek ve derinlemesine öğrenme oldu. Her projem bir freelance is kadar kapsamli — gerçek kullanıcılar, gerçek deployment, gerçek problemler.'\n\nSoru: 'Bu projeler gerçek dünya deneyiminin yerini tutar mi?'\nCevap: 'Projelerim tutorial projeleri değil. Her birinde gerçek bir problemi cozdüm, mimari kararlar verdim, performans optimizasyonu yaptim ve production'a deploy ettim. Tek fark, bir müşteriye değil kendime hesap vermem. Ama teknik zorluk seviyesi aynı — hatta bazi projelerde çoğu junior developer'in sirketlerde karsilasacagindan daha yüksek.'"
         }
       ],
       "checklist": [
         "60-90 saniyelik Turkce script ezberlendi",
         "60-90 saniyelik Ingilizce script ezberlendi",
         "Zorlayici takip sorularina cevaplar hazirlandi",
-        "En az 3 kere sesli prova yapildi",
-        "Baska birinden geri bildirim alindi",
-        "Ses tonu guvenli ve enerjik"
+        "En az 3 kere sesli prova yapıldı",
+        "Başka birinden geri bildirim alindi",
+        "Ses tonu güvenli ve enerjik"
       ]
     },
     {
-      "id": "linkedinde-bosluk-yonetimi",
-      "title": "LinkedIn'de Bosluk Yonetimi",
+      "id": "linkedinde-boşluk-yönetimi",
+      "title": "LinkedIn'de Boşluk Yönetimi",
       "icon": "💼",
-      "content": "LinkedIn'de bosluk gorsel olarak cok belirgin — timeline'da bos yillar goze batiyor. Recruiter'lar profili tararken kesintisiz deneyim gormek istiyor. LinkedIn profilini dogru yapilandirirsan bosluk tamamen gorunmez olur.",
+      "content": "LinkedIn'de boşluk görsel olarak çok belirgin — timeline'da bos yillar goze batiyor. Recruiter'lar profili tararken kesintisiz deneyim gormek istiyor. LinkedIn profilini doğru yapılandırırsan boşluk tamamen gorunmez olur.",
       "tips": [
-        "Experience bolumune 'Independent Software Engineer' ekle — Sep 2022 - Present",
+        "Experience bölümüne 'Independent Software Engineer' ekle — Sep 2022 - Present",
         "Her projeyi bu pozisyon altinda ayri bir 'proje' olarak listele",
-        "Description kisminda projeleri, teknolojileri ve basarilari yaz",
-        "Skills bolumunu guncel tut — endorsement iste",
+        "Description kisminda projeleri, teknolojileri ve başarıları yaz",
+        "Skills bölümünü güncel tut — endorsement işte",
         "Recommendations al — eski hocalar, bootcamp arkadaslari, open source maintainer'lar",
-        "Activity bolumuну aktif tut — paylasimlarin timeline'da gorunsun",
-        "'Open to Work' badge'ini ac — ama 'recruiter'lara ozel' secenegini kullan",
-        "Featured bolumune en iyi projelerinin demolarini ekle"
+        "Activity bolumuну aktif tut — paylaşımların timeline'da gorunsun",
+        "'Open to Work' badge'ini ac — ama 'recruiter'lara özel' secenegini kullan",
+        "Featured bölümüne en iyi projelerinin demolarini ekle"
       ],
       "examples": [
         {
-          "label": "LinkedIn Experience bolumu nasil doldurulur",
-          "template": "Experience Bolumine Ekle:\n\n--- POZISYON 1 ---\nTitle: Independent Software Engineer\nCompany: Self-Employed (veya kendi portfolio domain'in)\nLocation: Remote\nStart Date: Sep 2022\nEnd Date: (bos birak — 'Present' gorunsun)\nDescription:\n\nBuilding production-ready full-stack and AI-powered applications.\n\nKey Projects:\n> AI Document Analysis Platform (Feb 2024 - Present)\n- RAG pipeline with LangChain, 1000+ docs, 92% accuracy\n- React, TypeScript, FastAPI, Pinecone, Docker\n- github.com/username/project | live-demo.com\n\n> Real-Time Collaboration Tool (Sep 2023 - Jan 2024)\n- WebSocket, Redis pub/sub, PostgreSQL\n- 80+ tests, 96% coverage\n- github.com/username/project\n\n[... daha fazla proje ...]\n\nTechnologies: React, TypeScript, Python, FastAPI, LangChain, PostgreSQL, Docker, AWS, CI/CD\n\n--- ONCEKI DENEYIM (varsa) ---\nStaj, part-time is, freelance — ne varsa ekle"
+          "label": "LinkedIn Experience bölümü nasil doldurulur",
+          "template": "Experience Bölümine Ekle:\n\n--- POZISYON 1 ---\nTitle: Independent Software Engineer\nCompany: Self-Employed (veya kendi portfolio domain'in)\nLocation: Remote\nStart Date: Sep 2022\nEnd Date: (bos bırak — 'Present' gorunsun)\nDescription:\n\nBuilding production-ready full-stack and AI-powered applications.\n\nKey Projects:\n> AI Document Analysis Platform (Feb 2024 - Present)\n- RAG pipeline with LangChain, 1000+ docs, 92% accuracy\n- React, TypeScript, FastAPI, Pinecone, Docker\n- github.com/username/project | live-demo.com\n\n> Real-Time Collaboration Tool (Sep 2023 - Jan 2024)\n- WebSocket, Redis pub/sub, PostgreSQL\n- 80+ tests, 96% coverage\n- github.com/username/project\n\n[... daha fazla proje ...]\n\nTechnologies: React, TypeScript, Python, FastAPI, LangChain, PostgreSQL, Docker, AWS, CI/CD\n\n--- ÖNCEKI DENEYIM (varsa) ---\nStaj, part-time is, freelance — ne varsa ekle"
         },
         {
-          "label": "LinkedIn Featured bolumu",
-          "template": "Featured Bolumune Ekle (en onemli 3-4 oge):\n\n1. Portfolio web sitesi linki — ana vitrin\n2. En etkileyici projenin canli demo linki\n3. GitHub profil linki\n4. Teknik blog yazisi veya Medium makalesi (varsa)\n\nHer ogenin kisa bir aciklamasi olsun:\n- 'AI-Powered Document Analysis Platform — RAG, LangChain, React'\n- 'Full-Stack E-Commerce Platform — React, TypeScript, FastAPI'\n- 'My GitHub Profile — 10+ projects, 500+ contributions'"
+          "label": "LinkedIn Featured bölümü",
+          "template": "Featured Bölümüne Ekle (en önemli 3-4 oge):\n\n1. Portfolio web sitesi linki — ana vitrin\n2. En etkileyici projenin canli demo linki\n3. GitHub profil linki\n4. Teknik blog yazisi veya Medium makalesi (varsa)\n\nHer ogenin kisa bir açıklaması olsun:\n- 'AI-Powered Document Analysis Platform — RAG, LangChain, React'\n- 'Full-Stack E-Commerce Platform — React, TypeScript, FastAPI'\n- 'My GitHub Profile — 10+ projects, 500+ contributions'"
         }
       ],
       "checklist": [
         "Experience'a 'Independent Software Engineer' eklendi",
         "Tarih araligi Sep 2022 - Present olarak ayarlandi",
         "Her proje description'da listelendi",
-        "Featured bolumune portfolio ve en iyi projeler eklendi",
-        "Skills bolumu guncellendi",
+        "Featured bölümüne portfolio ve en iyi projeler eklendi",
+        "Skills bölümü güncellendi",
         "Open to Work acildi (recruiter-only)",
-        "Profile'da bosluk gorunmuyor"
+        "Profile'da boşluk gorunmuyor"
       ]
     },
     {
-      "id": "portfolyo-ile-kanitlama",
-      "title": "Portfolyo ile Kanitlama",
+      "id": "portfolyo-ile-kanıtlama",
+      "title": "Portfolyo ile Kanıtlama",
       "icon": "🎨",
-      "content": "Lafla 'ben iyiyim' demek kolay — kanitla. 10 projen senin 3.5 yillik yatiriminin somut kanitlari. Her proje bir 'is deneyimi' gibi sunulmali. Portfolyo sitesi + GitHub + canli demolar = inkar edilemez kanit.",
+      "content": "Lafla 'ben iyiyim' demek kolay — kanıtla. 10 projen senin 3.5 yıllık yatiriminin somut kanıtları. Her proje bir 'is deneyimi' gibi sunulmali. Portfolyo sitesi + GitHub + canli demolar = inkar edilemez kanıt.",
       "tips": [
-        "Portfolyo sitesinde her projeye ayri detay sayfasi olustur",
-        "Her proje sayfasinda: problem, cozum, teknolojiler, mimari karar, sonuclar",
-        "Canli demo SART — demo olmayan proje yok sayilir",
+        "Portfolyo sitesinde her projeye ayri detay sayfasi oluştur",
+        "Her proje sayfasinda: problem, çözüm, teknolojiler, mimari karar, sonuçlar",
+        "Canli demo SART — demo olmayan proje yok sayılır",
         "README.md dosyalarini profesyonel yap: screenshot, kurulum, mimari diagram",
-        "GitHub'da yesil kare grafigini dolu tut — surekli aktivite gosterir",
+        "GitHub'da yesil kare grafigini dolu tut — sürekli aktivite gösterir",
         "Commit mesajlari profesyonel olsun: 'fix: resolve authentication redirect loop' gibi",
-        "Code quality gorunur olsun: ESLint, Prettier, TypeScript strict mode",
-        "Test dosyalari gorunur olsun — recruiter'lar test yazanin farkli oldugunu bilir",
-        "10 projenin hepsini degil, en iyi 3-5'ini one cikar — kalite > miktar"
+        "Code quality görünür olsun: ESLint, Prettier, TypeScript strict mode",
+        "Test dosyalari görünür olsun — recruiter'lar test yazanin farklı olduğunu bilir",
+        "10 projenin hepsini değil, en iyi 3-5'ini one çıkar — kalite > miktar"
       ],
       "examples": [
         {
           "label": "Proje detay sayfasi sablonu",
-          "template": "PROJE DETAY SAYFASI ICERIGI:\n\n1. BASLIK & TAGLING\n   'AI Document Analysis Platform'\n   'RAG tabanli akilli dokuman analiz sistemi'\n\n2. DEMO & LINKLER\n   [Canli Demo Butonu] [GitHub Butonu] [Video Demo Butonu]\n\n3. PROBLEM\n   'Buyuk dokuman koleksiyonlarinda bilgi aramak zaman aliyor.\n   Kullanicilar yuzlerce sayfa arasinda kayboliyor.'\n\n4. COZUM\n   'RAG (Retrieval-Augmented Generation) mimarisi ile dokumanlar\n   vektor veritabaninda indeksleniyor ve dogal dil sorulari ile\n   saniyeler icinde ilgili bilgi bulunuyor.'\n\n5. TEKNOLOJILER\n   Frontend: React, TypeScript, Tailwind CSS\n   Backend: Python, FastAPI\n   AI: LangChain, OpenAI API, Pinecone\n   DevOps: Docker, GitHub Actions, AWS\n\n6. MIMARI KARARLAR\n   - Neden RAG: Fine-tuning yerine RAG sectim cunku\n     dokuman koleksiyonu dinamik ve surekli guncelleniyor\n   - Neden Pinecone: ChromaDB yerine Pinecone sectim cunku\n     production-grade olceklenebilirlik gerekiyordu\n   - Neden FastAPI: Django yerine FastAPI sectim cunku\n     async support ve otomatik API dokumantasyonu gerekiyordu\n\n7. SONUCLAR & METRIKLER\n   - 1000+ dokuman isleme kapasitesi\n   - %92 retrieval dogrulugu\n   - <2 saniye ortalama yanit suresi\n   - 95+ Lighthouse performans skoru\n   - %95 test coverage\n\n8. OGRENILEN DERSLER\n   - Chunk boyutu retrieval kalitesini dogrudan etkiliyor\n   - Hybrid search (BM25 + semantic) tek basina semantic'ten daha iyi"
+          "template": "PROJE DETAY SAYFASI IÇERIĞI:\n\n1. BAŞLIK & TAGLING\n   'AI Document Analysis Platform'\n   'RAG tabanli akilli doküman analiz sistemi'\n\n2. DEMO & LINKLER\n   [Canli Demo Butonu] [GitHub Butonu] [Video Demo Butonu]\n\n3. PROBLEM\n   'Büyük doküman koleksiyonlarinda bilgi aramak zaman aliyor.\n   Kullanıcılar yuzlerce sayfa arasinda kayboliyor.'\n\n4. ÇÖZÜM\n   'RAG (Retrieval-Augmented Generation) mimarisi ile dokümanlar\n   vektor veritabanında indeksleniyor ve dogal dil sorulari ile\n   saniyeler içinde ilgili bilgi bulunuyor.'\n\n5. TEKNOLOJILER\n   Frontend: React, TypeScript, Tailwind CSS\n   Backend: Python, FastAPI\n   AI: LangChain, OpenAI API, Pinecone\n   DevOps: Docker, GitHub Actions, AWS\n\n6. MIMARI KARARLAR\n   - Neden RAG: Fine-tuning yerine RAG sectim cunku\n     doküman koleksiyonu dinamik ve sürekli güncelleniyor\n   - Neden Pinecone: ChromaDB yerine Pinecone sectim cunku\n     production-grade ölçeklenebilirlik gerekiyordu\n   - Neden FastAPI: Django yerine FastAPI sectim cunku\n     async support ve otomatik API dokümantasyonu gerekiyordu\n\n7. SONUÇLAR & METRIKLER\n   - 1000+ doküman işleme kapasitesi\n   - %92 retrieval dogrulugu\n   - <2 saniye ortalama yanit süresi\n   - 95+ Lighthouse performans skoru\n   - %95 test coverage\n\n8. ÖĞRENILEN DERSLER\n   - Chunk boyutu retrieval kalitesini doğrudan etkiliyor\n   - Hybrid search (BM25 + semantic) tek basina semantic'ten daha iyi"
         },
         {
           "label": "GitHub README sablonu",
-          "template": "# Proje Adi\n\nKisa aciklama — bir cumle ile ne yapiyor.\n\n[Canli Demo](link) | [API Docs](link) | [Video Demo](link)\n\n## Screenshots\n[Ana sayfa screenshot'i]\n[Dashboard screenshot'i]\n\n## Tech Stack\n- Frontend: React, TypeScript, Tailwind CSS\n- Backend: Python, FastAPI\n- Database: PostgreSQL, Redis\n- AI: LangChain, Pinecone\n- DevOps: Docker, GitHub Actions\n\n## Features\n- Feature 1 aciklamasi\n- Feature 2 aciklamasi\n- Feature 3 aciklamasi\n\n## Architecture\n[Mimari diagram — draw.io veya Excalidraw ile]\n\n## Getting Started\n```bash\ngit clone ...\ndocker-compose up\n```\n\n## API Documentation\nSwagger UI: http://localhost:8000/docs\n\n## Testing\n```bash\nnpm run test -- --coverage\npytest --cov\n```\nCoverage: 95%+\n\n## Performance\n- Lighthouse: 95+ (Performance, A11y, Best Practices)\n- API Response: <100ms (cached), <500ms (uncached)\n\n## Lessons Learned\n- Key insight 1\n- Key insight 2"
+          "template": "# Proje Adi\n\nKisa açıklama — bir cumle ile ne yapıyor.\n\n[Canli Demo](link) | [API Docs](link) | [Video Demo](link)\n\n## Screenshots\n[Ana sayfa screenshot'i]\n[Dashboard screenshot'i]\n\n## Tech Stack\n- Frontend: React, TypeScript, Tailwind CSS\n- Backend: Python, FastAPI\n- Database: PostgreSQL, Redis\n- AI: LangChain, Pinecone\n- DevOps: Docker, GitHub Actions\n\n## Features\n- Feature 1 açıklaması\n- Feature 2 açıklaması\n- Feature 3 açıklaması\n\n## Architecture\n[Mimari diagram — draw.io veya Excalidraw ile]\n\n## Getting Started\n```bash\ngit clone ...\ndocker-compose up\n```\n\n## API Documentation\nSwagger UI: http://localhost:8000/docs\n\n## Testing\n```bash\nnpm run test -- --coverage\npytest --cov\n```\nCoverage: 95%+\n\n## Performance\n- Lighthouse: 95+ (Performance, A11y, Best Practices)\n- API Response: <100ms (cached), <500ms (uncached)\n\n## Lessons Learned\n- Key insight 1\n- Key insight 2"
         }
       ],
       "checklist": [
-        "Portfolyo sitesi canli ve erisilebilir",
+        "Portfolyo sitesi canli ve erişilebilir",
         "En iyi 3-5 proje detayli sekilde sunulmus",
-        "Her projenin canli demo linki calisiyor",
+        "Her projenin canli demo linki çalışıyor",
         "GitHub README'leri profesyonel formatta",
         "Mimari kararlar ve trade-off'lar aciklanmis",
-        "Metrikler ve sonuclar belirtilmis",
+        "Metrikler ve sonuçlar belirtilmis",
         "GitHub activity grafigi dolu gorunuyor"
       ]
     },
@@ -184,76 +184,76 @@
       "id": "senior-zihniyeti",
       "title": "Senior Zihniyeti",
       "icon": "🧠",
-      "content": "Junior olmadan senior olmak — bu sadece bir slogan degil, bir strateji. Seniority yil sayisi ile degil, dusunce sekli ile olculur. Mimari kararlar verebiliyor musun? Trade-off analizi yapabiliyor musun? Bir sistemi sifirdan tasarlayip production'a tasiyabiliyor musun? 3.5 yillik yogun ogrenim donemi bu becerileri kazandirdiysa, sen zaten senior gibi dusunuyorsun.",
+      "content": "Junior olmadan senior olmak — bu sadece bir slogan değil, bir strateji. Seniority yıl sayısı ile değil, düşünce sekli ile olculur. Mimari kararlar verebiliyor musun? Trade-off analizi yapabiliyor musun? Bir sistemi sifirdan tasarlayip production'a tasiyabiliyor musun? 3.5 yıllık yogun öğrenim dönemi bu becerileri kazandirdiysa, sen zaten senior gibi düşünüyorsun.",
       "tips": [
-        "Mulakatta 'junior pozisyon ariyorum' DEME — 'software engineer pozisyonu ariyorum' de",
-        "Maas muzakeresinde 'junior maasi' kabul etme — projelerin senior seviyede ise senior +/- maas iste",
+        "Mülakatta 'junior pozisyon ariyorum' DEME — 'software engineer pozisyonu ariyorum' de",
+        "Maas muzakeresinde 'junior maasi' kabul etme — projelerin senior seviyede işe senior +/- maas işte",
         "Teknik tartismalarda fikrin olsun: 'Bence X yerine Y kullanmak daha uygun cunku...'",
-        "Her soruda 'depends' diyebil — senior'lar her seyin baglamina bagli oldugunu bilir",
-        "Buyuk resmi gor: sadece 'nasil' degil 'neden' sorusuna cevap ver",
-        "Hata yaptigini kabul et ve ne ogrendigini anlat — bu olgunluk gosterir",
-        "Surekli ogrenme: 'Son 3 ayda X konusunda derinlestim' — stagnant degilsin",
+        "Her soruda 'depends' diyebil — senior'lar her seyin baglamina bağlı olduğunu bilir",
+        "Büyük resmi gor: sadece 'nasil' değil 'neden' sorusuna cevap ver",
+        "Hata yaptığını kabul et ve ne öğrendiğini anlat — bu olgunluk gösterir",
+        "Sürekli öğrenme: 'Son 3 ayda X konusunda derinlestim' — stagnant degilsin",
         "Mentorluk zihniyeti: baskalarina ogretebiliyorsan, o konuyu biliyorsun demektir"
       ],
       "examples": [
         {
-          "label": "Junior vs Senior dusunce farki",
-          "template": "JUNIOR DUSUNCE:\n- 'React kullandim' -> sadece araç listesi\n- 'Calisiyor' -> sadece sonuc\n- 'Tutorial'da boyle yapiyordu' -> taklit\n- 'Bilmiyorum' -> durma\n- 'Her seyi bilmem lazim' -> impostor syndrome\n\nSENIOR DUSUNCE:\n- 'React sectim cunku component-based mimari bu projenin gereksinimleri icin en uygundu. Vue da dusundum ama ekosistem ve is piyasasi acisindan React avantajliydi' -> mimari karar + gerekcesi\n- 'Calisiyor, 95+ Lighthouse skoru var, %96 test coverage ve 120ms API yanit suresi' -> olculebilir sonuc\n- 'Bu pattern'i X kaynagindan ogrendim, Y projesinde uyguladim, Z sorunuyla karsilastim ve su sekilde cozdüm' -> deneyim dongusu\n- 'Bu konuyu derinlemesine bilmiyorum ama benzer bir problem olan A'yi su sekilde cozmustum. Arastirip 1 gunde ogrenirim' -> ogrenmе kapasitesi\n- 'Her seyi bilmem gerekmiyor — onemli olan dogru soruyu sormak ve hizli ogrenmek' -> olgunluk"
+          "label": "Junior vs Senior düşünce farki",
+          "template": "JUNIOR DÜŞÜNCE:\n- 'React kullandim' -> sadece araç listesi\n- 'Çalışıyor' -> sadece sonuç\n- 'Tutorial'da boyle yapıyordu' -> taklit\n- 'Bilmiyorum' -> durma\n- 'Her seyi bilmem lazim' -> impostor syndrome\n\nSENIOR DÜŞÜNCE:\n- 'React sectim cunku component-based mimari bu projenin gereksinimleri için en uygundu. Vue da düşündüm ama ekosistem ve is piyasasi açısından React avantajliydi' -> mimari karar + gerekcesi\n- 'Çalışıyor, 95+ Lighthouse skoru var, %96 test coverage ve 120ms API yanit süresi' -> olculebilir sonuç\n- 'Bu pattern'i X kaynagindan öğrendim, Y projesinde uyguladim, Z sorunuyla karsilastim ve su sekilde cozdüm' -> deneyim döngüsü\n- 'Bu konuyu derinlemesine bilmiyorum ama benzer bir problem olan A'yi su sekilde cozmustum. Araştırıp 1 gunde öğrenirim' -> ogrenmе kapasitesi\n- 'Her seyi bilmem gerekmiyor — önemli olan doğru soruyu sormak ve hızlı öğrenmek' -> olgunluk"
         },
         {
-          "label": "Mulakatta senior gibi cevap verme",
-          "template": "Soru: 'State management icin ne kullanirsin?'\n\nJUNIOR CEVAP:\n'Redux kullanirdim.'\n\nSENIOR CEVAP:\n'Bu projenin ihtiyaclarina bagli. Eger global state karmasikligi dusukse, React'in kendi Context API'si veya Zustand yeterli — Redux'un boilerplate'i gereksiz olur. Eger buyuk bir enterprise uygulamaysa ve state management karmasiksa, Redux Toolkit mantikli. Server state icin ise TanStack Query kullanirdim — caching, invalidation ve optimistic updates'i cok iyi cozuyor. Ben genelde Zustand + TanStack Query kombinasyonunu tercih ediyorum cunku cok az boilerplate ile guclu bir cozum sunuyor.'\n\nFARK: Junior tek cevap verir. Senior baglam analizi yapar, alternatifleri degerlendirir ve tercihini gerekcesiyle aciklar."
+          "label": "Mülakatta senior gibi cevap verme",
+          "template": "Soru: 'State management için ne kullanirsin?'\n\nJUNIOR CEVAP:\n'Redux kullanirdim.'\n\nSENIOR CEVAP:\n'Bu projenin ihtiyaçlarına bağlı. Eger global state karmaşıklığı dusukse, React'in kendi Context API'si veya Zustand yeterli — Redux'un boilerplate'i gereksiz olur. Eger büyük bir enterprise uygulamaysa ve state management karmaşıksa, Redux Toolkit mantikli. Server state için işe TanStack Query kullanirdim — caching, invalidation ve optimistic updates'i çok iyi cozuyor. Ben genelde Zustand + TanStack Query kombinasyonunu tercih ediyorum cunku çok az boilerplate ile güçlü bir çözüm sunuyor.'\n\nFARK: Junior tek cevap verir. Senior bağlam analizi yapar, alternatifleri değerlendirir ve tercihini gerekcesiyle aciklar."
         },
         {
-          "label": "Anlatim stratejisi: 'Junior olmadan senior olmak'",
-          "template": "Bu narratifi mulakat ve networkingte kullan:\n\n'Kariyer yolculugum geleneksel degildir — ama bunun beni daha guclu kildigina inaniyorum.\n\nCogu developer siradi bir yol izler: junior olarak basla, 2-3 yil CRUD yap, mid-level ol. Ben farkli bir yol sectim: 3.5 yil boyunca yogun ve bagimisiz bir sekilde, 10+ farkli projede, 15+ farkli teknoloji ile calistim.\n\nHer projede sadece kod yazmadim — mimari kararlar verdim, teknoloji secimi yaptim, performans optimizasyonu uyguladim ve production'a deploy ettim. Bu, cogu junior developer'in ilk 3 yilinda asla yasamadigi bir deneyim genisligi.\n\nSimdi bir takima katildigimda, sifirdan ogretilmesi gereken bir junior degil, hemen katki saglayabilecek, mimari tartismalara katilabilecek ve bagimsiz calisabilecek bir muhendis olacagim.'"
+          "label": "Anlatım stratejisi: 'Junior olmadan senior olmak'",
+          "template": "Bu narratifi mülakat ve networkingte kullan:\n\n'Kariyer yolculuğum geleneksel degildir — ama bunun beni daha güçlü kildigina inaniyorum.\n\nÇoğu developer sıradı bir yol izler: junior olarak başla, 2-3 yıl CRUD yap, mid-level ol. Ben farklı bir yol sectim: 3.5 yıl boyunca yogun ve bagimisiz bir sekilde, 10+ farklı projede, 15+ farklı teknoloji ile çalıştım.\n\nHer projede sadece kod yazmadim — mimari kararlar verdim, teknoloji secimi yaptim, performans optimizasyonu uyguladim ve production'a deploy ettim. Bu, çoğu junior developer'in ilk 3 yılında asla yasamadigi bir deneyim genişliği.\n\nSimdi bir takima katildigimda, sifirdan ogretilmesi gereken bir junior değil, hemen katkı sağlayabilecek, mimari tartismalara katılabilecek ve bağımsız çalışabilecek bir mühendis olacagim.'"
         }
       ],
       "checklist": [
         "'Junior ariyorum' ifadesi kullanilmiyor",
-        "Her teknik soruda baglam analizi yapiliyor",
+        "Her teknik soruda bağlam analizi yapılıyor",
         "Mimari kararlar gerekcesiyle aciklanabiliyor",
-        "Trade-off analizi yapilabiliyor",
-        "Ogrenme kapasitesi ve hizi vurgulaniyor",
+        "Trade-off analizi yapılabiliyor",
+        "Öğrenme kapasitesi ve hızı vurgulaniyor",
         "Senior narratif prova edildi ve icsellestirildi"
       ]
     },
     {
-      "id": "basari-hikayeleri",
-      "title": "Basari Hikayeleri",
+      "id": "başarı-hikayeleri",
+      "title": "Başarı Hikayeleri",
       "icon": "⭐",
-      "content": "Yalniz degilsin. Dunyanin en basarili developer'larindan bazilari uzun kariyer boslugu yasadi, geleneksel yolu izlemedi veya gec basladi. Bu hikayeler motivasyon degil — kanit. Baskalari yaptiaysa, sen de yapabilirsin.",
+      "content": "Yalniz degilsin. Dünyanın en başarılı developer'larindan bazilari uzun kariyer boşluğu yasadi, geleneksel yolu izlemedi veya gec başladı. Bu hikayeler motivasyon değil — kanıt. Baskalari yaptiaysa, sen de yapabilirsin.",
       "tips": [
-        "Bu hikayeleri mulakatta kullanabilirsin: 'X kisi de benzer bir yoldan gecti ve basarili oldu'",
-        "Kendi hikayeni yazmaya basla — gelecekte baskalarini ilham vereceksin",
-        "LinkedIn'de benzer hikayeleri paylasan insanlari takip et",
+        "Bu hikayeleri mülakatta kullanabilirsin: 'X kisi de benzer bir yoldan gecti ve başarılı oldu'",
+        "Kendi hikayeni yazmaya başla — gelecekte baskalarini ilham vereceksin",
+        "LinkedIn'de benzer hikayeleri paylaşan insanlari takip et",
         "Her rejection'dan sonra bu hikayeleri oku — perspektif kazanirsin",
-        "Unutma: hiring manager'lar da bosluk yasayan basarili insanlari biliyorlar"
+        "Unutma: hiring manager'lar da boşluk yasayan başarılı insanlari biliyorlar"
       ],
       "examples": [
         {
           "label": "Hikaye 1: Bootcamp'ten Senior'a",
-          "template": "PROFIL: 28 yasinda, farkli bir sektordan yazilima gecis\n\nYOLCULUK:\n- 5 yil pazarlama sektorunde calisti\n- Mutsuzdu, yazilima gecmek istedi\n- 6 aylik bootcamp + 1 yil bagimsiz proje gelistirme\n- Toplam 1.5 yillik 'bosluk' (ogrenim donemi)\n- Open source projelere katki yapti, blog yazmaya basladi\n- Ilk isi: mid-level pozisyon, remote, Avrupa sirketi\n- 2 yil sonra: senior developer\n\nANAHTAR FAKTOR:\n- Portfolyosu siradan degil, gercek problemleri cozen projeler\n- Blog yazilari teknik derinlik gosterdi\n- Open source katkilari takim calismasini kanitladi\n- Mulakatta genis sektor deneyimini avantaja cevirdi"
+          "template": "PROFIL: 28 yasinda, farklı bir sektordan yazılıma geçiş\n\nYOLCULUK:\n- 5 yıl pazarlama sektorunde çalıştı\n- Mutsuzdu, yazılıma gecmek istedi\n- 6 aylik bootcamp + 1 yıl bağımsız proje geliştirme\n- Toplam 1.5 yıllık 'boşluk' (öğrenim dönemi)\n- Open source projelere katkı yapti, blog yazmaya başladı\n- Ilk işi: mid-level pozisyon, remote, Avrupa sirketi\n- 2 yıl sonra: senior developer\n\nANAHTAR FAKTOR:\n- Portfolyosu sıradan değil, gerçek problemleri cozen projeler\n- Blog yazilari teknik derinlik gösterdi\n- Open source katkilari takim çalışmasını kanıtladı\n- Mülakatta geniş sektor deneyimini avantaja çevirdi"
         },
         {
-          "label": "Hikaye 2: 4 yillik bosluktan uzaktan calisma basarisi",
-          "template": "PROFIL: CS mezunu, 4 yil is bulamadi\n\nYOLCULUK:\n- Universite sonrasi yoresel firmalardan reddedildi\n- 4 yil boyunca kendi projelerini gelistirdi\n- Freelance islerle basladi (Upwork'te kucuk projeler)\n- Portfolio ve GitHub profili zamanla guclendir\n- Bir Upwork musterisi tam zamanli pozisyon teklif etti\n- 1 yil sonra: farkli bir remote sirkete gecis, maas 2x artti\n\nANAHTAR FAKTOR:\n- Vazgecmedi — 4 yil boyunca surekli uretmeye devam etti\n- Freelance ile hem gelir sagladi hem referans olusturdur\n- Her projeyi bir sonrakinden daha iyi yapti — gelisim grafigi gorunur\n- Sabir + sistemmatik calisma = sonuc"
+          "label": "Hikaye 2: 4 yıllık boşluktan uzaktan çalışma başarısı",
+          "template": "PROFIL: CS mezunu, 4 yıl is bulamadi\n\nYOLCULUK:\n- Universite sonrasi yoresel firmalardan reddedildi\n- 4 yıl boyunca kendi projelerini geliştirdi\n- Freelance islerle başladı (Upwork'te küçük projeler)\n- Portfolio ve GitHub profili zamanla guclendir\n- Bir Upwork müşterisi tam zamanli pozisyon teklif etti\n- 1 yıl sonra: farklı bir remote sirkete geçiş, maas 2x artti\n\nANAHTAR FAKTOR:\n- Vazgecmedi — 4 yıl boyunca sürekli uretmeye devam etti\n- Freelance ile hem gelir sağladı hem referans oluşturdur\n- Her projeyi bir sonrakinden daha iyi yapti — gelişim grafigi görünür\n- Sabir + sistemmatik çalışma = sonuç"
         },
         {
           "label": "Hikaye 3: Kendi kendini yetistirmis CTO",
-          "template": "PROFIL: Universiteden atilmis, formal egitim yok\n\nYOLCULUK:\n- Universite 2. sinifta birаkti\n- 3 yil boyunca kendi kendine programlama ogrendi\n- Internetten kurslar, acik kaynak projeler, community katilimi\n- Ilk isini 26 yasinda bir startup'ta junior olarak basladi\n- 3 yil icinde tech lead oldu\n- 5 yil icinde CTO oldu\n\nANAHTAR FAKTOR:\n- Formal egitim eksikligini proje kalitesi ile kapatdi\n- Problem cozmede yaratici yaklasimi ile one cikti\n- Surekli ogrenme aliskanligini hic birakmadi\n- Takim icinde mentorluk yaparak liderlik gosterdi\n\nSENIN AVANTAJIN:\n- Sen CS mezunusun — formal egitimin VAR\n- 10+ projen var — portfolyon guclu\n- Modern teknolojileri biliyorsun — piyasanin istedigini ogrendin\n- Bu hikayelerdeki insanlardan daha iyi bir baslangic noktasindasin"
+          "template": "PROFIL: Universiteden atilmis, formal egitim yok\n\nYOLCULUK:\n- Universite 2. sınıfta birаkti\n- 3 yıl boyunca kendi kendine programlama öğrendi\n- Internetten kurslar, açık kaynak projeler, community katilimi\n- Ilk isini 26 yasinda bir startup'ta junior olarak başladı\n- 3 yıl içinde tech lead oldu\n- 5 yıl içinde CTO oldu\n\nANAHTAR FAKTOR:\n- Formal egitim eksikligini proje kalitesi ile kapatdi\n- Problem cozmede yaratıcı yaklaşımı ile one çıktı\n- Sürekli öğrenme aliskanligini hic bırakmadı\n- Takim içinde mentorluk yaparak liderlik gösterdi\n\nSENIN AVANTAJIN:\n- Sen CS mezunusun — formal egitimin VAR\n- 10+ projen var — portfolyon güçlü\n- Modern teknolojileri biliyorsun — piyasanin istedigini öğrendin\n- Bu hikayelerdeki insanlardan daha iyi bir başlangıç noktasındasın"
         },
         {
-          "label": "Sana ozel motivasyon",
-          "template": "SENIN HIKAYENI YAZIYORSUN\n\nSu an burdasin:\n- KTU Bilgisayar Muhendisligi mezunu ✓\n- 10+ production-ready proje ✓\n- Modern tech stack (React, TypeScript, Python, AI) ✓\n- Senior-level muhendislik pratikleri (CI/CD, testing, Docker) ✓\n- 3.5 yillik yogun ogrenim donemi ✓\n\n6 ay sonra burda olacaksin:\n- Is teklifi aldin ✓\n- Remote veya yerinde, senior-level maas ✓\n- Takim icinde deger yaratan muhendis ✓\n- 'Boslugu avantaja cevirdim' hikayesini anlatiyorsun ✓\n\n1 yil sonra:\n- Mid-level veya senior'a terfi ✓\n- Mentorluk yapiyorsun ✓\n- Senin hikayen baskalarina ilham veriyor ✓\n\nTek gereken: sistematik basvuru + dogru anlatim + vazgecmemek.\nBu rehberdeki her seyi uygula ve sonuclari gor."
+          "label": "Sana özel motivasyon",
+          "template": "SENIN HIKAYENI YAZIYORSUN\n\nSu an burdasin:\n- KTU Bilgisayar Mühendisliği mezunu ✓\n- 10+ production-ready proje ✓\n- Modern tech stack (React, TypeScript, Python, AI) ✓\n- Senior-level mühendislik pratikleri (CI/CD, testing, Docker) ✓\n- 3.5 yıllık yogun öğrenim dönemi ✓\n\n6 ay sonra burda olacaksin:\n- Is teklifi aldin ✓\n- Remote veya yerinde, senior-level maas ✓\n- Takim içinde değer yaratan mühendis ✓\n- 'Boşluğu avantaja çevirdim' hikayesini anlatıyorsun ✓\n\n1 yıl sonra:\n- Mid-level veya senior'a terfi ✓\n- Mentorluk yapıyorsun ✓\n- Senin hikayen baskalarina ilham veriyor ✓\n\nTek gereken: sistematik başvuru + doğru anlatım + vazgecmemek.\nBu rehberdeki her seyi uygula ve sonuçları gor."
         }
       ],
       "checklist": [
-        "Basari hikayeleri okundu ve icsellestirildi",
+        "Başarı hikayeleri okundu ve icsellestirildi",
         "Kendi hikayenin taslagi yazildi",
-        "LinkedIn'de benzer hikayeleri paylasan insanlar takip edildi",
+        "LinkedIn'de benzer hikayeleri paylaşan insanlar takip edildi",
         "Rejection sonrasi motivasyon stratejisi belirlendi",
-        "Ileri donuk hedefler (6 ay, 1 yil) yazildi"
+        "Ileri donuk hedefler (6 ay, 1 yıl) yazildi"
       ]
     }
   ]

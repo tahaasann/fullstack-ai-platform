@@ -12,19 +12,19 @@ export default function AIToolsGuidePage() {
     getAIToolsGuide().then(setGuide).catch(console.error);
   }, []);
 
-  if (!guide) return <div className="text-gray-400">Yukleniyor...</div>;
+  if (!guide) return <div className="text-gray-400">Yükleniyor...</div>;
 
   const tabs = [
-    { id: 'models' as const, label: 'Model Karsilastirma', icon: '🤖' },
-    { id: 'guide' as const, label: 'Kullanim Rehberi', icon: '📖' },
-    { id: 'workflows' as const, label: 'Workflow Sablonlari', icon: '⚡' },
+    { id: 'models' as const, label: 'Model Karşılaştırma', icon: '🤖' },
+    { id: 'guide' as const, label: 'Kullanım Rehberi', icon: '📖' },
+    { id: 'workflows' as const, label: 'Workflow Şablonları', icon: '⚡' },
     { id: 'antipatterns' as const, label: 'Anti-Patterns', icon: '⚠️' },
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">AI Araclari Rehberi</h1>
+        <h1 className="text-2xl font-bold text-white">AI Araçları Rehberi</h1>
         <p className="text-gray-400 mt-1">{guide.description}</p>
       </div>
 
@@ -58,7 +58,7 @@ export default function AIToolsGuidePage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase mb-1">Guclu Yanlari</h4>
+                  <h4 className="text-xs font-semibold text-gray-400 uppercase mb-1">Güçlü Yanları</h4>
                   <ul className="space-y-1">
                     {model.strengths?.map((s: string, i: number) => (
                       <li key={i} className="text-sm text-green-400 flex items-start gap-1">
@@ -68,7 +68,7 @@ export default function AIToolsGuidePage() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase mb-1">En Iyi Icin</h4>
+                  <h4 className="text-xs font-semibold text-gray-400 uppercase mb-1">En İyi İçin</h4>
                   <ul className="space-y-1">
                     {model.best_for?.map((b: string, i: number) => (
                       <li key={i} className="text-sm text-blue-400 flex items-start gap-1">
@@ -79,7 +79,7 @@ export default function AIToolsGuidePage() {
                 </div>
               </div>
 
-              <div className="flex gap-4 mt-3 text-xs text-gray-500">
+              <div className="flex gap-4 mt-3 text-xs text-gray-400">
                 <span>Context: {model.context_window}</span>
                 <span>Fiyat: {model.pricing_tier}</span>
               </div>
@@ -103,7 +103,7 @@ export default function AIToolsGuidePage() {
                     <span className="text-xl">{section.icon}</span>
                     <h2 className="text-lg font-semibold text-white">{section.title}</h2>
                   </div>
-                  <span className="text-gray-500 text-lg">{isOpen ? '−' : '+'}</span>
+                  <span className="text-gray-400 text-lg">{isOpen ? '−' : '+'}</span>
                 </button>
                 {isOpen && (
                   <div className="px-5 pb-5 border-t border-gray-800 pt-4 space-y-3">
@@ -158,7 +158,7 @@ export default function AIToolsGuidePage() {
               <h3 className="text-red-400 font-semibold mb-2">❌ {ap.pattern}</h3>
               <p className="text-sm text-gray-400 mb-3">{ap.description}</p>
               <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-3">
-                <h4 className="text-xs font-semibold text-green-400 mb-1">Dogru Yaklasim:</h4>
+                <h4 className="text-xs font-semibold text-green-400 mb-1">Doğru Yaklaşım:</h4>
                 <p className="text-sm text-green-300">{ap.better_approach}</p>
               </div>
             </div>

@@ -34,7 +34,7 @@ export default function ProjectPage() {
       await startProject(projectId);
       load();
     } catch (err) {
-      toast.error('Proje baslatilamadi. Tekrar deneyin.');
+      toast.error('Proje başlatılamadı. Tekrar deneyin.');
     }
   };
 
@@ -43,11 +43,11 @@ export default function ProjectPage() {
       await toggleMilestone(milestoneId);
       load();
     } catch (err) {
-      toast.error('Milestone guncellenemedi. Tekrar deneyin.');
+      toast.error('Milestone güncellenemedi. Tekrar deneyin.');
     }
   };
 
-  if (!project) return <div className="text-gray-400">Yukleniyor...</div>;
+  if (!project) return <div className="text-gray-400">Yükleniyor...</div>;
 
   const completedMs = project.milestones?.filter((ms: Milestone) => ms.completed).length || 0;
   const totalMs = project.milestones?.length || 0;
@@ -72,7 +72,7 @@ export default function ProjectPage() {
             <span className="px-2 py-0.5 bg-gray-800 text-gray-400 rounded text-xs">{project.difficulty}</span>
           )}
           {project.estimated_days && (
-            <span className="px-2 py-0.5 bg-gray-800 text-gray-500 rounded text-xs">{project.estimated_days} gun</span>
+            <span className="px-2 py-0.5 bg-gray-800 text-gray-400 rounded text-xs">{project.estimated_days} gün</span>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -100,7 +100,7 @@ export default function ProjectPage() {
             onClick={handleStart}
             className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
           >
-            Projeye Basla
+            Projeye Başla
           </button>
         )}
       </div>
@@ -116,12 +116,12 @@ export default function ProjectPage() {
       {/* What You Learn */}
       {project.what_you_learn && Object.keys(project.what_you_learn).length > 0 && (
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h2 className="text-lg font-semibold text-white mb-4">Ne Ogreneceksin</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Ne Öğreneceksin</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(project.what_you_learn).map(([category, skills]) => (
               skills?.length > 0 && (
                 <div key={category}>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">
                     {category === 'technical' ? 'Teknik' :
                      category === 'architectural' ? 'Mimari' :
                      category === 'ai_specific' ? 'AI/ML' :
@@ -159,12 +159,12 @@ export default function ProjectPage() {
                 <h3 className="text-sm font-semibold text-purple-300 mb-1">{d.decision}</h3>
                 <p className="text-sm text-gray-300 mb-2">{d.reasoning}</p>
                 {d.alternatives && (
-                  <div className="text-xs text-gray-500 mb-1">
+                  <div className="text-xs text-gray-400 mb-1">
                     <span className="font-medium text-gray-400">Alternatifler: </span>{d.alternatives}
                   </div>
                 )}
                 {d.when_to_choose_alternative && (
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-400">
                     <span className="font-medium text-gray-400">Ne zaman alternatif: </span>{d.when_to_choose_alternative}
                   </div>
                 )}
@@ -181,7 +181,7 @@ export default function ProjectPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {project.requirements.functional && project.requirements.functional.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Fonksiyonel</h3>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">Fonksiyonel</h3>
                 {project.requirements.functional.map((r: string, i: number) => (
                   <div key={i} className="text-sm text-gray-300 flex items-start gap-2 mb-1">
                     <span className="text-green-400 shrink-0">✓</span> {r}
@@ -191,7 +191,7 @@ export default function ProjectPage() {
             )}
             {project.requirements.non_functional && project.requirements.non_functional.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Non-Fonksiyonel</h3>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">Non-Fonksiyonel</h3>
                 {project.requirements.non_functional.map((r: string, i: number) => (
                   <div key={i} className="text-sm text-gray-300 flex items-start gap-2 mb-1">
                     <span className="text-blue-400 shrink-0">·</span> {r}
@@ -201,7 +201,7 @@ export default function ProjectPage() {
             )}
             {project.requirements.ai_requirements && project.requirements.ai_requirements.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">AI Gereksinimleri</h3>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">AI Gereksinimleri</h3>
                 {project.requirements.ai_requirements.map((r: string, i: number) => (
                   <div key={i} className="text-sm text-gray-300 flex items-start gap-2 mb-1">
                     <span className="text-purple-400 shrink-0">·</span> {r}
@@ -216,7 +216,7 @@ export default function ProjectPage() {
       {/* Evaluation Criteria */}
       {project.evaluation_criteria && project.evaluation_criteria.length > 0 && (
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h2 className="text-lg font-semibold text-white mb-4">Degerlendirme Kriterleri</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Değerlendirme Kriterleri</h2>
           <div className="space-y-3">
             {project.evaluation_criteria.map((c, i: number) => (
               <div key={i} className="flex items-center gap-4">
@@ -225,7 +225,7 @@ export default function ProjectPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-200">{c.criterion}</h3>
-                  <p className="text-xs text-gray-500">{c.description}</p>
+                  <p className="text-xs text-gray-400">{c.description}</p>
                 </div>
               </div>
             ))}
@@ -252,13 +252,13 @@ export default function ProjectPage() {
                         : 'border-gray-600 hover:border-gray-400'
                     }`}
                   >
-                    {ms.completed ? <span className="text-xs">✓</span> : <span className="text-xs text-gray-500">{i + 1}</span>}
+                    {ms.completed ? <span className="text-xs">✓</span> : <span className="text-xs text-gray-400">{i + 1}</span>}
                   </button>
                   <div className="flex-1">
-                    <h3 className={`text-sm font-semibold ${ms.completed ? 'text-gray-500' : 'text-gray-200'}`}>
+                    <h3 className={`text-sm font-semibold ${ms.completed ? 'text-gray-400' : 'text-gray-200'}`}>
                       {ms.title}
                     </h3>
-                    {ms.description && <p className="text-xs text-gray-500 mt-1">{ms.description}</p>}
+                    {ms.description && <p className="text-xs text-gray-400 mt-1">{ms.description}</p>}
                     {detail?.estimated_hours && (
                       <span className="text-xs text-gray-600 mt-1 inline-block">{detail.estimated_hours} saat</span>
                     )}
@@ -296,7 +296,7 @@ export default function ProjectPage() {
                     <div key={step.step} className="border-l-2 border-blue-500/20 pl-4 space-y-3">
                       <div>
                         <h4 className="text-sm font-semibold text-blue-300">
-                          Adim {step.step}: {step.title}
+                          Adım {step.step}: {step.title}
                         </h4>
                         {step.why && (
                           <div className="text-xs text-yellow-300/70 mt-1 bg-yellow-900/10 border border-yellow-500/10 rounded px-3 py-2">
@@ -354,11 +354,11 @@ export default function ProjectPage() {
       {/* Interview Prep */}
       {project.interview_prep && (project.interview_prep.questions?.length || project.interview_prep.talking_points?.length) && (
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h2 className="text-lg font-semibold text-white mb-4">Mulakat Hazirlik</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Mülakat Hazırlık</h2>
 
           {project.interview_prep.questions && project.interview_prep.questions.length > 0 && (
             <div className="mb-4">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Sorulabilecek Sorular</h3>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">Sorulabilecek Sorular</h3>
               <div className="space-y-2">
                 {project.interview_prep.questions.map((q: string, i: number) => (
                   <div key={i} className="text-sm text-gray-300 flex items-start gap-2">
@@ -371,7 +371,7 @@ export default function ProjectPage() {
 
           {project.interview_prep.talking_points && project.interview_prep.talking_points.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Konusma Noktalari</h3>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">Konuşma Noktaları</h3>
               <div className="space-y-2">
                 {project.interview_prep.talking_points.map((tp: string, i: number) => (
                   <div key={i} className="text-sm text-gray-300 flex items-start gap-2">
@@ -391,7 +391,7 @@ export default function ProjectPage() {
             CV Rehberi
           </h2>
           <div className="mb-3">
-            <div className="text-xs font-semibold text-gray-500 uppercase mb-1">ATS-Optimized Proje Başlığı</div>
+            <div className="text-xs font-semibold text-gray-400 uppercase mb-1">ATS-Optimized Proje Başlığı</div>
             <div className="text-sm text-blue-300 font-medium">{project.cv_guidance.project_title_for_cv}</div>
           </div>
 
@@ -411,7 +411,7 @@ export default function ProjectPage() {
 
           {project.cv_guidance.ats_keywords?.length > 0 && (
             <div className="mb-3">
-              <div className="text-xs font-semibold text-gray-500 uppercase mb-2">ATS Anahtar Kelimeler</div>
+              <div className="text-xs font-semibold text-gray-400 uppercase mb-2">ATS Anahtar Kelimeler</div>
               <div className="flex flex-wrap gap-1.5">
                 {project.cv_guidance.ats_keywords.map((kw: string, i: number) => (
                   <span key={i} className="px-2 py-0.5 bg-blue-900/30 text-blue-400 rounded text-xs">{kw}</span>
@@ -422,7 +422,7 @@ export default function ProjectPage() {
 
           {project.cv_guidance.metrics_you_can_claim?.length > 0 && (
             <div className="mb-3">
-              <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Kullanabileceğin Metrikler</div>
+              <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Kullanabileceğin Metrikler</div>
               <div className="space-y-1">
                 {project.cv_guidance.metrics_you_can_claim.map((m: string, i: number) => (
                   <div key={i} className="text-sm text-yellow-300 flex items-start gap-2">
@@ -451,12 +451,12 @@ export default function ProjectPage() {
 
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Repo Adı</div>
+              <div className="text-xs font-semibold text-gray-400 uppercase mb-1">Repo Adı</div>
               <code className="text-sm text-green-400 bg-gray-800 px-2 py-1 rounded">{project.github_guidance.repo_name}</code>
             </div>
             {project.github_guidance.pin_on_profile && (
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Profilde Pinle</div>
+                <div className="text-xs font-semibold text-gray-400 uppercase mb-1">Profilde Pinle</div>
                 <span className="text-sm text-yellow-400">Evet (Öncelik: {project.github_guidance.pin_priority})</span>
               </div>
             )}
@@ -464,14 +464,14 @@ export default function ProjectPage() {
 
           {project.github_guidance.repo_description && (
             <div className="mb-3">
-              <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Repo Açıklaması</div>
+              <div className="text-xs font-semibold text-gray-400 uppercase mb-1">Repo Açıklaması</div>
               <div className="text-sm text-gray-300 italic">{project.github_guidance.repo_description}</div>
             </div>
           )}
 
           {project.github_guidance.topics && project.github_guidance.topics.length > 0 && (
             <div className="mb-3">
-              <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Topics</div>
+              <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Topics</div>
               <div className="flex flex-wrap gap-1.5">
                 {project.github_guidance.topics.map((t: string, i: number) => (
                   <span key={i} className="px-2 py-0.5 bg-gray-800 text-gray-400 rounded text-xs">{t}</span>
@@ -482,7 +482,7 @@ export default function ProjectPage() {
 
           {project.github_guidance.commit_examples && project.github_guidance.commit_examples.length > 0 && (
             <div className="mb-3">
-              <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Örnek Commit Mesajları</div>
+              <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Örnek Commit Mesajları</div>
               <div className="space-y-1">
                 {project.github_guidance.commit_examples.map((c: string, i: number) => (
                   <code key={i} className="block text-xs text-gray-300 bg-gray-800 px-2 py-1 rounded">{c}</code>
@@ -500,7 +500,7 @@ export default function ProjectPage() {
 
           {project.github_guidance.pro_tips && project.github_guidance.pro_tips.length > 0 && (
             <div className="mt-3">
-              <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Pro Tips</div>
+              <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Pro Tips</div>
               <div className="space-y-1">
                 {project.github_guidance.pro_tips.map((tip: string, i: number) => (
                   <div key={i} className="text-sm text-gray-300 flex items-start gap-2">
@@ -530,7 +530,7 @@ export default function ProjectPage() {
                   >
                     {res.title || res.url}
                   </a>
-                  {res.why && <p className="text-xs text-gray-500 mt-0.5">{res.why}</p>}
+                  {res.why && <p className="text-xs text-gray-400 mt-0.5">{res.why}</p>}
                 </div>
               </div>
             ))}

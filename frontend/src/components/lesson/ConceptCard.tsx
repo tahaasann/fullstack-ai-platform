@@ -13,7 +13,7 @@ export default function ConceptCard({ concept }: { concept: Section }) {
           <p className="text-gray-300 leading-relaxed">{concept.content}</p>
           {concept.analogy && (
             <div className="mt-3 p-3 bg-gray-900/50 rounded-lg">
-              <span className="text-xs text-gray-500 uppercase font-semibold">Gerçek Hayat Benzetmesi</span>
+              <span className="text-xs text-gray-400 uppercase font-semibold">Gerçek Hayat Benzetmesi</span>
               <p className="text-gray-400 text-sm mt-1">{concept.analogy}</p>
             </div>
           )}

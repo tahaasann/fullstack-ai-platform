@@ -18,17 +18,30 @@ router = APIRouter()
 def list_projects(db: Session = Depends(get_db)) -> list[ProjectListItem]:
     """Return all projects with progress stats."""
     projects = db.query(Project).order_by(Project.order_index).all()
+    project_ids = [p.id for p in projects]
+
+    # Batch query all related data
+    progress_map = {pp.project_id: pp for pp in
+        db.query(ProjectProgress).filter(ProjectProgress.project_id.in_(project_ids)).all()}
+
+    all_milestones = db.query(ProjectMilestone).filter(
+        ProjectMilestone.project_id.in_(project_ids)).all()
+    milestone_ids = [m.id for m in all_milestones]
+
+    completed_ms_ids = set(mp.milestone_id for mp in
+        db.query(MilestoneProgress).filter(
+            MilestoneProgress.milestone_id.in_(milestone_ids),
+            MilestoneProgress.completed == True).all()) if milestone_ids else set()
+
+    milestones_by_project = {}
+    for m in all_milestones:
+        milestones_by_project.setdefault(m.project_id, []).append(m)
+
     result = []
     for p in projects:
-        prog = db.query(ProjectProgress).filter(ProjectProgress.project_id == p.id).first()
-        milestones = db.query(ProjectMilestone).filter(ProjectMilestone.project_id == p.id).all()
-        completed_ms = sum(
-            1 for ms in milestones
-            if db.query(MilestoneProgress).filter(
-                MilestoneProgress.milestone_id == ms.id,
-                MilestoneProgress.completed == True
-            ).first()
-        )
+        prog = progress_map.get(p.id)
+        ms_list = milestones_by_project.get(p.id, [])
+        completed_ms = sum(1 for ms in ms_list if ms.id in completed_ms_ids)
         result.append(ProjectListItem(
             id=p.id,
             title=p.title,
@@ -39,7 +52,7 @@ def list_projects(db: Session = Depends(get_db)) -> list[ProjectListItem]:
             tech_stack=json.loads(p.tech_stack) if p.tech_stack else [],
             status=prog.status if prog else "not_started",
             completed_milestones=completed_ms,
-            total_milestones=len(milestones),
+            total_milestones=len(ms_list),
         ))
     return result
 
@@ -74,9 +87,14 @@ def get_project(project_id: str, db: Session = Depends(get_db)) -> ProjectDetail
         ProjectMilestone.project_id == project_id
     ).order_by(ProjectMilestone.order_index).all()
 
+    milestone_ids = [ms.id for ms in milestones]
+    ms_progress_map = {mp.milestone_id: mp for mp in
+        db.query(MilestoneProgress).filter(
+            MilestoneProgress.milestone_id.in_(milestone_ids)).all()} if milestone_ids else {}
+
     ms_list = []
     for ms in milestones:
-        ms_prog = db.query(MilestoneProgress).filter(MilestoneProgress.milestone_id == ms.id).first()
+        ms_prog = ms_progress_map.get(ms.id)
         ms_list.append(MilestoneDetailItem(
             id=ms.id,
             title=ms.title,

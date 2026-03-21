@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, memo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { getLesson, startLesson, completeLesson, updateLessonTime } from '../api/client';
-import type { LessonContent, Section } from '../types';
+import { startLesson, updateLessonTime } from '../api/client';
+import { useLesson } from '../hooks/useLesson';
+import type { Section } from '../types';
 import ConceptCard from '../components/lesson/ConceptCard';
 import ComparisonTable from '../components/lesson/ComparisonTable';
 import CodeBlock from '../components/lesson/CodeBlock';
@@ -17,20 +18,23 @@ import MarkdownRenderer from '../components/common/MarkdownRenderer';
 
 export default function LessonPage() {
   const { lessonId } = useParams();
-  const [lesson, setLesson] = useState<LessonContent | null>(null);
+  const { lesson, isLoading, completeMutation } = useLesson(lessonId || '');
   const [completed, setCompleted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const secondsRef = useRef(0);
 
+  // Sync completed state from fetched lesson data
+  useEffect(() => {
+    if (lesson) {
+      setCompleted(lesson.status === 'completed');
+    }
+  }, [lesson]);
+
+  // Start lesson tracking and time tracking
   useEffect(() => {
     if (!lessonId) return;
-    getLesson(lessonId).then((data) => {
-      setLesson(data);
-      setCompleted(data.status === 'completed');
-      startLesson(lessonId).catch(() => {});
-    }).catch(console.error);
+    startLesson(lessonId).catch(() => {});
 
-    // Track time spent
     secondsRef.current = 0;
     timerRef.current = setInterval(() => {
       secondsRef.current += 30;
@@ -48,15 +52,15 @@ export default function LessonPage() {
   const handleComplete = async () => {
     if (!lessonId) return;
     try {
-      await completeLesson(lessonId);
+      await completeMutation.mutateAsync();
       setCompleted(true);
-      toast.success('Ders tamamlandi!');
+      toast.success('Ders tamamlandı!');
     } catch (err) {
-      toast.error('Ders tamamlanamadi. Tekrar deneyin.');
+      toast.error('Ders tamamlanamadı. Tekrar deneyin.');
     }
   };
 
-  if (!lesson) return <div className="text-gray-400">Yükleniyor...</div>;
+  if (isLoading || !lesson) return <div className="text-gray-400">Yükleniyor...</div>;
 
   return (
     <div className="space-y-6">
@@ -90,7 +94,7 @@ export default function LessonPage() {
           <h1 className="text-3xl font-bold text-white">{lesson.title}</h1>
           {lessonId && <BookmarkButton itemType="lesson" itemId={lessonId} />}
         </div>
-        <div className="text-sm text-gray-500 mt-2">Tahmini süre: {lesson.estimated_minutes} dakika</div>
+        <div className="text-sm text-gray-400 mt-2">Tahmini süre: {lesson.estimated_minutes} dakika</div>
       </div>
 
       {/* Content Sections */}
@@ -128,7 +132,7 @@ export default function LessonPage() {
   );
 }
 
-function LessonSection({ section }: { section: Section }) {
+const LessonSection = memo(function LessonSection({ section }: { section: Section }) {
   switch (section.type) {
     case 'text':
       return <MarkdownRenderer content={section.content} />;
@@ -167,4 +171,4 @@ function LessonSection({ section }: { section: Section }) {
     default:
       return <MarkdownRenderer content={section.content || ''} />;
   }
-}
+});

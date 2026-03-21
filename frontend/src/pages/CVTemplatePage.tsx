@@ -11,12 +11,12 @@ export default function CVTemplatePage() {
     getCvTemplates().then(setGuide).catch(console.error);
   }, []);
 
-  if (!guide) return <div className="text-gray-400">Yukleniyor...</div>;
+  if (!guide) return <div className="text-gray-400">Yükleniyor...</div>;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">CV ve Resume Sablonlari</h1>
+        <h1 className="text-2xl font-bold text-white">CV ve Resume Şablonları</h1>
         <p className="text-gray-400 mt-1">{guide.description}</p>
       </div>
 
@@ -33,7 +33,7 @@ export default function CVTemplatePage() {
                   <span className="text-xl">{section.icon}</span>
                   <h2 className="text-lg font-semibold text-white">{section.title}</h2>
                 </div>
-                <span className="text-gray-500 text-lg">{isOpen ? '−' : '+'}</span>
+                <span className="text-gray-400 text-lg">{isOpen ? '−' : '+'}</span>
               </button>
 
               {isOpen && (
@@ -62,7 +62,7 @@ export default function CVTemplatePage() {
 
                   {section.tips && section.tips.length > 0 && (
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-400 mb-2">Ipuclari:</h3>
+                      <h3 className="text-sm font-semibold text-gray-400 mb-2">İpuçları:</h3>
                       <ul className="space-y-1">
                         {section.tips.map((tip: string, i: number) => (
                           <li key={i} className="text-sm text-gray-300 flex items-start gap-2">

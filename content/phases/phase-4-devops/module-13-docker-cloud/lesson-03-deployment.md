@@ -525,7 +525,7 @@ git clone https://github.com/username/my-api.git
 cd my-api
 python3.13 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt  # EC2'de pip kullanılabilir
+uv pip install -r requirements.txt  # uv tercih edilir, yoksa pip de kullanılabilir
 
 # 7. systemd service oluştur (uygulama crash olursa otomatik restart)
 sudo tee /etc/systemd/system/myapp.service << 'UNIT'
@@ -1233,7 +1233,7 @@ echo "Deploying to $DEPLOY_ENV (port $DEPLOY_PORT)..."
 cd /home/ubuntu/my-api-$DEPLOY_ENV
 git pull origin main
 source .venv/bin/activate
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 sudo systemctl restart myapp-$DEPLOY_ENV
 
 # 2. Health check — yeni versiyon hazır mı?

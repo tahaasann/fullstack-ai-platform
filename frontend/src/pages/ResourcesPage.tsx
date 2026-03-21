@@ -113,7 +113,7 @@ function ResourceCategory({ title, icon, resources }: {
           >
             <div>
               <h3 className="text-sm font-medium text-blue-400">{res.name}</h3>
-              <p className="text-xs text-gray-500 mt-0.5">{res.desc}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{res.desc}</p>
             </div>
             <span className="text-gray-600 text-sm shrink-0 ml-3">↗</span>
           </a>

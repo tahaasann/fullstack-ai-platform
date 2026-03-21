@@ -1,7 +1,8 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, ReactNode } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { PageSkeleton } from './components/common/Skeleton';
 import AppLayout from './components/layout/AppLayout';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
@@ -26,12 +27,28 @@ const CVTemplatePage = lazy(() => import('./pages/CVTemplatePage'));
 const JobSearchStrategyPage = lazy(() => import('./pages/JobSearchStrategyPage'));
 const EmploymentGapGuidePage = lazy(() => import('./pages/EmploymentGapGuidePage'));
 
+function SafePage({ children }: { children: ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<PageSkeleton />}>
+        {children}
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 function NotFoundPage() {
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center bg-gray-900 text-gray-300">
-      <h1 className="text-6xl font-bold text-emerald-500 mb-4">404</h1>
-      <p className="text-xl mb-6">Sayfa bulunamadi</p>
-      <Link to="/" className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
+    <div className="min-h-[60vh] flex flex-col items-center justify-center text-gray-300">
+      <h1 className="text-7xl font-bold text-emerald-500 mb-3">404</h1>
+      <p className="text-xl mb-2">Aradığınız sayfa bulunamadı</p>
+      <p className="text-sm text-gray-500 mb-8">
+        Bu sayfa taşınmış, silinmiş veya hiç var olmamış olabilir.
+      </p>
+      <Link
+        to="/"
+        className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+      >
         Ana Sayfaya Don
       </Link>
     </div>
@@ -42,30 +59,30 @@ export default function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-gray-400">Yukleniyor...</div></div>}>
+        <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><PageSkeleton /></div>}>
           <Routes>
             <Route element={<AppLayout />}>
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/modules" element={<ModuleListPage />} />
-              <Route path="/module/:moduleId" element={<ModulePage />} />
-              <Route path="/lesson/:lessonId" element={<LessonPage />} />
-              <Route path="/quiz/:quizId" element={<QuizPage />} />
-              <Route path="/challenges" element={<ChallengeListPage />} />
-              <Route path="/challenge/:challengeId" element={<ChallengePage />} />
-              <Route path="/projects" element={<ProjectListPage />} />
-              <Route path="/project/:projectId" element={<ProjectPage />} />
-              <Route path="/progress" element={<ProgressPage />} />
-              <Route path="/english" element={<EnglishProgressPage />} />
-              <Route path="/bookmarks" element={<BookmarksPage />} />
-              <Route path="/cv-guide" element={<CVGuidancePage />} />
-              <Route path="/linkedin-guide" element={<LinkedInGuidePage />} />
-              <Route path="/job-tracker" element={<JobTrackerPage />} />
-              <Route path="/cv-templates" element={<CVTemplatePage />} />
-              <Route path="/job-search-strategy" element={<JobSearchStrategyPage />} />
-              <Route path="/employment-gap-guide" element={<EmploymentGapGuidePage />} />
-              <Route path="/ai-tools" element={<AIToolsGuidePage />} />
-              <Route path="/resources" element={<ResourcesPage />} />
-              <Route path="/roadmap" element={<RoadmapPage />} />
+              <Route path="/" element={<SafePage><DashboardPage /></SafePage>} />
+              <Route path="/modules" element={<SafePage><ModuleListPage /></SafePage>} />
+              <Route path="/module/:moduleId" element={<SafePage><ModulePage /></SafePage>} />
+              <Route path="/lesson/:lessonId" element={<SafePage><LessonPage /></SafePage>} />
+              <Route path="/quiz/:quizId" element={<SafePage><QuizPage /></SafePage>} />
+              <Route path="/challenges" element={<SafePage><ChallengeListPage /></SafePage>} />
+              <Route path="/challenge/:challengeId" element={<SafePage><ChallengePage /></SafePage>} />
+              <Route path="/projects" element={<SafePage><ProjectListPage /></SafePage>} />
+              <Route path="/project/:projectId" element={<SafePage><ProjectPage /></SafePage>} />
+              <Route path="/progress" element={<SafePage><ProgressPage /></SafePage>} />
+              <Route path="/english" element={<SafePage><EnglishProgressPage /></SafePage>} />
+              <Route path="/bookmarks" element={<SafePage><BookmarksPage /></SafePage>} />
+              <Route path="/cv-guide" element={<SafePage><CVGuidancePage /></SafePage>} />
+              <Route path="/linkedin-guide" element={<SafePage><LinkedInGuidePage /></SafePage>} />
+              <Route path="/job-tracker" element={<SafePage><JobTrackerPage /></SafePage>} />
+              <Route path="/cv-templates" element={<SafePage><CVTemplatePage /></SafePage>} />
+              <Route path="/job-search-strategy" element={<SafePage><JobSearchStrategyPage /></SafePage>} />
+              <Route path="/employment-gap-guide" element={<SafePage><EmploymentGapGuidePage /></SafePage>} />
+              <Route path="/ai-tools" element={<SafePage><AIToolsGuidePage /></SafePage>} />
+              <Route path="/resources" element={<SafePage><ResourcesPage /></SafePage>} />
+              <Route path="/roadmap" element={<SafePage><RoadmapPage /></SafePage>} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>

@@ -14,12 +14,13 @@ export default function CodeBlock({ code }: { code: Section }) {
     <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800 bg-gray-900/80">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500 font-mono uppercase">{code.language || 'code'}</span>
+          <span className="text-xs text-gray-400 font-mono uppercase">{code.language || 'code'}</span>
           {code.title && <span className="text-xs text-gray-400">— {code.title}</span>}
         </div>
         <button
           onClick={handleCopy}
-          className="text-xs text-gray-500 hover:text-gray-300 transition-colors px-2 py-1"
+          className="text-xs text-gray-400 hover:text-gray-300 transition-colors px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded"
+          aria-label="Kodu kopyala"
         >
           {copied ? '✓ Kopyalandı' : 'Kopyala'}
         </button>

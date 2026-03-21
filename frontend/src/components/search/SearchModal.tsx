@@ -100,10 +100,13 @@ export default function SearchModal({ open, onClose }: Props) {
       <div
         className="relative w-full max-w-xl bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="İçerik arama"
       >
         {/* Input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800">
-          <HiOutlineSearch className="w-5 h-5 text-gray-500" />
+          <HiOutlineSearch className="w-5 h-5 text-gray-400" />
           <input
             ref={inputRef}
             type="text"
@@ -111,15 +114,16 @@ export default function SearchModal({ open, onClose }: Props) {
             onChange={(e) => { setQuery(e.target.value); setSelectedIdx(0); }}
             onKeyDown={handleKeyDown}
             placeholder="Ders, challenge, proje veya kelime ara..."
-            className="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-500"
+            className="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:rounded"
+            aria-label="İçerik ara"
           />
-          <kbd className="text-xs text-gray-600 border border-gray-700 rounded px-1.5 py-0.5">ESC</kbd>
+          <button onClick={onClose} className="text-xs text-gray-600 border border-gray-700 rounded px-1.5 py-0.5 hover:text-gray-400 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none" aria-label="Aramayı kapat">ESC</button>
         </div>
 
         {/* Results */}
         <div className="max-h-80 overflow-y-auto">
           {allResults.length === 0 && query.length >= 2 && (
-            <div className="px-4 py-8 text-center text-gray-500 text-sm">Sonuc bulunamadi.</div>
+            <div className="px-4 py-8 text-center text-gray-400 text-sm">Sonuç bulunamadı.</div>
           )}
           {allResults.length === 0 && query.length < 2 && (
             <div className="px-4 py-8 text-center text-gray-600 text-sm">En az 2 karakter yaz...</div>
@@ -137,7 +141,7 @@ export default function SearchModal({ open, onClose }: Props) {
               <div className="flex-1 min-w-0">
                 <div className="text-sm truncate">{item.title}</div>
                 {item.description && (
-                  <div className="text-xs text-gray-500 truncate">{item.description}</div>
+                  <div className="text-xs text-gray-400 truncate">{item.description}</div>
                 )}
               </div>
               <span className="text-xs text-gray-600 shrink-0">{typeLabels[item.type]}</span>

@@ -60,7 +60,7 @@ export default function ModuleListPage() {
                   </div>
                   <div className="text-right ml-4">
                     <div className="text-sm font-medium text-gray-300">{pct}%</div>
-                    <div className="text-xs text-gray-500">{phase.module_count} modül · Hafta {phase.estimated_weeks}</div>
+                    <div className="text-xs text-gray-400">{phase.module_count} modül · Hafta {phase.estimated_weeks}</div>
                   </div>
                 </div>
                 <div className="mt-3 h-2 bg-gray-800 rounded-full overflow-hidden">
@@ -91,14 +91,14 @@ export default function ModuleListPage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-gray-500 mt-1 truncate">{mod.description}</p>
+                            <p className="text-xs text-gray-400 mt-1 truncate">{mod.description}</p>
                           </div>
                           <div className="flex items-center gap-3 ml-4 shrink-0">
                             <div className="text-right">
                               <div className="text-xs text-gray-400">
                                 {mod.completed_lessons}/{mod.lesson_count} ders
                               </div>
-                              <div className="text-xs text-gray-500">{mod.estimated_hours}h</div>
+                              <div className="text-xs text-gray-400">{mod.estimated_hours}h</div>
                             </div>
                             <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center ${
                               isComplete ? 'border-green-500' : isStarted ? 'border-blue-500' : 'border-gray-700'

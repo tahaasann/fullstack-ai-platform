@@ -1,13 +1,13 @@
 {
   "id": "linkedin-profile-guide",
   "title": "LinkedIn Profil Optimizasyon Rehberi",
-  "description": "Recruiter'larin seni bulmasini saglayan LinkedIn stratejisi. LinkedIn'de gorünür ol, dogru anahtar kelimeleri kullan, profesyonel bir profil olustur.",
+  "description": "Recruiter'larin seni bulmasini sağlayan LinkedIn stratejisi. LinkedIn'de gorünür ol, doğru anahtar kelimeleri kullan, profesyonel bir profil oluştur.",
   "sections": [
     {
       "id": "profil-fotografi-banner",
       "title": "Profil Fotografi & Banner",
       "icon": "📸",
-      "content": "LinkedIn'de ilk izlenim profil fotografinla baslar. Recruiter'lar günde yüzlerce profil tarıyor — profesyonel bir foto seni öne cikarir. Banner ise senin 'reklam panonn': ne yaptigini, hangi teknolojileri kullandigini bir bakista anlatir.",
+      "content": "LinkedIn'de ilk izlenim profil fotografinla başlar. Recruiter'lar günde yüzlerce profil tarıyor — profesyonel bir foto seni öne çıkarır. Banner işe senin 'reklam panonn': ne yaptığını, hangi teknolojileri kullandigini bir bakista anlatır.",
       "tips": [
         "Yüzün net görünsün, arka plan sade olsun (tek renk veya blur)",
         "Omuzlardan yukarı çekilmiş, iyi ışıklandırılmış bir fotoğraf kullan",
@@ -63,7 +63,7 @@
       ]
     },
     {
-      "id": "about-summary-bolumu",
+      "id": "about-summary-bölümü",
       "title": "About / Summary Bölümü",
       "icon": "📝",
       "content": "About bölümü senin elevator pitch'in. Recruiter'lar ilk 3 satırı görür ('see more' tıklanmadan), bu yüzden ilk 3 satır çok kritik. 3 paragraf formülü kullan: 1) Hook — Kim olduğun ve ne yaptığın (dikkat çekici giriş), 2) Skills & Experience — Teknolojilerin ve projelerinde neler başardığın, 3) Call to Action — Ne aradığın ve nasıl ulaşılacağı. ATS (Applicant Tracking System) keyword'lerini doğal şekilde serpiştir.",
@@ -106,7 +106,7 @@
       ]
     },
     {
-      "id": "experience-bolumu",
+      "id": "experience-bölümü",
       "title": "Experience Bölümü",
       "icon": "💼",
       "content": "Resmi iş deneyimin olmasa bile, projelerini experience olarak ekleyebilirsin. LinkedIn'de 'Self-employed', 'Freelance' veya 'Independent Projects' olarak listeleyebilirsin. Önemli olan: her entry'de ne yaptığını, hangi teknolojileri kullandığını ve sonuçları somut olarak yazman. Recruiter'lar action verb + metrik ister.",
@@ -149,10 +149,26 @@
         }
       ],
       "action_verbs": [
-        "Built", "Developed", "Designed", "Implemented", "Deployed",
-        "Architected", "Integrated", "Optimized", "Automated", "Created",
-        "Engineered", "Configured", "Migrated", "Refactored", "Scaled",
-        "Streamlined", "Established", "Launched", "Maintained", "Resolved"
+        "Built",
+        "Developed",
+        "Designed",
+        "Implemented",
+        "Deployed",
+        "Architected",
+        "Integrated",
+        "Optimized",
+        "Automated",
+        "Created",
+        "Engineered",
+        "Configured",
+        "Migrated",
+        "Refactored",
+        "Scaled",
+        "Streamlined",
+        "Established",
+        "Launched",
+        "Maintained",
+        "Resolved"
       ],
       "checklist": [
         "En az 3-4 experience entry var",
@@ -165,7 +181,7 @@
       ]
     },
     {
-      "id": "skills-bolumu",
+      "id": "skills-bölümü",
       "title": "Skills Bölümü",
       "icon": "🛠️",
       "content": "LinkedIn Skills bölümü doğrudan arama sıralamanı etkiler. Recruiter'lar 'React developer' diye aratınca, Skills bölümünde 'React' yazan profiller üste çıkar. 50 skill ekleyebilirsin — hepsini kullan. Endorsement almak için bağlantılarından rica et. En önemli 3 skill'i 'pin' yap.",
@@ -173,7 +189,7 @@
         "50 skill sınırını doldur — boş bırakma",
         "En güçlü 3 skill'i pinle (Top 3 Skills)",
         "Skill Assessment quiz'lerini geç — profilinde 'verified' badge çıkar",
-        "Bağlantılarından endorsement iste — karşılıklı endorsement yapın",
+        "Bağlantılarından endorsement işte — karşılıklı endorsement yapın",
         "Genel skill'ler yerine spesifik olanları tercih et: 'Programming' yerine 'Python', 'TypeScript'",
         "Her ay yeni öğrendiğin teknolojiyi ekle"
       ],
@@ -181,54 +197,95 @@
         "languages": {
           "title": "Programlama Dilleri",
           "skills": [
-            "JavaScript", "TypeScript", "Python", "HTML5", "CSS3", "SQL", "Bash"
+            "JavaScript",
+            "TypeScript",
+            "Python",
+            "HTML5",
+            "CSS3",
+            "SQL",
+            "Bash"
           ]
         },
         "frontend": {
           "title": "Frontend",
           "skills": [
-            "React.js", "Next.js", "Tailwind CSS", "Redux", "Zustand",
-            "Responsive Web Design", "Single Page Applications (SPA)",
-            "Progressive Web Apps (PWA)", "Figma", "UI/UX Design"
+            "React.js",
+            "Next.js",
+            "Tailwind CSS",
+            "Redux",
+            "Zustand",
+            "Responsive Web Design",
+            "Single Page Applications (SPA)",
+            "Progressive Web Apps (PWA)",
+            "Figma",
+            "UI/UX Design"
           ]
         },
         "backend": {
           "title": "Backend",
           "skills": [
-            "Node.js", "Express.js", "FastAPI", "REST APIs", "GraphQL",
-            "WebSockets", "Microservices", "API Development",
-            "Authentication (JWT, OAuth)", "Server-Side Development"
+            "Node.js",
+            "Express.js",
+            "FastAPI",
+            "REST APIs",
+            "GraphQL",
+            "WebSockets",
+            "Microservices",
+            "API Development",
+            "Authentication (JWT, OAuth)",
+            "Server-Side Development"
           ]
         },
         "databases": {
-          "title": "Veritabani",
+          "title": "Veritabanı",
           "skills": [
-            "PostgreSQL", "MongoDB", "Redis", "Prisma ORM",
-            "SQLAlchemy", "Database Design", "Data Modeling"
+            "PostgreSQL",
+            "MongoDB",
+            "Redis",
+            "Prisma ORM",
+            "SQLAlchemy",
+            "Database Design",
+            "Data Modeling"
           ]
         },
         "ai_ml": {
           "title": "AI / ML",
           "skills": [
-            "LangChain", "OpenAI API", "RAG (Retrieval-Augmented Generation)",
-            "Vector Databases", "Prompt Engineering", "Hugging Face",
-            "Natural Language Processing (NLP)", "Machine Learning",
-            "Artificial Intelligence", "LLM Applications"
+            "LangChain",
+            "OpenAI API",
+            "RAG (Retrieval-Augmented Generation)",
+            "Vector Databases",
+            "Prompt Engineering",
+            "Hugging Face",
+            "Natural Language Processing (NLP)",
+            "Machine Learning",
+            "Artificial Intelligence",
+            "LLM Applications"
           ]
         },
         "devops": {
           "title": "DevOps & Cloud",
           "skills": [
-            "Docker", "GitHub Actions", "CI/CD", "AWS",
-            "Vercel", "Linux", "Nginx"
+            "Docker",
+            "GitHub Actions",
+            "CI/CD",
+            "AWS",
+            "Vercel",
+            "Linux",
+            "Nginx"
           ]
         },
         "tools_practices": {
           "title": "Araclar & Pratikler",
           "skills": [
-            "Git", "GitHub", "Agile Methodologies", "Scrum",
-            "Test-Driven Development (TDD)", "Clean Code",
-            "Software Architecture", "Problem Solving",
+            "Git",
+            "GitHub",
+            "Agile Methodologies",
+            "Scrum",
+            "Test-Driven Development (TDD)",
+            "Clean Code",
+            "Software Architecture",
+            "Problem Solving",
             "Technical Writing"
           ]
         }
@@ -247,7 +304,7 @@
       ]
     },
     {
-      "id": "featured-bolumu",
+      "id": "featured-bölümü",
       "title": "Featured Bölümü",
       "icon": "⭐",
       "content": "Featured bölümü profilinin en görünür alanlarından biri. Buraya en iyi projelerini, blog yazılarını veya proje demosu paylaştığın post'ları pin'le. Recruiter profiline geldiğinde ilk göreceği şeylerden biri burası.",
@@ -325,11 +382,24 @@
         }
       ],
       "recommended_hashtags": [
-        "#FullStackDeveloper", "#WebDevelopment", "#React", "#TypeScript",
-        "#Python", "#AIEngineer", "#MachineLearning", "#LangChain",
-        "#BuildInPublic", "#OpenToWork", "#SoftwareEngineering",
-        "#TechTwitter", "#100DaysOfCode", "#DevCommunity",
-        "#Frontend", "#Backend", "#Docker", "#FastAPI"
+        "#FullStackDeveloper",
+        "#WebDevelopment",
+        "#React",
+        "#TypeScript",
+        "#Python",
+        "#AIEngineer",
+        "#MachineLearning",
+        "#LangChain",
+        "#BuildInPublic",
+        "#OpenToWork",
+        "#SoftwareEngineering",
+        "#TechTwitter",
+        "#100DaysOfCode",
+        "#DevCommunity",
+        "#Frontend",
+        "#Backend",
+        "#Docker",
+        "#FastAPI"
       ],
       "checklist": [
         "Haftalık post takvimi oluşturuldu",
@@ -415,7 +485,7 @@
       "recommendations": {
         "primary_language": "English",
         "secondary_language": "Turkish",
-        "reasoning": "Global şirketler ve remote pozisyonlar İngilizce arama yapar. Türk recruiter'lar da genellikle İngilizce keyword'lerle arama yapar (React Developer, Full Stack Developer). Türkçe ikincil profil ise Türkiye'deki yerel fırsatları yakalar.",
+        "reasoning": "Global şirketler ve remote pozisyonlar İngilizce arama yapar. Türk recruiter'lar da genellikle İngilizce keyword'lerle arama yapar (React Developer, Full Stack Developer). Türkçe ikincil profil işe Türkiye'deki yerel fırsatları yakalar.",
         "custom_url_tips": [
           "linkedin.com/in/adinsoyadin — en temiz format",
           "linkedin.com/in/adinsoyadindev — 'dev' ekleyerek developer olduğunu vurgula",
@@ -450,27 +520,62 @@
       "keyword_placement_strategy": {
         "headline": {
           "priority": "En yüksek",
-          "keywords": ["Full Stack Developer", "Software Engineer", "AI Engineer", "React", "TypeScript", "Python"],
+          "keywords": [
+            "Full Stack Developer",
+            "Software Engineer",
+            "AI Engineer",
+            "React",
+            "TypeScript",
+            "Python"
+          ],
           "note": "Headline'daki keyword'ler arama sıralamasında en çok ağırlığa sahip"
         },
         "current_title": {
           "priority": "Çok yüksek",
-          "keywords": ["Full Stack Developer", "Software Engineer", "AI Engineer"],
+          "keywords": [
+            "Full Stack Developer",
+            "Software Engineer",
+            "AI Engineer"
+          ],
           "note": "Mevcut pozisyon başlığı recruiter filtrelerinde direkt kullanılır"
         },
         "skills": {
           "priority": "Yüksek",
-          "keywords": ["React.js", "TypeScript", "Python", "Node.js", "FastAPI", "LangChain", "Docker", "PostgreSQL"],
+          "keywords": [
+            "React.js",
+            "TypeScript",
+            "Python",
+            "Node.js",
+            "FastAPI",
+            "LangChain",
+            "Docker",
+            "PostgreSQL"
+          ],
           "note": "50 skill ekle — recruiter'lar skill filtresi kullanır"
         },
         "about": {
           "priority": "Orta-Yüksek",
-          "keywords": ["full stack development", "AI applications", "web development", "REST APIs", "microservices"],
+          "keywords": [
+            "full stack development",
+            "AI applications",
+            "web development",
+            "REST APIs",
+            "microservices"
+          ],
           "note": "Doğal cümleler içinde keyword'leri kullan — spam gibi görünmesin"
         },
         "experience": {
           "priority": "Orta",
-          "keywords": ["built", "developed", "implemented", "deployed", "React", "TypeScript", "Python", "FastAPI"],
+          "keywords": [
+            "built",
+            "developed",
+            "implemented",
+            "deployed",
+            "React",
+            "TypeScript",
+            "Python",
+            "FastAPI"
+          ],
           "note": "Her bullet point'ta en az 1 teknoloji keyword'ü olsun"
         }
       },
@@ -484,8 +589,16 @@
           "Software Developer",
           "Web Developer"
         ],
-        "location_types": ["Remote", "On-site", "Hybrid"],
-        "locations": ["Turkey", "Europe", "Worldwide"],
+        "location_types": [
+          "Remote",
+          "On-site",
+          "Hybrid"
+        ],
+        "locations": [
+          "Turkey",
+          "Europe",
+          "Worldwide"
+        ],
         "start_date": "Immediately",
         "visibility": "Recruiters only (önerilir) veya All LinkedIn members"
       },

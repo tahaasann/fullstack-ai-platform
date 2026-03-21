@@ -15,7 +15,7 @@ export default function ResumeBar() {
         <div className="min-w-0">
           <p className="text-sm text-gray-300">Son kaldigin yer:</p>
           <p className="text-white font-medium truncate">{lastPos.title}</p>
-          <p className="text-xs text-gray-500 mt-0.5">{timeAgo}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{timeAgo}</p>
         </div>
       </div>
       <Link
@@ -31,10 +31,10 @@ export default function ResumeBar() {
 function getTimeAgo(timestamp: number): string {
   const diff = Date.now() - timestamp;
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return 'az once';
-  if (minutes < 60) return `${minutes} dakika once`;
+  if (minutes < 1) return 'az önce';
+  if (minutes < 60) return `${minutes} dakika önce`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} saat once`;
+  if (hours < 24) return `${hours} saat önce`;
   const days = Math.floor(hours / 24);
-  return `${days} gun once`;
+  return `${days} gün önce`;
 }

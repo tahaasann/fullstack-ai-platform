@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./egitim.db"
     cors_origins: list[str] = ["http://localhost:5173"]
     log_level: str = "INFO"
+    debug: bool = False
     content_dir: str = "content"
 
     class Config:

@@ -7,7 +7,7 @@
         "patterns": [
           {
             "pattern": "Yesterday I worked on [task]. Today I'll [plan]. No blockers.",
-            "turkish": "Dun [gorev] uzerinde calistim. Bugun [plan] yapacagim. Engel yok.",
+            "turkish": "Dün [görev] üzerinde çalıştım. Bugün [plan] yapacagim. Engel yok.",
             "when_to_use": "Her sabah standup meeting'de — 30 saniyede bitir",
             "variations": [
               "I spent yesterday on [task] and plan to continue with [next step] today.",
@@ -17,7 +17,7 @@
           },
           {
             "pattern": "I'm currently working on [task] and expect to finish by [time].",
-            "turkish": "Su anda [gorev] uzerinde calisiyorum ve [zaman]'a kadar bitirmeyi bekliyorum.",
+            "turkish": "Su anda [görev] üzerinde çalışıyorum ve [zaman]'a kadar bitirmeyi bekliyorum.",
             "when_to_use": "Devam eden bir is hakkinda ilerleme bildirirken",
             "variations": [
               "I've been working on [task] since [day] and I'm about [percentage] done.",
@@ -27,8 +27,8 @@
           },
           {
             "pattern": "I got blocked on [issue]. Could someone help me with [specific need]?",
-            "turkish": "[Sorun] konusunda takildim. [Belirli ihtiyac] konusunda biri yardim edebilir mi?",
-            "when_to_use": "Bir engel oldugunda ve yardim istemek gerektiginde",
+            "turkish": "[Sorun] konusunda takildim. [Belirli ihtiyaç] konusunda biri yardım edebilir mi?",
+            "when_to_use": "Bir engel olduğunda ve yardım istemek gerektiginde",
             "variations": [
               "I'm stuck on [issue] and need [person/team]'s input to move forward.",
               "I ran into a blocker with [issue] — I'll need access to [resource] to continue."
@@ -37,8 +37,8 @@
           },
           {
             "pattern": "I finished [task] ahead of schedule. I'll pick up [next task] from the backlog.",
-            "turkish": "[Gorevi] planlanan sureden once bitirdim. Backlog'dan [sonraki gorev]'i alacagim.",
-            "when_to_use": "Isi erken bitirdiginde ve yeni is aldiginda",
+            "turkish": "[Görevi] planlanan süreden önce bitirdim. Backlog'dan [sonraki görev]'i alacagim.",
+            "when_to_use": "Işi erken bitirdiginde ve yeni is aldığında",
             "variations": [
               "I wrapped up [task] early, so I'm pulling in [next task].",
               "[Task] is done. I'll start on [next task] unless anyone needs help."
@@ -47,8 +47,8 @@
           },
           {
             "pattern": "I'll need to carry over [task] — it turned out to be more complex than estimated.",
-            "turkish": "[Gorevi] devam ettirmem gerekecek — tahmin edilenden daha karmasik cikti.",
-            "when_to_use": "Bir gorev beklenenden uzun surerse ve bir sonraki gune sarktiginda",
+            "turkish": "[Görevi] devam ettirmem gerekecek — tahmin edilenden daha karmaşık çıktı.",
+            "when_to_use": "Bir görev beklenenden uzun sürerse ve bir sonraki gune sarktiginda",
             "variations": [
               "I'm going to spill [task] into today — I hit some unexpected complexity.",
               "[Task] is taking longer than expected. I found [unexpected issue] that needs to be addressed first."
@@ -62,8 +62,8 @@
         "patterns": [
           {
             "pattern": "Hi [name], I'm reaching out to get more details about [topic]. Could you share [specific info]?",
-            "turkish": "Merhaba [isim], [konu] hakkinda daha fazla bilgi almak icin yaziyorum. [Belirli bilgi]'yi paylasabilir misiniz?",
-            "when_to_use": "Baska bir takim veya kisiden bilgi isterken",
+            "turkish": "Merhaba [isim], [konu] hakkinda daha fazla bilgi almak için yaziyorum. [Belirli bilgi]'yi paylasabilir misiniz?",
+            "when_to_use": "Başka bir takim veya kisiden bilgi isterken",
             "variations": [
               "I was hoping you could provide some context on [topic].",
               "Could you point me to the documentation for [topic]? I need it for [reason]."
@@ -72,8 +72,8 @@
           },
           {
             "pattern": "Just following up on my previous email about [topic]. Do you have any updates?",
-            "turkish": "[Konu] hakkindaki onceki e-postami takip ediyorum. Herhangi bir guncelleme var mi?",
-            "when_to_use": "Onceki bir e-postaya yanit alinmadiginda nazikce hatirlatmak icin",
+            "turkish": "[Konu] hakkindaki önceki e-postami takip ediyorum. Herhangi bir güncelleme var mi?",
+            "when_to_use": "Önceki bir e-postaya yanit alinmadiginda nazikce hatirlatmak için",
             "variations": [
               "I wanted to circle back on [topic] from last [day]. Any progress on that?",
               "Friendly reminder about [topic] — let me know if you need anything from my side."
@@ -82,8 +82,8 @@
           },
           {
             "pattern": "Here's a quick update on [project/task]: [summary]. Next steps: [plan].",
-            "turkish": "[Proje/gorev] hakkinda kisa bir guncelleme: [ozet]. Sonraki adimlar: [plan].",
-            "when_to_use": "Yonetici veya paydasa durum raporu gonderirken",
+            "turkish": "[Proje/görev] hakkinda kisa bir güncelleme: [özet]. Sonraki adimlar: [plan].",
+            "when_to_use": "Yönetici veya paydasa durum raporu gonderirken",
             "variations": [
               "Wanted to keep you in the loop on [project]. We've completed [X] and are moving to [Y].",
               "Status update: [project] is on track. We finished [milestone] and are starting [next phase]."
@@ -92,7 +92,7 @@
           },
           {
             "pattern": "Hi, I'm [name], a [role] on the [team] team. I'll be working on [project/area].",
-            "turkish": "Merhaba, ben [isim], [takim] takiminda [rol]. [Proje/alan] uzerinde calisacagim.",
+            "turkish": "Merhaba, ben [isim], [takim] takiminda [rol]. [Proje/alan] üzerinde çalışacağım.",
             "when_to_use": "Yeni bir takima veya projeye katildiginda kendini tanitirken",
             "variations": [
               "I just joined the team as a [role] and I'm excited to contribute to [project].",
@@ -102,8 +102,8 @@
           },
           {
             "pattern": "I'm running into an issue with [problem]. Would you be able to help or point me in the right direction?",
-            "turkish": "[Sorun] ile ilgili bir problemle karsilasiyorum. Yardim edebilir veya beni dogru yone yonlendirebilir misiniz?",
-            "when_to_use": "E-posta ile teknik yardim isterken",
+            "turkish": "[Sorun] ile ilgili bir problemle karsilasiyorum. Yardım edebilir veya beni doğru yone yonlendirebilir misiniz?",
+            "when_to_use": "E-posta ile teknik yardım isterken",
             "variations": [
               "I've been trying to resolve [issue] but I'm stuck. Do you have any suggestions?",
               "Could I get your input on [problem]? I've tried [approach] but it didn't work."
@@ -117,8 +117,8 @@
         "patterns": [
           {
             "pattern": "Hey team, quick question: [question]? Any pointers would be appreciated.",
-            "turkish": "Selam takim, kisa bir soru: [soru]? Herhangi bir ipucu faydali olur.",
-            "when_to_use": "Slack'te hizli bir teknik soru sorarken",
+            "turkish": "Selam takim, kisa bir soru: [soru]? Herhangi bir ipucu faydalı olur.",
+            "when_to_use": "Slack'te hızlı bir teknik soru sorarken",
             "variations": [
               "Has anyone dealt with [issue] before? I'm trying to [goal].",
               "Does anyone know [question]? I checked the docs but couldn't find it."
@@ -127,8 +127,8 @@
           },
           {
             "pattern": "Heads up: [update]. This affects [scope]. Let me know if you have questions.",
-            "turkish": "Bilgilendirme: [guncelleme]. Bu [kapsam]'i etkiliyor. Sorulariniz varsa bana ulasin.",
-            "when_to_use": "Takima onemli bir degisikligi veya guncellemeyi bildirirken",
+            "turkish": "Bilgilendirme: [güncelleme]. Bu [kapsam]'i etkiliyor. Sorulariniz varsa bana ulasin.",
+            "when_to_use": "Takima önemli bir değişikliği veya güncellemeyi bildirirken",
             "variations": [
               "FYI — I just [action]. This might impact [area].",
               "Quick update: [change] has been deployed to [environment]. Please verify your services."
@@ -147,8 +147,8 @@
           },
           {
             "pattern": "I'm seeing [issue] in [environment]. Anyone else experiencing this?",
-            "turkish": "[Ortam]'da [sorun] goruyorum. Baskasi da bunu yasiyor mu?",
-            "when_to_use": "Bir hata veya sorun bildirirken baskalarinin da etkilenip etkilenmedigini sormak icin",
+            "turkish": "[Ortam]'da [sorun] goruyorum. Başkası da bunu yasiyor mu?",
+            "when_to_use": "Bir hata veya sorun bildirirken baskalarinin da etkilenip etkilenmedigini sormak için",
             "variations": [
               "[Service] seems to be down/slow in [environment]. Can anyone confirm?",
               "Is anyone else getting [error] when trying to [action]?"
@@ -157,10 +157,10 @@
           },
           {
             "pattern": "On it! I'll have it done by [time]. Will update you when it's ready.",
-            "turkish": "Uzerindeyim! [Zaman]'a kadar bitirmis olurum. Hazir olunca haber veririm.",
-            "when_to_use": "Bir istegi kabul edip tahmini sure verirken",
+            "turkish": "Üzerindeyim! [Zaman]'a kadar bitirmis olurum. Hazir olunca haber veririm.",
+            "when_to_use": "Bir isteği kabul edip tahmini süre verirken",
             "variations": [
-              "Sure, I can take care of that. ETA: [time].",
+              "Süre, I can take care of that. ETA: [time].",
               "I'll pick that up now. Should be done within [timeframe]."
             ],
             "real_example": "On it! I'll have the hotfix deployed by 3 PM. Will update you when it's ready."
@@ -172,7 +172,7 @@
         "patterns": [
           {
             "pattern": "I think we should consider [approach] because [reason]. What do you all think?",
-            "turkish": "[Yaklasim]'i dikkate almamiz gerektigini dusunuyorum cunku [sebep]. Ne dusunuyorsunuz?",
+            "turkish": "[Yaklaşım]'i dikkate almamiz gerektigini düşünüyorum cunku [sebep]. Ne düşünüyorsunuz?",
             "when_to_use": "Toplantida yeni bir fikir onerirken",
             "variations": [
               "What if we tried [approach]? It would solve [problem] and give us [benefit].",
@@ -181,18 +181,18 @@
             "real_example": "I think we should consider using a message queue instead of direct API calls because it would make the system more resilient to failures. What do you all think?"
           },
           {
-            "pattern": "Could you clarify what you mean by [term/concept]? I want to make sure I understand correctly.",
-            "turkish": "[Terim/kavram] ile ne kastettiginizi aciklayabilir misiniz? Dogru anladigimdan emin olmak istiyorum.",
-            "when_to_use": "Bir seyi anlamadiginda veya emin olmadiginda sormak icin",
+            "pattern": "Could you clarify what you mean by [term/concept]? I want to make süre I understand correctly.",
+            "turkish": "[Terim/kavram] ile ne kastettiginizi aciklayabilir misiniz? Doğru anladigimdan emin olmak istiyorum.",
+            "when_to_use": "Bir seyi anlamadiginda veya emin olmadiginda sormak için",
             "variations": [
               "Sorry, can you elaborate on [point]? I didn't quite follow.",
               "Just to be clear — when you say [X], do you mean [interpretation A] or [interpretation B]?"
             ],
-            "real_example": "Could you clarify what you mean by 'eventual consistency' in this context? I want to make sure I understand correctly — are we okay with a few seconds of delay?"
+            "real_example": "Could you clarify what you mean by 'eventual consistency' in this context? I want to make süre I understand correctly — are we okay with a few seconds of delay?"
           },
           {
             "pattern": "So to summarize, we agreed on [decision 1], [decision 2], and [owner] will [action item].",
-            "turkish": "Ozetlemek gerekirse, [karar 1], [karar 2] uzerinde anlasmistik ve [sorumlu] [eylem maddesini] yapacak.",
+            "turkish": "Özetlemek gerekirse, [karar 1], [karar 2] üzerinde anlasmistik ve [sorumlu] [eylem maddesini] yapacak.",
             "when_to_use": "Toplanti sonunda kararlari ozetlerken",
             "variations": [
               "Let me recap the key takeaways: [points]. Did I miss anything?",
@@ -202,8 +202,8 @@
           },
           {
             "pattern": "I see your point, but I have a slightly different perspective. What about [alternative]?",
-            "turkish": "Gorusunuzu anliyorum, ama biraz farkli bir bakis acim var. [Alternatif] hakkinda ne dusunursunuz?",
-            "when_to_use": "Kibar bir sekilde farkli bir gorus bildirirken",
+            "turkish": "Gorusunuzu anliyorum, ama biraz farklı bir bakis acim var. [Alternatif] hakkinda ne düşünürsünüz?",
+            "when_to_use": "Kibar bir sekilde farklı bir görüş bildirirken",
             "variations": [
               "That's a valid approach, though I wonder if [alternative] might work better because [reason].",
               "I agree with the goal, but I'd suggest a different approach: [alternative]."
@@ -212,8 +212,8 @@
           },
           {
             "pattern": "I'd be happy to take on [task]. I have experience with [relevant skill].",
-            "turkish": "[Gorev]'i almaktan mutluluk duyarim. [Ilgili beceri] konusunda deneyimim var.",
-            "when_to_use": "Bir gorev icin gonullu olurken",
+            "turkish": "[Görev]'i almaktan mutluluk duyarım. [Ilgili beceri] konusunda deneyimim var.",
+            "when_to_use": "Bir görev için gönüllü olurken",
             "variations": [
               "I can own [task] — I worked on something similar at my previous company.",
               "I'll volunteer for [task]. It aligns well with what I'm currently working on."
@@ -227,7 +227,7 @@
         "patterns": [
           {
             "pattern": "What went well: [positive]. What could improve: [issue]. Action item: [suggestion].",
-            "turkish": "Iyi giden: [olumlu]. Gelistirilebilecek: [sorun]. Eylem maddesi: [oneri].",
+            "turkish": "Iyi giden: [olumlu]. Geliştirilebilecek: [sorun]. Eylem maddesi: [öneri].",
             "when_to_use": "Sprint retrospective'de geri bildirim verirken",
             "variations": [
               "I appreciated [positive thing] this sprint. One area we could improve is [suggestion].",
@@ -237,8 +237,8 @@
           },
           {
             "pattern": "I estimate this at [X] story points because [reasoning]. It involves [scope].",
-            "turkish": "Bunu [X] story point olarak tahmin ediyorum cunku [gerekce]. [Kapsam]'i iceriyor.",
-            "when_to_use": "Sprint planning'de gorev tahminlemesi yaparken",
+            "turkish": "Bunu [X] story point olarak tahmin ediyorum cunku [gerekce]. [Kapsam]'i içeriyor.",
+            "when_to_use": "Sprint planning'de görev tahminlemesi yaparken",
             "variations": [
               "I'd say this is a [size] — it's similar to [previous task] which took [time].",
               "This looks like a [X]-pointer to me. The main effort will be [area]."
@@ -247,8 +247,8 @@
           },
           {
             "pattern": "Let me walk you through [feature]. Here's what it does and how it works.",
-            "turkish": "[Ozellik]'i sizinle adim adim gostereyim. Iste ne yaptigini ve nasil calistigini.",
-            "when_to_use": "Sprint demo'da tamamlanan bir ozelligi gosterirken",
+            "turkish": "[Özellik]'i sizinle adim adim göstereyim. Işte ne yaptığını ve nasil çalıştığını.",
+            "when_to_use": "Sprint demo'da tamamlanan bir özelliği gösterirken",
             "variations": [
               "I'd like to demo [feature] that we completed this sprint. Let me share my screen.",
               "Here's what we shipped this sprint: [feature]. I'll show you the happy path and edge cases."
@@ -257,8 +257,8 @@
           },
           {
             "pattern": "I think we should break [story] into smaller tasks: [task 1], [task 2], and [task 3].",
-            "turkish": "[Hikaye]'yi daha kucuk gorevlere ayirmamiz gerektigini dusunuyorum: [gorev 1], [gorev 2] ve [gorev 3].",
-            "when_to_use": "Backlog grooming'de buyuk user story'leri parcalamak icin",
+            "turkish": "[Hikaye]'yi daha küçük gorevlere ayirmamiz gerektigini düşünüyorum: [görev 1], [görev 2] ve [görev 3].",
+            "when_to_use": "Backlog grooming'de büyük user story'leri parçalamak için",
             "variations": [
               "This story is too big for one sprint. Can we split it into [part A] and [part B]?",
               "Before we can work on this, we need to define the acceptance criteria more clearly. I suggest [criteria]."
@@ -268,7 +268,7 @@
           {
             "pattern": "Based on our velocity, I think we can commit to [X] points this sprint. Let's prioritize [items].",
             "turkish": "Hizimiza gore, bu sprint'te [X] puana commit olabiliriz. [Maddeler]'i onceliklendirelim.",
-            "when_to_use": "Sprint planning'de kapasite ve onceliklendirme tartisirken",
+            "when_to_use": "Sprint planning'de kapasite ve önceliklendirme tartisirken",
             "variations": [
               "Our average velocity is [X] points. I'd recommend we take on [stories] and keep [story] as a stretch goal.",
               "Given the holidays this sprint, we should plan for about [X] points instead of the usual [Y]."
@@ -287,8 +287,8 @@
         "patterns": [
           {
             "pattern": "Consider using [alternative] here instead of [current]. It would [benefit].",
-            "turkish": "Burada [mevcut] yerine [alternatif] kullanmayi dusunun. Bu [fayda] saglar.",
-            "when_to_use": "Kod incelemesinde daha iyi bir yaklasim onerirken",
+            "turkish": "Burada [mevcut] yerine [alternatif] kullanmayi düşünün. Bu [fayda] sağlar.",
+            "when_to_use": "Kod incelemesinde daha iyi bir yaklaşım onerirken",
             "variations": [
               "What do you think about [alternative approach]? It might be more [readable/performant/maintainable].",
               "A suggestion: you could simplify this by [approach]. This way, [benefit]."
@@ -297,7 +297,7 @@
           },
           {
             "pattern": "This will throw [error] when [condition]. We should add a check for [edge case].",
-            "turkish": "[Kosul] oldugunda bu [hata] fırlatacak. [Kenar durum] icin bir kontrol eklemeliyiz.",
+            "turkish": "[Koşul] olduğunda bu [hata] fırlatacak. [Kenar durum] için bir kontrol eklemeliyiz.",
             "when_to_use": "Kodda potansiyel bir hata tespit ettiginde",
             "variations": [
               "Bug: [variable] can be null here if [condition]. This will cause a [error].",
@@ -307,8 +307,8 @@
           },
           {
             "pattern": "Nice approach! I like how you [specific thing]. Clean and readable.",
-            "turkish": "Guzel yaklasim! [Belirli sey]'i nasil yaptiginizi begeniyorum. Temiz ve okunabilir.",
-            "when_to_use": "Kodda iyi bir yaklasimi takdir ederken — onemli, sadece hata bulmak degil",
+            "turkish": "Guzel yaklaşım! [Belirli sey]'i nasil yaptığınızı begeniyorum. Temiz ve okunabilir.",
+            "when_to_use": "Kodda iyi bir yaklaşımı takdir ederken — önemli, sadece hata bulmak değil",
             "variations": [
               "Great use of [pattern/technique] here. Makes the code much cleaner.",
               "This is well-structured. I especially like the way you handled [specific aspect]."
@@ -317,8 +317,8 @@
           },
           {
             "pattern": "This function is doing too much. Could we extract [logic] into a separate [function/class]?",
-            "turkish": "Bu fonksiyon cok fazla is yapiyor. [Mantik]'i ayri bir [fonksiyon/sinif]'a cikarabilir miyiz?",
-            "when_to_use": "Buyuk bir fonksiyonun parcalanmasini isterken",
+            "turkish": "Bu fonksiyon çok fazla is yapıyor. [Mantik]'i ayri bir [fonksiyon/sınıf]'a cikarabilir miyiz?",
+            "when_to_use": "Büyük bir fonksiyonun parçalanmasını isterken",
             "variations": [
               "I'd suggest splitting this into smaller functions for better testability.",
               "This method has [X] lines — would be easier to maintain if we refactored it into [components]."
@@ -342,8 +342,8 @@
         "patterns": [
           {
             "pattern": "Thanks for catching that! I'll fix it in the next commit.",
-            "turkish": "Bunu farkettiginiz icin tesekkurler! Bir sonraki commit'te duzeltecegim.",
-            "when_to_use": "Reviewer dogru bir hata buldugun da",
+            "turkish": "Bunu farkettiginiz için teşekkürler! Bir sonraki commit'te duzeltecegim.",
+            "when_to_use": "Reviewer doğru bir hata buldugun da",
             "variations": [
               "Good catch! I completely missed that edge case. Fixing now.",
               "You're right — I'll update this. Thanks for the thorough review!"
@@ -351,19 +351,19 @@
             "real_example": "Thanks for catching that null check issue! I'll fix it in the next commit and add a unit test for that edge case."
           },
           {
-            "pattern": "Could you elaborate on what you mean by [feedback]? I'm not sure I follow.",
+            "pattern": "Could you elaborate on what you mean by [feedback]? I'm not süre I follow.",
             "turkish": "[Geri bildirim] ile ne kastettiginizi aciklayabilir misiniz? Tam anladigimdan emin degilim.",
             "when_to_use": "Review yorumunu anlamadiginda",
             "variations": [
-              "I'm not sure I understand — do you mean [interpretation A] or [interpretation B]?",
+              "I'm not süre I understand — do you mean [interpretation A] or [interpretation B]?",
               "Could you give me an example of how you'd approach this differently?"
             ],
-            "real_example": "Could you elaborate on what you mean by 'this should be more functional'? I'm not sure I follow — do you mean using map/filter instead of the for loop?"
+            "real_example": "Could you elaborate on what you mean by 'this should be more functional'? I'm not süre I follow — do you mean using map/filter instead of the for loop?"
           },
           {
             "pattern": "I chose [approach] because [reason], but I'm open to [alternative] if you think it's better.",
-            "turkish": "[Yaklasim]'i sectim cunku [sebep], ama daha iyi oldugunu dusunuyorsaniz [alternatif]'e acigim.",
-            "when_to_use": "Neden belirli bir yaklasim sectiginizi aciklamak isterken",
+            "turkish": "[Yaklaşım]'i sectim cunku [sebep], ama daha iyi olduğunu düşünüyorsanız [alternatif]'e acigim.",
+            "when_to_use": "Neden belirli bir yaklaşım sectiginizi açıklamak isterken",
             "variations": [
               "The reason I went with [approach] is [justification]. Happy to change it if there's a better way.",
               "I considered [alternative] but went with [approach] because [trade-off]. Thoughts?"
@@ -372,7 +372,7 @@
           },
           {
             "pattern": "You're right, that was an oversight. I should have [correct approach].",
-            "turkish": "Haklisiniz, bu bir gozden kacirma oldu. [Dogru yaklasim] yapmam gerekirdi.",
+            "turkish": "Haklisiniz, bu bir gozden kacirma oldu. [Doğru yaklaşım] yapmam gerekirdi.",
             "when_to_use": "Bir hatayi kabul ederken",
             "variations": [
               "My bad — I didn't think about [edge case]. Let me fix that.",
@@ -382,7 +382,7 @@
           },
           {
             "pattern": "Can you share more context on why [suggestion]? Is there a specific issue this would prevent?",
-            "turkish": "Neden [oneri] konusunda daha fazla bilgi paylasabilir misiniz? Bu onleyecegi belirli bir sorun mu var?",
+            "turkish": "Neden [öneri] konusunda daha fazla bilgi paylasabilir misiniz? Bu onleyecegi belirli bir sorun mu var?",
             "when_to_use": "Review yorumunun arkasindaki motivasyonu anlamak isterken",
             "variations": [
               "I'd like to understand the reasoning behind this suggestion. Have we had issues with [current approach] before?",
@@ -397,8 +397,8 @@
         "patterns": [
           {
             "pattern": "## Summary\nThis PR [action] to [goal]. It addresses [issue/ticket].",
-            "turkish": "## Ozet\nBu PR [eylem] yaparak [hedef] saglar. [Sorun/ticket]'i ele alir.",
-            "when_to_use": "PR aciklamasinin basina ozet yazarken",
+            "turkish": "## Özet\nBu PR [eylem] yaparak [hedef] sağlar. [Sorun/ticket]'i ele alir.",
+            "when_to_use": "PR açıklamasının basina özet yazarken",
             "variations": [
               "This PR introduces [feature] as part of [epic/project].",
               "This change [action] in order to [business goal]. Related to [ticket]."
@@ -407,8 +407,8 @@
           },
           {
             "pattern": "## Changes\n- Added [component/feature]\n- Updated [existing code]\n- Removed [deprecated code]",
-            "turkish": "## Degisiklikler\n- [Bilesen/ozellik] eklendi\n- [Mevcut kod] guncellendi\n- [Kullanilmayan kod] kaldirildi",
-            "when_to_use": "PR'daki degisiklikleri listelemek icin",
+            "turkish": "## Değişiklikler\n- [Bileşen/özellik] eklendi\n- [Mevcut kod] güncellendi\n- [Kullanilmayan kod] kaldırıldı",
+            "when_to_use": "PR'daki değişiklikleri listelemek için",
             "variations": [
               "### What changed\n- New: [additions]\n- Modified: [updates]\n- Deleted: [removals]",
               "Key changes:\n1. [Change 1] — [reason]\n2. [Change 2] — [reason]"
@@ -417,8 +417,8 @@
           },
           {
             "pattern": "## Why\n[Explanation of the problem and why this solution was chosen over alternatives].",
-            "turkish": "## Neden\n[Problemin aciklamasi ve bu cozumun alternatifler yerine neden secildigi].",
-            "when_to_use": "Degisikligin motivasyonunu aciklamak icin — reviewer'in 'neden?' sorusunu cevaplayacak",
+            "turkish": "## Neden\n[Problemin açıklaması ve bu çözümün alternatifler yerine neden secildigi].",
+            "when_to_use": "Değişikliğin motivasyonunu açıklamak için — reviewer'in 'neden?' sorusunu cevaplayacak",
             "variations": [
               "### Motivation\nWe needed to [goal] because [reason]. The current approach [problem with status quo].",
               "### Context\nThis change was prompted by [trigger]. Without it, [consequence]."
@@ -427,8 +427,8 @@
           },
           {
             "pattern": "## Testing\n- [x] Unit tests added/updated\n- [x] Integration tests passing\n- [x] Manually tested [scenarios]",
-            "turkish": "## Test\n- [x] Birim testleri eklendi/guncellendi\n- [x] Entegrasyon testleri gecti\n- [x] [Senaryolar] manuel olarak test edildi",
-            "when_to_use": "PR'in nasil test edildigini belgelemek icin",
+            "turkish": "## Test\n- [x] Birim testleri eklendi/güncellendi\n- [x] Entegrasyon testleri gecti\n- [x] [Senaryolar] manuel olarak test edildi",
+            "when_to_use": "PR'in nasil test edildigini belgelemek için",
             "variations": [
               "### How to test\n1. [Step 1]\n2. [Step 2]\n3. Verify [expected result]",
               "Test coverage: [before]% → [after]%. Added [X] unit tests and [Y] integration tests."
@@ -437,8 +437,8 @@
           },
           {
             "pattern": "## Screenshots\n| Before | After |\n|--------|-------|\n| [screenshot] | [screenshot] |",
-            "turkish": "## Ekran Goruntuleri\n| Once | Sonra |\n|------|-------|\n| [ekran goruntusu] | [ekran goruntusu] |",
-            "when_to_use": "UI degisiklikleri iceren PR'larda gorsel kanitlar icin",
+            "turkish": "## Ekran Goruntuleri\n| Önce | Sonra |\n|------|-------|\n| [ekran goruntusu] | [ekran goruntusu] |",
+            "when_to_use": "UI değişiklikleri içeren PR'larda görsel kanıtlar için",
             "variations": [
               "### Demo\n[GIF or video link showing the feature in action]",
               "### Visual Changes\n- Before: [description/screenshot]\n- After: [description/screenshot]"
@@ -452,8 +452,8 @@
         "patterns": [
           {
             "pattern": "[Blocking] This needs to be fixed before merging: [issue]. Reason: [explanation].",
-            "turkish": "[Engelleyici] Bu merge edilmeden once duzeltilmeli: [sorun]. Sebep: [aciklama].",
-            "when_to_use": "Kritik bir sorun oldugunda ve merge'i engellemek gerektiginde",
+            "turkish": "[Engelleyici] Bu merge edilmeden önce duzeltilmeli: [sorun]. Sebep: [açıklama].",
+            "when_to_use": "Kritik bir sorun olduğunda ve merge'i engellemek gerektiginde",
             "variations": [
               "Blocking: [issue]. This could cause [consequence] in production.",
               "I'm requesting changes because [reason]. This is a must-fix before merging."
@@ -462,8 +462,8 @@
           },
           {
             "pattern": "[Non-blocking] Consider [suggestion], but it's fine to address in a follow-up.",
-            "turkish": "[Engelleyici degil] [Oneri]'yi dusunun, ama bunu bir sonraki PR'da ele almak da uygun.",
-            "when_to_use": "Onemli ama acil olmayan bir oneri icin",
+            "turkish": "[Engelleyici değil] [Öneri]'yi düşünün, ama bunu bir sonraki PR'da ele almak da uygun.",
+            "when_to_use": "Önemli ama acil olmayan bir öneri için",
             "variations": [
               "Optional: [suggestion]. Not a blocker, just a thought for improvement.",
               "Nice-to-have: [suggestion]. Feel free to create a follow-up ticket."
@@ -472,8 +472,8 @@
           },
           {
             "pattern": "Nit: [minor suggestion]. Take it or leave it.",
-            "turkish": "Nit: [kucuk oneri]. Alsan da olmasa da olur.",
-            "when_to_use": "Cok kucuk, stil veya tercih bazli yorumlar icin",
+            "turkish": "Nit: [küçük öneri]. Alsan da olmasa da olur.",
+            "when_to_use": "Çok küçük, stil veya tercih bazli yorumlar için",
             "variations": [
               "Nit: [formatting/naming suggestion]. Very minor.",
               "Nitpick: [suggestion]. Totally optional."
@@ -482,8 +482,8 @@
           },
           {
             "pattern": "Have you considered [alternative approach]? It might [benefit].",
-            "turkish": "[Alternatif yaklasim]'i dusundunuz mu? Bu [fayda] saglayabilir.",
-            "when_to_use": "Farkli bir yaklasimi tartismaya acmak icin",
+            "turkish": "[Alternatif yaklaşım]'i düşündünüz mu? Bu [fayda] sağlayabilir.",
+            "when_to_use": "Farklı bir yaklaşımı tartismaya acmak için",
             "variations": [
               "Just a thought: what if we [alternative]? Could be simpler.",
               "I wonder if [approach] would be a better fit here. Thoughts?"
@@ -513,8 +513,8 @@
         "patterns": [
           {
             "pattern": "This function takes [input] and returns [output]. It works by [mechanism].",
-            "turkish": "Bu fonksiyon [girdi] alir ve [cikti] dondurur. [Mekanizma] ile calisir.",
-            "when_to_use": "Bir fonksiyonun ne yaptigini aciklama isterken",
+            "turkish": "Bu fonksiyon [girdi] alir ve [çıktı] dondurur. [Mekanizma] ile çalışır.",
+            "when_to_use": "Bir fonksiyonun ne yaptığını açıklama isterken",
             "variations": [
               "The purpose of this function is to [goal]. It accepts [params] and produces [result].",
               "[FunctionName] is responsible for [task]. Under the hood, it [mechanism]."
@@ -523,8 +523,8 @@
           },
           {
             "pattern": "The algorithm works in [N] steps: first [step 1], then [step 2], finally [step 3].",
-            "turkish": "Algoritma [N] adimda calisir: once [adim 1], sonra [adim 2], son olarak [adim 3].",
-            "when_to_use": "Bir algoritmayı adim adim aciklamak isterken",
+            "turkish": "Algoritma [N] adimda çalışır: önce [adim 1], sonra [adim 2], son olarak [adim 3].",
+            "when_to_use": "Bir algoritmayı adim adim açıklamak isterken",
             "variations": [
               "Here's how the algorithm works: we start by [step 1]. Then, for each [item], we [step 2]. Finally, [step 3].",
               "At a high level, this algorithm [goal] by: 1) [step], 2) [step], 3) [step]."
@@ -533,8 +533,8 @@
           },
           {
             "pattern": "The system is structured as [architecture]. [Component A] handles [responsibility], while [Component B] manages [responsibility].",
-            "turkish": "Sistem [mimari] olarak yapilandirilmistir. [Bilesen A] [sorumluluk]'u ustlenir, [Bilesen B] ise [sorumluluk]'u yonetir.",
-            "when_to_use": "Sistem mimarisini baskasina aciklamak isterken",
+            "turkish": "Sistem [mimari] olarak yapılandırılmıştır. [Bileşen A] [sorumluluk]'u ustlenir, [Bileşen B] işe [sorumluluk]'u yonetir.",
+            "when_to_use": "Sistem mimarisini baskasina açıklamak isterken",
             "variations": [
               "We use a [architecture pattern] where [description of data/control flow].",
               "The architecture consists of [N] layers: [layer 1] for [purpose], [layer 2] for [purpose]."
@@ -543,7 +543,7 @@
           },
           {
             "pattern": "I chose [approach A] over [approach B] because [trade-off reason]. The downside is [limitation].",
-            "turkish": "[Yaklasim A]'yi [Yaklasim B] yerine sectim cunku [trade-off nedeni]. Dezavantaji [sinirlilik].",
+            "turkish": "[Yaklaşım A]'yi [Yaklaşım B] yerine sectim cunku [trade-off nedeni]. Dezavantaji [sinirlilik].",
             "when_to_use": "Teknik trade-off'lari tartisirken",
             "variations": [
               "The trade-off here is [X] vs [Y]. We prioritized [X] because [reason].",
@@ -553,8 +553,8 @@
           },
           {
             "pattern": "The time complexity is O([complexity]) because [explanation]. Space complexity is O([complexity]).",
-            "turkish": "Zaman karmasikligi O([karmasiklik]) cunku [aciklama]. Alan karmasikligi O([karmasiklik]).",
-            "when_to_use": "Kodun performans karakteristigini aciklamak isterken",
+            "turkish": "Zaman karmaşıklığı O([karmaşıklık]) cunku [açıklama]. Alan karmaşıklığı O([karmaşıklık]).",
+            "when_to_use": "Kodun performans karakteristigini açıklamak isterken",
             "variations": [
               "This runs in O([complexity]) time, which is [acceptable/not ideal] for our use case of [N] items.",
               "Performance note: the bottleneck here is [operation] which is O([complexity]). We could optimize it by [approach]."
@@ -568,8 +568,8 @@
         "patterns": [
           {
             "pattern": "I propose we use [technology/approach] for [problem]. Here's my reasoning: [reasons].",
-            "turkish": "[Problem] icin [teknoloji/yaklasim] kullanmayi oneriyorum. Gerekcem su: [gerekce].",
-            "when_to_use": "Teknik bir cozum onerirken",
+            "turkish": "[Problem] için [teknoloji/yaklaşım] kullanmayi oneriyorum. Gerekcem su: [gerekce].",
+            "when_to_use": "Teknik bir çözüm onerirken",
             "variations": [
               "My recommendation is to go with [approach] because [reason 1] and [reason 2].",
               "After researching options, I think [approach] is the best fit because [reasons]."
@@ -578,8 +578,8 @@
           },
           {
             "pattern": "Let's compare [option A] and [option B]. [A] is better for [use case], while [B] excels at [use case].",
-            "turkish": "[Secenek A] ve [Secenek B]'yi karsilastiralim. [A] [kullanim senaryosu] icin daha iyi, [B] ise [kullanim senaryosu]'nda daha ustun.",
-            "when_to_use": "Iki yaklasimi kiyaslarken",
+            "turkish": "[Secenek A] ve [Secenek B]'yi karşılaştıralım. [A] [kullanım senaryosu] için daha iyi, [B] işe [kullanım senaryosu]'nda daha üstün.",
+            "when_to_use": "Iki yaklaşımı kiyaslarken",
             "variations": [
               "Comparing [A] vs [B]: pros of A are [list], pros of B are [list].",
               "Here's a quick comparison: [A] gives us [benefits] but [downsides], [B] gives us [benefits] but [downsides]."
@@ -588,17 +588,17 @@
           },
           {
             "pattern": "Based on the requirements, we need [feature list]. Are there any constraints I should know about?",
-            "turkish": "Gereksinimlere gore, [ozellik listesi]'ne ihtiyacimiz var. Bilmem gereken herhangi bir kisitlama var mi?",
-            "when_to_use": "Gereksinimleri netlestrirken ve kisitlamalari ogrenmek isterken",
+            "turkish": "Gereksinimlere gore, [özellik listesi]'ne ihtiyacımız var. Bilmem gereken herhangi bir kisitlama var mi?",
+            "when_to_use": "Gereksinimleri netlestrirken ve kisitlamalari öğrenmek isterken",
             "variations": [
-              "Let me make sure I understand the requirements: we need [X], [Y], and [Z]. Is that correct?",
+              "Let me make süre I understand the requirements: we need [X], [Y], and [Z]. Is that correct?",
               "Before we start, I want to confirm: the must-haves are [list] and the nice-to-haves are [list]. Right?"
             ],
             "real_example": "Based on the requirements, we need user authentication, role-based access control, and audit logging. Are there any constraints I should know about, like compliance requirements or third-party integrations?"
           },
           {
             "pattern": "I estimate this will take [time] because [breakdown]. The main effort is [area].",
-            "turkish": "Bunun [sure] surecegini tahmin ediyorum cunku [dagilim]. Ana efor [alan]'da.",
+            "turkish": "Bunun [süre] süreceğini tahmin ediyorum cunku [dağılım]. Ana efor [alan]'da.",
             "when_to_use": "Is tahmini verirken",
             "variations": [
               "Rough estimate: [time] for [scope]. This breaks down into [X] for [part 1] and [Y] for [part 2].",
@@ -608,7 +608,7 @@
           },
           {
             "pattern": "Progress update: [completed items]. Currently working on [current]. ETA for completion: [date].",
-            "turkish": "Ilerleme guncellemesi: [tamamlananlar]. Su anda [mevcut] uzerinde calisiyorum. Tahmini bitis: [tarih].",
+            "turkish": "Ilerleme güncellemesi: [tamamlananlar]. Su anda [mevcut] üzerinde çalışıyorum. Tahmini bitis: [tarih].",
             "when_to_use": "Teknik ilerleme raporlarken",
             "variations": [
               "We're [percentage] done. Completed: [items]. Remaining: [items]. On track for [deadline].",
@@ -623,8 +623,8 @@
         "patterns": [
           {
             "pattern": "/**\n * [Brief description of what the function does]\n * @param {[type]} [name] - [description]\n * @returns {[type]} [description]\n * @throws {[ErrorType]} [when condition]\n */",
-            "turkish": "/**\n * [Fonksiyonun ne yaptiginin kisa aciklamasi]\n * @param {[tip]} [isim] - [aciklama]\n * @returns {[tip]} [aciklama]\n * @throws {[HataTipi]} [hangi durumda]\n */",
-            "when_to_use": "Fonksiyon dokumantasyonu yazarken — JSDoc/TSDoc formati",
+            "turkish": "/**\n * [Fonksiyonun ne yaptığının kisa açıklaması]\n * @param {[tip]} [isim] - [açıklama]\n * @returns {[tip]} [açıklama]\n * @throws {[HataTipi]} [hangi durumda]\n */",
+            "when_to_use": "Fonksiyon dokümantasyonu yazarken — JSDoc/TSDoc formati",
             "variations": [
               "def function_name(param):\n    \"\"\"[Brief description].\n    \n    Args:\n        param: [description]\n    \n    Returns:\n        [description]\n    \"\"\"",
               "/// [Brief description]\n/// \n/// # Arguments\n/// * `param` - [description]\n/// \n/// # Returns\n/// [description]"
@@ -633,8 +633,8 @@
           },
           {
             "pattern": "## Getting Started\n\n### Prerequisites\n- [requirement 1]\n\n### Installation\n```bash\n[commands]\n```",
-            "turkish": "## Baslarken\n\n### Gereksinimler\n- [gereksinim 1]\n\n### Kurulum\n```bash\n[komutlar]\n```",
-            "when_to_use": "README'nin baslangic bolumund yazarken",
+            "turkish": "## Başlarken\n\n### Gereksinimler\n- [gereksinim 1]\n\n### Kurulum\n```bash\n[komutlar]\n```",
+            "when_to_use": "README'nin başlangıç bölümund yazarken",
             "variations": [
               "## Quick Start\n1. Clone the repo\n2. Install dependencies\n3. Run the app",
               "## Setup\nFollow these steps to get the project running locally: [steps]"
@@ -643,8 +643,8 @@
           },
           {
             "pattern": "### `[METHOD] /api/[resource]`\n\n[Description]. Returns [response type].\n\n**Parameters:**\n| Name | Type | Required | Description |\n|------|------|----------|-------------|",
-            "turkish": "### `[METHOD] /api/[kaynak]`\n\n[Aciklama]. [Yanit tipi] dondurur.\n\n**Parametreler:**\n| Isim | Tip | Zorunlu | Aciklama |\n|------|-----|---------|----------|",
-            "when_to_use": "API endpoint dokumantasyonu yazarken",
+            "turkish": "### `[METHOD] /api/[kaynak]`\n\n[Açıklama]. [Yanit tipi] dondurur.\n\n**Parametreler:**\n| Isim | Tip | Zorunlu | Açıklama |\n|------|-----|---------|----------|",
+            "when_to_use": "API endpoint dokümantasyonu yazarken",
             "variations": [
               "**Endpoint:** `[METHOD] [path]`\n**Auth:** Required\n**Body:** [schema]",
               "## [Resource Name]\n\n`[METHOD] [path]` - [short description]"
@@ -653,8 +653,8 @@
           },
           {
             "pattern": "**Error [CODE]**: [ErrorName] — [description]. This occurs when [condition]. To fix: [solution].",
-            "turkish": "**Hata [KOD]**: [HataAdi] — [aciklama]. Bu [kosul] oldugunda olusur. Cozmek icin: [cozum].",
-            "when_to_use": "Hata mesajlarini dokumante ederken",
+            "turkish": "**Hata [KOD]**: [HataAdi] — [açıklama]. Bu [koşul] olduğunda oluşur. Çözmek için: [çözüm].",
+            "when_to_use": "Hata mesajlarini dokümante ederken",
             "variations": [
               "| Error Code | Message | Cause | Resolution |\n|---|---|---|---|",
               "### Troubleshooting\n**Problem:** [symptom]\n**Cause:** [reason]\n**Solution:** [fix]"
@@ -663,8 +663,8 @@
           },
           {
             "pattern": "@deprecated Use [alternative] instead. Will be removed in v[version].",
-            "turkish": "@deprecated Bunun yerine [alternatif] kullanin. v[versiyon]'da kaldirilacak.",
-            "when_to_use": "Kullanilmayan bir API'yi isaret ederken",
+            "turkish": "@deprecated Bunun yerine [alternatif] kullanin. v[versiyon]'da kaldırılacak.",
+            "when_to_use": "Kullanilmayan bir API'yi işaret ederken",
             "variations": [
               "⚠️ **Deprecated since v[X]**: This method will be removed in v[Y]. Migrate to [alternative].",
               "**NOTICE:** [function/endpoint] is deprecated and scheduled for removal on [date]. Please switch to [new function/endpoint]."
@@ -678,8 +678,8 @@
         "patterns": [
           {
             "pattern": "I'm seeing [symptom] when [action]. Expected behavior: [expected]. Actual behavior: [actual].",
-            "turkish": "[Eylem] yaptiginda [belirti] goruyorum. Beklenen davranis: [beklenen]. Gerceklesen davranis: [gerceklesen].",
-            "when_to_use": "Bir bug'i aciklama isterken",
+            "turkish": "[Eylem] yaptığında [belirti] goruyorum. Beklenen davranis: [beklenen]. Gerçekleşen davranis: [gerçekleşen].",
+            "when_to_use": "Bir bug'i açıklama isterken",
             "variations": [
               "There's a bug where [description]. It happens when [trigger] and causes [impact].",
               "The [component] is behaving unexpectedly: [description]. It should [expected] but instead [actual]."
@@ -688,8 +688,8 @@
           },
           {
             "pattern": "I've been debugging [issue] and I'm stuck. Here's what I've tried: [approaches]. Any ideas?",
-            "turkish": "[Sorun]'u debug ediyorum ve takildim. Denedigim seyler: [yaklasimlar]. Fikriniz var mi?",
-            "when_to_use": "Debug'da takildinda ve yardim istemek isterken",
+            "turkish": "[Sorun]'u debug ediyorum ve takildim. Denedigim seyler: [yaklaşımlar]. Fikriniz var mi?",
+            "when_to_use": "Debug'da takildinda ve yardım istemek isterken",
             "variations": [
               "I've spent [time] on [issue] and I'm running out of ideas. I've ruled out [causes]. What else could it be?",
               "Need a second pair of eyes on [issue]. I've checked [A], [B], and [C], but the problem persists."
@@ -698,8 +698,8 @@
           },
           {
             "pattern": "I found the root cause: [explanation]. The fix is [solution]. Here's what happened: [chain of events].",
-            "turkish": "Kok nedeni buldum: [aciklama]. Cozum [cozum]. Olan su: [olaylar zinciri].",
-            "when_to_use": "Bir arastirmanin sonuclarini raporlarken",
+            "turkish": "Kok nedeni buldum: [açıklama]. Çözüm [çözüm]. Olan su: [olaylar zinciri].",
+            "when_to_use": "Bir araştırmanın sonuçlarını raporlarken",
             "variations": [
               "After investigation, the issue was caused by [root cause]. The [component] was [incorrect behavior] because [reason].",
               "Root cause analysis: [cause]. Impact: [scope]. The issue started when [trigger]."
@@ -708,7 +708,7 @@
           },
           {
             "pattern": "I think the issue is in [component/area]. My proposed fix is [solution]. This should work because [reasoning].",
-            "turkish": "Sorunun [bilesen/alan]'da oldugunu dusunuyorum. Onerdigim cozum [cozum]. Bu ise yaramali cunku [gerekce].",
+            "turkish": "Sorunun [bileşen/alan]'da olduğunu düşünüyorum. Onerdigim çözüm [çözüm]. Bu işe yaramali cunku [gerekce].",
             "when_to_use": "Bir duzeltme onerirken",
             "variations": [
               "Here's my proposed fix: [solution]. I've tested it with [test cases] and it resolves the issue.",
@@ -718,7 +718,7 @@
           },
           {
             "pattern": "The error occurs at [location] with the message: [error message]. Stack trace points to [relevant frames].",
-            "turkish": "Hata [konum]'da su mesajla olusur: [hata mesaji]. Stack trace [ilgili frame'ler]'e isaret ediyor.",
+            "turkish": "Hata [konum]'da su mesajla oluşur: [hata mesaji]. Stack trace [ilgili frame'ler]'e işaret ediyor.",
             "when_to_use": "Hata detaylarini teknik olarak paylasirken",
             "variations": [
               "The exception is thrown in [file:line] when [condition]. Full stack trace: [trace].",
@@ -738,8 +738,8 @@
         "patterns": [
           {
             "pattern": "feat: add [feature description]",
-            "turkish": "feat: [ozellik aciklamasi] ekle",
-            "when_to_use": "Yeni bir ozellik eklerken — conventional commit formati",
+            "turkish": "feat: [özellik açıklaması] ekle",
+            "when_to_use": "Yeni bir özellik eklerken — conventional commit formati",
             "variations": [
               "feat([scope]): add [feature description]",
               "feat: implement [feature] for [component]",
@@ -749,7 +749,7 @@
           },
           {
             "pattern": "fix: resolve [bug description]",
-            "turkish": "fix: [hata aciklamasi] coz",
+            "turkish": "fix: [hata açıklaması] çöz",
             "when_to_use": "Bir hatayi duzeltirken",
             "variations": [
               "fix([scope]): handle [edge case] in [component]",
@@ -760,8 +760,8 @@
           },
           {
             "pattern": "refactor: restructure [component] for [improvement]",
-            "turkish": "refactor: [iyilestirme] icin [bilesen]'i yeniden yapilandir",
-            "when_to_use": "Davranisi degistirmeden kodu yeniden yapilandirirken",
+            "turkish": "refactor: [iyilestirme] için [bileşen]'i yeniden yapılandır",
+            "when_to_use": "Davranisi değiştirmeden kodu yeniden yapılandırırken",
             "variations": [
               "refactor([scope]): extract [logic] into [new component]",
               "refactor: simplify [complex logic] using [pattern/approach]",
@@ -771,8 +771,8 @@
           },
           {
             "pattern": "docs: update [documentation area] with [content]",
-            "turkish": "docs: [dokumantasyon alani]'ni [icerik] ile guncelle",
-            "when_to_use": "Dokumantasyon degisikligi yaparken",
+            "turkish": "docs: [dokümantasyon alanı]'ni [içerik] ile güncelle",
+            "when_to_use": "Dokümantasyon değişikliği yaparken",
             "variations": [
               "docs: add [section] to README",
               "docs([scope]): document [API/feature/configuration]",
@@ -782,8 +782,8 @@
           },
           {
             "pattern": "chore: update [dependency/config/tooling]",
-            "turkish": "chore: [bagimlillik/yapilandirma/arac] guncelle",
-            "when_to_use": "Uretim kodunu etkilemeyen bakım islerinde",
+            "turkish": "chore: [bagimlillik/yapılandırma/araç] güncelle",
+            "when_to_use": "Üretim kodunu etkilemeyen bakım islerinde",
             "variations": [
               "chore: bump [package] from [v1] to [v2]",
               "chore: configure [tool] for [purpose]",
@@ -798,8 +798,8 @@
         "patterns": [
           {
             "pattern": "[Type]: [Short description of change] (#[ticket])",
-            "turkish": "[Tip]: [Degisikligin kisa aciklamasi] (#[bilet])",
-            "when_to_use": "PR basligi yazarken — kisa ve aciklayici olmali",
+            "turkish": "[Tip]: [Değişikliğin kisa açıklaması] (#[bilet])",
+            "when_to_use": "PR başlığı yazarken — kisa ve açıklayıcı olmali",
             "variations": [
               "feat: [description] [JIRA-XXX]",
               "[TICKET-123] [description]",
@@ -809,8 +809,8 @@
           },
           {
             "pattern": "## What\n[Description of changes]\n\n## Why\n[Motivation]\n\n## How\n[Implementation details]",
-            "turkish": "## Ne\n[Degisikliklerin aciklamasi]\n\n## Neden\n[Motivasyon]\n\n## Nasil\n[Uygulama detaylari]",
-            "when_to_use": "PR aciklamasinin ana yapisini olustururken",
+            "turkish": "## Ne\n[Değişikliklerin açıklaması]\n\n## Neden\n[Motivasyon]\n\n## Nasil\n[Uygulama detaylari]",
+            "when_to_use": "PR açıklamasının ana yapısını oluştururken",
             "variations": [
               "### Context\n[background]\n\n### Changes\n[list]\n\n### Impact\n[affected areas]",
               "**Problem:** [what's broken]\n**Solution:** [what this PR does]\n**Alternatives considered:** [other approaches]"
@@ -819,8 +819,8 @@
           },
           {
             "pattern": "## Checklist\n- [ ] Tests added\n- [ ] Documentation updated\n- [ ] No breaking changes\n- [ ] Reviewed by [team]",
-            "turkish": "## Kontrol Listesi\n- [ ] Testler eklendi\n- [ ] Dokumantasyon guncellendi\n- [ ] Kirilma degisikligi yok\n- [ ] [Takim] tarafindan incelendi",
-            "when_to_use": "PR kontrol listesi olustururken",
+            "turkish": "## Kontrol Listesi\n- [ ] Testler eklendi\n- [ ] Dokümantasyon güncellendi\n- [ ] Kirilma değişikliği yok\n- [ ] [Takim] tarafindan incelendi",
+            "when_to_use": "PR kontrol listesi oluştururken",
             "variations": [
               "### Pre-merge checklist\n- [ ] All CI checks pass\n- [ ] Code reviewed\n- [ ] QA tested",
               "### Review checklist\n- [ ] Logic is correct\n- [ ] Error handling is adequate\n- [ ] Performance impact considered"
@@ -829,8 +829,8 @@
           },
           {
             "pattern": "## Migration Guide\nIf you're upgrading from [old version], note the following changes:\n- [breaking change 1]\n- [migration step]",
-            "turkish": "## Gecis Rehberi\n[Eski versiyon]'dan yukseltme yapiyorsaniz, su degisikliklere dikkat edin:\n- [kirilma degisikligi 1]\n- [gecis adimi]",
-            "when_to_use": "Breaking change iceren PR'larda gecis rehberi yazarken",
+            "turkish": "## Geçiş Rehberi\n[Eski versiyon]'dan yukseltme yapıyorsanız, su değişikliklere dikkat edin:\n- [kirilma değişikliği 1]\n- [geçiş adimi]",
+            "when_to_use": "Breaking change içeren PR'larda geçiş rehberi yazarken",
             "variations": [
               "### Breaking Changes\n- [change]: [how to update]\n- [change]: [how to update]",
               "### Upgrade Notes\nThis PR changes [X]. Existing consumers should [action]."
@@ -839,8 +839,8 @@
           },
           {
             "pattern": "## Dependencies\nThis PR depends on / is blocked by:\n- [ ] [#PR-number] [description]\n\nThis PR unblocks:\n- [#PR-number] [description]",
-            "turkish": "## Bagimliliklar\nBu PR su PR'lara bagimli / tarafindan engelleniyor:\n- [ ] [#PR-numarasi] [aciklama]\n\nBu PR'in engeli kaldiracagi PR'lar:\n- [#PR-numarasi] [aciklama]",
-            "when_to_use": "Baska PR'larla bagimliligi olan PR'larda",
+            "turkish": "## Bağımlılıklar\nBu PR su PR'lara bağımlı / tarafindan engelleniyor:\n- [ ] [#PR-numarasi] [açıklama]\n\nBu PR'in engeli kaldıracağı PR'lar:\n- [#PR-numarasi] [açıklama]",
+            "when_to_use": "Başka PR'larla bağımlılığı olan PR'larda",
             "variations": [
               "Blocked by #[PR]. Please merge that first.",
               "This is part [X] of [Y] in the [feature] implementation. See #[PR] for part [X-1]."
@@ -854,8 +854,8 @@
         "patterns": [
           {
             "pattern": "feature/[ticket-id]-[short-description]",
-            "turkish": "feature/[ticket-id]-[kisa-aciklama]",
-            "when_to_use": "Yeni bir ozellik gelistirirken dal olusturmak icin",
+            "turkish": "feature/[ticket-id]-[kisa-açıklama]",
+            "when_to_use": "Yeni bir özellik geliştirirken dal oluşturmak için",
             "variations": [
               "feat/[description]",
               "feature/[team]-[description]",
@@ -865,8 +865,8 @@
           },
           {
             "pattern": "bugfix/[ticket-id]-[short-description]",
-            "turkish": "bugfix/[ticket-id]-[kisa-aciklama]",
-            "when_to_use": "Bir hatayi duzeltirken dal olusturmak icin",
+            "turkish": "bugfix/[ticket-id]-[kisa-açıklama]",
+            "when_to_use": "Bir hatayi duzeltirken dal oluşturmak için",
             "variations": [
               "fix/[description]",
               "bugfix/[ticket-id]/[description]",
@@ -876,8 +876,8 @@
           },
           {
             "pattern": "hotfix/[ticket-id]-[short-description]",
-            "turkish": "hotfix/[ticket-id]-[kisa-aciklama]",
-            "when_to_use": "Uretim ortaminda acil duzeltme yaparken",
+            "turkish": "hotfix/[ticket-id]-[kisa-açıklama]",
+            "when_to_use": "Üretim ortaminda acil duzeltme yaparken",
             "variations": [
               "hotfix/[date]-[description]",
               "hotfix/[version]-[description]",
@@ -888,7 +888,7 @@
           {
             "pattern": "release/v[major].[minor].[patch]",
             "turkish": "release/v[major].[minor].[patch]",
-            "when_to_use": "Yeni bir surum hazirlama icin dal olusturmak",
+            "when_to_use": "Yeni bir sürüm hazirlama için dal oluşturmak",
             "variations": [
               "release/[version]",
               "release/[year].[month]",
@@ -898,8 +898,8 @@
           },
           {
             "pattern": "chore/[short-description]",
-            "turkish": "chore/[kisa-aciklama]",
-            "when_to_use": "Bakım, yapilandirma veya arac guncellemeleri icin dal olusturmak",
+            "turkish": "chore/[kisa-açıklama]",
+            "when_to_use": "Bakım, yapılandırma veya araç güncellemeleri için dal oluşturmak",
             "variations": [
               "chore/[ticket-id]-[description]",
               "infra/[description]",
@@ -919,8 +919,8 @@
         "patterns": [
           {
             "pattern": "### `[METHOD] [path]`\n[Description of what this endpoint does and when to use it].",
-            "turkish": "### `[METOD] [yol]`\n[Bu endpoint'in ne yaptiginin ve ne zaman kullanilacaginin aciklamasi].",
-            "when_to_use": "API endpoint'lerini dokumante ederken",
+            "turkish": "### `[METOD] [yol]`\n[Bu endpoint'in ne yaptığının ve ne zaman kullanilacaginin açıklaması].",
+            "when_to_use": "API endpoint'lerini dokümante ederken",
             "variations": [
               "**[METHOD]** `[path]` — [short description]",
               "#### [Resource] Endpoint\n`[METHOD] [path]`\n[description]"
@@ -929,8 +929,8 @@
           },
           {
             "pattern": "**Request Body:**\n```json\n{\n  \"[field]\": \"[type] — [description]\"\n}\n```",
-            "turkish": "**Istek Govdesi:**\n```json\n{\n  \"[alan]\": \"[tip] — [aciklama]\"\n}\n```",
-            "when_to_use": "API istek parametrelerini dokumante ederken",
+            "turkish": "**Istek Govdesi:**\n```json\n{\n  \"[alan]\": \"[tip] — [açıklama]\"\n}\n```",
+            "when_to_use": "API istek parametrelerini dokümante ederken",
             "variations": [
               "| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|",
               "**Query Parameters:**\n- `[param]` (string, required): [description]"
@@ -939,8 +939,8 @@
           },
           {
             "pattern": "**Response [STATUS CODE]:**\n```json\n{\n  \"[field]\": \"[value]\"\n}\n```",
-            "turkish": "**Yanit [DURUM KODU]:**\n```json\n{\n  \"[alan]\": \"[deger]\"\n}\n```",
-            "when_to_use": "API yanit formatini dokumante ederken",
+            "turkish": "**Yanit [DURUM KODU]:**\n```json\n{\n  \"[alan]\": \"[değer]\"\n}\n```",
+            "when_to_use": "API yanit formatini dokümante ederken",
             "variations": [
               "**Success Response (200 OK):**\n[schema]\n\n**Error Response (400 Bad Request):**\n[schema]",
               "Returns a [ResourceType] object on success."
@@ -949,8 +949,8 @@
           },
           {
             "pattern": "**Error Codes:**\n| Status | Code | Message | Description |\n|--------|------|---------|-------------|",
-            "turkish": "**Hata Kodlari:**\n| Durum | Kod | Mesaj | Aciklama |\n|-------|-----|-------|----------|",
-            "when_to_use": "API hata kodlarini dokumante ederken",
+            "turkish": "**Hata Kodlari:**\n| Durum | Kod | Mesaj | Açıklama |\n|-------|-----|-------|----------|",
+            "when_to_use": "API hata kodlarini dokümante ederken",
             "variations": [
               "### Errors\n- `400`: [description]\n- `401`: [description]\n- `404`: [description]",
               "**Error Response Format:**\n```json\n{\"error\": {\"code\": \"[CODE]\", \"message\": \"[message]\"}}\n```"
@@ -959,8 +959,8 @@
           },
           {
             "pattern": "**Authentication:** This endpoint requires [auth type]. Include [token/key] in the [header/query].",
-            "turkish": "**Kimlik Dogrulama:** Bu endpoint [auth tipi] gerektirir. [Token/anahtar]'i [header/sorgu]'ya ekleyin.",
-            "when_to_use": "API kimlik dogrulama gereksinimlerini dokumante ederken",
+            "turkish": "**Kimlik Doğrulama:** Bu endpoint [auth tipi] gerektirir. [Token/anahtar]'i [header/sorgu]'ya ekleyin.",
+            "when_to_use": "API kimlik doğrulama gereksinimlerini dokümante ederken",
             "variations": [
               "**Auth:** Bearer token required. Pass in `Authorization` header.",
               "**Permissions:** Requires `[permission]` scope. Admin-only endpoint."
@@ -974,8 +974,8 @@
         "patterns": [
           {
             "pattern": "## Requirements\n### Functional\n- The system must [requirement]\n### Non-Functional\n- [Performance/Security/Scalability] requirement",
-            "turkish": "## Gereksinimler\n### Fonksiyonel\n- Sistem [gereksinim] yapmali\n### Fonksiyonel Olmayan\n- [Performans/Guvenlik/Olceklenebilirlik] gereksinimi",
-            "when_to_use": "Teknik gereksinimleri dokumante ederken",
+            "turkish": "## Gereksinimler\n### Fonksiyonel\n- Sistem [gereksinim] yapmali\n### Fonksiyonel Olmayan\n- [Performans/Güvenlik/Ölçeklenebilirlik] gereksinimi",
+            "when_to_use": "Teknik gereksinimleri dokümante ederken",
             "variations": [
               "### Must Have\n- [requirement]\n### Should Have\n- [requirement]\n### Nice to Have\n- [requirement]",
               "**User Story:** As a [role], I want to [action] so that [benefit].\n**Acceptance Criteria:** [list]"
@@ -994,8 +994,8 @@
           },
           {
             "pattern": "## Architecture Decision Record\n**Status:** [Proposed/Accepted/Deprecated]\n**Context:** [problem]\n**Decision:** [chosen approach]\n**Consequences:** [trade-offs]",
-            "turkish": "## Mimari Karar Kaydi\n**Durum:** [Onerilen/Kabul Edilen/Kullanilmayan]\n**Baglam:** [problem]\n**Karar:** [secilen yaklasim]\n**Sonuclar:** [trade-off'lar]",
-            "when_to_use": "Onemli mimari kararlari dokumante ederken — ADR formati",
+            "turkish": "## Mimari Karar Kaydi\n**Durum:** [Onerilen/Kabul Edilen/Kullanilmayan]\n**Bağlam:** [problem]\n**Karar:** [secilen yaklaşım]\n**Sonuçlar:** [trade-off'lar]",
+            "when_to_use": "Önemli mimari kararlari dokümante ederken — ADR formati",
             "variations": [
               "### Decision: [title]\n**Problem:** [what we faced]\n**Options considered:** [list]\n**Chosen:** [option] because [reason]",
               "### ADR-[number]: [title]\n**Date:** [date]\n**Deciders:** [names]\n**Decision:** [summary]"
@@ -1004,8 +1004,8 @@
           },
           {
             "pattern": "## Performance Criteria\n- Response time: p95 < [X]ms\n- Throughput: [X] requests/second\n- Availability: [X]% uptime",
-            "turkish": "## Performans Kriterleri\n- Yanit suresi: p95 < [X]ms\n- Verimlilik: [X] istek/saniye\n- Erisilebilirlik: %[X] uptime",
-            "when_to_use": "Performans gereksinimlerini tanimlarken",
+            "turkish": "## Performans Kriterleri\n- Yanit süresi: p95 < [X]ms\n- Verimlilik: [X] istek/saniye\n- Erişilebilirlik: %[X] uptime",
+            "when_to_use": "Performans gereksinimlerini tanımlarken",
             "variations": [
               "### SLA Requirements\n- Uptime: [target]\n- Latency: [target]\n- Error rate: [target]",
               "### Benchmarks\n- Current: [metrics]\n- Target: [metrics]\n- Acceptable degradation: [threshold]"
@@ -1014,8 +1014,8 @@
           },
           {
             "pattern": "## Security Considerations\n- **Authentication:** [method]\n- **Authorization:** [approach]\n- **Data Protection:** [measures]\n- **Known Risks:** [risks and mitigations]",
-            "turkish": "## Guvenlik Hususlari\n- **Kimlik Dogrulama:** [yontem]\n- **Yetkilendirme:** [yaklasim]\n- **Veri Koruma:** [onlemler]\n- **Bilinen Riskler:** [riskler ve azaltma yontemleri]",
-            "when_to_use": "Guvenlik gereksinimlerini tanimlarken",
+            "turkish": "## Güvenlik Hususlari\n- **Kimlik Doğrulama:** [yöntem]\n- **Yetkilendirme:** [yaklaşım]\n- **Veri Koruma:** [onlemler]\n- **Bilinen Riskler:** [riskler ve azaltma yöntemleri]",
+            "when_to_use": "Güvenlik gereksinimlerini tanımlarken",
             "variations": [
               "### Threat Model\n- [Threat]: [Mitigation]\n- [Attack vector]: [Defense]",
               "### Security Checklist\n- [ ] Input validation\n- [ ] SQL injection prevention\n- [ ] XSS protection\n- [ ] CSRF tokens\n- [ ] Rate limiting"
@@ -1029,8 +1029,8 @@
         "patterns": [
           {
             "pattern": "## Steps to Reproduce\n1. [Step 1]\n2. [Step 2]\n3. [Step 3]\n4. Observe: [what happens]",
-            "turkish": "## Yeniden Uretme Adimlari\n1. [Adim 1]\n2. [Adim 2]\n3. [Adim 3]\n4. Gozlem: [ne oluyor]",
-            "when_to_use": "Bug raporu yazarken adimlari listelemek icin",
+            "turkish": "## Yeniden Üretme Adimlari\n1. [Adim 1]\n2. [Adim 2]\n3. [Adim 3]\n4. Gozlem: [ne oluyor]",
+            "when_to_use": "Bug raporu yazarken adimlari listelemek için",
             "variations": [
               "### Reproduction\nNavigate to [page] → Click [button] → Enter [data] → [Bug occurs]",
               "### How to trigger\n- Precondition: [setup]\n- Action: [what user does]\n- Result: [what goes wrong]"
@@ -1039,8 +1039,8 @@
           },
           {
             "pattern": "**Expected:** [what should happen]\n**Actual:** [what actually happens]\n**Impact:** [who is affected and how]",
-            "turkish": "**Beklenen:** [ne olmali]\n**Gerceklesen:** [gercekte ne oluyor]\n**Etki:** [kim ve nasil etkileniyor]",
-            "when_to_use": "Beklenen ve gerceklesen davranisi karsilastirirken",
+            "turkish": "**Beklenen:** [ne olmali]\n**Gerçekleşen:** [gerçekte ne oluyor]\n**Etki:** [kim ve nasil etkileniyor]",
+            "when_to_use": "Beklenen ve gerçekleşen davranisi karşılaştırırken",
             "variations": [
               "Expected behavior: [description]\nActual behavior: [description]\nFrequency: [always/intermittent/rare]",
               "Works: [correct scenario]\nFails: [broken scenario]"
@@ -1049,8 +1049,8 @@
           },
           {
             "pattern": "## Environment\n- **OS:** [operating system]\n- **Browser:** [browser and version]\n- **App Version:** [version/commit]\n- **Device:** [device type]",
-            "turkish": "## Ortam\n- **IS:** [isletim sistemi]\n- **Tarayici:** [tarayici ve surum]\n- **Uygulama Surumu:** [surum/commit]\n- **Cihaz:** [cihaz tipi]",
-            "when_to_use": "Bug'in hangi ortamda olustugunu belirtirken",
+            "turkish": "## Ortam\n- **IS:** [isletim sistemi]\n- **Tarayici:** [tarayici ve sürüm]\n- **Uygulama Sürümü:** [sürüm/commit]\n- **Cihaz:** [cihaz tipi]",
+            "when_to_use": "Bug'in hangi ortamda oluştuğunu belirtirken",
             "variations": [
               "**Tested on:** [browser/OS combinations]",
               "**Environment:** Production / Staging / Local\n**Commit:** [hash]\n**Feature flags:** [enabled flags]"
@@ -1059,7 +1059,7 @@
           },
           {
             "pattern": "**Severity:** [Critical/High/Medium/Low]\n**Priority:** [P0/P1/P2/P3]\n**Frequency:** [Always/Intermittent/Rare]",
-            "turkish": "**Siddet:** [Kritik/Yuksek/Orta/Dusuk]\n**Oncelik:** [P0/P1/P2/P3]\n**Siklik:** [Her zaman/Arasira/Nadir]",
+            "turkish": "**Siddet:** [Kritik/Yüksek/Orta/Düşük]\n**Öncelik:** [P0/P1/P2/P3]\n**Siklik:** [Her zaman/Arasıra/Nadir]",
             "when_to_use": "Bug'in ciddiyetini ve onceliklendirmesini belirlerken",
             "variations": [
               "**Impact:** [X] users affected. [Y]% of [action] fail.",
@@ -1069,8 +1069,8 @@
           },
           {
             "pattern": "## Evidence\n- **Screenshot/Video:** [link]\n- **Error Logs:** [relevant log entries]\n- **Network Tab:** [relevant requests/responses]",
-            "turkish": "## Kanitlar\n- **Ekran Goruntusu/Video:** [link]\n- **Hata Loglari:** [ilgili log girisleri]\n- **Ag Sekisi:** [ilgili istekler/yanitlar]",
-            "when_to_use": "Bug raporuna kanitlar eklerken",
+            "turkish": "## Kanıtlar\n- **Ekran Goruntusu/Video:** [link]\n- **Hata Loglari:** [ilgili log girişleri]\n- **Ag Sekisi:** [ilgili istekler/yanitlar]",
+            "when_to_use": "Bug raporuna kanıtlar eklerken",
             "variations": [
               "### Attachments\n- [Screenshot showing the error]\n- [Console log output]\n- [HAR file from network tab]",
               "### Debug Info\n- Request ID: [id]\n- Timestamp: [time]\n- User ID: [id (anonymized)]"
@@ -1084,8 +1084,8 @@
         "patterns": [
           {
             "pattern": "**As a** [user role], **I want to** [action] **so that** [benefit].",
-            "turkish": "**Bir** [kullanici rolu] **olarak**, [eylem] **yapmak istiyorum**, **boylece** [fayda].",
-            "when_to_use": "User story formatinda ozellik talep ederken",
+            "turkish": "**Bir** [kullanıcı rolu] **olarak**, [eylem] **yapmak istiyorum**, **boylece** [fayda].",
+            "when_to_use": "User story formatinda özellik talep ederken",
             "variations": [
               "**User Story:** [role] needs [capability] to [goal].",
               "**Feature:** [name]\n**Users:** [who benefits]\n**Value:** [business value]"
@@ -1094,8 +1094,8 @@
           },
           {
             "pattern": "## Acceptance Criteria\n- [ ] Given [context], when [action], then [expected result]\n- [ ] Given [context], when [action], then [expected result]",
-            "turkish": "## Kabul Kriterleri\n- [ ] [Baglam] verildiginde, [eylem] yapildiginda, [beklenen sonuc] olmali\n- [ ] [Baglam] verildiginde, [eylem] yapildiginda, [beklenen sonuc] olmali",
-            "when_to_use": "Ozelligin kabul kriterlerini tanimlarken — Gherkin-style",
+            "turkish": "## Kabul Kriterleri\n- [ ] [Bağlam] verildiginde, [eylem] yapıldığında, [beklenen sonuç] olmali\n- [ ] [Bağlam] verildiginde, [eylem] yapıldığında, [beklenen sonuç] olmali",
+            "when_to_use": "Ozelligin kabul kriterlerini tanımlarken — Gherkin-style",
             "variations": [
               "### Done when:\n- [criterion 1]\n- [criterion 2]",
               "### Success Criteria\n1. Users can [action]\n2. System [behavior]\n3. [Metric] improves by [amount]"
@@ -1104,8 +1104,8 @@
           },
           {
             "pattern": "## Technical Considerations\n- **Complexity:** [Low/Medium/High]\n- **Dependencies:** [list]\n- **Estimated effort:** [time]\n- **Risks:** [potential issues]",
-            "turkish": "## Teknik Hususlar\n- **Karmasiklik:** [Dusuk/Orta/Yuksek]\n- **Bagimliliklar:** [liste]\n- **Tahmini efor:** [sure]\n- **Riskler:** [potansiyel sorunlar]",
-            "when_to_use": "Ozellik talebinin teknik yonlerini degerlendirirken",
+            "turkish": "## Teknik Hususlar\n- **Karmaşıklık:** [Düşük/Orta/Yüksek]\n- **Bağımlılıklar:** [liste]\n- **Tahmini efor:** [süre]\n- **Riskler:** [potansiyel sorunlar]",
+            "when_to_use": "Özellik talebinin teknik yonlerini değerlendirirken",
             "variations": [
               "### Implementation Notes\n- Approach: [suggested approach]\n- Impact on existing code: [assessment]\n- Performance implications: [analysis]",
               "### Effort Estimate\n- Backend: [time]\n- Frontend: [time]\n- Testing: [time]"
@@ -1114,8 +1114,8 @@
           },
           {
             "pattern": "## Proposed Solution\n[Description of how the feature could be implemented]\n\n### Alternative Approaches\n1. [Alternative 1]: [pros and cons]\n2. [Alternative 2]: [pros and cons]",
-            "turkish": "## Onerilen Cozum\n[Ozelligin nasil uygulanabileceginin aciklamasi]\n\n### Alternatif Yaklasimlar\n1. [Alternatif 1]: [artilari ve eksileri]\n2. [Alternatif 2]: [artilari ve eksileri]",
-            "when_to_use": "Ozellik icin cozum onerileri sunarken",
+            "turkish": "## Onerilen Çözüm\n[Ozelligin nasil uygulanabileceginin açıklaması]\n\n### Alternatif Yaklaşımlar\n1. [Alternatif 1]: [artilari ve eksileri]\n2. [Alternatif 2]: [artilari ve eksileri]",
+            "when_to_use": "Özellik için çözüm önerileri sunarken",
             "variations": [
               "### Option A: [approach]\n**Pros:** [list]\n**Cons:** [list]\n\n### Option B: [approach]\n**Pros:** [list]\n**Cons:** [list]",
               "**Recommended approach:** [description]\n**Reasoning:** [why this over alternatives]"
@@ -1124,8 +1124,8 @@
           },
           {
             "pattern": "## Mockup / Wireframe\n[Description or link to visual representation of the feature]\n\n## User Flow\n1. User [action 1]\n2. System [response 1]\n3. User [action 2]\n4. System [response 2]",
-            "turkish": "## Maket / Tel Cerceve\n[Ozelligin gorsel temsilinin aciklamasi veya linki]\n\n## Kullanici Akisi\n1. Kullanici [eylem 1]\n2. Sistem [yanit 1]\n3. Kullanici [eylem 2]\n4. Sistem [yanit 2]",
-            "when_to_use": "Ozelligin kullanici akisini ve gorsel tasarimini tanimlarken",
+            "turkish": "## Maket / Tel Çerçeve\n[Ozelligin görsel temsilinin açıklaması veya linki]\n\n## Kullanıcı Akisi\n1. Kullanıcı [eylem 1]\n2. Sistem [yanit 1]\n3. Kullanıcı [eylem 2]\n4. Sistem [yanit 2]",
+            "when_to_use": "Ozelligin kullanıcı akisini ve görsel tasarımını tanımlarken",
             "variations": [
               "### User Journey\n[Step-by-step description of user interaction]",
               "### Screens\n1. [Screen name]: [description and purpose]\n2. [Screen name]: [description and purpose]"
@@ -1144,7 +1144,7 @@
         "patterns": [
           {
             "pattern": "We're seeing [error type] in [service/component]. It started [when] and affects [scope].",
-            "turkish": "[Servis/bilesen]'de [hata tipi] goruyoruz. [Ne zaman] basladi ve [kapsam]'i etkiliyor.",
+            "turkish": "[Servis/bileşen]'de [hata tipi] goruyoruz. [Ne zaman] başladı ve [kapsam]'i etkiliyor.",
             "when_to_use": "Bir hatayi ilk kez raporlarken",
             "variations": [
               "[Service] is throwing [error] since [time]. [X] users are impacted.",
@@ -1154,8 +1154,8 @@
           },
           {
             "pattern": "Here's the stack trace:\n```\n[error message]\n  at [file:line] — [context]\n  at [file:line] — [context]\n```\nThe relevant code is in [file/function].",
-            "turkish": "Iste stack trace:\n```\n[hata mesaji]\n  at [dosya:satir] — [baglam]\n  at [dosya:satir] — [baglam]\n```\nIlgili kod [dosya/fonksiyon]'da.",
-            "when_to_use": "Stack trace paylasirken baglam ekleyerek",
+            "turkish": "Işte stack trace:\n```\n[hata mesaji]\n  at [dosya:satir] — [bağlam]\n  at [dosya:satir] — [bağlam]\n```\nIlgili kod [dosya/fonksiyon]'da.",
+            "when_to_use": "Stack trace paylasirken bağlam ekleyerek",
             "variations": [
               "Error output:\n```\n[stack trace]\n```\nI think the issue originates at [specific line].",
               "Exception caught: [error]. Originating from [method] called by [caller]."
@@ -1164,7 +1164,7 @@
           },
           {
             "pattern": "Root cause identified: [cause]. The issue was [explanation]. Impact: [affected users/data].",
-            "turkish": "Kok neden belirlendi: [neden]. Sorun [aciklama] idi. Etki: [etkilenen kullanicilar/veri].",
+            "turkish": "Kok neden belirlendi: [neden]. Sorun [açıklama] idi. Etki: [etkilenen kullanıcılar/veri].",
             "when_to_use": "Kok neden analizini tamamladiginda",
             "variations": [
               "After investigation, the root cause is [cause] in [component]. This was triggered by [event].",
@@ -1174,7 +1174,7 @@
           },
           {
             "pattern": "I noticed [anomaly] in [logs/metrics/monitoring]. This could indicate [possible issue]. Should we investigate?",
-            "turkish": "[Loglar/metrikler/izleme]'de [anomali] fark ettim. Bu [olasi sorun]'a isaret edebilir. Arastirmali miyiz?",
+            "turkish": "[Loglar/metrikler/izleme]'de [anomali] fark ettim. Bu [olası sorun]'a işaret edebilir. Araştırmalı miyiz?",
             "when_to_use": "Potansiyel bir sorunu erken fark ettiginde",
             "variations": [
               "The [metric] has been [trending up/down/spiking] since [time]. This might be related to [recent change].",
@@ -1184,8 +1184,8 @@
           },
           {
             "pattern": "The error is reproducible with [conditions]. To reproduce: [steps]. Environment: [details].",
-            "turkish": "Hata [kosullar] ile yeniden uretilebilir. Yeniden uretmek icin: [adimlar]. Ortam: [detaylar].",
-            "when_to_use": "Bir hatayi yeniden uretme adimlarini paylasirken",
+            "turkish": "Hata [koşullar] ile yeniden uretilebilir. Yeniden üretmek için: [adimlar]. Ortam: [detaylar].",
+            "when_to_use": "Bir hatayi yeniden üretme adimlarini paylasirken",
             "variations": [
               "I can consistently reproduce this by [steps]. It happens every time when [condition].",
               "Reproduction rate: [percentage]. Trigger: [condition]. Not reproducible when [exception]."
@@ -1200,7 +1200,7 @@
           {
             "pattern": "Something went wrong. Please try again. If the problem persists, contact support with reference [ID].",
             "turkish": "Bir seyler ters gitti. Lutfen tekrar deneyin. Sorun devam ederse, [ID] referansiyla destekle iletisime gecin.",
-            "when_to_use": "Son kullaniciya gosterilecek genel hata mesaji yazarken",
+            "when_to_use": "Son kullanıcıya gösterilecek genel hata mesaji yazarken",
             "variations": [
               "We couldn't process your request. Please try again in a few minutes.",
               "Oops! Something unexpected happened. Our team has been notified and is working on it."
@@ -1209,8 +1209,8 @@
           },
           {
             "pattern": "[ErrorCode]: [Technical description]. Expected: [expected]. Received: [received]. Context: [details].",
-            "turkish": "[HataKodu]: [Teknik aciklama]. Beklenen: [beklenen]. Alinan: [alinan]. Baglam: [detaylar].",
-            "when_to_use": "Gelistirici loglarina yazilacak detayli hata mesaji",
+            "turkish": "[HataKodu]: [Teknik açıklama]. Beklenen: [beklenen]. Alinan: [alinan]. Bağlam: [detaylar].",
+            "when_to_use": "Geliştirici loglarina yazilacak detayli hata mesaji",
             "variations": [
               "Error in [module]: [description]. Input: [input]. Stack: [trace].",
               "[LEVEL] [timestamp] [service] [errorCode]: [message] | requestId=[id] userId=[id]"
@@ -1219,8 +1219,8 @@
           },
           {
             "pattern": "[timestamp] [LEVEL] [service] [requestId]: [message] | [key=value pairs]",
-            "turkish": "[zaman_damgasi] [SEVIYE] [servis] [istekId]: [mesaj] | [anahtar=deger ciftleri]",
-            "when_to_use": "Yapilandirilmis log mesaji formati olustururken",
+            "turkish": "[zaman_damgasi] [SEVIYE] [servis] [istekId]: [mesaj] | [anahtar=değer ciftleri]",
+            "when_to_use": "Yapılandırılmış log mesaji formati oluştururken",
             "variations": [
               "{\"timestamp\": \"[ts]\", \"level\": \"[level]\", \"service\": \"[svc]\", \"message\": \"[msg]\", \"metadata\": {}}",
               "[ISO-timestamp] [level] [correlation-id] [component]: [message]"
@@ -1229,8 +1229,8 @@
           },
           {
             "pattern": "Unable to [action] because [reason]. Please [fix instruction].",
-            "turkish": "[Sebep] nedeniyle [eylem] yapilamiyor. Lutfen [duzeltme talimati].",
-            "when_to_use": "Kullaniciya acik ve eyleme donusturulebilir hata mesaji yazarken",
+            "turkish": "[Sebep] nedeniyle [eylem] yapılamıyor. Lutfen [duzeltme talimati].",
+            "when_to_use": "Kullanıcıya açık ve eyleme dönüştürülebilir hata mesaji yazarken",
             "variations": [
               "[Action] failed: [reason]. Try [solution].",
               "We can't [action] right now. [Reason]. You can [alternative] instead."
@@ -1239,8 +1239,8 @@
           },
           {
             "pattern": "Warning: [condition detected]. This may cause [potential issue]. Recommended action: [suggestion].",
-            "turkish": "Uyari: [tespit edilen durum]. Bu [potansiyel sorun]'a yol acabilir. Onerilen eylem: [oneri].",
-            "when_to_use": "Kritik olmayan ama dikkat gerektiren uyari mesajlari icin",
+            "turkish": "Uyarı: [tespit edilen durum]. Bu [potansiyel sorun]'a yol acabilir. Onerilen eylem: [öneri].",
+            "when_to_use": "Kritik olmayan ama dikkat gerektiren uyarı mesajlari için",
             "variations": [
               "Deprecation warning: [feature] will be removed in [version]. Use [alternative] instead.",
               "Performance warning: [operation] took [X]ms (threshold: [Y]ms). Consider [optimization]."
@@ -1254,8 +1254,8 @@
         "patterns": [
           {
             "pattern": "## Incident Report\n**Incident:** [title]\n**Severity:** [SEV-1/2/3/4]\n**Status:** [Investigating/Identified/Monitoring/Resolved]\n**Impact:** [description]\n**Start Time:** [timestamp]",
-            "turkish": "## Olay Raporu\n**Olay:** [baslik]\n**Siddet:** [SEV-1/2/3/4]\n**Durum:** [Arastiriliyor/Belirlendi/Izleniyor/Cozuldu]\n**Etki:** [aciklama]\n**Baslangic Zamani:** [zaman damgasi]",
-            "when_to_use": "Bir olay raporunun ilk versiyonunu olustururken",
+            "turkish": "## Olay Raporu\n**Olay:** [başlık]\n**Siddet:** [SEV-1/2/3/4]\n**Durum:** [Araştırılıyor/Belirlendi/Izleniyor/Cozuldu]\n**Etki:** [açıklama]\n**Başlangıç Zamani:** [zaman damgasi]",
+            "when_to_use": "Bir olay raporunun ilk versiyonunu oluştururken",
             "variations": [
               "INCIDENT: [title] | SEV-[X] | Status: [status]\nTimeline: [start] → [current]\nImpact: [scope]",
               "Alert: [service] incident. Severity: [level]. [X] users affected. Team investigating."
@@ -1264,8 +1264,8 @@
           },
           {
             "pattern": "## Postmortem\n**Date:** [date]\n**Duration:** [length]\n**Summary:** [one-line summary]\n**Root Cause:** [cause]\n**Timeline:** [events]\n**Action Items:** [improvements]",
-            "turkish": "## Postmortem\n**Tarih:** [tarih]\n**Sure:** [uzunluk]\n**Ozet:** [tek satirlik ozet]\n**Kok Neden:** [neden]\n**Zaman Cizelgesi:** [olaylar]\n**Eylem Maddeleri:** [iyilestirmeler]",
-            "when_to_use": "Olay sonrasi postmortem dokumani yazarken",
+            "turkish": "## Postmortem\n**Tarih:** [tarih]\n**Süre:** [uzunluk]\n**Özet:** [tek satirlik özet]\n**Kok Neden:** [neden]\n**Zaman Cizelgesi:** [olaylar]\n**Eylem Maddeleri:** [iyilestirmeler]",
+            "when_to_use": "Olay sonrasi postmortem dokümanı yazarken",
             "variations": [
               "### Incident Review: [title]\n**What happened:** [description]\n**Why it happened:** [root cause]\n**How we fixed it:** [resolution]\n**How we prevent it:** [action items]",
               "### Lessons Learned\n1. [Lesson]: [improvement]\n2. [Lesson]: [improvement]"
@@ -1274,8 +1274,8 @@
           },
           {
             "pattern": "**Status Update [time]:** [current status]. We [action taken]. Next step: [planned action]. ETA: [estimate].",
-            "turkish": "**Durum Guncellemesi [zaman]:** [mevcut durum]. [Alinan eylem] yaptik. Sonraki adim: [planlanan eylem]. Tahmini sure: [tahmin].",
-            "when_to_use": "Devam eden bir olay hakkinda durum guncellemesi verirken",
+            "turkish": "**Durum Güncellemesi [zaman]:** [mevcut durum]. [Alinan eylem] yaptik. Sonraki adim: [planlanan eylem]. Tahmini süre: [tahmin].",
+            "when_to_use": "Devam eden bir olay hakkinda durum güncellemesi verirken",
             "variations": [
               "[time] UPDATE: [status]. Investigation ongoing. Affected: [scope]. Workaround: [if any].",
               "Incident update ([time]): We've [progress]. [X]% of traffic restored. Full resolution expected by [time]."
@@ -1284,7 +1284,7 @@
           },
           {
             "pattern": "## Resolution\nThe incident has been resolved as of [time]. [Description of fix]. All services are operating normally. We will publish a full postmortem by [date].",
-            "turkish": "## Cozum\nOlay [zaman] itibariyle cozulmustur. [Duzeltmenin aciklamasi]. Tum servisler normal calisiyor. [Tarih]'e kadar tam bir postmortem yayinlayacagiz.",
+            "turkish": "## Çözüm\nOlay [zaman] itibariyle çözülmüştür. [Duzeltmenin açıklaması]. Tum servisler normal çalışıyor. [Tarih]'e kadar tam bir postmortem yayınlayacağız.",
             "when_to_use": "Olay cozuldugunde son durumu bildirirken",
             "variations": [
               "RESOLVED: [title] incident is now resolved. Root cause: [cause]. Fix: [solution]. No data loss.",
@@ -1295,7 +1295,7 @@
           {
             "pattern": "## Follow-up Actions\n- [ ] [Action 1] — Owner: [name], Due: [date]\n- [ ] [Action 2] — Owner: [name], Due: [date]\n- [ ] [Action 3] — Owner: [name], Due: [date]",
             "turkish": "## Takip Eylemleri\n- [ ] [Eylem 1] — Sorumlu: [isim], Son Tarih: [tarih]\n- [ ] [Eylem 2] — Sorumlu: [isim], Son Tarih: [tarih]\n- [ ] [Eylem 3] — Sorumlu: [isim], Son Tarih: [tarih]",
-            "when_to_use": "Olay sonrasi yapilmasi gereken iyilestirmeleri listelemek icin",
+            "when_to_use": "Olay sonrasi yapılması gereken iyilestirmeleri listelemek için",
             "variations": [
               "### Preventive Measures\n1. [Measure] to prevent [recurrence]\n2. [Measure] to detect [issue] earlier",
               "### Next Steps\nShort-term: [quick fixes]\nMedium-term: [improvements]\nLong-term: [architectural changes]"
@@ -1314,8 +1314,8 @@
         "patterns": [
           {
             "pattern": "# [Project Name]\n\n[One-line description of what the project does and who it's for].\n\n[![Build Status](badge-url)](link) [![License](badge-url)](link)",
-            "turkish": "# [Proje Adi]\n\n[Projenin ne yaptiginin ve kime yonelik oldugunun tek satirlik aciklamasi].\n\n[![Yapi Durumu](rozet-url)](link) [![Lisans](rozet-url)](link)",
-            "when_to_use": "README'nin baslangic bolumunu yazarken — ilk izlenim cok onemli",
+            "turkish": "# [Proje Adi]\n\n[Projenin ne yaptığının ve kime yonelik olduğunun tek satirlik açıklaması].\n\n[![Yapı Durumu](rozet-url)](link) [![Lisans](rozet-url)](link)",
+            "when_to_use": "README'nin başlangıç bölümünü yazarken — ilk izlenim çok önemli",
             "variations": [
               "# [Project Name]\n> [Tagline or short description]\n\n[Longer description in 2-3 sentences]",
               "# [Project Name] — [short tagline]\n\n[What] | [Why] | [For Whom]"
@@ -1324,8 +1324,8 @@
           },
           {
             "pattern": "## Installation\n\n```bash\n# Clone the repository\ngit clone [repo-url]\n\n# Install dependencies\n[package-manager] install\n\n# Set up environment\ncp .env.example .env\n\n# Run the application\n[command]\n```",
-            "turkish": "## Kurulum\n\n```bash\n# Depoyu klonla\ngit clone [repo-url]\n\n# Bagimliliklari kur\n[paket-yoneticisi] install\n\n# Ortami ayarla\ncp .env.example .env\n\n# Uygulamayi calistir\n[komut]\n```",
-            "when_to_use": "Kurulum talimatlarini yazarken — adim adim ve kopyala-yapistir yapilabilir olmali",
+            "turkish": "## Kurulum\n\n```bash\n# Depoyu klonla\ngit clone [repo-url]\n\n# Bağımlılıkları kur\n[paket-yöneticisi] install\n\n# Ortami ayarla\ncp .env.example .env\n\n# Uygulamayi çalıştır\n[komut]\n```",
+            "when_to_use": "Kurulum talimatlarini yazarken — adim adim ve kopyala-yapıştır yapılabilir olmali",
             "variations": [
               "## Quick Start\n```bash\npnpm dlx create-[project] my-app\ncd my-app\npnpm start\n```",
               "## Installation\n### Using pnpm\n```bash\npnpm install [package]\n```\n### Using yarn\n```bash\nyarn add [package]\n```"
@@ -1334,8 +1334,8 @@
           },
           {
             "pattern": "## Usage\n\n```[language]\n[minimal working example]\n```\n\nFor more examples, see the [examples directory](link) or [documentation](link).",
-            "turkish": "## Kullanim\n\n```[dil]\n[minimal calisan ornek]\n```\n\nDaha fazla ornek icin [ornekler dizini](link) veya [dokumantasyon](link)'a bakin.",
-            "when_to_use": "Temel kullanim ornegi yazarken — hizlica kopyala-yapistir yapilabilir olmali",
+            "turkish": "## Kullanım\n\n```[dil]\n[minimal çalışan örnek]\n```\n\nDaha fazla örnek için [örnekler dizini](link) veya [dokümantasyon](link)'a bakin.",
+            "when_to_use": "Temel kullanım örneği yazarken — hızlıca kopyala-yapıştır yapılabilir olmali",
             "variations": [
               "## Getting Started\nHere's a simple example to get you up and running:\n```[language]\n[code]\n```",
               "## Basic Usage\n### [Use Case 1]\n```[language]\n[code]\n```\n### [Use Case 2]\n```[language]\n[code]\n```"
@@ -1344,8 +1344,8 @@
           },
           {
             "pattern": "## Contributing\n\nContributions are welcome! Please see [CONTRIBUTING.md](link) for guidelines.\n\n1. Fork the repository\n2. Create your feature branch (`git checkout -b feature/[name]`)\n3. Commit your changes (`git commit -m 'feat: [description]'`)\n4. Push to the branch (`git push origin feature/[name]`)\n5. Open a Pull Request",
-            "turkish": "## Katki\n\nKatkilar memnuniyetle karsilanir! Yonergeler icin [CONTRIBUTING.md](link) dosyasina bakin.\n\n1. Depoyu fork'layin\n2. Ozellik dalinizi olusturun (`git checkout -b feature/[isim]`)\n3. Degisikliklerinizi commit'leyin (`git commit -m 'feat: [aciklama]'`)\n4. Dali push'layin (`git push origin feature/[isim]`)\n5. Pull Request acin",
-            "when_to_use": "Katki rehberi yazarken",
+            "turkish": "## Katkı\n\nKatkilar memnuniyetle karsilanir! Yonergeler için [CONTRIBUTING.md](link) dosyasina bakin.\n\n1. Depoyu fork'layin\n2. Özellik dalinizi oluşturun (`git checkout -b feature/[isim]`)\n3. Değişikliklerinizi commit'leyin (`git commit -m 'feat: [açıklama]'`)\n4. Dali push'layin (`git push origin feature/[isim]`)\n5. Pull Request acin",
+            "when_to_use": "Katkı rehberi yazarken",
             "variations": [
               "## Contributing\nWe love contributions! Check out our [Contributing Guide](link) to get started.",
               "## How to Contribute\n- Report bugs by [opening an issue](link)\n- Suggest features in [discussions](link)\n- Submit PRs for [good first issues](link)"
@@ -1354,7 +1354,7 @@
           },
           {
             "pattern": "## License\n\nThis project is licensed under the [License Type] License — see the [LICENSE](link) file for details.",
-            "turkish": "## Lisans\n\nBu proje [Lisans Tipi] Lisansi altinda lisanslidir — detaylar icin [LICENSE](link) dosyasina bakin.",
+            "turkish": "## Lisans\n\nBu proje [Lisans Tipi] Lisansi altinda lisanslidir — detaylar için [LICENSE](link) dosyasina bakin.",
             "when_to_use": "Lisans bilgisi eklerken",
             "variations": [
               "## License\n\nMIT © [Year] [Author]",
@@ -1369,8 +1369,8 @@
         "patterns": [
           {
             "pattern": "## API Overview\n\n**Base URL:** `[url]`\n**Authentication:** [method]\n**Rate Limit:** [limit]\n**Response Format:** JSON",
-            "turkish": "## API Genel Bakis\n\n**Temel URL:** `[url]`\n**Kimlik Dogrulama:** [yontem]\n**Hiz Siniri:** [sinir]\n**Yanit Formati:** JSON",
-            "when_to_use": "API dokumantasyonunun giris bolumunu yazarken",
+            "turkish": "## API Genel Bakis\n\n**Temel URL:** `[url]`\n**Kimlik Doğrulama:** [yöntem]\n**Hız Siniri:** [sinir]\n**Yanit Formati:** JSON",
+            "when_to_use": "API dokümantasyonunun giriş bölümünü yazarken",
             "variations": [
               "## API Reference\nAll endpoints are relative to `[base-url]`. Authenticate with [method].",
               "## Getting Started with the API\n1. Get your API key from [dashboard]\n2. Set the `Authorization` header\n3. Make your first request"
@@ -1379,8 +1379,8 @@
           },
           {
             "pattern": "### [Resource Name]\n\n| Method | Endpoint | Description |\n|--------|----------|-------------|\n| GET | /[resource] | List all [resources] |\n| GET | /[resource]/:id | Get a single [resource] |\n| POST | /[resource] | Create a [resource] |\n| PUT | /[resource]/:id | Update a [resource] |\n| DELETE | /[resource]/:id | Delete a [resource] |",
-            "turkish": "### [Kaynak Adi]\n\n| Metod | Endpoint | Aciklama |\n|-------|----------|----------|\n| GET | /[kaynak] | Tum [kaynaklar]'i listele |\n| GET | /[kaynak]/:id | Tek bir [kaynak] getir |\n| POST | /[kaynak] | Bir [kaynak] olustur |\n| PUT | /[kaynak]/:id | Bir [kaynak] guncelle |\n| DELETE | /[kaynak]/:id | Bir [kaynak] sil |",
-            "when_to_use": "CRUD endpoint'lerini tablo olarak listelemek icin",
+            "turkish": "### [Kaynak Adi]\n\n| Metod | Endpoint | Açıklama |\n|-------|----------|----------|\n| GET | /[kaynak] | Tum [kaynaklar]'i listele |\n| GET | /[kaynak]/:id | Tek bir [kaynak] getir |\n| POST | /[kaynak] | Bir [kaynak] oluştur |\n| PUT | /[kaynak]/:id | Bir [kaynak] güncelle |\n| DELETE | /[kaynak]/:id | Bir [kaynak] sil |",
+            "when_to_use": "CRUD endpoint'lerini tablo olarak listelemek için",
             "variations": [
               "## Endpoints\n### [Resource]\n- `GET /[resource]` — [description]\n- `POST /[resource]` — [description]",
               "## Routes\n```\nGET    /api/[resource]       → list\nPOST   /api/[resource]       → create\nGET    /api/[resource]/:id   → show\nPUT    /api/[resource]/:id   → update\nDELETE /api/[resource]/:id   → destroy\n```"
@@ -1389,8 +1389,8 @@
           },
           {
             "pattern": "### Pagination\n\nAll list endpoints support pagination:\n- `page` (integer, default: 1): Page number\n- `limit` (integer, default: 20, max: 100): Items per page\n\nResponse includes:\n```json\n{\n  \"data\": [],\n  \"meta\": { \"page\": 1, \"limit\": 20, \"total\": 150 }\n}```",
-            "turkish": "### Sayfalama\n\nTum listeleme endpoint'leri sayfalama destekler:\n- `page` (tamsayi, varsayilan: 1): Sayfa numarasi\n- `limit` (tamsayi, varsayilan: 20, maks: 100): Sayfa basina oge\n\nYanit icerigi:\n```json\n{\n  \"data\": [],\n  \"meta\": { \"page\": 1, \"limit\": 20, \"total\": 150 }\n}```",
-            "when_to_use": "API sayfalama mekanizmasini dokumante ederken",
+            "turkish": "### Sayfalama\n\nTum listeleme endpoint'leri sayfalama destekler:\n- `page` (tamsayı, varsayılan: 1): Sayfa numarasi\n- `limit` (tamsayı, varsayılan: 20, maks: 100): Sayfa basina oge\n\nYanit içeriği:\n```json\n{\n  \"data\": [],\n  \"meta\": { \"page\": 1, \"limit\": 20, \"total\": 150 }\n}```",
+            "when_to_use": "API sayfalama mekanizmasini dokümante ederken",
             "variations": [
               "### Cursor-based Pagination\nUse `cursor` parameter for efficient pagination through large datasets.",
               "### Pagination\nPass `offset` and `limit` query parameters. Default: offset=0, limit=25."
@@ -1399,8 +1399,8 @@
           },
           {
             "pattern": "### Error Response Format\n```json\n{\n  \"error\": {\n    \"code\": \"[ERROR_CODE]\",\n    \"message\": \"[Human-readable description]\",\n    \"details\": [{ \"field\": \"[field]\", \"issue\": \"[problem]\" }]\n  }\n}```",
-            "turkish": "### Hata Yanit Formati\n```json\n{\n  \"error\": {\n    \"code\": \"[HATA_KODU]\",\n    \"message\": \"[Insanin okuyabilecegi aciklama]\",\n    \"details\": [{ \"field\": \"[alan]\", \"issue\": \"[sorun]\" }]\n  }\n}```",
-            "when_to_use": "API hata yanit formatini tanimlarken",
+            "turkish": "### Hata Yanit Formati\n```json\n{\n  \"error\": {\n    \"code\": \"[HATA_KODU]\",\n    \"message\": \"[Insanin okuyabilecegi açıklama]\",\n    \"details\": [{ \"field\": \"[alan]\", \"issue\": \"[sorun]\" }]\n  }\n}```",
+            "when_to_use": "API hata yanit formatini tanımlarken",
             "variations": [
               "### Errors\nAll errors follow RFC 7807 Problem Details format.",
               "### Error Handling\nErrors return a JSON body with `status`, `code`, and `message` fields."
@@ -1409,8 +1409,8 @@
           },
           {
             "pattern": "### Webhooks\n\n**URL:** Configure in your dashboard settings\n**Events:** [list of events]\n**Payload:** [format]\n**Retry Policy:** [policy]",
-            "turkish": "### Webhook'lar\n\n**URL:** Dashboard ayarlarinizda yapilandirin\n**Olaylar:** [olay listesi]\n**Yuk:** [format]\n**Yeniden Deneme Politikasi:** [politika]",
-            "when_to_use": "Webhook entegrasyonunu dokumante ederken",
+            "turkish": "### Webhook'lar\n\n**URL:** Dashboard ayarlarinizda yapılandırın\n**Olaylar:** [olay listesi]\n**Yük:** [format]\n**Yeniden Deneme Politikasi:** [politika]",
+            "when_to_use": "Webhook entegrasyonunu dokümante ederken",
             "variations": [
               "### Events\nSubscribe to events via webhooks or WebSocket:\n- `[event.type]`: Triggered when [condition]",
               "### Callbacks\nRegister a callback URL to receive real-time notifications."
@@ -1424,8 +1424,8 @@
         "patterns": [
           {
             "pattern": "## ADR-[number]: [Decision Title]\n\n**Date:** [date]\n**Status:** [Proposed/Accepted/Deprecated/Superseded]\n**Deciders:** [names]\n\n### Context\n[Problem description]\n\n### Decision\n[What we decided]\n\n### Consequences\n[What happens as a result]",
-            "turkish": "## ADR-[numara]: [Karar Basligi]\n\n**Tarih:** [tarih]\n**Durum:** [Onerilen/Kabul Edilen/Kullanilmayan/Yerini Alan]\n**Karar Verenler:** [isimler]\n\n### Baglam\n[Problem aciklamasi]\n\n### Karar\n[Ne karar verdik]\n\n### Sonuclar\n[Sonuc olarak ne olacak]",
-            "when_to_use": "Mimari karar kaydi (ADR) yazarken — her onemli karar dokumante edilmeli",
+            "turkish": "## ADR-[numara]: [Karar Başlığı]\n\n**Tarih:** [tarih]\n**Durum:** [Onerilen/Kabul Edilen/Kullanilmayan/Yerini Alan]\n**Karar Verenler:** [isimler]\n\n### Bağlam\n[Problem açıklaması]\n\n### Karar\n[Ne karar verdik]\n\n### Sonuçlar\n[Sonuç olarak ne olacak]",
+            "when_to_use": "Mimari karar kaydi (ADR) yazarken — her önemli karar dokümante edilmeli",
             "variations": [
               "### Decision Record\n**Title:** [title]\n**Context:** [why this decision is needed]\n**Options:** [list of considered options]\n**Decision:** [chosen option]\n**Rationale:** [why this option was chosen]",
               "## Architecture Decision\n**Problem:** [statement]\n**Constraints:** [list]\n**Chosen Solution:** [description]\n**Trade-offs:** [list]"
@@ -1434,8 +1434,8 @@
           },
           {
             "pattern": "## System Overview\n\n### Architecture\n[High-level description of the system architecture]\n\n### Components\n| Component | Purpose | Technology |\n|-----------|---------|------------|\n| [name] | [purpose] | [tech stack] |",
-            "turkish": "## Sistem Genel Bakis\n\n### Mimari\n[Sistem mimarisinin ust duzey aciklamasi]\n\n### Bilesenler\n| Bilesen | Amac | Teknoloji |\n|---------|------|-----------|\n| [isim] | [amac] | [teknoloji yigini] |",
-            "when_to_use": "Sistemin genel mimarisini dokumante ederken",
+            "turkish": "## Sistem Genel Bakis\n\n### Mimari\n[Sistem mimarisinin üst düzey açıklaması]\n\n### Bileşenler\n| Bileşen | Amac | Teknoloji |\n|---------|------|-----------|\n| [isim] | [amac] | [teknoloji yigini] |",
+            "when_to_use": "Sistemin genel mimarisini dokümante ederken",
             "variations": [
               "## Architecture\n### High-Level Diagram\n[diagram or link]\n\n### Data Flow\n1. [step] → 2. [step] → 3. [step]",
               "## System Design\n### Overview\n[description]\n### Key Decisions\n[list of architectural decisions and rationale]"
@@ -1444,8 +1444,8 @@
           },
           {
             "pattern": "## [Component Name]\n\n### Responsibility\n[What this component does and why it exists]\n\n### Interfaces\n- **Input:** [what it receives]\n- **Output:** [what it produces]\n- **Dependencies:** [what it needs]\n\n### Internal Design\n[How it's structured internally]",
-            "turkish": "## [Bilesen Adi]\n\n### Sorumluluk\n[Bu bilesenin ne yaptigini ve neden var oldugu]\n\n### Arayuzler\n- **Girdi:** [ne alir]\n- **Cikti:** [ne uretir]\n- **Bagimliliklar:** [neye ihtiyac duyar]\n\n### Ic Tasarim\n[Dahili olarak nasil yapilandirilmistir]",
-            "when_to_use": "Tek bir bilesenin detayli dokumantasyonunu yazarken",
+            "turkish": "## [Bileşen Adi]\n\n### Sorumluluk\n[Bu bileşenin ne yaptığını ve neden var olduğu]\n\n### Arayüzler\n- **Girdi:** [ne alir]\n- **Çıktı:** [ne uretir]\n- **Bağımlılıklar:** [neye ihtiyaç duyar]\n\n### Ic Tasarım\n[Dahili olarak nasil yapılandırılmıştır]",
+            "when_to_use": "Tek bir bileşenin detayli dokümantasyonunu yazarken",
             "variations": [
               "### Module: [name]\n**Owner:** [team]\n**API:** [endpoint/interface]\n**Data:** [what data it manages]",
               "### Service: [name]\n**Ports:** [API ports]\n**Config:** [environment variables]\n**Health Check:** [endpoint]"
@@ -1454,8 +1454,8 @@
           },
           {
             "pattern": "## Data Flow\n\n### [Flow Name]\n```\n[Actor] → [Component 1] → [Component 2] → [Component 3] → [Result]\n```\n\n1. [Actor] sends [request] to [Component 1]\n2. [Component 1] [action] and forwards to [Component 2]\n3. [Component 2] [action]\n4. [Response] is returned to [Actor]",
-            "turkish": "## Veri Akisi\n\n### [Akis Adi]\n```\n[Aktor] → [Bilesen 1] → [Bilesen 2] → [Bilesen 3] → [Sonuc]\n```\n\n1. [Aktor] [Component 1]'e [istek] gonderir\n2. [Component 1] [eylem] yapar ve [Component 2]'ye iletir\n3. [Component 2] [eylem] yapar\n4. [Yanit] [Aktor]'e dondurulur",
-            "when_to_use": "Bir islemin akisini adim adim dokumante ederken",
+            "turkish": "## Veri Akisi\n\n### [Akis Adi]\n```\n[Aktor] → [Bileşen 1] → [Bileşen 2] → [Bileşen 3] → [Sonuç]\n```\n\n1. [Aktor] [Component 1]'e [istek] gonderir\n2. [Component 1] [eylem] yapar ve [Component 2]'ye iletir\n3. [Component 2] [eylem] yapar\n4. [Yanit] [Aktor]'e dondurulur",
+            "when_to_use": "Bir işlemin akisini adim adim dokümante ederken",
             "variations": [
               "### Sequence\n[Step-by-step description with arrows showing flow]",
               "### Request Lifecycle\n1. Request arrives at [entry point]\n2. [Processing steps]\n3. Response returned"
@@ -1464,8 +1464,8 @@
           },
           {
             "pattern": "## Deployment\n\n### Environments\n| Environment | URL | Purpose |\n|-------------|-----|--------|\n| Development | [url] | Local development |\n| Staging | [url] | Pre-production testing |\n| Production | [url] | Live traffic |\n\n### CI/CD Pipeline\n[Description of build, test, and deploy process]",
-            "turkish": "## Dagitim\n\n### Ortamlar\n| Ortam | URL | Amac |\n|-------|-----|------|\n| Gelistirme | [url] | Yerel gelistirme |\n| Staging | [url] | Uretim oncesi test |\n| Uretim | [url] | Canli trafik |\n\n### CI/CD Pipeline\n[Derleme, test ve dagitim surecinin aciklamasi]",
-            "when_to_use": "Dagitim altyapisini ve surecleri dokumante ederken",
+            "turkish": "## Dağıtım\n\n### Ortamlar\n| Ortam | URL | Amac |\n|-------|-----|------|\n| Geliştirme | [url] | Yerel geliştirme |\n| Staging | [url] | Üretim oncesi test |\n| Üretim | [url] | Canli trafik |\n\n### CI/CD Pipeline\n[Derleme, test ve dağıtım sürecinin açıklaması]",
+            "when_to_use": "Dağıtım altyapısını ve süreçleri dokümante ederken",
             "variations": [
               "### Infrastructure\n- Cloud: [provider]\n- Container: [orchestration]\n- Monitoring: [tools]",
               "### Deploy Process\n1. PR merged to main\n2. CI runs tests\n3. Docker image built\n4. Auto-deploy to staging\n5. Manual approval for production"
@@ -1484,8 +1484,8 @@
         "patterns": [
           {
             "pattern": "Hi, I'm [name]. I'm a [role] with [X] years of experience in [technologies/domains]. Most recently, I [recent achievement/role].",
-            "turkish": "Merhaba, ben [isim]. [Teknolojiler/alanlar]'da [X] yillik deneyime sahip bir [rol]'um. En son olarak, [son basari/rol] yaptim.",
-            "when_to_use": "Mulakatin basinda kendini tanitirken — 30-60 saniyede bitir",
+            "turkish": "Merhaba, ben [isim]. [Teknolojiler/alanlar]'da [X] yıllık deneyime sahip bir [rol]'um. En son olarak, [son başarı/rol] yaptim.",
+            "when_to_use": "Mülakatın basinda kendini tanitirken — 30-60 saniyede bitir",
             "variations": [
               "I'm [name], a [role] specializing in [area]. I've spent the last [X] years building [type of systems] at [company/independently].",
               "My name is [name]. I'm a [role] passionate about [area]. My background includes [key experiences]."
@@ -1494,8 +1494,8 @@
           },
           {
             "pattern": "What excites me most about this role is [specific aspect]. I believe I can contribute by [value proposition].",
-            "turkish": "Bu rol hakkinda beni en cok heyecanlandiran sey [belirli yon]. [Deger onerisi] ile katki saglayabilecegime inaniyorum.",
-            "when_to_use": "Neden bu pozisyonla ilgilendiginizi aciklama isterken",
+            "turkish": "Bu rol hakkinda beni en çok heyecanlandiran sey [belirli yön]. [Değer onerisi] ile katkı sağlayabileceğime inaniyorum.",
+            "when_to_use": "Neden bu pozisyonla ilgilendiginizi açıklama isterken",
             "variations": [
               "I'm particularly drawn to this position because [reason]. My experience in [area] aligns well with [job requirement].",
               "I'm excited about [company] because [reason], and I think my skills in [area] would be a great fit for [team/project]."
@@ -1504,8 +1504,8 @@
           },
           {
             "pattern": "Outside of work, I [hobby/activity related to tech growth]. I'm currently [learning/building/contributing to] [project/technology].",
-            "turkish": "Is disinda [teknik gelisimle ilgili hobi/aktivite] yapiyorum. Su anda [proje/teknoloji] [ogreniyorum/insa ediyorum/katki sagliyorum].",
-            "when_to_use": "Kisisel gelisim ve tutkunu gostermek icin — mulakatin sonunda",
+            "turkish": "Is dışında [teknik gelisimle ilgili hobi/aktivite] yapıyorum. Su anda [proje/teknoloji] [öğreniyorum/insa ediyorum/katkı sagliyorum].",
+            "when_to_use": "Kisisel gelişim ve tutkunu göstermek için — mülakatın sonunda",
             "variations": [
               "In my spare time, I enjoy [activity]. I recently [achievement/project] which taught me [skill].",
               "I'm always learning — currently exploring [technology]. I also [contribute to open source / write blog posts / mentor others]."
@@ -1519,8 +1519,8 @@
         "patterns": [
           {
             "pattern": "**Situation:** In my [role/project], we faced [challenge/context].",
-            "turkish": "**Durum:** [Rol/proje]'mde [zorluk/baglam] ile karsi karsiya kaldik.",
-            "when_to_use": "STAR yonteminin 'Situation' kismini anlatirken — baglami kisa tut",
+            "turkish": "**Durum:** [Rol/proje]'mde [zorluk/bağlam] ile karşı karsiya kaldık.",
+            "when_to_use": "STAR yonteminin 'Situation' kismini anlatırken — bağlamı kisa tut",
             "variations": [
               "At [company/project], we had a situation where [context]. The team was [state] and [stakeholders] were [concern].",
               "During [project/time period], our team encountered [challenge] that threatened [impact]."
@@ -1529,8 +1529,8 @@
           },
           {
             "pattern": "**Task:** My responsibility was to [specific task/goal]. The deadline was [timeframe] and the stakes were [impact].",
-            "turkish": "**Gorev:** Benim sorumluluğum [belirli gorev/hedef] idi. Son tarih [zaman dilimi] idi ve riskler [etki] idi.",
-            "when_to_use": "STAR yonteminin 'Task' kismini anlatirken — kendi rolunu vurgula",
+            "turkish": "**Görev:** Benim sorumluluğum [belirli görev/hedef] idi. Son tarih [zaman dilimi] idi ve riskler [etki] idi.",
+            "when_to_use": "STAR yonteminin 'Task' kismini anlatırken — kendi rolunu vurgula",
             "variations": [
               "I was responsible for [task]. The challenge was [constraint] and failure would mean [consequence].",
               "I took ownership of [area] and needed to deliver [outcome] within [timeframe]."
@@ -1539,8 +1539,8 @@
           },
           {
             "pattern": "**Action:** I [specific actions taken]. First, I [step 1]. Then, I [step 2]. I also [step 3].",
-            "turkish": "**Eylem:** [Alinan belirli eylemler] yaptim. Once [adim 1] yaptim. Sonra [adim 2] yaptim. Ayrica [adim 3] yaptim.",
-            "when_to_use": "STAR yonteminin 'Action' kismini anlatirken — 'ben' diyerek kendi eylemlerini anlat",
+            "turkish": "**Eylem:** [Alinan belirli eylemler] yaptim. Önce [adim 1] yaptim. Sonra [adim 2] yaptim. Ayrica [adim 3] yaptim.",
+            "when_to_use": "STAR yonteminin 'Action' kismini anlatırken — 'ben' diyerek kendi eylemlerini anlat",
             "variations": [
               "Here's what I did: I started by [analysis/research]. Based on my findings, I [implementation]. I also [communication/collaboration].",
               "My approach was to [strategy]. Specifically, I [action 1], [action 2], and [action 3]."
@@ -1549,8 +1549,8 @@
           },
           {
             "pattern": "**Result:** As a result, [measurable outcome]. This led to [broader impact]. I learned [key takeaway].",
-            "turkish": "**Sonuc:** Sonuc olarak, [olculebilir sonuc]. Bu [genis etki]'ye yol acti. [Anahtar cikarm]'i ogrendim.",
-            "when_to_use": "STAR yonteminin 'Result' kismini anlatirken — rakamlara odaklan",
+            "turkish": "**Sonuç:** Sonuç olarak, [olculebilir sonuç]. Bu [geniş etki]'ye yol acti. [Anahtar cikarm]'i öğrendim.",
+            "when_to_use": "STAR yonteminin 'Result' kismini anlatırken — rakamlara odaklan",
             "variations": [
               "The outcome was [result]. We saw a [metric] improvement of [number]. The stakeholders were [reaction].",
               "This resulted in [quantified improvement]. More importantly, [broader impact or lesson learned]."
@@ -1559,8 +1559,8 @@
           },
           {
             "pattern": "If I were to do it again, I would [improvement]. The key lesson was [insight].",
-            "turkish": "Tekrar yapacak olsam, [iyilestirme] yapardim. Anahtar ders [icerik] idi.",
-            "when_to_use": "STAR sonrasinda ogrenim ve ozelesetiri eklerken — olgunluk gosterir",
+            "turkish": "Tekrar yapacak olsam, [iyilestirme] yapardim. Anahtar ders [içerik] idi.",
+            "when_to_use": "STAR sonrasinda öğrenim ve ozelesetiri eklerken — olgunluk gösterir",
             "variations": [
               "Looking back, one thing I'd do differently is [change]. But overall, [positive reflection].",
               "The experience taught me [lesson], which I've applied since then in [subsequent situation]."
@@ -1574,8 +1574,8 @@
         "patterns": [
           {
             "pattern": "Let me think through this step by step. First, I'd [approach]. The key considerations are [factors].",
-            "turkish": "Bunu adim adim dusuneyim. Once [yaklasim] yapardim. Temel hususlar [faktorler].",
-            "when_to_use": "Teknik bir soruda yaklasimini aciklamaya baslarken — sesli dusun",
+            "turkish": "Bunu adim adim düşüneyim. Önce [yaklaşım] yapardim. Temel hususlar [faktorler].",
+            "when_to_use": "Teknik bir soruda yaklaşımını açıklamaya başlarken — sesli düşün",
             "variations": [
               "Great question. My approach would be to [strategy]. Let me walk you through my thinking.",
               "I'd start by [first step] to understand the problem better, then [subsequent steps]."
@@ -1584,7 +1584,7 @@
           },
           {
             "pattern": "There's a trade-off between [option A] and [option B]. [A] gives us [benefit] but costs [drawback]. I'd choose [preference] because [reasoning].",
-            "turkish": "[Secenek A] ve [Secenek B] arasinda bir trade-off var. [A] bize [fayda] saglar ama [dezavantaj] maliyeti var. [Tercih]'i secerdim cunku [gerekce].",
+            "turkish": "[Secenek A] ve [Secenek B] arasinda bir trade-off var. [A] bize [fayda] sağlar ama [dezavantaj] maliyeti var. [Tercih]'i secerdim cunku [gerekce].",
             "when_to_use": "Teknik trade-off'lari tartisirken — her zaman trade-off'lardan bahset",
             "variations": [
               "We have two main options: [A] which optimizes for [X], and [B] which optimizes for [Y]. Given the constraints, I'd lean toward [choice].",
@@ -1594,8 +1594,8 @@
           },
           {
             "pattern": "That's a great follow-up. Building on my previous answer, [extension]. An additional consideration is [new point].",
-            "turkish": "Bu harika bir takip sorusu. Onceki cevabimi gelistirerek, [uzanti]. Ek bir husus da [yeni nokta].",
-            "when_to_use": "Takip sorularina yanit verirken — onceki cevabina referans ver",
+            "turkish": "Bu harika bir takip sorusu. Önceki cevabimi geliştirerek, [uzanti]. Ek bir husus da [yeni nokta].",
+            "when_to_use": "Takip sorularina yanit verirken — önceki cevabina referans ver",
             "variations": [
               "Good point — I should also consider [aspect]. This changes my approach because [reason].",
               "To extend my previous answer: if we also need [new requirement], then I'd modify the approach by [change]."
@@ -1603,19 +1603,19 @@
             "real_example": "That's a great follow-up. Building on my previous answer about using a hash map, if we need to handle concurrent access, I'd wrap it with a read-write lock or use a concurrent hash map. An additional consideration is cache invalidation — we'd need a TTL or LRU eviction policy."
           },
           {
-            "pattern": "I'm not 100% sure about [specific detail], but here's what I know: [knowledge]. I would verify by [method].",
-            "turkish": "[Belirli detay] hakkinda %100 emin degilim, ama bildiklerim su: [bilgi]. [Yontem] ile dogrulardim.",
-            "when_to_use": "Bir seyi bilmediginde durust olmak icin — bilmemek sorun degil, nasil ogrenecegini bilmek onemli",
+            "pattern": "I'm not 100% süre about [specific detail], but here's what I know: [knowledge]. I would verify by [method].",
+            "turkish": "[Belirli detay] hakkinda %100 emin degilim, ama bildiklerim su: [bilgi]. [Yöntem] ile dogrulardim.",
+            "when_to_use": "Bir seyi bilmediginde durust olmak için — bilmemek sorun değil, nasil öğreneceğini bilmek önemli",
             "variations": [
               "Honestly, I haven't worked with [technology] directly, but based on my experience with [similar tech], I'd expect [reasoning].",
               "That's something I'd need to look up, but my instinct says [educated guess] because [reasoning]."
             ],
-            "real_example": "I'm not 100% sure about the exact garbage collection algorithm in Go, but here's what I know: it uses a concurrent, tri-color mark-and-sweep collector. I would verify the specifics by checking the Go runtime documentation or reading the GC design document."
+            "real_example": "I'm not 100% süre about the exact garbage collection algorithm in Go, but here's what I know: it uses a concurrent, tri-color mark-and-sweep collector. I would verify the specifics by checking the Go runtime documentation or reading the GC design document."
           },
           {
             "pattern": "To optimize this further, we could [optimization]. This would improve [metric] from [current] to [target] at the cost of [trade-off].",
-            "turkish": "Bunu daha da optimize etmek icin [optimizasyon] yapabilirdik. Bu [metrik]'i [mevcut]'den [hedef]'e iyilestirir, [trade-off] maliyetiyle.",
-            "when_to_use": "Cozumun nasil daha da iyilestirilecegini tartisirken",
+            "turkish": "Bunu daha da optimize etmek için [optimizasyon] yapabilirdik. Bu [metrik]'i [mevcut]'den [hedef]'e iyilestirir, [trade-off] maliyetiyle.",
+            "when_to_use": "Çözümün nasil daha da iyilestirilecegini tartisirken",
             "variations": [
               "For a follow-up optimization, I'd consider [approach]. The bottleneck right now is [area].",
               "If we needed to scale this to [larger scale], we'd need to [change]. Here's how I'd approach it."
@@ -1629,8 +1629,8 @@
         "patterns": [
           {
             "pattern": "Before diving in, let me clarify the requirements. What's the expected [scale/users/data volume]? Do we need [specific feature]?",
-            "turkish": "Derinlesmeden once, gereksinimleri netlestirelim. Beklenen [olcek/kullanici/veri hacmi] nedir? [Belirli ozellik]'e ihtiyacimiz var mi?",
-            "when_to_use": "System design mulakattinda gereksinimleri toplayarak baslarken — her zaman bu adimla basla",
+            "turkish": "Derinlesmeden önce, gereksinimleri netlestirelim. Beklenen [ölçek/kullanıcı/veri hacmi] nedir? [Belirli özellik]'e ihtiyacımız var mi?",
+            "when_to_use": "System design mülakattında gereksinimleri toplayarak başlarken — her zaman bu adimla başla",
             "variations": [
               "I'd like to start by understanding the scope. Are we designing for [scale]? What are the must-have vs nice-to-have features?",
               "A few clarifying questions: How many [users/requests] are we expecting? What's the read-to-write ratio? Any latency requirements?"
@@ -1639,8 +1639,8 @@
           },
           {
             "pattern": "At a high level, I'd design this with [N] main components: [component list]. Let me sketch out the architecture.",
-            "turkish": "Ust duzeyden bakarsak, bunu [N] ana bilesenle tasarlardim: [bilesen listesi]. Mimariyi cizelim.",
-            "when_to_use": "Ust duzey tasarimi sunmaya baslarken",
+            "turkish": "Üst duzeyden bakarsak, bunu [N] ana bileşenle tasarlardim: [bileşen listesi]. Mimariyi cizelim.",
+            "when_to_use": "Üst düzey tasarımı sunmaya başlarken",
             "variations": [
               "Here's my high-level approach: we'd have [components] communicating via [protocol/mechanism].",
               "The system can be broken down into [N] key services: [list]. The data flows from [source] through [components] to [destination]."
@@ -1649,8 +1649,8 @@
           },
           {
             "pattern": "Let me dive deeper into [component]. For [specific challenge], I'd use [solution] because [reasoning]. Here's how it handles [edge case].",
-            "turkish": "[Bilesen]'e daha derinlemesine bakalim. [Belirli zorluk] icin [cozum] kullanirdim cunku [gerekce]. Iste [kenar durum]'u nasil ele aliyor.",
-            "when_to_use": "Belirli bir bileseni derinlestirirken",
+            "turkish": "[Bileşen]'e daha derinlemesine bakalim. [Belirli zorluk] için [çözüm] kullanirdim cunku [gerekce]. Işte [kenar durum]'u nasil ele aliyor.",
+            "when_to_use": "Belirli bir bileşeni derinlestirirken",
             "variations": [
               "Zooming into [component]: the key challenge here is [challenge]. My approach would be [solution].",
               "For the [component], the critical design decision is [decision]. I'd go with [approach] for these reasons: [list]."
@@ -1659,8 +1659,8 @@
           },
           {
             "pattern": "The main trade-offs in this design are: [trade-off 1], [trade-off 2]. If requirements change to [scenario], we'd need to [adjustment].",
-            "turkish": "Bu tasarimdaki ana trade-off'lar: [trade-off 1], [trade-off 2]. Gereksinimler [senaryo]'ya degisirse, [ayarlama] yapmamiz gerekir.",
-            "when_to_use": "Tasarimin trade-off'larini ve sinirliklarini tartisirken — olgunluk gosterir",
+            "turkish": "Bu tasarımdaki ana trade-off'lar: [trade-off 1], [trade-off 2]. Gereksinimler [senaryo]'ya değişirse, [ayarlama] yapmamiz gerekir.",
+            "when_to_use": "Tasarımın trade-off'larini ve sinirliklarini tartisirken — olgunluk gösterir",
             "variations": [
               "This design optimizes for [X] at the expense of [Y]. If we later need [Z], we could [extension].",
               "Potential bottlenecks: [list]. We can mitigate these by [solutions]. The system scales [horizontally/vertically] by [mechanism]."
@@ -1674,8 +1674,8 @@
         "patterns": [
           {
             "pattern": "Could you tell me about the team I'd be working with? What does a typical day look like for someone in this role?",
-            "turkish": "Birlikte calisacagim takim hakkinda bilgi verebilir misiniz? Bu roldeki biri icin tipik bir gun nasil gorunuyor?",
-            "when_to_use": "Takimi ve calisma ortamini anlamak icin — mulakat sonunda sorulacak sorular",
+            "turkish": "Birlikte çalışacağım takim hakkinda bilgi verebilir misiniz? Bu roldeki biri için tipik bir gun nasil gorunuyor?",
+            "when_to_use": "Takimi ve çalışma ortamini anlamak için — mülakat sonunda sorulacak sorular",
             "variations": [
               "How is the engineering team structured? How many people would I be collaborating with directly?",
               "What does the onboarding process look like for new engineers? How long does it typically take to start contributing?"
@@ -1684,8 +1684,8 @@
           },
           {
             "pattern": "What does the tech stack look like? Are there any major technical initiatives or migrations planned?",
-            "turkish": "Teknoloji yigini nasil gorunuyor? Planlanmis buyuk teknik girisimler veya gecisler var mi?",
-            "when_to_use": "Teknik ortami ve gelecek planlarini anlamak icin",
+            "turkish": "Teknoloji yigini nasil gorunuyor? Planlanmis büyük teknik girişimler veya gecisler var mi?",
+            "when_to_use": "Teknik ortami ve gelecek planlarini anlamak için",
             "variations": [
               "What's the development workflow like? Do you use CI/CD? How do you handle deployments?",
               "What are the biggest technical challenges the team is currently facing?"
@@ -1694,8 +1694,8 @@
           },
           {
             "pattern": "What does career growth look like here? How does the company support engineers in developing their skills?",
-            "turkish": "Burada kariyer gelisimi nasil gorunuyor? Sirket muhendislerin becerilerini gelistirmesini nasil destekliyor?",
-            "when_to_use": "Kariyer gelisim firsatlarini anlamak icin",
+            "turkish": "Burada kariyer gelişimi nasil gorunuyor? Sirket mühendislerin becerilerini geliştirmesini nasil destekliyor?",
+            "when_to_use": "Kariyer gelişim firsatlarini anlamak için",
             "variations": [
               "Is there a clear career path for engineers? What does progression from [current level] to [next level] look like?",
               "Does the team have a learning budget or time allocated for professional development?"
@@ -1709,8 +1709,8 @@
         "patterns": [
           {
             "pattern": "Let me think about this for a moment... My initial approach would be [approach].",
-            "turkish": "Bir an dusunmeme izin verin... Ilk yaklasimim [yaklasim] olurdu.",
-            "when_to_use": "Live coding veya teknik soruda dusunce surecini sesli paylasirken",
+            "turkish": "Bir an düşünmeme izin verin... Ilk yaklaşımım [yaklaşım] olurdu.",
+            "when_to_use": "Live coding veya teknik soruda düşünce sürecini sesli paylasirken",
             "variations": [
               "Let me break this down... The first thing that comes to mind is [idea].",
               "Okay, let me think through this step by step. My instinct is to [approach], but let me verify that.",
@@ -1719,20 +1719,20 @@
             "real_example": "Let me think about this for a moment... My initial approach would be to use a hash map to track frequencies. That gives us O(n) time complexity, which should work within the constraints."
           },
           {
-            "pattern": "Just to make sure I understand correctly — [restatement of problem]. Is that right?",
-            "turkish": "Dogru anladigimdan emin olmak icin — [problemin yeniden ifadesi]. Bu dogru mu?",
-            "when_to_use": "Mulakatta problemi netlestirir ve varsayimlari dogrularken",
+            "pattern": "Just to make süre I understand correctly — [restatement of problem]. Is that right?",
+            "turkish": "Doğru anladigimdan emin olmak için — [problemin yeniden ifadesi]. Bu doğru mu?",
+            "when_to_use": "Mülakatta problemi netlestirir ve varsayımları dogrularken",
             "variations": [
               "Could you walk me through an example so I can confirm my understanding?",
-              "Let me rephrase to make sure we're on the same page...",
+              "Let me rephrase to make süre we're on the same page...",
               "Before I proceed, I want to clarify — are we assuming [assumption]?"
             ],
-            "real_example": "Just to make sure I understand correctly — we need to find the shortest path in an unweighted graph where some edges are bidirectional and others are not. Is that right?"
+            "real_example": "Just to make süre I understand correctly — we need to find the shortest path in an unweighted graph where some edges are bidirectional and others are not. Is that right?"
           },
           {
             "pattern": "The trade-off here is [trade-off]. I chose [option] over [alternative] because [reasoning].",
             "turkish": "Buradaki trade-off [trade-off]. [Alternatif] yerine [secenek]'i sectim cunku [gerekce].",
-            "when_to_use": "Mimari veya tasarim kararlari hakkinda gerekce sunarken",
+            "when_to_use": "Mimari veya tasarım kararlari hakkinda gerekce sunarken",
             "variations": [
               "There are two approaches here: [A] and [B]. I'd lean toward [A] because [reason], but [B] would be better if [condition].",
               "I went with [approach] because [reason]. The downside is [limitation], but for our use case, the benefits outweigh that.",
@@ -1741,27 +1741,27 @@
             "real_example": "The trade-off here is between consistency and availability. I chose eventual consistency over strong consistency because our use case tolerates slight delays in data propagation, and it allows us to scale horizontally much more easily."
           },
           {
-            "pattern": "I'm not entirely sure about [topic], but based on my understanding, [best guess]. I'd want to verify this by [verification method].",
-            "turkish": "[Konu] hakkinda tamamen emin degilim, ama anlayisima gore [en iyi tahmin]. Bunu [dogrulama yontemi] ile dogrulamak isterdim.",
-            "when_to_use": "Bilmedigin bir konuda durust ve yapici bir sekilde cevap verirken",
+            "pattern": "I'm not entirely süre about [topic], but based on my understanding, [best guess]. I'd want to verify this by [verification method].",
+            "turkish": "[Konu] hakkinda tamamen emin degilim, ama anlayisima gore [en iyi tahmin]. Bunu [doğrulama yontemi] ile doğrulamak isterdim.",
+            "when_to_use": "Bilmedigin bir konuda durust ve yapıcı bir sekilde cevap verirken",
             "variations": [
               "That's a great question. I'd need to research that further, but my intuition says [guess] because [reasoning].",
               "I haven't worked with [technology] directly, but from what I know, [understanding]. I'd want to prototype it before committing.",
-              "Honestly, I'm not sure about the specifics, but I'd approach it by [method] and validate with [approach]."
+              "Honestly, I'm not süre about the specifics, but I'd approach it by [method] and validate with [approach]."
             ],
-            "real_example": "I'm not entirely sure about the exact garbage collection behavior in that scenario, but based on my understanding, the JVM would trigger a major GC when the old generation reaches about 75% capacity. I'd want to verify this by running a profiler and checking the GC logs."
+            "real_example": "I'm not entirely süre about the exact garbage collection behavior in that scenario, but based on my understanding, the JVM would trigger a major GC when the old generation reaches about 75% capacity. I'd want to verify this by running a profiler and checking the GC logs."
           },
           {
             "pattern": "Do you have any concerns about my fit for this role? What does success look like in this position?",
-            "turkish": "Bu role uygunlugum hakkinda herhangi bir endiseniz var mi? Bu pozisyonda basari nasil gorunuyor?",
-            "when_to_use": "Mulakatin sonunda guclu bir kapanis yapmak icin",
+            "turkish": "Bu role uygunlugum hakkinda herhangi bir endişeniz var mi? Bu pozisyonda başarı nasil gorunuyor?",
+            "when_to_use": "Mülakatın sonunda güçlü bir kapanis yapmak için",
             "variations": [
               "Is there anything about my background that gives you pause? I'd love the chance to address it.",
               "What would make someone wildly successful in this role in the first year?",
               "Based on our conversation, is there any skill gap you see that I should be working on?",
               "What are the biggest challenges someone in this role would face in the first six months?"
             ],
-            "real_example": "Do you have any concerns about my fit for this role? I want to make sure I've addressed everything. Also, what does success look like for someone in this position during the first 90 days — what milestones would you expect them to hit?"
+            "real_example": "Do you have any concerns about my fit for this role? I want to make süre I've addressed everything. Also, what does success look like for someone in this position during the first 90 days — what milestones would you expect them to hit?"
           }
         ]
       }
@@ -1839,16 +1839,16 @@
         "category": "Anlama ve Teyit",
         "patterns": [
           {
-            "pattern": "Let me make sure I understand — [paraphrase what you heard].",
+            "pattern": "Let me make süre I understand — [paraphrase what you heard].",
             "turkish": "Doğru anladığımdan emin olayım — [duyduğunu tekrarla].",
             "when_to_use": "Birisi karmaşık bir şey anlattığında, devam etmeden önce anladığını teyit etmek için",
             "variations": [
-              "Just to make sure I'm on the same page — [paraphrase].",
+              "Just to make süre I'm on the same page — [paraphrase].",
               "So if I'm hearing you right, [paraphrase].",
-              "Let me play that back to make sure I've got it — [paraphrase].",
+              "Let me play that back to make süre I've got it — [paraphrase].",
               "Okay, so what you're saying is [paraphrase], right?"
             ],
-            "real_example": "Let me make sure I understand — so you want us to deprecate the v1 API but keep it running for at least 6 months while we migrate all the clients to v2?"
+            "real_example": "Let me make süre I understand — so you want us to deprecate the v1 API but keep it running for at least 6 months while we migrate all the clients to v2?"
           },
           {
             "pattern": "So what you're saying is [restatement]?",
@@ -1869,10 +1869,10 @@
             "variations": [
               "Can you go into more detail on [point]?",
               "I'd love to hear more about [point].",
-              "Could you walk me through [point]? I want to make sure I get the full picture.",
+              "Could you walk me through [point]? I want to make süre I get the full picture.",
               "What exactly do you mean by [point]?"
             ],
-            "real_example": "Could you elaborate on the caching strategy? I'm not sure I follow how we'd handle cache invalidation when the underlying data changes."
+            "real_example": "Could you elaborate on the caching strategy? I'm not süre I follow how we'd handle cache invalidation when the underlying data changes."
           },
           {
             "pattern": "Just to clarify — [question about ambiguous point]?",
@@ -1880,7 +1880,7 @@
             "when_to_use": "Bir şeyin birden fazla anlamı olabilecekken kesin anlamını öğrenmek için",
             "variations": [
               "Quick clarification — [question]?",
-              "Sorry, I want to make sure I'm not misunderstanding — [question]?",
+              "Sorry, I want to make süre I'm not misunderstanding — [question]?",
               "Just so I'm clear on this — [question]?",
               "One thing I want to nail down — [question]?"
             ],
@@ -1893,8 +1893,8 @@
             "variations": [
               "Let me summarize what we've agreed on — [summary]. Anything I'm missing?",
               "So to recap, [summary]. Is everyone aligned on that?",
-              "Just to make sure we're all on the same page — [summary].",
-              "Before we move on, let me make sure I've captured this correctly — [summary]."
+              "Just to make süre we're all on the same page — [summary].",
+              "Before we move on, let me make süre I've captured this correctly — [summary]."
             ],
             "real_example": "If I'm understanding correctly, we'll use PostgreSQL for the main data, Redis for caching, and S3 for file storage. The API will be in Go and the frontend in React. Does that sound right?"
           }
@@ -1932,7 +1932,7 @@
             "turkish": "Buna itiraz ederdim çünkü [sebep].",
             "when_to_use": "Daha güçlü bir karşı çıkış gerektiğinde — hala profesyonel ama doğrudan",
             "variations": [
-              "I'm not sure I agree with that approach — [reason].",
+              "I'm not süre I agree with that approach — [reason].",
               "I'd actually argue the opposite — [reason].",
               "I have some pushback on this — [reason].",
               "I think we need to reconsider this because [reason]."
@@ -1949,7 +1949,7 @@
               "Before we commit to this, should we weigh the pros and cons?",
               "Has anyone thought about what happens if [negative scenario]?"
             ],
-            "real_example": "Have we considered the trade-off of using a monorepo? Sure, it simplifies dependency management, but our CI pipeline would get significantly slower."
+            "real_example": "Have we considered the trade-off of using a monorepo? Süre, it simplifies dependency management, but our CI pipeline would get significantly slower."
           },
           {
             "pattern": "I respectfully disagree because [reason]. Here's my reasoning: [logic].",
@@ -2043,7 +2043,7 @@
               "Hey, do you have a minute to glance at [thing]?",
               "Mind taking a peek at [thing]? I want a second pair of eyes."
             ],
-            "real_example": "Would you mind taking a look at my PR? I'm not 100% sure about the error handling approach I used in the middleware."
+            "real_example": "Would you mind taking a look at my PR? I'm not 100% süre about the error handling approach I used in the middleware."
           },
           {
             "pattern": "I'm stuck on [problem]. Could you point me in the right direction?",
@@ -2108,7 +2108,7 @@
               "I want to come back to [topic], but let's cover [other topic] first.",
               "Let's park [topic] for now and circle back at the end."
             ],
-            "real_example": "Let's circle back to the deployment strategy in a bit. First, I want to make sure we're aligned on the database schema changes."
+            "real_example": "Let's circle back to the deployment strategy in a bit. First, I want to make süre we're aligned on the database schema changes."
           },
           {
             "pattern": "Can we table this for now and take it offline?",

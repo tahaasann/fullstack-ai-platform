@@ -50,7 +50,7 @@ describe('DashboardPage', () => {
   it('renders welcome message after data loads', async () => {
     renderWithProviders(<DashboardPage />);
     await waitFor(() => {
-      expect(screen.getByText(/Hos Geldin, Developer/)).toBeInTheDocument();
+      expect(screen.getByText(/Hoş Geldin, Developer/)).toBeInTheDocument();
     });
   });
 

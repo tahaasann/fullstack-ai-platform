@@ -63,7 +63,7 @@ export default function RoadmapPage() {
                 <div className="bg-orange-500/50" style={{ width: `${phase.tr}%` }} />
                 <div className="bg-emerald-500/50" style={{ width: `${phase.en}%` }} />
               </div>
-              <div className="text-[10px] text-gray-500">Hafta {phase.weeks}</div>
+              <div className="text-[10px] text-gray-400">Hafta {phase.weeks}</div>
               <div className="text-[10px] text-gray-400">{phase.label}</div>
               <div className="text-[10px] text-gray-600">TR {phase.tr}% / EN {phase.en}%</div>
             </div>
@@ -85,7 +85,7 @@ export default function RoadmapPage() {
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-3">
                       <span className={`text-xs font-bold ${c.text}`}>Hafta {item.week}</span>
-                      <span className="text-xs text-gray-500">{item.phase}</span>
+                      <span className="text-xs text-gray-400">{item.phase}</span>
                     </div>
                   </div>
                   <h3 className="text-lg font-semibold text-white">{item.title}</h3>

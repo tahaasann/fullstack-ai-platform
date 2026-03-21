@@ -127,16 +127,56 @@
     ]
   },
   "evaluation_criteria": [
-    "Provider abstraction layer doğru çalışıyor mu — yeni provider eklemek mevcut kodu bozmuyor mu?",
-    "Fallback mekanizması güvenilir mi — bir provider çökünce diğerine geçiş süresi kabul edilebilir mi?",
-    "Prompt versioning sistemi çalışıyor mu — eski versiyona geri dönülebiliyor mu?",
-    "İçerik kalitesi tutarlı mı — farklı ton ayarları doğru yansıyor mu?",
-    "Fine-tuning pipeline uçtan uca çalışıyor mu — dataset'ten trained model'e kadar?",
-    "Evaluation metrikleri anlamlı mı — AI-as-Judge puanları insan değerlendirmesiyle tutarlı mı?",
-    "Maliyet tracking doğru mu — her API çağrısının maliyeti hesaplanıyor mu?",
-    "Streaming response düzgün çalışıyor mu — kullanıcı deneyimi akıcı mı?",
-    "Cache mekanizması etkili mi — tekrarlanan istekler için maliyet düşüyor mu?",
-    "Kod kalitesi ve test coverage yeterli mi — edge case'ler kapsanıyor mu?"
+    {
+      "criterion": "Provider Abstraction",
+      "weight": 15,
+      "description": "Provider abstraction layer doğru çalışıyor mu — yeni provider eklemek mevcut kodu bozmuyor mu?"
+    },
+    {
+      "criterion": "Fallback Mekanizması",
+      "weight": 10,
+      "description": "Fallback mekanizması güvenilir mi — bir provider çökünce diğerine geçiş süresi kabul edilebilir mi?"
+    },
+    {
+      "criterion": "Prompt Versioning",
+      "weight": 10,
+      "description": "Prompt versioning sistemi çalışıyor mu — eski versiyona geri dönülebiliyor mu?"
+    },
+    {
+      "criterion": "İçerik Kalitesi",
+      "weight": 10,
+      "description": "İçerik kalitesi tutarlı mı — farklı ton ayarları doğru yansıyor mu?"
+    },
+    {
+      "criterion": "Fine-tuning Pipeline",
+      "weight": 10,
+      "description": "Fine-tuning pipeline uçtan uca çalışıyor mu — dataset'ten trained model'e kadar?"
+    },
+    {
+      "criterion": "Evaluation Metrikleri",
+      "weight": 10,
+      "description": "Evaluation metrikleri anlamlı mı — AI-as-Judge puanları insan değerlendirmesiyle tutarlı mı?"
+    },
+    {
+      "criterion": "Maliyet Tracking",
+      "weight": 10,
+      "description": "Maliyet tracking doğru mu — her API çağrısının maliyeti hesaplanıyor mu?"
+    },
+    {
+      "criterion": "Streaming Response",
+      "weight": 10,
+      "description": "Streaming response düzgün çalışıyor mu — kullanıcı deneyimi akıcı mı?"
+    },
+    {
+      "criterion": "Cache Mekanizması",
+      "weight": 5,
+      "description": "Cache mekanizması etkili mi — tekrarlanan istekler için maliyet düşüyor mu?"
+    },
+    {
+      "criterion": "Kod Kalitesi",
+      "weight": 10,
+      "description": "Kod kalitesi ve test coverage yeterli mi — edge case'ler kapsanıyor mu?"
+    }
   ],
   "milestones": [
     {

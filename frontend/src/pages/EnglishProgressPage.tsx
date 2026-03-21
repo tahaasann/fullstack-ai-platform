@@ -27,7 +27,7 @@ export default function EnglishProgressPage() {
       getScenarios().then(setScenarios),
       getEnglishProgress().then(setProgress),
     ])
-      .catch((err) => setError(err.message || 'Veri yuklenemedi'))
+      .catch((err) => setError(err.message || 'Veri yüklenemedi'))
       .finally(() => setLoading(false));
   };
 
@@ -38,7 +38,7 @@ export default function EnglishProgressPage() {
       await markVocabLearned(id);
       setVocabulary((prev) => prev.map((v) => v.id === id ? { ...v, learned: true } : v));
     } catch (err) {
-      toast.error('Kelime durumu guncellenemedi.');
+      toast.error('Kelime durumu güncellenemedi.');
     }
   };
 
@@ -67,13 +67,13 @@ export default function EnglishProgressPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Teknik Ingilizce</h1>
-        <p className="text-gray-400 text-sm mt-1">Is hayatinda kullanacagin teknik Ingilizce kelimeler, kaliplar ve senaryolar</p>
+        <h1 className="text-2xl font-bold text-white">Teknik İngilizce</h1>
+        <p className="text-gray-400 text-sm mt-1">İş hayatında kullanacağın teknik İngilizce kelimeler, kalıplar ve senaryolar</p>
       </div>
 
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <div className="text-gray-500 text-sm">Yukleniyor...</div>
+          <div className="text-gray-400 text-sm">Yükleniyor...</div>
         </div>
       )}
 
@@ -89,10 +89,10 @@ export default function EnglishProgressPage() {
       {/* Overall Progress */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-400">Genel Ilerleme</h3>
+          <h3 className="text-sm font-semibold text-gray-400">Genel İlerleme</h3>
           <div className="flex items-center gap-4 text-sm text-gray-300">
             <span>{learnedCount}/{vocabulary.length} kelime</span>
-            {progress && <span>{progress.total_patterns} kalip</span>}
+            {progress && <span>{progress.total_patterns} kalıp</span>}
             {progress && <span>{progress.total_scenarios} senaryo</span>}
           </div>
         </div>
@@ -116,7 +116,7 @@ export default function EnglishProgressPage() {
                   isActive ? 'border-emerald-500/50 bg-emerald-900/10' : 'border-gray-800 hover:border-gray-700'
                 }`}
               >
-                <div className="text-xs text-gray-500 uppercase mb-1">{domain}</div>
+                <div className="text-xs text-gray-400 uppercase mb-1">{domain}</div>
                 <div className="text-lg font-bold text-white">{domainLearned}/{domainWords.length}</div>
               </button>
             );
@@ -128,8 +128,8 @@ export default function EnglishProgressPage() {
       <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-xl p-1">
         {([
           { value: 'vocabulary' as Tab, label: 'Kelimeler', count: vocabulary.length },
-          { value: 'patterns' as Tab, label: 'Cumle Kaliplari', count: patterns.length },
-          { value: 'scenarios' as Tab, label: 'Is Senaryolari', count: scenarios.length },
+          { value: 'patterns' as Tab, label: 'Cümle Kalıpları', count: patterns.length },
+          { value: 'scenarios' as Tab, label: 'İş Senaryoları', count: scenarios.length },
         ]).map((t) => (
           <button
             key={t.value}
@@ -151,9 +151,9 @@ export default function EnglishProgressPage() {
           {/* Filter */}
           <div className="flex gap-2">
             {[
-              { value: 'all' as const, label: 'Tumu' },
-              { value: 'not_learned' as const, label: 'Ogrenilmemis' },
-              { value: 'learned' as const, label: 'Ogrenilmis' },
+              { value: 'all' as const, label: 'Tümü' },
+              { value: 'not_learned' as const, label: 'Öğrenilmemiş' },
+              { value: 'learned' as const, label: 'Öğrenilmiş' },
             ].map((f) => (
               <button
                 key={f.value}
@@ -197,12 +197,12 @@ export default function EnglishProgressPage() {
                             </span>
                           )}
                           {word.domain && (
-                            <span className="px-2 py-0.5 bg-gray-800 text-gray-500 rounded text-[10px]">{word.domain}</span>
+                            <span className="px-2 py-0.5 bg-gray-800 text-gray-400 rounded text-[10px]">{word.domain}</span>
                           )}
                         </div>
-                        {word.pronunciation && <div className="text-xs text-gray-500 mt-0.5">{word.pronunciation}</div>}
+                        {word.pronunciation && <div className="text-xs text-gray-400 mt-0.5">{word.pronunciation}</div>}
                         <div className="text-sm text-gray-400 mt-1">{word.translation}</div>
-                        {!isExpanded && <div className="text-xs text-gray-600 mt-1">Detaylar icin tikla</div>}
+                        {!isExpanded && <div className="text-xs text-gray-600 mt-1">Detaylar için tıkla</div>}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {!word.learned && (
@@ -210,7 +210,7 @@ export default function EnglishProgressPage() {
                             onClick={(e) => { e.stopPropagation(); handleLearn(word.id); }}
                             className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs transition-colors"
                           >
-                            Ogrendim
+                            Öğrendim
                           </button>
                         )}
                         {word.learned && <span className="text-emerald-400 text-sm">✓</span>}
@@ -229,12 +229,12 @@ export default function EnglishProgressPage() {
                         <div className="space-y-1">
                           {word.definition_en && (
                             <div className="text-sm text-gray-300">
-                              <span className="text-gray-500 text-xs mr-2">EN:</span>{word.definition_en}
+                              <span className="text-gray-400 text-xs mr-2">EN:</span>{word.definition_en}
                             </div>
                           )}
                           {word.definition_tr && (
                             <div className="text-sm text-gray-400">
-                              <span className="text-gray-500 text-xs mr-2">TR:</span>{word.definition_tr}
+                              <span className="text-gray-400 text-xs mr-2">TR:</span>{word.definition_tr}
                             </div>
                           )}
                         </div>
@@ -243,7 +243,7 @@ export default function EnglishProgressPage() {
                       {/* Example Sentences */}
                       {word.example_sentences?.length > 0 && (
                         <div>
-                          <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Ornek Cumleler</div>
+                          <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Örnek Cümleler</div>
                           <div className="space-y-2">
                             {word.example_sentences.map((ex, i: number) => (
                               <div key={i} className="bg-gray-800/50 rounded-lg p-3">
@@ -261,7 +261,7 @@ export default function EnglishProgressPage() {
                       {/* Common Patterns */}
                       {word.common_patterns?.length > 0 && (
                         <div>
-                          <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Kullanim Kaliplari</div>
+                          <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Kullanım Kalıpları</div>
                           <div className="space-y-1">
                             {word.common_patterns.map((p: string, i: number) => (
                               <div key={i} className="text-sm text-gray-300 flex items-start gap-2">
@@ -275,7 +275,7 @@ export default function EnglishProgressPage() {
                       {/* Scenario */}
                       {word.scenario && (
                         <div>
-                          <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Is Senaryosu</div>
+                          <div className="text-xs font-semibold text-gray-400 uppercase mb-2">İş Senaryosu</div>
                           <div className="text-sm text-gray-300 bg-gray-800/50 rounded-lg p-3">{word.scenario}</div>
                         </div>
                       )}
@@ -283,7 +283,7 @@ export default function EnglishProgressPage() {
                       {/* Common Mistakes */}
                       {word.common_mistakes && (
                         <div>
-                          <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Sik Yapilan Hatalar</div>
+                          <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Sık Yapılan Hatalar</div>
                           <div className="text-sm text-orange-300/80 bg-orange-900/10 border border-orange-500/20 rounded-lg p-3">
                             {word.common_mistakes}
                           </div>
@@ -293,7 +293,7 @@ export default function EnglishProgressPage() {
                       {/* Related Terms */}
                       {word.related_terms && word.related_terms.length > 0 && (
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs text-gray-500">Iliskili:</span>
+                          <span className="text-xs text-gray-400">İlişkili:</span>
                           {word.related_terms.map((t: string, i: number) => (
                             <span key={i} className="px-2 py-0.5 bg-gray-800 text-gray-400 rounded text-xs">{t}</span>
                           ))}
@@ -307,10 +307,10 @@ export default function EnglishProgressPage() {
           </div>
 
           {filteredVocab.length === 0 && (
-            <p className="text-gray-500 text-sm text-center py-8">
-              {filter === 'not_learned' ? 'Tum kelimeler ogrenilmis!' :
-               filter === 'learned' ? 'Henuz ogrenilen kelime yok.' :
-               'Henuz kelime eklenmedi.'}
+            <p className="text-gray-400 text-sm text-center py-8">
+              {filter === 'not_learned' ? 'Tüm kelimeler öğrenilmiş!' :
+               filter === 'learned' ? 'Henüz öğrenilen kelime yok.' :
+               'Henüz kelime eklenmedi.'}
             </p>
           )}
         </>
@@ -327,7 +327,7 @@ export default function EnglishProgressPage() {
                 domainFilter === 'all' ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
               }`}
             >
-              Tumu
+              Tümü
             </button>
             {patternDomains.map(d => (
               <button
@@ -356,7 +356,7 @@ export default function EnglishProgressPage() {
                       <div className="font-mono text-sm text-emerald-300 mb-1">{p.pattern}</div>
                       <div className="text-sm text-gray-400 mb-2">{p.turkish}</div>
                       {p.when_to_use && (
-                        <div className="text-xs text-gray-500 mb-2">
+                        <div className="text-xs text-gray-400 mb-2">
                           <span className="text-gray-600 font-medium">Ne zaman:</span> {p.when_to_use}
                         </div>
                       )}
@@ -370,7 +370,7 @@ export default function EnglishProgressPage() {
                       )}
                       {p.real_example && (
                         <div className="bg-gray-800/50 rounded-lg p-3 mt-2">
-                          <div className="text-xs text-gray-600 font-medium mb-1">Gercek Ornek:</div>
+                          <div className="text-xs text-gray-600 font-medium mb-1">Gerçek Örnek:</div>
                           <div className="text-sm text-gray-300 italic">{p.real_example}</div>
                         </div>
                       )}
@@ -382,7 +382,7 @@ export default function EnglishProgressPage() {
           })}
 
           {filteredPatterns.length === 0 && (
-            <p className="text-gray-500 text-sm text-center py-8">Henuz kalip eklenmedi.</p>
+            <p className="text-gray-400 text-sm text-center py-8">Henüz kalıp eklenmedi.</p>
           )}
         </div>
       )}
@@ -406,7 +406,7 @@ export default function EnglishProgressPage() {
                         )}
                         <h3 className="text-sm font-semibold text-gray-200">{scenario.title}</h3>
                       </div>
-                      <p className="text-xs text-gray-500">{scenario.context}</p>
+                      <p className="text-xs text-gray-400">{scenario.context}</p>
                     </div>
                     <span className={`text-gray-600 transition-transform shrink-0 ml-2 ${isExpanded ? 'rotate-180' : ''}`}>
                       ▼
@@ -428,12 +428,12 @@ export default function EnglishProgressPage() {
                               ? 'bg-blue-600/20 border border-blue-500/30'
                               : 'bg-gray-800/80 border border-gray-700/50'
                           }`}>
-                            <div className="text-xs text-gray-500 mb-1">
+                            <div className="text-xs text-gray-400 mb-1">
                               {msg.role === 'you' ? 'Sen' : msg.role}
                             </div>
                             <div className="text-sm text-gray-200">{msg.message}</div>
                             {msg.translation && (
-                              <div className="text-xs text-gray-500 mt-1 italic">{msg.translation}</div>
+                              <div className="text-xs text-gray-400 mt-1 italic">{msg.translation}</div>
                             )}
                           </div>
                         </div>
@@ -443,7 +443,7 @@ export default function EnglishProgressPage() {
                     {/* Key Phrases */}
                     {scenario.key_phrases?.length > 0 && (
                       <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Anahtar Ifadeler</div>
+                        <div className="text-xs font-semibold text-gray-400 uppercase mb-2">Anahtar İfadeler</div>
                         <div className="flex flex-wrap gap-2">
                           {scenario.key_phrases.map((phrase: string, i: number) => (
                             <span key={i} className="px-2 py-1 bg-emerald-900/20 border border-emerald-500/20 text-emerald-300 rounded text-xs font-mono">
@@ -457,7 +457,7 @@ export default function EnglishProgressPage() {
                     {/* Cultural Note */}
                     {scenario.cultural_note && (
                       <div className="bg-yellow-900/10 border border-yellow-500/20 rounded-lg p-3">
-                        <div className="text-xs font-semibold text-yellow-400 mb-1">Kultur Notu</div>
+                        <div className="text-xs font-semibold text-yellow-400 mb-1">Kültür Notu</div>
                         <div className="text-sm text-yellow-200/80">{scenario.cultural_note}</div>
                       </div>
                     )}
@@ -468,7 +468,7 @@ export default function EnglishProgressPage() {
           })}
 
           {filteredScenarios.length === 0 && (
-            <p className="text-gray-500 text-sm text-center py-8">Henuz senaryo eklenmedi.</p>
+            <p className="text-gray-400 text-sm text-center py-8">Henüz senaryo eklenmedi.</p>
           )}
         </div>
       )}

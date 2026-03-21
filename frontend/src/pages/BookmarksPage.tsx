@@ -37,7 +37,7 @@ export default function BookmarksPage() {
     }
   };
 
-  if (loading) return <div className="text-gray-400">Yukleniyor...</div>;
+  if (loading) return <div className="text-gray-400">Yükleniyor...</div>;
 
   const grouped = {
     lesson: bookmarks.filter((b) => b.item_type === 'lesson'),
@@ -55,14 +55,14 @@ export default function BookmarksPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <HiOutlineBookmark className="w-6 h-6 text-yellow-400" />
-        <h1 className="text-2xl font-bold text-white">Yer Imleri</h1>
-        <span className="text-sm text-gray-500">({bookmarks.length})</span>
+        <h1 className="text-2xl font-bold text-white">Yer İmleri</h1>
+        <span className="text-sm text-gray-400">({bookmarks.length})</span>
       </div>
 
       {bookmarks.length === 0 && (
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
           <HiOutlineBookmark className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-400">Henuz yer imi eklemedin.</p>
+          <p className="text-gray-400">Henüz yer imi eklemedin.</p>
           <p className="text-sm text-gray-600 mt-1">Ders, challenge veya proje sayfalarindaki yer imi butonunu kullan.</p>
         </div>
       )}
@@ -85,7 +85,7 @@ export default function BookmarksPage() {
                     <p className="text-white font-medium truncate hover:text-blue-400 transition-colors">
                       {b.title}
                     </p>
-                    {b.note && <p className="text-xs text-gray-500 mt-0.5">{b.note}</p>}
+                    {b.note && <p className="text-xs text-gray-400 mt-0.5">{b.note}</p>}
                     <p className="text-xs text-gray-600 mt-1">
                       {new Date(b.created_at).toLocaleDateString('tr-TR')}
                     </p>

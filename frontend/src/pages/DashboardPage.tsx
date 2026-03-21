@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { getProgressOverview, getPhases, getDailyGoal, getSuggestions } from '../api/client';
 import type { ProgressOverview, Phase } from '../types';
@@ -34,15 +34,17 @@ export default function DashboardPage() {
 
   if (!overview) return <div className="text-gray-400">Yükleniyor...</div>;
 
-  const streakMessages = [
-    { min: 0, msg: 'Bugün başla, streak oluştur!' },
-    { min: 1, msg: 'Harika başlangıç, devam et!' },
-    { min: 3, msg: 'Süper gidiyorsun!' },
-    { min: 7, msg: 'Bir haftalık disiplin, etkileyici!' },
-    { min: 14, msg: 'İki hafta, alışkanlık oluşuyor!' },
-    { min: 30, msg: 'Bir ay! Artık durdurulamaz!' },
-  ];
-  const streakMsg = [...streakMessages].reverse().find(s => overview.current_streak_days >= s.min)?.msg || '';
+  const streakMsg = useMemo(() => {
+    const messages = [
+      { min: 0, msg: 'Bugün başla, streak oluştur!' },
+      { min: 1, msg: 'Harika başlangıç, devam et!' },
+      { min: 3, msg: 'Süper gidiyorsun!' },
+      { min: 7, msg: 'Bir haftalık disiplin, etkileyici!' },
+      { min: 14, msg: 'İki hafta, alışkanlık oluşuyor!' },
+      { min: 30, msg: 'Bir ay! Artık durdurulamaz!' },
+    ];
+    return [...messages].reverse().find(s => overview.current_streak_days >= s.min)?.msg || '';
+  }, [overview.current_streak_days]);
 
   return (
     <div className="space-y-6">
@@ -53,14 +55,14 @@ export default function DashboardPage() {
       <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-6">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2">Hos Geldin, Developer! </h1>
+            <h1 className="text-2xl font-bold text-white mb-2">Hoş Geldin, Developer! </h1>
             <p className="text-gray-300">
-              AI-Capable Full Stack Developer olma yolculugunda {Math.round(overview.overall_completion_percent)}% ilerleme kaydettin.
+              AI-Capable Full Stack Developer olma yolculuğunda {Math.round(overview.overall_completion_percent)}% ilerleme kaydettin.
             </p>
           </div>
           <div className="text-right shrink-0 ml-4">
             <div className="text-3xl font-bold text-orange-400">{overview.current_streak_days}</div>
-            <div className="text-xs text-orange-300/80 font-medium">gun streak</div>
+            <div className="text-xs text-orange-300/80 font-medium">gün streak</div>
           </div>
         </div>
         <div className="flex items-center gap-4 mt-3">
@@ -82,13 +84,13 @@ export default function DashboardPage() {
         {goal && (
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 md:col-span-1">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-gray-400">Gunluk Hedef</h3>
+              <h3 className="text-sm font-semibold text-gray-400">Günlük Hedef</h3>
             </div>
             <div className="space-y-3">
               <GoalBar label="Ders" icon="📖" current={goal.progress.lessons} target={goal.targets.lessons} />
               <GoalBar label="Quiz" icon="✅" current={goal.progress.quizzes} target={goal.targets.quizzes} />
               <GoalBar label="Challenge" icon="💻" current={goal.progress.challenges} target={goal.targets.challenges} />
-              <GoalBar label="Sure" icon="⏱️" current={goal.progress.time_minutes} target={goal.targets.time_minutes} suffix="dk" />
+              <GoalBar label="Süre" icon="⏱️" current={goal.progress.time_minutes} target={goal.targets.time_minutes} suffix="dk" />
             </div>
           </div>
         )}
@@ -127,18 +129,18 @@ export default function DashboardPage() {
       {/* Suggestions */}
       {suggestions.length > 0 && (
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-gray-400 mb-3">Onerilen Aksiyonlar</h3>
+          <h3 className="text-sm font-semibold text-gray-400 mb-3">Önerilen Aksiyonlar</h3>
           <div className="space-y-2">
             {suggestions.map((s, i) => (
               <Link
                 key={i}
                 to={s.link}
-                className="flex items-center gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors"
+                className="flex items-center gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
                 <span className="text-lg">{s.icon}</span>
                 <div className="flex-1">
                   <div className="text-sm text-gray-200">{s.title}</div>
-                  <div className="text-xs text-gray-500">{s.reason}</div>
+                  <div className="text-xs text-gray-400">{s.reason}</div>
                 </div>
                 <span className="text-gray-600 text-sm">&rarr;</span>
               </Link>
@@ -150,51 +152,34 @@ export default function DashboardPage() {
       {/* Today + Weekly Activity */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-gray-400 mb-3">Bugun</h3>
+          <h3 className="text-sm font-semibold text-gray-400 mb-3">Bugün</h3>
           <div className="flex items-center gap-6">
             <div>
               <div className="text-2xl font-bold text-white">
                 {Math.round(overview.today.time_seconds / 60)} dk
               </div>
-              <div className="text-xs text-gray-500">calisma suresi</div>
+              <div className="text-xs text-gray-400">çalışma süresi</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-white">{overview.today.lessons_completed}</div>
-              <div className="text-xs text-gray-500">ders tamamlandi</div>
+              <div className="text-xs text-gray-400">ders tamamlandı</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-white">{overview.today.challenges_solved}</div>
-              <div className="text-xs text-gray-500">challenge cozuldu</div>
+              <div className="text-xs text-gray-400">challenge çözüldü</div>
             </div>
           </div>
         </div>
 
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-gray-400 mb-3">Haftalik Aktivite</h3>
-          <div className="flex items-end gap-1 h-16">
-            {overview.weekly_activity.map((day, i) => {
-              const maxSec = Math.max(...overview.weekly_activity.map(d => d.seconds), 1);
-              const h = Math.max((day.seconds / maxSec) * 100, 4);
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div
-                    className="w-full bg-blue-500/60 rounded-sm transition-all"
-                    style={{ height: `${h}%` }}
-                    title={`${day.date}: ${Math.round(day.seconds / 60)} dk`}
-                  />
-                  <span className="text-[10px] text-gray-600">
-                    {new Date(day.date).toLocaleDateString('tr', { weekday: 'narrow' })}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          <h3 className="text-sm font-semibold text-gray-400 mb-3">Haftalık Aktivite</h3>
+          <WeeklyActivityChart weeklyActivity={overview.weekly_activity} />
         </div>
       </div>
 
       {/* Phase Progress */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-gray-400 mb-4">Faz Ilerlemesi</h3>
+        <h3 className="text-sm font-semibold text-gray-400 mb-4">Faz İlerlemesi</h3>
         <div className="space-y-3">
           {phases.map((phase) => {
             const pct = phase.total_lessons > 0
@@ -203,13 +188,13 @@ export default function DashboardPage() {
               <Link
                 key={phase.id}
                 to={`/modules?phase=${phase.id}`}
-                className="block hover:bg-gray-800/50 rounded-lg p-3 transition-colors"
+                className="block hover:bg-gray-800/50 rounded-lg p-3 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-gray-200">
                     {phase.icon} {phase.title}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-400">
                     {phase.completed_lessons}/{phase.total_lessons} ders · {pct}%
                   </span>
                 </div>
@@ -228,7 +213,7 @@ export default function DashboardPage() {
       {/* English Progress */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-gray-400">Teknik Ingilizce</h3>
+          <h3 className="text-sm font-semibold text-gray-400">Teknik İngilizce</h3>
           <Link to="/english" className="text-xs text-blue-400 hover:underline">Detay &rarr;</Link>
         </div>
         <div className="flex items-center gap-4">
@@ -247,7 +232,7 @@ export default function DashboardPage() {
   );
 }
 
-function GoalBar({ label, icon, current, target, suffix }: {
+const GoalBar = memo(function GoalBar({ label, icon, current, target, suffix }: {
   label: string; icon: string; current: number; target: number; suffix?: string;
 }) {
   const pct = target > 0 ? Math.min((current / target) * 100, 100) : 0;
@@ -256,7 +241,7 @@ function GoalBar({ label, icon, current, target, suffix }: {
     <div>
       <div className="flex items-center justify-between mb-1">
         <span className="text-xs text-gray-400">{icon} {label}</span>
-        <span className={`text-xs font-medium ${done ? 'text-green-400' : 'text-gray-500'}`}>
+        <span className={`text-xs font-medium ${done ? 'text-green-400' : 'text-gray-400'}`}>
           {current}/{target}{suffix ? ` ${suffix}` : ''} {done ? '✓' : ''}
         </span>
       </div>
@@ -268,9 +253,9 @@ function GoalBar({ label, icon, current, target, suffix }: {
       </div>
     </div>
   );
-}
+});
 
-function StatCard({ title, value, subtitle, icon, color }: {
+const StatCard = memo(function StatCard({ title, value, subtitle, icon, color }: {
   title: string; value: string; subtitle?: string; icon: string; color: string;
 }) {
   const borderColors: Record<string, string> = {
@@ -280,11 +265,40 @@ function StatCard({ title, value, subtitle, icon, color }: {
   return (
     <div className={`bg-gray-900 border ${borderColors[color] || 'border-gray-800'} rounded-xl p-4`}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-gray-500 uppercase">{title}</span>
+        <span className="text-xs text-gray-400 uppercase">{title}</span>
         <span className="text-lg">{icon}</span>
       </div>
       <div className="text-xl font-bold text-white">{value}</div>
-      {subtitle && <div className="text-xs text-gray-500 mt-1">{subtitle}</div>}
+      {subtitle && <div className="text-xs text-gray-400 mt-1">{subtitle}</div>}
     </div>
   );
-}
+});
+
+const WeeklyActivityChart = memo(function WeeklyActivityChart({ weeklyActivity }: {
+  weeklyActivity: Array<{ date: string; seconds: number }>;
+}) {
+  const maxSec = useMemo(
+    () => Math.max(...weeklyActivity.map(d => d.seconds), 1),
+    [weeklyActivity]
+  );
+
+  return (
+    <div className="flex items-end gap-1 h-16">
+      {weeklyActivity.map((day, i) => {
+        const h = Math.max((day.seconds / maxSec) * 100, 4);
+        return (
+          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+            <div
+              className="w-full bg-blue-500/60 rounded-sm transition-all"
+              style={{ height: `${h}%` }}
+              title={`${day.date}: ${Math.round(day.seconds / 60)} dk`}
+            />
+            <span className="text-[10px] text-gray-600">
+              {new Date(day.date).toLocaleDateString('tr', { weekday: 'narrow' })}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+});

@@ -1,17 +1,17 @@
 {
   "title": "Cover Letter Sablonlari",
-  "description": "ATS-optimize, rol-spesifik on yazi sablonlari. Full Stack Developer ve AI Engineer rolleri icin Turkce ve Ingilizce sablonlar.",
+  "description": "ATS-optimize, rol-spesifik on yazi sablonlari. Full Stack Developer ve AI Engineer rolleri için Turkce ve Ingilizce sablonlar.",
   "general_tips": [
-    "Cover letter'i 1 sayfayi gecmeyecek sekilde kisa tutun - ideal olarak 250-400 kelime arasi olmali",
-    "Her basvuru icin cover letter'i o sirket ve pozisyona ozel olarak customize edin - generic sablonlar etkisiz kalir",
+    "Cover letter'i 1 sayfayi geçmeyecek sekilde kisa tutun - ideal olarak 250-400 kelime arasi olmali",
+    "Her başvuru için cover letter'i o sirket ve pozisyona özel olarak customize edin - generic sablonlar etkisiz kalir",
     "Is ilanindan anahtar kelimeleri (keywords) cover letter'inize yansitarak ATS uyumlulugunuzu artirin",
-    "Sirket hakkinda arastirma yapin ve neden O sirkette calismak istediginizi spesifik olarak belirtin - genel ifadelerden kacinin",
-    "Basarilarinizi sayilarla destekleyin: '%30 performans iyilestirmesi', '500+ kullanici', '3 ayda tamamlandi' gibi somut veriler kullanin",
-    "CV'nizi tekrar etmeyin - cover letter CV'yi tamamlamali, ayni bilgileri tekrarlamamali. Projelerinizin arkasindaki motivasyonu ve ogrenme surecini anlatarak derinlik katin",
-    "Profesyonel ama samimi bir ton kullanin - ne cok resmi ne de cok rahat olmali. Kendi sesinizi bulmak onemli",
-    "Mumkunse hiring manager'in ismini bulun ve direkt ona hitap edin - 'Dear Hiring Manager' yerine 'Dear [Isim]' kullanin",
-    "Cover letter'i net bir call-to-action ile bitirin: mulakat talebi, gorusme istegi veya bir sonraki adimi belirtin",
-    "Gonderilmeden once grammar ve yazim hatalari icin mutlaka kontrol edin - Grammarly veya benzeri araclarla proofread yapin"
+    "Sirket hakkinda araştırma yapın ve neden O sirkette çalışmak istediginizi spesifik olarak belirtin - genel ifadelerden kacinin",
+    "Başarılarınızı sayılarla destekleyin: '%30 performans iyilestirmesi', '500+ kullanıcı', '3 ayda tamamlandı' gibi somut veriler kullanin",
+    "CV'nizi tekrar etmeyin - cover letter CV'yi tamamlamali, aynı bilgileri tekrarlamamali. Projelerinizin arkasindaki motivasyonu ve öğrenme sürecini anlatarak derinlik katin",
+    "Profesyonel ama samimi bir ton kullanin - ne çok resmi ne de çok rahat olmali. Kendi sesinizi bulmak önemli",
+    "Mümkünse hiring manager'in ismini bulun ve direkt ona hitap edin - 'Dear Hiring Manager' yerine 'Dear [Isim]' kullanin",
+    "Cover letter'i net bir call-to-action ile bitirin: mülakat talebi, görüşme isteği veya bir sonraki adimi belirtin",
+    "Gonderilmeden önce grammar ve yazim hatalari için mutlaka kontrol edin - Grammarly veya benzeri araçlarla proofread yapın"
   ],
   "templates": [
     {
@@ -31,12 +31,12 @@
       "tone": "professional",
       "language": "tr",
       "template": {
-        "opening": "Sayin [Ise Alim Yoneticisinin Adi],\n\n[Sirket Adi] bunyesindeki [Pozisyon Adi] pozisyonu icin basvurumu sunarken buyuk bir heyecan duyuyorum. Karadeniz Teknik Universitesi Bilgisayar Muhendisligi mezunu olarak React, Next.js, Node.js ve PostgreSQL teknolojileriyle uretim ortamina hazir full stack uygulamalar gelistirme konusundaki deneyimimle ekibinize anlamli katkilar sunabileceime inaniyorum.",
-        "why_company": "[Sirket Adi]'nin [spesifik alan/urun] alanindaki calismalarini yakindan takip ediyorum ve ozellikle [spesifik basari, urun ozelligi veya sirket degeri] konusundaki yaklasimlariniz beni cok etkiledi. Olceklenebilir ve kullanici odakli web uygulamalari gelistirme tutkumla [sirket misyonu veya teknolojik yaklasim] konusundaki vizyonunuz mukemmel bir uyum gosteriyor. [Sirket degeri - ornegin inovasyon, kalite, is birligi] degerlerini benimseyen bir ekibe katilmak benim icin buyuk bir firsat olacaktir.",
-        "project_highlights": "Son projelerimde uctan uca cozumler sunma yetkinligimi ortaya koydum. React, Node.js ve PostgreSQL kullanan bir proje yonetim platformu gelistirdim; gercek zamanli is birligi ozellikleri, rol tabanli yetkilendirme sistemi ve veritabani sorgularinda %[X] performans iyilestirmesi sagladim. Bununla birlikte FastAPI ile bir e-ticaret API'si ve React ile admin paneli olusturarak [X]+ urun listesini gelismis filtreleme ve guvenli odeme entegrasyonuyla yonettim. Bu projeler temiz, surdurulebilir kod yazma ve ustun kullanici deneyimi sunma taahhudumu yansitmaktadir.",
-        "closing": "Teknik becerilerimin ve proje deneyimimin [Sirket Adi]'nin basarisina nasil katki saglayabilecegini gorusmekten mutluluk duyarim. Uygun gordugunuz bir zamanda mulakat icin hazir oldugunuzu belirtir, ekibinize katilma firsatini sabrsizlikla bekliyorum.\n\nBasvurumu degerlendirdiginiz icin tesekkur ederim.\n\nSaygilarimla,\n[Adiniz Soyadiniz]"
+        "opening": "Sayin [Işe Alim Yoneticisinin Adi],\n\n[Sirket Adi] bunyesindeki [Pozisyon Adi] pozisyonu için başvurumu sunarken büyük bir heyecan duyuyorum. Karadeniz Teknik Universitesi Bilgisayar Mühendisliği mezunu olarak React, Next.js, Node.js ve PostgreSQL teknolojileriyle üretim ortamina hazir full stack uygulamalar geliştirme konusundaki deneyimimle ekibinize anlamli katkilar sunabileceime inaniyorum.",
+        "why_company": "[Sirket Adi]'nin [spesifik alan/ürün] alanındaki çalışmalarını yakindan takip ediyorum ve özellikle [spesifik başarı, ürün özelliği veya sirket değeri] konusundaki yaklaşımlarınız beni çok etkiledi. Ölçeklenebilir ve kullanıcı odakli web uygulamalari geliştirme tutkumla [sirket misyonu veya teknolojik yaklaşım] konusundaki vizyonunuz mükemmel bir uyum gösteriyor. [Sirket değeri - örneğin inovasyon, kalite, is birligi] değerlerini benimseyen bir ekibe katilmak benim için büyük bir firsat olacaktir.",
+        "project_highlights": "Son projelerimde uctan uca çözümler sunma yetkinligimi ortaya koydum. React, Node.js ve PostgreSQL kullanan bir proje yönetim platformu geliştirdim; gerçek zamanli is birligi özellikleri, rol tabanli yetkilendirme sistemi ve veritabanı sorgularinda %[X] performans iyilestirmesi sağladım. Bununla birlikte FastAPI ile bir e-ticaret API'si ve React ile admin paneli oluşturarak [X]+ ürün listesini gelişmiş filtreleme ve güvenli odeme entegrasyonuyla yonettim. Bu projeler temiz, sürdürülebilir kod yazma ve üstün kullanıcı deneyimi sunma taahhudumu yansitmaktadir.",
+        "closing": "Teknik becerilerimin ve proje deneyimimin [Sirket Adi]'nin başarısına nasil katkı sağlayabileceğini gorusmekten mutluluk duyarım. Uygun gordugunuz bir zamanda mülakat için hazir olduğunuzu belirtir, ekibinize katilma firsatini sabrsizlikla bekliyorum.\n\nBaşvurumu değerlendirdiğiniz için teşekkür ederim.\n\nSaygilarimla,\n[Adiniz Soyadiniz]"
       },
-      "example": "Sayin Mehmet Bey,\n\nABC Teknoloji bunyesindeki Full Stack Developer pozisyonu icin basvurumu sunarken buyuk bir heyecan duyuyorum. Karadeniz Teknik Universitesi Bilgisayar Muhendisligi mezunu olarak React, Next.js, Node.js ve PostgreSQL teknolojileriyle uretim ortamina hazir full stack uygulamalar gelistirme konusundaki deneyimimle ekibinize anlamli katkilar sunabileceime inaniyorum.\n\nABC Teknoloji'nin fintech alanindaki calismalarini yakindan takip ediyorum ve ozellikle mobil odeme cozumlerindeki yenilikci yaklasimlariniz beni cok etkiledi. Olceklenebilir ve kullanici odakli web uygulamalari gelistirme tutkumla dijital donusum konusundaki vizyonunuz mukemmel bir uyum gosteriyor. Inovasyon ve muhendislik mukemmeliyetini benimseyen bir ekibe katilmak benim icin buyuk bir firsat olacaktir.\n\nSon projelerimde uctan uca cozumler sunma yetkinligimi ortaya koydum. React, Node.js ve PostgreSQL kullanan bir proje yonetim platformu gelistirdim; gercek zamanli is birligi ozellikleri, rol tabanli yetkilendirme sistemi ve veritabani sorgularinda %40 performans iyilestirmesi sagladim. Bununla birlikte FastAPI ile bir e-ticaret API'si ve React ile admin paneli olusturarak 1000+ urun listesini gelismis filtreleme ve guvenli odeme entegrasyonuyla yonettim.\n\nTeknik becerilerimin ve proje deneyimimin ABC Teknoloji'nin basarisina nasil katki saglayabilecegini gorusmekten mutluluk duyarim. Uygun gordugunuz bir zamanda mulakat icin hazirim.\n\nBasvurumu degerlendirdiginiz icin tesekkur ederim.\n\nSaygilarimla,\n[Adiniz Soyadiniz]"
+      "example": "Sayin Mehmet Bey,\n\nABC Teknoloji bunyesindeki Full Stack Developer pozisyonu için başvurumu sunarken büyük bir heyecan duyuyorum. Karadeniz Teknik Universitesi Bilgisayar Mühendisliği mezunu olarak React, Next.js, Node.js ve PostgreSQL teknolojileriyle üretim ortamina hazir full stack uygulamalar geliştirme konusundaki deneyimimle ekibinize anlamli katkilar sunabileceime inaniyorum.\n\nABC Teknoloji'nin fintech alanındaki çalışmalarını yakindan takip ediyorum ve özellikle mobil odeme çözümlerindeki yenilikci yaklaşımlarınız beni çok etkiledi. Ölçeklenebilir ve kullanıcı odakli web uygulamalari geliştirme tutkumla dijital dönüşüm konusundaki vizyonunuz mükemmel bir uyum gösteriyor. Inovasyon ve mühendislik mükemmeliyetini benimseyen bir ekibe katilmak benim için büyük bir firsat olacaktir.\n\nSon projelerimde uctan uca çözümler sunma yetkinligimi ortaya koydum. React, Node.js ve PostgreSQL kullanan bir proje yönetim platformu geliştirdim; gerçek zamanli is birligi özellikleri, rol tabanli yetkilendirme sistemi ve veritabanı sorgularinda %40 performans iyilestirmesi sağladım. Bununla birlikte FastAPI ile bir e-ticaret API'si ve React ile admin paneli oluşturarak 1000+ ürün listesini gelişmiş filtreleme ve güvenli odeme entegrasyonuyla yonettim.\n\nTeknik becerilerimin ve proje deneyimimin ABC Teknoloji'nin başarısına nasil katkı sağlayabileceğini gorusmekten mutluluk duyarım. Uygun gordugunuz bir zamanda mülakat için hazirim.\n\nBaşvurumu değerlendirdiğiniz için teşekkür ederim.\n\nSaygilarimla,\n[Adiniz Soyadiniz]"
     },
     {
       "role": "AI Engineer",
@@ -55,143 +55,214 @@
       "tone": "startup_modern",
       "language": "tr",
       "template": {
-        "opening": "Merhaba [Ise Alim Yoneticisi / Ekip Lidi],\n\n[Sirket Adi]'ndaki [Pozisyon Adi] firsatini gorur gormez hemen basvurmak istedim. KTU Bilgisayar Muhendisligi mezunu olarak LangChain, RAG mimarileri, vector database'ler ve modern ML pipeline'lar ile AI destekli uygulamalar gelistiriyorum. [Sirket Adi]'nin [spesifik AI/urun alani] konusundaki yaklasimi tam da benim heyecan duydugum alan.",
-        "why_company": "[Sirket Adi]'ni takip ediyorum ve [spesifik urun, ozellik veya teknoloji karari] konusundaki cesur adimlariniz beni gercekten heyecanlandiriyor. Startup ekosisteminde hizli hareket etmenin ve deneysel yaklasimin ne kadar onemli oldugunu biliyorum. RAG sistemlerinden multi-agent mimarilerine kadar farkli AI cozumleri uzerinde calisma deneyimim, [Sirket Adi]'nin hizli tempolu gelistirme ortamina uyum saglamamda avantaj olacaktir. [Sirketin spesifik degeri - ornegin acik kaynak, kullanici odaklilik] felsefenize tamamen katiliyorum.",
-        "project_highlights": "Portfolyomda AI odakli guclu projeler var. LangChain ve vector database kullanan RAG Document Q&A sistemimde, gelismis chunking ve retrieval stratejileriyle %[X] dogruluk iyilestirmesi sagladim. LangGraph ile gelistirdigim Multi-Agent Customer Support sisteminde gercek zamanli WebSocket iletisimi ve %[X] otomatik cozum orani elde ettim. MLflow ve Docker ile kurdugum ML Pipeline projemde ise otomatik egitim, versiyon yonetimi ve deployment surecleri olusturdum. Capstone projem olan AI Code Review Tool'da ise GitHub API ve Anthropic API entegrasyonuyla gelismis bir kod analiz araci gelistirdim.",
-        "closing": "Yazilim muhendisligi ve yapay zekanin kesisim noktasinda calismak beni inanilmaz motive ediyor. [Sirket Adi]'nin bu alanda neler basardigini ve nereye gittigini gorunce ekibinizin bir parcasi olmak istedigimden emin oldum.\n\nBir kahve esliginde projelerimi ve vizyonunuzu konusmak isterim!\n\nTesekkurler,\n[Adiniz]"
+        "opening": "Merhaba [Işe Alim Yöneticisi / Ekip Lidi],\n\n[Sirket Adi]'ndaki [Pozisyon Adi] firsatini gorur gormez hemen basvurmak istedim. KTU Bilgisayar Mühendisliği mezunu olarak LangChain, RAG mimarileri, vector database'ler ve modern ML pipeline'lar ile AI destekli uygulamalar geliştiriyorum. [Sirket Adi]'nin [spesifik AI/ürün alanı] konusundaki yaklaşımı tam da benim heyecan duydugum alan.",
+        "why_company": "[Sirket Adi]'ni takip ediyorum ve [spesifik ürün, özellik veya teknoloji karari] konusundaki cesur adimlariniz beni gerçekten heyecanlandiriyor. Startup ekosisteminde hızlı hareket etmenin ve deneysel yaklaşımın ne kadar önemli olduğunu biliyorum. RAG sistemlerinden multi-agent mimarilerine kadar farklı AI çözümleri üzerinde çalışma deneyimim, [Sirket Adi]'nin hızlı tempolu geliştirme ortamina uyum sağlamamda avantaj olacaktir. [Sirketin spesifik değeri - örneğin açık kaynak, kullanıcı odaklilik] felsefenize tamamen katiliyorum.",
+        "project_highlights": "Portfolyomda AI odakli güçlü projeler var. LangChain ve vector database kullanan RAG Document Q&A sistemimde, gelişmiş chunking ve retrieval stratejileriyle %[X] doğruluk iyilestirmesi sağladım. LangGraph ile geliştirdiğim Multi-Agent Customer Support sisteminde gerçek zamanli WebSocket iletisimi ve %[X] otomatik çözüm orani elde ettim. MLflow ve Docker ile kurdugum ML Pipeline projemde işe otomatik egitim, versiyon yönetimi ve deployment süreçleri oluşturdum. Capstone projem olan AI Code Review Tool'da işe GitHub API ve Anthropic API entegrasyonuyla gelişmiş bir kod analiz aracı geliştirdim.",
+        "closing": "Yazılım mühendisliği ve yapay zekanin kesisim noktasında çalışmak beni inanilmaz motive ediyor. [Sirket Adi]'nin bu alanda neler basardigini ve nereye gittigini gorunce ekibinizin bir parçası olmak istedigimden emin oldum.\n\nBir kahve esliginde projelerimi ve vizyonunuzu konusmak isterim!\n\nTeşekkürler,\n[Adiniz]"
       },
-      "example": "Merhaba Ayse Hanim,\n\nYapayz AI'daki AI Engineer firsatini gorur gormez hemen basvurmak istedim. KTU Bilgisayar Muhendisligi mezunu olarak LangChain, RAG mimarileri, vector database'ler ve modern ML pipeline'lar ile AI destekli uygulamalar gelistiriyorum. Yapayz AI'nin Turkce NLP alanindaki yaklasimi tam da benim heyecan duydugum alan.\n\nYapayz AI'yi takip ediyorum ve Turkce dil modelleri konusundaki cesur adimlariniz beni gercekten heyecanlandiriyor. Startup ekosisteminde hizli hareket etmenin ve deneysel yaklasimin ne kadar onemli oldugunu biliyorum. RAG sistemlerinden multi-agent mimarilerine kadar farkli AI cozumleri uzerinde calisma deneyimim, Yapayz AI'nin hizli tempolu gelistirme ortamina uyum saglamamda avantaj olacaktir.\n\nPortfolyomda AI odakli guclu projeler var. LangChain ve vector database kullanan RAG Document Q&A sistemimde, gelismis chunking ve retrieval stratejileriyle %85 dogruluk iyilestirmesi sagladim. LangGraph ile gelistirdigim Multi-Agent Customer Support sisteminde gercek zamanli WebSocket iletisimi ve %70 otomatik cozum orani elde ettim. Capstone projem olan AI Code Review Tool'da ise GitHub API ve Anthropic API entegrasyonuyla gelismis bir kod analiz araci gelistirdim.\n\nYazilim muhendisligi ve yapay zekanin kesisim noktasinda calismak beni inanilmaz motive ediyor. Yapayz AI'nin bu alanda neler basardigini gorunce ekibinizin bir parcasi olmak istedigimden emin oldum.\n\nBir kahve esliginde projelerimi ve vizyonunuzu konusmak isterim!\n\nTesekkurler,\n[Adiniz]"
+      "example": "Merhaba Ayse Hanim,\n\nYapayz AI'daki AI Engineer firsatini gorur gormez hemen basvurmak istedim. KTU Bilgisayar Mühendisliği mezunu olarak LangChain, RAG mimarileri, vector database'ler ve modern ML pipeline'lar ile AI destekli uygulamalar geliştiriyorum. Yapayz AI'nin Turkce NLP alanındaki yaklaşımı tam da benim heyecan duydugum alan.\n\nYapayz AI'yi takip ediyorum ve Turkce dil modelleri konusundaki cesur adimlariniz beni gerçekten heyecanlandiriyor. Startup ekosisteminde hızlı hareket etmenin ve deneysel yaklaşımın ne kadar önemli olduğunu biliyorum. RAG sistemlerinden multi-agent mimarilerine kadar farklı AI çözümleri üzerinde çalışma deneyimim, Yapayz AI'nin hızlı tempolu geliştirme ortamina uyum sağlamamda avantaj olacaktir.\n\nPortfolyomda AI odakli güçlü projeler var. LangChain ve vector database kullanan RAG Document Q&A sistemimde, gelişmiş chunking ve retrieval stratejileriyle %85 doğruluk iyilestirmesi sağladım. LangGraph ile geliştirdiğim Multi-Agent Customer Support sisteminde gerçek zamanli WebSocket iletisimi ve %70 otomatik çözüm orani elde ettim. Capstone projem olan AI Code Review Tool'da işe GitHub API ve Anthropic API entegrasyonuyla gelişmiş bir kod analiz aracı geliştirdim.\n\nYazılım mühendisliği ve yapay zekanin kesisim noktasında çalışmak beni inanilmaz motive ediyor. Yapayz AI'nin bu alanda neler basardigini gorunce ekibinizin bir parçası olmak istedigimden emin oldum.\n\nBir kahve esliginde projelerimi ve vizyonunuzu konusmak isterim!\n\nTeşekkürler,\n[Adiniz]"
     }
   ],
   "per_project_guidance": [
     {
       "project_id": "project-01",
       "project_title": "Kisisel Portfolio & Blog Sitesi",
-      "highlight_for_cover_letter": "Modern web teknolojileriyle kisisel markalasmaya verilen onemi gosterir. Next.js ile SSR/SSG, TypeScript ile tip guvenligi ve Tailwind CSS ile responsive tasarim yeteneklerini sergiler.",
-      "skills_to_emphasize": ["Next.js", "TypeScript", "Tailwind CSS", "SSR/SSG", "SEO Optimizasyonu", "Responsive Design"],
+      "highlight_for_cover_letter": "Modern web teknolojileriyle kisisel markalasmaya verilen önemi gösterir. Next.js ile SSR/SSG, TypeScript ile tip güvenliği ve Tailwind CSS ile responsive tasarım yeteneklerini sergiler.",
+      "skills_to_emphasize": [
+        "Next.js",
+        "TypeScript",
+        "Tailwind CSS",
+        "SSR/SSG",
+        "SEO Optimizasyonu",
+        "Responsive Design"
+      ],
       "talking_points": [
-        "Next.js'in SSR ve SSG ozelliklerini kullanarak SEO-optimize, hizli yuklenme sureli bir site olusturdum",
-        "TypeScript ile tip-guvenli, surdurulebilir bir kod tabani kurdum",
-        "Tailwind CSS ile pixel-perfect responsive tasarim gerceklestirdim",
-        "MDX ile blog icerik yonetimi ve dinamik sayfa olusturma implementasyonu yaptim",
+        "Next.js'in SSR ve SSG özelliklerini kullanarak SEO-optimize, hızlı yüklenme süreli bir site oluşturdum",
+        "TypeScript ile tip-güvenli, sürdürülebilir bir kod tabani kurdum",
+        "Tailwind CSS ile pixel-perfect responsive tasarım gerçekleştirdim",
+        "MDX ile blog içerik yönetimi ve dinamik sayfa oluşturma implementasyonu yaptim",
         "Lighthouse skorlarinda 90+ performans elde ettim"
       ]
     },
     {
       "project_id": "project-02",
-      "project_title": "Full Stack Proje Yonetim Platformu",
-      "highlight_for_cover_letter": "Ekip is birligi ve proje yonetimi icin uctan uca full stack cozum gelistirme becerisini kanitlar. Gercek dunya is akislarini modelleyebilme yetenegini gosterir.",
-      "skills_to_emphasize": ["React", "Node.js", "Express.js", "PostgreSQL", "REST API", "JWT Authentication", "RBAC"],
+      "project_title": "Full Stack Proje Yönetim Platformu",
+      "highlight_for_cover_letter": "Ekip is birligi ve proje yönetimi için uctan uca full stack çözüm geliştirme becerisini kanıtlar. Gerçek dünya is akislarini modelleyebilme yetenegini gösterir.",
+      "skills_to_emphasize": [
+        "React",
+        "Node.js",
+        "Express.js",
+        "PostgreSQL",
+        "REST API",
+        "JWT Authentication",
+        "RBAC"
+      ],
       "talking_points": [
-        "React ve Node.js ile ekip bazli proje yonetim platformu gelistirdim",
-        "PostgreSQL ile iliskisel veritabani tasarimi ve optimizasyonu yaptim",
-        "Rol tabanli yetkilendirme (RBAC) sistemi implementasyonu gerceklestirdim",
-        "JWT ile guvenli kimlik dogrulama altyapisi kurdum",
-        "Drag-and-drop Kanban board ve gercek zamanli bildirim sistemi olusturdum"
+        "React ve Node.js ile ekip bazli proje yönetim platformu geliştirdim",
+        "PostgreSQL ile ilişkisel veritabanı tasarımı ve optimizasyonu yaptim",
+        "Rol tabanli yetkilendirme (RBAC) sistemi implementasyonu gerçekleştirdim",
+        "JWT ile güvenli kimlik doğrulama altyapısı kurdum",
+        "Drag-and-drop Kanban board ve gerçek zamanli bildirim sistemi oluşturdum"
       ]
     },
     {
       "project_id": "project-03",
       "project_title": "Real-time Chat Uygulamasi",
-      "highlight_for_cover_letter": "WebSocket ile gercek zamanli iletisim sistemleri gelistirme becerisini ve olceklenebilir mimari tasarimi yapabilme yetenegini ortaya koyar.",
-      "skills_to_emphasize": ["WebSocket", "Socket.io", "React", "Node.js", "Redis", "Real-time Communication"],
+      "highlight_for_cover_letter": "WebSocket ile gerçek zamanli iletisim sistemleri geliştirme becerisini ve ölçeklenebilir mimari tasarımı yapabilme yetenegini ortaya koyar.",
+      "skills_to_emphasize": [
+        "WebSocket",
+        "Socket.io",
+        "React",
+        "Node.js",
+        "Redis",
+        "Real-time Communication"
+      ],
       "talking_points": [
-        "WebSocket ve Socket.io ile dusuk gecikmeli gercek zamanli mesajlasma altyapisi kurdum",
-        "Redis ile oturum yonetimi ve mesaj cache'leme implementasyonu yaptim",
-        "Grup sohbetleri, dosya paylasimi ve online durum gostergesi ozelliklerini gelistirdim",
-        "Olceklenebilir mimari tasarimi ile es zamanli birden fazla kullaniciyi destekledim",
-        "Mesaj sifreleme ve guvenlik onlemleri uyguladim"
+        "WebSocket ve Socket.io ile düşük gecikmeli gerçek zamanli mesajlasma altyapısı kurdum",
+        "Redis ile oturum yönetimi ve mesaj cache'leme implementasyonu yaptim",
+        "Grup sohbetleri, dosya paylaşımı ve online durum göstergesi özelliklerini geliştirdim",
+        "Ölçeklenebilir mimari tasarımı ile es zamanli birden fazla kullanıcıyı destekledim",
+        "Mesaj şifreleme ve güvenlik onlemleri uyguladim"
       ]
     },
     {
       "project_id": "project-04",
       "project_title": "E-ticaret API & Admin Paneli",
-      "highlight_for_cover_letter": "Backend API tasarimi, veritabani modelleme ve admin arayuzu gelistirme konusundaki kapsamli yetenekleri gosterir. Ticari uygulamalar icin production-ready cozum sunabilme becerisini kanitlar.",
-      "skills_to_emphasize": ["FastAPI", "PostgreSQL", "React", "REST API", "Payment Integration", "Admin Dashboard"],
+      "highlight_for_cover_letter": "Backend API tasarımı, veritabanı modelleme ve admin arayüzü geliştirme konusundaki kapsamli yetenekleri gösterir. Ticari uygulamalar için production-ready çözüm sunabilme becerisini kanıtlar.",
+      "skills_to_emphasize": [
+        "FastAPI",
+        "PostgreSQL",
+        "React",
+        "REST API",
+        "Payment Integration",
+        "Admin Dashboard"
+      ],
       "talking_points": [
-        "FastAPI ile yuksek performansli, dokumante edilmis RESTful API gelistirdim",
-        "PostgreSQL ile karmasik urun katalogu ve siparis yonetimi veritabani tasarladim",
-        "React ile kapsamli admin paneli olusturdum: urun yonetimi, siparis takibi, analitik",
-        "Odeme sistemi entegrasyonu ve guvenli transaction yonetimi implementasyonu yaptim",
-        "Gelismis filtreleme, arama ve sayfalama ozellikleri gelistirdim"
+        "FastAPI ile yüksek performansli, dokümante edilmis RESTful API geliştirdim",
+        "PostgreSQL ile karmaşık ürün katalogu ve siparis yönetimi veritabanı tasarladim",
+        "React ile kapsamli admin paneli oluşturdum: ürün yönetimi, siparis takibi, analitik",
+        "Odeme sistemi entegrasyonu ve güvenli transaction yönetimi implementasyonu yaptim",
+        "Gelişmiş filtreleme, arama ve sayfalama özellikleri geliştirdim"
       ]
     },
     {
       "project_id": "project-05",
       "project_title": "Akilli Analitik Dashboard",
-      "highlight_for_cover_letter": "Veri goruntuleme, caching stratejileri ve AI/ML entegrasyonu konusundaki becerileri bir araya getiren kapsamli bir full stack proje. Veri odakli karar verme sureclerini destekleyen araclar gelistirme yetenegini sergiler.",
-      "skills_to_emphasize": ["React", "FastAPI", "Redis", "Data Visualization", "AI/ML Integration", "Caching Strategies"],
+      "highlight_for_cover_letter": "Veri görüntüleme, caching stratejileri ve AI/ML entegrasyonu konusundaki becerileri bir araya getiren kapsamli bir full stack proje. Veri odakli karar verme süreçlerini destekleyen araclar geliştirme yetenegini sergiler.",
+      "skills_to_emphasize": [
+        "React",
+        "FastAPI",
+        "Redis",
+        "Data Visualization",
+        "AI/ML Integration",
+        "Caching Strategies"
+      ],
       "talking_points": [
-        "React ile interaktif ve dinamik veri goruntuleme dashboard'u gelistirdim",
-        "FastAPI backend'i ile veri isleme ve API katmani olusturdum",
-        "Redis ile caching stratejileri uygulayarak response surelerini onemli olcude azalttim",
-        "AI/ML modelleri entegre ederek prediktif analitik ozellikleri ekledim",
-        "Gercek zamanli veri akisi ve otomatik raporlama sistemi kurdum"
+        "React ile interaktif ve dinamik veri görüntüleme dashboard'u geliştirdim",
+        "FastAPI backend'i ile veri işleme ve API katmani oluşturdum",
+        "Redis ile caching stratejileri uygulayarak response sürelerini önemli olcude azalttim",
+        "AI/ML modelleri entegre ederek prediktif analitik özellikleri ekledim",
+        "Gerçek zamanli veri akisi ve otomatik raporlama sistemi kurdum"
       ]
     },
     {
       "project_id": "project-06",
       "project_title": "AI-Powered Blog Platform",
-      "highlight_for_cover_letter": "AI icerik uretimi ve modern web gelistirmeyi birlestiren yenilikci bir proje. Yapay zeka teknolojilerini pratik urun ozelliklerine donusturme becerisini gosterir.",
-      "skills_to_emphasize": ["Next.js", "AI Content Generation", "LLM Integration", "Full Stack Development", "UX Design"],
+      "highlight_for_cover_letter": "AI içerik üretimi ve modern web geliştirmeyi birleştiren yenilikci bir proje. Yapay zeka teknolojilerini pratik ürün ozelliklerine dönüştürme becerisini gösterir.",
+      "skills_to_emphasize": [
+        "Next.js",
+        "AI Content Generation",
+        "LLM Integration",
+        "Full Stack Development",
+        "UX Design"
+      ],
       "talking_points": [
-        "Next.js ile AI destekli icerik uretim platformu gelistirdim",
-        "LLM API entegrasyonu ile otomatik blog yazisi taslagi, baslik onerisi ve SEO optimizasyonu sagladim",
-        "Kullanici dostu editor arayuzu ile AI onerilerini icerige entegre ettim",
-        "AI prompt engineering ile kaliteli ve tutarli icerik uretimi optimize ettim",
-        "Icerik moderasyonu ve kalite kontrol mekanizmalari uyguladim"
+        "Next.js ile AI destekli içerik üretim platformu geliştirdim",
+        "LLM API entegrasyonu ile otomatik blog yazisi taslagi, başlık onerisi ve SEO optimizasyonu sağladım",
+        "Kullanıcı dostu editor arayüzü ile AI onerilerini içeriğe entegre ettim",
+        "AI prompt engineering ile kaliteli ve tutarli içerik üretimi optimize ettim",
+        "Içerik moderasyonu ve kalite kontrol mekanizmalari uyguladim"
       ]
     },
     {
       "project_id": "project-07",
       "project_title": "RAG Document Q&A System",
-      "highlight_for_cover_letter": "Retrieval-Augmented Generation (RAG) mimarisini production seviyesinde uygulama becerisini kanitlar. Dokuman isleme, embedding olusturma ve semantik arama konularindaki derin teknik bilgiyi sergiler.",
-      "skills_to_emphasize": ["LangChain", "Vector Database", "FastAPI", "RAG Architecture", "Embedding Models", "Document Processing"],
+      "highlight_for_cover_letter": "Retrieval-Augmented Generation (RAG) mimarisini production seviyesinde uygulama becerisini kanıtlar. Doküman işleme, embedding oluşturma ve semantik arama konularindaki derin teknik bilgiyi sergiler.",
+      "skills_to_emphasize": [
+        "LangChain",
+        "Vector Database",
+        "FastAPI",
+        "RAG Architecture",
+        "Embedding Models",
+        "Document Processing"
+      ],
       "talking_points": [
-        "LangChain framework'u ile kapsamli RAG pipeline'i tasarladim ve gelistirdim",
-        "Vector database entegrasyonu ile semantik arama ve dokuman eslestirme sistemi kurdum",
-        "Gelismis chunking stratejileri ile retrieval dogrulugunu onemli olcude artirdim",
-        "FastAPI ile olceklenebilir API katmani olusturdum",
-        "Farkli dokuman formatlari (PDF, DOCX, TXT) icin isleme pipeline'lari gelistirdim"
+        "LangChain framework'u ile kapsamli RAG pipeline'i tasarladim ve geliştirdim",
+        "Vector database entegrasyonu ile semantik arama ve doküman eslestirme sistemi kurdum",
+        "Gelişmiş chunking stratejileri ile retrieval dogrulugunu önemli olcude artirdim",
+        "FastAPI ile ölçeklenebilir API katmani oluşturdum",
+        "Farklı doküman formatlari (PDF, DOCX, TXT) için işleme pipeline'lari geliştirdim"
       ]
     },
     {
       "project_id": "project-08",
       "project_title": "Multi-Agent Customer Support",
-      "highlight_for_cover_letter": "Coklu ajan mimarisi ve orkestrasyon konusundaki ileri duzey AI muhendisligi becerilerini gosterir. Gercek zamanli iletisim ile AI ajanlarini birlestiren karmasik sistemler tasarlama yetenegini kanitlar.",
-      "skills_to_emphasize": ["LangGraph", "Multi-Agent Systems", "WebSocket", "Agent Orchestration", "NLP", "Real-time AI"],
+      "highlight_for_cover_letter": "Çoklu ajan mimarisi ve orkestrasyon konusundaki ileri düzey AI mühendisliği becerilerini gösterir. Gerçek zamanli iletisim ile AI ajanlarini birleştiren karmaşık sistemler tasarlama yetenegini kanıtlar.",
+      "skills_to_emphasize": [
+        "LangGraph",
+        "Multi-Agent Systems",
+        "WebSocket",
+        "Agent Orchestration",
+        "NLP",
+        "Real-time AI"
+      ],
       "talking_points": [
-        "LangGraph ile coklu ajan orkestrasyon sistemi tasarladim ve gelistirdim",
-        "Farkli uzmanlik alanlarinda (siparis takibi, teknik destek, genel sorular) uzmanlasmis ajanlar olusturdum",
-        "WebSocket ile gercek zamanli kullanici-ajan iletisimi sagladim",
-        "Ajan yonlendirme ve escalation mantigi implementasyonu yaptim",
-        "Insan-ajan devir teslim (handoff) mekanizmasi gelistirdim"
+        "LangGraph ile çoklu ajan orkestrasyon sistemi tasarladim ve geliştirdim",
+        "Farklı uzmanlik alanlarinda (siparis takibi, teknik destek, genel sorular) uzmanlasmis ajanlar oluşturdum",
+        "WebSocket ile gerçek zamanli kullanıcı-ajan iletisimi sağladım",
+        "Ajan yönlendirme ve escalation mantigi implementasyonu yaptim",
+        "Insan-ajan devir teslim (handoff) mekanizmasi geliştirdim"
       ]
     },
     {
       "project_id": "project-09",
       "project_title": "ML Pipeline & Model Serving",
-      "highlight_for_cover_letter": "MLOps ve model yasam dongusu yonetimi konusundaki becerileri gosterir. ML modellerini uretim ortamina tasima ve olceklendirme konusundaki pratik deneyimi kanitlar.",
-      "skills_to_emphasize": ["MLflow", "Docker", "FastAPI", "ML Pipeline", "Model Versioning", "CI/CD", "MLOps"],
+      "highlight_for_cover_letter": "MLOps ve model yasam döngüsü yönetimi konusundaki becerileri gösterir. ML modellerini üretim ortamina taşıma ve ölçeklendirme konusundaki pratik deneyimi kanıtlar.",
+      "skills_to_emphasize": [
+        "MLflow",
+        "Docker",
+        "FastAPI",
+        "ML Pipeline",
+        "Model Versioning",
+        "CI/CD",
+        "MLOps"
+      ],
       "talking_points": [
-        "MLflow ile model egitimi, izleme ve versiyon yonetimi pipeline'i kurdum",
-        "Docker ile tekrarlanabilir ve tasinabilir ML ortamlari olusturdum",
-        "FastAPI ile model serving endpoint'leri gelistirdim",
+        "MLflow ile model egitimi, izleme ve versiyon yönetimi pipeline'i kurdum",
+        "Docker ile tekrarlanabilir ve taşınabilir ML ortamlari oluşturdum",
+        "FastAPI ile model serving endpoint'leri geliştirdim",
         "Otomatik model egitimi ve deployment CI/CD pipeline'i tasarladim",
-        "Model performans izleme ve A/B testing altyapisi kurdum"
+        "Model performans izleme ve A/B testing altyapısı kurdum"
       ]
     },
     {
       "project_id": "project-10",
       "project_title": "AI Code Review Tool (Capstone)",
-      "highlight_for_cover_letter": "Tum ogrenilen becerileri bir araya getiren capstone projesi. GitHub API ve Anthropic API entegrasyonuyla gelistirici is akislarini iyilestiren pratik bir AI araci. Bagimsiz olarak karmasik sistemler tasarlama ve teslim etme yeteneginin en guclu kaniti.",
-      "skills_to_emphasize": ["GitHub API", "Anthropic API", "AI Integration", "Code Analysis", "Developer Tools", "System Design"],
+      "highlight_for_cover_letter": "Tum öğrenilen becerileri bir araya getiren capstone projesi. GitHub API ve Anthropic API entegrasyonuyla geliştirici is akislarini iyilestiren pratik bir AI aracı. Bağımsız olarak karmaşık sistemler tasarlama ve teslim etme yeteneginin en güçlü kanıtı.",
+      "skills_to_emphasize": [
+        "GitHub API",
+        "Anthropic API",
+        "AI Integration",
+        "Code Analysis",
+        "Developer Tools",
+        "System Design"
+      ],
       "talking_points": [
-        "GitHub API entegrasyonu ile otomatik pull request analizi ve kod inceleme sistemi gelistirdim",
-        "Anthropic API (Claude) kullanarak akilli kod analizi ve iyilestirme onerileri sunan sistem kurdum",
-        "Kod kalitesi, guvenlik aciklari ve performans sorunlarini otomatik tespit eden arac olusturdum",
-        "Gelistirici is akisina sorunsuz entegre olan GitHub webhook sistemi tasarladim",
-        "Bu capstone projesi tum full stack ve AI becerilerimi tek bir uretim seviyesinde urun olarak birlestiriyor"
+        "GitHub API entegrasyonu ile otomatik pull request analizi ve kod inceleme sistemi geliştirdim",
+        "Anthropic API (Claude) kullanarak akilli kod analizi ve iyilestirme önerileri sunan sistem kurdum",
+        "Kod kalitesi, güvenlik aciklari ve performans sorunlarini otomatik tespit eden araç oluşturdum",
+        "Geliştirici is akisina sorunsuz entegre olan GitHub webhook sistemi tasarladim",
+        "Bu capstone projesi tum full stack ve AI becerilerimi tek bir üretim seviyesinde ürün olarak birleştiriyor"
       ]
     }
   ]

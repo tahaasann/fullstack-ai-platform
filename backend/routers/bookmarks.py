@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from typing import Literal
 from database import get_db
 from models import Bookmark, Lesson, Challenge, Project
 from schemas import BookmarkOut, BookmarkCheck, BookmarkCreateResponse, BookmarkDeleteResponse
@@ -11,9 +12,27 @@ router = APIRouter()
 def list_bookmarks(db: Session = Depends(get_db)) -> list[BookmarkOut]:
     """Return all bookmarks with resolved item titles."""
     bookmarks = db.query(Bookmark).order_by(Bookmark.created_at.desc()).all()
+
+    # Group bookmark item_ids by type
+    ids_by_type: dict[str, list[str]] = {}
+    for b in bookmarks:
+        ids_by_type.setdefault(b.item_type, []).append(b.item_id)
+
+    # Batch query each type
+    resolved: dict[tuple[str, str], dict] = {}
+    if "lesson" in ids_by_type:
+        for lesson in db.query(Lesson).filter(Lesson.id.in_(ids_by_type["lesson"])).all():
+            resolved[("lesson", lesson.id)] = {"title": lesson.title, "link": f"/lesson/{lesson.id}"}
+    if "challenge" in ids_by_type:
+        for ch in db.query(Challenge).filter(Challenge.id.in_(ids_by_type["challenge"])).all():
+            resolved[("challenge", ch.id)] = {"title": ch.title, "link": f"/challenge/{ch.id}"}
+    if "project" in ids_by_type:
+        for proj in db.query(Project).filter(Project.id.in_(ids_by_type["project"])).all():
+            resolved[("project", proj.id)] = {"title": proj.title, "link": f"/project/{proj.id}"}
+
     result = []
     for b in bookmarks:
-        item = _resolve_item(db, b.item_type, b.item_id)
+        item = resolved.get((b.item_type, b.item_id))
         result.append(BookmarkOut(
             id=b.id,
             item_type=b.item_type,
@@ -27,7 +46,7 @@ def list_bookmarks(db: Session = Depends(get_db)) -> list[BookmarkOut]:
 
 
 @router.get("/bookmarks/check", response_model=BookmarkCheck)
-def check_bookmark(item_type: str, item_id: str, db: Session = Depends(get_db)) -> BookmarkCheck:
+def check_bookmark(item_type: Literal["lesson", "challenge", "project"], item_id: str, db: Session = Depends(get_db)) -> BookmarkCheck:
     """Check if an item is bookmarked."""
     b = db.query(Bookmark).filter(
         Bookmark.item_type == item_type,
@@ -37,7 +56,7 @@ def check_bookmark(item_type: str, item_id: str, db: Session = Depends(get_db)) 
 
 
 @router.post("/bookmarks", response_model=BookmarkCreateResponse)
-def create_bookmark(item_type: str, item_id: str, note: str = "", db: Session = Depends(get_db)) -> BookmarkCreateResponse:
+def create_bookmark(item_type: Literal["lesson", "challenge", "project"], item_id: str, note: str = Query(default="", max_length=500), db: Session = Depends(get_db)) -> BookmarkCreateResponse:
     """Create a bookmark for an item."""
     existing = db.query(Bookmark).filter(
         Bookmark.item_type == item_type,

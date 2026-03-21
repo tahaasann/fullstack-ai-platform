@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from typing import Literal, Optional
 from database import get_db
 from models import Challenge, ChallengeAttempt, Module
 from schemas import (
@@ -17,9 +18,9 @@ router = APIRouter()
 
 @router.get("/challenges", response_model=list[ChallengeListItem])
 def list_challenges(
-    difficulty: str = None,
-    category: str = None,
-    module_id: str = None,
+    difficulty: Optional[Literal["easy", "medium", "hard"]] = None,
+    category: Optional[str] = Query(default=None, max_length=100),
+    module_id: Optional[str] = Query(default=None, max_length=100),
     db: Session = Depends(get_db)
 ) -> list[ChallengeListItem]:
     """Return filtered list of challenges with solved status."""
@@ -124,7 +125,7 @@ def submit_challenge(challenge_id: str, req: ChallengeRunRequest, db: Session = 
 
 
 @router.get("/challenges/{challenge_id}/hints", response_model=ChallengeHintsOut)
-def get_hints(challenge_id: str, reveal: int = 1, db: Session = Depends(get_db)) -> ChallengeHintsOut:
+def get_hints(challenge_id: str, reveal: int = Query(default=1, ge=1, le=20), db: Session = Depends(get_db)) -> ChallengeHintsOut:
     """Return revealed hints for a challenge."""
     ch = db.query(Challenge).filter(Challenge.id == challenge_id).first()
     if not ch:

@@ -41,7 +41,7 @@ export default function KnowledgeCheck({ data }: { data: Section }) {
                 onClick={() => !revealed && setSelected(letter)}
                 className={`w-full text-left p-3 rounded-lg border ${cls} transition-colors text-sm`}
               >
-                <span className="font-mono text-gray-500 mr-2">{letter}.</span>
+                <span className="font-mono text-gray-400 mr-2">{letter}.</span>
                 <span className="text-gray-300">{opt}</span>
               </button>
             );

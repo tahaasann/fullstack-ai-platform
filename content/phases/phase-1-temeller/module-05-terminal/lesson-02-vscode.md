@@ -738,6 +738,22 @@ explanation: "Step Over (F10), fonksiyon çağrısını tek adımda geçer. Step
 - **Senior cevabi:** Breakpoint debugging console.log'dan ustundur cunku: 1) Call stack'i gorursun (fonksiyona nereden gelindigini), 2) Scope'daki tum degiskenleri inceleyebilirsin, 3) Watch expression'larla kosullu izleme yapabilirsin, 4) Step over/into/out ile akisi takip edebilirsin, 5) Conditional breakpoint ile sadece belirli kosullarda durabilirsin. Ancak production'da structured logging (Winston, Pino) ile log level'lar (error, warn, info, debug) kullanilir. console.log production kodda kalmamalidir, lint rule'lariyla engellenir.
 :::
 
+:::ai-guidance
+### 🤖 AI ile Öğren
+
+**Önerilen Model:** Claude Sonnet 4.5 veya GPT-4o
+
+**Prompt Örnekleri:**
+
+1. **Derinlemesine Anla:** "VS Code'un multi-cursor editing, snippet sistemi ve workspace settings yapısını detaylıca açıkla. Her birinin günlük geliştirme akışını nasıl hızlandırdığını örneklerle göster."
+
+2. **Pratik Uygulama:** "VS Code'da bir React + TypeScript projesi için ideal extension listesi, settings.json konfigürasyonu ve keyboard shortcut'ları öner. Sonra bu setup'ı adım adım uygulamamda bana yardım et."
+
+3. **Mükemmellik İçin:** "Senior developer'ların VS Code'u nasıl kullandığını anlat — debugging workflow, Git integration, terminal multiplexing, remote development. Junior ve senior kullanım farkını göster."
+
+> **Pair Programming İpucu:** AI'a VS Code'da yavaş hissettiğin bir işlemi anlat. Daha hızlı yapmanın yolunu ve ilgili shortcut'ları öğren.
+:::
+
 :::must-note
 - `Ctrl+P` → dosya hızlı aç, `Ctrl+Shift+P` → Command Palette (en önemli shortcut!)
 - `Ctrl+D` → kelimeyi seç + sonraki eşleşmeyi ekle (multi-cursor editing)

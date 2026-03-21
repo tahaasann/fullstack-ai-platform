@@ -1,6 +1,6 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
-from typing import Optional, Any
+from typing import Literal, Optional, Any
 
 
 # --- Phase / Module / Lesson ---
@@ -149,7 +149,7 @@ class QuizOut(BaseModel):
 
 class QuizSubmit(BaseModel):
     answers: dict
-    time_spent_seconds: int = 0
+    time_spent_seconds: int = Field(default=0, ge=0, le=86400)
 
 
 class QuizResultOut(BaseModel):
@@ -217,8 +217,8 @@ class ChallengeDetailOut(BaseModel):
 
 
 class ChallengeRunRequest(BaseModel):
-    code: str
-    language: str = "python"
+    code: str = Field(max_length=10240)
+    language: Literal["python", "javascript"] = "python"
 
 
 class ChallengeRunResult(BaseModel):

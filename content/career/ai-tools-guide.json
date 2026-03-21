@@ -1,80 +1,80 @@
 {
-  "title": "AI Araclari Rehberi",
-  "description": "Yazilim gelistirmede AI modellerini en verimli sekilde kullanma rehberi. Dogru modeli, dogru is icin, dogru sekilde kullanmayi ogretin.",
+  "title": "AI Araçları Rehberi",
+  "description": "Yazılım geliştirmede AI modellerini en verimli sekilde kullanma rehberi. Doğru modeli, doğru is için, doğru sekilde kullanmayi ogretin.",
   "last_updated": "2026-03-20",
   "model_comparison": [
     {
       "name": "Claude Opus 4.6",
       "provider": "Anthropic",
       "strengths": [
-        "Karmasik mimari kararlari ve system design",
+        "Karmaşık mimari kararlari ve system design",
         "Derin kod analizi ve multi-file refactoring",
         "Uzun ve detayli reasoning zincirleri",
-        "Buyuk codebase'leri anlama ve analiz etme",
+        "Büyük codebase'leri anlama ve analiz etme",
         "Zor bug'lari tespit etme",
         "Trade-off analizi ve karar verme"
       ],
       "best_for": [
         "System design ve architecture kararlari",
-        "Buyuk olcekli refactoring planlari",
-        "Karmasik bug'larin kok neden analizi",
-        "Kod tabaninda kapsamli degisiklik planlama",
-        "Teknik dokuman yazimi ve review",
+        "Büyük ölçekli refactoring planlari",
+        "Karmaşık bug'larin kok neden analizi",
+        "Kod tabaninda kapsamli değişiklik planlama",
+        "Teknik doküman yazimi ve review",
         "Design pattern secimi ve uygulama stratejisi"
       ],
       "pricing_tier": "Premium",
       "context_window": "1M tokens",
-      "when_to_use": "Karmasik mimari kararlar, system design, buyuk refactoring planlari ve derin analiz gerektiren isler icin kullanin. Gunluk basit kodlama isleri icin gereksiz maliyet olusturur.",
-      "cost_note": "En pahali model - sadece gercekten karmasik isler icin kullanin"
+      "when_to_use": "Karmaşık mimari kararlar, system design, büyük refactoring planlari ve derin analiz gerektiren isler için kullanin. Gunluk basit kodlama isleri için gereksiz maliyet oluşturur.",
+      "cost_note": "En pahali model - sadece gerçekten karmaşık isler için kullanin"
     },
     {
       "name": "Claude Sonnet 4.5",
       "provider": "Anthropic",
       "strengths": [
-        "Hizli ve maliyet-etkin kod uretimi",
-        "Gunluk coding gorevleri icin ideal denge",
+        "Hızlı ve maliyet-etkin kod üretimi",
+        "Gunluk coding görevleri için ideal denge",
         "Kod review ve debugging",
-        "Hizli aciklamalar ve ogretme",
+        "Hızlı açıklamalar ve ogretme",
         "Test yazimi ve refactoring",
-        "API entegrasyonu ve CRUD islemleri"
+        "API entegrasyonu ve CRUD işlemleri"
       ],
       "best_for": [
         "Gunluk kodlama ve pair programming",
-        "Code review ve guvenlik analizi",
+        "Code review ve güvenlik analizi",
         "Bug debugging ve hata ayiklama",
         "Birim test ve entegrasyon test yazimi",
-        "Kucuk-orta olcekli refactoring",
-        "Hizli kavram aciklamalari",
-        "Dokumantasyon yazimi"
+        "Küçük-orta ölçekli refactoring",
+        "Hızlı kavram açıklamaları",
+        "Dokümantasyon yazimi"
       ],
       "pricing_tier": "Standard",
       "context_window": "200K tokens",
-      "when_to_use": "Gunluk yazilim gelistirme islerinizin %80'i icin bu modeli kullanin. Hiz ve kalite arasinda en iyi dengeyi sunar. Default seciminiz bu olmali.",
-      "cost_note": "Gunluk kullanim icin en iyi fiyat/performans orani"
+      "when_to_use": "Gunluk yazılım geliştirme islerinizin %80'i için bu modeli kullanin. Hız ve kalite arasinda en iyi dengeyi sunar. Default seciminiz bu olmali.",
+      "cost_note": "Gunluk kullanım için en iyi fiyat/performans orani"
     },
     {
       "name": "Gemini 2.5 Pro",
       "provider": "Google",
       "strengths": [
         "Devasa context window (1M token)",
-        "Multimodal yetenek - gorsel, diyagram, ekran goruntusu analizi",
-        "Cok uzun dokumanlari tek seferde isleme",
-        "Arastirma ve bilgi sentezi",
-        "Gorsel icerikten kod uretme",
-        "PDF ve dokuman analizi"
+        "Multimodal yetenek - görsel, diyagram, ekran goruntusu analizi",
+        "Çok uzun dokümanları tek seferde işleme",
+        "Araştırma ve bilgi sentezi",
+        "Görsel içerikten kod üretme",
+        "PDF ve doküman analizi"
       ],
       "best_for": [
-        "Cok uzun dokumanlar ve spesifikasyonlari okuma",
-        "Gorsel tasarimdan (screenshot, Figma) kod uretme",
-        "Buyuk kod tabanlari hakkinda soru sorma",
-        "Arastirma ve karsilastirmali analiz",
+        "Çok uzun dokümanlar ve spesifikasyonlari okuma",
+        "Görsel tasarımdan (screenshot, Figma) kod üretme",
+        "Büyük kod tabanlari hakkinda soru sorma",
+        "Araştırma ve karşılaştırmalı analiz",
         "Diyagram ve mimari semalari anlama",
         "Legacy kod tabani analizi"
       ],
       "pricing_tier": "Standard-Premium",
       "context_window": "1M tokens",
-      "when_to_use": "Cok uzun dokumanlar, gorsel icerik analizi veya devasa kod tabanlari ile calisirken kullanin. 200K token yetmediginde veya gorsel input gerektiginde tercih edin.",
-      "cost_note": "Uzun context gerektiren isler icin maliyet-etkin"
+      "when_to_use": "Çok uzun dokümanlar, görsel içerik analizi veya devasa kod tabanlari ile çalışırken kullanin. 200K token yetmediginde veya görsel input gerektiginde tercih edin.",
+      "cost_note": "Uzun context gerektiren isler için maliyet-etkin"
     }
   ],
   "sections": [
@@ -82,171 +82,171 @@
       "id": "prompt-engineering-temelleri",
       "title": "Prompt Engineering Temelleri",
       "icon": "🎯",
-      "content": "Etkili prompt yazmanin temeli, AI'ya ne istediginizi net ve yapilandirilmis sekilde iletmektir. Iyi bir prompt; spesifik, baglamli, ornekli ve iteratif olmalidir. AI'dan iyi cevap almanin sirri, iyi soru sormaktir.",
+      "content": "Etkili prompt yazmanin temeli, AI'ya ne istediginizi net ve yapılandırılmış sekilde iletmektir. Iyi bir prompt; spesifik, baglamli, örnekli ve iteratif olmalidir. AI'dan iyi cevap almanin sirri, iyi soru sormaktir.",
       "examples": [
         {
           "bad_prompt": "Bu kodu duzeltt",
-          "good_prompt": "Bu React component'inde useEffect icinde memory leak var. Component unmount oldugunda cleanup yapilmiyor. Asagidaki kodu review edip, cleanup fonksiyonu ekleyerek duzeltir misin? Ayrica neden memory leak olustugunu acikla.",
-          "why_better": "Spesifik problem tanimi, beklenen cozum ve aciklama talebi var"
+          "good_prompt": "Bu React component'inde useEffect içinde memory leak var. Component unmount olduğunda cleanup yapılmıyor. Asagidaki kodu review edip, cleanup fonksiyonu ekleyerek duzeltir misin? Ayrica neden memory leak oluştuğunu acikla.",
+          "why_better": "Spesifik problem tanımı, beklenen çözüm ve açıklama talebi var"
         },
         {
           "bad_prompt": "API yaz",
-          "good_prompt": "Node.js ve Express kullanarak bir REST API endpoint'i olustur. POST /api/users endpoint'i olmali. Request body'de { name: string, email: string, role: 'admin' | 'user' } beklenmeli. Zod ile validation yap. Basarili durumda 201, validation hatasinda 400 dondur. Error handling middleware ile sarmala.",
-          "why_better": "Teknoloji stack'i, endpoint detaylari, veri yapisi, validation gereksinimleri ve hata yonetimi acikca belirtilmis"
+          "good_prompt": "Node.js ve Express kullanarak bir REST API endpoint'i oluştur. POST /api/users endpoint'i olmali. Request body'de { name: string, email: string, role: 'admin' | 'user' } beklenmeli. Zod ile validation yap. Başarılı durumda 201, validation hatasında 400 dondur. Error handling middleware ile sarmala.",
+          "why_better": "Teknoloji stack'i, endpoint detaylari, veri yapısı, validation gereksinimleri ve hata yönetimi açıkça belirtilmis"
         },
         {
           "bad_prompt": "Performans sorunu var",
-          "good_prompt": "PostgreSQL'de su sorgu 3 saniye suruyor. Tablo 2M satir iceriyor. Sorgu: [sorgu buraya]. EXPLAIN ANALYZE ciktisi: [cikti buraya]. Hangi index'ler olusturulmali ve sorgu nasil optimize edilmeli? Mevcut index'ler: [index listesi].",
+          "good_prompt": "PostgreSQL'de su sorgu 3 saniye suruyor. Tablo 2M satir içeriyor. Sorgu: [sorgu buraya]. EXPLAIN ANALYZE çıktısı: [çıktı buraya]. Hangi index'ler oluşturulmalı ve sorgu nasil optimize edilmeli? Mevcut index'ler: [index listesi].",
           "why_better": "Somut metrikler, mevcut durum bilgisi ve gerekli tum teknik detaylar verilmis"
         }
       ],
       "tips": [
         "Her zaman kullandiginiz teknoloji stack'ini belirtin (Node.js, Python, React, vb.)",
-        "Hata mesajlarini ve log'lari oldugu gibi paylasin - kendiniz yorumlamayin",
-        "Beklediginiz cikti formatini tanimlayin (JSON, tablo, bullet point, vb.)",
-        "Karmasik istekleri adim adim bolumlere ayirin",
-        "Ilk cevap yetersizse, eksik bilgiyi ekleyerek tekrar sorun - iteratif calisin",
-        "Rolu tanimlayin: 'Senior backend developer olarak review et' gibi",
+        "Hata mesajlarini ve log'lari olduğu gibi paylasin - kendiniz yorumlamayin",
+        "Beklediginiz çıktı formatini tanımlayın (JSON, tablo, bullet point, vb.)",
+        "Karmaşık istekleri adim adim bölümlere ayirin",
+        "Ilk cevap yetersizse, eksik bilgiyi ekleyerek tekrar sorun - iteratif çalışın",
+        "Rolu tanımlayın: 'Senior backend developer olarak review et' gibi",
         "Kisitlamalari belirtin: 'External library kullanmadan', 'TypeScript strict mode ile' gibi"
       ],
-      "senior_cto_notu": "Senior developer'lar AI'ya soru sorarken her zaman constraint'leri belirtir. 'Bunu yap' yerine 'Su kisitlamalar dahilinde bunu yap' derler. CTO'lar ise AI'dan trade-off analizi ister - 'A ve B yaklasimlarini karsilastir, avantaj/dezavantajlari listele' seklinde sorar."
+      "senior_cto_notu": "Senior developer'lar AI'ya soru sorarken her zaman constraint'leri belirtir. 'Bunu yap' yerine 'Su kisitlamalar dahilinde bunu yap' derler. CTO'lar işe AI'dan trade-off analizi ister - 'A ve B yaklaşımlarını karşılaştır, avantaj/dezavantajlari listele' seklinde sorar."
     },
     {
-      "id": "kod-yazarken-ai-kullanimi",
-      "title": "Kod Yazarken AI Kullanimi",
+      "id": "kod-yazarken-ai-kullanımı",
+      "title": "Kod Yazarken AI Kullanımı",
       "icon": "💻",
-      "content": "AI ile pair programming yaparken en onemli kural: AI'nin urettigi kodu anlamadan kullanmayin. AI bir pair programming partner'idir, kod yazma makinesi degil. Amac, AI'nin hizindan faydalanirken ogrenmeye devam etmektir.",
+      "content": "AI ile pair programming yaparken en önemli kural: AI'nin urettigi kodu anlamadan kullanmayin. AI bir pair programming partner'idir, kod yazma makinesi değil. Amac, AI'nin hizindan faydalanirken öğrenmeye devam etmektir.",
       "examples": [
         {
-          "scenario": "Yeni bir feature gelistirme",
-          "approach": "Once AI'ya tasarimi tartis, sonra birlikte implement et",
+          "scenario": "Yeni bir feature geliştirme",
+          "approach": "Önce AI'ya tasarımı tartis, sonra birlikte implement et",
           "steps": [
-            "1. Feature gereksinimlerini AI'ya acikla ve yaklasim oner",
-            "2. AI'nin onerilerini degerlendir, trade-off'lari tartis",
-            "3. Birlikte pseudocode olustur",
-            "4. AI'dan ilk implementasyonu iste",
+            "1. Feature gereksinimlerini AI'ya acikla ve yaklaşım oner",
+            "2. AI'nin onerilerini değerlendir, trade-off'lari tartis",
+            "3. Birlikte pseudocode oluştur",
+            "4. AI'dan ilk implementasyonu işte",
             "5. Kodu satir satir oku ve anla",
             "6. Anlamadigin yerleri sor",
-            "7. Gerekli degisiklikleri kendin yap veya AI'dan iste"
+            "7. Gerekli değişiklikleri kendin yap veya AI'dan işte"
           ]
         },
         {
           "scenario": "Bilmediginiz bir library kullanma",
-          "approach": "AI'dan hem kod hem de aciklama isteyin",
+          "approach": "AI'dan hem kod hem de açıklama isteyin",
           "steps": [
-            "1. Library'nin temel kavramlarini AI'ya sorarak ogrenin",
-            "2. Basit bir ornek isteyin ve calistirin",
-            "3. Ornegi adim adim anlayin",
-            "4. Kendi use case'iniz icin adapte edin",
+            "1. Library'nin temel kavramlarini AI'ya sorarak öğrenin",
+            "2. Basit bir örnek isteyin ve çalıştırın",
+            "3. Örneği adim adim anlayin",
+            "4. Kendi use case'iniz için adapte edin",
             "5. Edge case'leri ve error handling'i tartistin"
           ]
         }
       ],
       "tips": [
-        "AI'nin urettigi her kod parcasini calistirmadan once okuyun ve anlayin",
-        "Anlamadiginiz satirlari 'Bu satir ne yapiyor ve neden?' diye sorun",
-        "AI'ya alternatif yaklasimlar sorun - tek bir cozume baglanmayin",
-        "Kendi cozumunuzu AI'ya review ettirin - sadece AI'nin cozumunu kullanmayin",
-        "AI'dan ogrendiginiz pattern'leri not alin ve tekrar kullanin",
-        "Production kodu icin AI ciktisini her zaman test edin",
-        "AI'nin yanlis yapabilecegini unutmayin - ozellikle edge case'lerde"
+        "AI'nin urettigi her kod parçasını çalıştırmadan önce okuyun ve anlayin",
+        "Anlamadiginiz satirlari 'Bu satir ne yapıyor ve neden?' diye sorun",
+        "AI'ya alternatif yaklaşımlar sorun - tek bir çözüme baglanmayin",
+        "Kendi çözümünüzü AI'ya review ettirin - sadece AI'nin çözümünü kullanmayin",
+        "AI'dan öğrendiğiniz pattern'leri not alin ve tekrar kullanin",
+        "Production kodu için AI çıktısını her zaman test edin",
+        "AI'nin yanlis yapabilecegini unutmayin - özellikle edge case'lerde"
       ],
-      "senior_cto_notu": "Senior developer'lar AI'yi scaffold olusturmak icin kullanir, sonra kodu kendi tarzlarina ve proje convention'larina uygun sekilde refactor eder. Copy-paste yapmazlar - AI'nin kodunu baslangic noktasi olarak alir, sonra iyilestirirler."
+      "senior_cto_notu": "Senior developer'lar AI'yi scaffold oluşturmak için kullanir, sonra kodu kendi tarzlarina ve proje convention'larina uygun sekilde refactor eder. Copy-paste yapmazlar - AI'nin kodunu başlangıç noktasi olarak alir, sonra iyilestirirler."
     },
     {
       "id": "code-review-ile-ai",
       "title": "Code Review ile AI",
       "icon": "🔍",
-      "content": "AI ile code review yapmak, insan review'inin yerini almaz ama guclendirir. AI; guvenlik aciklari, performans sorunlari, kod kalitesi ve best practice uyumu konularinda sistematik review yapabilir. Insan reviewer'in gozunden kacabilecek detaylari yakalar.",
+      "content": "AI ile code review yapmak, insan review'inin yerini almaz ama guclendirir. AI; güvenlik aciklari, performans sorunlari, kod kalitesi ve best practice uyumu konularinda sistematik review yapabilir. Insan reviewer'in gozunden kaçabilecek detaylari yakalar.",
       "examples": [
         {
           "scenario": "Pull Request review",
-          "prompt": "Bu PR'daki degisiklikleri review et. Su alanlara odaklan:\n1. Guvenlik aciklari (SQL injection, XSS, vb.)\n2. Performans sorunlari\n3. Error handling eksiklikleri\n4. Edge case'ler\n5. Naming convention tutarliligi\n6. Test coverage eksiklikleri\n\nHer bulgu icin: Ciddiyet seviyesi (kritik/orta/dusuk), Aciklama, Onerilen duzeltme ver.",
-          "what_to_expect": "Sistematik bir review raporu - ama AI'nin her buldugunu kor kopyalamayin, baglamsal degerlendirin"
+          "prompt": "Bu PR'daki değişiklikleri review et. Su alanlara odaklan:\n1. Güvenlik aciklari (SQL injection, XSS, vb.)\n2. Performans sorunlari\n3. Error handling eksiklikleri\n4. Edge case'ler\n5. Naming convention tutarliligi\n6. Test coverage eksiklikleri\n\nHer bulgu için: Ciddiyet seviyesi (kritik/orta/düşük), Açıklama, Onerilen duzeltme ver.",
+          "what_to_expect": "Sistematik bir review raporu - ama AI'nin her buldugunu kor kopyalamayin, baglamsal değerlendirin"
         },
         {
-          "scenario": "Guvenlik odakli review",
-          "prompt": "Bu kodu guvenlik perspektifinden analiz et. OWASP Top 10'a gore potansiyel zafiyetleri listele. Her zafiyet icin: Risk seviyesi, Nasil exploit edilebilir, Nasil duzeltilir acikla.",
-          "what_to_expect": "Detayli guvenlik raporu - kritik bulgulari mutlaka kendiniz de dogrulayin"
+          "scenario": "Güvenlik odakli review",
+          "prompt": "Bu kodu güvenlik perspektifinden analiz et. OWASP Top 10'a gore potansiyel zafiyetleri listele. Her zafiyet için: Risk seviyesi, Nasil exploit edilebilir, Nasil duzeltilir acikla.",
+          "what_to_expect": "Detayli güvenlik raporu - kritik bulgulari mutlaka kendiniz de dogrulayin"
         }
       ],
       "tips": [
-        "Tum dosyayi degil, sadece degisen kimlari gonderin - odakli review daha etkilidir",
-        "Review kriterlerinizi onceden belirleyin (guvenlik, performans, okunabilirlik)",
+        "Tum dosyayi değil, sadece değişen kimlari gonderin - odakli review daha etkilidir",
+        "Review kriterlerinizi önceden belirleyin (güvenlik, performans, okunabilirlik)",
         "AI'nin buldugu sorunlari kor kabul etmeyin - false positive olabilir",
         "Ekip coding standard'larinizi AI'ya ogretir - her review'da tutarli olur",
-        "AI review'i insan review'inden ONCE yapin - insan review'in kalitesini arttirir",
-        "CI/CD pipeline'ina AI review adimi ekleyin - otomatiklestirin"
+        "AI review'i insan review'inden ÖNCE yapın - insan review'in kalitesini arttirir",
+        "CI/CD pipeline'ina AI review adimi ekleyin - otomatikleştirin"
       ],
-      "senior_cto_notu": "CTO'lar AI code review'i, junior developer'larin kodlarini pull request'e gondermeden once kontrol ettirmek icin kullanir. Bu hem junior'in ogrenimini hizlandirir hem de senior reviewer'in zamanini korur."
+      "senior_cto_notu": "CTO'lar AI code review'i, junior developer'larin kodlarini pull request'e gondermeden önce kontrol ettirmek için kullanir. Bu hem junior'in öğrenimini hizlandirir hem de senior reviewer'in zamanini korur."
     },
     {
       "id": "debugging-ile-ai",
       "title": "Debugging ile AI",
       "icon": "🐛",
-      "content": "AI ile debugging yaparken en onemli kural: AI'ya sadece hata mesajini degil, tum baglami verin. Hatanin olustugu ortam, yaptiginiz islem, beklediginiz sonuc ve gerceklesen sonuc - bunlarin hepsi kritik bilgidir.",
+      "content": "AI ile debugging yaparken en önemli kural: AI'ya sadece hata mesajini değil, tum bağlamı verin. Hatanin oluştuğu ortam, yaptığınız işlem, beklediginiz sonuç ve gerçekleşen sonuç - bunlarin hepsi kritik bilgidir.",
       "examples": [
         {
           "scenario": "Runtime error debugging",
-          "prompt_template": "Su hatayi aliyorum:\n\nHata mesaji: [hata mesajini buraya yapistin]\n\nBu hata su durumda olusuyor: [hangi islem sirasinda]\nBekledigim davranis: [ne olmasi gerekiyordu]\nGerceklesen davranis: [ne oldu]\n\nIlgili kod:\n```\n[kodu buraya yapistin]\n```\n\nOrtam: [Node.js 20, React 19, PostgreSQL 16, vb.]\n\nDenedigim cozumler:\n1. [ne denediniz]\n2. [ne denediniz]\n\nHatanin kok nedenini acikla ve cozum oner.",
-          "why_effective": "Tum baglam verildiginde AI cok daha dogru teshis koyar"
+          "prompt_template": "Su hatayi aliyorum:\n\nHata mesaji: [hata mesajini buraya yapıştın]\n\nBu hata su durumda oluşuyor: [hangi işlem sırasında]\nBekledigim davranis: [ne olmasi gerekiyordu]\nGerçekleşen davranis: [ne oldu]\n\nIlgili kod:\n```\n[kodu buraya yapıştın]\n```\n\nOrtam: [Node.js 20, React 19, PostgreSQL 16, vb.]\n\nDenedigim çözümler:\n1. [ne denediniz]\n2. [ne denediniz]\n\nHatanin kok nedenini acikla ve çözüm oner.",
+          "why_effective": "Tum bağlam verildiginde AI çok daha doğru teshis koyar"
         },
         {
           "scenario": "Intermittent bug (bazen olan hata)",
-          "prompt_template": "Asagidaki hata rastgele olusuyor - her istekte degil.\n\nHata: [hata mesaji]\nOlusma sikligi: Yaklasik her 10 istekte 1 kez\nPattern: [varsa gozlemlediginiz pattern]\n\nIlgili kod: [kod]\n\nBu tur intermittent bug'larin olasi nedenleri neler olabilir? Race condition, memory leak, connection pool tukenmesi gibi olasiliklari degerlendir.",
-          "why_effective": "Intermittent bug'lar icin AI'ya pattern bilgisi vermek cok kritiktir"
+          "prompt_template": "Asagidaki hata rastgele oluşuyor - her istekte değil.\n\nHata: [hata mesaji]\nOlusma sikligi: Yaklasik her 10 istekte 1 kez\nPattern: [varsa gozlemlediginiz pattern]\n\nIlgili kod: [kod]\n\nBu tür intermittent bug'larin olası nedenleri neler olabilir? Race condition, memory leak, connection pool tukenmesi gibi olasılıkları değerlendir.",
+          "why_effective": "Intermittent bug'lar için AI'ya pattern bilgisi vermek çok kritiktir"
         }
       ],
       "tips": [
-        "Hata mesajini OLDUGU GIBI yapistin - kendiniz yorumlamayin veya kisaltmayin",
-        "Stack trace'i tam olarak paylasin - onemli ipuclari icerir",
-        "AI'dan sadece cozum degil, ACIKLAMA isteyin - neden boyle oluyor?",
-        "Denediginiz cozumleri belirtin - AI ayni seyleri onermekten kacinir",
-        "Ortam bilgisini verin - versiyon farkliliklari bug'a neden olabilir",
-        "AI cozum onerdikten sonra 'Baska ne ters gidebilir?' diye sorun",
-        "Debugging surecini not alin - benzer hatalarda referans olur"
+        "Hata mesajini OLDUĞU GIBI yapıştın - kendiniz yorumlamayin veya kisaltmayin",
+        "Stack trace'i tam olarak paylasin - önemli ipuclari içerir",
+        "AI'dan sadece çözüm değil, AÇIKLAMA isteyin - neden boyle oluyor?",
+        "Denediginiz çözümleri belirtin - AI aynı seyleri onermekten kacinir",
+        "Ortam bilgisini verin - versiyon farklılıkları bug'a neden olabilir",
+        "AI çözüm onerdikten sonra 'Başka ne ters gidebilir?' diye sorun",
+        "Debugging sürecini not alin - benzer hatalarda referans olur"
       ],
-      "senior_cto_notu": "Tecrubeli developer'lar AI'ya 'duzelt' demez, 'analiz et' der. Once kok nedeni anlarlar, sonra duzeltme stratejisi belirlerler. Hatayi anlamadan duzeltmek, ayni hatanin farkli sekillerde tekrar ortaya cikmasina neden olur."
+      "senior_cto_notu": "Tecrubeli developer'lar AI'ya 'duzelt' demez, 'analiz et' der. Önce kok nedeni anlarlar, sonra duzeltme stratejisi belirlerler. Hatayi anlamadan duzeltmek, aynı hatanin farklı sekillerde tekrar ortaya cikmasina neden olur."
     },
     {
-      "id": "sistem-tasarimi-ile-ai",
-      "title": "Sistem Tasarimi ile AI",
+      "id": "sistem-tasarımı-ile-ai",
+      "title": "Sistem Tasarımı ile AI",
       "icon": "🏗️",
-      "content": "AI, sistem tasarimi konusunda muthis bir sparring partner'dir. Mimari kararlar, teknoloji secimleri, olceklendirme stratejileri ve trade-off analizleri icin AI'yi kullanin. Ancak nihai karar her zaman sizin olmalidir - AI baglaminizi tam olarak bilemez.",
+      "content": "AI, sistem tasarımı konusunda muthis bir sparring partner'dir. Mimari kararlar, teknoloji secimleri, ölçeklendirme stratejileri ve trade-off analizleri için AI'yi kullanin. Ancak nihai karar her zaman sizin olmalidir - AI baglaminizi tam olarak bilemez.",
       "examples": [
         {
           "scenario": "Yeni proje mimarisi",
-          "prompt": "E-ticaret platformu tasarliyorum. Gereksinimler:\n- Gunluk 10K aktif kullanici\n- Urun katalogu (50K urun)\n- Siparis yonetimi\n- Odeme entegrasyonu\n- Gercek zamanli stok takibi\n\nTakim: 3 backend, 2 frontend developer\nSure: 6 ay MVP\nBudget: Orta seviye cloud harcamasi\n\nMonolith vs Microservice karsilastirmasi yap. Bu ozel senaryo icin hangi yaklasim uygun ve neden? Trade-off'lari listele.",
-          "what_to_expect": "Baglamsal trade-off analizi - dogru cevap baglama gore degisir"
+          "prompt": "E-ticaret platformu tasarliyorum. Gereksinimler:\n- Gunluk 10K aktif kullanıcı\n- Ürün katalogu (50K ürün)\n- Siparis yönetimi\n- Odeme entegrasyonu\n- Gerçek zamanli stok takibi\n\nTakim: 3 backend, 2 frontend developer\nSüre: 6 ay MVP\nBudget: Orta seviye cloud harcamasi\n\nMonolith vs Microservice karşılaştırması yap. Bu özel senaryo için hangi yaklaşım uygun ve neden? Trade-off'lari listele.",
+          "what_to_expect": "Baglamsal trade-off analizi - doğru cevap baglama gore değişir"
         },
         {
           "scenario": "Database secimi",
-          "prompt": "Asagidaki veri modeli icin database secimi yapmam gerekiyor:\n- Kullanici profilleri (yapisal veri)\n- Urun katalogu (yari-yapisal, degisken attribute'lar)\n- Siparis gecmisi (iliskisel, transaction gerektiren)\n- Arama fonksiyonu (full-text search)\n- Session yonetimi (hizli okuma/yazma)\n\nTek database mi yoksa polyglot persistence mi kullanmaliyim? Her secenek icin artilari/eksileri ve operasyonel karmasikligi degerlendir.",
-          "what_to_expect": "Her secenek icin detayli karsilastirma - operasyonel maliyeti de icermeli"
+          "prompt": "Asagidaki veri modeli için database secimi yapmam gerekiyor:\n- Kullanıcı profilleri (yapısal veri)\n- Ürün katalogu (yari-yapısal, değişken attribute'lar)\n- Siparis geçmişi (ilişkisel, transaction gerektiren)\n- Arama fonksiyonu (full-text search)\n- Session yönetimi (hızlı okuma/yazma)\n\nTek database mi yoksa polyglot persistence mi kullanmaliyim? Her secenek için artilari/eksileri ve operasyonel karmaşıklığı değerlendir.",
+          "what_to_expect": "Her secenek için detayli karşılaştırma - operasyonel maliyeti de icermeli"
         }
       ],
       "tips": [
-        "Kisitlamalarinizi belirtin - takim buyuklugu, sure, budget, teknik borclar",
-        "AI'dan tek cevap degil, alternatifler ve trade-off'lar isteyin",
-        "Her mimari karar icin 'Bu kararin 2 yil sonraki etkisi ne olur?' sorun",
+        "Kisitlamalarinizi belirtin - takim büyüklüğü, süre, budget, teknik borclar",
+        "AI'dan tek cevap değil, alternatifler ve trade-off'lar isteyin",
+        "Her mimari karar için 'Bu kararin 2 yıl sonraki etkisi ne olur?' sorun",
         "AI'nin onerilerini kendi deneyiminizle harmanlayin",
-        "Diagrams-as-code ile AI'dan mimari diyagramlar olusturmasini isteyin",
-        "Incremental karar alin - her seyi bastan tasarlamaya calismayin",
+        "Diagrams-as-code ile AI'dan mimari diyagramlar oluşturmasını isteyin",
+        "Incremental karar alin - her seyi bastan tasarlamaya çalışmayın",
         "AI ile tasarladiginiz mimariyi baskalarindan da review ettirin"
       ],
-      "senior_cto_notu": "CTO'lar AI'yi 'en iyi mimari ne?' diye sormak icin degil, 'su kisitlamalar altinda hangi trade-off'lari kabul etmeliyiz?' diye tartismak icin kullanir. Mukemmel mimari diye bir sey yoktur - sadece baglamina uygun mimari vardir."
+      "senior_cto_notu": "CTO'lar AI'yi 'en iyi mimari ne?' diye sormak için değil, 'su kisitlamalar altinda hangi trade-off'lari kabul etmeliyiz?' diye tartismak için kullanir. Mükemmel mimari diye bir sey yoktur - sadece baglamina uygun mimari vardir."
     },
     {
-      "id": "ogrenme-ile-ai",
-      "title": "Ogrenme ile AI",
+      "id": "öğrenme-ile-ai",
+      "title": "Öğrenme ile AI",
       "icon": "📚",
-      "content": "AI, kisisel bir mentor gibi kullanilabilir. Feynman teknigi, 'neden' zincirleri ve analoji ile ogrenme yontemlerini AI ile birlikte uygulayin. Onemli olan cevabi almak degil, kavramsal olarak anlamaktir.",
+      "content": "AI, kisisel bir mentor gibi kullanılabilir. Feynman teknigi, 'neden' zincirleri ve analoji ile öğrenme yontemlerini AI ile birlikte uygulayin. Önemli olan cevabi almak değil, kavramsal olarak anlamaktir.",
       "examples": [
         {
-          "scenario": "Yeni kavram ogrenme - Feynman Teknigi",
+          "scenario": "Yeni kavram öğrenme - Feynman Teknigi",
           "steps": [
-            "1. AI'ya kavrami aciklamasini isteyin: 'Docker container nedir? 10 yasindaki birine anlatir gibi acikla.'",
-            "2. Kendi cumlelerinizle AI'ya geri anlatin: 'Docker'i su sekilde anladim: [sizin anlatiminiz]. Dogru mu?'",
+            "1. AI'ya kavrami açıklamasını isteyin: 'Docker container nedir? 10 yasindaki birine anlatır gibi acikla.'",
+            "2. Kendi cumlelerinizle AI'ya geri anlatın: 'Docker'i su sekilde anladim: [sizin anlatımınız]. Doğru mu?'",
             "3. AI eksik veya yanlis noktalarini belirtsin",
             "4. Anlayisiniz netlesene kadar tekrarlayin",
             "5. Sonra teknik derinlige inin: 'Simdi Docker'in Linux namespace'leri nasil kullandigini acikla'"
@@ -256,163 +256,163 @@
           "scenario": "Neden zincirleri ile derinlesmek",
           "steps": [
             "1. 'React neden Virtual DOM kullaniyor?' - ilk neden",
-            "2. 'Neden dogrudan DOM manipulasyonu yavas?' - ikinci neden",
+            "2. 'Neden doğrudan DOM manipulasyonu yavas?' - ikinci neden",
             "3. 'Browser reflow ve repaint neden pahali?' - ucuncu neden",
-            "4. 'Browser rendering engine nasil calisiyor?' - temel mekanizma",
-            "5. Artik Virtual DOM'u sadece kullanmiyor, NEDEN var oldugunu biliyorsunuz"
+            "4. 'Browser rendering engine nasil çalışıyor?' - temel mekanizma",
+            "5. Artik Virtual DOM'u sadece kullanmiyor, NEDEN var olduğunu biliyorsunuz"
           ]
         }
       ],
       "tips": [
-        "Her yeni kavramda 'Bunu 5 yasindaki birine nasil anlatirim?' sorun",
-        "Gercek dunya analojileri isteyin - soyut kavramlari somutlastirir",
-        "'Neden?' sorusunu en az 3 kez ust uste sorun - derinlesir",
-        "AI'nin aciklamasini kendi cumlelerinizle tekrar edin ve dogrulayin",
-        "Ogrendiginiz seyleri kisa notlar halinde kaydedin",
-        "Bir konuyu ogrendikten sonra AI'dan mini quiz isteyin",
-        "Kavramlar arasi baglantilari sorun: 'X ile Y nasil iliskili?'"
+        "Her yeni kavramda 'Bunu 5 yasindaki birine nasil anlatırım?' sorun",
+        "Gerçek dünya analojileri isteyin - soyut kavramlari somutlastirir",
+        "'Neden?' sorusunu en az 3 kez üst uste sorun - derinlesir",
+        "AI'nin açıklamasını kendi cumlelerinizle tekrar edin ve dogrulayin",
+        "Öğrendiğiniz seyleri kisa notlar halinde kaydedin",
+        "Bir konuyu öğrendikten sonra AI'dan mini quiz isteyin",
+        "Kavramlar arasi bağlantıları sorun: 'X ile Y nasil ilişkili?'"
       ],
-      "senior_cto_notu": "Senior developer'lar yeni bir teknoloji ogrenirken once 'mental model' olustururlar. AI'ya 'Bu teknoloji hangi problemi cozuyor, bu problem onceden nasil cozuluyordu, ve bu yeni yaklasim ne farkli yapiyor?' seklinde sorarlar. Syntax degil, kavramsal cerceve onceliklidir."
+      "senior_cto_notu": "Senior developer'lar yeni bir teknoloji öğrenirken önce 'mental model' oluştururlar. AI'ya 'Bu teknoloji hangi problemi cozuyor, bu problem önceden nasil cozuluyordu, ve bu yeni yaklaşım ne farklı yapıyor?' seklinde sorarlar. Syntax değil, kavramsal çerçeve onceliklidir."
     },
     {
-      "id": "ai-ile-yapilmamasi-gerekenler",
-      "title": "AI ile Yapilmamasi Gerekenler",
+      "id": "ai-ile-yapılmaması-gerekenler",
+      "title": "AI ile Yapılmaması Gerekenler",
       "icon": "⛔",
-      "content": "AI guclu bir aractir ama yanlis kullanim, gelistirici olarak buyumenizi engelleyebilir. Bu bolum, AI kullanirken kacinmaniz gereken yaygin hatalari ve anti-pattern'leri kapsar.",
+      "content": "AI güçlü bir araçtır ama yanlis kullanım, geliştirici olarak buyumenizi engelleyebilir. Bu bölüm, AI kullanirken kacinmaniz gereken yaygin hatalari ve anti-pattern'leri kapsar.",
       "examples": [
         {
           "anti_pattern": "Blind Copy-Paste Developer",
-          "description": "AI'nin urettigi kodu okumadan, anlamadan projeye yapisirmak",
-          "real_world_impact": "Production'da guvenlik acigi, performans sorunu veya beklenmedik davranislar",
+          "description": "AI'nin urettigi kodu okumadan, anlamadan projeye yapıştırmak",
+          "real_world_impact": "Production'da güvenlik acigi, performans sorunu veya beklenmedik davranislar",
           "how_to_avoid": "Her kodu okuyun, anlayin, test edin. Anlamadiginiz kismi AI'ya sorduktan sonra kullanin."
         },
         {
-          "anti_pattern": "AI Bagimli Developer",
+          "anti_pattern": "AI Bağımlı Developer",
           "description": "En basit for loop'u bile AI'ya yazdirmak, kendi basina hic kod yazmamak",
-          "real_world_impact": "Teknik mulakatta basarisizlik, AI erisimi olmayan ortamlarda ise yaramama",
+          "real_world_impact": "Teknik mülakatta başarısızlık, AI erişimi olmayan ortamlarda işe yaramama",
           "how_to_avoid": "Temel kodlama becerilerinizi koruyun. Haftada en az birkac saat AI'siz kodlayin."
         },
         {
           "anti_pattern": "Context-Free Prompt",
-          "description": "AI'ya hicbir baglam vermeden soru sormak: 'calismiyor duzelt'",
-          "real_world_impact": "Yanlis cozumler, zaman kaybi, yaniltici oneriler",
-          "how_to_avoid": "Her zaman hata mesaji, ortam bilgisi, beklenen davranis ve gerceklesen davranisi paylasin."
+          "description": "AI'ya hicbir bağlam vermeden soru sormak: 'çalışmıyor duzelt'",
+          "real_world_impact": "Yanlis çözümler, zaman kaybi, yaniltici oneriler",
+          "how_to_avoid": "Her zaman hata mesaji, ortam bilgisi, beklenen davranis ve gerçekleşen davranisi paylasin."
         }
       ],
       "tips": [
-        "AI ciktisini her zaman kritik gozle degerlendir - AI yanilabilir",
-        "AI'yi ogrenme araci olarak kullanin, dusunme araci olarak degil",
-        "Temel programlama becerilerinizi koruyun - AI bir gun erisimde olmayabilir",
+        "AI çıktısını her zaman kritik gozle değerlendir - AI yanilabilir",
+        "AI'yi öğrenme aracı olarak kullanin, düşünme aracı olarak değil",
+        "Temel programlama becerilerinizi koruyun - AI bir gun erişimde olmayabilir",
         "AI'nin urettigi kodu anlamamak, teknik borc biriktirmektir",
-        "AI'yi bir junior developer gibi dusunun - supervise etmeniz gerekir",
-        "Hassas verileri (API key, password, musteri bilgisi) AI'ya gondermeyin",
-        "AI cozumlerini production'a almadan once mutlaka test edin"
+        "AI'yi bir junior developer gibi düşünün - supervise etmeniz gerekir",
+        "Hassas verileri (API key, password, müşteri bilgisi) AI'ya gondermeyin",
+        "AI çözümlerini production'a almadan önce mutlaka test edin"
       ],
-      "senior_cto_notu": "CTO'lar AI'yi verimlilik araci olarak benimser ama takim uyelerinin AI'ya asiri bagimli olmasini istemez. En degerli developer, AI'yi en iyi kullanan degil, AI olmadan da is cikarabilen ama AI ile 10x hizlanan developer'dir."
+      "senior_cto_notu": "CTO'lar AI'yi verimlilik aracı olarak benimser ama takim uyelerinin AI'ya aşırı bağımlı olmasini istemez. En değerli developer, AI'yi en iyi kullanan değil, AI olmadan da is cikarabilen ama AI ile 10x hizlanan developer'dir."
     }
   ],
   "workflow_templates": [
     {
       "task": "Code Review",
       "recommended_model": "Claude Sonnet 4.5",
-      "prompt_template": "Asagidaki kodu review et.\n\nDil/Framework: [teknoloji]\nDosya: [dosya adi ve amaci]\n\n```\n[kodu buraya yapistin]\n```\n\nSu kriterlere gore degerlendir:\n1. Kod kalitesi ve okunabilirlik\n2. Potansiyel bug'lar ve edge case'ler\n3. Guvenlik aciklari\n4. Performans iyilestirme firsatlari\n5. Best practice uyumu\n6. Error handling yeterliligi\n\nHer bulgu icin ciddiyet seviyesi (kritik/orta/dusuk) ve onerilen duzeltmeyi belirt.",
+      "prompt_template": "Asagidaki kodu review et.\n\nDil/Framework: [teknoloji]\nDosya: [dosya adi ve amaci]\n\n```\n[kodu buraya yapıştın]\n```\n\nSu kriterlere gore değerlendir:\n1. Kod kalitesi ve okunabilirlik\n2. Potansiyel bug'lar ve edge case'ler\n3. Güvenlik aciklari\n4. Performans iyilestirme firsatlari\n5. Best practice uyumu\n6. Error handling yeterliligi\n\nHer bulgu için ciddiyet seviyesi (kritik/orta/düşük) ve onerilen duzeltmeyi belirt.",
       "tips": [
-        "Review'dan once projenin coding standard'ini AI'ya ogrettin",
-        "Tum dosyayi degil, degisiklikleri gonderin",
-        "AI'nin her buldugunu kor kabul etmeyin - baglam onemli"
+        "Review'dan önce projenin coding standard'ini AI'ya ogrettin",
+        "Tum dosyayi değil, değişiklikleri gonderin",
+        "AI'nin her buldugunu kor kabul etmeyin - bağlam önemli"
       ]
     },
     {
       "task": "Bug Debugging",
       "recommended_model": "Claude Sonnet 4.5",
-      "prompt_template": "Asagidaki hatayi debug etmeme yardim et.\n\nHata Mesaji:\n```\n[hata mesajini oldugu gibi yapistin]\n```\n\nStack Trace:\n```\n[stack trace'i yapistin]\n```\n\nIlgili Kod:\n```\n[kodu yapistin]\n```\n\nOrtam: [Node.js 20 / React 19 / PostgreSQL 16 / vb.]\nNe zaman olusuyor: [hangi islem sirasinda]\nBeklenen davranis: [ne olmasi gerekiyordu]\nGerceklesen davranis: [ne oldu]\nDenenen cozumler: [neler denediniz]\n\n1. Hatanin kok nedenini acikla\n2. Adim adim cozum oner\n3. Bu hatanin tekrar olmasmasi icin onleyici tedbirler oner",
+      "prompt_template": "Asagidaki hatayi debug etmeme yardım et.\n\nHata Mesaji:\n```\n[hata mesajini olduğu gibi yapıştın]\n```\n\nStack Trace:\n```\n[stack trace'i yapıştın]\n```\n\nIlgili Kod:\n```\n[kodu yapıştın]\n```\n\nOrtam: [Node.js 20 / React 19 / PostgreSQL 16 / vb.]\nNe zaman oluşuyor: [hangi işlem sırasında]\nBeklenen davranis: [ne olmasi gerekiyordu]\nGerçekleşen davranis: [ne oldu]\nDenenen çözümler: [neler denediniz]\n\n1. Hatanin kok nedenini acikla\n2. Adim adim çözüm oner\n3. Bu hatanin tekrar olmasmasi için onleyici tedbirler oner",
       "tips": [
-        "Hata mesajini kendiniz yorumlamayin - oldugu gibi yapistin",
-        "Denediginiz cozumleri belirtin - gereksiz tekrari onler",
-        "Sadece cozum degil aciklama isteyin - ogrenin"
+        "Hata mesajini kendiniz yorumlamayin - olduğu gibi yapıştın",
+        "Denediginiz çözümleri belirtin - gereksiz tekrari onler",
+        "Sadece çözüm değil açıklama isteyin - öğrenin"
       ]
     },
     {
       "task": "Architecture Design",
       "recommended_model": "Claude Opus 4.6",
-      "prompt_template": "Asagidaki sistem icin mimari tasarim onerisi istiyorum.\n\nProje: [proje aciklamasi]\n\nFonksiyonel Gereksinimler:\n- [gereksinim 1]\n- [gereksinim 2]\n- [gereksinim 3]\n\nNon-Fonksiyonel Gereksinimler:\n- Beklenen kullanici sayisi: [sayi]\n- Beklenen yanit suresi: [ms]\n- Uptime gereksinimi: [%]\n- Veri hacmi: [boyut]\n\nKisitlamalar:\n- Takim buyuklugu: [kisi sayisi]\n- Timeline: [sure]\n- Budget: [seviye]\n- Mevcut teknoloji stack: [stack]\n\n1. Onerien mimariyi acikla (monolith/microservice/hybrid)\n2. Teknoloji stack onerisi ver ve NEDEN sectigini acikla\n3. Data model taslagi olustur\n4. En az 2 alternatif yaklasim sun ve trade-off'lari karsilastir\n5. Potansiyel riskleri ve mitigation stratejilerini belirt",
+      "prompt_template": "Asagidaki sistem için mimari tasarım onerisi istiyorum.\n\nProje: [proje açıklaması]\n\nFonksiyonel Gereksinimler:\n- [gereksinim 1]\n- [gereksinim 2]\n- [gereksinim 3]\n\nNon-Fonksiyonel Gereksinimler:\n- Beklenen kullanıcı sayısı: [sayı]\n- Beklenen yanit süresi: [ms]\n- Uptime gereksinimi: [%]\n- Veri hacmi: [boyut]\n\nKisitlamalar:\n- Takim büyüklüğü: [kisi sayısı]\n- Timeline: [süre]\n- Budget: [seviye]\n- Mevcut teknoloji stack: [stack]\n\n1. Onerien mimariyi acikla (monolith/microservice/hybrid)\n2. Teknoloji stack onerisi ver ve NEDEN sectigini acikla\n3. Data model taslagi oluştur\n4. En az 2 alternatif yaklaşım sun ve trade-off'lari karşılaştır\n5. Potansiyel riskleri ve mitigation stratejilerini belirt",
       "tips": [
-        "Kisitlamalari mutlaka belirtin - ideal ve gercekci cozum farklidir",
-        "Trade-off analizi isteyin - tek cozum degil alternatifler",
-        "Opus 4.6 kullanin - karmasik tasarim kararlari icin en iyi sonucu verir"
+        "Kisitlamalari mutlaka belirtin - ideal ve gerçekçi çözüm farklıdır",
+        "Trade-off analizi isteyin - tek çözüm değil alternatifler",
+        "Opus 4.6 kullanin - karmaşık tasarım kararlari için en iyi sonucu verir"
       ]
     },
     {
       "task": "Test Yazimi",
       "recommended_model": "Claude Sonnet 4.5",
-      "prompt_template": "Asagidaki fonksiyon/component icin kapsamli testler yaz.\n\nKod:\n```\n[test edilecek kodu yapistin]\n```\n\nTest Framework: [Jest / Vitest / Pytest / vb.]\nTest Turu: [unit / integration / e2e]\n\nSu senaryolari kapsa:\n1. Happy path - normal calisma\n2. Edge case'ler - sinir degerleri\n3. Error case'ler - hata durumlari\n4. Null/undefined/empty input\n5. Concurrent/async senaryolar (varsa)\n\nHer test icin aciklayici test adi kullan ve AAA (Arrange-Act-Assert) pattern'ini uygula.",
+      "prompt_template": "Asagidaki fonksiyon/component için kapsamli testler yaz.\n\nKod:\n```\n[test edilecek kodu yapıştın]\n```\n\nTest Framework: [Jest / Vitest / Pytest / vb.]\nTest Türü: [unit / integration / e2e]\n\nSu senaryolari kapsa:\n1. Happy path - normal çalışma\n2. Edge case'ler - sinir değerleri\n3. Error case'ler - hata durumlari\n4. Null/undefined/empty input\n5. Concurrent/async senaryolar (varsa)\n\nHer test için açıklayıcı test adi kullan ve AAA (Arrange-Act-Assert) pattern'ini uygula.",
       "tips": [
-        "Once kendi test senaryolarinizi dusunun, sonra AI'ya tamamlatin",
-        "AI'nin yazdigi testleri calistirarak dogrulayin",
-        "Edge case'leri AI'ya sormak cok etkilidir - insan gozunden kacar"
+        "Önce kendi test senaryolarinizi düşünün, sonra AI'ya tamamlatin",
+        "AI'nin yazdigi testleri çalıştırarak dogrulayin",
+        "Edge case'leri AI'ya sormak çok etkilidir - insan gozunden kacar"
       ]
     },
     {
-      "task": "Dokumantasyon Yazimi",
+      "task": "Dokümantasyon Yazimi",
       "recommended_model": "Claude Sonnet 4.5",
-      "prompt_template": "Asagidaki kod/API/sistem icin dokumantasyon yaz.\n\nKod/API:\n```\n[kodu veya API tanimini yapistin]\n```\n\nHedef kitle: [junior developer / dis ekip / end user]\nDokuman turu: [API docs / README / teknik spec / kullanim kilavuzu]\n\nIcermesi gerekenler:\n1. Genel bakis ve amac\n2. Kurulum/baslangic adimlari\n3. Kullanim ornekleri (en az 3 farkli senaryo)\n4. API referansi (parametreler, donus degerleri, hata kodlari)\n5. SSS (Sikca Sorulan Sorular)\n6. Troubleshooting rehberi",
+      "prompt_template": "Asagidaki kod/API/sistem için dokümantasyon yaz.\n\nKod/API:\n```\n[kodu veya API tanimini yapıştın]\n```\n\nHedef kitle: [junior developer / dış ekip / end user]\nDoküman türü: [API docs / README / teknik spec / kullanım kilavuzu]\n\nIcermesi gerekenler:\n1. Genel bakis ve amac\n2. Kurulum/başlangıç adimlari\n3. Kullanım örnekleri (en az 3 farklı senaryo)\n4. API referansi (parametreler, dönüş değerleri, hata kodlari)\n5. SSS (Sikca Sorulan Sorular)\n6. Troubleshooting rehberi",
       "tips": [
-        "Hedef kitleyi belirtin - junior icin daha detayli, senior icin daha ozet",
-        "AI'nin yazdigi dokumantasyon'u mutlaka review edin - yanlislik olabilir",
-        "Orneklerin calistigini dogrulayin"
+        "Hedef kitleyi belirtin - junior için daha detayli, senior için daha özet",
+        "AI'nin yazdigi dokümantasyon'u mutlaka review edin - yanlislik olabilir",
+        "Örneklerin çalıştığını dogrulayin"
       ]
     },
     {
       "task": "Refactoring",
       "recommended_model": "Claude Sonnet 4.5",
-      "prompt_template": "Asagidaki kodu refactor et.\n\nMevcut Kod:\n```\n[kodu yapistin]\n```\n\nRefactoring Amaci:\n- [ ] Okunabilirlik iyilestirme\n- [ ] Performans optimizasyonu\n- [ ] Design pattern uygulama\n- [ ] Code duplication kaldirma\n- [ ] SOLID prensipleri uygulama\n- [ ] Test edilebilirlik artirma\n\nKisitlamalar:\n- Dis arayuz (API/interface) degismemeli\n- [diger kisitlamalar]\n\n1. Refactor edilmis kodu ver\n2. Yapilan her degisikligi ve NEDEN yapildigini acikla\n3. Refactoring oncesi ve sonrasi farklari ozetle\n4. Potansiyel riskleri belirt",
+      "prompt_template": "Asagidaki kodu refactor et.\n\nMevcut Kod:\n```\n[kodu yapıştın]\n```\n\nRefactoring Amaci:\n- [ ] Okunabilirlik iyilestirme\n- [ ] Performans optimizasyonu\n- [ ] Design pattern uygulama\n- [ ] Code duplication kaldırma\n- [ ] SOLID prensipleri uygulama\n- [ ] Test edilebilirlik artirma\n\nKisitlamalar:\n- Dış arayüz (API/interface) değişmemeli\n- [diger kisitlamalar]\n\n1. Refactor edilmis kodu ver\n2. Yapılan her değişikliği ve NEDEN yapıldığını acikla\n3. Refactoring oncesi ve sonrasi farklari ozetle\n4. Potansiyel riskleri belirt",
       "tips": [
-        "Kucuk adimlarla refactor edin - buyuk degisiklikler risklidir",
+        "Küçük adimlarla refactor edin - büyük değişiklikler risklidir",
         "Her adimda testlerin gectiginden emin olun",
         "AI'ya NEDEN refactor ettigini aciklayin - daha uygun oneriler gelir"
       ]
     },
     {
-      "task": "Yeni Kavram Ogrenme",
+      "task": "Yeni Kavram Öğrenme",
       "recommended_model": "Claude Sonnet 4.5",
-      "prompt_template": "[Kavram adi] konusunu ogrenmek istiyorum.\n\nMevcut bilgi seviyem: [beginner / intermediate / advanced]\nBildigim iliskili teknolojiler: [listelenyin]\n\n1. Bu kavram ne ise yarar? Hangi problemi cozer?\n2. Bu problem onceden nasil cozuluyordu?\n3. 10 yasindaki birine nasil anlatirdin? (Feynman teknigi)\n4. Gercek dunya analojisi ver\n5. Minimal calisir bir ornek ver (Hello World seviyesinde)\n6. En yaygin 3 kullanim senaryosu nedir?\n7. Yeni baslayanlar hangi hatalari yapar?\n8. Ogrenme yol haritasi oner (ne sirada ogrenmeliyim?)",
+      "prompt_template": "[Kavram adi] konusunu öğrenmek istiyorum.\n\nMevcut bilgi seviyem: [beginner / intermediate / advanced]\nBildigim ilişkili teknolojiler: [listelenyin]\n\n1. Bu kavram ne işe yarar? Hangi problemi cozer?\n2. Bu problem önceden nasil cozuluyordu?\n3. 10 yasindaki birine nasil anlatırdın? (Feynman teknigi)\n4. Gerçek dünya analojisi ver\n5. Minimal çalışır bir örnek ver (Hello World seviyesinde)\n6. En yaygin 3 kullanım senaryosu nedir?\n7. Yeni başlayanlar hangi hatalari yapar?\n8. Öğrenme yol haritasi oner (ne sırada öğrenmeliyim?)",
       "tips": [
-        "Once genel resmi anlayin, sonra detaylara inin",
-        "AI'nin aciklamasini kendi cumlelerinizle tekrar edin",
-        "Mini projeler yaparak ogrenin - sadece okuyarak degil",
+        "Önce genel resmi anlayin, sonra detaylara inin",
+        "AI'nin açıklamasını kendi cumlelerinizle tekrar edin",
+        "Mini projeler yaparak öğrenin - sadece okuyarak değil",
         "Neden zincirleri kullanin - derinlesir"
       ]
     },
     {
-      "task": "Mulakat Hazirligi",
+      "task": "Mülakat Hazirligi",
       "recommended_model": "Claude Sonnet 4.5",
-      "prompt_template": "[Pozisyon: Junior/Mid/Senior Backend/Frontend/Fullstack Developer] pozisyonu icin teknik mulakat hazirligi yapiyorum.\n\nSirket/Sekttor: [varsa belirtin]\nMulakat turu: [teknik / sistem tasarimi / davranissal / live coding]\n\n1. Bu pozisyon icin en sik sorulan 10 teknik soruyu listele\n2. Her soru icin:\n   - Ideal cevap ornegi\n   - Cevaplarken kacinilmasi gereken hatalar\n   - Ek puan kazandiran detaylar\n3. Canli kodlama icin 3 ornek problem ve cozum stratejisi ver\n4. Sistem tasarimi sorusu ornegi ve yaklasim framework'u ver\n5. Mulakatci olarak bana soru sor ve cevabimi degerlendir",
+      "prompt_template": "[Pozisyon: Junior/Mid/Senior Backend/Frontend/Fullstack Developer] pozisyonu için teknik mülakat hazirligi yapıyorum.\n\nSirket/Sekttor: [varsa belirtin]\nMülakat türü: [teknik / sistem tasarımı / davranissal / live coding]\n\n1. Bu pozisyon için en sik sorulan 10 teknik soruyu listele\n2. Her soru için:\n   - Ideal cevap örneği\n   - Cevaplarken kacinilmasi gereken hatalar\n   - Ek puan kazandiran detaylar\n3. Canli kodlama için 3 örnek problem ve çözüm stratejisi ver\n4. Sistem tasarımı sorusu örneği ve yaklaşım framework'u ver\n5. Mülakatçı olarak bana soru sor ve cevabimi değerlendir",
       "tips": [
-        "AI'ya mulakatci rolu verin - soru sorsun, cevabinizi degerlendirinsin",
-        "Gercek mulakat kosullarini simule edin - sure sinirli, not almadan cevaplayin",
-        "Zayif noktalariniza odaklanin - iyi bildiginiz konulari tekrar etmeyin"
+        "AI'ya mülakatçı rolu verin - soru sorsun, cevabinizi değerlendirsinler",
+        "Gerçek mülakat koşullarını simule edin - süre sinirli, not almadan cevaplayin",
+        "Zayıf noktalariniza odaklanin - iyi bildiginiz konulari tekrar etmeyin"
       ]
     },
     {
       "task": "CV ve On Yazi Review",
       "recommended_model": "Claude Sonnet 4.5",
-      "prompt_template": "Asagidaki CV'mi / on yazimi review et.\n\nBasvurduguim pozisyon: [pozisyon adi]\nSirket: [sirket adi]\nIs ilani gereksinimleri:\n- [gereksinim 1]\n- [gereksinim 2]\n\nCV / On Yazi:\n[icerigi yapistin]\n\n1. Is ilani gereksinimleriyle ne kadar uyumlu?\n2. Eksik veya zayif noktalar neler?\n3. Guclu noktalar neler - bunlari nasil daha one cikaririm?\n4. Dil ve format iyilestirme onerileri\n5. ATS (Applicant Tracking System) uyumlulugu\n6. Her gereksinim icin CV'de eslesme analizi yap\n7. Iyilestirilmis versiyon oner",
+      "prompt_template": "Asagidaki CV'mi / on yazimi review et.\n\nBasvurduguim pozisyon: [pozisyon adi]\nSirket: [sirket adi]\nIs ilani gereksinimleri:\n- [gereksinim 1]\n- [gereksinim 2]\n\nCV / On Yazi:\n[içeriği yapıştın]\n\n1. Is ilani gereksinimleriyle ne kadar uyumlu?\n2. Eksik veya zayıf noktalar neler?\n3. Güçlü noktalar neler - bunlari nasil daha one cikaririm?\n4. Dil ve format iyilestirme önerileri\n5. ATS (Applicant Tracking System) uyumlulugu\n6. Her gereksinim için CV'de eslesme analizi yap\n7. Iyilestirilmis versiyon oner",
       "tips": [
-        "Her is ilani icin CV'nizi customize edin - tek CV her yere uymaz",
-        "AI'dan onerilen degisiklikleri anlayin, kor kopyalamayin",
-        "Gercekleri saptirmayin - AI ile daha iyi ifade edin, uyudurmayinn",
-        "Sayisal basarilar ekleyin: '%20 performans iyilestirmesi' gibi"
+        "Her is ilani için CV'nizi customize edin - tek CV her yere uymaz",
+        "AI'dan onerilen değişiklikleri anlayin, kor kopyalamayin",
+        "Gerçekleri saptirmayin - AI ile daha iyi ifade edin, uyudurmayinn",
+        "Sayısal başarılar ekleyin: '%20 performans iyilestirmesi' gibi"
       ]
     },
     {
       "task": "Proje Planlama",
       "recommended_model": "Claude Opus 4.6",
-      "prompt_template": "[Proje adi] projesini planlamam gerekiyor.\n\nProje Aciklamasi: [ne yapilacak]\nHedef: [MVP / v1.0 / feature ekleme]\n\nKisitlamalar:\n- Takim: [kisi sayisi ve rolleri]\n- Sure: [toplam sure]\n- Teknoloji stack: [mevcut stack]\n- Budget: [varsa]\n\n1. Projeyi epic'lere ve user story'lere bol\n2. Her story icin effort tahmini ver (story point veya gun)\n3. Dependency'leri belirle ve kritik yolu (critical path) ciz\n4. Sprint planlmasi olustur (2 haftalik sprintler)\n5. Risk analizi yap - neler ters gidebilir ve nasil hazirlanilir?\n6. MVP scope'u oner - minimum ne yapilmali ilk release icin?\n7. Tech debt ve gelecek iterasyonlar icin notlar",
+      "prompt_template": "[Proje adi] projesini planlamam gerekiyor.\n\nProje Açıklaması: [ne yapılacak]\nHedef: [MVP / v1.0 / feature ekleme]\n\nKisitlamalar:\n- Takim: [kisi sayısı ve rolleri]\n- Süre: [toplam süre]\n- Teknoloji stack: [mevcut stack]\n- Budget: [varsa]\n\n1. Projeyi epic'lere ve user story'lere bol\n2. Her story için effort tahmini ver (story point veya gun)\n3. Dependency'leri belirle ve kritik yolu (critical path) ciz\n4. Sprint planlmasi oluştur (2 haftalik sprintler)\n5. Risk analizi yap - neler ters gidebilir ve nasil hazirlanilir?\n6. MVP scope'u oner - minimum ne yapılmalı ilk release için?\n7. Tech debt ve gelecek iterasyonlar için notlar",
       "tips": [
-        "AI tahminlerini %20-30 arttirin - her zaman beklenenden uzun surer",
-        "MVP scope'u mumkun oldugunca kucuk tutun",
-        "Risk analizini ciddiye alin - AI'nin uyarilarini not edin",
-        "Plani ekiple paylasin ve feedback alin - AI plani baslangic noktasidir"
+        "AI tahminlerini %20-30 arttirin - her zaman beklenenden uzun sürer",
+        "MVP scope'u mümkün olduğunca küçük tutun",
+        "Risk analizini ciddiye alin - AI'nin uyarılarını not edin",
+        "Plani ekiple paylasin ve feedback alin - AI plani başlangıç noktasidir"
       ]
     }
   ],
@@ -420,77 +420,77 @@
     {
       "pattern": "Copy-Paste Coding",
       "icon": "📋",
-      "description": "AI'nin urrettigi kodu okumadan, anlamadan, test etmeden projeye yapisirmak. En yaygin ve en tehlikeli anti-pattern.",
+      "description": "AI'nin urrettigi kodu okumadan, anlamadan, test etmeden projeye yapıştırmak. En yaygin ve en tehlikeli anti-pattern.",
       "symptoms": [
-        "Kodu yapistirdiktan sonra ne yaptigini aciklayamama",
-        "Kucuk bir degisiklik gerektiginde tekrar AI'ya gitme zorunlulugu",
+        "Kodu yapıştırdıktan sonra ne yaptığını aciklayamama",
+        "Küçük bir değişiklik gerektiginde tekrar AI'ya gitme zorunlulugu",
         "Production'da beklenmedik davranislar ve bug'lar",
         "Code review'da kendi kodunuzu savunamama"
       ],
-      "better_approach": "AI'nin urrettigi kodu satir satir okuyun. Anlamadiginiz her satiri AI'ya sorun. Kodu kendi projenizin convention'larina uyarlayin. Test yazip calistirin. Ancak o zaman commit edin.",
+      "better_approach": "AI'nin urrettigi kodu satir satir okuyun. Anlamadiginiz her satiri AI'ya sorun. Kodu kendi projenizin convention'larina uyarlayin. Test yazip çalıştırın. Ancak o zaman commit edin.",
       "severity": "Kritik"
     },
     {
       "pattern": "AI'yi Oracle Olarak Kullanma",
       "icon": "🔮",
-      "description": "AI'nin her soyledigi her seyin dogru oldugunu varsaymak. AI hallucinate edebilir - uydurma library isimleri, yanlis API kullamimlari, guncel olmayan bilgiler verebilir.",
+      "description": "AI'nin her soyledigi her seyin doğru olduğunu varsaymak. AI hallucinate edebilir - uydurma library isimleri, yanlis API kullamimlari, güncel olmayan bilgiler verebilir.",
       "symptoms": [
-        "AI'nin onerdigi library'yi kontrol etmeden yuklemek",
-        "AI'nin verdigi bilgiyi dogrulamadan baskasina aktarmak",
-        "AI olmadan stack overflow'u bile olusmuyor hissiyati",
+        "AI'nin onerdigi library'yi kontrol etmeden yüklemek",
+        "AI'nin verdigi bilgiyi doğrulamadan baskasina aktarmak",
+        "AI olmadan stack overflow'u bile oluşmuyor hissiyati",
         "AI'nin cevabini sorgulamadan kabul etmek"
       ],
-      "better_approach": "AI cevaplarini her zaman dogrulayin. Onerilen library'lerin npm/pypi sayfasini kontrol edin. Kritik bilgileri resmi dokumantasyondan teyit edin. AI'ya 'Bundan emin misin? Kaynagn nedir?' diye sorun.",
-      "severity": "Yuksek"
+      "better_approach": "AI cevaplarini her zaman dogrulayin. Onerilen library'lerin npm/pypi sayfasini kontrol edin. Kritik bilgileri resmi dokümantasyondan teyit edin. AI'ya 'Bundan emin misin? Kaynagn nedir?' diye sorun.",
+      "severity": "Yüksek"
     },
     {
       "pattern": "Anlamadan Gecme (Skipping Understanding)",
       "icon": "⏭️",
-      "description": "AI sayesinde kodu calistirmak ama nasil calistigini anlamamak. Kisa vadede hizli gorunur, uzun vadede ogrenme ve buyumeyi engeller.",
+      "description": "AI sayesinde kodu çalıştırmak ama nasil çalıştığını anlamamak. Kisa vadede hızlı görünür, uzun vadede öğrenme ve buyumeyi engeller.",
       "symptoms": [
-        "Calisan kodu degistirememe korkusu",
-        "Ayni konuda tekrar tekrar AI'ya soru sorma",
-        "Teknik mulakatlarda basarisizlik",
-        "Takim icinde teknik tartismalara katilamamaa"
+        "Çalışan kodu değiştirememe korkusu",
+        "Aynı konuda tekrar tekrar AI'ya soru sorma",
+        "Teknik mülakatlarda başarısızlık",
+        "Takim içinde teknik tartismalara katilamamaa"
       ],
-      "better_approach": "Her AI cevabindan sonra kendinize sorun: 'Bunu AI olmadan yapabilir miyim?' Cevap hayirsa, kavramimrami ogrenin. AI'ya 'Bu nasil calisiyor?' ve 'Neden bu yaklasim?' sorularini sorun.",
-      "severity": "Yuksek"
+      "better_approach": "Her AI cevabindan sonra kendinize sorun: 'Bunu AI olmadan yapabilir miyim?' Cevap hayirsa, kavramimrami öğrenin. AI'ya 'Bu nasil çalışıyor?' ve 'Neden bu yaklaşım?' sorularini sorun.",
+      "severity": "Yüksek"
     },
     {
-      "pattern": "Baglam Vermeden Soru Sorma",
+      "pattern": "Bağlam Vermeden Soru Sorma",
       "icon": "🌫️",
-      "description": "AI'ya yetersiz baglam vererek soru sormak: 'calismiyor', 'hata veriyor', 'yardim et'. Bu tarz sorular yanlis veya genel cevaplara yol acar.",
+      "description": "AI'ya yetersiz bağlam vererek soru sormak: 'çalışmıyor', 'hata veriyor', 'yardım et'. Bu tarz sorular yanlis veya genel cevaplara yol acar.",
       "symptoms": [
         "AI'nin verdigi cevaplar hep yanlis veya alakasiz",
-        "Ayni soruyu 5-6 kez farkli sekilde sorma",
-        "Cok zaman harcama ama sonuca ulasmama",
-        "'AI ise yaramiyor' dusuncesi"
+        "Aynı soruyu 5-6 kez farklı sekilde sorma",
+        "Çok zaman harcama ama sonuca ulasmama",
+        "'AI işe yaramiyor' düşüncesi"
       ],
-      "better_approach": "Her soruda su bilgileri verin: Teknoloji stack, hata mesaji (oldugu gibi), ne yapilmak isteniyor, ne oldu, ne bekleniyrdu, denenen cozumler. Template kullanin - yukaridaki workflow template'lerini referans alin.",
+      "better_approach": "Her soruda su bilgileri verin: Teknoloji stack, hata mesaji (olduğu gibi), ne yapılmak isteniyor, ne oldu, ne bekleniyrdu, denenen çözümler. Template kullanin - yukarıdaki workflow template'lerini referans alin.",
       "severity": "Orta"
     },
     {
       "pattern": "Yanlis Model Secimi",
       "icon": "🔧",
-      "description": "Her is icin ayni modeli kullanmak. Basit bir debugging icin Opus kullanmak (pahali ve yavas) veya karmasik mimari tasarim icin lightweight model kullanmak (yetersiz sonuc).",
+      "description": "Her is için aynı modeli kullanmak. Basit bir debugging için Opus kullanmak (pahali ve yavas) veya karmaşık mimari tasarım için lightweight model kullanmak (yetersiz sonuç).",
       "symptoms": [
-        "AI maliyetlerinin gereksiz yuksek olmasi",
-        "Basit islerin cok uzun surmesi",
-        "Karmasik islerde yetersiz sonuc almak",
-        "Her model icin ayni beklentiye sahip olmak"
+        "AI maliyetlerinin gereksiz yüksek olmasi",
+        "Basit islerin çok uzun surmesi",
+        "Karmaşık islerde yetersiz sonuç almak",
+        "Her model için aynı beklentiye sahip olmak"
       ],
-      "better_approach": "Gunluk kodlama icin Sonnet 4.5 (hizli, ucuz). Karmasik mimari icin Opus 4.6 (derin analiz). Uzun dokumanlar ve gorseller icin Gemini 2.5 Pro (1M context). Is karmasikligina gore model secin.",
+      "better_approach": "Gunluk kodlama için Sonnet 4.5 (hızlı, ucuz). Karmaşık mimari için Opus 4.6 (derin analiz). Uzun dokümanlar ve görseller için Gemini 2.5 Pro (1M context). Is karmaşıklığına gore model secin.",
       "severity": "Orta"
     }
   ],
   "kesinlikle_not_al": [
-    "AI araci degil, dusunme partneridir - siz dusunmeyi birakmayin",
+    "AI aracı değil, düşünme partneridir - siz düşünmeyi bırakmayın",
     "Her AI cevabini dogrulayin - AI yanilabilir ve hallucinate edebilir",
-    "Gunluk isler icin Sonnet, karmasik isler icin Opus, uzun dokumanlar icin Gemini kullanin",
+    "Gunluk isler için Sonnet, karmaşık isler için Opus, uzun dokümanlar için Gemini kullanin",
     "Prompt kalitesi = Cevap kalitesi - iyi soru sormak bir beceridir",
-    "AI ile ogrenmeye devam edin - AI'yi dusunme kisa yolu olarak kullanmayin",
-    "Production kodunu AI'dan almadan once mutlaka test edin",
-    "Hassas verileri (API key, sifre, musteri bilgisi) AI'ya gondermeyin",
-    "AI'siz da calisabilecek seviyede olun - AI'ya bagimli kalmayin"
+    "AI ile öğrenmeye devam edin - AI'yi düşünme kisa yolu olarak kullanmayin",
+    "Production kodunu AI'dan almadan önce mutlaka test edin",
+    "Hassas verileri (API key, şifre, müşteri bilgisi) AI'ya gondermeyin",
+    "AI'siz da çalışabilecek seviyede olun - AI'ya bağımlı kalmayin"
   ]
 }

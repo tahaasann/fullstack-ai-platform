@@ -41,7 +41,7 @@ export default function ProjectListPage() {
                 </div>
                 <div className="text-right ml-4 shrink-0">
                   <div className="text-sm font-bold text-white">{pct}%</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-400">
                     {project.completed_milestones}/{project.total_milestones} milestone
                   </div>
                 </div>
@@ -55,7 +55,7 @@ export default function ProjectListPage() {
           );
         })}
         {projects.length === 0 && (
-          <p className="text-gray-500 text-sm text-center py-8">Henüz proje eklenmedi.</p>
+          <p className="text-gray-400 text-sm text-center py-8">Henüz proje eklenmedi.</p>
         )}
       </div>
     </div>
@@ -64,7 +64,7 @@ export default function ProjectListPage() {
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
-    not_started: { label: 'Başlanmadı', cls: 'bg-gray-800 text-gray-500' },
+    not_started: { label: 'Başlanmadı', cls: 'bg-gray-800 text-gray-400' },
     in_progress: { label: 'Devam Ediyor', cls: 'bg-blue-900/50 text-blue-400' },
     completed: { label: 'Tamamlandı', cls: 'bg-green-900/50 text-green-400' },
   };

@@ -64,7 +64,7 @@ export default function ProgressPage() {
             const minutes = Math.round(day.seconds / 60);
             return (
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <div className="text-xs text-gray-500">{minutes}dk</div>
+                <div className="text-xs text-gray-400">{minutes}dk</div>
                 <div
                   className="w-full bg-blue-500/60 rounded-sm transition-all"
                   style={{ height: `${h}%` }}
@@ -96,7 +96,7 @@ export default function ProgressPage() {
               <div key={phase.id}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-gray-200">{phase.icon} {phase.title}</span>
-                  <span className="text-xs text-gray-500">{pct}% · {phase.completed_lessons}/{phase.total_lessons} ders</span>
+                  <span className="text-xs text-gray-400">{pct}% · {phase.completed_lessons}/{phase.total_lessons} ders</span>
                 </div>
                 <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" style={{ width: `${pct}%` }} />
@@ -119,9 +119,9 @@ function StatDetail({ label, completed, total, extra, color }: {
   };
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-      <div className="text-xs text-gray-500 uppercase mb-2">{label}</div>
+      <div className="text-xs text-gray-400 uppercase mb-2">{label}</div>
       <div className={`text-2xl font-bold ${colorMap[color]}`}>{completed}/{total}</div>
-      <div className="text-xs text-gray-500 mt-1">{pct}% tamamlandı</div>
+      <div className="text-xs text-gray-400 mt-1">{pct}% tamamlandı</div>
       {extra && <div className="text-xs text-gray-600 mt-0.5">{extra}</div>}
     </div>
   );

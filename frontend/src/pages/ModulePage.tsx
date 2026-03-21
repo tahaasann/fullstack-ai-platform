@@ -22,14 +22,14 @@ export default function ModulePage() {
         <Link to="/modules" className="text-sm text-blue-400 hover:underline">← Modüller</Link>
         <h1 className="text-2xl font-bold text-white mt-2">{module.title}</h1>
         <p className="text-gray-400 mt-1">{module.description}</p>
-        <div className="text-sm text-gray-500 mt-2">Tahmini süre: {module.estimated_hours} saat</div>
+        <div className="text-sm text-gray-400 mt-2">Tahmini süre: {module.estimated_hours} saat</div>
       </div>
 
       {/* Lessons */}
       <div className="space-y-2 mb-8">
         <h2 className="text-lg font-semibold text-gray-300 mb-3">Dersler</h2>
         {module.lessons?.length === 0 && (
-          <p className="text-gray-500 text-sm italic">Bu modülün dersleri henüz eklenmedi.</p>
+          <p className="text-gray-400 text-sm italic">Bu modülün dersleri henüz eklenmedi.</p>
         )}
         {module.lessons?.map((lesson: Lesson, i: number) => (
           <Link
@@ -40,13 +40,13 @@ export default function ModulePage() {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
               lesson.status === 'completed' ? 'bg-green-600 text-white' :
               lesson.status === 'in_progress' ? 'bg-blue-600 text-white' :
-              'bg-gray-800 text-gray-500'
+              'bg-gray-800 text-gray-400'
             }`}>
               {lesson.status === 'completed' ? '✓' : i + 1}
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-gray-200">{lesson.title}</h3>
-              <p className="text-xs text-gray-500">{lesson.estimated_minutes} dakika</p>
+              <p className="text-xs text-gray-400">{lesson.estimated_minutes} dakika</p>
             </div>
             <div className="flex gap-1">
               {lesson.tags?.map((tag: string) => (
@@ -69,7 +69,7 @@ export default function ModulePage() {
             >
               <div>
                 <h3 className="text-sm font-medium text-gray-200">{quiz.title}</h3>
-                <p className="text-xs text-gray-500">{quiz.description}</p>
+                <p className="text-xs text-gray-400">{quiz.description}</p>
               </div>
               <div className="text-right">
                 {quiz.best_score !== null ? (
@@ -77,7 +77,7 @@ export default function ModulePage() {
                     %{quiz.best_score}
                   </span>
                 ) : (
-                  <span className="text-xs text-gray-500">Çözülmedi</span>
+                  <span className="text-xs text-gray-400">Çözülmedi</span>
                 )}
               </div>
             </Link>

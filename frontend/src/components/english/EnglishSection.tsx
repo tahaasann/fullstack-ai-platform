@@ -107,7 +107,7 @@ function VocabCard({ word }: { word: LessonVocabWord }) {
         <div className="mt-2">
           <p className="text-sm text-gray-400">{word.turkish || word.definition}</p>
           {word.example && (
-            <p className="text-xs text-gray-500 mt-1 italic">"{word.example}"</p>
+            <p className="text-xs text-gray-400 mt-1 italic">"{word.example}"</p>
           )}
         </div>
       ) : (
