@@ -630,7 +630,7 @@ git branch -d fix/typo-in-readme
 :::exercise
 ### Alistirma 1: GitHub Repository ve SSH Kurulumu (Kolay)
 
-GitHub hesabini yapilandir, SSH key olustur ve ilk repository'ni push et.
+GitHub hesabini yapilandir, SSH key oluştur ve ilk repository'ni push et.
 
 ```bash
 # 1. SSH key olustur
@@ -662,13 +662,13 @@ git log --oneline  # push edilen commit'i gor
 ```
 
 **Beklenen Sonuc:** SSH ile GitHub'a basariyla baglanmali. Repository GitHub'da gorunmeli. `git remote -v` dogru URL'i gostermeli.
-**Ipucu:** SSH key zaten varsa yeniden olusturmana gerek yok. `ls ~/.ssh/` ile kontrol et.
+**Ipucu:** SSH key zaten varsa yeniden oluşturmana gerek yok. `ls ~/.ssh/` ile kontrol et.
 
 ---
 
 ### Alistirma 2: Pull Request Workflow (Orta)
 
-Bir feature branch olustur, degisiklik yap, GitHub'a push et ve Pull Request ac.
+Bir feature branch oluştur, degisiklik yap, GitHub'a push et ve Pull Request ac.
 
 ```bash
 # 1. Onceki repo'da devam et (veya yeni bir repo clone et)
@@ -716,7 +716,7 @@ git push -u origin feature/add-about-page
 
 ### Alistirma 3: GitHub Actions ile CI Pipeline (Zor)
 
-Basit bir CI workflow olustur: her push'ta lint ve test calistiran bir GitHub Actions pipeline yaz.
+Basit bir CI workflow oluştur: her push'ta lint ve test çalıştıran bir GitHub Actions pipeline yaz.
 
 ```yaml
 # .github/workflows/ci.yml dosyasini olustur:
@@ -774,7 +774,7 @@ git push -u origin test/ci-trigger
 # GitHub'da PR ac ve Actions tab'ini kontrol et
 ```
 
-**Beklenen Sonuc:** Her push ve PR'da workflow otomatik tetiklenmeli. Actions tab'inda calisma logu gorunmeli. Basarili ise yesil tik, basarisiz ise kirmizi X gorunmeli.
+**Beklenen Sonuc:** Her push ve PR'da workflow otomatik tetiklenmeli. Actions tab'inda çalışma logu gorunmeli. Basarili ise yesil tik, basarisiz ise kirmizi X gorunmeli.
 **Ipucu:** Workflow dosyasi `.github/workflows/` dizininde olmali ve `.yml` uzantili olmali. `on` bolumunde hangi event'lerde calisacagini belirtirsin.
 :::
 
@@ -819,24 +819,24 @@ title: Bu Derste AI ile Öğren
 content: GitHub workflow'larini, PR best practice'lerini ve CI/CD pipeline kurulumunu AI destegi ile ogrenip uygula.
 model_recommendation: Claude Sonnet 4.5
 prompts:
-  - prompt: "Profesyonel bir Pull Request nasil yazilir? Baslik, aciklama, test plani ve screenshot'lar dahil ornek bir PR template olustur. Code Review sirasinda yapici feedback verme ornekleri goster."
-    why: "PR kalitesi profesyonel yazilim gelistirmenin temel olcutudur. Iyi PR yazmak hem kod kalitesini hem de takim iletisimini guclendirir."
-    follow_up: "GitHub Actions ile basit bir CI pipeline yazalim: push'ta lint, type-check ve test calistirsin. YAML syntax'ini ve her adimdaki mantigi acikla."
-  - prompt: "Bir acik kaynak projeye katkida bulunmak istiyorum. Fork, clone, upstream ekleme, branch olusturma, commit, push ve PR acma adimlarini sirala. CONTRIBUTING.md okuma ve 'good first issue' bulma ipuclari ver."
+  - prompt: "Profesyonel bir Pull Request nasil yazilir? Baslik, aciklama, test plani ve screenshot'lar dahil örnek bir PR template oluştur. Code Review sirasinda yapici feedback verme örnekleri goster."
+    why: "PR kalitesi profesyonel yazilim geliştirmenin temel olcutudur. Iyi PR yazmak hem kod kalitesini hem de takim iletisimini guclendirir."
+    follow_up: "GitHub Actions ile basit bir CI pipeline yazalim: push'ta lint, type-check ve test çalıştırsin. YAML syntax'ini ve her adimdaki mantigi acikla."
+  - prompt: "Bir acik kaynak projeye katkida bulunmak istiyorum. Fork, clone, upstream ekleme, branch oluşturma, commit, push ve PR acma adimlarini sirala. CONTRIBUTING.md okuma ve 'good first issue' bulma ipuclari ver."
     why: "Acik kaynak katki deneyimi portfolyo icin cok degerli ve is mulakatlarinda avantaj saglar."
-pair_programming_tip: "GitHub Actions workflow'u yazarken AI'a YAML dosyani yapistir: 'Bu CI pipeline'i incele. Eksik adimlar var mi? Cache kullanimi optimize edilebilir mi? Matrix strategy ile birden fazla Node versiyonunda test calistirmali miyim?'"
+pair_programming_tip: "GitHub Actions workflow'u yazarken AI'a YAML dosyani yapistir: 'Bu CI pipeline'i incele. Eksik adimlar var mi? Cache kullanimi optimize edilebilir mi? Matrix strategy ile birden fazla Node versiyonunda test çalıştırmali miyim?'"
 :::
 
 :::interview
 ## Mulakat Sorulari
 
-**Soru 1: Pull Request (PR) review surecinde nelere dikkat edersiniz?**
-- **Junior cevabi:** Kodun calisip calismadigina ve syntax hatarina bakarim.
-- **Senior cevabi:** Iyi bir PR review'da: 1) Is mantigi dogru mu (requirements karsilaniyor mu), 2) Edge case'ler handle ediliyor mu, 3) Test coverage yeterli mi, 4) Naming convention ve kod standartlarina uyuluyor mu, 5) Performance impact var mi, 6) Security vulnerability olusturuyor mu, 7) Breaking change var mi. Ayrica PR boyutu 200-400 satiri gecmemeli, buyuk degisiklikler parca parca review edilmeli. LGTM (Looks Good To Me) demek sorumluluk almak demektir.
+**Soru 1: Pull Request (PR) review sürecinde nelere dikkat edersiniz?**
+- **Junior cevabi:** Kodun calisip çalışmadigina ve syntax hatarina bakarim.
+- **Senior cevabi:** Iyi bir PR review'da: 1) Is mantigi dogru mu (requirements karsilaniyor mu), 2) Edge case'ler handle ediliyor mu, 3) Test coverage yeterli mi, 4) Naming convention ve kod standartlarina uyuluyor mu, 5) Performance impact var mi, 6) Security vulnerability oluşturuyor mu, 7) Breaking change var mi. Ayrica PR boyutu 200-400 satiri gecmemeli, buyuk degisiklikler parca parca review edilmeli. LGTM (Looks Good To Me) demek sorumluluk almak demektir.
 
 **Soru 2: GitHub Actions ile CI/CD pipeline nasil kurulur?**
 - **Junior cevabi:** YAML dosyasiyla test ve deploy islemlerini otomatiklestiririz.
-- **Senior cevabi:** `.github/workflows/` altinda YAML dosyalari ile tanimlanir. Temel pipeline: PR acildiginda lint + test + build calisir, main'e merge edildiginde deploy tetiklenir. Matrix strategy ile birden fazla Node/Python versiyonunda test edilir. Cache kullanarak (actions/cache) CI suresi %50-70 azaltilir. Branch protection rules ile CI gecmeyen PR'lar merge edilemez. Secrets management ile API key'ler guvenli saklanir. Self-hosted runner'lar ile ozel ortamlarda calistirilabilir.
+- **Senior cevabi:** `.github/workflows/` altinda YAML dosyalari ile tanimlanir. Temel pipeline: PR acildiginda lint + test + build calisir, main'e merge edildiginde deploy tetiklenir. Matrix strategy ile birden fazla Node/Python versiyonunda test edilir. Cache kullanarak (actions/cache) CI suresi %50-70 azaltilir. Branch protection rules ile CI gecmeyen PR'lar merge edilemez. Secrets management ile API key'ler guvenli saklanir. Self-hosted runner'lar ile ozel ortamlarda çalıştırilabilir.
 :::
 
 :::exercise

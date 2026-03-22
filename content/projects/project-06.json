@@ -304,7 +304,7 @@
             {
               "error": "ModuleNotFoundError: No module named 'fastapi'",
               "cause": "Sanal ortam aktif degil veya bagimliliklar kurulmamis.",
-              "fix": "source .venv/bin/activate ile sanal ortami aktif et, ardindan uv sync ile bagimliliklari kur."
+              "fix": "source .venv/bin/activate ile sanal ortamı aktif et, ardindan uv sync ile bagimliliklari kur."
             },
             {
               "error": "ERROR: [Errno 48] Address already in use: port 8000",
@@ -1056,13 +1056,13 @@
           "common_errors": [
             {
               "error": "sqlalchemy.exc.OperationalError: could not connect to server",
-              "cause": "PostgreSQL servisi calismiyor veya baglanti bilgileri yanlis.",
+              "cause": "PostgreSQL servisi calismiyor veya bağlantı bilgileri yanlis.",
               "fix": "PostgreSQL'in calistigindan emin ol: sudo systemctl start postgresql. DATABASE_URL'deki host, port ve veritabani adini kontrol et."
             },
             {
               "error": "FAILED: Target database is not up to date",
-              "cause": "Mevcut migration'lar uygulanmadan yeni migration olusturulmaya calisilmis.",
-              "fix": "Oence alembic upgrade head ile mevcut migration'lari uygula, sonra yeni migration olustur."
+              "cause": "Mevcut migration'lar uygulanmadan yeni migration oluşturulmaya calisilmis.",
+              "fix": "Oence alembic upgrade head ile mevcut migration'lari uygula, sonra yeni migration oluştur."
             },
             {
               "error": "ModuleNotFoundError: No module named 'asyncpg'",
@@ -1267,7 +1267,7 @@
             {
               "error": "openai.AuthenticationError: Incorrect API key provided",
               "cause": ".env dosyasindaki OPENAI_API_KEY gecersiz veya sueresi dolmus.",
-              "fix": "platform.openai.com > API Keys sayfasindan yeni bir key olustur ve .env dosyasini guencelle."
+              "fix": "platform.openai.com > API Keys sayfasindan yeni bir key oluştur ve .env dosyasini guencelle."
             },
             {
               "error": "openai.RateLimitError: Rate limit reached",
@@ -1879,7 +1879,7 @@
           "common_errors": [
             {
               "error": "StreamingResponse yields empty data",
-              "cause": "Provider'in stream() metodu hicbir chunk yield etmiyor veya baglanti erken kapaniyor.",
+              "cause": "Provider'in stream() metodu hicbir chunk yield etmiyor veya bağlantı erken kapaniyor.",
               "fix": "Provider'in stream metodunu ayri test et. Nginx/reverse proxy varsa X-Accel-Buffering: no header'ini ekle."
             },
             {
@@ -2147,11 +2147,11 @@
             {
               "error": "json.decoder.JSONDecodeError: Expecting value",
               "cause": "Redis'ten okunan veri bozuk veya bos.",
-              "fix": "Redis'teki cache'i temizle: redis-cli FLUSHALL. Cache key olusturma mantigini kontrol et."
+              "fix": "Redis'teki cache'i temizle: redis-cli FLUSHALL. Cache key oluşturma mantigini kontrol et."
             },
             {
               "error": "sqlalchemy.exc.ProgrammingError: relation 'usage_logs' does not exist",
-              "cause": "Alembic migration'lari uygulanmamis, tablolar olusturulmamis.",
+              "cause": "Alembic migration'lari uygulanmamis, tablolar oluşturulmamis.",
               "fix": "alembic upgrade head komutu ile tuem migration'lari uygula."
             }
           ]
@@ -2165,7 +2165,7 @@
       "steps": [
         {
           "title": "Production Build",
-          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "instructions": "Uygulamayi production modda build et, tum testleri çalıştır, Lighthouse audit yap",
           "code_snippet": "pnpm build && pnpm test",
           "step": 1,
           "substeps": [
@@ -2239,7 +2239,7 @@
           "common_errors": [
             {
               "error": "docker build failed: pip install uv failed",
-              "cause": "Docker build sirasinda ag baglantisi sorunu veya pip versiyonu eski.",
+              "cause": "Docker build sirasinda ag bağlantısi sorunu veya pip versiyonu eski.",
               "fix": "Docker'in internet erisimi oldugundan emin ol. RUN pip install --upgrade pip && pip install uv seklinde guencelle."
             },
             {
@@ -2543,7 +2543,7 @@
       "docker",
       "ai-content-generation"
     ],
-    "when_to_create": "Milestone 1'in 2. adimini (Provider Abstraction Layer) bitirdiginde repo'yu olustur. Ilk commit docker-compose + proje yapisi olmali.",
+    "when_to_create": "Milestone 1'in 2. adimini (Provider Abstraction Layer) bitirdiginde repo'yu oluştur. Ilk commit docker-compose + proje yapisi olmali.",
     "pin_on_profile": true,
     "pin_priority": 4,
     "readme_sections": [
@@ -2609,17 +2609,17 @@
     "code_review": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "Review this AI content platform code (FastAPI + LangChain + OpenAI/Anthropic/Gemini) for: provider abstraction pattern correctness, prompt template management and versioning, streaming response implementation, token usage tracking and cost calculation, rate limiting per provider, error handling and fallback between providers, Redis caching for LLM responses, and evaluation pipeline accuracy. Also review fine-tuning code for LoRA configuration and training data preparation.",
-      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle provider switching mantigi, prompt engineering ve fine-tuning pipeline icin"
+      "when_to_use": "Her step tamamlandiktan sonra kullan — özellikle provider switching mantigi, prompt engineering ve fine-tuning pipeline icin"
     },
     "debugging": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "I'm getting this error in my AI content platform (FastAPI + LangChain + OpenAI/Anthropic/Gemini + HuggingFace): [error]. The relevant code is: [code]. Provider config: [config]. I'm trying to [goal].",
-      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle LLM API hatalari, streaming sorunlari, fine-tuning CUDA/memory hatalari ve provider fallback mantigi icin"
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — özellikle LLM API hatalari, streaming sorunlari, fine-tuning CUDA/memory hatalari ve provider fallback mantigi icin"
     },
     "research": {
       "model": "Gemini 2.5 Pro",
       "prompt_template": "Explain [concept] with practical examples for a multi-LLM content platform. Topics I need help with: OpenAI/Anthropic/Gemini API differences and best practices, LangChain chain composition and output parsers, PEFT/LoRA fine-tuning on consumer GPUs, prompt engineering techniques (few-shot, chain-of-thought), BLEU/ROUGE evaluation metrics, AI-as-Judge evaluation pattern, token cost optimization strategies, and streaming response handling.",
-      "when_to_use": "Yeni bir LLM konsepti veya fine-tuning teknigi ogrenirken kullan — ozellikle LoRA, prompt engineering ve evaluation metrikleri icin"
+      "when_to_use": "Yeni bir LLM konsepti veya fine-tuning teknigi ogrenirken kullan — özellikle LoRA, prompt engineering ve evaluation metrikleri icin"
     }
   },
   "deployment_guide": {
@@ -2644,7 +2644,7 @@
           "# platform.openai.com > API Keys",
           "# console.anthropic.com > API Keys"
         ],
-        "instructions": "Her iki provider icin API key olustur. Budget limit ayarla"
+        "instructions": "Her iki provider icin API key oluştur. Budget limit ayarla"
       },
       {
         "title": "Backend Deploy (Railway)",
@@ -2673,7 +2673,7 @@
     "estimated_time": "40 dakika",
     "cost": "~$5-20/ay (LLM API kullanima gore)",
     "demo_checklist": [
-      "Icerik uretimi calisiyor (blog, sosyal medya, email)",
+      "Icerik üretimi calisiyor (blog, sosyal medya, email)",
       "Provider degistirme (OpenAI/Anthropic) calisiyor",
       "Prompt versioning ve A/B test",
       "Maliyet takibi dogru",
@@ -2686,7 +2686,7 @@
       "Proje aciklamasi ve motivasyon (2-3 cumle)",
       "Canli demo linki (Vercel/Railway badge ile)",
       "Teknoloji stack badge'leri",
-      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Ekran goruntuleri (en az 3: dashboard, ana özellik, mobile)",
       "Mimari diyagram (ASCII veya draw.io)",
       "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
       "API dokumantasyonu (/docs linki veya Postman collection)",
@@ -2694,7 +2694,7 @@
     ],
     "screenshot_suggestions": [
       "Dashboard/Anasayfa",
-      "Ana ozellik ekrani",
+      "Ana özellik ekrani",
       "Mobile gorunum"
     ],
     "live_demo_url_template": "https://ai-content-platform.vercel.app",
@@ -2702,10 +2702,10 @@
   },
   "transition_guide": {
     "prerequisites": [
-      "Python ve FastAPI ile backend gelistirme",
+      "Python ve FastAPI ile backend geliştirme",
       "LLM API kullanimi (OpenAI, Anthropic)",
       "Temel prompt engineering bilgisi",
-      "Next.js ile frontend gelistirme"
+      "Next.js ile frontend geliştirme"
     ],
     "what_you_should_know": [
       "Phase 5 Module 16 - Transformers ve modern AI",
@@ -2714,6 +2714,6 @@
       "Phase 4 Module 13 - Docker ve CI/CD"
     ],
     "next_project": "project-07",
-    "skills_bridge": "Bu projede ogrendigin multi-provider LLM entegrasyonu, prompt template yonetimi ve AI content pipeline bilgisi, sonraki projede RAG sistemi ve vektor veritabani kullanimi icin temel olusturacak."
+    "skills_bridge": "Bu projede ogrendigin multi-provider LLM entegrasyonu, prompt template yonetimi ve AI content pipeline bilgisi, sonraki projede RAG sistemi ve vektor veritabani kullanimi icin temel oluşturacak."
   }
 }

@@ -26,12 +26,12 @@
       "question": "Higher-Order Component (HOC) kullanirken asagidakilerden hangisi bir performans bug'ina neden olur?",
       "options": [
         "HOC'u module seviyesinde (component disinda) tanimlamak",
-        "HOC'u render metodu icinde olusturmak",
+        "HOC'u render metodu icinde oluşturmak",
         "HOC'a displayName atamak",
         "HOC ile props forwarding yapmak"
       ],
       "correct": 1,
-      "explanation": "HOC'u render icinde olusturmak (ornegin const Enhanced = withAuth(Dashboard) satirini component body'sinde yazmak), her render'da yeni bir component referansi olusturur. React bunu tamamen yeni bir component olarak gorur, onceki component'i unmount edip yenisini mount eder. Bu da tum state'in kaybolmasina ve gereksiz re-render'lara neden olur.",
+      "explanation": "HOC'u render icinde oluşturmak (örneğin const Enhanced = withAuth(Dashboard) satirini component body'sinde yazmak), her render'da yeni bir component referansi oluşturur. React bunu tamamen yeni bir component olarak gorur, onceki component'i unmount edip yenisini mount eder. Bu da tum state'in kaybolmasina ve gereksiz re-render'lara neden olur.",
       "difficulty": "orta",
       "points": 10
     },
@@ -79,8 +79,10 @@
       "type": "code_completion",
       "question": "TanStack Query ile bir mutation sonrasi ilgili query cache'ini gecersiz kilmak icin asagidaki kodu tamamla:",
       "code_template": "const queryClient = useQueryClient();\n\nconst deleteMutation = useMutation({\n  mutationFn: (id) => api.delete(`/users/${id}`),\n  onSuccess: () => {\n    queryClient._____({\n      queryKey: [\"users\"]\n    });\n  },\n});",
-      "correct_answers": ["invalidateQueries"],
-      "explanation": "queryClient.invalidateQueries() metodu, belirtilen queryKey'e sahip tum query'leri 'stale' olarak isaretler ve aktif olanlari otomatik refetch eder. Mutation (olusturma, guncelleme, silme) sonrasi ilgili query'leri invalidate etmek, cache'in guncel kalmasini saglar.",
+      "correct_answers": [
+        "invalidateQueries"
+      ],
+      "explanation": "queryClient.invalidateQueries() metodu, belirtilen queryKey'e sahip tum query'leri 'stale' olarak isaretler ve aktif olanlari otomatik refetch eder. Mutation (oluşturma, guncelleme, silme) sonrasi ilgili query'leri invalidate etmek, cache'in guncel kalmasini saglar.",
       "difficulty": "orta",
       "points": 10
     },
@@ -89,8 +91,10 @@
       "type": "code_completion",
       "question": "Axios interceptor ile her request'e Authorization header eklemek icin asagidaki kodu tamamla:",
       "code_template": "api.interceptors._____.use(\n  (config) => {\n    const token = localStorage.getItem(\"accessToken\");\n    if (token) {\n      config.headers.Authorization = `Bearer ${token}`;\n    }\n    return config;\n  },\n  (error) => Promise.reject(error)\n);",
-      "correct_answers": ["request"],
-      "explanation": "Axios'ta interceptors.request.use() metodu, her HTTP istegi gonderilmeden ONCE calisir. Bu, her istege otomatik olarak Authorization header eklemek icin ideal yerdir. interceptors.response.use() ise sunucu yanitI aldiktan SONRA calisir (ornegin 401 hatasi yakalayip token yenilemek icin).",
+      "correct_answers": [
+        "request"
+      ],
+      "explanation": "Axios'ta interceptors.request.use() metodu, her HTTP istegi gonderilmeden ONCE calisir. Bu, her istege otomatik olarak Authorization header eklemek icin ideal yerdir. interceptors.response.use() ise sunucu yanitI aldiktan SONRA calisir (örneğin 401 hatasi yakalayip token yenilemek icin).",
       "difficulty": "kolay",
       "points": 10
     },
@@ -99,8 +103,19 @@
       "type": "explain_code",
       "question": "Asagidaki React kodu ne yapar? Optimistic update mekanizmasini adim adim acikla.",
       "code": "const likeMutation = useMutation({\n  mutationFn: () => api.post(`/posts/${postId}/like`),\n  onMutate: async () => {\n    await queryClient.cancelQueries({ queryKey: ['posts', postId] });\n    const previous = queryClient.getQueryData(['posts', postId]);\n    queryClient.setQueryData(['posts', postId], (old) => ({\n      ...old,\n      likes: old.likes + 1,\n      isLiked: true,\n    }));\n    return { previous };\n  },\n  onError: (err, vars, context) => {\n    queryClient.setQueryData(['posts', postId], context.previous);\n  },\n  onSettled: () => {\n    queryClient.invalidateQueries({ queryKey: ['posts', postId] });\n  },\n});",
-      "correct_keywords": ["optimistic update", "onMutate", "cache", "rollback", "cancelQueries", "setQueryData", "invalidateQueries", "previous", "onError", "geri al"],
-      "sample_answer": "Bu kod bir optimistic update (iyimser guncelleme) pattern'i uygular: 1) onMutate: Sunucuya istek gondermeden ONCE calisan callback. Devam eden fetch'leri iptal eder (cancelQueries), mevcut cache verisini kaydeder (rollback icin), ve cache'i aninda gunceller (likes + 1, isLiked: true). Kullanici begeni butonuna tikladiginda UI aninda guncellenir. 2) onError: Sunucu hatasi donerse, onceden kaydedilen 'previous' verisiyle cache eski haline dondurulur (rollback). 3) onSettled: Basari veya hata farketmeksizin, sunucudan guncel veriyi almak icin query invalidate edilir. Bu pattern, kullaniciya aninda geri bildirim verirken veri tutarlIlIgInI korur.",
+      "correct_keywords": [
+        "optimistic update",
+        "onMutate",
+        "cache",
+        "rollback",
+        "cancelQueries",
+        "setQueryData",
+        "invalidateQueries",
+        "previous",
+        "onError",
+        "geri al"
+      ],
+      "sample_answer": "Bu kod bir optimistic update (iyimser guncelleme) pattern'i uygular: 1) onMutate: Sunucuya istek göndermeden ONCE calisan callback. Devam eden fetch'leri iptal eder (cancelQueries), mevcut cache verisini kaydeder (rollback icin), ve cache'i aninda gunceller (likes + 1, isLiked: true). Kullanici begeni butonuna tikladiginda UI aninda guncellenir. 2) onError: Sunucu hatasi donerse, onceden kaydedilen 'previous' verisiyle cache eski haline dondurulur (rollback). 3) onSettled: Basari veya hata farketmeksizin, sunucudan guncel veriyi almak icin query invalidate edilir. Bu pattern, kullaniciya aninda geri bildirim verirken veri tutarlIlIgInI korur.",
       "difficulty": "zor",
       "points": 20
     },

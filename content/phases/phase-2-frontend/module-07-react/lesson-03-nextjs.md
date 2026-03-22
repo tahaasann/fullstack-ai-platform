@@ -512,7 +512,7 @@ explanation: "Blog yazıları nadiren değişir ve SEO kritiktir. SSG ile build 
 :::exercise
 ### Alistirma 1: Next.js App Router ile Blog Sayfalari (Kolay)
 
-Next.js App Router kullanarak 3 sayfali bir blog uygulamasi olustur: ana sayfa, blog listesi ve dinamik blog detay.
+Next.js App Router kullanarak 3 sayfali bir blog uygulamasi oluştur: ana sayfa, blog listesi ve dinamik blog detay.
 
 ```tsx
 // app/page.tsx — Ana Sayfa (Server Component)
@@ -557,8 +557,8 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
 }
 ```
 
-**Beklenen Sonuc:** / ana sayfa, /blog liste, /blog/nextjs-giris detay sayfasi gorunmeli. Dynamic routing calismali. Server Component'te veri fetch edilmeli.
-**Ipucu:** `npx create-next-app@latest --typescript --tailwind --app` ile proje olustur. Link icin `import Link from "next/link"`.
+**Beklenen Sonuc:** / ana sayfa, /blog liste, /blog/nextjs-giris detay sayfasi gorunmeli. Dynamic routing çalışmali. Server Component'te veri fetch edilmeli.
+**Ipucu:** `npx create-next-app@latest --typescript --tailwind --app` ile proje oluştur. Link icin `import Link from "next/link"`.
 
 ---
 
@@ -612,14 +612,14 @@ export function LikeButton({ postId }: { postId: number }) {
 }
 ```
 
-**Beklenen Sonuc:** Sayfa Server Component olarak render edilmeli (JavaScript bundle'a eklenmemeli). Sadece LikeButton client-side calismali. ISR ile 60 saniyede bir yenilenmeli.
+**Beklenen Sonuc:** Sayfa Server Component olarak render edilmeli (JavaScript bundle'a eklenmemeli). Sadece LikeButton client-side çalışmali. ISR ile 60 saniyede bir yenilenmeli.
 **Ipucu:** "use client" direktifi sadece interaktif component'lere ekle. Veri cekme islemlerini Server Component'te yap.
 
 ---
 
 ### Alistirma 3: API Route ve Middleware (Zor)
 
-Next.js API route ile REST endpoint olustur ve middleware ile auth kontrolu ekle.
+Next.js API route ile REST endpoint oluştur ve middleware ile auth kontrolu ekle.
 
 ```tsx
 // app/api/posts/route.ts — API Route
@@ -669,7 +669,7 @@ export const config = {
 };
 ```
 
-**Beklenen Sonuc:** GET /api/posts filtreleme ve pagination ile calismali. POST /api/posts yeni yazi eklemeli. /dashboard'a token olmadan erismeye calisinca /login'e yonlendirmeli.
+**Beklenen Sonuc:** GET /api/posts filtreleme ve pagination ile çalışmali. POST /api/posts yeni yazi eklemeli. /dashboard'a token olmadan erismeye calisinca /login'e yonlendirmeli.
 **Ipucu:** `new URL(request.url).searchParams` ile query parametrelerini oku. Middleware sadece edge runtime'da calisir.
 :::
 
@@ -678,13 +678,13 @@ export const config = {
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "Next.js App Router'da Server Components ve Client Components arasindaki siniri nasil cizersin? 'use client' direktifini nereye koydugun bundle size'i nasil etkiler? Bir sayfada %80 Server Component, %20 Client Component olmasi icin component agacini nasil tasarlarim? Gercek orneklerle acikla."
+> "Next.js App Router'da Server Components ve Client Components arasindaki siniri nasil cizersin? 'use client' direktifini nereye koydugun bundle size'i nasil etkiler? Bir sayfada %80 Server Component, %20 Client Component olmasi icin component agacini nasil tasarlarim? Gercek örneklerle acikla."
 
 **2. Pratik Uygulama:**
-> "Next.js App Router ile bir blog uygulamasi olustur: SSG ile blog listesi (generateStaticParams), ISR ile blog detay (revalidate: 60), Server Component'te dogrudan fetch, Client Component ile begeni butonu (useState), dynamic metadata ve loading.tsx ile skeleton UI. Tum dosya yapisini ve kodlari ver."
+> "Next.js App Router ile bir blog uygulamasi oluştur: SSG ile blog listesi (generateStaticParams), ISR ile blog detay (revalidate: 60), Server Component'te dogrudan fetch, Client Component ile begeni butonu (useState), dynamic metadata ve loading.tsx ile skeleton UI. Tum dosya yapisini ve kodlari ver."
 > Takip: "Simdi bu blog'a Server Actions ile yorum ekleme ozelligi ekle. API route yerine 'use server' kullan ve optimistic update ile UI'i aninda guncelle."
 
 **3. Mukemmellik Icin:**

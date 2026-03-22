@@ -40,7 +40,7 @@ ML kodu yazarken AI'a model performans metriklerini göster ve sor: "Bu confusio
 - **Senior cevabi:** Overfitting, modelin training set'teki noise'u ogrenip generalize edememesidir. Tespiti: training accuracy yüksek ama validation accuracy düşük. Onleme yöntemleri: 1) Daha fazla veri (data augmentation dahil), 2) Regularization (L1/Lasso sparse model, L2/Ridge küçük weight'ler), 3) Cross-validation (k-fold ile gerçekçi performans tahmini), 4) Early stopping (validation loss artmaya basladiginda dur), 5) Dropout (neural network'lerde), 6) Feature selection (gereksiz feature'lari çıkar), 7) Ensemble methods (bagging variance'i azaltır). Bias-variance tradeoff: basit model = high bias (underfitting), karmaşık model = high variance (overfitting). Sweet spot learning curve analizi ile bulunur.
 
 **Soru 2: Feature engineering nedir ve model performansini nasil etkiler?**
-- **Junior cevabi:** Mevcut veriden yeni özellikler olusturmaktir.
+- **Junior cevabi:** Mevcut veriden yeni özellikler oluşturmaktir.
 - **Senior cevabi:** Feature engineering, domain knowledge kullanarak raw data'dan anlamli özellikler cikarmadir ve model performansini %20-50 artirabilir. Teknikler: one-hot encoding (kategorik veriler), scaling (StandardScaler, MinMaxScaler), polynomial features (non-linear iliskiler), datetime decomposition (yil/ay/gun/saat), text vectorization (TF-IDF, word embeddings), interaction features (A*B). Feature selection: correlation analysis, mutual information, recursive feature elimination. Data leakage riski: test verisinden bilgi sizmasi, örneğin target encoding'de fold-based yapilmazsa leakage olur. Pipeline ile preprocessing + model birlestirilir ve leakage onlenir.
 :::
 
@@ -1185,7 +1185,7 @@ print(f"\nMissing values:\n{df.isnull().sum()}")
 # TODO: Feature dagilimlarini boxplot ile goruntule (outlier tespiti)
 ```
 
-**Beklenen Sonuc:** Dataset 20640 satir, 8 feature icermeli. MedInc (medyan gelir) hedef degiskenle en yuksek korelasyona sahip olmali. Ev fiyatlarinda 5.0'da kesme (capping) gorulmeli.
+**Beklenen Sonuc:** Dataset 20640 satir, 8 feature icermeli. MedInc (medyan gelir) hedef değişkenle en yuksek korelasyona sahip olmali. Ev fiyatlarinda 5.0'da kesme (capping) gorulmeli.
 **Ipucu:** `df.corr()["MedHouseVal"].sort_values(ascending=False)` ile korelasyonlari sirala.
 
 ---
@@ -1389,7 +1389,7 @@ df["bina_durumu"] = pd.cut(df["bina_yasi"], bins=[0, 5, 15, 50], labels=["yeni",
 ```
 
 **Beklenen Sonuc:** Feature engineering sonrasi model R2 skoru artmali. Log transform ile fiyat dagilimi normal'e yaklasmali. Polynomial feature'lar non-linear iliskileri yakalamalı.
-**Ipucu:** Feature engineering model performansini %20-50 artirabilir. Domain bilgisi en iyi feature'lari olusturur.
+**Ipucu:** Feature engineering model performansini %20-50 artirabilir. Domain bilgisi en iyi feature'lari oluşturur.
 
 ---
 
@@ -1480,7 +1480,7 @@ df["rolling_30"] = df["satis"].rolling(30).mean()
 
 ### Alistirma 8: Ensemble Learning — Stacking (Orta)
 
-Birden fazla modeli birlestirerek daha guclu bir tahmin modeli olustur.
+Birden fazla modeli birlestirerek daha guclu bir tahmin modeli oluştur.
 
 ```python
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, StackingClassifier
@@ -1523,7 +1523,7 @@ stacking = StackingClassifier(
 
 ### Alistirma 9: ML Pipeline ve Reproducibility (Zor)
 
-End-to-end ML pipeline olustur: veri yukleme, preprocessing, training, evaluation.
+End-to-end ML pipeline oluştur: veri yukleme, preprocessing, training, evaluation.
 
 ```python
 from sklearn.pipeline import Pipeline
@@ -1606,6 +1606,303 @@ shap.force_plot(explainer.expected_value, shap_values[0], X_test[0], feature_nam
 **Beklenen Sonuc:** SHAP ile her feature'in tahmine katkisi gorunmeli. LIME ve SHAP benzer sonuclar vermeli. Top-5 feature ile model performansi %90+ korunmali.
 **Ipucu:** SHAP Shapley value'lara dayanir (oyun teorisi). Pozitif SHAP degeri tahimini arttirir, negatif azaltir. TreeExplainer agac modelleri icin O(TLD) hizinda calisir.
 :::
+
+:::exercise
+### Alistirma 11: Pandas ile Veri Kesfetme (EDA) (Kolay)
+
+Bir veri setini Pandas ile kesfet ve temizle.
+
+```python
+import pandas as pd
+import numpy as np
+
+# TODO: Ornek veri seti olustur veya yukle
+# df = pd.read_csv('data.csv')
+
+# TODO: Temel EDA adimlari
+# df.shape, df.dtypes, df.describe()
+# df.isnull().sum()  # Eksik deger analizi
+# df.duplicated().sum()  # Duplike kontrol
+
+# TODO: Eksik degerleri doldur
+# Sayisal: median, ortalama veya interpolation
+# Kategorik: mod veya 'unknown'
+
+# TODO: Outlier tespiti
+# IQR yontemi: Q1 - 1.5*IQR, Q3 + 1.5*IQR
+# Z-score yontemi: |z| > 3
+
+# TODO: Feature engineering
+# Tarih sutunundan yil, ay, gun cikar
+# Kategorik degiskenleri encode et (one-hot, label)
+```
+
+**Beklenen Sonuc:** Eksik degerler ve outlier'lar tespit edilmeli. Veri seti modelleme icin hazir hale getirilmeli.
+**Ipucu:** EDA'da %80 zaman veri temizleme ve hazirlama, %20 modelleme. `df.info()` ve `df.describe()` ilk adimin.
+:::
+
+:::exercise
+### Alistirma 12: Scikit-learn ile Temel ML Modelleri (Kolay)
+
+Scikit-learn ile classification ve regression modelleri kur.
+
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report
+
+# TODO: Veri hazirla
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+# scaler = StandardScaler()
+# X_train_scaled = scaler.fit_transform(X_train)
+# X_test_scaled = scaler.transform(X_test)
+
+# TODO: 3 farkli model egit ve karsilastir
+# 1. Logistic Regression
+# 2. Random Forest
+# 3. SVM
+
+# TODO: Her model icin accuracy, precision, recall, F1 hesapla
+# TODO: Confusion matrix gorsellestir
+# TODO: En iyi modeli sec ve nedenini acikla
+```
+
+**Beklenen Sonuc:** 3 model egitilmeli. Metrikler karsilastirilmali. En iyi model secilmeli.
+**Ipucu:** `fit_transform` sadece train'de, `transform` test'te kullan. Aksi halde data leakage olur!
+:::
+
+:::exercise
+### Alistirma 13: Cross-Validation ve Hyperparameter Tuning (Kolay)
+
+Model secimi ve hyperparameter optimizasyonu yap.
+
+```python
+from sklearn.model_selection import cross_val_score, GridSearchCV
+
+# TODO: 5-fold cross-validation uygula
+# scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+# print(f"Mean: {scores.mean():.3f}, Std: {scores.std():.3f}")
+
+# TODO: GridSearchCV ile hyperparameter ara
+# param_grid = {
+#     'n_estimators': [50, 100, 200],
+#     'max_depth': [3, 5, 10, None],
+#     'min_samples_split': [2, 5, 10]
+# }
+# grid = GridSearchCV(RandomForestClassifier(), param_grid, cv=5)
+# grid.fit(X_train, y_train)
+# print(f"Best params: {grid.best_params_}")
+
+# TODO: RandomizedSearchCV ile daha hizli arama yap
+# TODO: Learning curve ciz (overfitting/underfitting tespiti)
+```
+
+**Beklenen Sonuc:** Best hyperparameter'lar bulunmali. Cross-validation skoru stabil olmali. Learning curve cizilmeli.
+**Ipucu:** GridSearchCV tum kombinasyonlari dener (yavas). RandomizedSearchCV rastgele ornekler (hizli). Buyuk arama uzayinda Randomized tercih et.
+:::
+
+:::exercise
+### Alistirma 14: Feature Engineering ve Selection (Orta)
+
+Feature muhendisligi ve secimi uygula.
+
+```python
+from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.decomposition import PCA
+
+# TODO: Yeni feature'lar olustur
+# df['age_income_ratio'] = df['age'] / df['income']
+# df['experience_per_year'] = df['experience'] / df['age']
+
+# TODO: SelectKBest ile en iyi K feature'i sec
+# selector = SelectKBest(f_classif, k=5)
+# X_selected = selector.fit_transform(X, y)
+
+# TODO: PCA ile boyut azaltma
+# pca = PCA(n_components=0.95)  # %95 variance korunsun
+# X_pca = pca.fit_transform(X_scaled)
+
+# TODO: Feature importance (Random Forest ile)
+# importances = model.feature_importances_
+# TODO: Correlation matrix gorsellestir
+# TODO: Multicollinearity kontrolu (VIF)
+```
+
+**Beklenen Sonuc:** En onemli feature'lar belirlenmeli. PCA ile boyut azaltilmali. Gereksiz feature'lar cikarilmali.
+**Ipucu:** Correlation > 0.9 olan feature ciftlerinden birini cikar (multicollinearity). PCA oncesi mutlaka scaling yap.
+:::
+
+:::exercise
+### Alistirma 15: Ensemble Methods Karsilastirmasi (Orta)
+
+Bagging, Boosting ve Stacking yontemlerini karsilastir.
+
+```python
+from sklearn.ensemble import (
+    RandomForestClassifier,     # Bagging
+    GradientBoostingClassifier, # Boosting
+    StackingClassifier          # Stacking
+)
+
+# TODO: RandomForest (Bagging) egit
+# TODO: GradientBoosting egit
+# TODO: XGBoost egit (pip install xgboost)
+# TODO: LightGBM egit (pip install lightgbm)
+
+# TODO: Stacking ensemble olustur
+# estimators = [
+#     ('rf', RandomForestClassifier()),
+#     ('gb', GradientBoostingClassifier()),
+# ]
+# stacking = StackingClassifier(estimators=estimators, final_estimator=LogisticRegression())
+
+# TODO: Tum modellerin performansini karsilastir
+# TODO: Bagging vs Boosting farklarini acikla
+```
+
+**Beklenen Sonuc:** Ensemble yontemleri tek modelden daha iyi performans gostermeli. Her yontemin avantaji aciklanmali.
+**Ipucu:** Bagging: variance azaltir (paralel agaclar). Boosting: bias azaltir (sirali agaclar). XGBoost/LightGBM Kaggle'da en populer.
+:::
+
+:::exercise
+### Alistirma 16: Pipeline ve Model Persistence (Orta)
+
+Sklearn Pipeline ile end-to-end ML workflow olustur.
+
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+import joblib
+
+# TODO: Preprocessing + Model pipeline olustur
+# numeric_transformer = Pipeline([
+#     ('scaler', StandardScaler())
+# ])
+# categorical_transformer = Pipeline([
+#     ('encoder', OneHotEncoder(handle_unknown='ignore'))
+# ])
+# preprocessor = ColumnTransformer([
+#     ('num', numeric_transformer, numeric_features),
+#     ('cat', categorical_transformer, categorical_features)
+# ])
+# pipeline = Pipeline([
+#     ('preprocessor', preprocessor),
+#     ('classifier', RandomForestClassifier())
+# ])
+
+# TODO: Pipeline'i egit
+# pipeline.fit(X_train, y_train)
+
+# TODO: Modeli kaydet ve yukle
+# joblib.dump(pipeline, 'model.pkl')
+# loaded_model = joblib.load('model.pkl')
+
+# TODO: Yeni veri ile tahmin yap
+```
+
+**Beklenen Sonuc:** Pipeline preprocessing ve modeli tek objede birlestirmeli. Kaydedilen model yuklenip tahmin yapabilmeli.
+**Ipucu:** Pipeline data leakage'i onler — fit_transform sadece train'de, transform test/production'da otomatik calisir.
+:::
+
+:::exercise
+### Alistirma 17: Imbalanced Data ile Calismak (Orta)
+
+Dengesiz veri setlerinde model egitimi yap.
+
+```python
+from sklearn.utils.class_weight import compute_class_weight
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+
+# TODO: Dengesiz veri seti olustur (%95 negatif, %5 pozitif)
+# TODO: Baseline model egit — accuracy yuksek ama recall dusuk olacak
+
+# TODO: Cozum 1: Class weight ayarla
+# model = RandomForestClassifier(class_weight='balanced')
+
+# TODO: Cozum 2: SMOTE ile oversampling
+# smote = SMOTE(random_state=42)
+# X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
+
+# TODO: Cozum 3: Undersampling
+# TODO: Cozum 4: Threshold ayarlama (precision-recall tradeoff)
+
+# TODO: Her cozumun precision, recall, F1 ve AUC degerlerini karsilastir
+# TODO: PR curve ve ROC curve ciz
+```
+
+**Beklenen Sonuc:** Dengesiz veri ile accuracy yaniltici oldugu gosterilmeli. SMOTE veya class_weight ile recall iyilesmeli.
+**Ipucu:** Imbalanced data'da accuracy yerine F1, AUC-PR kullan. Fraud detection, hastalik tespiti gibi alanlarda cok kritik.
+:::
+
+:::exercise
+### Alistirma 18: Time Series Forecasting (Zor)
+
+Zaman serisi tahmini yap.
+
+```python
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# TODO: Zaman serisi verisi olustur (gunluk satis)
+# dates = pd.date_range('2024-01-01', periods=365, freq='D')
+# sales = trend + seasonality + noise
+
+# TODO: Feature engineering (zaman serisi icin)
+# - Lag features (t-1, t-7, t-30)
+# - Rolling mean/std (7 gun, 30 gun)
+# - Day of week, month, is_weekend
+# - Trend (linear)
+
+# TODO: Train/test split (zaman sirasina gore, shuffle YAPMA)
+# TODO: Model egit ve tahmin yap
+# TODO: RMSE, MAE, MAPE metrikleri hesapla
+
+# TODO: Statsmodels ile ARIMA modeli dene
+# TODO: Prophet kutuphanesi ile karsilastir
+```
+
+**Beklenen Sonuc:** Zaman serisi trendi ve mevsimsellik yakalanmali. Test seti tahmini makul olmali.
+**Ipucu:** Zaman serisi split'inde ASLA shuffle yapma! Kronolojik sira korunmali. Gelecek bilgisi kullanamazsin (data leakage).
+:::
+
+:::exercise
+### Alistirma 19: ML Model Deployment Senaryosu (Zor)
+
+Egitilmis bir modeli FastAPI ile serve et.
+
+```python
+# TODO: FastAPI ile model API'si olustur
+# from fastapi import FastAPI
+# import joblib
+#
+# app = FastAPI()
+# model = joblib.load('model.pkl')
+#
+# class PredictionRequest(BaseModel):
+#     features: list[float]
+#
+# @app.post('/predict')
+# async def predict(request: PredictionRequest):
+#     prediction = model.predict([request.features])
+#     probability = model.predict_proba([request.features])
+#     return {
+#         'prediction': int(prediction[0]),
+#         'probability': float(probability[0].max())
+#     }
+
+# TODO: Input validation ekle
+# TODO: Model versiyonlama stratejisi olustur
+# TODO: A/B testing altyapisi tanimla
+# TODO: Model monitoring (data drift, performance degradation)
+# TODO: Dockerfile ile containerize et
+```
+
+**Beklenen Sonuc:** Model API uzerinden tahmin yapabilmeli. Input validation calismali. Deployment stratejisi yazilmali.
+**Ipucu:** Model drift: production verisinin dagalimi degisince model performansi duser. Periyodik retrain veya online learning gerekir.
+:::
+
 
 :::external-resource
 ## Ek Kaynaklar

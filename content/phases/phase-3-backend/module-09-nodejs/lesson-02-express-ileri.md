@@ -631,7 +631,7 @@ class UserService {
 
 ### Alistirma 2: Zod ile Request Validation (Orta)
 
-Zod kullanarak tip-guvenli request validation middleware'i olustur.
+Zod kullanarak tip-guvenli request validation middleware'i oluştur.
 
 ```javascript
 const { z } = require("zod");
@@ -671,7 +671,7 @@ app.post("/api/users", validate(createUserSchema), userController.create);
 app.get("/api/users", validate(getUsersSchema), userController.getAll);
 ```
 
-**Beklenen Sonuc:** Gecersiz body/query icin 400 + detayli hata mesaji donmeli. Gecerli veriler otomatik parse edilmeli (ornegin string "5" -> number 5 coerce ile). Schema'dan TypeScript tipleri turetilmeli.
+**Beklenen Sonuc:** Gecersiz body/query icin 400 + detayli hata mesaji donmeli. Gecerli veriler otomatik parse edilmeli (örneğin string "5" -> number 5 coerce ile). Schema'dan TypeScript tipleri turetilmeli.
 **Ipucu:** `z.coerce.number()` string'i otomatik number'a cevirir. ZodError'un `errors` arrayi ile alan bazli hata mesajlari elde edilir.
 
 ---
@@ -749,20 +749,20 @@ explanation: "z.infer<typeof schema> kullanılarak bir Zod schema'sından TypeSc
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "Layered Architecture'da Route, Controller, Service ve Model katmanlarinin sorumluluk sinirlarini acikla. Controller neden 'ince katman' olmali? Service katmaninda business logic nasil test edilebilir hale gelir? Dependency Injection bu katmanlar arasinda nasil uygulanir?"
 
 **2. Pratik Uygulama:**
-> "Zod ile bir kullanici kayit schema'si olustur (isim, email, sifre, yas, rol). Bu schema'dan TypeScript tipi cikar (z.infer). validateBody middleware factory fonksiyonunu yaz ve Express route'larinda kullan. Multer ile profil resmi yukleme endpoint'i ekle (max 2MB, sadece JPEG/PNG, UUID ile dosya adi)."
+> "Zod ile bir kullanici kayit schema'si oluştur (isim, email, sifre, yas, rol). Bu schema'dan TypeScript tipi cikar (z.infer). validateBody middleware factory fonksiyonunu yaz ve Express route'larinda kullan. Multer ile profil resmi yukleme endpoint'i ekle (max 2MB, sadece JPEG/PNG, UUID ile dosya adi)."
 > Takip: "Winston ile structured JSON logger kur, her HTTP istegini logla ve correlation ID ile request izleme ekle."
 
 **3. Mukemmellik Icin:**
 > "12-Factor App prensiplerini bir Express.js projesine nasil uygularim? Config management, logging, port binding, concurrency, dev/prod parity ve graceful shutdown konularini pratikte goster. Docker container icinde calisacak sekilde uyarla."
 
 ### Pair Programming Ipucu
-Proje yapisini olusturken AI'a mevcut kodunu goster ve sor: "Bu tek dosyadaki Express uygulamasini layered architecture'a donustur. Route, controller, service, model, middleware ve validator dosyalarini ayir. Her katmanin sorumlulugunu belirle."
+Proje yapisini oluşturken AI'a mevcut kodunu goster ve sor: "Bu tek dosyadaki Express uygulamasini layered architecture'a donustur. Route, controller, service, model, middleware ve validator dosyalarini ayir. Her katmanin sorumlulugunu belirle."
 :::
 
 :::interview
@@ -770,10 +770,10 @@ Proje yapisini olusturken AI'a mevcut kodunu goster ve sor: "Bu tek dosyadaki Ex
 
 **Soru 1: Backend uygulamasinda hata yonetimini nasil yapilandirirsiniz?**
 - **Junior cevabi:** try/catch ile hatalari yakalayip res.status(500) gonderirim.
-- **Senior cevabi:** Katmanli hata yonetimi: 1) Custom error class'lari olusturulur (AppError extends Error, statusCode ve isOperational flag'i ile), 2) Async handler wrapper ile her route'da try/catch tekrarindan kacinilir, 3) Global error handler middleware'i (4 param) tum hatalari yakalar, 4) Operational error'lar (validation, not found) istemciye anlamli mesaj doner, programming error'lar (TypeError, null reference) generic mesaj doner ve loglanir, 5) Unhandled rejection ve uncaught exception handler'lari process seviyesinde yakalanir. Production'da error tracking (Sentry) ve structured logging (Pino) kullanilir.
+- **Senior cevabi:** Katmanli hata yonetimi: 1) Custom error class'lari oluşturulur (AppError extends Error, statusCode ve isOperational flag'i ile), 2) Async handler wrapper ile her route'da try/catch tekrarindan kacinilir, 3) Global error handler middleware'i (4 param) tum hatalari yakalar, 4) Operational error'lar (validation, not found) istemciye anlamli mesaj doner, programming error'lar (TypeError, null reference) generic mesaj doner ve loglanir, 5) Unhandled rejection ve uncaught exception handler'lari process seviyesinde yakalanir. Production'da error tracking (Sentry) ve structured logging (Pino) kullanilir.
 
 **Soru 2: Bir Express uygulamasini nasil yapilandirirsiniz (proje yapisi)?**
-- **Junior cevabi:** Routes, controllers ve models klasorleri olustururum.
+- **Junior cevabi:** Routes, controllers ve models klasorleri oluştururum.
 - **Senior cevabi:** Layered architecture: routes (HTTP endpoint tanimlari), controllers (request/response handling), services (is mantigi), repositories (data access), middleware (cross-cutting concerns), validators (input validation). Her katman sadece altindaki katmani cagirir. Dependency injection ile test edilebilirlik saglanir. Config management: environment-based (.env, config/), secrets icin vault. Modular yaklasim: feature-based klasor yapisi (users/, products/) buyuk projelerde tercih edilir. index.ts barrel export ile temiz import'lar saglanir.
 :::
 

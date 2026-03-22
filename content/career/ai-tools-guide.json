@@ -178,7 +178,7 @@
         "AI review'i insan review'inden ÖNCE yapın - insan review'in kalitesini arttirir",
         "CI/CD pipeline'ina AI review adimi ekleyin - otomatikleştirin"
       ],
-      "senior_cto_notu": "CTO'lar AI code review'i, junior developer'larin kodlarini pull request'e gondermeden önce kontrol ettirmek için kullanir. Bu hem junior'in öğrenimini hizlandirir hem de senior reviewer'in zamanini korur."
+      "senior_cto_notu": "CTO'lar AI code review'i, junior developer'larin kodlarini pull request'e göndermeden önce kontrol ettirmek için kullanir. Bu hem junior'in öğrenimini hizlandirir hem de senior reviewer'in zamanini korur."
     },
     {
       "id": "debugging-ile-ai",
@@ -305,7 +305,7 @@
         "Temel programlama becerilerinizi koruyun - AI bir gun erişimde olmayabilir",
         "AI'nin urettigi kodu anlamamak, teknik borc biriktirmektir",
         "AI'yi bir junior developer gibi düşünün - supervise etmeniz gerekir",
-        "Hassas verileri (API key, password, müşteri bilgisi) AI'ya gondermeyin",
+        "Hassas verileri (API key, password, müşteri bilgisi) AI'ya göndermeyin",
         "AI çözümlerini production'a almadan önce mutlaka test edin"
       ],
       "senior_cto_notu": "CTO'lar AI'yi verimlilik aracı olarak benimser ama takim uyelerinin AI'ya aşırı bağımlı olmasini istemez. En değerli developer, AI'yi en iyi kullanan değil, AI olmadan da is cikarabilen ama AI ile 10x hizlanan developer'dir."
@@ -365,7 +365,7 @@
     {
       "task": "Refactoring",
       "recommended_model": "Claude Sonnet 4.5",
-      "prompt_template": "Asagidaki kodu refactor et.\n\nMevcut Kod:\n```\n[kodu yapıştın]\n```\n\nRefactoring Amaci:\n- [ ] Okunabilirlik iyilestirme\n- [ ] Performans optimizasyonu\n- [ ] Design pattern uygulama\n- [ ] Code duplication kaldırma\n- [ ] SOLID prensipleri uygulama\n- [ ] Test edilebilirlik artirma\n\nKisitlamalar:\n- Dış arayüz (API/interface) değişmemeli\n- [diger kisitlamalar]\n\n1. Refactor edilmis kodu ver\n2. Yapılan her değişikliği ve NEDEN yapıldığını acikla\n3. Refactoring oncesi ve sonrasi farklari ozetle\n4. Potansiyel riskleri belirt",
+      "prompt_template": "Asagidaki kodu refactor et.\n\nMevcut Kod:\n```\n[kodu yapıştın]\n```\n\nRefactoring Amaci:\n- [ ] Okunabilirlik iyilestirme\n- [ ] Performans optimizasyonu\n- [ ] Design pattern uygulama\n- [ ] Code duplication kaldırma\n- [ ] SOLID prensipleri uygulama\n- [ ] Test edilebilirlik artirma\n\nKisitlamalar:\n- Dış arayüz (API/interface) değişmemeli\n- [diger kisitlamalar]\n\n1. Refactor edilmis kodu ver\n2. Yapılan her değişikliği ve NEDEN yapıldığını acikla\n3. Refactoring oncesi ve sonrasi farklari özetle\n4. Potansiyel riskleri belirt",
       "tips": [
         "Küçük adimlarla refactor edin - büyük değişiklikler risklidir",
         "Her adimda testlerin gectiginden emin olun",
@@ -490,7 +490,7 @@
     "Prompt kalitesi = Cevap kalitesi - iyi soru sormak bir beceridir",
     "AI ile öğrenmeye devam edin - AI'yi düşünme kisa yolu olarak kullanmayin",
     "Production kodunu AI'dan almadan önce mutlaka test edin",
-    "Hassas verileri (API key, şifre, müşteri bilgisi) AI'ya gondermeyin",
+    "Hassas verileri (API key, şifre, müşteri bilgisi) AI'ya göndermeyin",
     "AI'siz da çalışabilecek seviyede olun - AI'ya bağımlı kalmayin"
   ]
 }

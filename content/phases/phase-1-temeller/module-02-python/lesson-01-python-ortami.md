@@ -550,9 +550,9 @@ Production kodunda `print()` debugging bırakma. `breakpoint()` veya `logging` m
 ## Pratik Uygulama
 
 :::exercise
-### Alistirma 1: Python Ortamini Kurup Dogrulama (Kolay)
+### Alistirma 1: Python Ortamıni Kurup Doğrulama (Kolay)
 
-Python'u pyenv ile kurup, versiyonu dogrulayin ve ilk script'inizi calistirin.
+Python'u pyenv ile kurup, versiyonu dogrulayin ve ilk script'inizi çalıştırin.
 
 ```bash
 # 1. pyenv ile Python kur
@@ -577,14 +577,14 @@ EOF
 python hello.py
 ```
 
-**Beklenen Sonuc:** Python 3.13.2 versiyonu gorunmeli, script hatasiz calismali ve platform bilgisini gostermeli.
+**Beklenen Sonuc:** Python 3.13.2 versiyonu gorunmeli, script hatasiz çalışmali ve platform bilgisini gostermeli.
 **Ipucu:** pyenv kurulu degilse once `curl https://pyenv.run | bash` ile kur (Linux/Mac) veya pyenv-win kullan (Windows).
 
 ---
 
 ### Alistirma 2: Virtual Environment ve Paket Yonetimi (Orta)
 
-uv ve venv kullanarak izole bir proje ortamı olustur, paketleri yukle ve requirements.txt ile paylasimli hale getir.
+uv ve venv kullanarak izole bir proje ortamı oluştur, paketleri yukle ve requirements.txt ile paylasimli hale getir.
 
 ```bash
 # 1. Proje klasoru olustur
@@ -693,7 +693,7 @@ uv run pytest tests/ -v
 ```
 
 **Beklenen Sonuc:** `ruff check` hata vermemeli, `mypy --strict` tip hatasiz gecmeli, `pytest` tum testler gecmeli. pyproject.toml'da tum proje ayarlari tek bir dosyada tanimlanmis olmali.
-**Ipucu:** `uv init` otomatik olarak pyproject.toml olusturur. Ek ayarlari dosyayi editleyerek ekle.
+**Ipucu:** `uv init` otomatik olarak pyproject.toml oluşturur. Ek ayarlari dosyayi editleyerek ekle.
 
 5. **.gitignore ve .env.example oluştur:**
    - Yukarıdaki .gitignore şablonunu kullan
@@ -748,15 +748,15 @@ explanation: "pyproject.toml (PEP 518/621), sadece bağımlılıkları değil, p
 
 **Onerilen Model:** Claude Opus 4.6
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Konuyu Derinlemesine Anla:**
-> "Python'da virtual environment neden gerekli? Sistem Python'u ile venv arasindaki farki, paket izolasyonunun nasil calistigini ve .venv klasorunun icinde neler oldugunu detayli anlat. PATH degiskeninin bu sureceteki rolu ne?"
+> "Python'da virtual environment neden gerekli? Sistem Python'u ile venv arasindaki farki, paket izolasyonunun nasil calistigini ve .venv klasorunun icinde neler oldugunu detayli anlat. PATH değişkeninin bu sureceteki rolu ne?"
 
 *Neden:* Virtual environment'in sadece nasil kullanildigini degil, neden var oldugunu anlamak kalici ogrenme saglar
 
 **2. Pratik Uygulama:**
-> "Sifirdan bir Python projesi kuruyorum. uv ile proje olusturma, bagimliliklari ekleme, pyproject.toml yapılandırma, .gitignore ve .env.example olusturma adimlarini sirala. Her adimda neden o komutu kullandigimi acikla."
+> "Sifirdan bir Python projesi kuruyorum. uv ile proje oluşturma, bagimliliklari ekleme, pyproject.toml yapılandırma, .gitignore ve .env.example oluşturma adimlarini sirala. Her adimda neden o komutu kullandigimi acikla."
 
 *Follow-up:* "Bu projeye pre-commit hooks (ruff + mypy) eklemek istesem adimlar ne olur? Makefile'a hangi target'lari eklemeliyim?"
 
@@ -764,7 +764,7 @@ explanation: "pyproject.toml (PEP 518/621), sadece bağımlılıkları değil, p
 > "pip, poetry ve uv arasindaki farklari dependency resolution, lockfile yonetimi, performans ve CI/CD entegrasyonu acisindan karsilastir. 2026'da yeni bir production projesi icin hangisini neden secmeliyim?"
 
 ### Pair Programming Ipucu
-Proje kurarken AI'a pyproject.toml dosyani yapistir: "Bu pyproject.toml yapilandirmasini incele. Eksik veya iyilestirilmesi gereken ayarlar var mi? ruff, mypy ve pytest konfigurasyonu icin best practice onerilerin neler?"
+Proje kurarken AI'a pyproject.toml dosyani yapistir: "Bu pyproject.toml yapılandırmasini incele. Eksik veya iyilestirilmesi gereken ayarlar var mi? ruff, mypy ve pytest konfigurasyonu icin best practice onerilerin neler?"
 :::
 
 :::exercise
@@ -1534,8 +1534,8 @@ Bir Senior Developer, Python ortamını öğrenirken şu yaklaşımı benimser:
 
 **Okuma Egzersizi:** Python Packaging User Guide'in "Managing Dependencies" bolumunu Ingilizce oku: https://packaging.python.org/en/latest/tutorials/managing-dependencies/
 
-**Yazma Pratigi:** Asagidaki commit mesajini Ingilizce yaz: "Proje ortamini ve bagimlilik yapilandirmasini kurdum"
---> Ornek: `chore: set up project environment and dependency configuration`
+**Yazma Pratigi:** Asagidaki commit mesajini Ingilizce yaz: "Proje ortamıni ve bagimlilik yapılandırmasini kurdum"
+--> Örnek: `chore: set up project environment and dependency configuration`
 :::
 
 :::external-resource

@@ -608,7 +608,7 @@ Flexbox ve Grid birbirinin alternatifi değil, tamamlayıcısıdır. Sayfa düze
 :::exercise
 ### Alistirma 1: Flexbox ile Navbar ve Kart Layout (Kolay)
 
-Flexbox kullanarak responsive bir navbar ve yatay kart dizilimi olustur.
+Flexbox kullanarak responsive bir navbar ve yatay kart dizilimi oluştur.
 
 ```html
 <style>
@@ -677,7 +677,7 @@ Flexbox kullanarak responsive bir navbar ve yatay kart dizilimi olustur.
 
 ### Alistirma 2: CSS Grid ile Dashboard Layout (Orta)
 
-CSS Grid kullanarak bir admin dashboard layout'u olustur: sidebar, header, ana icerik ve footer.
+CSS Grid kullanarak bir admin dashboard layout'u oluştur: sidebar, header, ana icerik ve footer.
 
 ```html
 <style>
@@ -849,13 +849,13 @@ explanation: "auto-fill, yeterli eleman olmasa bile boş sütunlar için grid tr
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "Flexbox ve CSS Grid arasindaki temel farki 'tek boyut vs iki boyut' otesinde acikla. Icerikten disari (content-out) vs disaridan iceri (layout-in) yaklasimlarini gercek layout ornekleriyle karsilastir. Ne zaman ikisini birlikte kullanmam gerekir?"
+> "Flexbox ve CSS Grid arasindaki temel farki 'tek boyut vs iki boyut' otesinde acikla. Icerikten disari (content-out) vs disaridan iceri (layout-in) yaklasimlarini gercek layout örnekleriyle karsilastir. Ne zaman ikisini birlikte kullanmam gerekir?"
 
 **2. Pratik Uygulama:**
-> "Bana bir dashboard layoutu olustur: ust kisimda navbar (Flexbox), sol tarafta sidebar (sabit 250px), ortada 3 sutunlu kart gridi (CSS Grid auto-fit), altta footer. Responsive olsun - mobilde sidebar gizlensin ve kartlar tek sutun olsun. Kodunu ve her CSS kararinin nedenini yaz."
+> "Bana bir dashboard layoutu oluştur: ust kisimda navbar (Flexbox), sol tarafta sidebar (sabit 250px), ortada 3 sutunlu kart gridi (CSS Grid auto-fit), altta footer. Responsive olsun - mobilde sidebar gizlensin ve kartlar tek sutun olsun. Kodunu ve her CSS kararinin nedenini yaz."
 > Takip: "Simdi bu layouta container queries ekleyerek kartlarin sidebar'da dar, ana alanda genis gorunmesini sagla."
 
 **3. Mukemmellik Icin:**
@@ -870,7 +870,7 @@ Layout sorunlarinda AI'a DevTools'tan alinan computed styles veya element screen
 
 **Soru 1: Flexbox ve CSS Grid arasindaki fark nedir? Ne zaman hangisini kullanirsiniz?**
 - **Junior cevabi:** Flexbox tek yonlu, Grid iki yonlu layout icindir.
-- **Senior cevabi:** Flexbox 1 boyutlu (row VEYA column) icerik dagitimi icindir: navbar, card row, centering. Grid 2 boyutlu (row VE column) sayfa layout'u icindir: dashboard, gallery, complex page layout. Pratikte birlikte kullanilirlar: Grid ile genel sayfa yapisi, Flexbox ile grid hucrelerinin icindeki icerik dizilimi yapilir. Grid'in `fr` birimi responsive layout'u kolaylastirir. `auto-fit` ve `minmax()` ile media query'siz responsive grid olusturulabilir. Accessibility acisindan visual order ile DOM order uyumlu olmalidir.
+- **Senior cevabi:** Flexbox 1 boyutlu (row VEYA column) icerik dagitimi icindir: navbar, card row, centering. Grid 2 boyutlu (row VE column) sayfa layout'u icindir: dashboard, gallery, complex page layout. Pratikte birlikte kullanilirlar: Grid ile genel sayfa yapisi, Flexbox ile grid hucrelerinin icindeki icerik dizilimi yapilir. Grid'in `fr` birimi responsive layout'u kolaylastirir. `auto-fit` ve `minmax()` ile media query'siz responsive grid oluşturulabilir. Accessibility acisindan visual order ile DOM order uyumlu olmalidir.
 
 **Soru 2: CSS specificity nasil calisir?**
 - **Junior cevabi:** ID > class > element seklinde oncelik sirasi vardir.

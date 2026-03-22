@@ -406,7 +406,7 @@ HATEOAS, REST'in en az uygulanan ama en güçlü prensibidir. Pratikte çoğu AP
 :::exercise
 ### Alistirma 1: E-Ticaret REST API Tasarimi (Kolay)
 
-Bir e-ticaret uygulamasi icin RESTful URL yapisi tasarla ve endpoint listesi olustur.
+Bir e-ticaret uygulamasi icin RESTful URL yapisi tasarla ve endpoint listesi oluştur.
 
 ```
 # GOREV: Asagidaki kaynaklarin CRUD endpoint'lerini tasarla
@@ -493,7 +493,7 @@ app.get("/api/v1/products", paginate(20), async (req, res) => {
 });
 ```
 
-**Beklenen Sonuc:** `?page=2&limit=10` ile 2. sayfa gorunmeli. Filtreleme ve siralama birlikte calismali. Response'ta pagination metadata ve HATEOAS linkleri olmali.
+**Beklenen Sonuc:** `?page=2&limit=10` ile 2. sayfa gorunmeli. Filtreleme ve siralama birlikte çalışmali. Response'ta pagination metadata ve HATEOAS linkleri olmali.
 **Ipucu:** Sort parametresinde `-` prefix'i descending, prefix'siz ascending anlamina gelir: `sort=-price,name`.
 
 ---
@@ -597,17 +597,17 @@ explanation: "GET /api/v1/users/123/orders RESTful tasarıma uygundur: çoğul i
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "REST'in stateless prensibini derinlemesine acikla. Neden her istek kendi basina yeterli olmali? Bu prensip horizontal scaling'i nasil kolaylastirir? Session-based authentication stateless prensibini ihlal eder mi? JWT bu sorunu nasil cozer? Idempotency kavramini odeme API'si ornegi ile acikla."
+> "REST'in stateless prensibini derinlemesine acikla. Neden her istek kendi basina yeterli olmali? Bu prensip horizontal scaling'i nasil kolaylastirir? Session-based authentication stateless prensibini ihlal eder mi? JWT bu sorunu nasil cozer? Idempotency kavramini odeme API'si örneği ile acikla."
 
 **2. Pratik Uygulama:**
 > "Bir e-ticaret API'si icin tam URL yapisi tasarla: urunler, kategoriler, siparisler, kullanicilar ve yorumlar icin CRUD endpoint'leri. Nested resource'lar (kullanicinin siparisleri), cursor-based pagination, filtering (?category=electronics&min_price=100) ve sorting (?sort=-price,name) dahil et. RFC 7807 hata formati ile error response'lari yaz."
-> Takip: "Simdi bu API'nin v1 ve v2 versiyonlarini olustur. v2'de bir alan adi degisikligini backward-compatible sekilde nasil yaparsin?"
+> Takip: "Simdi bu API'nin v1 ve v2 versiyonlarini oluştur. v2'de bir alan adi degisikligini backward-compatible sekilde nasil yaparsin?"
 
 **3. Mukemmellik Icin:**
-> "Stripe API'sinin tasarim kalitesini analiz et: URL yapisi, versioning stratejisi, idempotency key kullanimi, pagination, error format ve rate limiting. Bu tasarim prensiplerini kendi API'me nasil uyarlarim? OpenAPI spec ile contract-first development surecini acikla."
+> "Stripe API'sinin tasarim kalitesini analiz et: URL yapisi, versioning stratejisi, idempotency key kullanimi, pagination, error format ve rate limiting. Bu tasarim prensiplerini kendi API'me nasil uyarlarim? OpenAPI spec ile contract-first development sürecini acikla."
 
 ### Pair Programming Ipucu
 API tasarlarken AI'a endpoint listeni goster ve sor: "Bu API tasarimimi RESTful prensiplere gore denetle. URL isimlendirme, HTTP method kullanimi, status code secimi ve response formatinda hatalar var mi? Stripe ve GitHub API standartlarina gore iyilestirmeler oner."
@@ -617,7 +617,7 @@ API tasarlarken AI'a endpoint listeni goster ve sor: "Bu API tasarimimi RESTful 
 ## Mulakat Sorulari
 
 **Soru 1: RESTful API tasarlarken en onemli prensipler nelerdir?**
-- **Junior cevabi:** Dogru HTTP method'lari kullanmak, JSON dondurmek ve anlamli URL'ler olusturmak.
+- **Junior cevabi:** Dogru HTTP method'lari kullanmak, JSON dondurmek ve anlamli URL'ler oluşturmak.
 - **Senior cevabi:** REST'in temel prensipleri: 1) Statelessness: her istek kendi basina yeterli olmali, sunucu session tutmamali. 2) Resource-based URL'ler: fiiller degil isimler (`/users/123` not `/getUser`), cogul isimler, nested resource'lar max 2 seviye. 3) HTTP method semantics: GET idempotent ve cacheable, POST yaratir, PUT tamamen degistirir (idempotent), PATCH kismen degistirir, DELETE siler. 4) HATEOAS: response'da iliskili resource link'leri sunulur. 5) Versioning: URL (`/v1/`) veya header (Accept) ile. 6) Pagination: cursor-based (buyuk veri) veya offset (kucuk veri). Stripe ve GitHub API'lari industry standard olarak incelenmeli.
 
 **Soru 2: REST API'de hata dondurme best practice'leri nelerdir?**

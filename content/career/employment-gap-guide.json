@@ -88,7 +88,7 @@
       ],
       "examples": [
         {
-          "label": "Turkce mülakat scripti — Kisa versiyon",
+          "label": "Türkçe mülakat scripti — Kisa versiyon",
           "template": "Soru: 'Mezuniyetten bu yana ne yaptiniz?'\n\nCevap:\n'Mezun olduktan sonra bilinçli bir karar verdim: ilk bulduğum işe girip stagnant olmak yerine, modern yazılım mühendisliğini derinlemesine öğrenmeye odaklanmak istedim.\n\nBu süre zarfinda 10'dan fazla production-ready proje geliştirdim. React, TypeScript, Python, FastAPI ile full-stack uygulamalar kurdum. LangChain ve RAG mimarileri ile AI projeleri geliştirdim. Her projede CI/CD pipeline, Docker deployment ve kapsamli test coverage uyguladim.\n\nÖrneğin, [proje adi] projesinde [spesifik başarı — örneğin: 1000+ dokümanı isleyen bir RAG sistemi kurdum ve %92 doğruluk orani elde ettim].\n\nBu dönemin bana kattigi en önemli sey: sadece kod yazmak değil, mimari kararlar vermek, trade-off analizi yapmak ve bir projeyi sifirdan production'a tasimak. Simdi bu birikimi bir takim içinde uygulamak için hazirim.'"
         },
         {
@@ -101,7 +101,7 @@
         }
       ],
       "checklist": [
-        "60-90 saniyelik Turkce script ezberlendi",
+        "60-90 saniyelik Türkçe script ezberlendi",
         "60-90 saniyelik Ingilizce script ezberlendi",
         "Zorlayici takip sorularina cevaplar hazirlandi",
         "En az 3 kere sesli prova yapıldı",

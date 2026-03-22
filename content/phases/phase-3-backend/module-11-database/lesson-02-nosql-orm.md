@@ -656,7 +656,7 @@ Seçim kriterleri:
 :::exercise
 ### Alistirma 1: Mongoose ile Blog API Modelleri (Kolay)
 
-MongoDB ve Mongoose kullanarak blog uygulamasi icin User, Post ve Comment modellerini olustur.
+MongoDB ve Mongoose kullanarak blog uygulamasi icin User, Post ve Comment modellerini oluştur.
 
 ```javascript
 const mongoose = require("mongoose");
@@ -695,7 +695,7 @@ const Post = mongoose.model("Post", postSchema);
 const Comment = mongoose.model("Comment", commentSchema);
 ```
 
-**Beklenen Sonuc:** 3 model olusturulmali. Post sorgularinda author bilgisi populate ile getirilmeli. Comment'ler post'a baglanmis olmali.
+**Beklenen Sonuc:** 3 model oluşturulmali. Post sorgularinda author bilgisi populate ile getirilmeli. Comment'ler post'a baglanmis olmali.
 **Ipucu:** `Post.find().populate("author", "name email")` ile sadece ihtiyac duyulan alanlari getir.
 
 ---
@@ -743,7 +743,7 @@ console.log("Tag Stats:", tagStats);
 console.log("Monthly Stats:", monthlyStats);
 ```
 
-**Beklenen Sonuc:** 4 aggregation pipeline calismali ve dogru sonuc dondurmeli. $lookup ile JOIN benzeri islem yapilmis olmali. Sonuclar siralanmis ve formatlanmis olmali.
+**Beklenen Sonuc:** 4 aggregation pipeline çalışmali ve dogru sonuc dondurmeli. $lookup ile JOIN benzeri islem yapilmis olmali. Sonuclar siralanmis ve formatlanmis olmali.
 **Ipucu:** `$lookup` ile baska koleksiyonu birlestir, `$unwind` array'i parcala, `$group` ile gruplama yap, `$project` ile ciktiya sekil ver.
 
 ---
@@ -838,13 +838,13 @@ explanation: "N+1 problemi, ilişkili verileri teker teker sorgulamaktan kaynakl
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "CAP teoremini bir dagitik sistem ornegi ile acikla. MongoDB CP mi AP mi? Redis hangi kategoride? PostgreSQL? Her veritabaninin CAP trade-off'unu ve bunun uygulama tasarimini nasil etkiledigini gercek senaryolarla anlat. Ne zaman SQL, ne zaman NoSQL tercih etmeliyim?"
+> "CAP teoremini bir dagitik sistem örneği ile acikla. MongoDB CP mi AP mi? Redis hangi kategoride? PostgreSQL? Her veritabaninin CAP trade-off'unu ve bunun uygulama tasarimini nasil etkiledigini gercek senaryolarla anlat. Ne zaman SQL, ne zaman NoSQL tercih etmeliyim?"
 
 **2. Pratik Uygulama:**
-> "Prisma ORM ile bir blog uygulamasinin veritabani katmanini olustur: schema.prisma dosyasinda User, Post, Comment, Tag modelleri ve iliskileri tanimla. Migration olustur, seed data ekle. CRUD operasyonlari icin service fonksiyonlari yaz. Prisma Client'in type-safe sorgularini goster."
+> "Prisma ORM ile bir blog uygulamasinin veritabani katmanini oluştur: schema.prisma dosyasinda User, Post, Comment, Tag modelleri ve iliskileri tanimla. Migration oluştur, seed data ekle. CRUD operasyonlari icin service fonksiyonlari yaz. Prisma Client'in type-safe sorgularini goster."
 > Takip: "Simdi ayni verileri Redis ile cache'le. Cache-aside pattern uygula: once Redis'e bak, yoksa PostgreSQL'den cek ve Redis'e yaz. Cache invalidation stratejisini belirle."
 
 **3. Mukemmellik Icin:**

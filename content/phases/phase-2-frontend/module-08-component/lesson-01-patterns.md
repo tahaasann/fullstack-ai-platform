@@ -43,7 +43,7 @@ Atomic Design, Brad Frost tarafından oluşturulan bir UI tasarım metodolojisid
 
 En küçük, bölünemeyen UI birimleridir. Tek başına bir anlam ifade etmeyebilirler ama sistemin temel yapı taşlarını oluştururlar.
 
-:::code[jsx]{title="Atom Ornekleri"}
+:::code[jsx]{title="Atom Örnekleri"}
 // Button Atom
 function Button({ variant = "primary", size = "md", children, ...props }) {
   return (
@@ -85,7 +85,7 @@ function Avatar({ src, alt, size = 40 }) {
 
 Birden fazla atom'un bir araya gelerek anlamlı bir birim oluşturduğu yapidir.
 
-:::code[jsx]{title="Molecule Ornekleri"}
+:::code[jsx]{title="Molecule Örnekleri"}
 // SearchBar Molecule (Input atom + Button atom)
 function SearchBar({ onSearch }) {
   const [query, setQuery] = useState("");
@@ -122,7 +122,7 @@ function UserCard({ user }) {
 
 Moleküller ve atomların birleşimiyle oluşan karmaşık UI bloklarıdır. Kendi başına bir anlam taşır.
 
-:::code[jsx]{title="Organism Ornegi"}
+:::code[jsx]{title="Organism Örneği"}
 // Header Organism
 function Header({ user, onSearch, onLogout }) {
   return (
@@ -306,7 +306,7 @@ Render props pattern'i modern React'te çoğunlukla custom hook'lar ile değişt
 ## Higher-Order Components (HOC)
 
 :::concept[Higher-Order Component / HOC (Ing: Higher-Order Component)]
-Bir component alip, onu ek ozelliklerle saran ve yeni bir component döndüren fonksiyondur.
+Bir component alip, onu ek özelliklerle saran ve yeni bir component döndüren fonksiyondur.
 
 **Türkçe karşılığı:** Ust-Düzey Component
 **Ne ise yarar:** Cross-cutting concern'leri (auth, logging, theming) birden fazla component'e ekler
@@ -712,7 +712,7 @@ explanation: "HOC'u render içinde oluşturmak her render'da yeni bir component 
 > "500+ component'li büyük bir SaaS projesinde component architecture nasıl yönetilir? Design system kurma sürecini, component audit yapmayi, API-first tasarımı ve Storybook ile dokumantasyonu kapsayan bir strateji oluştur. Shopify Polaris ve Radix UI gibi production design system'lerinden ilham al."
 
 ### Pair Programming Ipucu
-Yeni component tasarlarken AI'a önce kullanım ornegini (JSX) göster: "Bu component'i bu şekilde kullanmak istiyorum. Simdi bu API'yi karşılayan implementasyonu yaz. Progressive disclosure prensibini uygula - basit kullanım için minimum props, gelişmiş kullanım için ek props olsun."
+Yeni component tasarlarken AI'a önce kullanım örneğini (JSX) göster: "Bu component'i bu şekilde kullanmak istiyorum. Simdi bu API'yi karşılayan implementasyonu yaz. Progressive disclosure prensibini uygula - basit kullanım için minimum props, gelişmiş kullanım için ek props olsun."
 :::
 
 :::exercise
@@ -1126,7 +1126,7 @@ export type { AuthUser } from "./types/auth";
 :::must-note
 - Atomic Design 5 seviye: Atoms (buton, input) -> Molecules (search bar) -> Organisms (header) -> Templates (layout) -> Pages (gerçek veri)
 - Presentational component = sadece gösterim (props alir, render eder), Container component = is mantığı + state yönetimi
-- Compound Components = birbiriyle baglantili component'ler (Tabs/Tab/Panel gibi), Context ile iletişim kurar
+- Compound Components = birbiriyle bağlantıli component'ler (Tabs/Tab/Panel gibi), Context ile iletişim kurar
 - Render Props = component'e render fonksiyonu geçirme, aynı mantik farklı görünüm. Modern alternatif: custom hooks
 - HOC = component alip yeni component döndüren fonksiyon, ASLA render içinde oluşturma (performance bug)
 - Error Boundary = React'te hata yakalayan class component, getDerivedStateFromError + componentDidCatch

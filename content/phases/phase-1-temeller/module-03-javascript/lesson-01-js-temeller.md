@@ -70,8 +70,8 @@ console.log(window.globalLet); // undefined (let window'a eklenmez!)
 `var` ile tanımlanan değişkenler function scope'a sahiptir. Fonksiyonun her yerinden erişilebilir ama dışından erişilemez.
 
 :::code[javascript]{title="Function Scope - var"}
-function ornekFonksiyon() {
-  var fonksiyonDegiskeni = "Sadece burada yaşarım";
+function örnekFonksiyon() {
+  var fonksiyonDeğişkeni = "Sadece burada yaşarım";
 
   if (true) {
     var ifIcinde = "Ben de fonksiyon scope'tayım!";
@@ -81,7 +81,7 @@ function ornekFonksiyon() {
   console.log(ifIcinde); // "Ben de fonksiyon scope'tayım!" (Erişilebilir!)
 }
 
-console.log(fonksiyonDegiskeni); // ReferenceError: fonksiyonDegiskeni is not defined
+console.log(fonksiyonDeğişkeni); // ReferenceError: fonksiyonDeğişkeni is not defined
 :::
 
 ### Block Scope (let ve const)
@@ -89,7 +89,7 @@ console.log(fonksiyonDegiskeni); // ReferenceError: fonksiyonDegiskeni is not de
 `let` ve `const` ile tanımlanan değişkenler block scope'a sahiptir. `{}` süslü parantezlerle sınırlıdır.
 
 :::code[javascript]{title="Block Scope - let ve const"}
-function blockScopeOrnegi() {
+function blockScopeÖrneği() {
   if (true) {
     let blockLet = "Sadece bu blokta yaşarım";
     const blockConst = "Ben de sadece burada";
@@ -651,7 +651,7 @@ document.querySelector("#item-list").appendChild(newBtn);
 :::exercise
 ### Alistirma 1: Scope ve Closure — Ciktiyi Tahmin Et (Kolay)
 
-Asagidaki kodlarin ciktisini calismadan once tahmin et, sonra calistirarak dogrula.
+Asagidaki kodlarin ciktisini çalışmadan once tahmin et, sonra çalıştırarak dogrula.
 
 ```javascript
 // Senaryo 1: var vs let scope farki
@@ -689,7 +689,7 @@ console.log("D");
 ```
 
 **Beklenen Sonuc:** var dongusu 3,3,3 basar (function scope). let dongusu 0,1,2 basar (block scope). Counter 11,12,11,11 dondurur. Event loop sirasi A,D,C,B olur (sync > microtask > macrotask).
-**Ipucu:** var function scope, let block scope olusturur. setTimeout macrotask queue'ya, Promise.then microtask queue'ya gider.
+**Ipucu:** var function scope, let block scope oluşturur. setTimeout macrotask queue'ya, Promise.then microtask queue'ya gider.
 
 ---
 
@@ -739,7 +739,7 @@ console.log(gradeDistribution);
 
 ### Alistirma 3: this Keyword ve Event Delegation (Zor)
 
-`this` keyword'unun farkli baglamlardaki davranisini test et ve event delegation ile dinamik bir liste olustur.
+`this` keyword'unun farkli baglamlardaki davranisini test et ve event delegation ile dinamik bir liste oluştur.
 
 ```javascript
 // KISIM 1: this davranisi
@@ -793,7 +793,7 @@ greetFn.bind(user)(); // ? — simdi ne olur?
 ```
 
 **Beklenen Sonuc:** `this` farklarini aciklayabilmeli: regular function'da objeye, arrow function'da lexical scope'a bagli. Event delegation ile her yeni eklenen eleman icin ayri listener eklemeye gerek kalmamali.
-**Ipucu:** Arrow function kendi `this`'ini olusturmaz, tanimlandigi scope'taki `this`'i kullanir. `e.target` tiklanan elemani, `e.target.closest()` en yakin parent'i bulur.
+**Ipucu:** Arrow function kendi `this`'ini oluşturmaz, tanimlandigi scope'taki `this`'i kullanir. `e.target` tiklanan elemani, `e.target.closest()` en yakin parent'i bulur.
 :::
 
 :::knowledge-check
@@ -837,10 +837,10 @@ explanation: "Arrow function'ların kendi this binding'i yoktur. this değerini 
 
 **Onerilen Model:** Claude Opus 4.6
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Konuyu Derinlemesine Anla:**
-> "JavaScript'te closure'un calisma mekanizmasini adim adim acikla. Lexical scope nedir? Bir fonksiyon return edildikten sonra dis scope'taki degiskenler neden garbage collect edilmiyor? Closure'un bellekte nasil tutuldugunu goster."
+> "JavaScript'te closure'un çalışma mekanizmasini adim adim acikla. Lexical scope nedir? Bir fonksiyon return edildikten sonra dis scope'taki değişkenler neden garbage collect edilmiyor? Closure'un bellekte nasil tutuldugunu goster."
 
 *Neden:* Closure'u derinden anlamak, React hooks, memoization ve module pattern gibi modern JS kaliplarinin temelini kavramani saglar
 
@@ -850,7 +850,7 @@ explanation: "Arrow function'ların kendi this binding'i yoktur. this değerini 
 *Follow-up:* "setTimeout icinde bir Promise.then olsaydi, ve Promise.then icinde bir setTimeout olsaydi, cikti sirasi nasil degisirdi?"
 
 **3. Mukemmellik Icin:**
-> "JavaScript'te this keyword'unun 7 farkli binding kuralini (global, method, arrow, call/apply/bind, new, event handler, class) orneklerle acikla. Her durumda this neye isaret eder ve neden?"
+> "JavaScript'te this keyword'unun 7 farkli binding kuralini (global, method, arrow, call/apply/bind, new, event handler, class) örneklerle acikla. Her durumda this neye isaret eder ve neden?"
 
 ### Pair Programming Ipucu
 JS bug'i debug ederken AI'a hata mesajini ve kodu yapistir: "Bu kodda 'this' undefined donuyor. Sorunun scope, closure veya this binding'den hangisinden kaynaklandigini analiz et ve cozum oner."
@@ -860,8 +860,8 @@ JS bug'i debug ederken AI'a hata mesajini ve kodu yapistir: "Bu kodda 'this' und
 ## Mulakat Sorulari
 
 **Soru 1: JavaScript'te closure nedir ve nerede kullanilir?**
-- **Junior cevabi:** Closure, ic fonksiyonun dis fonksiyonun degiskenlerine erisebilmesidir.
-- **Senior cevabi:** Closure, bir fonksiyonun olusturuldugu lexical scope'u hatirlamasidir. Pratikte data privacy (module pattern), event handler'larda state tutma, partial application ve currying icin kullanilir. Ancak dikkat edilmezse memory leak'e yol acabilir cunku closure referans tuttugu scope'u garbage collection'dan korur.
+- **Junior cevabi:** Closure, ic fonksiyonun dis fonksiyonun değişkenlerine erisebilmesidir.
+- **Senior cevabi:** Closure, bir fonksiyonun oluşturuldugu lexical scope'u hatirlamasidir. Pratikte data privacy (module pattern), event handler'larda state tutma, partial application ve currying icin kullanilir. Ancak dikkat edilmezse memory leak'e yol acabilir cunku closure referans tuttugu scope'u garbage collection'dan korur.
 
 **Soru 2: == ve === arasindaki fark nedir? Neden sadece === kullanilmali?**
 - **Junior cevabi:** == tip donusumu yapar, === yapmaz.

@@ -18,13 +18,13 @@ Her gün milyarlarca HTTPS isteği yapılıyor ve her biri TLS handshake ile ba�
 :::concept[OSI Model (İng: Open Systems Interconnection Model)]
 OSI Model, network iletişimini 7 soyut katmana ayıran bir referans modelidir. Her katman belirli bir sorumluluğa sahiptir ve bir üst katmana hizmet sunar.
 
-**Türkçe karsiligi:** Açık Sistemler Arabaglanti Modeli
+**Türkçe karsiligi:** Açık Sistemler Arabağlantı Modeli
 **Ne ise yarar:** Network iletişiminin nasıl çalıştığını anlamak ve sorunları doğru katmanda çözmek için kullanılır
 **Gercek hayat benzetmesi:** Posta sistemi gibi - mektup yazarsın (Application), zarfa koyarsın (Presentation), posta kodunu yazarsın (Session), posta kutusuna bırakırsın (Transport), postacı alır (Network), kamyona yükler (Data Link), yolda gider (Physical)
 :::
 
 :::comparison
-| Katman | Isim | Protokol Ornekleri | Ne Yapar? | Developer Icin |
+| Katman | Isim | Protokol Örnekleri | Ne Yapar? | Developer Icin |
 |--------|------|-------------------|-----------|----------------|
 | 7 | **Application** | HTTP, HTTPS, DNS, FTP, SMTP, WebSocket | Kullanıcı uygulamalarına ağ erişimi sağlar | API tasarımı, REST/GraphQL |
 | 6 | **Presentation** | SSL/TLS, JPEG, UTF-8, JSON | Veri formatı dönüşümü, şifreleme | JSON parse, encoding |
@@ -74,7 +74,7 @@ UDP, bağlantısız (connectionless) ve hızlı bir transport protokolüdür. Ve
 :::comparison
 | Özellik | TCP | UDP |
 |---------|-----|-----|
-| Baglanti | Connection-oriented (3-way handshake) | Connectionless |
+| Bağlantı | Connection-oriented (3-way handshake) | Connectionless |
 | Guvenilirlik | Guaranteed delivery (ACK/retransmit) | Best effort (kayıp olabilir) |
 | Siralama | Sıralı teslim (ordered) | Sırasız (unordered) |
 | Hiz | Daha yavaş (overhead) | Daha hızlı (minimal overhead) |
@@ -208,7 +208,7 @@ VPN, internet üzerinden güvenli, şifreli bir tünel oluşturarak özel ağlar
 :::
 
 :::comparison
-| VPN Turu | Kullanim | Protokol | Ornek |
+| VPN Turu | Kullanim | Protokol | Örnek |
 |----------|----------|----------|-------|
 | **Site-to-Site** | İki ofis ağını birleştirir | IPSec | AWS VPN Gateway |
 | **Remote Access** | Uzak çalışanlar ofis ağına bağlanır | OpenVPN, WireGuard | Employee VPN |
@@ -693,13 +693,13 @@ mtr myapp.com
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "OSI 7 katman modelini ve TCP/IP 4 katman modelini karsilastirarak acikla. TLS 1.3 handshake surecini adim adim goster - Client Hello'dan sifreli iletisim baslayana kadar ne oluyor? TLS 1.2 ile 1.3 arasindaki performans ve güvenlik farklari neler? Certificate chain of trust nasil calisir?"
+> "OSI 7 katman modelini ve TCP/IP 4 katman modelini karsilastirarak acikla. TLS 1.3 handshake sürecini adim adim goster - Client Hello'dan sifreli iletisim baslayana kadar ne oluyor? TLS 1.2 ile 1.3 arasindaki performans ve güvenlik farklari neler? Certificate chain of trust nasil calisir?"
 
 **2. Pratik Uygulama:**
-> "SSH key pair olustur (ed25519), bir sunucuya password'suz baglan, SSH config dosyasi yaz ve SSH tunneling ile uzak veritabanina guvenli eris. Let's Encrypt ile ucretsiz TLS sertifikasi al ve Nginx'te HTTPS konfigurasyonu yap. HSTS header'ini aktiflestir."
+> "SSH key pair oluştur (ed25519), bir sunucuya password'suz baglan, SSH config dosyasi yaz ve SSH tunneling ile uzak veritabanina guvenli eris. Let's Encrypt ile ucretsiz TLS sertifikasi al ve Nginx'te HTTPS konfigurasyonu yap. HSTS header'ini aktiflestir."
 > Takip: "Simdi firewall kurallari (iptables/ufw) ile sadece 80, 443 ve 22 portlarini ac. Fail2ban ile brute force saldirilarini engelle."
 
 **3. Mukemmellik Icin:**
@@ -748,7 +748,7 @@ curl -I https://google.com
 # TODO: Her header'in ne ise yaradigini ve eksik olursa ne olacagini yazin
 ```
 
-**Beklenen sonuc:** En az 5 güvenlik header'ini aciklayabilmeli, eksik header'larin olusturdugu riskleri belirtebilmeli.
+**Beklenen sonuc:** En az 5 güvenlik header'ini aciklayabilmeli, eksik header'larin oluşturdugu riskleri belirtebilmeli.
 
 ### Alistirma 3: Basit Load Balancer Simulasyonu
 Docker Compose ile basit bir load balancer ortamı kurun:
@@ -797,7 +797,7 @@ done
 
 ### Alistirma 5: TLS Sertifika Analizi (Kolay)
 
-Bir web sitesinin TLS sertifikasini ve güvenlik yapilandirmasini incele.
+Bir web sitesinin TLS sertifikasini ve güvenlik yapılandırmasini incele.
 
 ```bash
 # 1. Sertifika bilgilerini gor
@@ -863,7 +863,7 @@ def packet_callback(packet):
 
 ---
 
-### Alistirma 7: Reverse Proxy Yapilandirmasi (Orta)
+### Alistirma 7: Reverse Proxy Yapılandırmasi (Orta)
 
 Nginx reverse proxy ile SSL termination, caching ve gzip compression yapilandir.
 
@@ -913,7 +913,7 @@ server {
 }
 ```
 
-**Beklenen Sonuc:** HTTP→HTTPS yonlendirmesi calismali. Gzip ile response boyutu kuculmus olmali. Backend'e X-Real-IP header'i ile gercek IP iletilmeli.
+**Beklenen Sonuc:** HTTP→HTTPS yonlendirmesi çalışmali. Gzip ile response boyutu kuculmus olmali. Backend'e X-Real-IP header'i ile gercek IP iletilmeli.
 **Ipucu:** `nginx -t` ile konfigurasyonu dogrula. `curl -I https://example.com` ile response header'larini kontrol et.
 
 ---
@@ -950,14 +950,14 @@ EOF
 # TODO: sshfs ile uzak dosya sistemini mount et
 ```
 
-**Beklenen Sonuc:** Lokal porttan uzak veritabanina baglanilabilmeli. SSH key ile sifresiz erisim saglanmali. Config dosyasi ile tek komutla baglanti kurulmali.
-**Ipucu:** `ssh-keygen -t ed25519` modern ve guvenli key olusturur. `ssh-copy-id user@server` ile public key'i kolayca yukle.
+**Beklenen Sonuc:** Lokal porttan uzak veritabanina baglanilabilmeli. SSH key ile sifresiz erisim saglanmali. Config dosyasi ile tek komutla bağlantı kurulmali.
+**Ipucu:** `ssh-keygen -t ed25519` modern ve guvenli key oluşturur. `ssh-copy-id user@server` ile public key'i kolayca yukle.
 
 ---
 
 ### Alistirma 9: Network Guvenligi Audit Scripti (Zor)
 
-Bir sunucunun network guvenligini otomatik kontrol eden script yaz.
+Bir sunucunun network güvenliğini otomatik kontrol eden script yaz.
 
 ```bash
 #!/bin/bash
@@ -1047,20 +1047,265 @@ setInterval(() => {
 }, 30000);
 ```
 
-**Beklenen Sonuc:** JWT olmadan WebSocket baglantisi reddedilmeli. Heartbeat ile olü baglantilar temizlenmeli. Mesaj boyut ve hiz limitleri uygulanmali.
-**Ipucu:** WebSocket URL'inde token gondermek yerine, ilk mesajda authentication yapmak daha guvenlidir (URL server loglarinda gorunur).
+**Beklenen Sonuc:** JWT olmadan WebSocket bağlantısi reddedilmeli. Heartbeat ile olü bağlantılar temizlenmeli. Mesaj boyut ve hiz limitleri uygulanmali.
+**Ipucu:** WebSocket URL'inde token göndermek yerine, ilk mesajda authentication yapmak daha guvenlidir (URL server loglarinda gorunur).
 :::
+
+:::exercise
+### Alistirma 11: OSI Katmanlari Analizi (Kolay)
+
+Bir HTTP isteginin OSI katmanlarindan gecisini adim adim analiz et.
+
+```bash
+# TODO: Her katmani belirle ve acikla:
+# Layer 7 (Application): HTTP GET /index.html
+# Layer 4 (Transport): TCP, hedef port: 80
+# Layer 3 (Network): IP adresleri
+# Layer 2 (Data Link): MAC adresleri
+# Layer 1 (Physical): Ethernet frame
+
+# TODO: Ayni analizi HTTPS icin yap — hangi katmanlarda fark var?
+# TODO: DNS cozumleme surecini katmanlarla eslestir
+# TODO: tcpdump ile bir HTTP istegini yakala ve katmanlari gozlemle
+# sudo tcpdump -i any -n -A port 80 -c 10
+```
+
+**Beklenen Sonuc:** Her katmanin gorevi aciklanmali. HTTP vs HTTPS arasindaki katman farklari belirtilmeli.
+**Ipucu:** Gercek hayatta TCP/IP modeli (4 katman) kullanilir ama mulakatlarda OSI (7 katman) sorulur!
+:::
+
+:::exercise
+### Alistirma 12: DNS Cozumleme Sureci (Kolay)
+
+DNS sorgulama surecini adim adim incele.
+
+```bash
+# DNS sorgulama araclari
+nslookup example.com
+dig example.com +trace
+
+# TODO: Farkli DNS kayit tiplerini sorgula
+# dig example.com A      # IPv4
+# dig example.com AAAA   # IPv6
+# dig example.com MX     # Mail sunucusu
+# dig example.com CNAME  # Alias
+# dig example.com TXT    # SPF, DKIM
+# dig example.com NS     # Name server
+
+# TODO: DNS cache'i kontrol et
+# TODO: DNS over HTTPS (DoH) vs DNS over TLS (DoT) karsilastir
+```
+
+**Beklenen Sonuc:** DNS cozumleme adimlarini (recursive -> root -> TLD -> authoritative) aciklayabilmeli.
+**Ipucu:** `dig +trace` tum DNS yolculugunu gosterir: root (.) -> com. -> example.com. -> IP adresi.
+:::
+
+:::exercise
+### Alistirma 13: TCP Handshake ve Baglanti Analizi (Kolay)
+
+TCP 3-way handshake surecini incele.
+
+```bash
+# TCP baglanti adimlari:
+# 1. SYN: Client -> Server (seq: x)
+# 2. SYN-ACK: Server -> Client (seq: y, ack: x+1)
+# 3. ACK: Client -> Server (seq: x+1, ack: y+1)
+
+# TODO: Baglanti durumlarini gozlemle
+# netstat -an | grep ESTABLISHED
+# ss -tunap
+
+# TODO: TCP vs UDP karsilastirma tablosu olustur
+# | Ozellik   | TCP            | UDP            |
+# |-----------|----------------|----------------|
+# | Baglanti  | Connection     | Connectionless |
+# | Guvenilir | Evet           | Hayir          |
+# | Kullanim  | HTTP, SSH      | DNS, Video     |
+
+# TODO: TIME_WAIT durumunu acikla
+```
+
+**Beklenen Sonuc:** 3-way handshake adimlarini aciklayabilmeli. TCP ve UDP farklarini bilmeli.
+**Ipucu:** TIME_WAIT durumu baglanti kapandiktan sonra ~60sn surer. Cok sayida TIME_WAIT performans sorununa isaret eder.
+:::
+
+:::exercise
+### Alistirma 14: TLS/SSL Sertifika Analizi (Orta)
+
+Bir web sitesinin TLS sertifikasini incele.
+
+```bash
+# TODO: Sertifika bilgilerini goster
+# openssl s_client -connect google.com:443 < /dev/null 2>/dev/null | openssl x509 -text -noout
+
+# TODO: Sertifika zincirini kontrol et
+# openssl s_client -connect example.com:443 -showcerts
+
+# TODO: Sertifika surum tarihini kontrol et
+# echo | openssl s_client -connect example.com:443 2>/dev/null | openssl x509 -noout -dates
+
+# TODO: Self-signed sertifika olustur (gelistirme icin)
+# openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+
+# TODO: Let's Encrypt ile ucretsiz sertifika alma adimlarini yaz
+```
+
+**Beklenen Sonuc:** Sertifika bilgileri (issuer, subject, validity) okunabilmeli. Sertifika zinciri anlasilmali.
+**Ipucu:** TLS 1.3 en guncel ve guvenli versiyondur. TLS 1.0 ve 1.1 kullanimdisi. Her zaman TLS 1.2+ kullan.
+:::
+
+:::exercise
+### Alistirma 15: SSH Key Yonetimi ve Guvenlik (Orta)
+
+SSH anahtar cifti olustur ve guvenli yapilandir.
+
+```bash
+# TODO: Ed25519 SSH key olustur
+# ssh-keygen -t ed25519 -C "email@example.com"
+
+# TODO: SSH config dosyasi olustur
+# Host production
+#   HostName 192.168.1.100
+#   User deploy
+#   IdentityFile ~/.ssh/id_project
+#   Port 2222
+
+# TODO: SSH hardening (sshd_config)
+# PermitRootLogin no
+# PasswordAuthentication no
+# MaxAuthTries 3
+
+# TODO: SSH tunnel olustur (port forwarding)
+# ssh -L 5432:localhost:5432 production
+```
+
+**Beklenen Sonuc:** SSH key pair olusturulabilmeli. Root login ve parola ile giris engellenmeli.
+**Ipucu:** Ed25519 RSA'dan daha kisa ve guvenlidir. SSH agent ile passphrase'i her seferinde girmekten kurtul.
+:::
+
+:::exercise
+### Alistirma 16: Firewall ve Port Yonetimi (Orta)
+
+Temel firewall kurallari olustur.
+
+```bash
+# TODO: Acik portlari tara
+# nmap -sT localhost
+
+# TODO: UFW ile firewall kurallari
+# sudo ufw default deny incoming
+# sudo ufw default allow outgoing
+# sudo ufw allow 22/tcp
+# sudo ufw allow 80/tcp
+# sudo ufw allow 443/tcp
+# sudo ufw deny 3306/tcp
+# sudo ufw enable
+
+# TODO: iptables ile ayni kurallari yaz
+# TODO: Port forwarding konfigurasyonu olustur
+# TODO: Bastion host (jump server) mimarisi ciz
+```
+
+**Beklenen Sonuc:** Sadece gerekli portlar acik olmali. Varsayilan politika "deny" olmali.
+**Ipucu:** "En az yetki" prensibi: sadece gerekli portlari ac. Production'da SSH portu IP kisitlamali olmali.
+:::
+
+:::exercise
+### Alistirma 17: HTTP/HTTPS Protokol Analizi (Orta)
+
+HTTP istek ve yanitlarini detayli analiz et.
+
+```bash
+# TODO: HTTP istek detaylarini goster
+# curl -v https://httpbin.org/get
+
+# TODO: Farkli HTTP metodlarini test et
+# curl -X POST httpbin.org/post -d '{"name":"test"}' -H 'Content-Type: application/json'
+# curl -X PUT httpbin.org/put
+# curl -X DELETE httpbin.org/delete
+
+# TODO: HTTP response header'larini analiz et
+# curl -I https://example.com
+
+# TODO: HTTP/1.1 vs HTTP/2 vs HTTP/3 karsilastirmasi yap
+# - Multiplexing, Header compression, Server push, QUIC
+
+# TODO: CORS header'larini test et
+```
+
+**Beklenen Sonuc:** HTTP metodlarini ve durum kodlarini bilmeli. HTTP/2 avantajlarini listelemeli.
+**Ipucu:** HTTP/2 tek TCP baglantisi uzerinden paralel istekler gonderir (multiplexing).
+:::
+
+:::exercise
+### Alistirma 18: VPN ve Proxy Mimarisi (Zor)
+
+VPN ve proxy kavramlarini anla ve konfigur et.
+
+```nginx
+# TODO: Nginx reverse proxy konfigurasyonu
+# server {
+#   listen 80;
+#   server_name api.example.com;
+#   location / {
+#     proxy_pass http://localhost:3000;
+#     proxy_set_header Host $host;
+#     proxy_set_header X-Real-IP $remote_addr;
+#     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#   }
+# }
+```
+
+```markdown
+# TODO: Forward proxy vs reverse proxy karsilastirmasi yaz
+# Forward: Client -> Proxy -> Internet (istemci gizlenir)
+# Reverse: Internet -> Proxy -> Server (sunucu gizlenir)
+
+# TODO: VPN vs Proxy vs TOR karsilastirmasi yaz
+# TODO: Corporate network mimarisi ciz (DMZ, internal, VPN)
+# TODO: WireGuard VPN kurulumu arastir
+```
+
+**Beklenen Sonuc:** Forward/reverse proxy farki aciklanmali. VPN tunel mekanizmasi anlasilmali.
+**Ipucu:** Nginx reverse proxy arkasinda Node.js calistirmak production standarttidir.
+:::
+
+:::exercise
+### Alistirma 19: Network Guvenligi Degerlendirmesi (Zor)
+
+Bir ag icin temel network security degerlendirmesi yap.
+
+```bash
+# TODO: Network kesfini yap
+# nmap -sn 192.168.1.0/24  # Ping sweep
+# nmap -sV -sC target-ip   # Service detection
+
+# TODO: Guvenlik kontrol listesi olustur
+# [ ] Acik portlar minimum mu?
+# [ ] Gereksiz servisler kapatildi mi?
+# [ ] Default sifre kullanan servis var mi?
+# [ ] SSL/TLS versiyonu guncel mi?
+# [ ] DNS zone transfer engellendi mi?
+
+# TODO: testssl.sh ile SSL konfigurasyonunu test et
+# TODO: Bulgu raporu yaz (Kritik/Yuksek/Orta/Dusuk)
+```
+
+**Beklenen Sonuc:** Tum aktif cihazlar ve servisler listelenmeli. Guvenlik riskleri onceliklendirilmeli.
+**Ipucu:** nmap taramalarini SADECE kendi aglarina yap. Izinsiz tarama yasalara aykiridir!
+:::
+
 
 :::interview
 ## Mulakat Sorulari
 
 **Soru 1: TCP ve UDP arasindaki farklar nelerdir? Hangi senaryolarda hangisi kullanilir?**
-- **Junior cevabi:** TCP guvenilir baglanti kurar, UDP hizli ama guvenilir degildir.
-- **Senior cevabi:** TCP: connection-oriented (3-way handshake), reliable delivery (acknowledgment + retransmission), ordered (sequence number), flow control (sliding window), congestion control. UDP: connectionless, best-effort delivery, no ordering, no flow control. TCP kullanim: HTTP/HTTPS, veritabani baglantilari, dosya transferi, email - veri butunlugu kritik olan her yer. UDP kullanim: DNS (kucuk paketler, hizli response), video streaming (kayip frame tolere edilir), online gaming (dusuk latency), VoIP. Modern yaklasim: QUIC protokolu (HTTP/3) UDP uzerine TCP benzeri guvenilirlik saglar, head-of-line blocking sorununu cozer.
+- **Junior cevabi:** TCP guvenilir bağlantı kurar, UDP hizli ama guvenilir degildir.
+- **Senior cevabi:** TCP: connection-oriented (3-way handshake), reliable delivery (acknowledgment + retransmission), ordered (sequence number), flow control (sliding window), congestion control. UDP: connectionless, best-effort delivery, no ordering, no flow control. TCP kullanim: HTTP/HTTPS, veritabani bağlantılari, dosya transferi, email - veri butunlugu kritik olan her yer. UDP kullanim: DNS (kucuk paketler, hizli response), video streaming (kayip frame tolere edilir), online gaming (dusuk latency), VoIP. Modern yaklasim: QUIC protokolu (HTTP/3) UDP uzerine TCP benzeri guvenilirlik saglar, head-of-line blocking sorununu cozer.
 
-**Soru 2: HTTPS nasil calisir? TLS handshake surecini aciklayiniz.**
+**Soru 2: HTTPS nasil calisir? TLS handshake sürecini aciklayiniz.**
 - **Junior cevabi:** HTTPS sifreli HTTP'dir, SSL sertifikasi kullanir.
-- **Senior cevabi:** TLS 1.3 handshake: 1) Client Hello: desteklenen cipher suite'lar ve key share gonderilir, 2) Server Hello: secilen cipher suite ve server key share, 3) Server Certificate: sertifika zinciri gonderilir, 4) Client sertifikayi CA chain'e karsi dogrular, 5) Ortak session key olusturulur (ECDHE key exchange ile forward secrecy saglanir). TLS 1.3 handshake 1-RTT'ye dusuruldu (1.2'de 2-RTT), 0-RTT resumption ile tekrar baglantilarda sifir ek latency. Certificate pinning mobil uygulamalarda MITM'e karsi koruma saglar. Let's Encrypt ile ucretsiz otomatik sertifika yonetimi.
+- **Senior cevabi:** TLS 1.3 handshake: 1) Client Hello: desteklenen cipher suite'lar ve key share gonderilir, 2) Server Hello: secilen cipher suite ve server key share, 3) Server Certificate: sertifika zinciri gonderilir, 4) Client sertifikayi CA chain'e karsi dogrular, 5) Ortak session key oluşturulur (ECDHE key exchange ile forward secrecy saglanir). TLS 1.3 handshake 1-RTT'ye dusuruldu (1.2'de 2-RTT), 0-RTT resumption ile tekrar bağlantılarda sifir ek latency. Certificate pinning mobil uygulamalarda MITM'e karsi koruma saglar. Let's Encrypt ile ucretsiz otomatik sertifika yonetimi.
 :::
 
 :::must-note

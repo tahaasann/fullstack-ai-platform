@@ -16,13 +16,13 @@ LLM'ler güçlü ama sınırlı: **training data'sının dışındaki bilgiyi bi
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "RAG (Retrieval Augmented Generation) pipeline'ini adim adim acikla: dokuman chunking stratejileri, embedding modeli secimi, vector database'e indexleme, semantic search ile retrieval, context window'a yerlestirme ve LLM ile generation. Naive RAG vs Advanced RAG (re-ranking, hybrid search, query expansion) arasindaki farklari goster."
 
 **2. Pratik Uygulama:**
-> "LangChain ile bir RAG uygulamasi olustur: PDF dokumanlarini yukle, RecursiveCharacterTextSplitter ile chunk'la, OpenAI embeddings ile vektorlestir, ChromaDB'ye kaydet ve RetrievalQA chain ile soru-cevap sistemi kur. Retrieval kalitesini olcmek icin basit bir evaluation pipeline ekle."
+> "LangChain ile bir RAG uygulamasi oluştur: PDF dokumanlarini yukle, RecursiveCharacterTextSplitter ile chunk'la, OpenAI embeddings ile vektorlestir, ChromaDB'ye kaydet ve RetrievalQA chain ile soru-cevap sistemi kur. Retrieval kalitesini olcmek icin basit bir evaluation pipeline ekle."
 > Takip: "Simdi bu RAG sistemine bir AI Agent ekle: LLM'in araclar (web search, calculator, database query) kullanarak karmasik gorevleri cozebilen bir agent tasarla. ReAct (Reasoning + Acting) pattern'ini uygula."
 
 **3. Mukemmellik Icin:**
@@ -52,14 +52,14 @@ Senior developer RAG öğrenirken:
 3. **Hybrid search**: Sadece semantic değil, keyword search (BM25) + semantic search birleştirerek daha iyi sonuç alır
 4. **Security**: Kullanıcının görmemesi gereken dokümanlar retrieval'da nasıl filtrelenir?
 
-**Karar Verme Sureci — Vector DB Secimi:**
+**Karar Verme Süreci — Vector DB Secimi:**
 - **Pinecone**: Fully managed, olceklenmesi kolay, metadata filtering. Trade-off: Pahali (yuksek hacimde), vendor lock-in, self-hosted opsiyon yok. Kullanim: Hizli baslangic, AWS/GCP entegrasyonu, kucuk-orta olcek.
 - **Weaviate**: Open-source, hybrid search (BM25 + vector) built-in, multi-modal. Trade-off: Self-hosted ise ops yuku var, cloud versiyonu Pinecone kadar pahali olabilir. Kullanim: Hybrid search gereken durumlar, multi-modal arama.
 - **Qdrant**: Open-source, Rust-based (cok hizli), filtreleme performansi cok iyi. Trade-off: Community Pinecone'dan kucuk, ecosystem daha az olgun. Kullanim: Yuksek performans gereken durumlar, self-hosted tercih.
 - **pgvector (PostgreSQL extension)**: Mevcut PostgreSQL'e extension ekle, ayri DB yonetme. Trade-off: 10M+ vector'de dedicated vector DB'lerden yavas, ANN algoritmasi sinirli. Kullanim: Kucuk-orta olcek (<1M vector), zaten PostgreSQL kullaniyorsan, basitlik oncelikliyse.
 - **Senior karar agaci**: "1M'den az vector, zaten PostgreSQL var? pgvector. Hybrid search lazim? Weaviate. Managed istiyorum, butce var? Pinecone. Self-hosted, yuksek performans? Qdrant."
 
-**Karar Verme Sureci — Chunking Stratejisi:**
+**Karar Verme Süreci — Chunking Stratejisi:**
 - **Fixed-size chunks (500-1000 token)**: Basit, tahmin edilebilir. Trade-off: Cumle ortasindan keser, anlam kaybi olur.
 - **Semantic chunking**: Anlam sinirlarina gore bolme. Trade-off: Daha yavas, implementasyonu karmasik ama retrieval kalitesi cok daha iyi.
 - **Recursive character splitting**: LangChain default, paragraf > cumle > kelime sirasinda boler. Trade-off: "Yeterince iyi" cogu durum icin ama domain-specific icerik icin ozel strateji gerekebilir.
@@ -68,7 +68,7 @@ Senior developer RAG öğrenirken:
 **Anti-pattern Farkindaligi:**
 - **"Chunk and pray" yaklasimi**: Dokumanları rastgele bolerek vector DB'ye atip "is gorecektir" demek. Evaluation olmadan production'a cikmak. RAGAS metrikleri (faithfulness, answer relevancy, context recall) ile sistematik olcum sart.
 - **Embedding model secimini gozardi etmek**: Default OpenAI text-embedding-3-small her dilde iyi calismiyor. Türkçe icerik icin multilingual model sec (multilingual-e5-large gibi). Yanlis embedding = yanlis retrieval = yanlis cevap.
-- **Tek buyuk prompt'a her seyi tikmak**: 50 sayfalik dokumani prompt'a koyup "ozetle" demek. Context window yetse bile "lost in the middle" problemi var. RAG ile sadece ilgili chunk'lari getir.
+- **Tek buyuk prompt'a her seyi tikmak**: 50 sayfalik dokumani prompt'a koyup "özetle" demek. Context window yetse bile "lost in the middle" problemi var. RAG ile sadece ilgili chunk'lari getir.
 
 **Gercek Dunya Deneyimi:** Bir hukuk firmasinin 50K+ sozlesme arsivinde arama sistemi kurduk. Ilk versiyonda fixed-size chunking + OpenAI embedding kullandik. Avukatlar "yanlis maddeleri getiriyor" dedi. Analiz: chunk'lar madde ortasindan bolunuyordu. Heading-based chunking + multilingual-e5-large embedding + hybrid search (BM25 + semantic) gecisinden sonra retrieval accuracy %62'den %91'e cikti. Ders: chunking stratejisi, model seciminden bile daha kritik olabilir.
 :::
@@ -1620,13 +1620,13 @@ Cevap (kaynak gostererek):""")
 ```
 
 **Beklenen Sonuc:** Cevaplar ilgili kaynaklar ile desteklenmeli. Her kaynak dogru dosyaya isaret etmeli. Kaynaksiz bilgi uretilmemeli.
-**Ipucu:** Metadata ile kaynak takibi yap. Citation dogrulama icin cevaptaki bilgiyi kaynak chunk ile karsilastir.
+**Ipucu:** Metadata ile kaynak takibi yap. Citation doğrulama icin cevaptaki bilgiyi kaynak chunk ile karsilastir.
 
 ---
 
 ### Alıştırma 8: Conversational RAG — Chat History ile (Zor)
 
-Sohbet gecmisini kullanarak baglam-duyarli RAG sistemi olustur.
+Sohbet gecmisini kullanarak baglam-duyarli RAG sistemi oluştur.
 
 ```python
 from langchain.chains import ConversationalRetrievalChain
@@ -1676,7 +1676,7 @@ qa_chain = ConversationalRetrievalChain.from_llm(
 
 ### Alıştırma 9: Production RAG Pipeline — End to End (Zor)
 
-Production-ready RAG sistemi olustur: ingestion, retrieval, generation, monitoring.
+Production-ready RAG sistemi oluştur: ingestion, retrieval, generation, monitoring.
 
 ```python
 from fastapi import FastAPI, HTTPException
@@ -1737,9 +1737,9 @@ async def query(req: QueryRequest):
 
 ---
 
-### Alıştırma 10: Multi-Agent System — Takim Calismasi (Zor)
+### Alıştırma 10: Multi-Agent System — Takim Çalışmasi (Zor)
 
-Birden fazla agent'in birlikte calisarak karmasik gorevleri cozdugu bir sistem olustur.
+Birden fazla agent'in birlikte calisarak karmasik gorevleri cozdugu bir sistem oluştur.
 
 ```python
 from langchain.agents import AgentExecutor, create_react_agent
@@ -1795,6 +1795,287 @@ orchestrator = MultiAgentOrchestrator()
 **Beklenen Sonuc:** 3 agent sirali olarak calisip gorev tamamlamali. Supervisor agent kalite kontrolu yapmali. Max iteration ile sonsuz dongu onlenmeli.
 **Ipucu:** CrewAI veya AutoGen gibi framework'ler multi-agent sistemi kolaylastirir. Agent rolleri net tanimlanmali — overlapping roller tutarsizliga yol acar.
 :::
+
+:::exercise
+### Alistirma 11: Basit RAG Pipeline Olusturma (Kolay)
+
+Temel bir RAG (Retrieval-Augmented Generation) pipeline'i kur.
+
+```python
+from langchain_community.document_loaders import TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+# TODO: Dokuman yukle ve chunk'la
+# loader = TextLoader("knowledge_base.txt")
+# docs = loader.load()
+# splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+# chunks = splitter.split_documents(docs)
+
+# TODO: Embedding model ile vectorize et
+# embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+# vectorstore = Chroma.from_documents(chunks, embeddings)
+
+# TODO: Sorgu yap ve en benzer 3 chunk'i getir
+# results = vectorstore.similarity_search("soru", k=3)
+
+# TODO: LLM'e context olarak ver ve cevap uret
+# TODO: Kaynak belirtme (citation) ekle
+```
+
+**Beklenen Sonuc:** RAG pipeline soruya dokunmanlardan ilgili bilgiyi bulup cevap uretmeli. Kaynaklar belirtilmeli.
+**Ipucu:** chunk_size cok buyukse irrelevant bilgi gelir, cok kucukse context kaybolur. 300-1000 arasi dene.
+:::
+
+:::exercise
+### Alistirma 12: Embedding Model Secimi (Kolay)
+
+Farkli embedding modellerini karsilastir.
+
+```python
+from sentence_transformers import SentenceTransformer
+import numpy as np
+
+# TODO: 3 farkli embedding modeli test et
+# models = [
+#     "all-MiniLM-L6-v2",      # Hizli, kucuk
+#     "all-mpnet-base-v2",      # Dengeli
+#     "intfloat/e5-large-v2"    # En iyi kalite
+# ]
+
+# TODO: Test sorulari ve beklenen dokumanlar hazirla
+# TODO: Her model ile retrieval accuracy olc (top-3 hit rate)
+# TODO: Embedding boyutu, hiz ve kalite karsilastirmasi yap
+# TODO: Turkce metin icin en iyi modeli bul
+
+# Karsilastirma tablosu:
+# | Model           | Boyut | Hiz  | Accuracy | Turkce |
+# |-----------------|-------|------|----------|--------|
+```
+
+**Beklenen Sonuc:** En az 3 model karsilastirilmali. Hiz-kalite tradeoff'u gosterilmeli.
+**Ipucu:** Kucuk modeller (MiniLM) prototipler icin, buyuk modeller (e5-large) production icin uygundur. Turkce icin multilingual modeller sec.
+:::
+
+:::exercise
+### Alistirma 13: Vector Database Islemleri (Kolay)
+
+Vector database (Chroma/Pinecone) islemlerini ogren.
+
+```python
+import chromadb
+
+# TODO: Chroma client olustur
+# client = chromadb.Client()
+# collection = client.create_collection("my_docs")
+
+# TODO: Dokumanlar ekle (metadata ile)
+# collection.add(
+#     documents=["Python programlama dili", "JavaScript web gelistirme"],
+#     metadatas=[{"source": "doc1"}, {"source": "doc2"}],
+#     ids=["id1", "id2"]
+# )
+
+# TODO: Similarity search yap
+# results = collection.query(query_texts=["web programlama"], n_results=3)
+
+# TODO: Metadata filtreleme ile arama
+# results = collection.query(
+#     query_texts=["programlama"],
+#     where={"source": "doc1"}
+# )
+
+# TODO: Collection istatistiklerini goster (dokuman sayisi, boyut)
+# TODO: Batch insert performansini olc
+```
+
+**Beklenen Sonuc:** CRUD islemleri calismali. Metadata filtreleme dogru sonuc vermeli. Batch insert performansi olculmu olmali.
+**Ipucu:** Chroma lokal gelistirme icin, Pinecone/Weaviate production icin uygundur. Her zaman metadata ekle — filtreleme cok faydali.
+:::
+
+:::exercise
+### Alistirma 14: Chunking Stratejileri Deneyimi (Orta)
+
+Farkli chunking stratejilerini karsilastir.
+
+```python
+from langchain.text_splitter import (
+    RecursiveCharacterTextSplitter,
+    TokenTextSplitter,
+    MarkdownHeaderTextSplitter,
+)
+
+# TODO: 3 farkli chunking stratejisi dene
+# 1. Fixed-size character chunking
+# 2. Token-based chunking
+# 3. Semantic chunking (header/paragraph bazli)
+
+# TODO: Ayni dokuman ile her stratejiyi test et
+# TODO: Retrieval kalitesini karsilastir
+# TODO: Overlap miktarinin etkisini olc (0%, 10%, 20%)
+
+# TODO: Her strateji icin:
+# - Ortalama chunk boyutu
+# - Chunk sayisi
+# - Retrieval accuracy (ilgili chunk ilk 3'te mi?)
+```
+
+**Beklenen Sonuc:** Semantic chunking genellikle en iyi sonucu vermeli. Overlap retrieval kalitesini artirmali.
+**Ipucu:** RecursiveCharacterTextSplitter paragraf -> cumle -> kelime sirasinda ayirir. Markdown dokumanlar icin header-based en iyisi.
+:::
+
+:::exercise
+### Alistirma 15: ReAct Agent Olusturma (Orta)
+
+Reasoning + Acting pattern'i ile tool-calling agent yaz.
+
+```python
+# TODO: ReAct agent implement et
+# Agent dongusu:
+# 1. Thought: Problemi analiz et
+# 2. Action: Bir tool cagir
+# 3. Observation: Tool sonucunu oku
+# 4. Tekrarla veya Final Answer ver
+
+# TODO: Tool'lari tanimla
+# tools = {
+#     "search": lambda q: web_search(q),
+#     "calculator": lambda expr: eval(expr),
+#     "weather": lambda city: get_weather(city),
+# }
+
+# TODO: Agent'a sorular sor
+# "Istanbul'da yarin hava nasil olacak? Sicaklik Fahrenheit'a cevir."
+# Agent: Thought -> weather("Istanbul") -> calculator("C * 9/5 + 32")
+
+# TODO: Max iteration limiti ekle (sonsuz dongu onleme)
+# TODO: Tool cagri hatalarini yonet
+# TODO: Agent'in dusunme surecini logla
+```
+
+**Beklenen Sonuc:** Agent dogru tool'lari secmeli. Multi-step reasoning yapabilmeli. Max iteration ile guvenli olmali.
+**Ipucu:** ReAct = Reasoning + Acting. LLM dusunur (Thought), eylem yapar (Action), sonucu okur (Observation). Bu dongu tekrarlanir.
+:::
+
+:::exercise
+### Alistirma 16: RAG Evaluation — Kalite Olcumu (Orta)
+
+RAG sisteminin kalitesini sistematik olarak olc.
+
+```python
+# TODO: RAGAS framework ile degerlendirme
+# Metrikler:
+# 1. Faithfulness: Cevap context'e sadik mi?
+# 2. Answer Relevancy: Cevap soruyla ilgili mi?
+# 3. Context Precision: Getirilen context ilgili mi?
+# 4. Context Recall: Gerekli bilgi getirildi mi?
+
+# TODO: Test veri seti olustur (20+ soru-cevap cifti)
+# test_data = [
+#     {"question": "...", "ground_truth": "...", "contexts": [...]},
+# ]
+
+# TODO: Her metrik icin skor hesapla
+# TODO: Zayif noktalari belirle (retrieval mi generation mi sorunlu?)
+# TODO: Iyilestirme onerileri yaz
+```
+
+**Beklenen Sonuc:** 4 metrik hesaplanmali. Zayif noktalar belirlenmeli. Somut iyilestirme onerileri yazilmali.
+**Ipucu:** Faithfulness dusukse LLM hallucinate ediyor. Context Recall dusukse retrieval yetersiz. Oncelik: retrieval'i duzelt, sonra generation'i.
+:::
+
+:::exercise
+### Alistirma 17: Conversational RAG (Orta)
+
+Sohbet gecmisi ile calisan RAG sistemi olustur.
+
+```python
+# TODO: Chat history yonetimi
+# from langchain.memory import ConversationBufferWindowMemory
+# memory = ConversationBufferWindowMemory(k=5)
+
+# TODO: Takip sorusu icin query reformulation
+# Ornek:
+# Kullanici: "Python nedir?"
+# AI: "Python bir programlama dilidir..."
+# Kullanici: "Avantajlari neler?"
+# -> Reformulated: "Python programlama dilinin avantajlari neler?"
+
+# TODO: Contextual compression (gereksiz bilgiyi cikar)
+# TODO: Chat history'yi ozetle (uzun konusmalar icin)
+# TODO: Multi-turn retrieval stratejisi
+```
+
+**Beklenen Sonuc:** Takip sorulari dogru yorumlanmali. Chat history context'e eklenmeli. Uzun konusmalar yonetilebilmeli.
+**Ipucu:** "Avantajlari neler?" sorusu tek basina anlamsiz — onceki context ile birlestirilmeli. HyDE veya query rewriting kullan.
+:::
+
+:::exercise
+### Alistirma 18: Multi-Agent System Tasarimi (Zor)
+
+Birden fazla agent'in birlikte calistigi sistem olustur.
+
+```python
+# TODO: Agent rolleri tanimla
+# 1. Researcher Agent: Web'den bilgi toplar
+# 2. Writer Agent: Toplanan bilgiyi yapilandirir
+# 3. Reviewer Agent: Ciktiyi kalite kontrolunden gecirir
+# 4. Supervisor Agent: Agent'lari koordine eder
+
+# TODO: Agent iletisim protokolu
+# - Her agent'in input/output formati
+# - Supervisor'in gorev dagitimi
+# - Hata durumunda retry/escalation
+
+# TODO: Ornek gorev: "Python vs JavaScript karsilastirma makalesi yaz"
+# 1. Researcher: Her iki dil hakkinda bilgi toplar
+# 2. Writer: Karsilastirma makalesi taslagi yazar
+# 3. Reviewer: Taslagi inceler, eksik/hatali yerleri belirtir
+# 4. Writer: Duzeltmeleri yapar
+
+# TODO: Max iteration ve timeout sinirlamalari ekle
+# TODO: Agent ciktilarini logla ve analiz et
+```
+
+**Beklenen Sonuc:** 3+ agent sirali olarak calisip gorevi tamamlamali. Supervisor kalite kontrolu yapmali.
+**Ipucu:** Agent rolleri net tanimlanmali — overlapping roller tutarsizliga yol acar. CrewAI veya AutoGen framework'lerini dene.
+:::
+
+:::exercise
+### Alistirma 19: Production RAG Optimizasyonu (Zor)
+
+RAG sistemini production icin optimize et.
+
+```python
+# TODO: Hybrid Search (BM25 + Semantic)
+# from rank_bm25 import BM25Okapi
+# BM25 keyword eslesmesi + semantic benzerlik birlestir
+# final_score = alpha * bm25_score + (1 - alpha) * semantic_score
+
+# TODO: Re-ranking (Cross-encoder ile)
+# from sentence_transformers import CrossEncoder
+# reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+# Initial retrieval (top-20) -> Re-rank (top-5)
+
+# TODO: Caching stratejisi
+# - Embedding cache (ayni dokumani tekrar embed etme)
+# - Query cache (ayni soru icin tekrar retrieval yapma)
+# - LLM response cache
+
+# TODO: Monitoring dashboard
+# - Query latency (p50, p95, p99)
+# - Retrieval relevancy score
+# - User feedback (thumbs up/down)
+# - Token kullanimi ve maliyet
+
+# TODO: A/B test altyapisi kur
+```
+
+**Beklenen Sonuc:** Hybrid search tek basindan daha iyi retrieval saglamali. Re-ranking top-5 kalitesini artirmali. Latency kabul edilebilir olmali.
+**Ipucu:** Production RAG: Hybrid search + re-ranking + caching = altin standart. alpha=0.3 (BM25) + 0.7 (semantic) iyi baslanis noktasi.
+:::
+
 
 :::interview
 ## Mülakat Soruları

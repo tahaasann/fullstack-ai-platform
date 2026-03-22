@@ -3083,7 +3083,7 @@
       "steps": [
         {
           "title": "Production Build",
-          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "instructions": "Uygulamayi production modda build et, tum testleri çalıştır, Lighthouse audit yap",
           "code_snippet": "pnpm build && pnpm test",
           "substeps": [
             {
@@ -3600,17 +3600,17 @@
     "code_review": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "Review this analytics dashboard code (React + Recharts + Express + PostgreSQL + Redis) for: Recharts component optimization and memoization, time-series query performance, Redis cache invalidation strategy, aggregation query correctness, responsive dashboard layout, lazy loading for large datasets, TypeScript type safety for chart data, and API response pagination. Also review the Python anomaly detection service for Isolation Forest configuration and Z-score thresholds.",
-      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle chart performansi, cache hit ratio ve anomali tespit dogrulugu icin"
+      "when_to_use": "Her step tamamlandiktan sonra kullan — özellikle chart performansi, cache hit ratio ve anomali tespit dogrulugu icin"
     },
     "debugging": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "I'm getting this error in my analytics dashboard (React + Recharts + Express + PostgreSQL + Redis + Python ML): [error]. The relevant code is: [code]. Query/aggregation: [query]. I'm trying to [goal].",
-      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle Recharts rendering sorunlari, PostgreSQL time-series sorgu performansi ve anomali detection false positive'leri icin"
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — özellikle Recharts rendering sorunlari, PostgreSQL time-series sorgu performansi ve anomali detection false positive'leri icin"
     },
     "research": {
       "model": "Gemini 2.5 Pro",
       "prompt_template": "Explain [concept] with practical examples for an analytics dashboard with anomaly detection. Topics I need help with: Recharts advanced features (custom tooltips, synchronized charts, responsive containers), PostgreSQL time-series queries and window functions, Redis caching patterns for dashboards, Isolation Forest algorithm and hyperparameters, Z-score statistical analysis, WebSocket real-time data streaming, CSV/PDF export libraries, and data visualization best practices.",
-      "when_to_use": "Yeni bir konsept ogrenirken kullan — ozellikle Recharts API, time-series SQL sorgulari ve anomali tespit algoritmalari icin"
+      "when_to_use": "Yeni bir konsept ogrenirken kullan — özellikle Recharts API, time-series SQL sorgulari ve anomali tespit algoritmalari icin"
     }
   },
   "deployment_guide": {
@@ -3643,7 +3643,7 @@
           "railway init",
           "railway up"
         ],
-        "instructions": "Iki ayri service olustur: Node.js API ve Python ML service. Env vars: DATABASE_URL, REDIS_URL"
+        "instructions": "Iki ayri service oluştur: Node.js API ve Python ML service. Env vars: DATABASE_URL, REDIS_URL"
       },
       {
         "title": "Frontend Deploy (Vercel)",
@@ -3675,7 +3675,7 @@
       "Proje aciklamasi ve motivasyon (2-3 cumle)",
       "Canli demo linki (Vercel/Railway badge ile)",
       "Teknoloji stack badge'leri",
-      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Ekran goruntuleri (en az 3: dashboard, ana özellik, mobile)",
       "Mimari diyagram (ASCII veya draw.io)",
       "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
       "API dokumantasyonu (/docs linki veya Postman collection)",
@@ -3683,7 +3683,7 @@
     ],
     "screenshot_suggestions": [
       "Dashboard/Anasayfa",
-      "Ana ozellik ekrani",
+      "Ana özellik ekrani",
       "Mobile gorunum"
     ],
     "live_demo_url_template": "https://analytics-dashboard.vercel.app",
@@ -3691,7 +3691,7 @@
   },
   "transition_guide": {
     "prerequisites": [
-      "Full-stack uygulama gelistirme deneyimi",
+      "Full-stack uygulama geliştirme deneyimi",
       "Veritabani sorgulama ve veri modelleme",
       "Temel istatistik ve veri analizi kavramlari",
       "Chart/grafik kutuphanesi kullanimi"
@@ -3703,6 +3703,6 @@
       "Phase 5 Module 15 - Python ML kutuphaneleri (NumPy, Pandas)"
     ],
     "next_project": "project-06",
-    "skills_bridge": "Bu projede ogrendigin veri gorsellestirme, anomaly detection ve dashboard tasarimi bilgisi, sonraki projede AI content platform icin LLM API entegrasyonu ve veri pipeline olusturma becerilerini destekleyecek."
+    "skills_bridge": "Bu projede ogrendigin veri gorsellestirme, anomaly detection ve dashboard tasarimi bilgisi, sonraki projede AI content platform icin LLM API entegrasyonu ve veri pipeline oluşturma becerilerini destekleyecek."
   }
 }

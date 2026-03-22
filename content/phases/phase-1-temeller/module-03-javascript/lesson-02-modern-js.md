@@ -735,7 +735,7 @@ function trackVisit(user) {
 :::exercise
 ### Alistirma 1: Destructuring ve Spread ile API Verisi Isleme (Kolay)
 
-Bir API response'unu destructuring ile parcala ve spread operator ile yeni objeler olustur.
+Bir API response'unu destructuring ile parcala ve spread operator ile yeni objeler oluştur.
 
 ```javascript
 // Simule edilmis API response
@@ -794,7 +794,7 @@ console.log(updatedSettings);
 // Beklenen: { theme: "light", language: "tr", notifications: { email: true, push: true, sms: true } }
 ```
 
-**Beklenen Sonuc:** Nested destructuring ile derin veriye tek satirda erisebilmeli. Spread operator ile orijinal obje degismeden yeni versiyonu olusturabilmeli.
+**Beklenen Sonuc:** Nested destructuring ile derin veriye tek satirda erisebilmeli. Spread operator ile orijinal obje degismeden yeni versiyonu oluşturabilmeli.
 **Ipucu:** Nested destructuring: `const { data: { user: { profile: { firstName } } } } = apiResponse`
 
 ---
@@ -962,7 +962,7 @@ explanation: "?? (nullish coalescing) sadece null ve undefined'da sağ tarafı k
 
 **Onerilen Model:** Claude Opus 4.6
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Konuyu Derinlemesine Anla:**
 > "JavaScript'te Promise.all, Promise.race, Promise.allSettled ve Promise.any arasindaki farklari gercek dunya senaryolariyla acikla. Bir e-ticaret uygulamasinda hangi durumda hangisini kullanmaliyim? Her birinin hata yonetimi nasil farklilik gosteriyor?"
@@ -986,11 +986,11 @@ Async kod yazarken AI'a kodunu yapistir: "Bu async fonksiyondaki hata yonetimini
 
 **Soru 1: Promise, async/await ve callback arasindaki farklar nelerdir?**
 - **Junior cevabi:** Callback eski yontem, Promise zincirleme yapar, async/await daha okunaklı.
-- **Senior cevabi:** Callback'ler callback hell ve inversion of control sorunlari yaratir. Promise'ler microtask queue'da calisir, zincirleme ve hata yonetimi (catch) saglar. async/await syntactic sugar'dir ama try/catch ile hata yonetimi, paralel calistirma (Promise.all vs Promise.allSettled), ve error propagation acisindan onemli farklari vardir. Promise.all fail-fast yapar, allSettled tum sonuclari bekler. Unhandled rejection'lar Node.js'te process'i sonlandirir.
+- **Senior cevabi:** Callback'ler callback hell ve inversion of control sorunlari yaratir. Promise'ler microtask queue'da calisir, zincirleme ve hata yonetimi (catch) saglar. async/await syntactic sugar'dir ama try/catch ile hata yonetimi, paralel çalıştırma (Promise.all vs Promise.allSettled), ve error propagation acisindan onemli farklari vardir. Promise.all fail-fast yapar, allSettled tum sonuclari bekler. Unhandled rejection'lar Node.js'te process'i sonlandirir.
 
 **Soru 2: Spread operator ve rest parameter arasindaki fark nedir?**
 - **Junior cevabi:** Uc nokta (...) spread acmak, rest toplamak icindir.
-- **Senior cevabi:** Spread ve rest ayni syntax'i kullanir ama farkli context'lerde farkli is yapar. Spread, iterable'lari acar (shallow copy olusturur, deep clone degil). Rest ise fonksiyon parametrelerinde veya destructuring'de kalan elemanlari toplar. Object spread ile Object.assign benzerdir ama spread daha okunaklidir. Performance-critical kodda spread'in yeni nesne olusturma maliyetine dikkat edilmelidir.
+- **Senior cevabi:** Spread ve rest ayni syntax'i kullanir ama farkli context'lerde farkli is yapar. Spread, iterable'lari acar (shallow copy oluşturur, deep clone degil). Rest ise fonksiyon parametrelerinde veya destructuring'de kalan elemanlari toplar. Object spread ile Object.assign benzerdir ama spread daha okunaklidir. Performance-critical kodda spread'in yeni nesne oluşturma maliyetine dikkat edilmelidir.
 :::
 
 :::exercise

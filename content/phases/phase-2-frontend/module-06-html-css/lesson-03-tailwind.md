@@ -597,7 +597,7 @@ Yaygın hata: Modern CSS özelliklerini tarayıcı desteğini kontrol etmeden ku
 :::exercise
 ### Alistirma 1: Tailwind ile Responsive Kart Grid (Kolay)
 
-Tailwind CSS kullanarak responsive bir urun karti grid'i olustur.
+Tailwind CSS kullanarak responsive bir urun karti grid'i oluştur.
 
 ```html
 <!-- TODO: Tailwind class'lari ile tamamla -->
@@ -626,7 +626,7 @@ Tailwind CSS kullanarak responsive bir urun karti grid'i olustur.
 
 ### Alistirma 2: Dark Mode Toggle Sistemi (Orta)
 
-Tailwind dark mode ve localStorage ile kalici tema degisimi olustur.
+Tailwind dark mode ve localStorage ile kalici tema degisimi oluştur.
 
 ```html
 <!-- tailwind.config.js'te darkMode: 'class' ayarla -->
@@ -659,7 +659,7 @@ Tailwind dark mode ve localStorage ile kalici tema degisimi olustur.
 
 ### Alistirma 3: CSS Animation ve Group Hover Pattern (Zor)
 
-Tailwind animation, group hover ve custom keyframes ile interaktif UI elementleri olustur.
+Tailwind animation, group hover ve custom keyframes ile interaktif UI elementleri oluştur.
 
 ```html
 <style>
@@ -698,7 +698,7 @@ Tailwind animation, group hover ve custom keyframes ile interaktif UI elementler
 <!-- TODO: fixed bottom-4 right-4, fadeInUp animasyonu, kapatma butonu -->
 ```
 
-**Beklenen Sonuc:** Skeleton pulsing animasyonu calismali. Kart hover'inda overlay ve golge gorunmeli. Toast asagidan yukari kayarak gelmeli. Tum gecisler smooth olmali.
+**Beklenen Sonuc:** Skeleton pulsing animasyonu çalışmali. Kart hover'inda overlay ve golge gorunmeli. Toast asagidan yukari kayarak gelmeli. Tum gecisler smooth olmali.
 **Ipucu:** `group` parent'a, `group-hover:` child'a eklenir. `transition-all duration-300` ile animasyonlu gecis saglanir.
 :::
 
@@ -731,13 +731,13 @@ explanation: "transform ve opacity GPU tarafından compositor thread'inde işlen
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "Tailwind CSS'in utility-first yaklasimini BEM ve CSS Modules ile karsilastir. Her yaklasimin specificity yonetimi, bundle size, developer experience ve takim olceklenmesi acisindan avantaj ve dezavantajlarini tablo halinde goster. Neden 2025'te Tailwind endüstri standardi oldu?"
 
 **2. Pratik Uygulama:**
-> "Tailwind CSS ile dark mode destekli bir pricing card component'i olustur. 3 plan (Basic, Pro, Enterprise) olsun. Hover efektleri, group-hover ile icerik degisimi, responsive tasarim (mobilde tek sutun, desktopte yan yana) ve animasyonlar icersin. Her utility class'in ne yaptigini acikla."
+> "Tailwind CSS ile dark mode destekli bir pricing card component'i oluştur. 3 plan (Basic, Pro, Enterprise) olsun. Hover efektleri, group-hover ile icerik degisimi, responsive tasarim (mobilde tek sutun, desktopte yan yana) ve animasyonlar icersin. Her utility class'in ne yaptigini acikla."
 > Takip: "Bu component'i @apply kullanmadan React component'ine donustur ve neden @apply yerine component abstraction tercih ettigini acikla."
 
 **3. Mukemmellik Icin:**
@@ -756,7 +756,7 @@ Tailwind class'larini yazarken AI'a UI screenshot veya Figma tasarimini goster v
 
 **Soru 2: Tailwind'de responsive tasarim nasil yapilir?**
 - **Junior cevabi:** sm:, md:, lg: gibi prefix'ler kullanilir.
-- **Senior cevabi:** Tailwind mobile-first yaklasimi benimser: prefix'siz class'lar tum ekranlarda gecerlidir, sm: (640px+), md: (768px+), lg: (1024px+), xl: (1280px+) buyuyen ekranlara uygulanir. Ornegin `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3` mobilde tek sutun, tablette 2, desktop'ta 3 sutun olusturur. Container query'ler (@container) ile parent boyutuna gore responsive tasarim yapilabilir. Custom breakpoint'ler tailwind.config.js'te tanimlanir. Responsive debugging icin dev tools'un device emulation'i kullanilir.
+- **Senior cevabi:** Tailwind mobile-first yaklasimi benimser: prefix'siz class'lar tum ekranlarda gecerlidir, sm: (640px+), md: (768px+), lg: (1024px+), xl: (1280px+) buyuyen ekranlara uygulanir. Örneğin `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3` mobilde tek sutun, tablette 2, desktop'ta 3 sutun oluşturur. Container query'ler (@container) ile parent boyutuna gore responsive tasarim yapilabilir. Custom breakpoint'ler tailwind.config.js'te tanimlanir. Responsive debugging icin dev tools'un device emulation'i kullanilir.
 :::
 
 :::exercise
@@ -1052,7 +1052,7 @@ body {
 - Dark mode: dark: prefix (dark:bg-gray-900, dark:text-white)
 - State variants: hover:, focus:, active:, disabled:, group-hover:, peer-invalid:
 - @apply: Tekrar eden utility gruplarını CSS sınıfına çıkar (az kullan)
-- CSS Custom Properties: --degisken-adi: deger; kullanım: var(--degisken-adi)
+- CSS Custom Properties: --değişken-adi: deger; kullanım: var(--değişken-adi)
 - Dark mode değişkenleri: @media (prefers-color-scheme: dark) ile override et
 - Animasyonlarda sadece transform ve opacity kullan (GPU-accelerated, performanslı)
 - @keyframes: Animasyon tanımla, animation: ile uygula

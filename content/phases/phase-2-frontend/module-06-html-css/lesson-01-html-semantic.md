@@ -286,7 +286,7 @@ Yaygın hata: Heading etiketlerini font büyüklüğü için kullanmak. `<h3>` s
       name="email"
       required
       autocomplete="email"
-      placeholder="ornek@mail.com"
+      placeholder="örnek@mail.com"
       aria-describedby="email-help"
     >
     <small id="email-help">Kurumsal email tercih edin</small>
@@ -490,7 +490,7 @@ HTML5 API'leri hakkında şunu unutma: localStorage'da hassas veri (token, şifr
 :::exercise
 ### Alistirma 1: Semantik HTML ile Sayfa Yapisi (Kolay)
 
-Bir kisisel portfoy sayfasinin HTML iskeletini semantik etiketler kullanarak olustur. `div` yerine anlamli HTML5 etiketleri kullan.
+Bir kisisel portfoy sayfasinin HTML iskeletini semantik etiketler kullanarak oluştur. `div` yerine anlamli HTML5 etiketleri kullan.
 
 ```html
 <!DOCTYPE html>
@@ -547,9 +547,9 @@ nav, header, main, section, article, h1, h2, p, time, footer, small -->
 
 ---
 
-### Alistirma 2: Erisilebilir Form Olusturma (Orta)
+### Alistirma 2: Erisilebilir Form Oluşturma (Orta)
 
-HTML5 input type'lari, ARIA attribute'leri ve form validasyonu kullanarak erisilebilir bir iletisim formu olustur.
+HTML5 input type'lari, ARIA attribute'leri ve form validasyonu kullanarak erisilebilir bir iletisim formu oluştur.
 
 ```html
 <!-- TODO: Bu formu tamamla -->
@@ -645,7 +645,7 @@ Bir web sayfasinin erisebilirligini test et: Lighthouse audit, Tab navigasyonu v
 -->
 ```
 
-**Beklenen Sonuc:** Tum 8 hata duzeltilmis olmali. Lighthouse Accessibility skoru 100 olmali. Tab ile gezinme sorunsuz calismali. Focus ring gorunur olmali.
+**Beklenen Sonuc:** Tum 8 hata duzeltilmis olmali. Lighthouse Accessibility skoru 100 olmali. Tab ile gezinme sorunsuz çalışmali. Focus ring gorunur olmali.
 **Ipucu:** Hata 5 icin `div` yerine `button` kullan. Hata 6 icin WCAG AA kontrast oranini sagla (4.5:1). Skip link icin `<a href="#main" class="skip-link">Ana iceriye atla</a>` kullan.
 :::
 
@@ -678,17 +678,17 @@ explanation: "aria-hidden='true' elemanı ekran okuyuculardan gizler ama görsel
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "Semantic HTML5 elemanlarini (header, nav, main, article, section, aside, footer) bir gazete sayfasi analojisiyle acikla. Her elemanin ekran okuyucular tarafindan nasil yorumlandigini ve ARIA landmark role'leri ile iliskisini detayli anlat."
 
 **2. Pratik Uygulama:**
-> "Bana bir e-ticaret urun detay sayfasi icin semantic HTML5 iskeleti olustur. Breadcrumb, urun resmi, aciklama, fiyat, yorum bolumu ve ilgili urunler kismi olsun. Her eleman icin neden o semantic etiketi sectigini acikla."
+> "Bana bir e-ticaret urun detay sayfasi icin semantic HTML5 iskeleti oluştur. Breadcrumb, urun resmi, aciklama, fiyat, yorum bolumu ve ilgili urunler kismi olsun. Her eleman icin neden o semantic etiketi sectigini acikla."
 > Takip: "Simdi bu sayfaya ARIA attribute'lari ekle ve Lighthouse accessibility skorunu 100 yapacak iyilestirmeleri goster."
 
 **3. Mukemmellik Icin:**
-> "WCAG 2.1 AA uyumlu bir form tasarliyorum. Label-input eslestirme, aria-describedby ile hata mesajlari, fieldset-legend gruplama, skip navigation ve focus management gibi tum erisilebilirlik gereksinimlerini karsilayan bir kayit formu ornegi olustur ve her karari acikla."
+> "WCAG 2.1 AA uyumlu bir form tasarliyorum. Label-input eslestirme, aria-describedby ile hata mesajlari, fieldset-legend gruplama, skip navigation ve focus management gibi tum erisilebilirlik gereksinimlerini karsilayan bir kayit formu örneği oluştur ve her karari acikla."
 
 ### Pair Programming Ipucu
 HTML yazilarken AI'a Lighthouse accessibility raporu ciktisini yapistir ve sor: "Bu rapordaki erisilebilirlik sorunlarini analiz et. Her sorunu severity sirasina gore listele ve semantic HTML ile nasil cozecegimi goster."

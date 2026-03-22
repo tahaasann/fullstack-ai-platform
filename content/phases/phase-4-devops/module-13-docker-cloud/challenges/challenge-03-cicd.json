@@ -3,9 +3,14 @@
   "title": "GitHub Actions CI/CD Pipeline",
   "difficulty": "zor",
   "category": "devops",
-  "tags": ["ci-cd", "github-actions", "automation", "deployment"],
+  "tags": [
+    "ci-cd",
+    "github-actions",
+    "automation",
+    "deployment"
+  ],
   "related_lesson": "mod-13-docker-cloud/lesson-02",
-  "description_tr": "Bir full-stack proje icin eksiksiz bir GitHub Actions CI/CD pipeline YAML dosyasi olustur. Build, test, lint ve deploy asamalarini icermeli.",
+  "description_tr": "Bir full-stack proje icin eksiksiz bir GitHub Actions CI/CD pipeline YAML dosyasi oluştur. Build, test, lint ve deploy asamalarini icermeli.",
   "description_detail": "Gercek bir projede kullanilabilecek bir CI/CD pipeline tanimlayin. Pipeline push ve pull request event'lerinde tetiklenmeli, paralel job'lar icermeli, caching kullanmali ve staging/production ortamlarina deploy etmelidir.",
   "examples": [
     {
@@ -17,13 +22,13 @@
   "constraints": [
     "GitHub Actions workflow syntax'i kullanin",
     "main branch'e push ve pull_request'te tetiklenmeli",
-    "lint ve test job'lari paralel calismali",
+    "lint ve test job'lari paralel çalışmali",
     "build job'i lint + test'e bagimli olmali",
-    "deploy-production sadece main branch'te calismali ve manual approval gerektirmeli"
+    "deploy-production sadece main branch'te çalışmali ve manual approval gerektirmeli"
   ],
   "starter_code": {
-    "python": "def generate_pipeline_config():\n    \"\"\"\n    GitHub Actions CI/CD pipeline konfigurasyonunu dict olarak dondur.\n    YAML'a donusturulunce gecerli bir workflow dosyasi olusturmali.\n    \n    Gerekli job'lar:\n    1. lint: ESLint + Prettier kontrolu\n    2. test: Jest unit testleri (coverage raporuyla)\n    3. build: Docker image build + push to registry\n    4. deploy-staging: Staging ortamina otomatik deploy\n    5. deploy-production: Production deploy (manual approval + main branch only)\n    \n    Her job'da:\n    - Node.js 20 kullanin\n    - npm cache'i aktif edin\n    - Uygun needs (bagimlilik) tanimlayin\n    \"\"\"\n    pass",
-    "javascript": "function generatePipelineConfig() {\n    /**\n     * GitHub Actions CI/CD pipeline konfigurasyonunu object olarak dondur.\n     * YAML'a donusturulunce gecerli bir workflow dosyasi olusturmali.\n     * \n     * Gerekli job'lar:\n     * 1. lint: ESLint + Prettier kontrolu\n     * 2. test: Jest unit testleri (coverage raporuyla)\n     * 3. build: Docker image build + push to registry\n     * 4. deploy-staging: Staging ortamina otomatik deploy\n     * 5. deploy-production: Production deploy (manual approval + main branch only)\n     * \n     * Her job'da:\n     * - Node.js 20 kullanin\n     * - npm cache'i aktif edin\n     * - Uygun needs (bagimlilik) tanimlayin\n     */\n}"
+    "python": "def generate_pipeline_config():\n    \"\"\"\n    GitHub Actions CI/CD pipeline konfigurasyonunu dict olarak dondur.\n    YAML'a donusturulunce gecerli bir workflow dosyasi oluşturmali.\n    \n    Gerekli job'lar:\n    1. lint: ESLint + Prettier kontrolu\n    2. test: Jest unit testleri (coverage raporuyla)\n    3. build: Docker image build + push to registry\n    4. deploy-staging: Staging ortamına otomatik deploy\n    5. deploy-production: Production deploy (manual approval + main branch only)\n    \n    Her job'da:\n    - Node.js 20 kullanin\n    - npm cache'i aktif edin\n    - Uygun needs (bagimlilik) tanimlayin\n    \"\"\"\n    pass",
+    "javascript": "function generatePipelineConfig() {\n    /**\n     * GitHub Actions CI/CD pipeline konfigurasyonunu object olarak dondur.\n     * YAML'a donusturulunce gecerli bir workflow dosyasi oluşturmali.\n     * \n     * Gerekli job'lar:\n     * 1. lint: ESLint + Prettier kontrolu\n     * 2. test: Jest unit testleri (coverage raporuyla)\n     * 3. build: Docker image build + push to registry\n     * 4. deploy-staging: Staging ortamına otomatik deploy\n     * 5. deploy-production: Production deploy (manual approval + main branch only)\n     * \n     * Her job'da:\n     * - Node.js 20 kullanin\n     * - npm cache'i aktif edin\n     * - Uygun needs (bagimlilik) tanimlayin\n     */\n}"
   },
   "test_cases": [
     {
@@ -39,7 +44,7 @@
     {
       "input": {},
       "expected": "lint_test_parallel",
-      "description": "lint ve test job'lari birbirinden bagimsiz (paralel) calismali"
+      "description": "lint ve test job'lari birbirinden bagimsiz (paralel) çalışmali"
     },
     {
       "input": {},
@@ -51,7 +56,7 @@
     {
       "input": {},
       "expected": "production_main_only",
-      "description": "deploy-production sadece main branch'te calismali"
+      "description": "deploy-production sadece main branch'te çalışmali"
     },
     {
       "input": {},
@@ -78,5 +83,5 @@
     "optimal_time": "O(1)",
     "optimal_space": "O(1)"
   },
-  "learn_after_solving": "CI/CD pipeline tasariminin temellerini ogrendin: paralel job'lar, bagimlilik zincirleri, branch koruma, environment-based deploy. Bu pattern her buyuk projede kullanilir ve DevOps mulakat sorularinin temelini olusturur."
+  "learn_after_solving": "CI/CD pipeline tasariminin temellerini ogrendin: paralel job'lar, bagimlilik zincirleri, branch koruma, environment-based deploy. Bu pattern her buyuk projede kullanilir ve DevOps mulakat sorularinin temelini oluşturur."
 }

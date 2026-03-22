@@ -196,7 +196,7 @@ XSS, saldırganın bir web sayfasına zararlı JavaScript kodu enjekte etmesiyle
 ### XSS Türleri
 
 :::comparison
-| Tur | Aciklama | Ornek | Tehlike Seviyesi |
+| Tur | Aciklama | Örnek | Tehlike Seviyesi |
 |-----|----------|-------|------------------|
 | **Stored XSS** | Zararlı kod veritabanına kaydedilir, her görüntülemede çalışır | Forum yorumuna `<script>` ekleme | Çok Yüksek |
 | **Reflected XSS** | Zararlı kod URL parametresinden yansıtılır | Arama sonuçlarında `<script>` | Yüksek |
@@ -960,7 +960,7 @@ jobs:
 # TODO: SBOM (Software Bill of Materials) olustur
 ```
 
-**Beklenen Sonuc:** Haftalik otomatik güvenlik taramasi calismali. Kritik aciklarda bildirim gelmeli. Dependabot PR'lari otomatik acilmali.
+**Beklenen Sonuc:** Haftalik otomatik güvenlik taramasi çalışmali. Kritik aciklarda bildirim gelmeli. Dependabot PR'lari otomatik acilmali.
 **Ipucu:** `pnpm audit --audit-level critical` ile sadece kritik aciklari goster. Snyk free tier acik kaynak projeler icin sinisrsiz.
 
 ---
@@ -1052,18 +1052,250 @@ describe("Guvenlik Testleri", () => {
 **Ipucu:** OWASP ZAP ucretsizdir ve CI/CD'ye entegre edilebilir. Penetrasyon testini SADECE kendi uygulamana yap, baskalarinin sistemine izinsiz test etme.
 :::
 
+:::exercise
+### Alistirma 11: XSS Saldirisi Tespiti ve Onleme (Kolay)
+
+Cross-Site Scripting (XSS) acigini tespit et ve onle.
+
+```javascript
+// Guvensiz kod — XSS acigi var!
+app.get('/search', (req, res) => {
+  const query = req.query.q;
+  res.send(`<h1>Arama sonuclari: ${query}</h1>`);
+});
+
+// TODO: Guvenli versiyonunu yaz
+// 1. DOMPurify veya he kutuphanesi ile input sanitize et
+// 2. Content-Security-Policy header ekle
+// 3. Template engine ile auto-escaping aktif et
+// 4. HttpOnly cookie kullan
+```
+
+**Beklenen Sonuc:** Script injection denemesi engellenmeli. CSP header'i inline script'leri bloklayabilmeli.
+**Ipucu:** Stored XSS en tehlikelisidir — veritabanina kaydedilir. Output encoding + CSP birlikte kullan.
+:::
+
+:::exercise
+### Alistirma 12: SQL Injection Onleme (Kolay)
+
+SQL Injection acigini bul ve parametrized query ile duzelt.
+
+```javascript
+// Guvensiz kod — SQL Injection acigi!
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const query = `SELECT * FROM users WHERE username='${username}' AND password='${password}'`;
+  // ' OR '1'='1' -- ile bypass edilebilir!
+
+  // TODO: Parametrized query ile yeniden yaz
+  // const result = await db.query(
+  //   'SELECT * FROM users WHERE username = $1 AND password = $2',
+  //   [username, password]
+  // );
+  // TODO: ORM kullanarak ayni sorguyu yaz (Prisma/Drizzle)
+  // TODO: Input validation ekle (zod ile)
+});
+```
+
+**Beklenen Sonuc:** SQL injection denemesi basarisiz olmali. Parametrized query kullanilmali.
+**Ipucu:** ASLA string concatenation ile SQL yazma. ORM kullanmak bile %100 guvenli degildir — raw query'lerde parametrize et.
+:::
+
+:::exercise
+### Alistirma 13: CSRF Token Implementasyonu (Kolay)
+
+Cross-Site Request Forgery korunmasini uygula.
+
+```javascript
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+
+// TODO: CSRF middleware'ini route'lara ekle
+// app.get('/transfer', csrfProtection, (req, res) => {
+//   res.render('transfer', { csrfToken: req.csrfToken() });
+// });
+
+// TODO: Form'da hidden input ile CSRF token gonder
+// TODO: SameSite cookie attribute'u ekle
+// TODO: Double Submit Cookie pattern'ini uygula
+```
+
+**Beklenen Sonuc:** CSRF token olmadan POST istekleri reddedilmeli. Token her form icin unique olmali.
+**Ipucu:** SameSite=Strict cookie'ler cross-site isteklerde gonderilmez. Modern tarayicilarda SameSite=Lax varsayilandir.
+:::
+
+:::exercise
+### Alistirma 14: Security Headers Konfigurasyonu (Orta)
+
+Temel guvenlik header'larini Helmet ile uygula.
+
+```javascript
+const helmet = require('helmet');
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    }
+  },
+  // TODO: HSTS konfigur et (maxAge: 1 yil, includeSubDomains)
+  // TODO: X-Frame-Options ayarla
+  // TODO: Referrer-Policy ekle
+}));
+
+// TODO: securityheaders.com ile sonucu test et
+// TODO: Her header'in ne yaptigini aciklayan yorum yaz
+```
+
+**Beklenen Sonuc:** securityheaders.com'da A+ notu alinmali. Tum guvenlik header'lari tanimli olmali.
+**Ipucu:** CSP'yi report-only modda baslat, hatalari izle, sonra enforce moduna gec.
+:::
+
+:::exercise
+### Alistirma 15: Rate Limiting ve Brute Force Korumasi (Orta)
+
+API'ye rate limiting ve brute force korumasi ekle.
+
+```javascript
+const rateLimit = require('express-rate-limit');
+
+// Genel rate limiter
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Cok fazla istek, lutfen bekleyin.'
+});
+
+// TODO: Login icin daha siki rate limiter olustur (5 deneme/15dk)
+// TODO: Redis-backed rate limiter (distributed systems icin)
+// TODO: Account lockout mekanizmasi ekle
+// TODO: Progressive delay (her basarisiz denemede artan bekleme)
+// TODO: IP-based ve user-based rate limiting birlestir
+```
+
+**Beklenen Sonuc:** 5 basarisiz login denemesinden sonra gecici engel uygulanmali. API dakikada 100 istekle sinirlanmali.
+**Ipucu:** Redis-backed rate limiter coklu sunucuda tutarli calisir. `express-slow-down` ile progressive delay uygula.
+:::
+
+:::exercise
+### Alistirma 16: Input Validation ve Sanitization (Orta)
+
+Zod ile kapsamli input validation sablonu olustur.
+
+```typescript
+import { z } from 'zod';
+
+const registerSchema = z.object({
+  email: z.string().email('Gecerli email giriniz'),
+  password: z.string()
+    .min(8, 'En az 8 karakter')
+    .regex(/[A-Z]/, 'En az bir buyuk harf')
+    .regex(/[0-9]/, 'En az bir rakam')
+    .regex(/[^A-Za-z0-9]/, 'En az bir ozel karakter'),
+  name: z.string().min(2).max(50),
+  // TODO: Telefon numarasi validasyonu ekle
+  // TODO: XSS iceren string'leri reddet
+});
+
+// TODO: Validation middleware yaz
+// TODO: File upload validasyonu ekle (boyut, tip, icerik kontrolu)
+// TODO: API response'larda da sensitive data filtrele
+```
+
+**Beklenen Sonuc:** Gecersiz input'lar anlamli hata mesajlariyla reddedilmeli. XSS payload'lari engellenmeli.
+**Ipucu:** Zod hem runtime validation hem TypeScript type inference saglar. Server-side validation ZORUNLU.
+:::
+
+:::exercise
+### Alistirma 17: JWT Guvenlik Best Practices (Orta)
+
+JWT token yonetimini guvenli sekilde uygula.
+
+```typescript
+// TODO: Access + Refresh token sistemi kur
+// Access token: 15dk, RS256
+// Refresh token: 7 gun, tek kullanimlik (rotation)
+
+// TODO: Token rotation uygula
+// TODO: Token blacklist mekanizmasi (logout icin Redis ile)
+// TODO: Token payload'ina hassas veri KOYMA
+// TODO: Symmetric (HS256) vs Asymmetric (RS256) karsilastirmasi yaz
+// TODO: Cookie vs Authorization header karsilastirmasi yaz
+```
+
+**Beklenen Sonuc:** Access token 15 dakikada expire olmali. Refresh token rotation calismali. Logout'ta token gecersiz olmali.
+**Ipucu:** RS256 ile public key'i dogrulama icin dagitabilirsin (microservices). HS256 tek servis icin uygun.
+:::
+
+:::exercise
+### Alistirma 18: OWASP Top 10 Denetim Kontrol Listesi (Zor)
+
+Bir uygulamayi OWASP Top 10'a karsi denetle.
+
+```markdown
+# OWASP Top 10 (2021) Denetim Kontrol Listesi
+
+## A01: Broken Access Control
+- [ ] Her endpoint'te yetkilendirme kontrolu var mi?
+- [ ] IDOR korunmasi var mi?
+
+## A02: Cryptographic Failures
+- [ ] Hassas veriler sifreleniyor mu (at rest + in transit)?
+
+## A03: Injection
+- [ ] Tum SQL sorgulari parametrize mi?
+
+## TODO: A04-A10 icin kontrol maddeleri ve test senaryolari yaz
+## Her kategori icin en az 2 test senaryosu ekle
+```
+
+**Beklenen Sonuc:** 10 kategorinin hepsi icin kontrol maddeleri olmali. Her kategori icin en az 2 test senaryosu yazilmali.
+**Ipucu:** OWASP Testing Guide (OTG) her kategori icin detayli test yontemleri icerir. ZAP ile otomatik + manuel test birlestir.
+:::
+
+:::exercise
+### Alistirma 19: Penetrasyon Testi Raporu Yazma (Zor)
+
+Bir web uygulamasi icin penetrasyon testi raporu olustur.
+
+```markdown
+# TODO: Asagidaki sablonu kullanarak rapor yaz
+
+## 1. Yonetici Ozeti
+- Tarama tarihi, bulunan zafiyet sayisi, risk degerlendirmesi
+
+## 2. Metodoloji
+- Araclar: OWASP ZAP, Burp Suite, nikto, nmap
+
+## 3. Bulgular (her biri icin):
+- Ciddiyet: Kritik/Yuksek/Orta/Dusuk
+- Konum, Aciklama, Kanit (PoC), Cozum Onerisi, Referans
+
+## TODO: En az 5 bulgu icin detayli rapor yaz
+## TODO: CVSS puani hesapla
+## TODO: Oncelik sirasina gore cozum yol haritasi olustur
+```
+
+**Beklenen Sonuc:** Profesyonel formatta pentest raporu hazirlanmali. Her bulgu icin PoC ve cozum onerisi olmali.
+**Ipucu:** CVSS ile bulgu ciddiyet puani hesapla. Yonetici ozeti teknik olmayan kisiler icin yazilmali.
+:::
+
+
 :::ai-guidance
 ## Bu Derste AI ile Ogren
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "OWASP Top 10 (2021) listesinideki ilk 5 güvenlik acigini (Broken Access Control, Cryptographic Failures, Injection, Insecure Design, Security Misconfiguration) gercek saldiri senaryolariyla acikla. Her biri icin nasil tespit edilir ve nasil onlenir? Express.js ve React'te hangi middleware/practice'ler kullanilir?"
 
 **2. Pratik Uygulama:**
-> "Bir web uygulamasinda XSS (Stored, Reflected, DOM-based), SQL Injection ve CSRF saldirilarini canli orneklerle goster. Her saldiri icin savunmasiz kodu yaz, sonra guvenli versiyonunu olustur. CSP (Content Security Policy) header'ini, parameterized queries'i ve CSRF token mekanizmasini implemente et."
+> "Bir web uygulamasinda XSS (Stored, Reflected, DOM-based), SQL Injection ve CSRF saldirilarini canli örneklerle goster. Her saldiri icin savunmasiz kodu yaz, sonra guvenli versiyonunu oluştur. CSP (Content Security Policy) header'ini, parameterized queries'i ve CSRF token mekanizmasini implemente et."
 > Takip: "Simdi Helmet.js ile HTTP güvenlik header'larini konfigure et ve CORS politikasini production icin ayarla. Her header'in ne korudugunu acikla."
 
 **3. Mukemmellik Icin:**
@@ -1102,14 +1334,14 @@ Senior developer web security öğrenirken:
 
 5. **Incident response planı hazırlar:** Veri sızıntısı durumunda: (1) Tespit, (2) İzolasyon, (3) İnceleme, (4) Müdahale, (5) Bildirim, (6) İyileştirme adımlarını tanımlar. Tabletop exercise'ler yapar.
 
-**Karar Verme Sureci — Güvenlik Yatirimi Onceliklendirme:**
+**Karar Verme Süreci — Güvenlik Yatirimi Onceliklendirme:**
 - **Input validation + parameterized queries**: Maliyet dusuk, etki cok yuksek. SQL Injection ve XSS'in %95'ini engeller. Bunu yapmayan hic bir proje production'a cikmamali.
 - **Authentication/Authorization**: JWT vs session, RBAC vs ABAC karari. Trade-off: JWT stateless ama revoke etmek zor (kisa expiry + refresh token ile coz). Session server-side state gerektirir ama aninda revoke edilir. Senior karar: "Microservice mi? JWT. Monolith mi? Session. Ikisi de mi? BFF pattern ile session frontend'e, JWT service'ler arasinda."
 - **WAF (Web Application Firewall)**: Cloudflare, AWS WAF gibi servisler. Trade-off: False positive'ler legitimate trafigi engelleyebilir, konfigurasyonu uzmanlik gerektirir. Ama bilinen saldiri pattern'lerini otomatik engeller. Production'da olmasi gereken minimum güvenlik katmani.
 - **Penetration testing**: Yilda en az 1 kez professional pentest. Trade-off: Pahali ($5K-50K) ama bir data breach'in maliyeti $4M+ (IBM 2025 raporuna gore). Bug bounty programi daha ucuz ve surekli test saglar.
 
 **Anti-pattern Farkindaligi:**
-- **"Security through obscurity"**: API endpoint'lerini gizleyerek güvenlik saglamaya calismak. Hacker zaten tum endpoint'leri brute-force ile veya JS bundle'dan bulur. Her endpoint authentication + authorization + input validation olmali.
+- **"Security through obscurity"**: API endpoint'lerini gizleyerek güvenlik saglamaya çalışmak. Hacker zaten tum endpoint'leri brute-force ile veya JS bundle'dan bulur. Her endpoint authentication + authorization + input validation olmali.
 - **Client-side validation'a guvenmek**: Frontend'de "admin" rolunu kontrol edip butonu gizlemek. Kullanici DevTools'tan butonu gorunur yapar veya direkt API'ye istek atar. Validation MUTLAKA server-side olmali.
 - **Logging'de sensitive data**: `console.log(user)` ile password hash'ini, token'i loga yazmak. Log aggregation servisleri (Datadog, ELK) bu verileri indexler ve arama yapilabilir hale getirir. PII masking ve structured logging kullan.
 

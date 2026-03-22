@@ -40,13 +40,13 @@
       "type": "multiple_choice",
       "question": "Aşağıdakilerden hangisi Python'da encapsulation (kapsülleme) için name mangling uygular?",
       "options": [
-        "_degisken (tek alt tire)",
-        "__degisken (çift alt tire)",
-        "__degisken__ (çift alt tire her iki taraf)",
-        "private degisken (private anahtar kelimesi)"
+        "_değişken (tek alt tire)",
+        "__değişken (çift alt tire)",
+        "__değişken__ (çift alt tire her iki taraf)",
+        "private değişken (private anahtar kelimesi)"
       ],
       "correct": 1,
-      "explanation": "Çift alt tire (__degisken) ile başlayan isimler Python tarafından name mangling'e uğrar ve _ClassName__degisken şekline dönüştürülür. Tek alt tire (_degisken) sadece konvansiyon olarak 'private' kabul edilir. Çift alt tireli isimler (__init__ gibi) ise dunder (magic) metotlardır.",
+      "explanation": "Çift alt tire (__değişken) ile başlayan isimler Python tarafından name mangling'e uğrar ve _ClassName__değişken şekline dönüştürülür. Tek alt tire (_değişken) sadece konvansiyon olarak 'private' kabul edilir. Çift alt tireli isimler (__init__ gibi) ise dunder (magic) metotlardır.",
       "difficulty": "orta",
       "points": 10
     },
@@ -94,7 +94,9 @@
       "type": "code_completion",
       "question": "Aşağıdaki generator fonksiyonunu tamamla. Fonksiyon verilen n sayısına kadar Fibonacci sayılarını üretmelidir:",
       "code_template": "def fibonacci(n):\n    a, b = 0, 1\n    for _ in range(n):\n        _____ a\n        a, b = b, a + b",
-      "correct_answers": ["yield"],
+      "correct_answers": [
+        "yield"
+      ],
       "explanation": "Generator fonksiyonlarda 'yield' anahtar kelimesi kullanılır. yield, return'den farklı olarak fonksiyonun durumunu korur ve bir sonraki next() çağrısında kaldığı yerden devam eder. Bu sayede tüm Fibonacci dizisi bellekte tutulmaz.",
       "difficulty": "kolay",
       "points": 10
@@ -104,7 +106,9 @@
       "type": "code_completion",
       "question": "Aşağıdaki sınıfta @property decorator'unu kullanarak 'alan' attribute'unu tamamla:",
       "code_template": "class Dikdortgen:\n    def __init__(self, en, boy):\n        self.en = en\n        self.boy = boy\n\n    _____\n    def alan(self):\n        return self.en * self.boy",
-      "correct_answers": ["@property"],
+      "correct_answers": [
+        "@property"
+      ],
       "explanation": "@property decorator'u, bir metodu attribute gibi erişilebilir yapar. dikdortgen.alan() yerine dikdortgen.alan şeklinde parantez olmadan kullanılabilir. Bu, getter/setter pattern'inin Pythonic yoludur.",
       "difficulty": "orta",
       "points": 10
@@ -120,7 +124,13 @@
         "Bağımlılıkları yükle (uv pip install -r requirements.txt)",
         "requirements.txt dosyasını oluştur veya güncelle (uv pip freeze > requirements.txt)"
       ],
-      "correct_order": [0, 1, 2, 3, 4],
+      "correct_order": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
       "explanation": "Sıra: Önce proje dizini oluşturulur, sonra izole bir sanal ortam oluşturulur, ortam aktifleştirilir, bağımlılıklar yüklenir ve son olarak requirements.txt ile bağımlılıklar kaydedilir. Bu akış her Python projesinin temelidir. 📌 2026 Notu: Modern Python projelerinde `uv` aracı tercih edilir — `uv init`, `uv add paket` ve `uv.lock` ile aynı adımlar 10-100x daha hızlı yapılır.",
       "difficulty": "kolay",
       "points": 15
@@ -130,7 +140,16 @@
       "type": "explain_code",
       "question": "Aşağıdaki Python kodu ne yapar? Her satırı açıkla.",
       "code": "from functools import wraps\n\ndef retry(max_attempts=3):\n    def decorator(func):\n        @wraps(func)\n        def wrapper(*args, **kwargs):\n            for attempt in range(max_attempts):\n                try:\n                    return func(*args, **kwargs)\n                except Exception as e:\n                    if attempt == max_attempts - 1:\n                        raise\n            return wrapper\n    return decorator",
-      "correct_keywords": ["decorator", "parametreli", "retry", "tekrar deneme", "hata yakalama", "try-except", "wraps", "max_attempts"],
+      "correct_keywords": [
+        "decorator",
+        "parametreli",
+        "retry",
+        "tekrar deneme",
+        "hata yakalama",
+        "try-except",
+        "wraps",
+        "max_attempts"
+      ],
       "sample_answer": "Bu kod, parametreli bir decorator tanımlar. @retry(max_attempts=3) şeklinde kullanılır. Dekore edilen fonksiyon hata fırlatırsa, max_attempts kadar tekrar dener. Son denemede de hata olursa, hatayı yukarı fırlatır (raise). @wraps(func) ise orijinal fonksiyonun adı ve docstring'inin korunmasını sağlar. Bu pattern, ağ istekleri veya veritabanı bağlantıları gibi geçici hatalara açık işlemlerde yaygın kullanılır.",
       "difficulty": "zor",
       "points": 15

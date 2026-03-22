@@ -3841,7 +3841,7 @@
       "steps": [
         {
           "title": "Production Build",
-          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "instructions": "Uygulamayi production modda build et, tum testleri çalıştır, Lighthouse audit yap",
           "code_snippet": "pnpm build && pnpm test",
           "substeps": [
             {
@@ -4082,9 +4082,9 @@
       "Event-Driven Architecture",
       "Streaming"
     ],
-    "cv_placement": "Full Stack Developer pozisyonlarinda ilk siraya koy — real-time ozellikler cok talep gorur. AI Engineer pozisyonlarinda da guclu bir proje cunku OpenAI entegrasyonu ve streaming response iceriyor. Chat uygulamasi recruiter'larin kolayca anlayabilecegi bir projedir — herkes WhatsApp/Slack kullanir.",
+    "cv_placement": "Full Stack Developer pozisyonlarinda ilk siraya koy — real-time özellikler cok talep gorur. AI Engineer pozisyonlarinda da guclu bir proje cunku OpenAI entegrasyonu ve streaming response iceriyor. Chat uygulamasi recruiter'larin kolayca anlayabilecegi bir projedir — herkes WhatsApp/Slack kullanir.",
     "metrics_you_can_claim": [
-      "100+ eszamanli WebSocket baglantisi destegi",
+      "100+ eszamanli WebSocket bağlantısi destegi",
       "Mesaj iletim suresi < 50ms (ayni sunucu icinde)",
       "Redis Pub/Sub ile multi-instance mesaj dagitimi",
       "OpenAI API streaming ile < 200ms ilk token suresi",
@@ -4174,17 +4174,17 @@
     "code_review": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "Review this Socket.io + Node.js + MongoDB code for: WebSocket event handling best practices, room management and namespace usage, MongoDB query optimization for chat messages, Redis pub/sub integration, memory leak prevention in Socket connections, error handling for disconnections, OpenAI API streaming implementation, and React state management for real-time updates.",
-      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle Socket.io event handler'lari, MongoDB aggregation pipeline'lari ve AI streaming icin"
+      "when_to_use": "Her step tamamlandiktan sonra kullan — özellikle Socket.io event handler'lari, MongoDB aggregation pipeline'lari ve AI streaming icin"
     },
     "debugging": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "I'm getting this error in my real-time chat app (React + Socket.io + MongoDB + Redis + OpenAI): [error]. The relevant code is: [code]. Socket event flow: [flow]. I'm trying to [goal].",
-      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle WebSocket baglanti sorunlari, Redis pub/sub hatalari ve OpenAI streaming kesintileri icin"
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — özellikle WebSocket bağlantı sorunlari, Redis pub/sub hatalari ve OpenAI streaming kesintileri icin"
     },
     "research": {
       "model": "Gemini 2.5 Pro",
       "prompt_template": "Explain [concept] with practical examples for a real-time chat app with AI. Topics I need help with: Socket.io rooms and namespaces, Redis pub/sub adapter for Socket.io, MongoDB TTL indexes and capped collections, cursor-based pagination, OpenAI streaming API with Server-Sent Events, typing indicators implementation, and online presence tracking patterns.",
-      "when_to_use": "Yeni bir konsept ogrenirken kullan — ozellikle WebSocket patterns, MongoDB chat semasi ve OpenAI streaming icin"
+      "when_to_use": "Yeni bir konsept ogrenirken kullan — özellikle WebSocket patterns, MongoDB chat semasi ve OpenAI streaming icin"
     }
   },
   "deployment_guide": {
@@ -4201,7 +4201,7 @@
         "commands": [
           "# mongodb.com/atlas > Create Cluster > M0 Free"
         ],
-        "instructions": "IP whitelist'e 0.0.0.0/0 ekle (Railway icin). Database user olustur"
+        "instructions": "IP whitelist'e 0.0.0.0/0 ekle (Railway icin). Database user oluştur"
       },
       {
         "title": "Upstash Redis",
@@ -4237,8 +4237,8 @@
     "estimated_time": "45 dakika",
     "cost": "~$0-5/ay (OpenAI kullanima gore)",
     "demo_checklist": [
-      "WebSocket baglantisi calisiyor",
-      "Mesaj gonderme/alma",
+      "WebSocket bağlantısi calisiyor",
+      "Mesaj gönderme/alma",
       "AI asistan yanit veriyor",
       "Dosya paylasimi",
       "Online/offline durumu"
@@ -4249,7 +4249,7 @@
       "Proje aciklamasi ve motivasyon (2-3 cumle)",
       "Canli demo linki (Vercel/Railway badge ile)",
       "Teknoloji stack badge'leri",
-      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Ekran goruntuleri (en az 3: dashboard, ana özellik, mobile)",
       "Mimari diyagram (ASCII veya draw.io)",
       "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
       "API dokumantasyonu (/docs linki veya Postman collection)",
@@ -4257,7 +4257,7 @@
     ],
     "screenshot_suggestions": [
       "Dashboard/Anasayfa",
-      "Ana ozellik ekrani",
+      "Ana özellik ekrani",
       "Mobile gorunum"
     ],
     "live_demo_url_template": "https://realtime-chat.vercel.app",
@@ -4265,7 +4265,7 @@
   },
   "transition_guide": {
     "prerequisites": [
-      "Full-stack web uygulama gelistirme deneyimi",
+      "Full-stack web uygulama geliştirme deneyimi",
       "REST API tasarimi ve implementasyonu",
       "React state management",
       "Temel veritabani islemleri"

@@ -750,7 +750,7 @@ explanation: "Server-Sent Events (SSE), sunucudan istemciye tek yönlü veri ak�
 
 **Onerilen Model:** Claude Opus 4.6
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Konuyu Derinlemesine Anla:**
 > "Tarayiciya 'example.com' yazdigimda DNS cozumlemesinin tam adimlarini anlat. Browser cache, OS cache, recursive resolver, root server, TLD server ve authoritative server arasindaki iliskiyi bir diagram gibi acikla. TTL bu surecte nasil bir rol oynuyor?"
@@ -758,7 +758,7 @@ explanation: "Server-Sent Events (SSE), sunucudan istemciye tek yönlü veri ak�
 *Neden:* DNS cozumleme zincirini uctan uca anlamak, hosting degisikligi ve DNS propagation sorunlarini cozebilmeni saglar
 
 **2. Pratik Uygulama:**
-> "Tarayicinin render pipeline'ini adim adim anlat: HTML parsing'den DOM olusturmaya, CSSOM'dan Render Tree'ye, Layout'tan Paint ve Compositing'e. Her adimda performansi etkileyen faktorler neler?"
+> "Tarayicinin render pipeline'ini adim adim anlat: HTML parsing'den DOM oluşturmaya, CSSOM'dan Render Tree'ye, Layout'tan Paint ve Compositing'e. Her adimda performansi etkileyen faktorler neler?"
 
 *Follow-up:* "Bir animasyonda width degistirmek yerine transform kullanmamin performans etkisini reflow, repaint ve compositing acisindan acikla."
 

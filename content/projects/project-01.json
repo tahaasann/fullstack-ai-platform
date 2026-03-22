@@ -515,7 +515,7 @@
             {
               "error": "Cannot find module '@tailwindcss/typography'",
               "cause": "Typography eklentisi kurulmamis veya yanlis import edilmis.",
-              "fix": "pnpm install @tailwindcss/typography komutunu calistir. globals.css'te @plugin \"@tailwindcss/typography\"; satirinin oldugunu dogrula."
+              "fix": "pnpm install @tailwindcss/typography komutunu çalıştır. globals.css'te @plugin \"@tailwindcss/typography\"; satirinin oldugunu dogrula."
             },
             {
               "error": "@theme icindeki renkler uygulanmiyor",
@@ -680,8 +680,8 @@
             },
             {
               "error": "Module not found: Can't resolve '@/components/theme-provider'",
-              "cause": "ThemeProvider component'i henuz olusturulmadi ama layout.tsx'te import ediliyor.",
-              "fix": "Su an icin ThemeProvider import'unu kaldir. Bu component Milestone 3'te olusturulacak. Simdilik children'i dogrudan body icine yaz."
+              "cause": "ThemeProvider component'i henuz oluşturulmadi ama layout.tsx'te import ediliyor.",
+              "fix": "Su an icin ThemeProvider import'unu kaldir. Bu component Milestone 3'te oluşturulacak. Simdilik children'i dogrudan body icine yaz."
             }
           ]
         },
@@ -1181,12 +1181,12 @@
             {
               "error": "Cannot find module 'gray-matter' veya 'reading-time'",
               "cause": "Paketler kurulmamis veya TypeScript tipleri eksik.",
-              "fix": "pnpm install next-mdx-remote gray-matter reading-time rehype-highlight rehype-slug komutunu tekrar calistir. Gerekirse @types/... paketlerini de kur."
+              "fix": "pnpm install next-mdx-remote gray-matter reading-time rehype-highlight rehype-slug komutunu tekrar çalıştır. Gerekirse @types/... paketlerini de kur."
             },
             {
               "error": "ENOENT: no such file or directory 'content/blog'",
-              "cause": "content/blog/ klasoru olusturulmamis.",
-              "fix": "mkdir -p content/blog komutu ile klasoru olustur. getAllPosts fonksiyonunda fs.existsSync kontrolu ekle."
+              "cause": "content/blog/ klasoru oluşturulmamis.",
+              "fix": "mkdir -p content/blog komutu ile klasoru oluştur. getAllPosts fonksiyonunda fs.existsSync kontrolu ekle."
             }
           ]
         },
@@ -1431,11 +1431,11 @@
             {
               "error": "generateStaticParams bos dizi donuyor",
               "cause": "content/blog/ klasorunde henuz .mdx dosyasi yok.",
-              "fix": "Bir sonraki adimda ornek blog yazilari olusturulacak. Simdilik bos liste normal."
+              "fix": "Bir sonraki adimda örnek blog yazilari oluşturulacak. Simdilik bos liste normal."
             },
             {
               "error": "404 Not Found on /blog/[slug]",
-              "cause": "Klasor adi [slug] yerine slug olarak olusturulmus (koseli parantez olmadan).",
+              "cause": "Klasor adi [slug] yerine slug olarak oluşturulmus (koseli parantez olmadan).",
               "fix": "Klasor adinin tam olarak [slug] oldugunu dogrula (koseli parantezler dahil). Bu, Next.js'in dynamic route convention'idir."
             }
           ]
@@ -1655,7 +1655,7 @@
             },
             {
               "error": "Module not found: Can't resolve '@/data/projects'",
-              "cause": "src/data/ klasoru veya projects.ts dosyasi olusturulmamis.",
+              "cause": "src/data/ klasoru veya projects.ts dosyasi oluşturulmamis.",
               "fix": "Dosyanin src/data/projects.ts yolunda oldugunu dogrula. tsconfig.json'da @/* alias'inin ./src/* oldugunu kontrol et."
             }
           ]
@@ -1815,14 +1815,14 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "5.21",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── about/\n│   │   │   └── page.tsx\n│   │   ├── blog/\n│   │   │   ├── [slug]/\n│   │   │   │   └── page.tsx\n│   │   │   └── page.tsx\n│   │   ├── contact/           ← YENİ\n│   │   │   └── page.tsx       ← YENİ\n│   │   ├── projects/\n│   │   │   └── page.tsx\n│   │   ├── globals.css\n│   │   ├── layout.tsx\n│   │   └── page.tsx\n│   ├── components/\n│   ├── data/\n│   └── lib/\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
@@ -1835,7 +1835,7 @@
             {
               "error": "422 Unprocessable Entity (Formspree hatasi)",
               "cause": "YOUR_FORM_ID placeholder'i degistirilmemis.",
-              "fix": "formspree.io'da ucretsiz hesap olustur, yeni form ekle ve verilen ID'yi YOUR_FORM_ID yerine yaz."
+              "fix": "formspree.io'da ucretsiz hesap oluştur, yeni form ekle ve verilen ID'yi YOUR_FORM_ID yerine yaz."
             }
           ]
         },
@@ -2054,7 +2054,7 @@
             {
               "error": "Syntax highlighting calismiyor",
               "cause": "rehype-highlight eklentisi kurulmamis veya MDXRemote options'ta tanimlanmamis.",
-              "fix": "pnpm install rehype-highlight komutunu calistir. Blog detay sayfasinda rehypePlugins: [rehypeHighlight] oldugunu dogrula."
+              "fix": "pnpm install rehype-highlight komutunu çalıştır. Blog detay sayfasinda rehypePlugins: [rehypeHighlight] oldugunu dogrula."
             }
           ]
         }
@@ -2532,7 +2532,7 @@
             },
             {
               "error": "SkillsSection ve Timeline import hatasi",
-              "cause": "Component dosyalari olusturulmamis veya export isimleri uyusmuyor.",
+              "cause": "Component dosyalari oluşturulmamis veya export isimleri uyusmuyor.",
               "fix": "Her iki dosyanin da src/components/ altinda oldugunu ve export function isimleriyle uyumlu import yapildigini dogrula."
             }
           ]
@@ -2803,14 +2803,14 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "1.16",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── public/\n│   ├── og-image.png         ← YENİ (1200x630px Open Graph görseli)\n│   └── ... (diğer public dosyalar)\n├── src/\n│   ├── app/\n│   │   ├── layout.tsx        ← GÜNCELLENDİ (genişletilmiş metadata)\n│   │   └── ... (diğerleri aynı)\n│   └── ...\n├── next.config.mjs\n└── package.json",
@@ -2962,14 +2962,14 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "2.18",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── src/\n│   ├── app/\n│   │   ├── robots.ts          ← YENİ\n│   │   ├── sitemap.ts         ← YENİ\n│   │   ├── layout.tsx\n│   │   └── ... (diğerleri aynı)\n│   └── ...\n├── next.config.mjs\n└── package.json",
@@ -3118,14 +3118,14 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "3.18",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── public/\n│   ├── images/               ← YENİ\n│   │   └── profile.jpg        ← YENİ (profil fotoğrafı)\n│   ├── og-image.png\n│   └── ...\n├── src/\n│   ├── components/\n│   │   ├── optimized-image.tsx ← YENİ\n│   │   └── ... (diğerleri)\n│   └── ...\n├── next.config.mjs\n└── package.json",
@@ -3543,14 +3543,14 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "1.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── .git/                      ← YENİ (Git repository)\n├── .gitignore\n├── content/\n├── public/\n├── src/\n├── next.config.mjs\n├── package.json\n├── pnpm-lock.yaml\n└── tsconfig.json",
@@ -3667,22 +3667,22 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "2.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── .vercel/                   ← YENİ (Vercel konfigürasyon dosyaları)\n│   └── project.json\n├── .git/\n├── content/\n├── public/\n├── src/\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
           "common_errors": [
             {
               "error": "Build failed on Vercel",
-              "cause": "Lokal'de calisan ama production'da calismayan kodlar (genellikle environment variable eksikligi veya TypeScript strict mode hatalari).",
-              "fix": "Vercel dashboard'dan build loglarini incele. pnpm run build komutunu lokal'de calistirarak ayni hatayi yakala ve duzelt."
+              "cause": "Lokal'de calisan ama production'da çalışmayan kodlar (genellikle environment variable eksikligi veya TypeScript strict mode hatalari).",
+              "fix": "Vercel dashboard'dan build loglarini incele. pnpm run build komutunu lokal'de çalıştırarak ayni hatayi yakala ve duzelt."
             },
             {
               "error": "404 on deployed site",
@@ -3985,7 +3985,7 @@
       "steps": [
         {
           "title": "Production Build",
-          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "instructions": "Uygulamayi production modda build et, tum testleri çalıştır, Lighthouse audit yap",
           "code_snippet": "pnpm build && pnpm test",
           "substeps": [
             {
@@ -4085,14 +4085,14 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "Production Build.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── .next/                     ← YENİ (build çıktısı)\n│   ├── cache/\n│   ├── server/\n│   └── static/\n├── src/\n├── content/\n├── public/\n├── next.config.mjs\n└── package.json",
@@ -4205,14 +4205,14 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "Deploy.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── (değişiklik yok — deploy sunucu tarafında gerçekleşir)\n└── Vercel dashboard'da yeni deployment görünür",
@@ -4317,14 +4317,14 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "Profesyonel README.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── README.md                  ← GÜNCELLENDİ (screenshots + demo link)\n└── ... (diğerleri aynı)",
@@ -4424,14 +4424,14 @@
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
               "expected_output": "(hata yoksa cikti bos olur)",
-              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
+              "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini çalıştırmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
               "order": "Demo Video (Opsiyonel).14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
-              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined degisken gibi sorunlar burada gorunur."
+              "why": "Her adimin sonunda console kontrolu yapmak, runtime hatalarini erken yakalar. Hydration mismatch, import hatasi veya undefined değişken gibi sorunlar burada gorunur."
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── (değişiklik yok — video harici platformda barındırılır)\n└── README'ye video linki eklenebilir",
@@ -4637,12 +4637,12 @@
     "code_review": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "Review this Next.js 16 App Router code for: proper use of Server Components vs Client Components, metadata API usage for SEO, Tailwind CSS class organization, TypeScript type safety, accessibility attributes (aria labels, semantic HTML), image optimization with next/image, and Core Web Vitals impact. Also check MDX content rendering and responsive design patterns.",
-      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle component yapisi ve SEO meta tag'leri icin"
+      "when_to_use": "Her step tamamlandiktan sonra kullan — özellikle component yapisi ve SEO meta tag'leri icin"
     },
     "debugging": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "I'm getting this error in my Next.js 16portfolio project using App Router + TypeScript + Tailwind CSS + MDX: [error]. The relevant code is: [code]. I'm trying to [goal]. My Next.js config and layout structure are: [config].",
-      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle SSG build hatalari, MDX rendering sorunlari ve Vercel deployment hatalari icin"
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — özellikle SSG build hatalari, MDX rendering sorunlari ve Vercel deployment hatalari icin"
     },
     "research": {
       "model": "Gemini 2.5 Pro",
@@ -4699,7 +4699,7 @@
       "Proje aciklamasi ve motivasyon (2-3 cumle)",
       "Canli demo linki (Vercel/Railway badge ile)",
       "Teknoloji stack badge'leri",
-      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Ekran goruntuleri (en az 3: dashboard, ana özellik, mobile)",
       "Mimari diyagram (ASCII veya draw.io)",
       "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
       "API dokumantasyonu (/docs linki veya Postman collection)",
@@ -4707,7 +4707,7 @@
     ],
     "screenshot_suggestions": [
       "Dashboard/Anasayfa",
-      "Ana ozellik ekrani",
+      "Ana özellik ekrani",
       "Mobile gorunum"
     ],
     "live_demo_url_template": "https://portfolio-site.vercel.app",
@@ -4726,6 +4726,6 @@
       "Phase 2 Module 7 - React temelleri ve Next.js"
     ],
     "next_project": "project-02",
-    "skills_bridge": "Bu projede ogrendigin Next.js App Router, TypeScript ve Tailwind CSS bilgisi, sonraki projede full-stack uygulama gelistirmek icin frontend temelini olusturacak. Vercel deployment deneyimin CI/CD kavramlarini anlamani kolaylastiracak."
+    "skills_bridge": "Bu projede ogrendigin Next.js App Router, TypeScript ve Tailwind CSS bilgisi, sonraki projede full-stack uygulama geliştirmek icin frontend temelini oluşturacak. Vercel deployment deneyimin CI/CD kavramlarini anlamani kolaylastiracak."
   }
 }

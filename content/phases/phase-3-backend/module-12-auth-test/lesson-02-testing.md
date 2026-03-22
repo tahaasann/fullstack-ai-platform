@@ -692,7 +692,7 @@ test('getProfile_gecerliToken_kullaniciBilgisiDoner', async () => { /* ... */ })
 :::exercise
 ### Alistirma 1: TDD ile Password Validator (Kolay)
 
-Test-Driven Development (Red-Green-Refactor) dongusuyle bir sifre dogrulama fonksiyonu gelistir.
+Test-Driven Development (Red-Green-Refactor) dongusuyle bir sifre doğrulama fonksiyonu gelistir.
 
 ```javascript
 // __tests__/passwordValidator.test.js
@@ -795,14 +795,14 @@ describe("Auth API", () => {
 });
 ```
 
-**Beklenen Sonuc:** En az 8 test senaryosu yazilmis olmali. Basarili ve basarisiz senaryolar kapsanmali. Token ile korunmali endpoint testleri calismali.
-**Ipucu:** `request(app).set("Authorization", "Bearer " + token)` ile token gonder. `beforeAll` ile test user olustur, `afterAll` ile temizle.
+**Beklenen Sonuc:** En az 8 test senaryosu yazilmis olmali. Basarili ve basarisiz senaryolar kapsanmali. Token ile korunmali endpoint testleri çalışmali.
+**Ipucu:** `request(app).set("Authorization", "Bearer " + token)` ile token gonder. `beforeAll` ile test user oluştur, `afterAll` ile temizle.
 
 ---
 
 ### Alistirma 3: Mock/Spy ve Coverage (Zor)
 
-Jest mock ve spy kullanarak dis servisleri izole et. Coverage raporunu olustur ve %80 hedefini yakala.
+Jest mock ve spy kullanarak dis servisleri izole et. Coverage raporunu oluştur ve %80 hedefini yakala.
 
 ```javascript
 // Dis servis — email gonderme
@@ -867,7 +867,7 @@ describe("UserService", () => {
 ```
 
 **Beklenen Sonuc:** Dis servisler mock'lanmis olmali (gercek email gonderilmemeli). Mock fonksiyonlarin cagrilma sayisi ve parametreleri dogrulanmali. Coverage %80'in ustunde olmali.
-**Ipucu:** `jest.fn()` mock fonksiyon olusturur. `.mockResolvedValue()` async fonksiyonlar icin Promise dondurur. `toHaveBeenCalledWith()` ile parametreleri kontrol et.
+**Ipucu:** `jest.fn()` mock fonksiyon oluşturur. `.mockResolvedValue()` async fonksiyonlar icin Promise dondurur. `toHaveBeenCalledWith()` ile parametreleri kontrol et.
 
 ---
 
@@ -894,7 +894,7 @@ describe("UserCard snapshot", () => {
 });
 ```
 
-**Beklenen Sonuc:** Ilk calistirmada `__snapshots__` klasorune snapshot dosyasi olusturulmali. Component degistiginde test basarisiz olmali ve `--updateSnapshot` ile guncellenebilmeli.
+**Beklenen Sonuc:** Ilk çalıştırmada `__snapshots__` klasorune snapshot dosyasi oluşturulmali. Component degistiginde test basarisiz olmali ve `--updateSnapshot` ile guncellenebilmeli.
 **Ipucu:** Snapshot testleri UI regresyonlarini hizli yakalar ama cok detayli snapshot'lar kirilgan olur. Kritik UI elementlerine odaklan.
 
 ---
@@ -1007,7 +1007,7 @@ describe("UserRepository integration", () => {
 });
 ```
 
-**Beklenen Sonuc:** Her test bagimsiz calismali (afterEach ile temizlik). Veritabani islemleri gercek SQL ile dogrulanmali.
+**Beklenen Sonuc:** Her test bagimsiz çalışmali (afterEach ile temizlik). Veritabani islemleri gercek SQL ile dogrulanmali.
 **Ipucu:** Test veritabani production'dan ayri olmali. `beforeAll` ile setup, `afterAll` ile teardown yap.
 
 ---
@@ -1054,7 +1054,7 @@ describe("LoginForm", () => {
 });
 ```
 
-**Beklenen Sonuc:** Kullanici etkilesileri (type, click) ile testler calismali. Hata mesajlari DOM'da gorunmeli. Submit callback dogru parametrelerle cagrilmali.
+**Beklenen Sonuc:** Kullanici etkilesileri (type, click) ile testler çalışmali. Hata mesajlari DOM'da gorunmeli. Submit callback dogru parametrelerle cagrilmali.
 **Ipucu:** `getByRole`, `getByLabelText` gibi accessibility sorgulari kullan. Implementation detayi degil kullanici davranisi test et.
 
 ---
@@ -1096,7 +1096,7 @@ test.describe("Authentication Flow", () => {
 ```
 
 **Beklenen Sonuc:** Tam kullanici akisi basariyla tamamlanmali. Her adimda sayfa durumu dogrulanmali. Unique email ile test izolasyonu saglanmali.
-**Ipucu:** Playwright `test.describe.serial` ile testleri sirali calistirabilirsin. `page.waitForResponse` ile API cevaplarini bekleyebilirsin.
+**Ipucu:** Playwright `test.describe.serial` ile testleri sirali çalıştırabilirsin. `page.waitForResponse` ile API cevaplarini bekleyebilirsin.
 
 ---
 
@@ -1146,8 +1146,8 @@ jobs:
   # TODO: Coverage threshold altinda PR'i blocklama kurali ekle
 ```
 
-**Beklenen Sonuc:** Her PR'da unit, integration ve E2E testleri otomatik calismali. Coverage raporu PR'da gorunmeli. Threshold altinda merge engellenmeli.
-**Ipucu:** `services` ile Docker container'lari CI ortaminda calistirabilirsin. Matrix strategy ile birden fazla Node versiyonunda test edebilirsin.
+**Beklenen Sonuc:** Her PR'da unit, integration ve E2E testleri otomatik çalışmali. Coverage raporu PR'da gorunmeli. Threshold altinda merge engellenmeli.
+**Ipucu:** `services` ile Docker container'lari CI ortamında çalıştırabilirsin. Matrix strategy ile birden fazla Node versiyonunda test edebilirsin.
 :::
 
 :::knowledge-check
@@ -1179,10 +1179,10 @@ explanation: "Test piramidine göre en çok unit test (%70) yazılmalıdır çü
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "Test piramidini (unit, integration, e2e) acikla. Her katmanda ne test edilir, ne test edilmez? Unit test'te mock/stub/spy arasindaki farki orneklerle goster. 'Implementation detail test etme, davranis test et' prensibi ne anlama gelir? Kent C. Dodds'un Testing Trophy yaklasimini acikla."
+> "Test piramidini (unit, integration, e2e) acikla. Her katmanda ne test edilir, ne test edilmez? Unit test'te mock/stub/spy arasindaki farki örneklerle goster. 'Implementation detail test etme, davranis test et' prensibi ne anlama gelir? Kent C. Dodds'un Testing Trophy yaklasimini acikla."
 
 **2. Pratik Uygulama:**
 > "Jest ile bir Express.js API'sinin testlerini yaz: UserService icin unit test (mock database), auth endpoint icin integration test (supertest ile), ve bir kullanici kayit akisi icin e2e test. AAA (Arrange, Act, Assert) patternini kullan. Code coverage raporunu yorumla."
@@ -1192,7 +1192,7 @@ explanation: "Test piramidine göre en çok unit test (%70) yazılmalıdır çü
 > "TDD (Test-Driven Development) ile bir odeme servisi gelistir. Once testi yaz (Red), sonra minimum kodu yaz (Green), sonra refactor et. Edge case'leri (yetersiz bakiye, network hatasi, duplicate odeme) test et. CI/CD pipeline'da test otomasyonu, coverage threshold ve mutation testing nasil uygulanir?"
 
 ### Pair Programming Ipucu
-Test yazarken AI'a test edilecek fonksiyonu goster ve sor: "Bu fonksiyon icin hangi test senaryolarini yazmaliyim? Happy path, edge case'ler ve error senaryolari neler? Mock'lanmasi gereken bagimliliklar hangileri? AAA pattern ile test kodunu olustur."
+Test yazarken AI'a test edilecek fonksiyonu goster ve sor: "Bu fonksiyon icin hangi test senaryolarini yazmaliyim? Happy path, edge case'ler ve error senaryolari neler? Mock'lanmasi gereken bagimliliklar hangileri? AAA pattern ile test kodunu oluştur."
 :::
 
 :::interview
@@ -1200,7 +1200,7 @@ Test yazarken AI'a test edilecek fonksiyonu goster ve sor: "Bu fonksiyon icin ha
 
 **Soru 1: Unit test, integration test ve E2E test arasindaki farklar nelerdir?**
 - **Junior cevabi:** Unit tek fonksiyonu, integration birlestirmeyi, E2E tum sistemi test eder.
-- **Senior cevabi:** Unit test: tek bir fonksiyon/metod, dissal bagimliliklari mock'lanir, milisaniyede calisir, en buyuk coverage'i saglar (%70+). Integration test: birden fazla katmanin birlikte calismasi (API endpoint + DB), gercek veya test DB kullanilir, boundary'lerde hatalari yakalar. E2E test: kullanici perspektifinden (tarayici otomasyonu), en yavas ve en kirilgan ama en gercekci. Test piramidi: unit > integration > E2E. Anti-pattern: ice cream cone (cok E2E, az unit). Mock vs stub vs spy farki: mock = fake implementation, stub = sabit deger doner, spy = gercek fonksiyonu sarar ve cagirilma bilgisini kaydeder.
+- **Senior cevabi:** Unit test: tek bir fonksiyon/metod, dissal bagimliliklari mock'lanir, milisaniyede calisir, en buyuk coverage'i saglar (%70+). Integration test: birden fazla katmanin birlikte çalışmasi (API endpoint + DB), gercek veya test DB kullanilir, boundary'lerde hatalari yakalar. E2E test: kullanici perspektifinden (tarayici otomasyonu), en yavas ve en kirilgan ama en gercekci. Test piramidi: unit > integration > E2E. Anti-pattern: ice cream cone (cok E2E, az unit). Mock vs stub vs spy farki: mock = fake implementation, stub = sabit deger doner, spy = gercek fonksiyonu sarar ve cagirilma bilgisini kaydeder.
 
 **Soru 2: TDD (Test Driven Development) nedir ve pratikte nasil uygulanir?**
 - **Junior cevabi:** Once test yazilir, sonra kodu yazilir, sonra refactor edilir.

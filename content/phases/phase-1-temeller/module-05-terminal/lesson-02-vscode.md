@@ -570,7 +570,7 @@ function calculateGrandTotal(items) {
 
 ### Alistirma 2: VS Code Debugging (Orta)
 
-Bir Node.js uygulamasini VS Code debugger ile adim adim calistir ve hata bul.
+Bir Node.js uygulamasini VS Code debugger ile adim adim çalıştır ve hata bul.
 
 ```javascript
 // debug-practice.js dosyasini olustur:
@@ -626,14 +626,14 @@ console.log("Max deger:", maxValue);
 // 7. Debug Console'da "results.length" yaz ve degerini gor
 ```
 
-**Beklenen Sonuc:** Breakpoint'te durdugundan sonra Watch panelinde degiskenlerin degerlerini gorebilmeli. Step Into ile recursive fonksiyon icine girebilmeli. fibonacci(8) = 21 olmali.
-**Ipucu:** launch.json olmadan F5'e basinca VS Code otomatik Node.js debug konfigurasyonu olusturur.
+**Beklenen Sonuc:** Breakpoint'te durdugundan sonra Watch panelinde değişkenlerin degerlerini gorebilmeli. Step Into ile recursive fonksiyon icine girebilmeli. fibonacci(8) = 21 olmali.
+**Ipucu:** launch.json olmadan F5'e basinca VS Code otomatik Node.js debug konfigurasyonu oluşturur.
 
 ---
 
 ### Alistirma 3: Custom Snippets ve Workspace Ayarlari (Zor)
 
-VS Code'u projene ozel olarak yapilandir: custom snippet'ler, workspace settings ve extension onerileri olustur.
+VS Code'u projene ozel olarak yapilandir: custom snippet'ler, workspace settings ve extension onerileri oluştur.
 
 ```json
 // GOREV 1: Custom Snippet olustur
@@ -698,7 +698,7 @@ VS Code'u projene ozel olarak yapilandir: custom snippet'ler, workspace settings
 // → Component sablonu otomatik olusturulmali
 ```
 
-**Beklenen Sonuc:** "rfc" yazip Tab'a basinca React component sablonu olusturulmali. Kaydettiginde dosya otomatik formatlanmali. Takim arkadaslarin projeyi actiginda onerilecek extension'lari gormeli.
+**Beklenen Sonuc:** "rfc" yazip Tab'a basinca React component sablonu oluşturulmali. Kaydettiginde dosya otomatik formatlanmali. Takim arkadaslarin projeyi actiginda onerilecek extension'lari gormeli.
 **Ipucu:** Snippet'lerde `$1`, `$2` tab stop'lardir (Tab ile aralarinda gecis yapilir). `${1:default}` varsayilan degerdir. `$0` son cursor pozisyonudur.
 :::
 
@@ -731,11 +731,11 @@ explanation: "Step Over (F10), fonksiyon çağrısını tek adımda geçer. Step
 
 **Soru 1: Gunluk geliştirme workflow'unuzda hangi IDE/editor araclarini kullaniyorsunuz?**
 - **Junior cevabi:** VS Code kullaniyorum, extension'lar yukluyorum.
-- **Senior cevabi:** VS Code'da verimlilik icin: multi-cursor editing (Alt+Click), Emmet ile hizli HTML, GitLens ile blame/history, ESLint + Prettier entegrasyonu (format on save), debugger ile breakpoint debugging (console.log yerine), integrated terminal ile context switch'i azaltma, workspace settings ile proje bazli konfigurasyonlar. Remote Development extension'i ile SSH üzerinden sunucuda calisma, Dev Containers ile tutarli geliştirme ortamı. Sonuc olarak editor ustaligi gunluk uretkenlige direkt etkilidir.
+- **Senior cevabi:** VS Code'da verimlilik icin: multi-cursor editing (Alt+Click), Emmet ile hizli HTML, GitLens ile blame/history, ESLint + Prettier entegrasyonu (format on save), debugger ile breakpoint debugging (console.log yerine), integrated terminal ile context switch'i azaltma, workspace settings ile proje bazli konfigurasyonlar. Remote Development extension'i ile SSH üzerinden sunucuda çalışma, Dev Containers ile tutarli geliştirme ortamı. Sonuc olarak editor ustaligi gunluk uretkenlige direkt etkilidir.
 
 **Soru 2: Debugging icin console.log yerine ne kullanilmali?**
 - **Junior cevabi:** Debugger kullanilabilir ama console.log da ise yarar.
-- **Senior cevabi:** Breakpoint debugging console.log'dan ustundur cunku: 1) Call stack'i gorursun (fonksiyona nereden gelindigini), 2) Scope'daki tum degiskenleri inceleyebilirsin, 3) Watch expression'larla kosullu izleme yapabilirsin, 4) Step over/into/out ile akisi takip edebilirsin, 5) Conditional breakpoint ile sadece belirli kosullarda durabilirsin. Ancak production'da structured logging (Winston, Pino) ile log level'lar (error, warn, info, debug) kullanilir. console.log production kodda kalmamalidir, lint rule'lariyla engellenir.
+- **Senior cevabi:** Breakpoint debugging console.log'dan ustundur cunku: 1) Call stack'i gorursun (fonksiyona nereden gelindigini), 2) Scope'daki tum değişkenleri inceleyebilirsin, 3) Watch expression'larla kosullu izleme yapabilirsin, 4) Step over/into/out ile akisi takip edebilirsin, 5) Conditional breakpoint ile sadece belirli kosullarda durabilirsin. Ancak production'da structured logging (Winston, Pino) ile log level'lar (error, warn, info, debug) kullanilir. console.log production kodda kalmamalidir, lint rule'lariyla engellenir.
 :::
 
 :::ai-guidance

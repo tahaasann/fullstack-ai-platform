@@ -16,7 +16,7 @@
         "ReferenceError olusur"
       ],
       "correct": 1,
-      "explanation": "var function-scoped oldugu icin dongunun bitiminde i degeri 3 olur. setTimeout callback'leri calistiginda hepsi ayni i degiskenine (3) referans verir. let kullanilsaydi her iterasyonda yeni bir block-scope olusacagi icin 0, 1, 2 yazdirilirdi.",
+      "explanation": "var function-scoped oldugu icin dongunun bitiminde i degeri 3 olur. setTimeout callback'leri calistiginda hepsi ayni i değişkenine (3) referans verir. let kullanilsaydi her iterasyonda yeni bir block-scope olusacagi icin 0, 1, 2 yazdirilirdi.",
       "difficulty": "orta",
       "points": 10
     },
@@ -31,7 +31,7 @@
         "ReferenceError - count erisilmez"
       ],
       "correct": 2,
-      "explanation": "Closure, bir fonksiyonun tanimlandigi lexical scope'taki degiskenlere erisimini korur. counter() cagirildiginda count degiskeni closure icinde yasar. Dondurilen objedeki fonksiyonlar ayni count'a referans verdigi icin deger korunur ve 2 olur.",
+      "explanation": "Closure, bir fonksiyonun tanimlandigi lexical scope'taki değişkenlere erisimini korur. counter() cagirildiginda count değişkeni closure icinde yasar. Dondurilen objedeki fonksiyonlar ayni count'a referans verdigi icin deger korunur ve 2 olur.",
       "difficulty": "orta",
       "points": 10
     },
@@ -61,7 +61,7 @@
         "SyntaxError olusur"
       ],
       "correct": 1,
-      "explanation": "a degeri objeden alinir (1). b objede bulunmadigi icin varsayilan deger 5 kullanilir. rest operatoru (...) kalan ozellikleri yeni bir objeye toplar: { c: 3, d: 4 }.",
+      "explanation": "a degeri objeden alinir (1). b objede bulunmadigi icin varsayilan deger 5 kullanilir. rest operatoru (...) kalan özellikleri yeni bir objeye toplar: { c: 3, d: 4 }.",
       "difficulty": "orta",
       "points": 10
     },
@@ -85,7 +85,7 @@
       "type": "true_false",
       "question": "async fonksiyonlar her zaman bir Promise dondurur, fonksiyon icinde await kullanilmasa bile.",
       "correct": true,
-      "explanation": "Dogru! async anahtar kelimesiyle tanimlanan her fonksiyon otomatik olarak bir Promise dondurur. Eger fonksiyon duz bir deger donduruyorsa, bu deger Promise.resolve() ile sarilir. Ornegin: async function foo() { return 5; } cagirildiginda Promise<number> doner.",
+      "explanation": "Dogru! async anahtar kelimesiyle tanimlanan her fonksiyon otomatik olarak bir Promise dondurur. Eger fonksiyon duz bir deger donduruyorsa, bu deger Promise.resolve() ile sarilir. Örneğin: async function foo() { return 5; } cagirildiginda Promise<number> doner.",
       "difficulty": "kolay",
       "points": 10
     },
@@ -94,7 +94,12 @@
       "type": "code_completion",
       "question": "Asagidaki async fonksiyonu tamamlayin. fetchUser fonksiyonu bir Promise dondurur. Hata durumunda null dondurun:\n",
       "code_template": "async function getUser(id) {\n  _____ {\n    const user = _____ fetchUser(id);\n    return user;\n  } _____ (error) {\n    console.error('Hata:', error);\n    return _____;\n  }\n}",
-      "correct_answers": ["try", "await", "catch", "null"],
+      "correct_answers": [
+        "try",
+        "await",
+        "catch",
+        "null"
+      ],
       "explanation": "async/await ile hata yonetimi try/catch bloklari ile yapilir. await anahtar kelimesi Promise'in cozulmesini bekler. Hata durumunda catch blogunda hata yakalanir ve null dondurulur.",
       "difficulty": "kolay",
       "points": 10
@@ -102,9 +107,13 @@
     {
       "id": "q8",
       "type": "code_completion",
-      "question": "TypeScript'te bir generic interface tanimlayarak tip guvenli bir API response yapisi olusturun:\n",
+      "question": "TypeScript'te bir generic interface tanimlayarak tip guvenli bir API response yapisi oluşturun:\n",
       "code_template": "interface ApiResponse_____ {\n  data: _____;\n  success: boolean;\n  message: string;\n}\n\nconst response: ApiResponse<_____[]> = {\n  data: ['elma', 'armut'],\n  success: true,\n  message: 'Basarili'\n};",
-      "correct_answers": ["<T>", "T", "string"],
+      "correct_answers": [
+        "<T>",
+        "T",
+        "string"
+      ],
       "explanation": "Generic interface'ler tip parametresi alir (<T>). Bu parametre interface icinde yer tutucu olarak kullanilir. Kullanim sirasinda ApiResponse<string[]> diyerek data alaninin string dizisi olacagini belirtiyoruz.",
       "difficulty": "orta",
       "points": 10
@@ -115,13 +124,19 @@
       "question": "JavaScript event loop'unda bir asenkron islemin islenme sirasi nedir?",
       "steps": [
         "Call stack'teki senkron kodlar calisir",
-        "Asenkron islem (ornegin fetch) Web API'ye devredilir",
+        "Asenkron islem (örneğin fetch) Web API'ye devredilir",
         "Web API islemi tamamlar ve callback'i uygun kuyruga ekler",
         "Call stack bosalir",
         "Event loop kuyruktan callback'i alir ve call stack'e koyar"
       ],
-      "correct_order": [0, 1, 2, 3, 4],
-      "explanation": "Event loop dongusu: Senkron kod calisir, asenkron islemler Web API'ye devredilir, tamamlaninca callback kuyruga eklenir, call stack bosaldiginda event loop callback'i stack'e koyar ve calistirilir.",
+      "correct_order": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "explanation": "Event loop dongusu: Senkron kod calisir, asenkron islemler Web API'ye devredilir, tamamlaninca callback kuyruga eklenir, call stack bosaldiginda event loop callback'i stack'e koyar ve çalıştırilir.",
       "difficulty": "orta",
       "points": 15
     },
@@ -130,8 +145,16 @@
       "type": "explain_code",
       "question": "Asagidaki TypeScript kodu ne yapar? Her satiri aciklayin:",
       "code": "type FilterFn<T> = (item: T) => boolean;\n\nfunction filterArray<T>(arr: T[], fn: FilterFn<T>): T[] {\n  return arr.reduce<T[]>((acc, item) => {\n    if (fn(item)) acc.push(item);\n    return acc;\n  }, []);\n}\n\nconst nums = filterArray([1, 2, 3, 4, 5], n => n % 2 === 0);",
-      "correct_keywords": ["generic", "type alias", "callback", "reduce", "filtre", "cift sayilar", "tip guvenligi"],
-      "sample_answer": "Bu kod, generic bir filtre fonksiyonu tanimlar. FilterFn<T> bir type alias olup T tipinde parametre alip boolean donduren bir callback fonksiyonunu temsil eder. filterArray fonksiyonu herhangi bir tipteki diziyi alir ve verilen kosula gore filtreler. reduce kullanarak yeni bir dizi olusturur. Son satirda [1,2,3,4,5] dizisinden cift sayilar filtrelenir ve nums = [2, 4] olur.",
+      "correct_keywords": [
+        "generic",
+        "type alias",
+        "callback",
+        "reduce",
+        "filtre",
+        "cift sayilar",
+        "tip güvenliği"
+      ],
+      "sample_answer": "Bu kod, generic bir filtre fonksiyonu tanimlar. FilterFn<T> bir type alias olup T tipinde parametre alip boolean donduren bir callback fonksiyonunu temsil eder. filterArray fonksiyonu herhangi bir tipteki diziyi alir ve verilen kosula gore filtreler. reduce kullanarak yeni bir dizi oluşturur. Son satirda [1,2,3,4,5] dizisinden cift sayilar filtrelenir ve nums = [2, 4] olur.",
       "difficulty": "zor",
       "points": 15
     }

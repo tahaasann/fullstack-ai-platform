@@ -150,7 +150,7 @@
               "title": "Python Ortamı ve Paket Yönetimi",
               "description": "Virtual environment, uv, pip, poetry, pyproject.toml - profesyonel Python proje yapısı",
               "order_index": 1,
-              "content_path": "phases/phase-1-temeller/module-02-python/lesson-01-python-ortami.md",
+              "content_path": "phases/phase-1-temeller/module-02-python/lesson-01-python-ortamı.md",
               "estimated_minutes": 40,
               "tags": [
                 "python",
@@ -1500,7 +1500,7 @@
             },
             {
               "id": "mod-13-devops/lesson-03-deployment",
-              "title": "Uretim Ortamina Deployment",
+              "title": "Üretim Ortamına Deployment",
               "order_index": 3,
               "content_path": "phases/phase-4-devops/module-13-docker-cloud/lesson-03-deployment.md",
               "estimated_minutes": 120,
@@ -1623,14 +1623,14 @@
             },
             {
               "id": "mod-14-security/challenge-xss-csrf",
-              "title": "XSS ve CSRF Guvenlik Aciklari",
+              "title": "XSS ve CSRF Güvenlik Aciklari",
               "content_path": "phases/phase-4-devops/module-14-security/challenges/challenge-02-xss-csrf.json",
               "order_index": 2,
               "difficulty": "zor"
             },
             {
               "id": "mod-14-security/challenge-auth-security",
-              "title": "Auth ve Rate Limiting Guvenlik",
+              "title": "Auth ve Rate Limiting Güvenlik",
               "content_path": "phases/phase-4-devops/module-14-security/challenges/challenge-03-auth-security.json",
               "order_index": 3,
               "difficulty": "zor"
@@ -2840,7 +2840,7 @@
         {
           "id": "p08-m1",
           "title": "Proje Altyapisi & Agent Mimari Tasarimi",
-          "description": "Monorepo yapisini kur, temel servisleri ayaga kaldir, LangGraph ile ilk agent graph'ini olustur.",
+          "description": "Monorepo yapisini kur, temel servisleri ayaga kaldir, LangGraph ile ilk agent graph'ini oluştur.",
           "checklist": [
             "Monorepo & Docker Compose Setup",
             "LangGraph Agent Graph Tasarimi",
@@ -2937,7 +2937,7 @@
         {
           "id": "p09-m1",
           "title": "Proje Altyapisi & Veri Pipeline Tasarimi",
-          "description": "Proje yapisini kur, veritabani semaalarini olustur, veri yukleme ve temizleme pipeline'ini implement et.",
+          "description": "Proje yapisini kur, veritabani semaalarini oluştur, veri yukleme ve temizleme pipeline'ini implement et.",
           "checklist": [
             "Proje Yapisi & Docker Setup",
             "Veri Ingestion Pipeline",
@@ -2948,7 +2948,7 @@
         {
           "id": "p09-m2",
           "title": "Feature Engineering & Feature Store",
-          "description": "Reusable feature'lar olustur, feature store pattern'ini implement et, online ve offline serving ayir.",
+          "description": "Reusable feature'lar oluştur, feature store pattern'ini implement et, online ve offline serving ayir.",
           "checklist": [
             "Feature Transformer Pipeline",
             "Feature Store Implementation",
@@ -3069,8 +3069,8 @@
         },
         {
           "id": "p10-m4",
-          "title": "Guvenlik Analizi & OWASP Taramasi",
-          "description": "OWASP top 10 pattern'lerini tespit eden guvenlik analiz modulu.",
+          "title": "Güvenlik Analizi & OWASP Taramasi",
+          "description": "OWASP top 10 pattern'lerini tespit eden güvenlik analiz modulu.",
           "checklist": [
             "OWASP Pattern Tanima",
             "AI-Enhanced Security Review",

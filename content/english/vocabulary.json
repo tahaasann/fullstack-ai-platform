@@ -20,7 +20,7 @@
     ],
     "usage_context": "Kod yazarken sürekli kullanılır",
     "scenario": "Senior dev: 'Use a more descriptive variable name here.'",
-    "common_mistakes": "Turkce'deki 'değişken' kelimesini direkt kullanmak yerine 'variable' demek gerekir Ingilizce ortamda.",
+    "common_mistakes": "Türkçe'deki 'değişken' kelimesini direkt kullanmak yerine 'variable' demek gerekir Ingilizce ortamda.",
     "related_terms": [
       "constant",
       "data type",
@@ -107,7 +107,7 @@
     ],
     "usage_context": "Fonksiyonlarin cikis değeri için",
     "scenario": "Reviewer: 'What does this function return if the input is null?'",
-    "common_mistakes": "Turk geliştiriciler 'return etmek' seklinde Turkce-Ingilizce karistirirlar.",
+    "common_mistakes": "Turk geliştiriciler 'return etmek' seklinde Türkçe-Ingilizce karistirirlar.",
     "related_terms": [
       "function",
       "output",
@@ -166,7 +166,7 @@
     ],
     "usage_context": "Hata çözme sürecinde",
     "scenario": "Dev: 'Let me debug this locally and get back to you.'",
-    "common_mistakes": "Turk geliştiriciler 'debug etmek' der, 'hata ayiklamak' daha doğru Turkcesidir.",
+    "common_mistakes": "Turk geliştiriciler 'debug etmek' der, 'hata ayiklamak' daha doğru Türkçesidir.",
     "related_terms": [
       "breakpoint",
       "stack trace",
@@ -1002,7 +1002,7 @@
     "example_sentences": [
       {
         "en": "We need to serialize this object to JSON before sending it.",
-        "tr": "Gondermeden önce bu nesneyi JSON'a serillestirmemiz gerekiyor.",
+        "tr": "Göndermeden önce bu nesneyi JSON'a serillestirmemiz gerekiyor.",
         "context": "API development"
       }
     ],
@@ -1218,7 +1218,7 @@
     ],
     "usage_context": "Metin işlemede",
     "scenario": "Dev: 'Use template literals instead of string concatenation.'",
-    "common_mistakes": "Turk geliştiriciler string encoding sorunlariyla karsilasir (UTF-8, Turkce karakterler).",
+    "common_mistakes": "Turk geliştiriciler string encoding sorunlariyla karsilasir (UTF-8, Türkçe karakterler).",
     "related_terms": [
       "character",
       "template literal",
@@ -1266,7 +1266,7 @@
     "example_sentences": [
       {
         "en": "Check if the value is null before accessing its properties.",
-        "tr": "Ozelliklerine erismeden önce değerin null olup olmadigini kontrol et.",
+        "tr": "Özelliklerine erismeden önce değerin null olup olmadigini kontrol et.",
         "context": "Debugging"
       }
     ],
@@ -1447,7 +1447,7 @@
     ],
     "common_patterns": [
       "runtime error — çalışma zamani hatası",
-      "runtime environment — çalışma ortami"
+      "runtime environment — çalışma ortamı"
     ],
     "usage_context": "Hata sınıflandırmada",
     "scenario": "Senior: 'This is a runtime issue, not a compile-time one.'",
@@ -1705,7 +1705,7 @@
     "example_sentences": [
       {
         "en": "We should refactor this function before adding new features.",
-        "tr": "Yeni ozellikler eklemeden önce bu fonksiyonu refactor etmeliyiz.",
+        "tr": "Yeni özellikler eklemeden önce bu fonksiyonu refactor etmeliyiz.",
         "context": "Sprint planning"
       }
     ],
@@ -1758,7 +1758,7 @@
     "difficulty_level": "intermediate",
     "domain": "programming",
     "definition_en": "Software that acts as a bridge between an operating system or database and applications",
-    "definition_tr": "Isletim sistemi veya veritabanı ile uygulamalar arasinda kopru görevi goren yazılım",
+    "definition_tr": "İşletim sistemi veya veritabanı ile uygulamalar arasinda kopru görevi goren yazılım",
     "example_sentences": [
       {
         "en": "Add authentication middleware to protect the routes.",
@@ -2481,7 +2481,7 @@
     ],
     "usage_context": "Takim standartlarinda",
     "scenario": "Lead: 'We follow the conventional commit spec for our changelogs.'",
-    "common_mistakes": "Turk geliştiriciler commit mesajlarini Turkce yazar, Ingilizce yazmalidir.",
+    "common_mistakes": "Turk geliştiriciler commit mesajlarini Türkçe yazar, Ingilizce yazmalidir.",
     "related_terms": [
       "commit",
       "changelog",
@@ -2500,7 +2500,7 @@
     "example_sentences": [
       {
         "en": "Bump the minor version for backward-compatible features.",
-        "tr": "Geriye uyumlu ozellikler için minor sürümü artir.",
+        "tr": "Geriye uyumlu özellikler için minor sürümü artir.",
         "context": "Release planning"
       }
     ],
@@ -3031,7 +3031,7 @@
     ],
     "usage_context": "Web adreslemede",
     "scenario": "Dev: 'What's the URL for the staging environment?'",
-    "common_mistakes": "Turk geliştiriciler URL'de Turkce karakter kullanir, encoding sorunlari oluşur.",
+    "common_mistakes": "Turk geliştiriciler URL'de Türkçe karakter kullanir, encoding sorunlari oluşur.",
     "related_terms": [
       "endpoint",
       "URI",
@@ -3123,7 +3123,7 @@
     ],
     "usage_context": "Veri gönderme ve almada",
     "scenario": "Dev: 'The user details should go in the POST body, not the URL.'",
-    "common_mistakes": "Turk geliştiriciler GET isteklerinde body gondermeye çalışır.",
+    "common_mistakes": "Turk geliştiriciler GET isteklerinde body göndermeye çalışır.",
     "related_terms": [
       "request",
       "payload",
@@ -3813,7 +3813,7 @@
       "rate limit — hız siniri",
       "rate limiter — hız sinirlandirici"
     ],
-    "usage_context": "API guvenliginde",
+    "usage_context": "API güvenliğinde",
     "scenario": "Lead: 'Add rate limiting before we get DDoS'd.'",
     "common_mistakes": "Turk geliştiriciler rate limiting uygulamayi unutur, production'da sorun yasar.",
     "related_terms": [
@@ -3953,7 +3953,7 @@
     "difficulty_level": "intermediate",
     "domain": "web",
     "definition_en": "Rendering web pages on the server before sending them to the client",
-    "definition_tr": "Web sayfalarini istemciye gondermeden önce sunucuda render etme",
+    "definition_tr": "Web sayfalarini istemciye göndermeden önce sunucuda render etme",
     "example_sentences": [
       {
         "en": "Use SSR for better SEO and initial load performance.",
@@ -4483,7 +4483,7 @@
     "difficulty_level": "intermediate",
     "domain": "errors",
     "definition_en": "An urgent fix applied directly to the production environment",
-    "definition_tr": "Doğrudan production ortamina uygulanan acil duzeltme",
+    "definition_tr": "Doğrudan production ortamına uygulanan acil duzeltme",
     "example_sentences": [
       {
         "en": "Deploy a hotfix for the critical payment bug.",
@@ -6001,7 +6001,7 @@
     "difficulty_level": "beginner",
     "domain": "communication",
     "definition_en": "To release software to a production or staging environment",
-    "definition_tr": "Yazılımı production veya staging ortamina yayınlamak",
+    "definition_tr": "Yazılımı production veya staging ortamına yayınlamak",
     "example_sentences": [
       {
         "en": "We deploy every Friday afternoon.",
@@ -6536,7 +6536,7 @@
     ],
     "usage_context": "Kod yazim standartlarinda",
     "scenario": "Reviewer: 'This doesn't follow our naming convention — use camelCase.'",
-    "common_mistakes": "Turk geliştiriciler değişken isimlerini Turkce yazar veya kisaltmalar kullanir (a, tmp, x).",
+    "common_mistakes": "Turk geliştiriciler değişken isimlerini Türkçe yazar veya kisaltmalar kullanir (a, tmp, x).",
     "related_terms": [
       "clean code",
       "readability",
@@ -6555,7 +6555,7 @@
     "example_sentences": [
       {
         "en": "Run the linter before submitting your PR.",
-        "tr": "PR'inizi gondermeden önce linter'i çalıştırın.",
+        "tr": "PR'inizi göndermeden önce linter'i çalıştırın.",
         "context": "Development workflow"
       }
     ],
@@ -7215,7 +7215,7 @@
     "difficulty_level": "beginner",
     "domain": "docs",
     "definition_en": "A summary of changes, fixes, and features included in a software release",
-    "definition_tr": "Yazılım surumune dahil edilen değişikliklerin, duzeltmelerin ve ozelliklerin özeti",
+    "definition_tr": "Yazılım surumune dahil edilen değişikliklerin, duzeltmelerin ve özelliklerin özeti",
     "example_sentences": [
       {
         "en": "Draft the release notes for v2.5.",
@@ -7402,7 +7402,7 @@
     ],
     "usage_context": "Mülakat basinda",
     "scenario": "Interviewer: 'Let's start — tell me about yourself.'",
-    "common_mistakes": "Turk geliştiriciler bu soruya çok uzun ve dagnik cevap verir, 2 dakikada ozetlemeli.",
+    "common_mistakes": "Turk geliştiriciler bu soruya çok uzun ve dagnik cevap verir, 2 dakikada özetlemeli.",
     "related_terms": [
       "elevator pitch",
       "experience",
@@ -8083,7 +8083,7 @@
     "difficulty_level": "beginner",
     "domain": "interview",
     "definition_en": "A document summarizing your professional experience, education, and skills",
-    "definition_tr": "Profesyonel deneyiminizi, egitiminizi ve becerilerinizi ozetleyen belge",
+    "definition_tr": "Profesyonel deneyiminizi, egitiminizi ve becerilerinizi özetleyen belge",
     "example_sentences": [
       {
         "en": "Tailor your resume for each job application.",
@@ -8668,12 +8668,12 @@
   },
   {
     "term": "props",
-    "translation": "Ozellikler",
+    "translation": "Özellikler",
     "pronunciation": "PROPS",
     "difficulty_level": "beginner",
     "domain": "programming",
     "definition_en": "Properties passed from a parent component to a child component",
-    "definition_tr": "Üst bileşenden alt bileşene gecirilen ozellikler",
+    "definition_tr": "Üst bileşenden alt bileşene gecirilen özellikler",
     "example_sentences": [
       {
         "en": "Pass the user data as props to the child component.",
@@ -9778,14 +9778,14 @@
     "example_sentences": [
       {
         "en": "Test in the staging environment before deploying to production.",
-        "tr": "Production'a deploy etmeden önce staging ortaminda test edin.",
+        "tr": "Production'a deploy etmeden önce staging ortamında test edin.",
         "context": "Deployment"
       }
     ],
     "common_patterns": [
-      "development environment — geliştirme ortami",
-      "staging environment — staging ortami",
-      "production environment — production ortami"
+      "development environment — geliştirme ortamı",
+      "staging environment — staging ortamı",
+      "production environment — production ortamı"
     ],
     "usage_context": "Dağıtım sürecinde",
     "scenario": "Lead: 'Never test directly in production.'",
@@ -9800,7 +9800,7 @@
   },
   {
     "term": "staging",
-    "translation": "Hazirlk ortami",
+    "translation": "Hazirlk ortamı",
     "pronunciation": "STEY-jing",
     "difficulty_level": "beginner",
     "domain": "web",
@@ -9819,7 +9819,7 @@
     ],
     "usage_context": "Sürüm hazirliginda",
     "scenario": "QA: 'The fix is on staging, please verify.'",
-    "common_mistakes": "Turk geliştiriciler staging ortami kurmaz, development'tan production'a atlar.",
+    "common_mistakes": "Turk geliştiriciler staging ortamı kurmaz, development'tan production'a atlar.",
     "related_terms": [
       "production",
       "environment",
@@ -9829,7 +9829,7 @@
   },
   {
     "term": "production",
-    "translation": "Üretim ortami",
+    "translation": "Üretim ortamı",
     "pronunciation": "pruh-DUK-shun",
     "difficulty_level": "beginner",
     "domain": "web",
@@ -9848,7 +9848,7 @@
     ],
     "usage_context": "Canli sistem yönetiminde",
     "scenario": "Lead: 'This is a production issue, handle it ASAP.'",
-    "common_mistakes": "Turk geliştiriciler production debugging yapar, test ortaminda yeniden uretmez.",
+    "common_mistakes": "Turk geliştiriciler production debugging yapar, test ortamında yeniden uretmez.",
     "related_terms": [
       "staging",
       "deploy",
@@ -9863,7 +9863,7 @@
     "difficulty_level": "beginner",
     "domain": "errors",
     "definition_en": "When a program stops working unexpectedly",
-    "definition_tr": "Programin beklenmedik sekilde calismayı durdurmas",
+    "definition_tr": "Programin beklenmedik sekilde çalışmayı durdurmas",
     "example_sentences": [
       {
         "en": "The app crashed due to an unhandled exception.",
@@ -10047,7 +10047,7 @@
       "XSS vulnerability — XSS acigi",
       "prevent XSS — XSS'i önlemek"
     ],
-    "usage_context": "Web guvenliginde",
+    "usage_context": "Web güvenliğinde",
     "scenario": "Security: 'This input field is vulnerable to XSS.'",
     "common_mistakes": "Turk geliştiriciler kullanıcı girdisini escape etmez.",
     "related_terms": [
@@ -10076,7 +10076,7 @@
       "SQL injection attack — SQL enjeksiyon saldırısı",
       "prevent SQL injection — SQL enjeksiyonunu önlemek"
     ],
-    "usage_context": "Veritabanı guvenliginde",
+    "usage_context": "Veritabanı güvenliğinde",
     "scenario": "Security: 'This query is vulnerable to SQL injection.'",
     "common_mistakes": "Turk geliştiriciler string interpolation ile SQL sorgusu oluşturur.",
     "related_terms": [
@@ -10132,7 +10132,7 @@
     ],
     "common_patterns": [
       "give a demo — demo vermek",
-      "demo environment — demo ortami"
+      "demo environment — demo ortamı"
     ],
     "usage_context": "Sprint inceleme ve satis sürecinde",
     "scenario": "PO: 'Let's demo the new feature to the client.'",
@@ -10213,7 +10213,7 @@
     "example_sentences": [
       {
         "en": "Let's focus on the MVP features first.",
-        "tr": "Önce MVP ozelliklerine odaklanalim.",
+        "tr": "Önce MVP özelliklerine odaklanalim.",
         "context": "Product planning"
       }
     ],
@@ -10482,7 +10482,7 @@
     ],
     "usage_context": "OOP tasarım incelemesinde",
     "scenario": "Senior: 'This design violates OCP, we have to modify the base class for every new type.'",
-    "common_mistakes": "Turk geliştiriciler yeni ozellikler için sürekli mevcut kodu değiştirir.",
+    "common_mistakes": "Turk geliştiriciler yeni özellikler için sürekli mevcut kodu değiştirir.",
     "related_terms": [
       "SOLID",
       "design pattern",
@@ -11642,7 +11642,7 @@
     "difficulty_level": "advanced",
     "domain": "web",
     "definition_en": "A technology allowing servers to push updates to the client over HTTP",
-    "definition_tr": "Sunucularin HTTP üzerinden istemciye güncelleme gondermesine izin veren teknoloji",
+    "definition_tr": "Sunucularin HTTP üzerinden istemciye güncelleme göndermesine izin veren teknoloji",
     "example_sentences": [
       {
         "en": "Use server-sent events for live notifications.",
@@ -12276,7 +12276,7 @@
     "difficulty_level": "intermediate",
     "domain": "communication",
     "definition_en": "A change that causes existing functionality to stop working as expected",
-    "definition_tr": "Mevcut işlevselliin beklenildigi gibi calismayı durdurmasina neden olan değişiklik",
+    "definition_tr": "Mevcut işlevselliin beklenildigi gibi çalışmayı durdurmasina neden olan değişiklik",
     "example_sentences": [
       {
         "en": "This API change is a breaking change — update the consumers.",
@@ -12746,7 +12746,7 @@
     "common_patterns": [
       "write a tech spec — teknik spec yazmak"
     ],
-    "usage_context": "Büyük ozellikler için tasarım sürecinde",
+    "usage_context": "Büyük özellikler için tasarım sürecinde",
     "scenario": "Lead: 'We need a tech spec for this project before coding.'",
     "common_mistakes": "Turk geliştiriciler spec yazmadan kodlamaya başlar.",
     "related_terms": [
@@ -13199,7 +13199,7 @@
     "example_sentences": [
       {
         "en": "Always do a null check before accessing properties.",
-        "tr": "Ozelliklere erismeden önce her zaman null kontrolu yapın.",
+        "tr": "Özelliklere erismeden önce her zaman null kontrolu yapın.",
         "context": "Defensive programming"
       }
     ],
@@ -13492,7 +13492,7 @@
     ],
     "usage_context": "Kod okunurlugunda",
     "scenario": "Reviewer: 'This comment is outdated, update or remove it.'",
-    "common_mistakes": "Turk geliştiriciler yorumlari Turkce yazar, Ingilizce yazmalidir.",
+    "common_mistakes": "Turk geliştiriciler yorumlari Türkçe yazar, Ingilizce yazmalidir.",
     "related_terms": [
       "comment",
       "documentation",
@@ -14402,7 +14402,7 @@
     "common_patterns": [
       "seed the database — veritabanını tohumlamak"
     ],
-    "usage_context": "Geliştirme ortami kurulumunda",
+    "usage_context": "Geliştirme ortamı kurulumunda",
     "scenario": "Dev: 'Don't forget to run the seed after migrations.'",
     "common_mistakes": "Turk geliştiriciler seed data hazirlmaz, test için üretim verisi kullanir.",
     "related_terms": [
@@ -14633,7 +14633,7 @@
     ],
     "common_patterns": [
       "ship it — gonder/yayınla",
-      "ready to ship — gondermeye hazir"
+      "ready to ship — göndermeye hazir"
     ],
     "usage_context": "Sürüm ve teslimat sürecinde",
     "scenario": "Lead: 'Ship it! We can iterate based on user feedback.'",

@@ -57,7 +57,7 @@ async function createUser(userData) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "Kullanici olusturulamadi");
+    throw new Error(errorData.message || "Kullanici oluşturulamadi");
   }
 
   return response.json();
@@ -85,7 +85,7 @@ async function fetchWithTimeout(url, options = {}, timeout = 5000) {
 :::code[javascript]{title="Axios Temelleri"}
 import axios from "axios";
 
-// Axios instance olustur (base config)
+// Axios instance oluştur (base config)
 const api = axios.create({
   baseURL: "https://api.example.com",
   timeout: 5000,
@@ -211,7 +211,7 @@ const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000,         // 10 dakika - cache'te tutulur (eski cacheTime)
       retry: 3,                        // Basarisiz istegi 3 kez dene
       refetchOnWindowFocus: true,      // Tab'a geri donunce refetch
-      refetchOnReconnect: true,        // Internet baglantisi gelince refetch
+      refetchOnReconnect: true,        // Internet bağlantısi gelince refetch
     },
   },
 });
@@ -244,7 +244,7 @@ function UserList() {
     queryFn: () => api.get("/users").then(r => r.data),
     staleTime: 30 * 1000,            // 30 saniye fresh
     select: (data) => data.filter(u => u.active), // Veriyi donustur
-    enabled: true,                    // false ise sorgu calismaz
+    enabled: true,                    // false ise sorgu çalışmaz
   });
 
   if (isLoading) return <Spinner />;
@@ -263,7 +263,7 @@ function UserProfile({ userId }) {
   const { data: user } = useQuery({
     queryKey: ["users", userId],      // userId degisince yeniden fetch eder
     queryFn: () => api.get(`/users/${userId}`).then(r => r.data),
-    enabled: !!userId,                // userId yoksa calisma
+    enabled: !!userId,                // userId yoksa çalışma
   });
 
   return user ? <Profile user={user} /> : null;
@@ -298,13 +298,13 @@ function CreateUserForm() {
     onError: (err, newUser, context) => {
       // Hata olursa eski haline dondur
       queryClient.setQueryData(["users"], context.previous);
-      toast.error("Kullanici olusturulamadi: " + err.message);
+      toast.error("Kullanici oluşturulamadi: " + err.message);
     },
 
     onSuccess: () => {
       // Basarili olursa cache'i tamamen yenile
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Kullanici olusturuldu!");
+      toast.success("Kullanici oluşturuldu!");
     },
 
     onSettled: () => {
@@ -434,7 +434,7 @@ Sunucu yanıtını beklemeden UI'i hemen guncellemektir. Başarısız olursa esk
 **Gerçek hayat benzetmesi:** Bir mesaj uygulamasında "Gonderildi" tikini hemen göstermek - aslında henuz sunucuya ulasmamis olabilir ama kullanıcı beklemesin diye hemen gösterirsin
 :::
 
-:::code[jsx]{title="Optimistic Update - Like Butonu Ornegi"}
+:::code[jsx]{title="Optimistic Update - Like Butonu Örneği"}
 function LikeButton({ postId, initialLikes, isLiked }) {
   const queryClient = useQueryClient();
 
@@ -601,7 +601,7 @@ function useWebSocket(url) {
     ws.onopen = () => {
       setIsConnected(true);
       reconnectAttempts.current = 0;
-      console.log("WebSocket baglantisi kuruldu");
+      console.log("WebSocket bağlantısi kuruldu");
     };
 
     ws.onmessage = (event) => {
@@ -701,9 +701,9 @@ async function apiRequest(config) {
       );
     } else if (error.request) {
       // Istek gitti ama yanit gelmedi (network hatasi)
-      throw new ApiError(0, "Sunucuya ulasilamiyor. Internet baglantinizi kontrol edin.");
+      throw new ApiError(0, "Sunucuya ulasilamiyor. Internet bağlantınizi kontrol edin.");
     } else {
-      // Istek olusturulurken hata
+      // Istek oluşturulurken hata
       throw new ApiError(-1, "Beklenmeyen bir hata olustu");
     }
   }
@@ -1281,13 +1281,13 @@ Bir Senior Developer data fetching konusunu öğrenirken su yaklaşımı benimse
 
 3. **Optimistic update ile pessimistic update arasındaki dengeyi kurar** - Like butonu: optimistic (anında geri bildirim). Odeme işlemi: pessimistic (sunucu onaylasIn). Risk seviyesine göre strateji belirler.
 
-4. **API contract'larini tanımlar** - Backend ekibi ile API response formatini, error kodlarını ve pagination yapısını önceden belirler. TypeScript ile API tiplerini tanımlar ve otomatik dogrulama yapar.
+4. **API contract'larini tanımlar** - Backend ekibi ile API response formatini, error kodlarını ve pagination yapısını önceden belirler. TypeScript ile API tiplerini tanımlar ve otomatik doğrulama yapar.
 
 5. **Offline-first düşünür** - TanStack Query'nin offline mutasyonlarını, service worker ile cache stratejisini ve kullanıcının internet bağlantısı kesildiğindeki UX'i planlar.
 
 6. **Monitoring ve alerting kurar** - API response time'larını izler (Datadog, New Relic). p50, p95, p99 latency metriklerini takip eder. "Ortalama yanıt süresi 200ms" yeterli değildir, p99'un 3 saniye olmadığından emin olur.
 
-**Karar Verme Sureci — Fetch vs Axios vs ky:**
+**Karar Verme Süreci — Fetch vs Axios vs ky:**
 - **Native fetch**: Zero dependency, browser API. Trade-off: interceptor yok, timeout desteği yok (AbortController ile manuel), response.ok kontrolünü unutursan sessizce hata yutarsın. Küçük projeler ve Server Components için yeterli.
 - **Axios**: Interceptor, timeout, request/response transform, progress tracking. Trade-off: 13KB bundle ekleniyor, fetch'in yapamadığı çok az şey var artık. Legacy projelerde yaygın ama yeni projelerde fetch+wrapper tercih et.
 - **ky (tiny alternative)**: ~3KB, fetch tabanlı, retry, timeout, JSON otomatik. Trade-off: Axios'un tüm özelliklerini sunmaz ama %90 use case'i karşılar.

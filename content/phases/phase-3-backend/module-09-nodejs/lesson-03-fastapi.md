@@ -143,18 +143,18 @@ fastapi-project/
 :::senior-learns
 Senior/CTO bu yapiyi şöyle değerlendirir: "Separation of Concerns" prensibi tam uygulanmis. Router'lar sadece HTTP katmani, service'ler is mantigi, schema'lar veri doğrulama, model'ler veritabanı. Yeni bir geliştirici geldiginde nereye bakacagini hemen anlar. Bu yapı monolith için yeterli; mikroservis gecisinde her service dosyasi kendi servisine donusebilir.
 
-**Karar Verme Sureci — FastAPI vs Django vs Flask:**
-- **FastAPI**: Async-native, otomatik OpenAPI docs, Pydantic validation. Trade-off: Django'nun admin panel, ORM, auth gibi "batteries-included" ozelliklerini sunmaz. Kullanim: API-first projeler, microservice'ler, yuksek performans.
+**Karar Verme Süreci — FastAPI vs Django vs Flask:**
+- **FastAPI**: Async-native, otomatik OpenAPI docs, Pydantic validation. Trade-off: Django'nun admin panel, ORM, auth gibi "batteries-included" özelliklerini sunmaz. Kullanim: API-first projeler, microservice'ler, yuksek performans.
 - **Django + DRF**: Admin panel, ORM, auth, migrations hazir. Trade-off: Async destegi sinirli, monolith yapisina yonlendirir. Kullanim: Content-heavy siteler, admin panel gereken projeler, hizli MVP.
 - **Flask**: Minimalist, ogrenmesi kolay. Trade-off: Async yok, buyuk projelerde yapi dayatmadigi icin spagetti koda yol acar. Kullanim: Cok kucuk API'ler, legacy projeler.
 - **Senior karar agaci**: "Admin panel lazim mi? Django. Sadece API + yuksek performans? FastAPI. Hepsi icin: FastAPI + SQLAlchemy."
 
 **Anti-pattern Farkindaligi:**
 - **Router'da is mantigi**: Endpoint icerisinde dogrudan database sorgusu, email gonderimi yapmak. Test edilmesi imkansiz, tekrar kullanilmasi olanaksiz kod uretir. Cozum: service layer pattern.
-- **Global state**: Modul seviyesinde `db = get_db()` gibi global degiskenler. Test'lerde mock'lanamaz, race condition riski var. Cozum: Dependency Injection ile `Depends()`.
+- **Global state**: Modul seviyesinde `db = get_db()` gibi global değişkenler. Test'lerde mock'lanamaz, race condition riski var. Cozum: Dependency Injection ile `Depends()`.
 - **Tek schema her is icin**: Ayni Pydantic model'i hem create, hem update, hem response icin kullanmak. Cozum: UserCreate, UserUpdate, UserResponse ayir.
 
-**Gercek Dunya Deneyimi:** Bir fintech projesinde baslangicta Flask ile basladik. 50 endpoint'e ulasinca test yazmak kabusa dondu — dependency injection yok, her endpoint icinde global DB baglantiSI, mock'lamak icin monkey-patching. FastAPI'ye gecis 2 hafta surdu ama sonrasinda test coverage %30'dan %85'e cikti. Depends() sistemi sayesinde her endpoint izole test edilebilir hale geldi.
+**Gercek Dunya Deneyimi:** Bir fintech projesinde baslangicta Flask ile basladik. 50 endpoint'e ulasinca test yazmak kabusa dondu — dependency injection yok, her endpoint icinde global DB bağlantıSI, mock'lamak icin monkey-patching. FastAPI'ye gecis 2 hafta surdu ama sonrasinda test coverage %30'dan %85'e cikti. Depends() sistemi sayesinde her endpoint izole test edilebilir hale geldi.
 :::
 
 ## Pydantic v2 ile Veri Doğrulama
@@ -283,7 +283,7 @@ Pydantic v2'de önemli değişiklikler:
 
 FastAPI'nin en güçlü özelliklerinden biri Dependency Injection (DI) sistemidir. Spring Boot'taki DI'ya benzer ama çok daha basit.
 
-:::code[python]{title="app/core/database.py - Veritabanı Baglantisi"}
+:::code[python]{title="app/core/database.py - Veritabanı Bağlantısi"}
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 
@@ -1010,7 +1010,7 @@ async def get_report_status(task_id: str):
 :::
 
 :::senior-learns
-**Karar Verme Sureci — BackgroundTasks vs Celery vs Dramatiq:**
+**Karar Verme Süreci — BackgroundTasks vs Celery vs Dramatiq:**
 
 **BackgroundTasks kullan:** Email gönderme, log yazma, cache güncelleme, webhook tetikleme gibi hafif ve kısa isler. Ayrı bir servis gerektirmez, ayni process'te çalışır. Trade-off: Worker crash ederse task kaybolur, retry mekanizmasi yok, olceklenmez.
 
@@ -1020,7 +1020,7 @@ async def get_report_status(task_id: str):
 
 **Senior karar agaci:** "Is 30 saniyeden kisa ve hafifse BackgroundTasks. Uzun suren ama basit? Dramatiq. Complex workflow, buyuk takim? Celery."
 
-**Gercek Dunya Deneyimi:** Bir SaaS projede baslangicta tum asenkron isleri BackgroundTasks ile yaptik. 6 ay sonra email bazen basarisiz oluyor ama retry yok. PDF uretimi 45 saniye suruyor ve uvicorn worker'i bloke ediyor. Celery'ye gecis sonrasinda retry, dead letter queue ve monitoring ile hic bir task kaybolmadi.
+**Gercek Dunya Deneyimi:** Bir SaaS projede baslangicta tum asenkron isleri BackgroundTasks ile yaptik. 6 ay sonra email bazen basarisiz oluyor ama retry yok. PDF üretimi 45 saniye suruyor ve uvicorn worker'i bloke ediyor. Celery'ye gecis sonrasinda retry, dead letter queue ve monitoring ile hic bir task kaybolmadi.
 :::
 
 ## Konfigürasyon Yönetimi
@@ -1470,7 +1470,7 @@ JWT tabanli bir authentication sistemi kur:
 
 Gereksinimler:
 - Şifre hash'leme (passlib + bcrypt)
-- JWT token uretimi (python-jose)
+- JWT token üretimi (python-jose)
 - Access token (15dk) + Refresh token (7 gun)
 - `get_current_user` dependency
 - Hatali giriş denemesi limiti (5 deneme, 15dk kilitleme)
@@ -1578,7 +1578,7 @@ Kural basit: Eger endpoint içinde `await` kullaniyorsan `async def`, kullanmiyo
 
 3. **Connection pooling:** SQLAlchemy'de pool_size, max_overflow ve pool_recycle parametrelerini ayarla. Veritabanı bağlantı limitlerine dikkat et.
 
-4. **Health check endpoint:** `/health` endpoint'i ile load balancer'in sağlık kontrolu yapmasini sagla. Veritabanı ve Redis baglantisini kontrol et.
+4. **Health check endpoint:** `/health` endpoint'i ile load balancer'in sağlık kontrolu yapmasini sagla. Veritabanı ve Redis bağlantısini kontrol et.
 
 5. **Structured logging:** JSON formatinda loglama yap. Request ID ile istekleri izle. ELK stack veya Datadog ile merkezi loglama.
 
@@ -1899,7 +1899,7 @@ FastAPI projelerinde MUTLAKA bilmen gerekenler:
 :::ai-guidance
 ### Bu Konuyu Derinlestirmek Için AI Prompt'lari
 
-1. "FastAPI'de N+1 query problemini async SQLAlchemy ile nasil cozebilirim? selectin, joinedload ve subqueryload arasindaki farklari ornekle goster."
+1. "FastAPI'de N+1 query problemini async SQLAlchemy ile nasil cozebilirim? selectin, joinedload ve subqueryload arasindaki farklari örnekle goster."
 
 2. "FastAPI uygulamam 1000 concurrent request'te yavasliyor. Profiling nasil yaparim? asyncio, uvicorn ve SQLAlchemy seviyesinde bottleneck analizi yap."
 

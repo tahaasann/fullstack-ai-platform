@@ -16,13 +16,13 @@ Machine Learning'in arkasındaki **matematik**i anlamadan, gerçek bir AI engine
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "Gradient Descent algoritmasini bir dagdan inis analojisiyle acikla. Learning rate, loss function ve gradient kavramlarini gorsellerle anlat. Stochastic, Mini-batch ve Batch Gradient Descent arasindaki farklari, her birinin avantaj/dezavantajlarini ve ne zaman hangisinin kullanildigini karsilastir."
 
 **2. Pratik Uygulama:**
-> "NumPy ile sifirdan basit bir linear regression modeli olustur. Loss function (MSE) tanimla, gradient'leri elle hesapla ve gradient descent ile parametreleri optimize et. Her iterasyondaki loss degerini ciz. Learning rate'i degistirerek etkisini goster."
+> "NumPy ile sifirdan basit bir linear regression modeli oluştur. Loss function (MSE) tanimla, gradient'leri elle hesapla ve gradient descent ile parametreleri optimize et. Her iterasyondaki loss degerini ciz. Learning rate'i degistirerek etkisini goster."
 > Takip: "Simdi ayni modele L2 regularization ekle. Regularization'in gradient hesabini ve weight'leri nasil etkiledigini matematiksel olarak goster."
 
 **3. Mukemmellik Icin:**
@@ -1533,6 +1533,313 @@ class Adam:
 **Beklenen Sonuc:** Adam en hizli converge etmeli. SGD en yavas, Momentum ortada olmali. Contour plot üzerinde izlenen yollar farkli olmali.
 **Ipucu:** Adam = Momentum + RMSprop. Bias correction (m_hat, v_hat) ilk adimilardaki sapmayı duzeltir. AdamW = Adam + weight decay (modern standart).
 :::
+
+:::exercise
+### Alistirma 11: Vektor ve Matris Islemleri Pratikte (Kolay)
+
+NumPy ile temel lineer cebir islemlerini uygula.
+
+```python
+import numpy as np
+
+# Vektor islemleri
+v1 = np.array([1, 2, 3])
+v2 = np.array([4, 5, 6])
+
+# TODO: Dot product hesapla
+# dot = np.dot(v1, v2)
+
+# TODO: Cosine similarity hesapla
+# cos_sim = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
+# TODO: Matris carpimi
+# A = np.array([[1, 2], [3, 4]])
+# B = np.array([[5, 6], [7, 8]])
+# C = A @ B  # veya np.matmul(A, B)
+
+# TODO: Transpose, determinant, inverse hesapla
+# TODO: Bir neural network layer'ini matris carpimi olarak ifade et
+# output = activation(W @ x + b)
+```
+
+**Beklenen Sonuc:** Dot product, cosine similarity ve matris carpimi dogru hesaplanmali. NN layer'in matris formunu yazabilmeli.
+**Ipucu:** Cosine similarity [-1, 1] araligindadir. 1 = ayni yon, 0 = dik, -1 = zit yon. NLP embedding karsilastirmasinda temel metriktir.
+:::
+
+:::exercise
+### Alistirma 12: Turev ve Gradient Hesaplama (Kolay)
+
+Python ile turev ve gradient hesaplama pratiği yap.
+
+```python
+import numpy as np
+
+# Basit fonksiyon: f(x) = x^2 + 3x + 2
+# Turevi: f'(x) = 2x + 3
+
+# TODO: Numerik turev hesapla
+def numerical_derivative(f, x, h=1e-7):
+    return (f(x + h) - f(x - h)) / (2 * h)
+
+# TODO: f(x) = x^2 + 3x + 2 icin turev hesapla ve analitik sonucla karsilastir
+# f = lambda x: x**2 + 3*x + 2
+# x = 2.0
+# print(f"Numerik: {numerical_derivative(f, x)}")
+# print(f"Analitik: {2*x + 3}")
+
+# TODO: Partial derivative (cok degiskenli fonksiyon)
+# f(x, y) = x^2 * y + y^3
+# df/dx = 2xy, df/dy = x^2 + 3y^2
+
+# TODO: Gradient vektoru hesapla
+# grad_f = [df/dx, df/dy]
+```
+
+**Beklenen Sonuc:** Numerik ve analitik turev sonuclari eslestirilmeli. Gradient vektoru dogru hesaplanmali.
+**Ipucu:** Numerik turev icin merkezi fark (central difference) formulu en dogruyu verir. h = 1e-7 iyi bir secimdir.
+:::
+
+:::exercise
+### Alistirma 13: Olasilik Dagilim Gorsellemesi (Kolay)
+
+Temel olasilik dagilimlrini gorlsellestir ve anla.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# TODO: Normal (Gauss) dagilim
+# mu, sigma = 0, 1
+# x = np.linspace(-4, 4, 100)
+# plt.plot(x, stats.norm.pdf(x, mu, sigma), label='N(0,1)')
+# plt.plot(x, stats.norm.pdf(x, 0, 2), label='N(0,2)')
+
+# TODO: Bernoulli ve Binomial dagilim
+# TODO: Poisson dagilim
+# TODO: Uniform dagilim
+
+# TODO: Central Limit Theorem gosterimi
+# Farkli dagilimlardan orneklem ortalamasi alin
+# Orneklem buyudukce normal dagilima yaklastigini gosterin
+
+# TODO: Her dagilimin ML'deki kullanim alanini yaz
+```
+
+**Beklenen Sonuc:** 4 farkli dagilim gorsellestirilmeli. CLT etkisi gosterilmeli. Her dagilimin kullanim alani yazilmali.
+**Ipucu:** Normal dagilim: regression hatalari. Bernoulli: binary classification. Poisson: event counting. Uniform: random initialization.
+:::
+
+:::exercise
+### Alistirma 14: Learning Rate Etkisi Deneyimi (Orta)
+
+Farkli learning rate'lerin gradient descent uzerindeki etkisini gozlemle.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Basit quadratic loss: L(w) = (w - 3)^2
+def loss(w):
+    return (w - 3) ** 2
+
+def gradient(w):
+    return 2 * (w - 3)
+
+# TODO: 3 farkli learning rate ile gradient descent calistir
+# learning_rates = [0.01, 0.1, 0.9]
+# w_init = 10.0
+# epochs = 50
+
+# TODO: Her lr icin w ve loss degerlerini kaydet
+# TODO: Loss vs epoch grafigi ciz (3 lr bir arada)
+# TODO: w'nun izledigi yolu goster
+
+# TODO: Cok buyuk lr ile iraksamayi (divergence) goster
+# lr = 1.1 ile dene
+```
+
+**Beklenen Sonuc:** lr=0.01 yavas, lr=0.1 optimal, lr=0.9 salinimli converge etmeli. lr=1.1 iraksamali.
+**Ipucu:** Kural: lr cok buyukse loss artar (diverge), cok kucukse cok yavas azalir. Learning rate scheduler ile baslangicta buyuk, sonra kucult.
+:::
+
+:::exercise
+### Alistirma 15: Backpropagation Elle Hesaplama (Orta)
+
+Basit bir neural network'te backpropagation'i elle hesapla.
+
+```python
+import numpy as np
+
+# 2-layer network: input(2) -> hidden(2) -> output(1)
+# Activation: sigmoid
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def sigmoid_derivative(x):
+    s = sigmoid(x)
+    return s * (1 - s)
+
+# TODO: Forward pass hesapla
+# x = np.array([0.5, 0.8])
+# W1 = np.array([[0.1, 0.3], [0.2, 0.4]])
+# b1 = np.array([0.1, 0.1])
+# W2 = np.array([[0.5], [0.6]])
+# b2 = np.array([0.1])
+# target = np.array([1.0])
+
+# z1 = W1 @ x + b1
+# a1 = sigmoid(z1)
+# z2 = W2.T @ a1 + b2
+# output = sigmoid(z2)
+
+# TODO: Loss hesapla (MSE)
+# TODO: Backward pass — her katman icin gradient hesapla (chain rule)
+# TODO: Weight'leri guncelle
+# TODO: 100 iterasyon calistir ve loss'un azaldigini goster
+```
+
+**Beklenen Sonuc:** Forward ve backward pass elle hesaplanmali. 100 iterasyonda loss azalmali. Chain rule dogru uygulanmali.
+**Ipucu:** Chain rule: dL/dW1 = dL/doutput * doutput/dz2 * dz2/da1 * da1/dz1 * dz1/dW1. Her adimi ayri hesapla.
+:::
+
+:::exercise
+### Alistirma 16: Regularization Karsilastirmasi (Orta)
+
+L1, L2 ve Dropout regularization'i karsilastir.
+
+```python
+import numpy as np
+
+# TODO: L1 regularization (Lasso) — weight'leri sifira cekmek
+# loss_l1 = mse_loss + lambda * sum(abs(w))
+# gradient_l1 = gradient + lambda * sign(w)
+
+# TODO: L2 regularization (Ridge) — weight'leri kucultmek
+# loss_l2 = mse_loss + lambda * sum(w^2)
+# gradient_l2 = gradient + 2 * lambda * w
+
+# TODO: Farkli lambda degerleri ile overfitting etkisini goster
+# lambdas = [0, 0.001, 0.01, 0.1, 1.0]
+# Her lambda icin train ve test loss'u karsilastir
+
+# TODO: L1 vs L2'nin weight dagilimina etkisini gorsellestir
+# L1 sparse weight'ler uretir (feature selection)
+# L2 kucuk ama sifir olmayan weight'ler uretir
+
+# TODO: Dropout simulasyonu yaz
+```
+
+**Beklenen Sonuc:** L1 sparse, L2 kucuk weight'ler uretmeli. Optimal lambda overfitting'i azaltmali. Dropout etkisi gosterilmeli.
+**Ipucu:** L1 = feature selection (gereksiz feature'larin weight'i 0 olur). L2 = genel shrinkage. Dropout = ensemble benzeri etki.
+:::
+
+:::exercise
+### Alistirma 17: Feature Scaling ve Normalizasyon (Orta)
+
+Farkli feature scaling tekniklerini karsilastir.
+
+```python
+import numpy as np
+
+# Ornek veri
+data = np.array([
+    [25, 50000, 3],
+    [30, 80000, 7],
+    [22, 35000, 1],
+    [45, 120000, 15]
+])
+
+# TODO: Min-Max Scaling [0, 1]
+# scaled = (x - min) / (max - min)
+
+# TODO: Standard Scaling (Z-score)
+# scaled = (x - mean) / std
+
+# TODO: Robust Scaling (outlier'lara dayanikli)
+# scaled = (x - median) / IQR
+
+# TODO: Her yontemin ne zaman kullanilacagini acikla
+# TODO: Scaling olmadan vs ile gradient descent hizini karsilastir
+# TODO: Contour plot ile scaling etkisini gorsellestir
+```
+
+**Beklenen Sonuc:** 3 scaling yontemi dogru uygulanmali. Scaling ile gradient descent daha hizli converge etmeli.
+**Ipucu:** Feature'lar farkli olceklerdeyse (yas: 20-50, maas: 30K-120K) gradient descent zigzag yapar. Scaling bunu duzeltir.
+:::
+
+:::exercise
+### Alistirma 18: Bias-Variance Tradeoff Analizi (Zor)
+
+Bias-variance tradeoff'u gorsel olarak goster.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Gercek fonksiyon: y = sin(x) + noise
+np.random.seed(42)
+X = np.linspace(0, 2 * np.pi, 30)
+y = np.sin(X) + np.random.normal(0, 0.3, len(X))
+
+# TODO: Farkli karmasiklikta modeller fit et
+# degree 1: Underfitting (high bias, low variance)
+# degree 4: Just right
+# degree 15: Overfitting (low bias, high variance)
+
+# TODO: Her model icin train ve test error hesapla
+# TODO: Bias^2 + Variance + Noise ayristirmasi yap
+# TODO: Model complexity vs error grafigi ciz (U-curve)
+
+# TODO: Cross-validation ile optimal complexity sec
+```
+
+**Beklenen Sonuc:** Underfitting, just-right ve overfitting gorsel olarak gosterilmeli. U-curve cizilmeli.
+**Ipucu:** Total Error = Bias^2 + Variance + Irreducible Noise. Model karmasikligi artinca bias azalir, variance artar.
+:::
+
+:::exercise
+### Alistirma 19: Matematik Kavramlarini ML Pipeline'a Baglama (Zor)
+
+Ogrenilen tum matematik kavramlarini bir ML pipeline'inda uygula.
+
+```python
+import numpy as np
+
+# TODO: End-to-end ML pipeline (sifirdan, kutuphane kullanmadan)
+
+# 1. Veri olustur (synthetic classification)
+# X: 100 ornek, 3 feature
+# y: binary label
+
+# 2. Feature scaling uygula (standard scaling)
+
+# 3. Train/test split (%80/%20)
+
+# 4. Logistic regression modeli yaz
+#    - Sigmoid activation
+#    - Binary cross-entropy loss
+#    - Gradient descent optimizer
+#    - L2 regularization
+
+# 5. Egitim dongusu (100 epoch)
+#    - Forward pass
+#    - Loss hesapla
+#    - Backward pass (gradient)
+#    - Weight update
+
+# 6. Evaluation
+#    - Accuracy, precision, recall, F1
+#    - Confusion matrix
+#    - Loss vs epoch grafigi
+
+# TODO: Her adimda kullanilan matematik kavramini belirt
+```
+
+**Beklenen Sonuc:** Sifirdan logistic regression calismali. Test accuracy %80+ olmali. Her adimda matematik konsepti etiketlenmeli.
+**Ipucu:** Bu alistrima tum dersi birlestrir: linear algebra (matris carpimi), calculus (gradient), probability (sigmoid), optimization (GD).
+:::
+
 
 :::external-resource
 ## Ek Kaynaklar

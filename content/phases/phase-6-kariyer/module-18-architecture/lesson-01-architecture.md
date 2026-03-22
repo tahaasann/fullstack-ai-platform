@@ -47,17 +47,17 @@ Yukaridaki siparis sistemini event-driven mimariye donusturun:
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "Monolith, microservice ve serverless mimarileri karsilastir. Her birinin avantaj, dezavantaj ve uygun kullanim alanlarini goster. Bir startup MVP'sinden unicorn'a buyurken mimari nasil evrilir? Monolith-first yaklasimi neden tavsiye edilir? Conway's Law mimari kararlari nasil etkiler?"
 
 **2. Pratik Uygulama:**
-> "Bir e-ticaret uygulamasini Event-Driven Architecture ile tasarla. Siparis olusturma akisini event'lerle modelleyen bir sistem ciz: OrderCreated, PaymentProcessed, InventoryReserved, ShipmentScheduled. Message broker (RabbitMQ/Kafka) secimini ve her event'in handler'ini acikla. Saga pattern ile dagitik transaction yonet."
+> "Bir e-ticaret uygulamasini Event-Driven Architecture ile tasarla. Siparis oluşturma akisini event'lerle modelleyen bir sistem ciz: OrderCreated, PaymentProcessed, InventoryReserved, ShipmentScheduled. Message broker (RabbitMQ/Kafka) secimini ve her event'in handler'ini acikla. Saga pattern ile dagitik transaction yonet."
 > Takip: "Simdi CQRS pattern'ini uygula: okuma ve yazma modellerini ayir. Read model icin Elasticsearch, write model icin PostgreSQL kullan. Event sourcing ile veri tutarliligini sagla."
 
 **3. Mukemmellik Icin:**
-> "500 developer'lik bir organizasyonda microservice mimarisini yonetiyorum. Service mesh (Istio), API Gateway, distributed tracing (Jaeger), centralized logging (ELK Stack), service discovery ve circuit breaker pattern'ini icereen bir platform engineering stratejisi olustur. Team Topologies ile takim yapisini mimariyle nasil hizalarim?"
+> "500 developer'lik bir organizasyonda microservice mimarisini yonetiyorum. Service mesh (Istio), API Gateway, distributed tracing (Jaeger), centralized logging (ELK Stack), service discovery ve circuit breaker pattern'ini icereen bir platform engineering stratejisi oluştur. Team Topologies ile takim yapisini mimariyle nasil hizalarim?"
 
 ### Pair Programming Ipucu
 Mimari karar verirken AI'a mevcut sistem yapisini anlat ve sor: "Bu monolith uygulamayi microservice'lere bolmeli miyim? Hangi bounded context'leri ayirmaliyim? Strangler Fig pattern ile nasil kademeli gecis yaparim? Trade-off analizini yap."
@@ -1456,7 +1456,7 @@ root.finish()
 :::realworld
 ## Uber — Observability ile Sorun Tespiti
 
-Uber, Jaeger adlı distributed tracing aracını geliştirdi (open source). Bir kullanicinin ride request'i 20+ microservice'den gecer. Jaeger ile her request'in hangi service'te ne kadar zaman harcadigini gorebilirler. Bir service yavaslayinca dakikalar icinde bottleneck tespit edilir. Prometheus + Grafana ile CPU, memory, request rate gibi metrikleri izler ve anomali durumunda otomatik alert olusturur.
+Uber, Jaeger adlı distributed tracing aracını geliştirdi (open source). Bir kullanicinin ride request'i 20+ microservice'den gecer. Jaeger ile her request'in hangi service'te ne kadar zaman harcadigini gorebilirler. Bir service yavaslayinca dakikalar icinde bottleneck tespit edilir. Prometheus + Grafana ile CPU, memory, request rate gibi metrikleri izler ve anomali durumunda otomatik alert oluşturur.
 :::
 
 ---
@@ -1627,7 +1627,7 @@ Legacy monolith'ten microservices'e adim adim gecis plani yazin.
 2. Ilk ayrilacak servisi secin (en az bagimliligi olan)
 3. Strangler Fig pattern ile yeni servisin monolith'in onune nasil konacagini cizelgelleyin
 4. API Gateway ile trafik yonlendirme stratejisi yazin
-5. Veri migrasyon plani olusturun (shared DB → service-per-DB)
+5. Veri migrasyon plani oluşturun (shared DB → service-per-DB)
 
 **Beklenen Sonuc:** Migrasyon plani risk bazli onceliklendirme icermeli. Her adimda rollback stratejisi tanimlanmali. Veri tutarliligi icin eventual consistency deseni aciklanmali.
 
@@ -1641,7 +1641,7 @@ Bir e-ticaret sistemi icin Event Storming oturumu simulasyonu yapin.
 2. Command'lari belirleyin (PlaceOrder, ProcessPayment, ShipItem...)
 3. Aggregate'leri tanimlayin (Order, Payment, Shipment...)
 4. Bounded context'leri cizin (Ordering, Payment, Fulfillment, Inventory)
-5. Context Map olusturun (context'ler arasi iliskiler)
+5. Context Map oluşturun (context'ler arasi iliskiler)
 
 **Beklenen Sonuc:** En az 15 domain event, 10 command ve 5 aggregate tanimlanmali. Bounded context'ler arasindaki bagimlilklar net olmali. Context Map'te upstream/downstream iliskileri gosterilmeli.
 
@@ -1649,30 +1649,288 @@ Bir e-ticaret sistemi icin Event Storming oturumu simulasyonu yapin.
 
 ### Alıştırma 9: API Versioning ve Backward Compatibility (Zor)
 
-API versioning stratejisi tasarlayin ve breaking change yonetim plani olusturun.
+API versioning stratejisi tasarlayin ve breaking change yonetim plani oluşturun.
 
 1. URL versioning (`/v1/users`), header versioning (`Accept: application/vnd.api.v1+json`) ve query parameter versioning (`?version=1`) arasinda secim yapin ve nedenleri aciklayin
 2. Deprecation policy yazin (ne zaman eski versiyon kapatilir, nasil bildirilir)
-3. Breaking change ornegi: `User.name` → `User.firstName + User.lastName` icin migration plani
+3. Breaking change örneği: `User.name` → `User.firstName + User.lastName` icin migration plani
 4. SDK/client library versioning stratejisi
 
-**Beklenen Sonuc:** Versioning stratejisi secimi ve gerekceleri aciklanmali. Deprecation timeline'i net olmali (ornek: 6 ay uyari → 3 ay sunset → kaldirma). Migration guide ornegi hazirlanmali.
+**Beklenen Sonuc:** Versioning stratejisi secimi ve gerekceleri aciklanmali. Deprecation timeline'i net olmali (örnek: 6 ay uyari → 3 ay sunset → kaldirma). Migration guide örneği hazirlanmali.
 
 ---
 
 ### Alıştırma 10: Disaster Recovery ve Business Continuity Plani (Zor)
 
-Bir SaaS urunun icin disaster recovery plani olusturun.
+Bir SaaS urunun icin disaster recovery plani oluşturun.
 
-1. **RPO (Recovery Point Objective):** Maksimum ne kadar veri kaybi kabul edilebilir? (ornek: 1 saat)
-2. **RTO (Recovery Time Objective):** Sistemin ne kadar surede ayaga kalkmasi gerekir? (ornek: 15 dakika)
+1. **RPO (Recovery Point Objective):** Maksimum ne kadar veri kaybi kabul edilebilir? (örnek: 1 saat)
+2. **RTO (Recovery Time Objective):** Sistemin ne kadar surede ayaga kalkmasi gerekir? (örnek: 15 dakika)
 3. Multi-region deployment stratejisi cizelgelleyin (active-active vs active-passive)
 4. Failover suresci tanimlayin (otomatik vs manuel)
 5. Backup ve restore prosedurlerini yazin (DB, file storage, config)
-6. DR drill plani olusturun (yilda 2 kez test senaryosu)
+6. DR drill plani oluşturun (yilda 2 kez test senaryosu)
 
 **Beklenen Sonuc:** RPO ve RTO hedefleri net olmali. Multi-region mimarisi diyagrami cizilebilmeli. DR drill senaryolari tanimlanmali. Maliyet analizi yapilmali (active-active vs active-passive).
 :::
+
+:::exercise
+### Alistirma 11: Monolith vs Microservices Karsilastirmasi (Kolay)
+
+Monolith ve microservices mimarilerini karsilastir.
+
+```markdown
+# TODO: Karsilastirma tablosu doldur
+
+| Kriter             | Monolith         | Microservices      |
+|--------------------|------------------|--------------------|
+| Deployment         | Tek birim        | Bagimsiz servisler |
+| Olcekleme          | Dikey (vertical) | Yatay (horizontal) |
+| Teknoloji Secimi   | Tek stack        | ?                  |
+| Takim Yapisi       | Tek takim        | ?                  |
+| Debugging          | Kolay            | ?                  |
+| Data Consistency   | ACID             | ?                  |
+| Iletisim           | In-process       | ?                  |
+| Ilk Gelistirme     | Hizli            | ?                  |
+
+# TODO: Ne zaman monolith, ne zaman microservices secilmeli?
+# TODO: Monolith -> Microservices gecis stratejisi yaz (Strangler Fig Pattern)
+# TODO: Gerçek dünyadan 3 ornek ver (Netflix, Uber, vb.)
+```
+
+**Beklenen Sonuc:** Tablo eksiksiz doldurulmali. Secim kriterleri net aciklanmali. Gecis stratejisi tanimlanmali.
+**Ipucu:** Cogu startup monolith ile baslamali. Microservices'a erken gecis "distributed monolith" tehlikesi tasir. Conway's Law'u unutma.
+:::
+
+:::exercise
+### Alistirma 12: Clean Architecture Katmanlarini Tasarla (Kolay)
+
+Clean Architecture prensipleriyle bir uygulamanin katmanlarini tanimla.
+
+```typescript
+// TODO: Katmanlari tanimla ve bagimliliklari ciz
+
+// 1. Domain Layer (Entity + Value Object)
+// interface User { id: string; email: string; name: string; }
+// class Email { constructor(private value: string) { /* validation */ } }
+
+// 2. Use Case Layer (Application Business Rules)
+// interface CreateUserUseCase { execute(input: CreateUserDTO): Promise<User>; }
+
+// 3. Interface Adapters (Controllers, Presenters, Gateways)
+// class UserController { constructor(private createUser: CreateUserUseCase) {} }
+
+// 4. Frameworks & Drivers (Express, PostgreSQL, etc.)
+// class PostgresUserRepository implements UserRepository {}
+
+// TODO: Her katmanin bagimlilk yonunu belirle (iceridien disariya)
+// TODO: Dependency Inversion prensibini acikla
+// TODO: Bu yapinin test edilebilirligini goster
+```
+
+**Beklenen Sonuc:** 4 katman tanimlanmali. Bagimlilik yonu iceeri dogru olmali. Test edilebilirlik aciklanmali.
+**Ipucu:** Dependency Rule: ic katmanlar dis katmanlari bilmez. UseCase PostgreSQL'i bilmez — sadece UserRepository interface'ini bilir.
+:::
+
+:::exercise
+### Alistirma 13: API Tasarimi ve REST Best Practices (Kolay)
+
+RESTful API tasarim prensiplerini uygula.
+
+```markdown
+# TODO: Bir e-ticaret API'si icin endpoint tasarla
+
+# Urunler
+GET    /api/v1/products              # Liste (pagination, filter, sort)
+GET    /api/v1/products/:id          # Detay
+POST   /api/v1/products              # Olustur
+PUT    /api/v1/products/:id          # Guncelle
+DELETE /api/v1/products/:id          # Sil
+
+# TODO: Siparisler endpoint'lerini tasarla
+# TODO: Kullanici endpoint'lerini tasarla
+# TODO: Nested resources (urunun yorumlari)
+
+# TODO: Pagination response formati
+# { "data": [...], "meta": { "total": 100, "page": 1, "limit": 20 } }
+
+# TODO: Error response formati
+# { "error": { "code": "NOT_FOUND", "message": "...", "details": [...] } }
+
+# TODO: API versioning stratejisi sec (URL vs Header)
+# TODO: HATEOAS ornegi yaz
+```
+
+**Beklenen Sonuc:** Tum CRUD endpoint'leri tanimlanmali. Tutarli response formati olmali. Versioning stratejisi belirlenmeli.
+**Ipucu:** Resource isimleri cogul (products, orders), HTTP metotlari eylem belirtir. Nested resource 2 seviyeyi gecmemeli.
+:::
+
+:::exercise
+### Alistirma 14: Event-Driven Architecture Tasarimi (Orta)
+
+Event-driven mimari ile bir siparis sistemi tasarla.
+
+```typescript
+// TODO: Event tanimla
+// interface OrderCreatedEvent {
+//   type: 'ORDER_CREATED';
+//   payload: { orderId: string; userId: string; items: Item[]; total: number; };
+//   metadata: { timestamp: Date; correlationId: string; };
+// }
+
+// TODO: Event producer
+// class OrderService {
+//   async createOrder(data: CreateOrderDTO) {
+//     const order = await this.repository.save(data);
+//     await this.eventBus.publish({ type: 'ORDER_CREATED', payload: order });
+//   }
+// }
+
+// TODO: Event consumers tanimla
+// 1. PaymentService: ORDER_CREATED -> odeme baslat
+// 2. InventoryService: ORDER_CREATED -> stok dusur
+// 3. NotificationService: ORDER_CREATED -> email gonder
+// 4. AnalyticsService: ORDER_CREATED -> metrikleri guncelle
+
+// TODO: Event sourcing vs event notification farki
+// TODO: Idempotency sagla (ayni event'i tekrar isleme)
+// TODO: Dead letter queue stratejisi yaz
+```
+
+**Beklenen Sonuc:** Event akisi tanimlanmali. Her consumer'in gorevi acik olmali. Idempotency ve hata yonetimi saglanmali.
+**Ipucu:** Event-driven'da servisler birbirini bilmez — loose coupling. Ama eventual consistency kabul etmelisin. Idempotency key ile duplike islemeyi onle.
+:::
+
+:::exercise
+### Alistirma 15: Database Secimi ve Data Modeling (Orta)
+
+Farkli veritabani turlerini karsilastir ve dogru secimi yap.
+
+```markdown
+# TODO: Veritabani secim matrisi olustur
+
+| Senaryo              | En Uygun DB      | Neden?              |
+|----------------------|-------------------|---------------------|
+| E-ticaret (ACID)     | PostgreSQL        | Relational, ACID    |
+| Sosyal ag (graph)    | Neo4j             | ?                   |
+| Oturum yonetimi      | Redis             | ?                   |
+| Log depolama         | Elasticsearch     | ?                   |
+| IoT sensor verisi    | TimescaleDB       | ?                   |
+| Icerik yonetimi      | MongoDB           | ?                   |
+| Mesajlasma kuyruğu   | Kafka             | ?                   |
+
+# TODO: Her DB icin data model ornegi ciz
+# TODO: CAP teoremini acikla: Consistency, Availability, Partition Tolerance
+# TODO: SQL vs NoSQL ne zaman secilmeli karar agaci olustur
+```
+
+**Beklenen Sonuc:** Tablo doldurulmali. Her senaryo icin DB secimi gerekcelendirilmeli. CAP teoremi aciklanmali.
+**Ipucu:** CAP: dagitik sistemde 3 garantiden en fazla 2'si saglanabilir. PostgreSQL = CP, Cassandra = AP, MongoDB = CP (default).
+:::
+
+:::exercise
+### Alistirma 16: CQRS Pattern Implementasyonu (Orta)
+
+Command Query Responsibility Segregation pattern'ini uygula.
+
+```typescript
+// TODO: Command (yazma) tarafi
+// interface CreateOrderCommand {
+//   userId: string;
+//   items: { productId: string; quantity: number }[];
+// }
+// class OrderCommandHandler {
+//   async handle(command: CreateOrderCommand): Promise<string> {
+//     // Validate, create order, publish event
+//   }
+// }
+
+// TODO: Query (okuma) tarafi
+// interface OrderQueryService {
+//   getOrderById(id: string): Promise<OrderReadModel>;
+//   getOrdersByUser(userId: string): Promise<OrderSummary[]>;
+// }
+
+// TODO: Read model'i write model'den farkli tasarla
+// Write: normalized (3NF), ACID
+// Read: denormalized, hizli okuma icin optimize
+
+// TODO: Sync mekanizmasi (event ile read model guncelleme)
+// TODO: Ne zaman CQRS kullanmali, ne zaman kullanmamali?
+```
+
+**Beklenen Sonuc:** Command ve Query ayrilmali. Read model okuma icin optimize edilmeli. Sync mekanizmasi tanimlanmali.
+**Ipucu:** CQRS her yerde gerekli degil. Okuma/yazma oranlari cok farkli ise (1000:1 okuma:yazma) veya read model farkli optimize edilecekse kullan.
+:::
+
+:::exercise
+### Alistirma 17: Caching Stratejileri (Orta)
+
+Farkli caching stratejilerini tasarla ve uygula.
+
+```typescript
+// TODO: Cache-Aside (Lazy Loading)
+// async function getUser(id: string) {
+//   let user = await cache.get(`user:${id}`);
+//   if (!user) {
+//     user = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+//     await cache.set(`user:${id}`, user, { ttl: 3600 });
+//   }
+//   return user;
+// }
+
+// TODO: Write-Through
+// TODO: Write-Behind (Write-Back)
+// TODO: Cache invalidation stratejileri
+// - TTL-based
+// - Event-based (veri degisince cache temizle)
+// - Version-based (ETag)
+
+// TODO: Cache stampede (thundering herd) problemi ve cozumu
+// TODO: Multi-layer cache (L1: memory, L2: Redis, L3: CDN)
+// TODO: Her stratejinin avantaj/dezavantaj tablosu
+```
+
+**Beklenen Sonuc:** 3 cache stratejisi implement edilmeli. Invalidation yontemleri tanimlanmali. Cache stampede cozumu aciklanmali.
+**Ipucu:** "There are only two hard things in CS: cache invalidation and naming things." Cache TTL + event-based invalidation birlestir.
+:::
+
+:::exercise
+### Alistirma 18: Disaster Recovery Plani (Zor)
+
+Bir uygulama icin disaster recovery plani olustur.
+
+```markdown
+# TODO: DR Plan sablonu
+
+## 1. RTO ve RPO Hedefleri
+- RTO (Recovery Time Objective): Maksimum kabul edilebilir kesinti suresi
+- RPO (Recovery Point Objective): Maksimum kabul edilebilir veri kaybi
+
+## 2. Backup Stratejisi
+- Full backup: Haftalik
+- Incremental backup: Gunluk
+- WAL archiving: Surekli
+- TODO: 3-2-1 kurali (3 kopya, 2 farkli medya, 1 offsite)
+
+## 3. Failover Mekanizmasi
+- TODO: Active-passive vs active-active karsilastir
+- TODO: DNS failover, load balancer failover
+- TODO: Database replication (sync vs async)
+
+## 4. DR Drill Plani
+- TODO: Aylik test senaryolari tanimla
+- TODO: Rollback proseduru yaz
+- TODO: Iletisim plani (kim kime haber verir)
+
+## 5. Maliyet Analizi
+- TODO: Active-active vs active-passive maliyet karsilastirmasi
+```
+
+**Beklenen Sonuc:** RPO ve RTO hedefleri net olmali. Backup stratejisi tanimlanmali. DR drill senaryolari yazilmali.
+**Ipucu:** DR plani yazilip rafta durmamalai — duzanli drill yapmadan gercek afette plan calismaz. "Untested backup is not a backup."
+:::
+
 
 :::knowledge-check
 ## Bilgi Kontrolü

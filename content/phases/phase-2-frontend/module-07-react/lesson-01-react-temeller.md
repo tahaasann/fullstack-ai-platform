@@ -787,7 +787,7 @@ function TodoList() {
 }
 ```
 
-**Beklenen Sonuc:** Todo eklenip silinebilmeli. Tiklanarak toggle edilebilmeli. Filtre calismali. Enter ile ekleme yapilabilmeli.
+**Beklenen Sonuc:** Todo eklenip silinebilmeli. Tiklanarak toggle edilebilmeli. Filtre çalışmali. Enter ile ekleme yapilabilmeli.
 **Ipucu:** Immutable guncelleme: `setTodos(prev => prev.map(t => t.id === id ? {...t, completed: !t.completed} : t))`
 
 ---
@@ -834,7 +834,7 @@ function App() {
 }
 ```
 
-**Beklenen Sonuc:** Sayfa yenilendiginde degerler korunmali. Farkli tiplerle (string, object, array) calismali.
+**Beklenen Sonuc:** Sayfa yenilendiginde degerler korunmali. Farkli tiplerle (string, object, array) çalışmali.
 **Ipucu:** Lazy initialization ile ilk render'da localStorage'dan oku. SSR'da `window` undefined olabilir — try/catch ile handle et.
 :::
 
@@ -843,17 +843,17 @@ function App() {
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "React'in Virtual DOM ve reconciliation algoritmasini adim adim acikla. Bir state degistiginde React dahili olarak ne yapar? Fiber mimarisi nedir ve neden eski stack reconciler'dan gecildi? Diffing algoritmasi O(n) karmasikligini nasil basariyor?"
 
 **2. Pratik Uygulama:**
-> "useDebounce, useLocalStorage ve useFetch custom hook'larini sifirdan yaz. Her hook icin TypeScript tipleri, edge case yonetimi (race condition, cleanup) ve kullanim ornekleri ver. Ardindan bu hook'lari kullanan bir arama component'i olustur."
+> "useDebounce, useLocalStorage ve useFetch custom hook'larini sifirdan yaz. Her hook icin TypeScript tipleri, edge case yonetimi (race condition, cleanup) ve kullanim örnekleri ver. Ardindan bu hook'lari kullanan bir arama component'i oluştur."
 > Takip: "Bu hook'larda stale closure sorunu var mi? Varsa nasil cozulur? useCallback dependency'lerini dogru yonettigimi kontrol et."
 
 **3. Mukemmellik Icin:**
-> "React 19 Compiler ile useMemo ve useCallback artik cogunlukla gereksiz. Compiler'in ne yaptigini, hangi durumlarda hala manuel memoization gerektigini ve bir projeyi React 19'a migrate ederken dikkat edilmesi gereken noktalari anlat. Ornek kod ile oncesi-sonrasi karsilastirmasi yap."
+> "React 19 Compiler ile useMemo ve useCallback artik cogunlukla gereksiz. Compiler'in ne yaptigini, hangi durumlarda hala manuel memoization gerektigini ve bir projeyi React 19'a migrate ederken dikkat edilmesi gereken noktalari anlat. Örnek kod ile oncesi-sonrasi karsilastirmasi yap."
 
 ### Pair Programming Ipucu
 Component yazarken AI'a React DevTools Profiler ciktisini goster ve sor: "Bu component neden 5 kez render oldu? Profiler flame graph'ini analiz et ve gereksiz render'larin kaynagini tespit edip coz."

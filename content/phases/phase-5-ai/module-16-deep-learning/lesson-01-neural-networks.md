@@ -16,20 +16,20 @@ Klasik ML algoritmaları (Random Forest, SVM) iyi çalışır ama **complex patt
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "Backpropagation algoritmasini bir neural network ornegi üzerinde adim adim acikla. Forward pass'te her layer'da ne hesaplaniyor? Loss hesaplandiktan sonra chain rule ile gradient'ler nasil geriye yayiliyor? Vanishing gradient problemi nedir ve ReLU activation neden bunu azaltiyor?"
+> "Backpropagation algoritmasini bir neural network örneği üzerinde adim adim acikla. Forward pass'te her layer'da ne hesaplaniyor? Loss hesaplandiktan sonra chain rule ile gradient'ler nasil geriye yayiliyor? Vanishing gradient problemi nedir ve ReLU activation neden bunu azaltiyor?"
 
 **2. Pratik Uygulama:**
-> "PyTorch ile sifirdan bir CNN (Convolutional Neural Network) olustur ve MNIST dataset'inde el yazisi rakam tanima yap. Conv2d, MaxPool2d, ReLU, Fully Connected layer'lari kullan. Training loop, validation, early stopping ve model kaydetme islemlerini goster. Her layer'in ne ogrendigini gorsellestir."
+> "PyTorch ile sifirdan bir CNN (Convolutional Neural Network) oluştur ve MNIST dataset'inde el yazisi rakam tanima yap. Conv2d, MaxPool2d, ReLU, Fully Connected layer'lari kullan. Training loop, validation, early stopping ve model kaydetme islemlerini goster. Her layer'in ne ogrendigini gorsellestir."
 > Takip: "Simdi ayni modeli transfer learning ile pre-trained ResNet kullanarak tekrar egit. Accuracy farkini karsilastir ve fine-tuning stratejisini acikla."
 
 **3. Mukemmellik Icin:**
 > "CNN, RNN, LSTM ve GRU mimarilerini karsilastir. Her birinin hangi problem tipi icin uygun oldugunu (goruntu siniflandirma, zaman serisi, dogal dil isleme) acikla. Attention mekanizmasinin RNN'lerin sequential limitation'ini nasil cozdugununu ve Transformer mimarisine gecisi anlat."
 
 ### Pair Programming Ipucu
-Model egitirken AI'a training log ciktisini goster ve sor: "Loss azalmiyor, model converge etmiyor. Learning rate, batch size, model mimarisi ve data preprocessing adimlarimdaki potansiyel sorunlari analiz et. Debugging checklist'i olustur."
+Model egitirken AI'a training log ciktisini goster ve sor: "Loss azalmiyor, model converge etmiyor. Learning rate, batch size, model mimarisi ve data preprocessing adimlarimdaki potansiyel sorunlari analiz et. Debugging checklist'i oluştur."
 :::
 
 :::interview
@@ -134,7 +134,7 @@ result = qa(question="Turkiye'nin baskenti neresi?", context="Turkiye'nin basken
 print(result)  # {'answer': 'Ankara', 'score': 0.99}
 ```
 
-**Senior Ipucu:** Production'da kendi modelini egitmeden once, mutlaka pre-trained modelleri dene. Cogu zaman yeterli olur ve haftalarca egitim surecinden kurtulursun.
+**Senior Ipucu:** Production'da kendi modelini egitmeden once, mutlaka pre-trained modelleri dene. Cogu zaman yeterli olur ve haftalarca egitim sürecinden kurtulursun.
 :::
 
 :::must-note
@@ -1372,7 +1372,7 @@ total_params = sum(p.numel() for p in model.parameters())
 print(f"Toplam parametre: {total_params:,}")
 ```
 
-**Beklenen Sonuc:** Confusion matrix'te diagonal degerler yuksek olmali. En cok karistirilan cift genelde (3,5) veya (4,9) olur. Yanlis tahmin orneklerinde el yazisinin zor okunabilir oldugu gorulebilir.
+**Beklenen Sonuc:** Confusion matrix'te diagonal degerler yuksek olmali. En cok karistirilan cift genelde (3,5) veya (4,9) olur. Yanlis tahmin örneklerinde el yazisinin zor okunabilir oldugu gorulebilir.
 **Ipucu:** `classification_report` precision, recall ve F1-score'u sinif bazinda gosterir. Dusuk recall'lu siniflar modelin zorluk cektigi rakamlari gosterir.
 
 ---
@@ -1482,7 +1482,7 @@ class SimpleCNN(nn.Module):
 
 ### Alistirma 6: Overfitting Tespiti ve Onleme (Orta)
 
-Kasitli olarak overfit eden bir model olustur ve duzelltme tekniklerini uygula.
+Kasitli olarak overfit eden bir model oluştur ve duzelltme tekniklerini uygula.
 
 ```python
 import torch
@@ -1685,7 +1685,7 @@ print(f"En iyi skor: {study.best_value:.4f}")
 
 ### Alistirma 10: Model Deployment — PyTorch to ONNX (Zor)
 
-Egitilmis modeli ONNX formatina cevirip inference pipeline olustur.
+Egitilmis modeli ONNX formatina cevirip inference pipeline oluştur.
 
 ```python
 import torch
@@ -1732,8 +1732,308 @@ print(f"Prediction: {np.argmax(result[0])}")
 ```
 
 **Beklenen Sonuc:** ONNX modeli PyTorch ile ayni sonuclari vermeli. ONNX Runtime inference %30-50 daha hizli olmali. INT8 quantization ile model boyutu %50-75 kuculmeli.
-**Ipucu:** ONNX platform bagimsizdir — PyTorch modeli TensorFlow, C++ veya JavaScript'te calistirilabilir. Production'da ONNX Runtime tercih edilir.
+**Ipucu:** ONNX platform bagimsizdir — PyTorch modeli TensorFlow, C++ veya JavaScript'te çalıştırilabilir. Production'da ONNX Runtime tercih edilir.
 :::
+
+:::exercise
+### Alistirma 11: Perceptron'dan MLP'ye (Kolay)
+
+Sifirdan basit bir perceptron ve MLP yaz.
+
+```python
+import numpy as np
+
+class Perceptron:
+    def __init__(self, n_features):
+        self.weights = np.random.randn(n_features)
+        self.bias = 0.0
+        self.lr = 0.01
+
+    def predict(self, x):
+        return 1 if np.dot(self.weights, x) + self.bias > 0 else 0
+
+    # TODO: fit metodunu yaz (perceptron learning rule)
+    # TODO: AND, OR, XOR gate'leri ogren
+    # TODO: XOR'un neden ogrenilemedigini acikla (linear separability)
+    # TODO: 2-layer MLP ile XOR'u coz
+```
+
+**Beklenen Sonuc:** Perceptron AND ve OR'u ogrenmeli ama XOR'u ogrenmemeli. MLP ile XOR cozulmeli.
+**Ipucu:** XOR linearly separable degildir — tek katman cozmez. Hidden layer ekleyince non-linear karar siniri olusur.
+:::
+
+:::exercise
+### Alistirma 12: Activation Function Karsilastirmasi (Kolay)
+
+Farkli activation function'lari gorsel olarak karsilastir.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-5, 5, 100)
+
+# TODO: Asagidaki activation'lari implement et ve ciz
+# 1. Sigmoid: 1 / (1 + exp(-x))
+# 2. Tanh: (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+# 3. ReLU: max(0, x)
+# 4. Leaky ReLU: max(0.01x, x)
+# 5. GELU: x * phi(x) (phi = standard normal CDF)
+
+# TODO: Her birinin turevini de ciz
+# TODO: Vanishing gradient problemini sigmoid ile goster
+# TODO: Dead neuron problemini ReLU ile goster
+# TODO: Her activation'in ne zaman kullanilacagini yaz
+```
+
+**Beklenen Sonuc:** 5 activation ve turevleri cizilmeli. Avantaj/dezavantajlari listelemeli.
+**Ipucu:** Modern NN'lerde: hidden layer'da ReLU/GELU, output'ta sigmoid (binary) veya softmax (multi-class).
+:::
+
+:::exercise
+### Alistirma 13: Loss Function Secimi (Kolay)
+
+Farkli loss function'lari anla ve dogru secimi yap.
+
+```python
+import numpy as np
+
+# TODO: Binary Cross-Entropy Loss
+# BCE = -[y*log(p) + (1-y)*log(1-p)]
+def bce_loss(y_true, y_pred):
+    eps = 1e-7
+    y_pred = np.clip(y_pred, eps, 1 - eps)
+    return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+
+# TODO: Categorical Cross-Entropy Loss
+# TODO: Mean Squared Error (MSE)
+# TODO: Mean Absolute Error (MAE)
+
+# TODO: Karsilastirma tablosu olustur:
+# | Loss Function | Gorev           | Aktivasyon |
+# |---------------|-----------------|------------|
+# | BCE           | Binary class.   | Sigmoid    |
+# | CCE           | Multi class.    | Softmax    |
+# | MSE           | Regression      | Linear     |
+
+# TODO: Her loss'un gradient'ini hesapla
+```
+
+**Beklenen Sonuc:** 4 loss function implement edilmeli. Karsilastirma tablosu doldurulmali.
+**Ipucu:** Yanlis loss secimi model'in ogrenmesini engeller. Classification'da MSE kullanma — gradient cok yavas olur.
+:::
+
+:::exercise
+### Alistirma 14: PyTorch ile Basit NN Egitimi (Orta)
+
+PyTorch ile basit bir neural network egit.
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+# TODO: Model tanimla
+class SimpleNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super().__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, output_size)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        x = self.relu(self.fc1(x))
+        x = self.sigmoid(self.fc2(x))
+        return x
+
+# TODO: Veri hazirla (synthetic binary classification)
+# TODO: Loss function ve optimizer sec
+# criterion = nn.BCELoss()
+# optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+# TODO: Egitim dongusu yaz (100 epoch)
+# TODO: Train ve validation loss'u ciz
+# TODO: Overfitting kontrolu yap
+```
+
+**Beklenen Sonuc:** Model egitilmeli ve loss azalmali. Train/val loss grafigi cizilmeli.
+**Ipucu:** `model.train()` ve `model.eval()` modlarini dogru kullan. Eval modda dropout ve batchnorm farkli davranir.
+:::
+
+:::exercise
+### Alistirma 15: Batch Normalization ve Dropout (Orta)
+
+BatchNorm ve Dropout'un etkisini gozlemle.
+
+```python
+import torch.nn as nn
+
+# TODO: BatchNorm'lu ve Dropout'lu model
+class RegularizedNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.layers = nn.Sequential(
+            nn.Linear(784, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(128, 10)
+        )
+
+    def forward(self, x):
+        return self.layers(x)
+
+# TODO: BatchNorm'suz ve Dropout'suz model egit
+# TODO: BatchNorm'lu model egit
+# TODO: Dropout'lu model egit
+# TODO: Her ikisi ile model egit
+# TODO: 4 modelin train/val loss grafiklerini karsilastir
+```
+
+**Beklenen Sonuc:** BatchNorm egitimi hizlandirmali. Dropout overfitting'i azaltmali. Ikisi birlikte en iyi sonucu vermeli.
+**Ipucu:** BatchNorm: her layer'in ciktisini normalize eder (mean=0, std=1). Dropout: rastgele neuron'lari kapatir (ensemble etkisi).
+:::
+
+:::exercise
+### Alistirma 16: CNN ile Goruntu Siniflandirma (Orta)
+
+Convolutional Neural Network ile MNIST/CIFAR siniflandirmasi yap.
+
+```python
+import torch.nn as nn
+
+# TODO: CNN modeli tanimla
+class SimpleCNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv_layers = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+        )
+        self.fc_layers = nn.Sequential(
+            nn.Linear(64 * 7 * 7, 128),
+            nn.ReLU(),
+            nn.Linear(128, 10)
+        )
+
+    def forward(self, x):
+        x = self.conv_layers(x)
+        x = x.view(x.size(0), -1)
+        return self.fc_layers(x)
+
+# TODO: MNIST veri setini yukle (torchvision)
+# TODO: Data augmentation ekle (RandomRotation, RandomFlip)
+# TODO: Modeli egit ve test accuracy hesapla
+# TODO: Yanlis siniflandirilan ornekleri gorsellestir
+```
+
+**Beklenen Sonuc:** MNIST'te %98+ accuracy elde edilmeli. Data augmentation etkisi gosterilmeli.
+**Ipucu:** Conv layer feature extractor, FC layer classifier gorevi gorur. MaxPool spatial boyutu yarisina indirir.
+:::
+
+:::exercise
+### Alistirma 17: Transfer Learning Uygulama (Orta)
+
+Pre-trained model ile transfer learning yap.
+
+```python
+import torchvision.models as models
+import torch.nn as nn
+
+# TODO: Pre-trained ResNet yukle
+# model = models.resnet18(pretrained=True)
+
+# TODO: Son layer'i degistir (fine-tuning)
+# num_features = model.fc.in_features
+# model.fc = nn.Linear(num_features, num_classes)
+
+# TODO: Feature extraction (sadece son layer egit)
+# for param in model.parameters():
+#     param.requires_grad = False
+# model.fc.requires_grad_(True)
+
+# TODO: Full fine-tuning (tum model egit, dusuk lr ile)
+# TODO: Feature extraction vs fine-tuning performansini karsilastir
+# TODO: Learning rate scheduling ekle
+```
+
+**Beklenen Sonuc:** Transfer learning az veri ile yuksek accuracy saglamali. Fine-tuning feature extraction'dan daha iyi olmali.
+**Ipucu:** Az veri varsa feature extraction, cok veri varsa fine-tuning tercih et. Pre-trained model'in ilk katmanlarini dondurmak (freeze) genellikle yeterli.
+:::
+
+:::exercise
+### Alistirma 18: RNN/LSTM ile Sequence Modelleme (Zor)
+
+Recurrent Neural Network ile metin veya zaman serisi modelleme yap.
+
+```python
+import torch.nn as nn
+
+# TODO: LSTM modeli tanimla
+class LSTMModel(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, output_dim):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, batch_first=True, bidirectional=True)
+        self.fc = nn.Linear(hidden_dim * 2, output_dim)
+
+    def forward(self, x):
+        embedded = self.embedding(x)
+        output, (hidden, cell) = self.lstm(embedded)
+        hidden = torch.cat((hidden[-2], hidden[-1]), dim=1)
+        return self.fc(hidden)
+
+# TODO: Sentiment analysis veri seti hazirla
+# TODO: Tokenizer ve vocabulary olustur
+# TODO: Modeli egit
+# TODO: Vanishing gradient problemini goster (simple RNN vs LSTM)
+```
+
+**Beklenen Sonuc:** LSTM sentiment analysis'te %85+ accuracy vermeli. RNN vs LSTM farki gosterilmeli.
+**Ipucu:** LSTM'in gate mekanizmasi (forget, input, output) uzun mesafe bagimliligini ogrenebilir. Bidirectional LSTM her iki yonden context yakalar.
+:::
+
+:::exercise
+### Alistirma 19: Model Optimization ve Deployment (Zor)
+
+Model'i production icin optimize et: quantization, pruning, ONNX export.
+
+```python
+import torch
+# TODO: Model quantization
+# quantized_model = torch.quantization.quantize_dynamic(
+#     model, {nn.Linear}, dtype=torch.qint8
+# )
+
+# TODO: Model boyutunu karsilastir
+# original_size = os.path.getsize('model.pt')
+# quantized_size = os.path.getsize('model_quantized.pt')
+
+# TODO: ONNX export
+# dummy_input = torch.randn(1, input_size)
+# torch.onnx.export(model, dummy_input, 'model.onnx')
+
+# TODO: ONNX Runtime ile inference
+# import onnxruntime as ort
+# session = ort.InferenceSession('model.onnx')
+
+# TODO: Inference speed karsilastirmasi (PyTorch vs ONNX vs Quantized)
+# TODO: Model pruning uygula ve accuracy etkisini olc
+```
+
+**Beklenen Sonuc:** Quantization ile model %50-75 kuculmeli. ONNX ile %30+ hizlanma saglanmali. Accuracy kaybi minimal olmali.
+**Ipucu:** INT8 quantization accuracy'den cok az kayip ile model boyutunu 4x kucultebilir. ONNX Runtime production'da standart.
+:::
+
 
 :::deha-tip
 ## Pratik Gerceklik: Senior'lar Backpropagation Formullerini Ezberlemez

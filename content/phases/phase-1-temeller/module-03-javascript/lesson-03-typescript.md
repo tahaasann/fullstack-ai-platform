@@ -173,7 +173,7 @@ interface Kullanıcı {
   isim: string;
   email: string;
   yas?: number; // opsiyonel (? isareti)
-  readonly olusturulmaTarihi: Date; // değiştirilemez
+  readonly oluşturulmaTarihi: Date; // değiştirilemez
 }
 
 // Interface extends (kalitim)
@@ -262,7 +262,7 @@ const kisi: Kisi = {
 
 ## Type Narrowing ve Type Guards
 
-TypeScript'in en güçlü özelliklerinden biri: bir degiskenin tipini daraltarak güvenli erişim sağlamak.
+TypeScript'in en güçlü özelliklerinden biri: bir değişkenin tipini daraltarak güvenli erişim sağlamak.
 
 :::code[typescript]{title="typeof ile Type Guard"}
 function isle(değer: string | number): string {
@@ -462,7 +462,7 @@ interface Kullanıcı {
   isim: string;
   email: string;
   şifre: string;
-  olusturulmaTarihi: Date;
+  oluşturulmaTarihi: Date;
 }
 
 // Pick<T, K> - sadece belirli property'leri seç
@@ -471,7 +471,7 @@ type KullaniciOnizleme = Pick<Kullanıcı, "id" | "isim">;
 
 // Omit<T, K> - belirli property'leri çıkar
 type KullaniciPublic = Omit<Kullanıcı, "şifre">;
-// { id: number; isim: string; email: string; olusturulmaTarihi: Date; }
+// { id: number; isim: string; email: string; oluşturulmaTarihi: Date; }
 
 // Record<K, V> - key-value map oluştur
 type HataKodlari = Record<number, string>;
@@ -752,7 +752,7 @@ async function sayfayiYukle() {
 :::exercise
 ### Alistirma 1: Interface ve Utility Type'lar ile Veri Modeli (Kolay)
 
-Bir blog uygulamasi icin tip-guvenli veri modeli olustur ve Utility Type'lari kullan.
+Bir blog uygulamasi icin tip-guvenli veri modeli oluştur ve Utility Type'lari kullan.
 
 ```typescript
 // 1. User interface'i tanimla
@@ -808,7 +808,7 @@ function getPostSummaries(posts: Post[]): PostSummary[] {
 
 ### Alistirma 2: Generic Repository Class'i (Orta)
 
-Generic type'lar kullanarak tip-guvenli ve yeniden kullanilabilir bir repository olustur.
+Generic type'lar kullanarak tip-guvenli ve yeniden kullanilabilir bir repository oluştur.
 
 ```typescript
 type Result<T, E = string> =
@@ -859,14 +859,14 @@ tasks.add({ title: "TS ogren", completed: false, priority: "high" });
 const highPriority = tasks.find((t) => t.priority === "high");
 ```
 
-**Beklenen Sonuc:** Ayni class farkli tiplerle (Product, Task) calismali. Result tipi ile type narrowing (success kontrolu) calismali.
+**Beklenen Sonuc:** Ayni class farkli tiplerle (Product, Task) çalışmali. Result tipi ile type narrowing (success kontrolu) çalışmali.
 **Ipucu:** `T extends { id: number }` kisitlamasi T'nin id alani oldugunu garanti eder.
 
 ---
 
 ### Alistirma 3: Discriminated Union ile State Machine (Zor)
 
-Bir siparis sistemi icin tip-guvenli state machine olustur. Gecersiz state gecisleri derleme zamaninda yakalanmali.
+Bir siparis sistemi icin tip-guvenli state machine oluştur. Gecersiz state gecisleri derleme zamaninda yakalanmali.
 
 ```typescript
 // State'ler
@@ -992,7 +992,7 @@ explanation: "Partial<T>, T tipindeki tüm property'leri opsiyonel yapar. Bu, ö
 **2. Pratik Uygulama:**
 > "Bir REST API için tam tip tanimlari yaz: ApiResponse<T> generic interface, ApiError type, discriminated union ile başarı/hata durumu, ve type guard fonksiyonu. Kullanıcı CRUD işlemleri için Pick, Omit ve Partial utility type'larini kullan."
 
-*Follow-up:* "Bu tipleri frontend ve backend arasinda paylasilan bir shared types paketi olarak nasil yapilandirmaliyim? Monorepo'da tip senkronizasyonu nasil sağlanır?"
+*Follow-up:* "Bu tipleri frontend ve backend arasinda paylasilan bir shared types paketi olarak nasil yapılandırmaliyim? Monorepo'da tip senkronizasyonu nasil sağlanır?"
 
 **3. Mukemmellik Için:**
 > "TypeScript'te mapped types ve template literal types kullanarak type-safe bir API route builder yaz. Örneğin: defineRoute('/users/:id/posts/:postId') cagrisi otomatik olarak { id: string; postId: string } parametrelerini cikarsin. infer keyword'unu nasil kullanacagini göster."

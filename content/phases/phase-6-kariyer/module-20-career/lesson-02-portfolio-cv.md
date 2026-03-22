@@ -210,7 +210,7 @@ MIT License
 :::
 
 :::concept
-### Vitrin Projeleri - Ne Olusturmali?
+### Vitrin Projeleri - Ne Oluşturmali?
 
 3-5 proje yeterli ama **kaliteli** olmali:
 
@@ -447,7 +447,7 @@ Siz hangi hatalari yaptiniz? 👇
 - Baskalarinin postlarina yorum yap (sadece "harika" değil, degerli yorum)
 - Turkiye'deki tech community'lerle etkilesime gec
 - Hashtag kullan ama abartma (3-5 hashtag yeterli)
-- Recruiterlara InMail gondermekten cekinme
+- Recruiterlara InMail göndermekten cekinme
 :::
 
 ---
@@ -492,7 +492,7 @@ Saygilarimla,
 ### Cover Letter Hatalari
 
 - **Generic göndermek**: Her sirkete ayni yazi → Sirkete ozel yaz
-- **CV'yi tekrarlamak**: Cover letter ≠ CV ozeti → Motivasyonunu anlat
+- **CV'yi tekrarlamak**: Cover letter ≠ CV özeti → Motivasyonunu anlat
 - **Çok uzun yazmak**: Max 250-300 kelime → Kısa ve oz
 - **"Dear Sir/Madam"**: Mumkunse isim bul → LinkedIn'den hiring manager'i ara
 - **Türkçe/Ingilizce karışık**: Tutarli ol → Pozisyon diline gore yaz
@@ -542,7 +542,7 @@ GunlMk Hedef: 5-10 basvuru/gun + 3-5 networking mesaji/gun
 | Kariyer.net | Büyük şirketler | ATS-friendly CV yükle |
 | Kommunity | Startup'lar | Turkiye startup ekosistemi |
 | TopTal Turkiye | Freelance | Test-based giriş |
-| Turkcell, Trendyol, Getir | Büyük tech | Kariyer sayfalarindan |
+| Türkçell, Trendyol, Getir | Büyük tech | Kariyer sayfalarindan |
 
 **Uluslararasi Remote Is:**
 
@@ -561,7 +561,7 @@ GunlMk Hedef: 5-10 basvuru/gun + 3-5 networking mesaji/gun
 - Esnek çalışma saatleri
 
 **Remote is için zorluklar:**
-- Zaman farki (US = gece calismak gerekebilir)
+- Zaman farki (US = gece çalışmak gerekebilir)
 - Iletişim tamamen Ingilizce
 - Kendi disiplinini yönetmek
 - Sosyal izolasyon riski
@@ -947,7 +947,7 @@ Derin uzmanlik (depth):
 
 ---
 
-### Alistirma 2: Proje README Sablon Olusturma (Kolay)
+### Alistirma 2: Proje README Sablon Oluşturma (Kolay)
 
 GitHub projelerinin her biri icin profesyonel README yaz.
 
@@ -955,7 +955,7 @@ README icermeli:
 1. **Proje Basligi** ve kisa aciklama (1 cumle)
 2. **Screenshot/Demo GIF** (en az 2)
 3. **Tech Stack** (badge'lerle)
-4. **Ozellikler** (bullet list)
+4. **Özellikler** (bullet list)
 5. **Kurulum** (adim adim)
 6. **Mimari** (basit diyagram)
 7. **Ogrenilen Dersler** (2-3 madde)
@@ -975,7 +975,7 @@ Kisa aciklama — bu proje ne yapar ve neden onemli.
 # TODO: Adim adim kurulum talimatlari yaz
 ```
 
-**Beklenen Sonuc:** Her proje README'si 200+ kelime olmali. Screenshot veya GIF icermeli. Kurulum talimatlari ile herkes projeyi calistirabilmeli.
+**Beklenen Sonuc:** Her proje README'si 200+ kelime olmali. Screenshot veya GIF icermeli. Kurulum talimatlari ile herkes projeyi çalıştırabilmeli.
 
 ---
 
@@ -990,8 +990,8 @@ Kurallar:
 4. Anahtar kelimeler job description'dan alinmali
 5. PDF olarak kaydet (Word degil)
 
-Kotu ornek: "Web geliştirme yaptim"
-Iyi ornek: "React ve TypeScript ile e-ticaret platformu gelistirdim. Lighthouse performans skorunu 45'ten 92'ye cikardim. 3 ayda 15K kullanici edindik."
+Kotu örnek: "Web geliştirme yaptim"
+Iyi örnek: "React ve TypeScript ile e-ticaret platformu gelistirdim. Lighthouse performans skorunu 45'ten 92'ye cikardim. 3 ayda 15K kullanici edindik."
 
 **Beklenen Sonuc:** CV tek sayfa olmali. En az 3 proje bullet point'lerle anlatilmali. Her bullet'ta rakamsal impact olmali. Yazim hatasi sifir olmali.
 
@@ -1014,24 +1014,24 @@ LinkedIn profilini is arama icin optimize et.
 
 ### Alistirma 5: Cover Letter Sablonu (Orta)
 
-3 farkli sirket tipi icin cover letter sablonu olustur.
+3 farkli sirket tipi icin cover letter sablonu oluştur.
 
 **Startup icin:**
 - Hizli ogrenme yeteneginizi vurgula
-- Side project'lerden ornekler ver
+- Side project'lerden örnekler ver
 - "Wear many hats" yaklasiminizi goster
 
 **Buyuk sirket icin:**
 - Teknik derinlik ve best practice bilgisini vurgula
 - Olceklenebilirlik deneyiminden bahset
-- Takim calismasi ve sureclerden ornekler ver
+- Takim çalışmasi ve sureclerden örnekler ver
 
-**Uzaktan calisma icin:**
+**Uzaktan çalışma icin:**
 - Asenkron iletisim becerini goster
-- Self-management ve zaman yonetimi ornekleri ver
-- Timezone farklarinda calisma deneyimi
+- Self-management ve zaman yonetimi örnekleri ver
+- Timezone farklarinda çalışma deneyimi
 
-**Beklenen Sonuc:** Her cover letter 250-300 kelime olmali. Sirkete ozel referanslar icermeli (sirketi arastir). Neden o sirket/rol oldugunu aciklamali. Genel degil, spesifik ornekler vermeli.
+**Beklenen Sonuc:** Her cover letter 250-300 kelime olmali. Sirkete ozel referanslar icermeli (sirketi arastir). Neden o sirket/rol oldugunu aciklamali. Genel degil, spesifik örnekler vermeli.
 
 ---
 
@@ -1057,7 +1057,7 @@ Her proje icin yaz:
 
 ### Alistirma 7: GitHub Contribution Stratejisi (Orta)
 
-30 gunluk GitHub aktivite plani olustur.
+30 gunluk GitHub aktivite plani oluştur.
 
 **Hafta 1-2: Kendi projelerine odaklan**
 - Her gun en az 1 commit (kucuk de olsa)
@@ -1078,17 +1078,17 @@ Her proje icin yaz:
 
 ---
 
-### Alistirma 8: Freelance Profil Olusturma (Orta)
+### Alistirma 8: Freelance Profil Oluşturma (Orta)
 
-Upwork ve Fiverr'da rekabetci bir profil olustur.
+Upwork ve Fiverr'da rekabetci bir profil oluştur.
 
 1. **Profil Basligi:** "Full Stack Web Developer | React, Node.js, Python | Production-Ready Applications"
-2. **Profil Ozeti:** 200 kelime — specialization, deneyim, calisma sekli
+2. **Profil Özeti:** 200 kelime — specialization, deneyim, çalışma sekli
 3. **Portfolio:** 3-5 proje (screenshot + aciklama)
 4. **Fiyatlandirma:** Piyasa arastirmasi yap, baslangic fiyatini belirle
 5. **Ilk 3 proje:** Dusuk fiyatla review toplama stratejisi
 
-**Beklenen Sonuc:** Profil metni tamamlanmis olmali. En az 3 portfolio ornegi eklenmis olmali. Fiyat araligi piyasayla uyumlu olmali. Ilk proje arama stratejisi yazilmis olmali.
+**Beklenen Sonuc:** Profil metni tamamlanmis olmali. En az 3 portfolio örneği eklenmis olmali. Fiyat araligi piyasayla uyumlu olmali. Ilk proje arama stratejisi yazilmis olmali.
 
 ---
 
@@ -1111,17 +1111,17 @@ Farkli senaryolar icin networking email/mesaj sablonlari hazirla.
 
 ### Alistirma 10: Kariyer 90 Gunluk Eylem Plani (Zor)
 
-Is bulma surecini proje gibi yonet: 90 gunluk detayli plan olustur.
+Is bulma sürecini proje gibi yonet: 90 gunluk detayli plan oluştur.
 
 **Ay 1: Hazirlik**
 - Hafta 1: CV, LinkedIn, Portfolio guncellemesi
 - Hafta 2: GitHub profilini optimize et, 2 projeyi canlandir
 - Hafta 3: Interview hazirlik basla (gunluk 2 LeetCode + 1 system design)
-- Hafta 4: 20 hedef sirket listesi olustur, her birini arastir
+- Hafta 4: 20 hedef sirket listesi oluştur, her birini arastir
 
 **Ay 2: Basvuru ve Networking**
 - Haftada 10 basvuru gonder (iş ilanlari + cold outreach)
-- Haftada 5 LinkedIn baglanti istegi (kisiisel not ile)
+- Haftada 5 LinkedIn bağlantı istegi (kisiisel not ile)
 - Haftada 2 mock interview yap
 - Dev topluluk etkinliklerine katil (meetup, conference)
 
@@ -1139,6 +1139,354 @@ Haftalik metrikler:
 
 **Beklenen Sonuc:** Her hafta icin spesifik, olculebilir hedefler olmali. Tracking spreadsheet sablonu hazirlanmali. Haftalik retrospektif plani dahil olmali. Acil durum plani (3 ayda is bulamazsa ne yapacak) tanimlanmali.
 :::
+
+:::exercise
+### Alistirma 11: GitHub Profil Optimizasyonu (Kolay)
+
+GitHub profilini profesyonel seviyeye getir.
+
+```markdown
+# TODO: GitHub profil checklist
+
+## Profile README (username/username repo)
+# - [ ] Kisa bio ve uzmanlik alanlari
+# - [ ] Tech stack badgeleri (shields.io)
+# - [ ] GitHub stats karti
+# - [ ] En onemli 3 proje linki
+# - [ ] Iletisim bilgileri
+
+## Pinned Repositories (6 adet)
+# TODO: 6 pinned repo sec ve her biri icin:
+# 1. [Proje adi] - [tek cumlede aciklama]
+# 2. ...
+
+## Repository Kalitesi
+# - [ ] Her repo'da README.md var mi?
+# - [ ] .gitignore dogru mu?
+# - [ ] License ekli mi?
+# - [ ] Commit mesajlari temiz mi?
+
+## Contribution Graph
+# - [ ] Son 1 yil aktif mi?
+# - [ ] Duzanli commit var mi?
+
+# TODO: Guncellenmis profil screenshot'i al
+```
+
+**Beklenen Sonuc:** Profesyonel GitHub profili olusturulmali. 6 pinned repo secilmeli. README hazirlanmali.
+**Ipucu:** Recruiter'lar GitHub profiline 30 saniye bakar. Pinned repo'lar, README kalitesi ve commit duzenliligini hemen gorur.
+:::
+
+:::exercise
+### Alistirma 12: Proje Showcase README Yazma (Kolay)
+
+Portfolio projesi icin etkileyici README yaz.
+
+```markdown
+# TODO: README sablonu
+
+# Proje Adi
+> Tek cumlede ne yaptigini acikla
+
+## Demo
+[Canli Demo](link) | [Video Demo](link)
+![Screenshot](screenshot.png)
+
+## Ozellikler
+- [ ] Feature 1: Aciklama
+- [ ] Feature 2: Aciklama
+
+## Tech Stack
+- Frontend: React, TypeScript, Tailwind CSS
+- Backend: Node.js, Express, PostgreSQL
+- DevOps: Docker, GitHub Actions
+
+## Kurulum
+# TODO: Adim adim kurulum talimatlari
+
+## Mimari
+# TODO: Basit mimari diyagram
+
+## Ogrendiklerim
+# TODO: Bu projede ogrendigin 3 seyi yaz
+
+## Lisans
+MIT
+```
+
+**Beklenen Sonuc:** Kapsamli ve goze hitap eden README yazilmali. Screenshot/demo linki olmali.
+**Ipucu:** README'de ilk 3 saniye kritik — baslik, tek cumle aciklama ve screenshot hemen gorunmeli. Wall of text yazma.
+:::
+
+:::exercise
+### Alistirma 13: ATS-Uyumlu CV Olusturma (Kolay)
+
+ATS (Applicant Tracking System) uyumlu CV yaz.
+
+```markdown
+# TODO: CV sablonu (1 sayfa)
+
+## [Ad Soyad]
+[Email] | [Telefon] | [LinkedIn] | [GitHub] | [Portfolio]
+
+## Ozet (2-3 cumle)
+# TODO: Pozisyona ozel ozet yaz
+# "X yil deneyimli Full-Stack Developer. React, Node.js ve PostgreSQL
+#  ile olceklenebilir web uygulamalari gelistirdim. Y projede Z sonuc elde ettim."
+
+## Teknik Beceriler
+# Frontend: React, TypeScript, Next.js, Tailwind CSS
+# Backend: Node.js, Express, PostgreSQL, Redis
+# DevOps: Docker, GitHub Actions, AWS
+# TODO: Is ilanindaki anahtar kelimeleri ekle
+
+## Projeler (en onemli 2-3)
+# [Proje Adi] | [Tech Stack] | [Link]
+# - Olculebilir sonuc 1 (X% iyilesme)
+# - Olculebilir sonuc 2
+
+## Egitim
+# [Universite] - [Bolum] - [Yil]
+
+# TODO: ATS kontrol listesi
+# - [ ] PDF formatinda
+# - [ ] Tablo/grafik YOK (ATS okuyamaz)
+# - [ ] Is ilanindaki anahtar kelimeler var
+# - [ ] Tarihler tutarli
+# - [ ] Iletisim bilgileri header'da
+```
+
+**Beklenen Sonuc:** 1 sayfalik ATS uyumlu CV hazirlanmali. Is ilanina ozel customize edilmeli.
+**Ipucu:** ATS sistemleri tablolari, grafikleri ve fancy formatlari okuyamaz. Basit, temiz format kullan. Anahtar kelimeleri is ilanindan al.
+:::
+
+:::exercise
+### Alistirma 14: LinkedIn Profil Optimizasyonu (Orta)
+
+LinkedIn profilini is arama icin optimize et.
+
+```markdown
+# TODO: LinkedIn Checklist
+
+## Headline (120 karakter)
+# YANLIS: "Is ariyorum"
+# DOGRU: "Full-Stack Developer | React & Node.js | Open to Work"
+# TODO: Kendi headline'ini yaz
+
+## About (2000 karakter max)
+# TODO: 3 paragraf yaz:
+# 1. Ne yapiyorsun ve neden tutkuya sahipsin
+# 2. Teknik beceriler ve deneyim
+# 3. Ne ariyorsun + CTA (iletisime gec)
+
+## Experience
+# TODO: Her deneyim icin impact-driven bullet point'ler
+# YANLIS: "React ile frontend gelistirdim"
+# DOGRU: "React ile e-ticaret frontend'ini yeniden yazarak sayfa yukleme suresini %40 azalttim"
+
+## Skills
+# TODO: En az 20 skill ekle (is ilaniyla eslesen)
+# TODO: Endorsement iste (3+ kisi)
+
+## Featured
+# TODO: En iyi 3 projeyi veya blog yazilarini ekle
+
+# TODO: #OpenToWork cercevesini aktif et
+# TODO: Haftada 3 post/yorum stratejisi planla
+```
+
+**Beklenen Sonuc:** Tum LinkedIn bolumler doldurulmali. Impact-driven aciklamalar yazilmali. OpenToWork aktif olmali.
+**Ipucu:** LinkedIn algoritması aktif kullanicilari one cikarir. Haftada 2-3 post veya yorum yap — sadece profil doldurmak yetmez.
+:::
+
+:::exercise
+### Alistirma 15: Portfolio Web Sitesi Icerigi (Orta)
+
+Kisisel portfolio sitesinin icerik planini olustur.
+
+```markdown
+# TODO: Portfolio sitesi sayfalari
+
+## Ana Sayfa (Hero Section)
+# - Isim ve unvan
+# - Tek cumlede ne yaptigini anlat
+# - CTA butonlari: "Projelerim" ve "Iletisim"
+# TODO: Hero metnini yaz
+
+## Projeler Sayfasi
+# TODO: 3-5 proje icin kart icerigi hazirla
+# Her kart: Baslik, Screenshot, Tech stack, Kisa aciklama, Demo + GitHub linkleri
+
+## Hakkimda
+# TODO: Profesyonel hikayeni yaz (200 kelime)
+# - Neden yazilim? Motivasyonun ne?
+# - Guclu yonlerin
+# - Hedeflerin
+
+## Blog (opsiyonel ama etkili)
+# TODO: 3 blog yazisi konusu planla
+# 1. Teknik ogrenme yazisi
+# 2. Proje post-mortem
+# 3. Problem cozum hikayelsi
+
+## Iletisim
+# - Email formu
+# - LinkedIn ve GitHub linkleri
+```
+
+**Beklenen Sonuc:** Tum sayfalarin icerigi yazilmali. En az 3 proje showcase hazir olmali.
+**Ipucu:** Portfolio sitesi seni "satmali" — teknik beceri + kisilik + profesyonellik. Minimalist tasarim en iyisi, kompleks animasyonlar dikkat dagitir.
+:::
+
+:::exercise
+### Alistirma 16: Cover Letter Sablonu (Orta)
+
+Pozisyona ozel cover letter yaz.
+
+```markdown
+# TODO: Cover Letter sablonu (250-350 kelime)
+
+## Paragraf 1: Hook (neden bu sirket)
+# "X sirketinin [spesifik proje/urun]'u dikkatimi cekti cunku [neden].
+#  [Pozisyon] icin basvuruyorum."
+# TODO: Arastirma yapip spesifik bir detay bul
+
+## Paragraf 2: Deger Onerim (ne katabilirim)
+# "Son projemde [proje] ile [sonuc] elde ettim. Bu deneyim
+#  [sirketin ihtiyaci]'na direkt katkı saglayacak."
+# TODO: Is ilaniyla eslesen 2 basari hikayesi yaz
+
+## Paragraf 3: Kulturel Uyum
+# "[Sirketin degeri/kulturu] benim calisma tarzimla uyumlu.
+#  [Ornek vererek acikla]."
+
+## Paragraf 4: CTA
+# "Gorusme firsati icin sabirmisizlikla bekliyorum.
+#  Portfolyom: [link]. Saygilarimla, [isim]"
+
+# TODO: 3 farkli is ilani icin customize edilmis cover letter yaz
+# TODO: Her birinde sirket-spesifik detay olmali
+```
+
+**Beklenen Sonuc:** 3 farkli cover letter yazilmali. Her biri sirket-spesifik olmali. 250-350 kelime sinirinda olmali.
+**Ipucu:** Generic cover letter gonderme — recruiter hemen anlar. "X sirketini sectim cunku..." cumlesi sirket-spesifik olmalm. Web sitesini, blog'u, urunleri arastir.
+:::
+
+:::exercise
+### Alistirma 17: Freelance ve Remote Is Stratejisi (Orta)
+
+Freelance ve remote is bulma stratejisi olustur.
+
+```markdown
+# TODO: Platform profilleri olustur
+
+## Upwork Profili
+# - Profesyonel baslik
+# - 300 kelime portfolio ozeti
+# - Skills (React, Node.js, TypeScript...)
+# - Saatlik ucret belirleme
+# TODO: Profil metnini yaz
+
+## Toptal/Turing Basvurusu
+# TODO: Teknik mulakat hazirlik plani
+
+## Freelance Fiyatlandirma
+# Junior: $15-25/saat
+# Mid: $30-50/saat
+# TODO: Kendi fiyatini belirle ve gerekcelendir
+
+## Ilk Musteri Stratejisi
+# TODO: Ilk 3 isi dusuk fiyatla alip portfolio olustur
+# TODO: Musteri iletisim sablonu yaz
+# TODO: Sozlesme sablonu hazirla
+
+## Remote Is Platformlari
+# - We Work Remotely
+# - Remote OK
+# - AngelList
+# TODO: Her platformda profil olustur
+```
+
+**Beklenen Sonuc:** En az 2 platformda profil olusturulmali. Fiyatlandirma belirlenmeli. Musteri iletisim sablonu hazir olmali.
+**Ipucu:** Ilk 3 freelance isi referans icin cok onemli — dusuk fiyat ver ama kaliteli is cikart. 5 yildiz review'lar gelecek islerin kapisinmi acar.
+:::
+
+:::exercise
+### Alistirma 18: Networking ve Community Katilimi (Zor)
+
+Profesyonel ag olusturma stratejisi gelistir.
+
+```markdown
+# TODO: Haftalik networking rutini
+
+## Online
+# - [ ] LinkedIn'de 3 post yorum yaz (degerli yorum, "harika" degil)
+# - [ ] Twitter/X'te 2 teknik tweet paylas
+# - [ ] Dev.to veya Medium'da ayda 1 blog yazisi
+# - [ ] Open source projeye ayda 1 PR gonder
+
+## Offline
+# - [ ] Ayda 1 meetup'a katil (GDG, DevIstanbul, vb.)
+# - [ ] Konferans izle (JSConf, DevFest)
+# - [ ] Universite/bootcamp etkinliklerine katil
+
+## Stratejik Networking
+# TODO: 10 hedef kisi listesi olustur (LinkedIn'den)
+# TODO: Cold outreach email sablonu yaz:
+# "Merhaba [isim], [sirket]'teki [proje] calismanizi takip ediyorum.
+#  [Spesifik soru]. 15 dakikalik bir gorussme yapabilir miyiz?"
+
+# TODO: Bilgi gorusmesi (informational interview) soru listesi
+# 1. "Tipik bir gununuz nasil geciyor?"
+# 2. "Bu alana girmek icin en onemli tavsiyeniz ne olur?"
+# 3. "Hangi becerileri gelistirmemi onerirsiniz?"
+```
+
+**Beklenen Sonuc:** Haftalik networking rutini olusturulmali. Cold outreach sablonu hazir olmali.
+**Ipucu:** "Ag kurmak" degil "deger saglamak" dusuncesiyle yaklas. Baskalarina yardim et (soru cevapla, kaynak paylas) — karsilik dogal gelir.
+:::
+
+:::exercise
+### Alistirma 19: 90 Gunluk Kariyer Eylem Plani (Zor)
+
+3 aylik detayli kariyer eylem plani olustur.
+
+```markdown
+# TODO: 90 Gunluk Plan
+
+## Hafta 1-4: Temel Hazirhk
+# - [ ] Portfolio sitesini tamamla
+# - [ ] CV'yi 3 versiyonda hazirla (genel, frontend, fullstack)
+# - [ ] LinkedIn profilini optimize et
+# - [ ] GitHub'i temizle ve 6 proje pin'le
+# - [ ] 2 showcase proje tamamla
+# TODO: Her hafta icin spesifik gorevler yaz
+
+## Hafta 5-8: Aktif Basvuru
+# - [ ] Gunluk 5 is basvurusu (toplam 100+)
+# - [ ] Her basvuruyu spreadsheet'te takip et
+# - [ ] Haftada 2 mock interview yap
+# - [ ] Networking etkinliklerine katil
+# TODO: Basvuru tracking spreadsheet sablonu olustur
+
+## Hafta 9-12: Yogunlastirma
+# - [ ] Gelen teklifleri degerlendir
+# - [ ] Muzakere pratigi yap
+# - [ ] Zayif alanlari gelistir
+# - [ ] Plan B: Freelance veya staj seceicnekleri
+# TODO: Haftalik retrospektif sablonu olustur
+
+## Metrikler
+# - Basvuru sayisi: ___
+# - Geri donus orani: ___%
+# - Interview sayisi: ___
+# - Teklif sayisi: ___
+```
+
+**Beklenen Sonuc:** 12 haftalik detayli plan hazirlanmali. Haftalik olculebilir hedefler olmali. Tracking sistemi kurulmali.
+**Ipucu:** Is arama bir sayi oyunudur — 100 basvuru, 20 geri donus, 10 interview, 2-3 teklif. Duzenli ve sistematik ol. Haftada retrospektif yap.
+:::
+
 
 :::external-resource
 ### Ek Kaynaklar

@@ -193,7 +193,7 @@
           {
             "pattern": "So to summarize, we agreed on [decision 1], [decision 2], and [owner] will [action item].",
             "turkish": "Özetlemek gerekirse, [karar 1], [karar 2] üzerinde anlasmistik ve [sorumlu] [eylem maddesini] yapacak.",
-            "when_to_use": "Toplanti sonunda kararlari ozetlerken",
+            "when_to_use": "Toplanti sonunda kararlari özetlerken",
             "variations": [
               "Let me recap the key takeaways: [points]. Did I miss anything?",
               "Action items from this meeting: [list]. Please correct me if I got anything wrong."
@@ -877,7 +877,7 @@
           {
             "pattern": "hotfix/[ticket-id]-[short-description]",
             "turkish": "hotfix/[ticket-id]-[kisa-açıklama]",
-            "when_to_use": "Üretim ortaminda acil duzeltme yaparken",
+            "when_to_use": "Üretim ortamında acil duzeltme yaparken",
             "variations": [
               "hotfix/[date]-[description]",
               "hotfix/[version]-[description]",
@@ -1049,7 +1049,7 @@
           },
           {
             "pattern": "## Environment\n- **OS:** [operating system]\n- **Browser:** [browser and version]\n- **App Version:** [version/commit]\n- **Device:** [device type]",
-            "turkish": "## Ortam\n- **IS:** [isletim sistemi]\n- **Tarayici:** [tarayici ve sürüm]\n- **Uygulama Sürümü:** [sürüm/commit]\n- **Cihaz:** [cihaz tipi]",
+            "turkish": "## Ortam\n- **IS:** [işletim sistemi]\n- **Tarayici:** [tarayici ve sürüm]\n- **Uygulama Sürümü:** [sürüm/commit]\n- **Cihaz:** [cihaz tipi]",
             "when_to_use": "Bug'in hangi ortamda oluştuğunu belirtirken",
             "variations": [
               "**Tested on:** [browser/OS combinations]",
@@ -1314,7 +1314,7 @@
         "patterns": [
           {
             "pattern": "# [Project Name]\n\n[One-line description of what the project does and who it's for].\n\n[![Build Status](badge-url)](link) [![License](badge-url)](link)",
-            "turkish": "# [Proje Adi]\n\n[Projenin ne yaptığının ve kime yonelik olduğunun tek satirlik açıklaması].\n\n[![Yapı Durumu](rozet-url)](link) [![Lisans](rozet-url)](link)",
+            "turkish": "# [Proje Adi]\n\n[Projenin ne yaptığının ve kime yonelik olduğunun tek satirlik açıklaması].\n\n[![Yapı Durumu](rözet-url)](link) [![Lisans](rözet-url)](link)",
             "when_to_use": "README'nin başlangıç bölümünü yazarken — ilk izlenim çok önemli",
             "variations": [
               "# [Project Name]\n> [Tagline or short description]\n\n[Longer description in 2-3 sentences]",
@@ -1324,7 +1324,7 @@
           },
           {
             "pattern": "## Installation\n\n```bash\n# Clone the repository\ngit clone [repo-url]\n\n# Install dependencies\n[package-manager] install\n\n# Set up environment\ncp .env.example .env\n\n# Run the application\n[command]\n```",
-            "turkish": "## Kurulum\n\n```bash\n# Depoyu klonla\ngit clone [repo-url]\n\n# Bağımlılıkları kur\n[paket-yöneticisi] install\n\n# Ortami ayarla\ncp .env.example .env\n\n# Uygulamayi çalıştır\n[komut]\n```",
+            "turkish": "## Kurulum\n\n```bash\n# Depoyu klonla\ngit clone [repo-url]\n\n# Bağımlılıkları kur\n[paket-yöneticisi] install\n\n# Ortamı ayarla\ncp .env.example .env\n\n# Uygulamayi çalıştır\n[komut]\n```",
             "when_to_use": "Kurulum talimatlarini yazarken — adim adim ve kopyala-yapıştır yapılabilir olmali",
             "variations": [
               "## Quick Start\n```bash\npnpm dlx create-[project] my-app\ncd my-app\npnpm start\n```",
@@ -1675,7 +1675,7 @@
           {
             "pattern": "Could you tell me about the team I'd be working with? What does a typical day look like for someone in this role?",
             "turkish": "Birlikte çalışacağım takim hakkinda bilgi verebilir misiniz? Bu roldeki biri için tipik bir gun nasil gorunuyor?",
-            "when_to_use": "Takimi ve çalışma ortamini anlamak için — mülakat sonunda sorulacak sorular",
+            "when_to_use": "Takimi ve çalışma ortamıni anlamak için — mülakat sonunda sorulacak sorular",
             "variations": [
               "How is the engineering team structured? How many people would I be collaborating with directly?",
               "What does the onboarding process look like for new engineers? How long does it typically take to start contributing?"
@@ -1685,7 +1685,7 @@
           {
             "pattern": "What does the tech stack look like? Are there any major technical initiatives or migrations planned?",
             "turkish": "Teknoloji yigini nasil gorunuyor? Planlanmis büyük teknik girişimler veya gecisler var mi?",
-            "when_to_use": "Teknik ortami ve gelecek planlarini anlamak için",
+            "when_to_use": "Teknik ortamı ve gelecek planlarini anlamak için",
             "variations": [
               "What's the development workflow like? Do you use CI/CD? How do you handle deployments?",
               "What are the biggest technical challenges the team is currently facing?"

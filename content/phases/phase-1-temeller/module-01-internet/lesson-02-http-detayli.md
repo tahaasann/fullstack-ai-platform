@@ -135,7 +135,7 @@ const newUser = await fetch('/api/users', {
   body: JSON.stringify({ name: 'Taha', email: 'taha@test.com' })
 });
 
-// PUT - Tamamen güncelleme (tüm alanlari gondermelisin)
+// PUT - Tamamen güncelleme (tüm alanlari göndermelisin)
 await fetch('/api/users/42', {
   method: 'PUT',
   headers: { 'Content-Type': 'application/json' },
@@ -175,20 +175,20 @@ Status code, sunucunun istege verdigi yanitin durumunu belirten 3 haneli sayisal
 
 Nadiren karsilasirsin ama bilmelisin:
 - **100 Continue:** "Body'yi gonderebilirsin, header'lari aldim"
-- **101 Switching Protocols:** WebSocket baglantisina geçiş
+- **101 Switching Protocols:** WebSocket bağlantısina geçiş
 - **103 Early Hints:** Preload ipuclari (HTTP/2+)
 
 ### 2xx - Başarı (Success)
 
 :::code[text]{title="2xx Status Codes"}
 200 OK              → Istek başarılı. GET için veri dondu, POST için işlem tamam
-201 Created         → Yeni kaynak olusturuldu (POST başarılı)
+201 Created         → Yeni kaynak oluşturuldu (POST başarılı)
 204 No Content      → Başarılı ama donecek veri yok (DELETE sonrası)
 206 Partial Content → Kismi içerik (büyük dosya indirme, video streaming)
 :::
 
 :::tip
-POST ile yeni kayıt olusturdugunda 201 Created don, 200 değil. 201 donunce, response body'de olusturulan kaynagi ve Location header'inda yeni kaynağin URL'sini gönder. Bu REST best practice'tir.
+POST ile yeni kayıt oluşturdugunda 201 Created don, 200 değil. 201 donunce, response body'de oluşturulan kaynagi ve Location header'inda yeni kaynağin URL'sini gönder. Bu REST best practice'tir.
 :::
 
 ### 3xx - Yönlendirme (Redirection)
@@ -213,7 +213,7 @@ POST ile yeni kayıt olusturdugunda 201 Created don, 200 değil. 201 donunce, re
 403 Forbidden           → Yetki yok (giriş yaptin ama izinin yok)
 404 Not Found           → Kaynak bulunamadi
 405 Method Not Allowed  → Bu endpoint POST kabul etmiyor, GET gönderdin
-409 Conflict            → Cakisma (ayni email ile 2. kayıt olusturmaya calistin)
+409 Conflict            → Cakisma (ayni email ile 2. kayıt oluşturmaya calistin)
 415 Unsupported Media   → Desteklenmeyen Content-Type (XML gönderdin, JSON bekliyor)
 422 Unprocessable Entity→ Soz dizimi doğru ama anlamsal hata (yas: -5)
 429 Too Many Requests   → Rate limit asildi, çok fazla istek gönderdin
@@ -314,7 +314,7 @@ Access-Control-Max-Age: 86400                      → Preflight sonucu 1 gun ca
 :::
 
 :::beginner-mistake
-Yaygin hata: CORS hatasini frontend'de cozmeye çalışmak. CORS bir sunucu tarafi yapilandirmasidir. "Access-Control-Allow-Origin" header'ini SUNUCU gondermeli. Frontend'de proxy kullanmak sadece development için geçici cozumdur, production'da sunucu tarafinda doğru CORS ayarlarini yapman gerekir.
+Yaygin hata: CORS hatasini frontend'de cozmeye çalışmak. CORS bir sunucu tarafi yapılandırmasidir. "Access-Control-Allow-Origin" header'ini SUNUCU göndermeli. Frontend'de proxy kullanmak sadece development için geçici cozumdur, production'da sunucu tarafinda doğru CORS ayarlarini yapman gerekir.
 :::
 
 ### Preflight Request (OPTIONS)
@@ -371,7 +371,7 @@ Tarayici         Sunucu
   |--- GET /image.png ----->|   ← JS bitene kadar beklemek zorunda!
 :::
 
-Tarayicilar bu problemi 6-8 paralel TCP baglantisi acarak cozmeye çalışır ama bu da kaynak israfıdır.
+Tarayicilar bu problemi 6-8 paralel TCP bağlantısi acarak cozmeye çalışır ama bu da kaynak israfıdır.
 
 ### HTTP/2 Multiplexing
 
@@ -540,7 +540,7 @@ options:
   - "Cookie destegi"
   - "Daha büyük body gonderebilme"
 correct: 1
-explanation: "HTTP/2'nin en büyük yeniligi multiplexing'tir. Tek TCP baglantisi üzerinden birden fazla istek/yanit paralel olarak gonderilebilir. HTTP/1.1'deki head-of-line blocking problemini çözer."
+explanation: "HTTP/2'nin en büyük yeniligi multiplexing'tir. Tek TCP bağlantısi üzerinden birden fazla istek/yanit paralel olarak gonderilebilir. HTTP/1.1'deki head-of-line blocking problemini çözer."
 :::
 
 ## Pratik Uygulama
@@ -568,7 +568,7 @@ fetch('https://jsonplaceholder.typicode.com/posts', {
 # 5. Network tab'inda POST istegini bul ve request/response headers'i karsilastir
 ```
 
-**Beklenen Sonuç:** GET istegi 200 doner ve tüm post'lari getirir. POST istegi 201 (Created) doner ve olusturulan objeyi gösterir. Timing bilgilerinde DNS ve TTFB surelerini gorebilmelisin.
+**Beklenen Sonuç:** GET istegi 200 doner ve tüm post'lari getirir. POST istegi 201 (Created) doner ve oluşturulan objeyi gösterir. Timing bilgilerinde DNS ve TTFB surelerini gorebilmelisin.
 **Ipucu:** Network tab'inda filtreleme butonlarini kullanarak sadece XHR/Fetch isteklerini göster.
 
 ---
@@ -643,7 +643,7 @@ curl -w "\nStatus: %{http_code}\n" https://httpbin.org/status/503
 # | ...  | ...    | ...                 |
 ```
 
-**Beklenen Sonuç:** En az 10 farklı status code'u test etmis ve her birinin anlamini ve gerçek hayat ornegini yazabilmis olmalisin. 301 vs 302, 401 vs 403 farklarini aciklayabilmelisin.
+**Beklenen Sonuç:** En az 10 farklı status code'u test etmis ve her birinin anlamini ve gerçek hayat örneğini yazabilmis olmalisin. 301 vs 302, 401 vs 403 farklarini aciklayabilmelisin.
 **Ipucu:** `-w` flag'i ile response bilgilerini formatli yazdirabilisin. `%{http_code}` status code'u, `%{time_total}` toplam sureyi verir.
 :::
 
@@ -651,11 +651,11 @@ curl -w "\nStatus: %{http_code}\n" https://httpbin.org/status/503
 **Mülakat Sorusu:** "REST API tasarlarken PUT ve PATCH arasindaki farki açıkla. Hangisini ne zaman kullanirsin?"
 
 **Beklenen cevap:**
-PUT, bir kaynagi tamamen değiştirmek için kullanılır - tüm alanlari içeren tam bir temsil gondermelisin. Göndermediğin alanlar silinir veya null olur. PUT idempotent'tir.
+PUT, bir kaynagi tamamen değiştirmek için kullanılır - tüm alanlari içeren tam bir temsil göndermelisin. Göndermediğin alanlar silinir veya null olur. PUT idempotent'tir.
 
 PATCH, bir kaynagi kismi olarak güncellemek için kullanılır - sadece değişen alanlari gonderirsin. Diger alanlar korunur.
 
-Örnek: Bir kullanıcının sadece email'ini değiştirmek istiyorsam PATCH /users/42 ile { "email": "new@email.com" } gonderirim. PUT kullansaydim, name, role ve diger tüm alanlari da gondermem gerekirdi, aksi halde kaybolabilirlerdi.
+Örnek: Bir kullanıcının sadece email'ini değiştirmek istiyorsam PATCH /users/42 ile { "email": "new@email.com" } gonderirim. PUT kullansaydim, name, role ve diger tüm alanlari da göndermem gerekirdi, aksi halde kaybolabilirlerdi.
 :::
 
 :::interview
@@ -677,7 +677,7 @@ Same-Origin Policy geregi, frontend.com'dan api.backend.com'a istek gonderilemez
 ### Prompt Örnekleri
 
 **1. Konuyu Derinlemesine Anla:**
-> "REST API tasariminda HTTP method'larinin idempotency ve safety ozelliklerini açıkla. PUT ile PATCH arasindaki farki bir e-ticaret sepet güncelleme senaryosuyla göster. Neden bu ayrim önemli?"
+> "REST API tasariminda HTTP method'larinin idempotency ve safety özelliklerini açıkla. PUT ile PATCH arasindaki farki bir e-ticaret sepet güncelleme senaryosuyla göster. Neden bu ayrim önemli?"
 
 *Neden:* HTTP method semantiklerini gerçek senaryolarla anlamak, doğru API tasarımı yapabilmeni sağlar
 

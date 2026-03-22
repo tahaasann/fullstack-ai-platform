@@ -10,12 +10,12 @@ order: 1
 # Git Temelleri ve Günlük İş Akışı
 
 :::realworld
-Bir projede 3 gün önce çalışan kodu degistirdin ve her sey bozuldu. "Keske geri alabilsem" diye dusunduysen, version control tam da bunun için var. Profesyonel yazılım dunyasinda Git bilmeden is yapmak mumkun değil. Her gun commit atacaksin, branch olusturacaksin, conflict cozeceksin. Bu derste Git'i sadece "kullanmak" değil, "anlamak" seviyesine geleceksin. Mulakatlarda "Git workflow'unuz nedir?" sorusuna profesyonel cevap verebileceksin.
+Bir projede 3 gün önce çalışan kodu degistirdin ve her sey bozuldu. "Keske geri alabilsem" diye dusunduysen, version control tam da bunun için var. Profesyonel yazılım dunyasinda Git bilmeden is yapmak mumkun değil. Her gun commit atacaksin, branch oluşturacaksin, conflict cozeceksin. Bu derste Git'i sadece "kullanmak" değil, "anlamak" seviyesine geleceksin. Mulakatlarda "Git workflow'unuz nedir?" sorusuna profesyonel cevap verebileceksin.
 :::
 
 ## Neden Version Control?
 
-Yazılım geliştirme surecinde kodun sürekli değişir. Version control olmadan:
+Yazılım geliştirme sürecinde kodun sürekli değişir. Version control olmadan:
 
 - Hangi değişikliği ne zaman yaptığını bilemezsin
 - Bozulan kodu geri alamazsin
@@ -32,7 +32,7 @@ Version Control System, dosyalardaki değişiklikleri zaman içinde kaydeden ve 
 :::
 
 :::deha-tip
-Deha seviyesi geliştiriciler, Git'i sadece "kod yedekleme araci" olarak gormez. Git onlar için bir iletişim aracidir. Commit mesajlari, code review surecindeki yorumlar ve branch stratejileri, takimla iletisimin bir parcasidir. Iyi bir Git geçmişi, projenin hikayesini anlatir.
+Deha seviyesi geliştiriciler, Git'i sadece "kod yedekleme araci" olarak gormez. Git onlar için bir iletişim aracidir. Commit mesajlari, code review sürecindeki yorumlar ve branch stratejileri, takimla iletisimin bir parcasidir. Iyi bir Git geçmişi, projenin hikayesini anlatir.
 :::
 
 ## Git Nedir?
@@ -307,7 +307,7 @@ coverage/
 :::
 
 :::tip
-gitignore.io (toptal.com/developers/gitignore) sitesinden diline, framework'une ve IDE'ne gore otomatik .gitignore olusturabilirsin. Örneğin "Node, React, VSCode, macOS" secersen hazır bir şablon üretir.
+gitignore.io (toptal.com/developers/gitignore) sitesinden diline, framework'une ve IDE'ne gore otomatik .gitignore oluşturabilirsin. Örneğin "Node, React, VSCode, macOS" secersen hazır bir şablon üretir.
 :::
 
 :::beginner-mistake
@@ -404,7 +404,7 @@ git revert --no-edit abc123
 :::
 
 :::beginner-mistake
-`git reset --hard` kullanırken çok dikkatli ol! Bu komut değişiklikleri KALICI olarak siler. Eger yanlislikla calistirdiysan, `git reflog` ile kurtarabilirsin (Git her HEAD degisikligini 30 gun boyunca saklar). Ama reflog da yoksa, veri geri gelmez.
+`git reset --hard` kullanırken çok dikkatli ol! Bu komut değişiklikleri KALICI olarak siler. Eger yanlislikla çalıştırdiysan, `git reflog` ile kurtarabilirsin (Git her HEAD degisikligini 30 gun boyunca saklar). Ama reflog da yoksa, veri geri gelmez.
 :::
 
 ## Git Log Gelişmiş Kullanım
@@ -665,7 +665,7 @@ options:
   - "git delete <commit-hash>"
   - "git undo <commit-hash>"
 correct: 1
-explanation: "Push edilmis commit'lerde git revert kullanılır çünkü bu komut geçmişi bozmaz, değişikliği geri alan YENI bir commit oluşturur. git reset ise geçmişi değiştirir ve paylasilmis branch'lerde diger gelistiricilerin geçmişini bozar."
+explanation: "Push edilmis commit'lerde git revert kullanılır çünkü bu komut geçmişi bozmaz, değişikliği geri alan YENI bir commit oluşturur. git reset ise geçmişi değiştirir ve paylasilmis branch'lerde diger geliştiricilerin geçmişini bozar."
 :::
 
 :::knowledge-check
@@ -698,7 +698,7 @@ explanation: "git stash, working directory ve staging area'daki değişiklikleri
 *Follow-up:* "Yanlislikla git reset --hard yaptim ve commit'imi kaybettim. git reflog ile nasil kurtaririm? Adim adim göster."
 
 **3. Mukemmellik Için:**
-> "Conventional Commits formatini kullanarak bir haftalik geliştirme surecinin commit geçmişini örnekle. feat, fix, refactor, docs, test, chore type'larini kullan. Bu gecmisin git log ve CHANGELOG oluşturma acisindan neden önemli oldugunu açıkla."
+> "Conventional Commits formatini kullanarak bir haftalik geliştirme sürecinin commit geçmişini örnekle. feat, fix, refactor, docs, test, chore type'larini kullan. Bu gecmisin git log ve CHANGELOG oluşturma acisindan neden önemli oldugunu açıkla."
 
 ### Pair Programming Ipucu
 Git sorunlariyla karsilastiginda AI'a `git status` ve `git log --oneline` ciktisini yapistir: "Şu anki Git durumumu analiz et. Merge conflict çözümü / branch stratejisi / commit geçmişi temizligi için ne yapmaliyim?"
@@ -709,7 +709,7 @@ Git sorunlariyla karsilastiginda AI'a `git status` ve `git log --oneline` ciktis
 
 **Soru 1: git merge ve git rebase arasindaki fark nedir? Hangisini ne zaman kullanirsiniz?**
 - **Junior cevabi:** Merge birleştirme yapar, rebase commitleri tekrar uygular.
-- **Senior cevabi:** Merge, merge commit oluşturarak iki branch'in geçmişini korur. Rebase ise commitleri hedef branch'in ucuna tasiyarak lineer geçmiş oluşturur. Public branch'lerde (main, develop) her zaman merge kullanılır çünkü rebase geçmişi yeniden yazar ve diger gelistiricilerin force-pull yapmasini gerektirir. Feature branch'lerde rebase tercih edilir çünkü temiz geçmiş sağlar. Golden rule: Başkasının çalıştığı branch'i asla rebase etme.
+- **Senior cevabi:** Merge, merge commit oluşturarak iki branch'in geçmişini korur. Rebase ise commitleri hedef branch'in ucuna tasiyarak lineer geçmiş oluşturur. Public branch'lerde (main, develop) her zaman merge kullanılır çünkü rebase geçmişi yeniden yazar ve diger geliştiricilerin force-pull yapmasini gerektirir. Feature branch'lerde rebase tercih edilir çünkü temiz geçmiş sağlar. Golden rule: Başkasının çalıştığı branch'i asla rebase etme.
 
 **Soru 2: Staging area (index) ne ise yarar? Neden direkt commit yapamiyoruz?**
 - **Junior cevabi:** `git add` ile dosyalari commit'e hazirlariz.
@@ -1365,7 +1365,7 @@ Bir Senior Developer veya CTO, Git konusunu ogrenirken şu yaklasimi benimser:
 5. **Git hooks ile otomasyonu kurar** - `pre-commit` hook ile lint, format ve test kontrolu yapar. `commit-msg` hook ile commit mesaji formatini zorlar. Husky ve lint-staged gibi araclarla takim genelinde standart sağlar.
 6. **Reflog'u güvenlik agi olarak bilir** - `git reflog` ile her HEAD hareketini takip edebilecegini bilir. Yanlislikla yapılan `reset --hard` veya silinen branch'i kurtarmak için reflog kullanır. "Git'te veri kaybi neredeyse imkansizdir, yeter ki reflog'u bilin" der.
 
-**Karar Verme Sureci — Merge vs Rebase vs Squash:**
+**Karar Verme Süreci — Merge vs Rebase vs Squash:**
 - **Merge commit (--no-ff)**: Her feature branch'in baslangic ve bitis noktasi gorulur. Trade-off: gecmis karisik gorunebilir ama tam izlenebilirlik saglar. Buyuk takimlarda tercih edilir cunku her PR'in sinirlari net.
 - **Rebase**: Lineer gecmis, temiz goruntu. Trade-off: shared branch'lerde tehlikeli (force push gerektirir), conflict resolution her commit icin tekrarlanir. Kisisel feature branch'lerde kullan, main'e yapma.
 - **Squash merge**: Tum feature tek commit olur. Trade-off: granular gecmis kaybolur ama main branch temiz kalir. Kucuk-orta takimlarda en populer strateji.

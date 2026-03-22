@@ -53,14 +53,14 @@ Senior developer design patterns öğrenirken:
 4. **Refactoring to patterns**: Sıfırdan pattern ile yazmak yerine, gerektiğinde mevcut kodu pattern'a refactor eder
 5. **Composition over inheritance**: Modern yaklaşımda inheritance yerine composition tercih eder
 
-**Karar Verme Sureci — Pattern Ne Zaman Kullanilmali?**
-- **Singleton**: Global state yonetimi (DB connection pool, logger, config). Trade-off: Test edilmesi zor, hidden dependency olusturur. Modern alternatif: Dependency Injection. "Singleton kullanmadan once DI dusun" kurali.
-- **Strategy**: Calisma zamaninda algoritma degistirme (odeme yontemi, siralama). Trade-off: Basit if/else ile cozulebilecek durumda over-engineering. Kural: 3+ strateji varsa veya yeni stratejiler eklenecekse kullan.
+**Karar Verme Süreci — Pattern Ne Zaman Kullanilmali?**
+- **Singleton**: Global state yonetimi (DB connection pool, logger, config). Trade-off: Test edilmesi zor, hidden dependency oluşturur. Modern alternatif: Dependency Injection. "Singleton kullanmadan once DI dusun" kurali.
+- **Strategy**: Çalışma zamaninda algoritma degistirme (odeme yontemi, siralama). Trade-off: Basit if/else ile cozulebilecek durumda over-engineering. Kural: 3+ strateji varsa veya yeni stratejiler eklenecekse kullan.
 - **Observer/Event-driven**: Loose coupling. Trade-off: Debug etmesi zor, event storm olusabilir. Kural: Event sayisi kontrolsuz buyuyorsa event catalog + schema registry kur.
-- **Factory**: Karmasik nesne olusturma mantigi. Trade-off: Basit constructor yeterliyken gereksiz soyutlama. Kural: Nesne olusturma mantigi degisebiliyorsa factory kullan.
+- **Factory**: Karmasik nesne oluşturma mantigi. Trade-off: Basit constructor yeterliyken gereksiz soyutlama. Kural: Nesne oluşturma mantigi degisebiliyorsa factory kullan.
 
 **Anti-pattern Farkindaligi:**
-- **"Pattern-driven development"**: Her kodu bir pattern'e oturtmaya calismak. Basit CRUD uygulamasinda Abstract Factory + Strategy + Observer kullanmak. Sonuc: 50 satirlik is 500 satir oluyor. Kural: "Pattern'i kodun gerektirdigi zaman ekle, onceden degil."
+- **"Pattern-driven development"**: Her kodu bir pattern'e oturtmaya çalışmak. Basit CRUD uygulamasinda Abstract Factory + Strategy + Observer kullanmak. Sonuc: 50 satirlik is 500 satir oluyor. Kural: "Pattern'i kodun gerektirdigi zaman ekle, onceden degil."
 - **Inheritance hierarchy cehennemi**: `BaseService > AuthenticatedService > CRUDService > UserService > AdminUserService`. 5 seviye inheritance, bir method'u override edince 3 seviye yukaridaki davranisi bozuyor. Cozum: Composition + mixins + dependency injection.
 - **God Object / God Class**: Tek class'ta 2000+ satir, 50+ method. Production'da gorduk: bir bug fix icin 3 gun harcandi cunku her sey birbiriyle bagli. SRP uygulandiginda 6 kucuk class'a ayrildi, bug 15 dakikada bulundu.
 
@@ -2004,7 +2004,7 @@ editor.redo()
 print(editor.content)  # "Hello World"
 ```
 
-**Beklenen Sonuc:** Undo ve redo sinirsiz sayida calismali. Macro command birden fazla islemi tek adimda geri alabilmeli.
+**Beklenen Sonuc:** Undo ve redo sinirsiz sayida çalışmali. Macro command birden fazla islemi tek adimda geri alabilmeli.
 **Ipucu:** Command pattern her islemi nesne olarak saklar. Bu sayede undo, redo, replay ve audit trail mumkun olur.
 
 ---
@@ -2063,7 +2063,7 @@ PaymentFactory.register("credit_card", CreditCardPayment)
 
 ### Alıştırma 8: Builder Pattern — Query Builder (Zor)
 
-Karmasik SQL sorgulari olusturmak icin fluent API ile builder pattern implement edin.
+Karmasik SQL sorgulari oluşturmak icin fluent API ile builder pattern implement edin.
 
 ```python
 class QueryBuilder:
@@ -2132,7 +2132,7 @@ print(query)
 # TODO: SQL injection korunmasi icin parameterized query kullan
 ```
 
-**Beklenen Sonuc:** Fluent API ile okunabilir sorgu olusturulmali. Parameterized query ile SQL injection onlenmeli.
+**Beklenen Sonuc:** Fluent API ile okunabilir sorgu oluşturulmali. Parameterized query ile SQL injection onlenmeli.
 
 ---
 
@@ -2198,7 +2198,7 @@ bus.emit("user:registered", {"id": 1, "email": "test@test.com"})
 # TODO: TypedEvent class'i ile type-safe event tanimlama
 ```
 
-**Beklenen Sonuc:** Event emit edildiginde tum handler'lar calismali. Middleware chain ile cross-cutting concern'ler uygulanmali. once() ile tek seferlik handler calismali.
+**Beklenen Sonuc:** Event emit edildiginde tum handler'lar çalışmali. Middleware chain ile cross-cutting concern'ler uygulanmali. once() ile tek seferlik handler çalışmali.
 
 ---
 
@@ -2249,6 +2249,306 @@ def create_user(name, email, phone, street, city, zip_code, country,
 
 **Beklenen Sonuc:** Her anti-pattern icin dogru pattern uygulanmali. God Object en az 4 ayri servise parcalanmali. Callback hell okunabilir pipeline'a donusmeli. 12 parametreli fonksiyon 3-4 Value Object alacak sekilde refactor edilmeli.
 :::
+
+:::exercise
+### Alistirma 11: Singleton Pattern — Global Config Manager (Kolay)
+
+Singleton pattern ile uygulama konfigurasyonunu yonet.
+
+```typescript
+// TODO: Singleton ConfigManager yaz
+class ConfigManager {
+  private static instance: ConfigManager;
+  private config: Record<string, any> = {};
+
+  private constructor() {
+    // TODO: .env dosyasindan veya environment'tan config yukle
+  }
+
+  static getInstance(): ConfigManager {
+    if (!ConfigManager.instance) {
+      ConfigManager.instance = new ConfigManager();
+    }
+    return ConfigManager.instance;
+  }
+
+  get(key: string): any {
+    return this.config[key];
+  }
+
+  // TODO: Thread-safe singleton (Node.js'te gerekli mi?)
+  // TODO: Lazy initialization vs eager initialization
+  // TODO: Singleton'in test edilebilirlik sorunlarini acikla
+  // TODO: Dependency Injection ile Singleton karsilastir
+}
+```
+
+**Beklenen Sonuc:** Her yerden ayni config instance'ina erisilmeli. Test edilebilirlik sorunu ve cozumu aciklanmali.
+**Ipucu:** Singleton global state olusturur — test'te mock'lamak zor. DI container ile yonetmek daha modern ve test edilebilir.
+:::
+
+:::exercise
+### Alistirma 12: Strategy Pattern — Fiyatlandirma Motoru (Kolay)
+
+Strategy pattern ile degisken fiyatlandirma politikalari uygula.
+
+```typescript
+// TODO: Strategy interface
+interface PricingStrategy {
+  calculatePrice(basePrice: number, quantity: number): number;
+}
+
+// TODO: Concrete strategies
+// class RegularPricing implements PricingStrategy { ... }
+// class PremiumPricing implements PricingStrategy { /* %10 indirim */ }
+// class WholesalePricing implements PricingStrategy { /* adet bazli indirim */ }
+// class SeasonalPricing implements PricingStrategy { /* donem bazli */ }
+
+// TODO: Context
+// class PricingEngine {
+//   constructor(private strategy: PricingStrategy) {}
+//   setStrategy(strategy: PricingStrategy) { this.strategy = strategy; }
+//   getPrice(basePrice: number, quantity: number): number {
+//     return this.strategy.calculatePrice(basePrice, quantity);
+//   }
+// }
+
+// TODO: Runtime'da strateji degistirmeyi goster
+// TODO: Yeni strateji eklemek icin mevcut kodu degistirmeden nasil yapilir? (OCP)
+```
+
+**Beklenen Sonuc:** Farkli fiyatlandirma politikalari bagimsiz calismali. Yeni strateji eklemek kolay olmali.
+**Ipucu:** Strategy = if/else zincirini polymorphism ile degistirmek. Open/Closed Principle'in somut uygulamasi.
+:::
+
+:::exercise
+### Alistirma 13: Adapter Pattern — Ucuncu Parti Entegrasyon (Kolay)
+
+Adapter pattern ile farkli odeme sistemlerini birlestir.
+
+```typescript
+// TODO: Ortak interface
+interface PaymentGateway {
+  charge(amount: number, currency: string): Promise<PaymentResult>;
+  refund(transactionId: string): Promise<RefundResult>;
+}
+
+// TODO: Stripe adapter
+// class StripeAdapter implements PaymentGateway {
+//   constructor(private stripe: Stripe) {}
+//   async charge(amount: number, currency: string) {
+//     const result = await this.stripe.charges.create({ amount, currency });
+//     return { success: true, transactionId: result.id };
+//   }
+// }
+
+// TODO: PayPal adapter (farkli API yapisi)
+// TODO: Iyzico adapter (Turkiye icin)
+
+// TODO: Factory ile adapter secimi
+// function createPaymentGateway(provider: string): PaymentGateway {
+//   switch(provider) {
+//     case 'stripe': return new StripeAdapter(new Stripe(key));
+//     case 'paypal': return new PayPalAdapter(new PayPal(key));
+//   }
+// }
+```
+
+**Beklenen Sonuc:** Tum odeme sistemleri ayni interface uzerinden kullanilabilmeli. Yeni sistem eklemek kolay olmali.
+**Ipucu:** Adapter ucuncu parti API'nin interface'ini kendi interface'ine cevirir. Uygulama kodu Stripe/PayPal'i dogrudan bilmez.
+:::
+
+:::exercise
+### Alistirma 14: Observer Pattern — Real-time Bildirim (Orta)
+
+Observer pattern ile event-driven bildirim sistemi kur.
+
+```typescript
+// TODO: EventEmitter tarzinda Observer
+interface EventHandler<T = any> {
+  (data: T): void;
+}
+
+class EventBus {
+  private handlers: Map<string, EventHandler[]> = new Map();
+
+  // TODO: on, off, emit metodlarini yaz
+  on(event: string, handler: EventHandler) { /* ... */ }
+  off(event: string, handler: EventHandler) { /* ... */ }
+  emit(event: string, data: any) { /* ... */ }
+
+  // TODO: once metodu (tek seferlik dinleme)
+  // TODO: Async handler desteği
+  // TODO: Wildcard event desteği ('order.*')
+}
+
+// TODO: Kullanim ornegi
+// const bus = new EventBus();
+// bus.on('order.created', sendEmail);
+// bus.on('order.created', updateInventory);
+// bus.on('order.created', notifyDashboard);
+// bus.emit('order.created', { orderId: '123', total: 99.99 });
+```
+
+**Beklenen Sonuc:** Bir event'e birden fazla handler baglanmali. emit() tum handler'lari cagirmali.
+**Ipucu:** Observer = pub/sub pattern'in basit hali. Node.js EventEmitter zaten bu pattern'i kullanir. Memory leak'e dikkat — off() cagirmayi unutma.
+:::
+
+:::exercise
+### Alistirma 15: Repository Pattern — Data Access Layer (Orta)
+
+Repository pattern ile veritabani erisimini soyutla.
+
+```typescript
+// TODO: Generic Repository interface
+interface Repository<T> {
+  findById(id: string): Promise<T | null>;
+  findAll(filter?: Partial<T>): Promise<T[]>;
+  create(entity: Omit<T, 'id'>): Promise<T>;
+  update(id: string, data: Partial<T>): Promise<T>;
+  delete(id: string): Promise<void>;
+}
+
+// TODO: PostgreSQL implementasyonu
+// class PostgresUserRepository implements Repository<User> { ... }
+
+// TODO: In-memory implementasyonu (test icin)
+// class InMemoryUserRepository implements Repository<User> { ... }
+
+// TODO: Unit of Work pattern ekle (transaction yonetimi)
+// TODO: Specification pattern ile karmasik sorgular
+// TODO: Pagination ve sorting desteği
+```
+
+**Beklenen Sonuc:** Repository interface DB'den bagimsiz olmali. In-memory versiyon testlerde kullanilabilmeli.
+**Ipucu:** Repository DB detaylarini gizler. UseCase PostgreSQL mi MongoDB mi bilmez — sadece Repository interface'ini bilir.
+:::
+
+:::exercise
+### Alistirma 16: Decorator Pattern — Middleware Zinciri (Orta)
+
+Decorator pattern ile fonksiyonalite katmanlari ekle.
+
+```typescript
+// TODO: Base service
+interface Logger {
+  log(message: string): void;
+}
+
+class ConsoleLogger implements Logger {
+  log(message: string) { console.log(message); }
+}
+
+// TODO: Decorator'lar
+// class TimestampDecorator implements Logger {
+//   constructor(private logger: Logger) {}
+//   log(message: string) {
+//     this.logger.log(`[${new Date().toISOString()}] ${message}`);
+//   }
+// }
+
+// class JsonDecorator implements Logger { /* JSON formatinda log */ }
+// class FilterDecorator implements Logger { /* Severity bazli filtreleme */ }
+
+// TODO: Decorator'lari zincirle
+// const logger = new FilterDecorator(
+//   new JsonDecorator(
+//     new TimestampDecorator(
+//       new ConsoleLogger()
+//     )
+//   )
+// );
+
+// TODO: Express middleware ile karsilastir — benzerlikler neler?
+```
+
+**Beklenen Sonuc:** Decorator'lar zincirlenmeli. Her katman bagimsiz eklenip cikarilabilmeli.
+**Ipucu:** Decorator = Russian nesting dolls (matryoshka). Her katman altindakini sarar ve ekstra davranis ekler. Express middleware ayni mantik.
+:::
+
+:::exercise
+### Alistirma 17: Builder Pattern — Complex Object Construction (Orta)
+
+Builder pattern ile karmasik obje olusturmayi kolaylastir.
+
+```typescript
+// TODO: Builder class
+class QueryBuilder {
+  private table: string = '';
+  private conditions: string[] = [];
+  private orderBy: string[] = [];
+  private limitValue: number = 0;
+  private offsetValue: number = 0;
+
+  from(table: string): this { this.table = table; return this; }
+  where(condition: string): this { this.conditions.push(condition); return this; }
+  // TODO: orderByAsc, orderByDesc metodlari
+  // TODO: limit ve offset metodlari
+  // TODO: join metodu
+  // TODO: select metodu (specific columns)
+
+  build(): string {
+    let query = `SELECT * FROM ${this.table}`;
+    if (this.conditions.length) query += ` WHERE ${this.conditions.join(' AND ')}`;
+    // TODO: ORDER BY, LIMIT, OFFSET ekle
+    return query;
+  }
+}
+
+// TODO: Kullanim ornegi
+// const query = new QueryBuilder()
+//   .from('users')
+//   .where('age > 18')
+//   .where('active = true')
+//   .orderByAsc('name')
+//   .limit(20)
+//   .build();
+```
+
+**Beklenen Sonuc:** Method chaining ile okunabilir query olusturulmali. Karmasik SQL sorgusu kolayca insa edilebilmeli.
+**Ipucu:** Builder pattern constructora 10+ parametre geçmek yerine adim adim obje olusturur. Immutable builder (her metod yeni instance) daha guvenli.
+:::
+
+:::exercise
+### Alistirma 18: State Pattern — Siparis Durumu Yonetimi (Zor)
+
+State pattern ile siparis durumlarini yonet.
+
+```typescript
+// TODO: State interface
+interface OrderState {
+  confirm(order: Order): void;
+  ship(order: Order): void;
+  deliver(order: Order): void;
+  cancel(order: Order): void;
+}
+
+// TODO: Concrete state'ler
+// class PendingState implements OrderState {
+//   confirm(order: Order) { order.setState(new ConfirmedState()); }
+//   ship(order: Order) { throw new Error('Onaylanmadan kargoya verilemez'); }
+//   cancel(order: Order) { order.setState(new CancelledState()); }
+// }
+
+// class ConfirmedState implements OrderState { ... }
+// class ShippedState implements OrderState { ... }
+// class DeliveredState implements OrderState { ... }
+// class CancelledState implements OrderState { ... }
+
+// TODO: State transition diyagrami ciz
+// Pending -> Confirmed -> Shipped -> Delivered
+//    |          |
+//    v          v
+// Cancelled  Cancelled
+
+// TODO: Her gecis icin business rule'lari tanimla
+// TODO: State gecislerini loglayan audit trail ekle
+```
+
+**Beklenen Sonuc:** Gecersiz state gecisleri hata vermeli. State diyagrami tamamlanmali. Audit trail calismali.
+**Ipucu:** State pattern if/else state kontrollerini ortadan kaldirir. Her state kendi gecerli aksiyonlarini bilir. Yeni state eklemek OCP'ye uygun.
+:::
+
 
 :::knowledge-check
 ## Bilgi Kontrolü

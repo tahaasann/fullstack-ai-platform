@@ -256,7 +256,7 @@
               "order": "1.12",
               "action": "ALTTA DEVAM ET: Docker servisini tanimla",
               "type": "code_modify",
-              "why": "Container servisinin image, port ve ortam degiskenlerini yapilandiriyoruz.",
+              "why": "Container servisinin image, port ve ortam değişkenlerini yapilandiriyoruz.",
               "code": "redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'",
               "file": "docker-compose.yml"
             },
@@ -605,9 +605,9 @@
             },
             {
               "order": "3.10",
-              "action": "ALTTA DEVAM ET: paralel sorgulari calistir",
+              "action": "ALTTA DEVAM ET: paralel sorgulari çalıştır",
               "type": "code_modify",
-              "why": "Promise.all ile birden fazla sorguyu paralel calistirarak performansi artiriyoruz.",
+              "why": "Promise.all ile birden fazla sorguyu paralel çalıştırarak performansi artiriyoruz.",
               "code": "const [products, total] = await Promise.all([\n      prisma.product.findMany({\n        where,\n        include: { category: { select: { name: true, slug: true } } },\n        orderBy: { [pagination.sortBy]: pagination.sortOrder },\n        skip: (pagination.page - 1) * pagination.limit,\n        take: pagination.limit,\n      }),",
               "file": "src/services/product.service.ts"
             },
@@ -621,7 +621,7 @@
             },
             {
               "order": "3.12",
-              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "action": "ALTTA DEVAM ET: donus degerini oluştur",
               "type": "code_modify",
               "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
               "code": "return {\n      products,\n      meta: {\n        page: pagination.page,\n        limit: pagination.limit,\n        total,\n        totalPages: Math.ceil(total / pagination.limit),\n      },",
@@ -702,7 +702,7 @@
             },
             {
               "order": "3.22",
-              "action": "ALTTA DEVAM ET: asenkron islemi calistir",
+              "action": "ALTTA DEVAM ET: asenkron islemi çalıştır",
               "type": "code_add",
               "why": "Veritabani veya harici servis cagrisinin sonucunu bekliyoruz.",
               "code": "const result = await productService.getAll(\n      { categoryId: categoryId as string, minPrice: minPrice ? +minPrice : undefined, maxPrice: maxPrice ? +maxPrice : undefined, search: search as string },\n      { page, limit, sortBy, sortOrder }\n    );\n    res.json(result);\n  } catch (err) {\n    next(err);\n  }",
@@ -803,18 +803,18 @@
             },
             {
               "order": "3.34",
-              "action": "ALTTA DEVAM ET: veritabaninda kayit olustur",
+              "action": "ALTTA DEVAM ET: veritabaninda kayit oluştur",
               "type": "code_add",
-              "why": "Prisma ile veritabaninda yeni kayit olusturarak veriyi kalici yapiyoruz.",
+              "why": "Prisma ile veritabaninda yeni kayit oluşturarak veriyi kalici yapiyoruz.",
               "code": "const giyim = await prisma.category.create({\n    data: { name: 'Giyim', slug: 'giyim' },\n  });",
               "file": "prisma/seed.ts",
               "position": "bottom"
             },
             {
               "order": "3.35",
-              "action": "ALTTA DEVAM ET: veritabaninda kayit olustur",
+              "action": "ALTTA DEVAM ET: veritabaninda kayit oluştur",
               "type": "code_add",
-              "why": "Prisma ile veritabaninda yeni kayit olusturarak veriyi kalici yapiyoruz.",
+              "why": "Prisma ile veritabaninda yeni kayit oluşturarak veriyi kalici yapiyoruz.",
               "code": "await prisma.product.createMany({\n    data: [\n      { name: 'iPhone 15', slug: 'iphone-15', description: 'Apple iPhone 15 128GB', price: 49999.99, stock: 50, categoryId: elektronik.id },\n      { name: 'MacBook Air M2', slug: 'macbook-air-m2', description: 'Apple MacBook Air M2 çip', price: 39999.99, stock: 30, categoryId: elektronik.id },\n      { name: 'Oversize Tişört', slug: 'oversize-tisort', description: 'Pamuklu oversize tişört', price: 299.99, stock: 200, categoryId: giyim.id },\n    ],\n  });",
               "file": "prisma/seed.ts",
               "position": "bottom"
@@ -823,7 +823,7 @@
               "order": "3.36",
               "action": "ALTTA DEVAM ET: seed scriptini tamamla",
               "type": "code_add",
-              "why": "Seed scriptinin calistirma ve hata yonetimi bolumunu ekliyoruz.",
+              "why": "Seed scriptinin çalıştırma ve hata yonetimi bolumunu ekliyoruz.",
               "code": "console.log('Seed tamamlandı!');\n}\n\nmain()\n  .catch(console.error)\n  .finally(() => prisma.$disconnect());",
               "file": "prisma/seed.ts",
               "position": "bottom"
@@ -866,7 +866,7 @@
             },
             {
               "error": "Cannot find module '../services/product.service'",
-              "cause": "Dosya yolu yanlis veya dosya henuz olusturulmamis.",
+              "cause": "Dosya yolu yanlis veya dosya henuz oluşturulmamis.",
               "fix": "Dosya yolunun buyuk/kucuk harf dahil dogru oldugunu kontrol et. ts-node icin tsconfig paths ayarini dogrula."
             }
           ]
@@ -1084,7 +1084,7 @@
             },
             {
               "error": "ReplyError: WRONGTYPE Operation against a key holding the wrong kind of value",
-              "cause": "Ayni Redis key uzerinde farkli veri tipi islemleri yapilmis (ornegin string key uzerinde hash islemi).",
+              "cause": "Ayni Redis key üzerinde farkli veri tipi islemleri yapilmis (örneğin string key üzerinde hash islemi).",
               "fix": "redis-cli DEL cart:userId komutu ile sorunlu keyi sil. Tum sepet islemlerinin Hash komutlarini (HSET, HGET, HGETALL) kullandigini dogrula."
             },
             {
@@ -1140,7 +1140,7 @@
               "order": "5.5",
               "action": "ALTTA DEVAM ET: error handler kapanisi",
               "type": "code_add",
-              "why": "Bilinmeyen hatalari konsola loglayip istemciye 500 status code ile genel hata mesaji donduruyoruz. Production'da detay gostermemek guvenlik icin onemli.",
+              "why": "Bilinmeyen hatalari konsola loglayip istemciye 500 status code ile genel hata mesaji donduruyoruz. Production'da detay gostermemek güvenlik icin onemli.",
               "code": "}\n  console.error(err);\n  res.status(500).json({ error: 'Sunucu hatası' });\n};",
               "file": "src/middleware/error-handler.ts",
               "position": "bottom"
@@ -1249,14 +1249,14 @@
               "type": "code_add",
               "file": "src/services/auth.service.ts",
               "code": "export class AuthService {\n  async register(email: string, name: string, password: string) {\n    const existing = await prisma.user.findUnique({ where: { email } });\n    if (existing) throw new Error('Bu e-posta zaten kayıtlı');",
-              "why": "Dosyanin kalan yapilandirma ve tanim kisimlarini ekliyoruz.",
+              "why": "Dosyanin kalan yapılandırma ve tanim kisimlarini ekliyoruz.",
               "position": "bottom"
             },
             {
               "order": "5.19",
-              "action": "ALTTA DEVAM ET: veritabaninda kayit olustur",
+              "action": "ALTTA DEVAM ET: veritabaninda kayit oluştur",
               "type": "code_add",
-              "why": "Prisma ile veritabaninda yeni kayit olusturarak veriyi kalici yapiyoruz.",
+              "why": "Prisma ile veritabaninda yeni kayit oluşturarak veriyi kalici yapiyoruz.",
               "code": "const hashedPassword = await bcrypt.hash(password, 10);\n    const user = await prisma.user.create({\n      data: { email, name, password: hashedPassword },\n    });",
               "file": "src/services/auth.service.ts",
               "position": "bottom"
@@ -1333,7 +1333,7 @@
               "order": "5.28",
               "action": "ALTTA DEVAM ET: route handler kapanisi",
               "type": "code_add",
-              "why": "Register isleminin son asamasi: JWT token uretimi ve kullanici bilgileriyle birlikte donus. Token 7 gun gecerli olacak sekilde ayarlandi.",
+              "why": "Register isleminin son asamasi: JWT token üretimi ve kullanici bilgileriyle birlikte donus. Token 7 gun gecerli olacak sekilde ayarlandi.",
               "code": "});\n\nexport default router;",
               "file": "src/routes/auth.routes.ts",
               "position": "bottom"
@@ -1399,8 +1399,8 @@
             },
             {
               "error": "Error: secretOrPrivateKey must have a value",
-              "cause": "JWT_SECRET environment degiskeni tanimlanmamis.",
-              "fix": ".env dosyasina JWT_SECRET degiskenini ekle. dotenv.config() cagrisinin uygulama basinda yapildigini dogrula."
+              "cause": "JWT_SECRET environment değişkeni tanimlanmamis.",
+              "fix": ".env dosyasina JWT_SECRET değişkenini ekle. dotenv.config() cagrisinin uygulama basinda yapildigini dogrula."
             },
             {
               "error": "Error: data and salt arguments required (bcrypt)",
@@ -1499,7 +1499,7 @@
             },
             {
               "order": "1.8",
-              "action": "ALTTA DEVAM ET: asenkron islemi calistir",
+              "action": "ALTTA DEVAM ET: asenkron islemi çalıştır",
               "type": "code_modify",
               "why": "Veritabani veya harici servis cagrisinin sonucunu bekliyoruz.",
               "code": "const session = await stripe.checkout.sessions.create({\n      mode: 'payment',\n      customer_email: customerEmail,\n      line_items: lineItems,\n      success_url: `${CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,\n      cancel_url: `${CLIENT_URL}/cancel`,\n      metadata: { orderId },\n    });",
@@ -1507,7 +1507,7 @@
             },
             {
               "order": "1.9",
-              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "action": "ALTTA DEVAM ET: donus degerini oluştur",
               "type": "code_modify",
               "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
               "code": "return { sessionId: session.id, url: session.url };\n  }\n}",
@@ -1558,7 +1558,7 @@
               "order": "1.14",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Stripe'in bekledigibiicimde line_items dizisini olusturuyoruz: TRY cinsinden fiyat (kurus bazinda cevirilmis) ve urun miktari.",
+              "why": "Stripe'in bekledigibiicimde line_items dizisini oluşturuyoruz: TRY cinsinden fiyat (kurus bazinda cevirilmis) ve urun miktari.",
               "code": "};",
               "file": "src/controllers/payment.controller.ts",
               "position": "bottom"
@@ -1661,7 +1661,7 @@
               "type": "code_add",
               "file": "src/controllers/webhook.controller.ts",
               "code": "});\n\nexport const handleWebhook = async (req: Request, res: Response) => {\n  const sig = req.headers['stripe-signature'] as string;\n  let event: Stripe.Event;",
-              "why": "Dosyanin kalan yapilandirma ve tanim kisimlarini ekliyoruz.",
+              "why": "Dosyanin kalan yapılandırma ve tanim kisimlarini ekliyoruz.",
               "position": "bottom"
             },
             {
@@ -1675,7 +1675,7 @@
             },
             {
               "order": "2.5",
-              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "action": "ALTTA DEVAM ET: donus degerini oluştur",
               "type": "code_add",
               "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
               "code": "return res.status(400).send(`Webhook Error: ${err.message}`);\n  }\n\n  res.json({ received: true });\n};",
@@ -1708,7 +1708,7 @@
             },
             {
               "order": "2.9",
-              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "action": "ALTTA DEVAM ET: donus degerini oluştur",
               "type": "code_modify",
               "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
               "code": "return res.status(400).send(`Webhook Error: ${err.message}`);\n  }\n\n  switch (event.type) {\n  // TODO: implement\n}",
@@ -1726,7 +1726,7 @@
               "order": "2.11",
               "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
               "type": "code_modify",
-              "why": "Stripe webhook imzasini dogrulamak icin constructEvent'i try-catch icine aliyoruz. Gecersiz imza 400 ile reddedilir — sahte webhook'lari engeller.",
+              "why": "Stripe webhook imzasini doğrulamak icin constructEvent'i try-catch icine aliyoruz. Gecersiz imza 400 ile reddedilir — sahte webhook'lari engeller.",
               "code": "stripeSessionId: session.id,\n            stripePaymentId: session.payment_intent as string,\n        console.log(`Sipariş ${orderId} ödendi!`);\n      break;",
               "file": "src/controllers/webhook.controller.ts"
             },
@@ -1827,7 +1827,7 @@
             },
             {
               "error": "Webhook Error: STRIPE_WEBHOOK_SECRET is undefined",
-              "cause": "STRIPE_WEBHOOK_SECRET environment degiskeni tanimlanmamis.",
+              "cause": "STRIPE_WEBHOOK_SECRET environment değişkeni tanimlanmamis.",
               "fix": "Stripe CLI stripe listen ciktisindaki whsec_ degerini .env dosyasina STRIPE_WEBHOOK_SECRET olarak ekle."
             },
             {
@@ -1865,7 +1865,7 @@
               "order": "3.3",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_add",
-              "why": "Webhook handler'da Stripe signature dogrulamasini yapiyoruz. Secret key ile imza eslesmezse istek reddedilir — bu man-in-the-middle saldirilarina karsi koruma saglar.",
+              "why": "Webhook handler'da Stripe signature doğrulamasini yapiyoruz. Secret key ile imza eslesmezse istek reddedilir — bu man-in-the-middle saldirilarina karsi koruma saglar.",
               "code": "// Geçerli durum geçişleri\nconst VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {\n  PENDING: ['PAID', 'CANCELLED'],\n  PAID: ['PROCESSING', 'REFUNDED'],\n  PROCESSING: ['SHIPPED'],\n  SHIPPED: ['DELIVERED'],\n  DELIVERED: [],\n  CANCELLED: [],",
               "file": "src/services/order.service.ts",
               "position": "bottom"
@@ -1908,7 +1908,7 @@
             },
             {
               "order": "3.8",
-              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "action": "ALTTA DEVAM ET: donus degerini oluştur",
               "type": "code_add",
               "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
               "code": "return prisma.order.update({\n      where: { id: orderId },\n      data: { status: newStatus },\n    });\n  }",
@@ -2234,7 +2234,7 @@
             },
             {
               "order": "5.6",
-              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "action": "ALTTA DEVAM ET: donus degerini oluştur",
               "type": "code_add",
               "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
               "code": "return res.status(400).json({ error: 'Bu sipariş için ödeme bulunamadı' });\n    }\n    const refund = await paymentService.createRefund(order.stripePaymentId);\n    await prisma.order.update({ where: { id: orderId }, data: { status: 'REFUNDED' } });\n    res.json({ refund, message: 'İade başarılı' });\n  } catch (err) {\n    next(err);\n  }",
@@ -2245,7 +2245,7 @@
               "order": "5.7",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Siparis durumu gecis kurallarini tanimliyoruz: her durum sadece belirli durumlara gecebilir. Ornegin PENDING sadece PAID veya CANCELLED olabilir — gecersiz gecisler engellenir.",
+              "why": "Siparis durumu gecis kurallarini tanimliyoruz: her durum sadece belirli durumlara gecebilir. Örneğin PENDING sadece PAID veya CANCELLED olabilir — gecersiz gecisler engellenir.",
               "code": "};",
               "file": "src/controllers/payment.controller.ts",
               "position": "bottom"
@@ -2368,7 +2368,7 @@
             },
             {
               "order": "1.5",
-              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "action": "ALTTA DEVAM ET: donus degerini oluştur",
               "type": "code_modify",
               "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
               "code": "return prisma.$transaction(async (tx) => {\n      // 1. Stok kontrolü ve güncelleme\n      for (const item of cartItems) {\n        const product = await tx.product.findUnique({\n          where: { id: item.product.id },\n        });\n        if (!product || product.stock < item.quantity) {\n          throw new Error(`${item.product.name} için yetersiz stok`);",
@@ -2435,7 +2435,7 @@
               "order": "1.12",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Prisma transaction icinde siparis kaydini olusturup siparis kalemlerini nested create ile ekliyoruz.",
+              "why": "Prisma transaction icinde siparis kaydini oluşturup siparis kalemlerini nested create ile ekliyoruz.",
               "code": "}\n};",
               "file": "src/controllers/order.controller.ts",
               "position": "bottom"
@@ -2507,7 +2507,7 @@
             {
               "error": "Error: Sepetiniz bos",
               "cause": "Kullanicinin Redis sepeti bos veya TTL suresi dolmus.",
-              "fix": "Siparis olusturmadan once sepete urun eklendigini dogrula. Redis TTL degerini kontrol et."
+              "fix": "Siparis oluşturmadan once sepete urun eklendigini dogrula. Redis TTL degerini kontrol et."
             },
             {
               "error": "Prisma.TransactionIsolationLevel is not defined",
@@ -2734,7 +2734,7 @@
             },
             {
               "order": "3.8",
-              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "action": "ALTTA DEVAM ET: donus degerini oluştur",
               "type": "code_modify",
               "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
               "code": "return {\n      totalProducts,\n      outOfStock,\n      lowStock,\n      healthyStock: totalProducts - outOfStock - lowStock,\n    };\n  }\n}",
@@ -2927,7 +2927,7 @@
             },
             {
               "order": "1.9",
-              "action": "ALTTA DEVAM ET: veri seti olusturma mantigini yaz",
+              "action": "ALTTA DEVAM ET: veri seti oluşturma mantigini yaz",
               "type": "code_add",
               "why": "Sentetik veri uretme fonksiyonuyla ML modeli icin egitim verisi hazirliyoruz.",
               "code": "# Normal işlemler\n    normal = pd.DataFrame({\n        'amount': np.random.lognormal(5, 1, n_normal).clip(10, 50000),\n        'num_items': np.random.randint(1, 5, n_normal),\n        'hour_of_day': np.random.choice(range(8, 23), n_normal),\n        'days_since_registration': np.random.randint(30, 365, n_normal),\n        'previous_orders': np.random.randint(1, 20, n_normal),\n        'different_shipping': np.random.choice([0, 1], n_normal, p=[0.9, 0.1]),",
@@ -2945,7 +2945,7 @@
             },
             {
               "order": "1.11",
-              "action": "ALTTA DEVAM ET: veri seti olusturma mantigini yaz",
+              "action": "ALTTA DEVAM ET: veri seti oluşturma mantigini yaz",
               "type": "code_add",
               "why": "Sentetik veri uretme fonksiyonuyla ML modeli icin egitim verisi hazirliyoruz.",
               "code": "# Sahte işlemler — yüksek tutar, gece saatleri, yeni hesap\n    fraud = pd.DataFrame({\n        'amount': np.random.lognormal(8, 1.5, n_fraud).clip(1000, 100000),\n        'num_items': np.random.randint(5, 20, n_fraud),\n        'hour_of_day': np.random.choice([0, 1, 2, 3, 4, 5], n_fraud),\n        'days_since_registration': np.random.randint(0, 7, n_fraud),\n        'previous_orders': np.random.randint(0, 2, n_fraud),\n        'different_shipping': np.random.choice([0, 1], n_fraud, p=[0.3, 0.7]),",
@@ -3153,8 +3153,8 @@
             },
             {
               "error": "FileNotFoundError: [Errno 2] No such file or directory: 'fraud_data.csv'",
-              "cause": "Veri seti dosyasi bulunmuyor. generate_data.py once calistirilmamis.",
-              "fix": "Onceki adimda python generate_data.py komutunu calistir. Dosyanin fraud-detection klasorunde oldugunu dogrula."
+              "cause": "Veri seti dosyasi bulunmuyor. generate_data.py once çalıştırilmamis.",
+              "fix": "Onceki adimda python generate_data.py komutunu çalıştır. Dosyanin fraud-detection klasorunde oldugunu dogrula."
             },
             {
               "error": "Low F1-score for Fraud class (< 0.60)",
@@ -3233,7 +3233,7 @@
             },
             {
               "order": "3.8",
-              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "action": "ALTTA DEVAM ET: donus degerini oluştur",
               "type": "code_modify",
               "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
               "code": "return jsonify({\n            'is_fraud': bool(prediction),\n            'fraud_probability': float(probability[1]),\n            'risk_level': 'HIGH' if probability[1] > 0.7 else 'MEDIUM' if probability[1] > 0.3 else 'LOW',\n        })\n    except Exception as e:\n        return jsonify({'error': str(e)}), 400",
@@ -3484,7 +3484,7 @@
             {
               "error": "Fraud score always returns 0",
               "cause": "Fraud servisi erisilemdigi icin graceful degradation devreye girmis.",
-              "fix": "Fraud servisinin calisitigini dogrula: curl http://localhost:5000/health. FRAUD_SERVICE_URL environment degiskenini kontrol et."
+              "fix": "Fraud servisinin calisitigini dogrula: curl http://localhost:5000/health. FRAUD_SERVICE_URL environment değişkenini kontrol et."
             }
           ]
         }
@@ -3559,7 +3559,7 @@
               "type": "code_add",
               "file": "tests/setup.ts",
               "code": "});\n\nafterAll(async () => {\n  await prisma.$disconnect();\n});",
-              "why": "Dosyanin kalan yapilandirma ve tanim kisimlarini ekliyoruz.",
+              "why": "Dosyanin kalan yapılandırma ve tanim kisimlarini ekliyoruz.",
               "position": "bottom"
             },
             {
@@ -3621,7 +3621,7 @@
             },
             {
               "order": "1.14",
-              "action": "ALTTA DEVAM ET: test dogrulamalarini yaz",
+              "action": "ALTTA DEVAM ET: test doğrulamalarini yaz",
               "type": "code_modify",
               "why": "Her assertion bir gereksininimi dogrular — basarisiz assertion sorunu erkenden yakalar.",
               "code": "it('should list products with pagination', async () => {\n    const res = await request(app).get('/api/products');\n    expect(res.status).toBe(200);\n    expect(res.body.products).toHaveLength(1);\n    expect(res.body.meta.total).toBe(1);\n  });",
@@ -3629,7 +3629,7 @@
             },
             {
               "order": "1.15",
-              "action": "ALTTA DEVAM ET: test dogrulamalarini yaz",
+              "action": "ALTTA DEVAM ET: test doğrulamalarini yaz",
               "type": "code_modify",
               "why": "Her assertion bir gereksininimi dogrular — basarisiz assertion sorunu erkenden yakalar.",
               "code": "it('should get product by slug', async () => {\n    const res = await request(app).get('/api/products/test-urun');\n    expect(res.status).toBe(200);\n    expect(res.body.name).toBe('Test Ürün');\n  });",
@@ -3637,7 +3637,7 @@
             },
             {
               "order": "1.16",
-              "action": "ALTTA DEVAM ET: test dogrulamalarini yaz",
+              "action": "ALTTA DEVAM ET: test doğrulamalarini yaz",
               "type": "code_modify",
               "why": "Her assertion bir gereksininimi dogrular — basarisiz assertion sorunu erkenden yakalar.",
               "code": "it('should return 404 for non-existent product', async () => {\n    const res = await request(app).get('/api/products/yok-urun');\n    expect(res.status).toBe(404);\n  });",
@@ -3645,7 +3645,7 @@
             },
             {
               "order": "1.17",
-              "action": "ALTTA DEVAM ET: test dogrulamalarini yaz",
+              "action": "ALTTA DEVAM ET: test doğrulamalarini yaz",
               "type": "code_modify",
               "why": "Her assertion bir gereksininimi dogrular — basarisiz assertion sorunu erkenden yakalar.",
               "code": "it('should search products', async () => {\n    const res = await request(app).get('/api/products?search=Test');\n    expect(res.status).toBe(200);\n    expect(res.body.products).toHaveLength(1);\n  });\n});",
@@ -3753,7 +3753,7 @@
               "order": "2.5",
               "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
               "type": "code_add",
-              "why": "Fraud detection Python servisine HTTP POST ile siparis ozelliklerini (tutar, urun sayisi, saat) gonderiyoruz.",
+              "why": "Fraud detection Python servisine HTTP POST ile siparis özelliklerini (tutar, urun sayisi, saat) gonderiyoruz.",
               "code": "- run: echo 'TODO: test adımları'",
               "file": ".github/workflows/ci.yml",
               "position": "bottom"
@@ -3778,7 +3778,7 @@
               "order": "2.8",
               "action": "ALTTA DEVAM ET: Docker servisini tanimla",
               "type": "code_modify",
-              "why": "Container servisinin image, port ve ortam degiskenlerini yapilandiriyoruz.",
+              "why": "Container servisinin image, port ve ortam değişkenlerini yapilandiriyoruz.",
               "code": "services:\n      postgres:\n        image: postgres:16-alpine\n        env:\n          POSTGRES_USER: ecomuser\n          POSTGRES_PASSWORD: ecompass\n          POSTGRES_DB: ecommerce_test\n        ports:",
               "file": ".github/workflows/ci.yml"
             },
@@ -3786,7 +3786,7 @@
               "order": "2.9",
               "action": "ALTTA DEVAM ET: Docker servisini tanimla",
               "type": "code_modify",
-              "why": "Container servisinin image, port ve ortam degiskenlerini yapilandiriyoruz.",
+              "why": "Container servisinin image, port ve ortam değişkenlerini yapilandiriyoruz.",
               "code": "- 5432:5432\n        options: >-\n          --health-cmd pg_isready\n          --health-interval 10s\n          --health-timeout 5s\n          --health-retries 5\n      redis:\n        image: redis:7-alpine",
               "file": ".github/workflows/ci.yml"
             },
@@ -3818,7 +3818,7 @@
               "order": "2.13",
               "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
               "type": "code_modify",
-              "why": "FraudService sinifini kapatarak siparis olusturma akisinda import edilebilir hale getiriyoruz.",
+              "why": "FraudService sinifini kapatarak siparis oluşturma akisinda import edilebilir hale getiriyoruz.",
               "code": "- run: pnpm dlx prisma migrate deploy\n      - run: pnpm test\n      - run: pnpm tsc --noEmit",
               "file": ".github/workflows/ci.yml"
             },
@@ -3875,7 +3875,7 @@
             },
             {
               "error": "Error: P1001: Can't reach database server in CI",
-              "cause": "CI ortaminda PostgreSQL service containeri henuz hazir degil.",
+              "cause": "CI ortamında PostgreSQL service containeri henuz hazir degil.",
               "fix": "GitHub Actions service containeri icin healthcheck options ayarla. pg_isready ile veritabaninin hazir oldugunu dogrula."
             },
             {
@@ -4240,7 +4240,7 @@
               "type": "code_add",
               "file": "Dockerfile",
               "code": "COPY package.json pnpm-lock.yaml ./\nRUN npm install -g pnpm && pnpm install --frozen-lockfile\n\nCOPY . .\nRUN pnpm dlx prisma generate\nRUN pnpm tsc",
-              "why": "Dosyanin kalan yapilandirma ve tanim kisimlarini ekliyoruz.",
+              "why": "Dosyanin kalan yapılandırma ve tanim kisimlarini ekliyoruz.",
               "position": "bottom"
             },
             {
@@ -4352,12 +4352,12 @@
           "common_errors": [
             {
               "error": "COPY failed: file not found in build context: dist/",
-              "cause": "Build asamasinda pnpm build basarisiz olmus veya dist klasoru olusturulmamis.",
+              "cause": "Build asamasinda pnpm build basarisiz olmus veya dist klasoru oluşturulmamis.",
               "fix": "tsconfig.json icinde outDir: './dist' tanimli oldugunu dogrula. package.json icinde build scriptinin 'tsc' oldugunu kontrol et."
             },
             {
               "error": "Error: Cannot find module '/app/dist/app.js'",
-              "cause": "TypeScript derleme sonrasi app.ts dosyasi dist/app.js olarak olusturulmamis.",
+              "cause": "TypeScript derleme sonrasi app.ts dosyasi dist/app.js olarak oluşturulmamis.",
               "fix": "tsconfig.json icinde rootDir ve outDir ayarlarini kontrol et. src/app.ts dosyasinin mevcut oldugunu dogrula."
             },
             {
@@ -4378,7 +4378,7 @@
       "steps": [
         {
           "title": "Production Build",
-          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "instructions": "Uygulamayi production modda build et, tum testleri çalıştır, Lighthouse audit yap",
           "code_snippet": "pnpm build && pnpm test",
           "substeps": [
             {
@@ -4553,7 +4553,7 @@
               "why": "Production deploy'un tüm bileşenlerinin çalıştığını kapsamlı şekilde doğruluyoruz."
             }
           ],
-          "folder_structure_after": "(Deploy adiminda dosya yapisi degismez, uygulama bulut ortaminda calisir)",
+          "folder_structure_after": "(Deploy adiminda dosya yapisi degismez, uygulama bulut ortamında calisir)",
           "common_errors": [
             {
               "error": "Railway build failed: Docker build error",
@@ -4744,7 +4744,7 @@
               "file": "README.md",
               "position": "bottom",
               "code": "```bash\npnpm test           # Testleri çalıştır\npnpm test:coverage  # Coverage raporu\n```\n\n## Lisans",
-              "why": "README dokumantasyonuna ortam degiskenleri tablosu, test komutlari ve lisans bilgisini ekliyoruz."
+              "why": "README dokumantasyonuna ortam değişkenleri tablosu, test komutlari ve lisans bilgisini ekliyoruz."
             },
             {
               "order": "3.21",
@@ -4774,12 +4774,12 @@
             {
               "error": "Screenshots/GIF missing from README",
               "cause": "Gorsel icerik eklenmemis.",
-              "fix": "Postman veya Swagger UI ekran goruntuleri ekle. API response ornekleri goster."
+              "fix": "Postman veya Swagger UI ekran goruntuleri ekle. API response örnekleri goster."
             },
             {
               "error": "Setup instructions don't work",
               "cause": "README deki kurulum adimlari guncel degil.",
-              "fix": "Temiz bir ortamda README deki adimlari basdan sona takip et ve calismayanlari duzelt."
+              "fix": "Temiz bir ortamda README deki adimlari basdan sona takip et ve çalışmayanlari duzelt."
             }
           ]
         },
@@ -5094,17 +5094,17 @@
     "code_review": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "Review this e-commerce backend code (Express + Prisma + Stripe + Redis) for: payment security (PCI compliance, webhook signature verification), SQL injection prevention, proper transaction handling for orders, Redis cart implementation, rate limiting, input validation, error handling, idempotent webhook handlers, and separation of concerns. Also review the Python fraud detection model for feature engineering and model evaluation.",
-      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle Stripe webhook handler'lari, odeme guvenligi ve fraud model entegrasyonu icin"
+      "when_to_use": "Her step tamamlandiktan sonra kullan — özellikle Stripe webhook handler'lari, odeme güvenliği ve fraud model entegrasyonu icin"
     },
     "debugging": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "I'm getting this error in my e-commerce API (Express + PostgreSQL + Prisma + Stripe + Redis + Python ML): [error]. The relevant code is: [code]. Stripe webhook payload: [payload]. I'm trying to [goal].",
-      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle Stripe webhook hatalari, Prisma transaction sorunlari ve ML model entegrasyon hatalari icin"
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — özellikle Stripe webhook hatalari, Prisma transaction sorunlari ve ML model entegrasyon hatalari icin"
     },
     "research": {
       "model": "Gemini 2.5 Pro",
       "prompt_template": "Explain [concept] with practical examples for an e-commerce backend with fraud detection. Topics I need help with: Stripe Checkout Session API and webhooks, PCI DSS compliance, Redis data structures for shopping cart, Prisma transactions and nested writes, scikit-learn fraud detection models (Isolation Forest, Random Forest), feature engineering for fraud detection, GitHub Actions CI/CD pipeline, and Docker multi-service setup.",
-      "when_to_use": "Yeni bir konsept ogrenirken kullan — ozellikle Stripe API, fraud detection ML modelleri ve guvenlik best practice'leri icin"
+      "when_to_use": "Yeni bir konsept ogrenirken kullan — özellikle Stripe API, fraud detection ML modelleri ve güvenlik best practice'leri icin"
     }
   },
   "deployment_guide": {
@@ -5119,7 +5119,7 @@
       {
         "title": "Neon Database Olustur",
         "commands": [
-          "# neon.tech'e git, yeni proje olustur"
+          "# neon.tech'e git, yeni proje oluştur"
         ],
         "instructions": "Connection string'i kopyala. Neon ucretsiz tier yeterli"
       },
@@ -5181,7 +5181,7 @@
       "Proje aciklamasi ve motivasyon (2-3 cumle)",
       "Canli demo linki (Vercel/Railway badge ile)",
       "Teknoloji stack badge'leri",
-      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Ekran goruntuleri (en az 3: dashboard, ana özellik, mobile)",
       "Mimari diyagram (ASCII veya draw.io)",
       "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
       "API dokumantasyonu (/docs linki veya Postman collection)",
@@ -5189,7 +5189,7 @@
     ],
     "screenshot_suggestions": [
       "Dashboard/Anasayfa",
-      "Ana ozellik ekrani",
+      "Ana özellik ekrani",
       "Mobile gorunum"
     ],
     "live_demo_url_template": "https://ecommerce-api.vercel.app",
@@ -5197,7 +5197,7 @@
   },
   "transition_guide": {
     "prerequisites": [
-      "REST API gelistirme deneyimi",
+      "REST API geliştirme deneyimi",
       "Veritabani tasarimi ve SQL/NoSQL kullanimi",
       "Authentication ve authorization mekanizmalari",
       "Temel AI/ML API kullanimi"
@@ -5206,9 +5206,9 @@
       "Phase 3 Module 10 - API tasarimi ve dokumantasyon",
       "Phase 3 Module 11 - SQL ve PostgreSQL ileri konular",
       "Phase 3 Module 12 - Authentication, testing",
-      "Phase 4 Module 14 - Web guvenligi temelleri"
+      "Phase 4 Module 14 - Web güvenliği temelleri"
     ],
     "next_project": "project-05",
-    "skills_bridge": "Bu projede ogrendigin odeme sistemi entegrasyonu, fraud detection ve guvenlik pratikleri, sonraki projede analytics dashboard ve anomaly detection icin veri isleme ve ML model entegrasyonu becerilerini gelistirecek."
+    "skills_bridge": "Bu projede ogrendigin odeme sistemi entegrasyonu, fraud detection ve güvenlik pratikleri, sonraki projede analytics dashboard ve anomaly detection icin veri isleme ve ML model entegrasyonu becerilerini gelistirecek."
   }
 }

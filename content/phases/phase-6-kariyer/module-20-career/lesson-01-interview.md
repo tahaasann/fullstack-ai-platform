@@ -19,17 +19,17 @@ Teknik mülakat süreci korkutucu gorunebilir ama aslinda sistematik bir hazirli
 ### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "Teknik mülakat surecinin 4 asamasini (coding interview, system design interview, behavioral interview, take-home project) açıkla. Her asamada ne değerlendirilir? STAR metodu behavioral sorularda nasil uygulanır? UMPIRE framework'u system design'da nasil kullanılır? Her asama için hazirlik stratejisi oluştur."
+> "Teknik mülakat sürecinin 4 asamasini (coding interview, system design interview, behavioral interview, take-home project) açıkla. Her asamada ne değerlendirilir? STAR metodu behavioral sorularda nasil uygulanır? UMPIRE framework'u system design'da nasil kullanılır? Her asama için hazirlik stratejisi oluştur."
 
 **2. Pratik Uygulama:**
-> "Bana bir mock coding interview yap: Bir medium difficulty LeetCode sorusu sor, cozumumu dinle, ipuclari ver, cozumumu optimize etmemi iste ve sonunda geri bildirim ver. Gerçek bir mulakatci gibi davran - zaman siniri koy (30 dakika), düşünme surecimi degerlendirmeni iste."
+> "Bana bir mock coding interview yap: Bir medium difficulty LeetCode sorusu sor, cozumumu dinle, ipuclari ver, cozumumu optimize etmemi iste ve sonunda geri bildirim ver. Gerçek bir mulakatci gibi davran - zaman siniri koy (30 dakika), düşünme sürecimi degerlendirmeni iste."
 > Takip: "Şimdi bir system design mock interview yap: 'Design a real-time chat application like WhatsApp' sorusunu sor ve UMPIRE framework ile adim adim cozeyim. Her adimda soru sor ve yonlendir."
 
 **3. Mukemmellik Için:**
 > "FAANG seviyesinde bir teknik mülakat için 8 haftalik çalışma plani oluştur: haftalik DSA konulari (array, string, tree, graph, DP), gunluk LeetCode problem sayisi, system design çalışma stratejisi, behavioral soru bankasi ve mock interview programi. Zayif yonlerimi belirleyip onceliklendirme yap."
 
 ### Pair Programming Ipucu
-Mülakat hazirliginda AI'a çözümünü göster ve sor: "Bu çözümü bir mulakatci olarak değerlendir. Iletişim kalitem, problem çözme yaklasimim ve kod kalitem nasil? Nereleri gelistirmeliyim? Gerçekçi puan ver (1-5)."
+Mülakat hazirliginda AI'a çözümünü göster ve sor: "Bu çözümü bir mulakatci olarak değerlendir. Iletişim kalitem, problem çözme yaklasimim ve kod kalitem nasil? Nereleri geliştirmeliyim? Gerçekçi puan ver (1-5)."
 :::
 
 :::interview
@@ -287,7 +287,7 @@ def solve(nums: list[int], target: int) -> list[int]:
 
 4. **Test case'leri sen oluştur**: Sorulmadan "Şu edge case'leri test edelim..." de
 
-5. **Ölçekleme düşün**: "Bu 10M data için çalışır mi? Calismazsa şu yaklasimi dusunurum..."
+5. **Ölçekleme düşün**: "Bu 10M data için çalışır mi? Çalışmazsa şu yaklasimi dusunurum..."
 :::
 
 ---
@@ -465,7 +465,7 @@ R - Result (Sonuc):     Sonuc ne oldu? (rakamlarla)
 **STAR Cevap**:
 - **S**: "E-ticaret projemizde Black Friday'de checkout sayfasi 30 saniyede cevaap veriyordu, normal zamanda 2 saniyeydi."
 - **T**: "Backend developer olarak checkout API'nin performansini iyilestirmem gerekiyordu. 48 saat içinde çözüm bulmam lazimdi."
-- **A**: "Database query'leri profiling yaptim, N+1 query problemi buldum. Query'leri optimize ettim, Redis cache ekledim ve database index'leri olusturdum."
+- **A**: "Database query'leri profiling yaptim, N+1 query problemi buldum. Query'leri optimize ettim, Redis cache ekledim ve database index'leri oluşturdum."
 - **R**: "Checkout süresi 30 saniyeden 1.5 saniyeye dustu. Black Friday'de hic downtime olmadi ve satis %25 artti."
 :::
 
@@ -826,7 +826,7 @@ Her ana konu icin 5'er soru ve cevap hazirla.
 4. **DevOps:** Docker, CI/CD, monitoring, deployment strategies
 5. **System Design:** Scalability, caching, load balancing, database sharding
 
-**Beklenen Sonuc:** Her soruya Junior ve Senior seviyesinde iki ayri cevap yazilmali. Senior cevap trade-off'lari ve gercek dunya orneklerini icermeli. Toplam 25 soru-cevap cifti hazirlanmali.
+**Beklenen Sonuc:** Her soruya Junior ve Senior seviyesinde iki ayri cevap yazilmali. Senior cevap trade-off'lari ve gercek dunya örneklerini icermeli. Toplam 25 soru-cevap cifti hazirlanmali.
 
 ---
 
@@ -907,7 +907,7 @@ def max_profit(prices):
     # TODO: Coz
 ```
 
-**Beklenen Sonuc:** Her problemi suresi icinde coz. Cozume baslamadan once yaklasimi sözlu acikla. En az 2 test case'i elle calistir. Time ve space complexity belirt.
+**Beklenen Sonuc:** Her problemi suresi icinde coz. Cozume baslamadan once yaklasimi sözlu acikla. En az 2 test case'i elle çalıştır. Time ve space complexity belirt.
 **Ipucu:** Interview'da susma — dusundugunu sesli soyle. "Simdi brute force dusunuyorum, sonra optimize ederim" demek suskunluktan cok daha iyi.
 
 ---
@@ -926,7 +926,7 @@ Farkli senaryolarda maas muzakere pratigi yap:
 
 **Senaryo 3:** Birden fazla teklif var.
 - YANLIS: Yalan soyle
-- DOGRU: "Baska bir sirketin teklifini de degerlendiriyorum. Sizinle calismayi tercih ederim ama paketin X seviyesinde olmasi gerekir"
+- DOGRU: "Baska bir sirketin teklifini de degerlendiriyorum. Sizinle çalışmayi tercih ederim ama paketin X seviyesinde olmasi gerekir"
 
 **Beklenen Sonuc:** Her senaryo icin yazili script hazirla. Rakam belirtme zamanlamasi dogru olmali (once teklifi gor). Toplam paketi (maas + bonus + esop + yan haklar) degerlendir.
 
@@ -987,7 +987,7 @@ Interview sonunda "Sorulariniz var mi?" dendiginde sorulacak stratejik sorular h
 
 ### Alistirma 10: 4 Haftalik Interview Hazirlik Plani (Zor)
 
-Kisisel interview hazirlik plani olustur:
+Kisisel interview hazirlik plani oluştur:
 
 **Hafta 1: Temeller**
 - Gunluk 2 Easy LeetCode problemi (Hash Map, Two Pointers, String)
@@ -1011,6 +1011,330 @@ Kisisel interview hazirlik plani olustur:
 
 **Beklenen Sonuc:** Her gun icin spesifik gorevler tanimlanmali. Haftalik hedefler olculebilir olmali (X problem cozuldu, Y mock yapildi). Zayif alanlarin tespiti icin haftalik retrospektif planlanmali.
 :::
+
+:::exercise
+### Alistirma 11: STAR Methodu ile Davranissal Cevap Hazirlama (Kolay)
+
+STAR methodu ile mulakat sorularina yapilandirilmis cevaplar hazirla.
+
+```markdown
+# STAR Method
+# S - Situation: Durum/baglam
+# T - Task: Gorev/sorumluluk
+# A - Action: Yaptigin eylemler
+# R - Result: Somut sonuclar (rakamlarla)
+
+# TODO: Asagidaki sorular icin STAR cevaplari hazirla:
+
+# 1. "Bir projede yasadiginiz en buyuk zorluk neydi?"
+# S: [durumu anlat]
+# T: [gorevini acikla]
+# A: [adim adim ne yaptigini anlat]
+# R: [somut sonuc — %X iyilesme, Y gun erken teslim vb.]
+
+# 2. "Takim icerisinde bir anlasamazligi nasil cozdugunuz?"
+# TODO: STAR ile cevapla
+
+# 3. "Basinc altinda nasil calisirsiniz?"
+# TODO: STAR ile cevapla
+
+# 4. "Bir hata yaptiginizi ve nasil duzelttiginizi anlatin."
+# TODO: STAR ile cevapla
+
+# 5. "Neden bu pozisyona basvurdunuz?"
+# TODO: (Bu STAR degil ama hazirlanmali)
+```
+
+**Beklenen Sonuc:** Her soru icin yapilandirilmis STAR cevabi hazirlanmali. Sonuclar olculebilir olmali.
+**Ipucu:** Result kisminda MUTLAKA rakam ver: "%30 performans artisi", "2 hafta erken teslim", "0 bug ile production'a cikti".
+:::
+
+:::exercise
+### Alistirma 12: Teknik Mulakat Soru Bankasi (Kolay)
+
+Sik sorulan teknik mulakat sorularina cevap hazirla.
+
+```markdown
+# TODO: Her soruya 2-3 cumlecik kisa ve net cevap yaz
+
+## JavaScript/TypeScript
+# 1. var, let, const farki nedir?
+# 2. Closure nedir? Ornek ver.
+# 3. Event loop nasil calisir?
+# 4. Promise vs async/await?
+# 5. == vs === farki?
+
+## React
+# 1. Virtual DOM nedir?
+# 2. useEffect cleanup ne zaman calisir?
+# 3. useMemo vs useCallback?
+# 4. Context vs Redux ne zaman?
+# 5. Server Components nedir?
+
+## Backend
+# 1. REST vs GraphQL?
+# 2. SQL vs NoSQL ne zaman?
+# 3. JWT nasil calisir?
+# 4. Middleware nedir?
+# 5. Microservices avantaj/dezavantaj?
+
+# TODO: Her cevabi sesli 30 saniyede anlatma pratigi yap
+```
+
+**Beklenen Sonuc:** 15 sorunun hepsine kisa, net cevap yazilmali. Sesli pratik yapilmali.
+**Ipucu:** Interview'da uzun anlatma — 30-60 saniye ideal. Once ozet ver, sonra "detay ister misiniz?" diye sor.
+:::
+
+:::exercise
+### Alistirma 13: Whiteboard Coding Pratigi (Kolay)
+
+Kagit/whiteboard uzerinde kod yazma pratigi yap.
+
+```markdown
+# Kurallar:
+# - IDE/editor kullanma — kagit veya whiteboard
+# - 20 dakika siniri
+# - Once pseudocode, sonra gercek kod
+# - Edge case'leri belirt
+
+# TODO: Asagidaki problemleri kagit uzerinde coz:
+
+# 1. (Kolay) isPalindrome("racecar") -> true
+# Zaman: O(n), Alan: O(1)
+
+# 2. (Kolay) fizzbuzz(1..100) -> "1,2,Fizz,4,Buzz..."
+# 3 ile bolunuyorsa "Fizz", 5 ile "Buzz", ikisiyle "FizzBuzz"
+
+# 3. (Orta) maxSubarray([-2,1,-3,4,-1,2,1,-5,4]) -> 6
+# Kadane's Algorithm
+
+# TODO: Her cozum icin:
+# - Once problemi anladiginizi dogrulayin
+# - Brute force cozumu soyleyin
+# - Optimize edin
+# - Test case'leri yazin
+```
+
+**Beklenen Sonuc:** 3 problem kagit uzerinde cozulmeli. Edge case'ler belirtilmeli. Karmasiklik analizi yapilmali.
+**Ipucu:** Whiteboard'da temiz yaz — interviewer kodunu okuyabilmeli. Degisken isimlerini anlamli sec (i, j degil left, right).
+:::
+
+:::exercise
+### Alistirma 14: System Design Interview Pratigi (Orta)
+
+30 dakikalik system design interview simulasyonu yap.
+
+```markdown
+# Soru: "Instagram'in temel ozelliklerini tasarla"
+
+# TODO: 30 dakikaya bol
+
+## 0-5dk: Gereksinimleri Netlesitir
+# - Foto/video paylasimi
+# - Feed (timeline)
+# - Like, yorum
+# - Follow/unfollow
+# - Arama
+# Olcek: 1B kullanici, 500M gunluk aktif, 100M foto/gun
+
+## 5-15dk: High-Level Design
+# TODO: Servisleri ve veri akisini ciz
+
+## 15-25dk: Deep Dive
+# TODO: Feed generation stratejisi (push vs pull)
+# TODO: Media storage ve CDN
+# TODO: Database sharding
+
+## 25-30dk: Trade-off ve Iyilestirme
+# TODO: Celebrity problemi
+# TODO: Caching katmanlari
+```
+
+**Beklenen Sonuc:** Yapilandirilmis 30 dakikalik sunum yapilmali. Trade-off'lar tartmsilmali.
+**Ipucu:** System design'da "mu" soyleme — interviewer iletisim yetenegini de olcer. "Feed icin push modeli secerdim cunku..." diye acikla.
+:::
+
+:::exercise
+### Alistirma 15: Live Coding Interview Simulasyonu (Orta)
+
+Gercek interview ortamini simule et.
+
+```markdown
+# Kurallar:
+# - 30 dakika timer koy
+# - Sesli dusun (think aloud)
+# - IDE kullanabilirsin ama autocomplete kapali
+# - Interviewer (AI) ile iletisim kur
+
+# TODO: Bu problemi canli coding olarak coz:
+# Problem: "Valid Parentheses"
+# Verilen: s = "({[]})"
+# Dondurecek: true (eslesen parantezler)
+
+# Adimlar:
+# 1. Soruyu anla, ornek input/output iste
+# 2. Yaklasimini acikla (stack)
+# 3. Kodu yaz (sesli dusumerek)
+# 4. Test case'lerle test et
+# 5. Edge case'leri kontrol et: "", "(", "([)]"
+# 6. Karmasiklik analizi yap
+
+# TODO: 3 farkli problem ile tekrarla
+# TODO: Her seferinde zamani not et
+# TODO: Takildigin yerleri analiz et
+```
+
+**Beklenen Sonuc:** 30 dakikada problem cozulmeli. Think aloud pratigi yapilmali. Edge case'ler ele alinmali.
+**Ipucu:** Takildiginda panik yapma — interviewer'a "Burada iki yaklasim dusunuyorum..." diye soyle. Sessizlik kotu, dusunce sureci paylasimi iyi.
+:::
+
+:::exercise
+### Alistirma 16: Takip Sorusu Hazirlama (Orta)
+
+Interview sonunda sorulacak akilli sorular hazirla.
+
+```markdown
+# TODO: Her kategori icin 3 soru hazirla
+
+## Takim ve Kultur
+# 1. "Takiminizda tipik bir sprint nasil geciiyor?"
+# 2. "Code review sureci nasil isliyor?"
+# 3. TODO: 1 soru daha
+
+## Teknik
+# 1. "Tech stack'inizde en buyuk teknik borc (tech debt) nedir?"
+# 2. "CI/CD pipeline'iniz nasil yapilandirilmis?"
+# 3. TODO: 1 soru daha
+
+## Kariyer Gelisimi
+# 1. "Junior'dan mid-level'a gecis icin beklentileriniz neler?"
+# 2. "Takim icinde ogrenme kulturu nasil?"
+# 3. TODO: 1 soru daha
+
+# TODO: SORMA listesi (kotu sorular)
+# - "Maas ne kadar?" (henuz erken)
+# - "Izin kac gun?" (ilk interview'da sorma)
+# - "Uzaktan calisma var mi?" (ilanda yazmiyorsa dikkatli sor)
+```
+
+**Beklenen Sonuc:** En az 9 kaliteli soru hazirlanmali. Kotu soru ornekleri bilinmeli.
+**Ipucu:** Akilli sorular interview'da fark yaratir. "Arastirdim ve X teknolojisini kullaniyorsunuz, Y'ye gecis planlaniyor mu?" gibi hazirlikli sorular etkiler.
+:::
+
+:::exercise
+### Alistirma 17: Maas Muzakere Stratejisi (Orta)
+
+Maas muzakeresine hazirlan.
+
+```markdown
+# TODO: Maas arastirmasi yap
+# Kaynaklar: Glassdoor, levels.fyi, Kariyer.net, LinkedIn Salary
+# Pozisyon: Junior Full-Stack Developer
+# Sehir: Istanbul/Ankara/Remote
+
+# TODO: BATNA tanimla (Best Alternative to Negotiated Agreement)
+# Minimum kabul edilebilir teklif: ___
+# Hedef: ___
+# Hayal: ___
+
+# TODO: Muzakere senaryolari pratik et
+# Senaryo 1: "Maas beklentiniz nedir?"
+# Cevap: "Arastirmalarima gore bu pozisyon icin piyasa araligi X-Y TL.
+#          Deneyimim ve becerilerim goz onunde bulundurularak Y aralirinda
+#          bir teklif bekliyorum."
+
+# Senaryo 2: "Butcemiz sinirli, X TL onerebiliriz"
+# TODO: Counter-offer stratejisi
+
+# Senaryo 3: Maas disindaki faydalar
+# TODO: Esnek calisma, egitim butcesi, hisse senedi, prim sistemi
+```
+
+**Beklenen Sonuc:** Piyasa arastirmasi yapilmali. BATNA belirlenmeli. 3 senaryo icin pratik yapilmali.
+**Ipucu:** Ilk rakami sen soyleme — "Butceniz nedir?" diye sor. Eger sormak zorundaysan aralik ver (X-Y), tek rakam verme.
+:::
+
+:::exercise
+### Alistirma 18: Mock Interview Checklist (Zor)
+
+Tam kapsamli mock interview oturumu planla ve uygula.
+
+```markdown
+# TODO: Mock Interview Plani (60 dakika)
+
+## Hazirlik (interview oncesi)
+# - [ ] Sirketi arastir (urunler, teknoloji, kultur)
+# - [ ] LinkedIn'den interviewer'i arastir
+# - [ ] CV'deki her maddeyi STAR ile hazirla
+# - [ ] 5 teknik soru pratik et
+# - [ ] Kiyafet ve ortam hazirla
+
+## Intro (5 dk)
+# - [ ] Elevator pitch (60 sn kendini tanit)
+# TODO: Elevator pitch yaz ve ezberle
+
+## Teknik (25 dk)
+# - [ ] 2 coding problemi coz
+# TODO: Cozumleri yaz
+
+## Davranissal (15 dk)
+# - [ ] STAR cevaplari
+# TODO: 3 STAR cevap hazirla
+
+## Takip Sorulari (10 dk)
+# - [ ] 5 akilli soru sor
+# TODO: Sorulari yaz
+
+## Degerlendirme (5 dk)
+# - [ ] Gucliu yonlerim
+# - [ ] Gelistirmem gereken alanlar
+# - [ ] Aksyon plani
+```
+
+**Beklenen Sonuc:** Tam mock interview checklist'i doldurulmali. Elevator pitch yazilmali. Degerlendirme yapilmali.
+**Ipucu:** Mock interview'i gercek bir arkadas veya AI ile yap. Kendini kaydet ve izle — beden dili ve ses tonu da onemli.
+:::
+
+:::exercise
+### Alistirma 19: Interview Sonrasi Analiz ve Follow-up (Zor)
+
+Interview sonrasi yapilacaklari planla.
+
+```markdown
+# TODO: Interview Sonrasi Checklist
+
+## Ayni Gun (24 saat icinde)
+# - [ ] Tesekkur emaili gonder
+# TODO: Tesekkur email sablonu yaz
+# "Sayin [isim], bugunki gorusmemiz icin tesekkur ederim.
+#  [Spesifik bir konu hakkinda konustugumuz sey]'i ozellikle
+#  ilginc buldum. [Pozisyon] icin heyecanli ve katkida bulunmaya
+#  hazirim. Saygilarimla, [isim]"
+
+## 1 Hafta Icinde
+# - [ ] Cevap gelmediyse kibarca takip emaili gonder
+# TODO: Takip email sablonu yaz
+
+## Ret Durumunda
+# - [ ] Feedback iste ("Gelistirmem gereken alanlar neler?")
+# - [ ] Networking baglantisini koru
+# TODO: Ret sonrasi email sablonu yaz
+
+## Kabul Durumunda
+# - [ ] Teklifi yazili iste
+# - [ ] Muzakere planimni uygula
+# - [ ] Baslangic tarihini belirle
+
+## Her Interview Sonrasi
+# - [ ] Sorulan sorulari not et
+# - [ ] Veremedigin cevaplari arastir
+# - [ ] Bir sonraki interview icin iyilestirme plani yaz
+```
+
+**Beklenen Sonuc:** 3 email sablonu hazirlanmali. Post-interview analiz rutini olusturulmali.
+**Ipucu:** Tesekkur emaili gonderenlerin %80'i interview pool'undan oze cikar. Spesifik bir detay ekle — generic email etkisiz.
+:::
+
 
 :::external-resource
 ### Ek Kaynaklar

@@ -22,31 +22,67 @@
       "title": "Climbing Stairs",
       "pattern": "Dynamic Programming",
       "difficulty": "kolay",
-      "description": "Bir merdivenin n basamagi var. Her adimda 1 veya 2 basamak cikabilirsin. Tepeye kac farkli sekilde ulasabilirsin?\n\nOrnek: n = 2 -> 2 (1+1 veya 2)\nOrnek: n = 3 -> 3 (1+1+1, 1+2, 2+1)\nOrnek: n = 4 -> 5",
+      "description": "Bir merdivenin n basamagi var. Her adimda 1 veya 2 basamak cikabilirsin. Tepeye kac farkli sekilde ulasabilirsin?\n\nÖrnek: n = 2 -> 2 (1+1 veya 2)\nÖrnek: n = 3 -> 3 (1+1+1, 1+2, 2+1)\nÖrnek: n = 4 -> 5",
       "starter_code": {
-        "python": "def climb_stairs(n: int) -> int:\n    \"\"\"\n    Dynamic Programming - Bottom Up:\n    - dp[i] = i. basamaga ulasmanin yol sayisi\n    - dp[i] = dp[i-1] + dp[i-2]\n    - Neden? i. basamaga ya (i-1)'den 1 adim ya (i-2)'den 2 adim atarsin\n    \n    Fibonacci dizisi ile ayni pattern!\n    Optimizasyon: Array yerine 2 degisken yeter (space O(1))\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert climb_stairs(2) == 2\nassert climb_stairs(3) == 3\nassert climb_stairs(4) == 5\nassert climb_stairs(5) == 8\nassert climb_stairs(1) == 1\nassert climb_stairs(10) == 89\nprint(\"Climbing Stairs: All tests passed!\")",
-        "javascript": "/**\n * Dynamic Programming - Bottom Up:\n * dp[i] = dp[i-1] + dp[i-2] (Fibonacci pattern)\n * Optimizasyon: 2 degisken yeterli\n */\nfunction climbStairs(n) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(climbStairs(2) === 2);\nconsole.assert(climbStairs(3) === 3);\nconsole.assert(climbStairs(4) === 5);\nconsole.assert(climbStairs(5) === 8);\nconsole.assert(climbStairs(1) === 1);\nconsole.log(\"Climbing Stairs: All tests passed!\");"
+        "python": "def climb_stairs(n: int) -> int:\n    \"\"\"\n    Dynamic Programming - Bottom Up:\n    - dp[i] = i. basamaga ulasmanin yol sayisi\n    - dp[i] = dp[i-1] + dp[i-2]\n    - Neden? i. basamaga ya (i-1)'den 1 adim ya (i-2)'den 2 adim atarsin\n    \n    Fibonacci dizisi ile ayni pattern!\n    Optimizasyon: Array yerine 2 değişken yeter (space O(1))\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert climb_stairs(2) == 2\nassert climb_stairs(3) == 3\nassert climb_stairs(4) == 5\nassert climb_stairs(5) == 8\nassert climb_stairs(1) == 1\nassert climb_stairs(10) == 89\nprint(\"Climbing Stairs: All tests passed!\")",
+        "javascript": "/**\n * Dynamic Programming - Bottom Up:\n * dp[i] = dp[i-1] + dp[i-2] (Fibonacci pattern)\n * Optimizasyon: 2 değişken yeterli\n */\nfunction climbStairs(n) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(climbStairs(2) === 2);\nconsole.assert(climbStairs(3) === 3);\nconsole.assert(climbStairs(4) === 5);\nconsole.assert(climbStairs(5) === 8);\nconsole.assert(climbStairs(1) === 1);\nconsole.log(\"Climbing Stairs: All tests passed!\");"
       },
       "test_cases": [
-        {"input": [2], "expected": 2, "description": "2 basamak"},
-        {"input": [3], "expected": 3, "description": "3 basamak"},
-        {"input": [4], "expected": 5, "description": "4 basamak"},
-        {"input": [5], "expected": 8, "description": "5 basamak"},
-        {"input": [1], "expected": 1, "description": "Tek basamak"},
-        {"input": [10], "expected": 89, "description": "Buyuk input"}
+        {
+          "input": [
+            2
+          ],
+          "expected": 2,
+          "description": "2 basamak"
+        },
+        {
+          "input": [
+            3
+          ],
+          "expected": 3,
+          "description": "3 basamak"
+        },
+        {
+          "input": [
+            4
+          ],
+          "expected": 5,
+          "description": "4 basamak"
+        },
+        {
+          "input": [
+            5
+          ],
+          "expected": 8,
+          "description": "5 basamak"
+        },
+        {
+          "input": [
+            1
+          ],
+          "expected": 1,
+          "description": "Tek basamak"
+        },
+        {
+          "input": [
+            10
+          ],
+          "expected": 89,
+          "description": "Buyuk input"
+        }
       ],
       "hints": [
         "n=1: 1 yol. n=2: 2 yol. n=3: 3 yol. Bir pattern goruyor musun?",
         "i. basamaga ulasmak icin ya (i-1)'den gelirsin (1 adim) ya (i-2)'den (2 adim). Toplam yol = iki kaynagin toplami.",
-        "Bu Fibonacci dizisi! dp[i] = dp[i-1] + dp[i-2]. Array yerine prev1, prev2 degiskenleri ile O(1) space yap."
+        "Bu Fibonacci dizisi! dp[i] = dp[i-1] + dp[i-2]. Array yerine prev1, prev2 değişkenleri ile O(1) space yap."
       ],
-      "solution_approach": "DYNAMIC PROGRAMMING - FIBONACCI PATTERN: DP'nin en basit ornegidir. Kilit gozlem: her durum onceki iki durumun toplami. Bu 'karar agaci' mantigi: her basamakta 1 veya 2 adim atarsin. DP'yi tanimak icin iki soru sor: (1) Overlapping subproblems var mi? (ayni basamak birden fazla yoldan hesaplaniyor mu) (2) Optimal substructure var mi? (alt problemlerin cozumu buyuk cozumu olusturuyor mu). Ikisi de evet ise DP kullan.",
+      "solution_approach": "DYNAMIC PROGRAMMING - FIBONACCI PATTERN: DP'nin en basit örneğidir. Kilit gozlem: her durum onceki iki durumun toplami. Bu 'karar agaci' mantigi: her basamakta 1 veya 2 adim atarsin. DP'yi tanimak icin iki soru sor: (1) Overlapping subproblems var mi? (ayni basamak birden fazla yoldan hesaplaniyor mu) (2) Optimal substructure var mi? (alt problemlerin cozumu buyuk cozumu oluşturuyor mu). Ikisi de evet ise DP kullan.",
       "solution_code": {
         "python": "def climb_stairs(n: int) -> int:\n    if n <= 2:\n        return n\n    prev2, prev1 = 1, 2\n    for i in range(3, n + 1):\n        current = prev1 + prev2\n        prev2 = prev1\n        prev1 = current\n    return prev1",
         "javascript": "function climbStairs(n) {\n    if (n <= 2) return n;\n    let prev2 = 1, prev1 = 2;\n    for (let i = 3; i <= n; i++) {\n        const current = prev1 + prev2;\n        prev2 = prev1;\n        prev1 = current;\n    }\n    return prev1;\n}"
       },
       "time_complexity": "O(n)",
-      "space_complexity": "O(1) — sadece 2 degisken",
+      "space_complexity": "O(1) — sadece 2 değişken",
       "interview_tip": "Mulakatci once recursive cozumu ister, sonra memoization, sonra bottom-up, sonra space optimizasyonu. Bu 4 asamayi bilmek DP anlayisini gosterir. Ayrica 'ya 3 adim da atabilseydin?' gibi genellestirme sorulabilir — dp[i] = dp[i-1] + dp[i-2] + dp[i-3] olur."
     },
     {
@@ -54,57 +90,182 @@
       "title": "Coin Change",
       "pattern": "Dynamic Programming",
       "difficulty": "orta",
-      "description": "Farkli degerlerde bozuk paralar (coins) ve bir hedef miktar (amount) verilir. Hedef miktara ulasmak icin gereken minimum bozuk para sayisini bul. Ulasilamazsa -1 dondur. Her bozuk parayi sinirsiz kez kullanabilirsin.\n\nOrnek: coins = [1,5,11], amount = 15 -> 3 (5+5+5)\nOrnek: coins = [2], amount = 3 -> -1\nOrnek: coins = [1], amount = 0 -> 0",
+      "description": "Farkli degerlerde bozuk paralar (coins) ve bir hedef miktar (amount) verilir. Hedef miktara ulasmak icin gereken minimum bozuk para sayisini bul. Ulasilamazsa -1 dondur. Her bozuk parayi sinirsiz kez kullanabilirsin.\n\nÖrnek: coins = [1,5,11], amount = 15 -> 3 (5+5+5)\nÖrnek: coins = [2], amount = 3 -> -1\nÖrnek: coins = [1], amount = 0 -> 0",
       "starter_code": {
         "python": "def coin_change(coins: list[int], amount: int) -> int:\n    \"\"\"\n    DP - Unbounded Knapsack varyanti:\n    - dp[i] = i miktara ulasmak icin gereken minimum para sayisi\n    - dp[0] = 0 (0 miktar icin 0 para)\n    - dp[i] = min(dp[i - coin] + 1) tum coin'ler icin\n    - dp[i - coin] gecersizse (inf) o coin kullanilamaz\n    \n    Greedy CALISMAZ: coins=[1,5,11], amount=15\n    Greedy: 11+1+1+1+1 = 5 para (YANLIS)\n    DP: 5+5+5 = 3 para (DOGRU)\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert coin_change([1,5,11], 15) == 3\nassert coin_change([1,2,5], 11) == 3\nassert coin_change([2], 3) == -1\nassert coin_change([1], 0) == 0\nassert coin_change([1], 1) == 1\nassert coin_change([1], 2) == 2\nassert coin_change([186,419,83,408], 6249) == 20\nprint(\"Coin Change: All tests passed!\")",
         "javascript": "/**\n * DP - Unbounded Knapsack:\n * dp[i] = min(dp[i - coin] + 1) for each coin\n * Greedy CALISMAZ - DP gerekli\n */\nfunction coinChange(coins, amount) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(coinChange([1,5,11], 15) === 3);\nconsole.assert(coinChange([1,2,5], 11) === 3);\nconsole.assert(coinChange([2], 3) === -1);\nconsole.assert(coinChange([1], 0) === 0);\nconsole.log(\"Coin Change: All tests passed!\");"
       },
       "test_cases": [
-        {"input": [[1,5,11], 15], "expected": 3, "description": "Greedy yanlis verir, DP dogru"},
-        {"input": [[1,2,5], 11], "expected": 3, "description": "5+5+1"},
-        {"input": [[2], 3], "expected": -1, "description": "Ulasilamaz"},
-        {"input": [[1], 0], "expected": 0, "description": "Sifir miktar"},
-        {"input": [[1], 1], "expected": 1, "description": "Tek para, tek miktar"},
-        {"input": [[186,419,83,408], 6249], "expected": 20, "description": "Buyuk input"}
+        {
+          "input": [
+            [
+              1,
+              5,
+              11
+            ],
+            15
+          ],
+          "expected": 3,
+          "description": "Greedy yanlis verir, DP dogru"
+        },
+        {
+          "input": [
+            [
+              1,
+              2,
+              5
+            ],
+            11
+          ],
+          "expected": 3,
+          "description": "5+5+1"
+        },
+        {
+          "input": [
+            [
+              2
+            ],
+            3
+          ],
+          "expected": -1,
+          "description": "Ulasilamaz"
+        },
+        {
+          "input": [
+            [
+              1
+            ],
+            0
+          ],
+          "expected": 0,
+          "description": "Sifir miktar"
+        },
+        {
+          "input": [
+            [
+              1
+            ],
+            1
+          ],
+          "expected": 1,
+          "description": "Tek para, tek miktar"
+        },
+        {
+          "input": [
+            [
+              186,
+              419,
+              83,
+              408
+            ],
+            6249
+          ],
+          "expected": 20,
+          "description": "Buyuk input"
+        }
       ],
       "hints": [
-        "Greedy (en buyuk parayi sec) her zaman calismaz! coins=[1,5,11], amount=15: greedy 11+1+1+1+1=5 para, DP 5+5+5=3 para.",
+        "Greedy (en buyuk parayi sec) her zaman çalışmaz! coins=[1,5,11], amount=15: greedy 11+1+1+1+1=5 para, DP 5+5+5=3 para.",
         "dp[i] = i miktara ulasmak icin min para. dp[0]=0. Diger hepsini inf ile baslat.",
         "Her miktar icin tum coin'leri dene: dp[i] = min(dp[i], dp[i-coin]+1) eger i >= coin ise."
       ],
-      "solution_approach": "DP - UNBOUNDED KNAPSACK PATTERN: Bu problem greedy'nin NEDEN calismayacagini gosteren klasik ornektir. dp[i] = i miktara ulasmak icin minimum para sayisi. Her miktar icin tum coin'leri deneyerek minimum bulunur. Bottom-up: 0'dan amount'a kadar her miktari hesapla. Bu pattern Weight/Value optimizasyonu, Rod Cutting, Perfect Squares gibi 'minimum/maximum ile hedefe ulasma' problemlerinin temelidir.",
+      "solution_approach": "DP - UNBOUNDED KNAPSACK PATTERN: Bu problem greedy'nin NEDEN çalışmayacagini gosteren klasik örnektir. dp[i] = i miktara ulasmak icin minimum para sayisi. Her miktar icin tum coin'leri deneyerek minimum bulunur. Bottom-up: 0'dan amount'a kadar her miktari hesapla. Bu pattern Weight/Value optimizasyonu, Rod Cutting, Perfect Squares gibi 'minimum/maximum ile hedefe ulasma' problemlerinin temelidir.",
       "solution_code": {
         "python": "def coin_change(coins: list[int], amount: int) -> int:\n    dp = [float('inf')] * (amount + 1)\n    dp[0] = 0\n    for i in range(1, amount + 1):\n        for coin in coins:\n            if coin <= i and dp[i - coin] != float('inf'):\n                dp[i] = min(dp[i], dp[i - coin] + 1)\n    return dp[amount] if dp[amount] != float('inf') else -1",
         "javascript": "function coinChange(coins, amount) {\n    const dp = new Array(amount + 1).fill(Infinity);\n    dp[0] = 0;\n    for (let i = 1; i <= amount; i++) {\n        for (const coin of coins) {\n            if (coin <= i && dp[i - coin] !== Infinity) {\n                dp[i] = Math.min(dp[i], dp[i - coin] + 1);\n            }\n        }\n    }\n    return dp[amount] === Infinity ? -1 : dp[amount];\n}"
       },
       "time_complexity": "O(amount * len(coins))",
       "space_complexity": "O(amount)",
-      "interview_tip": "Mulakatci MUTLAKA 'greedy neden calismaz?' diye sorar. coins=[1,5,11], amount=15 ornegini bil. Ayrica DP tablosunu elle doldurmani isteyebilir — bunu whiteboard'da yapabilmen lazim. Follow-up: 'Hangi paralari kullandigini da dondur' — backtracking ile dp tablosundan geri izleme yap."
+      "interview_tip": "Mulakatci MUTLAKA 'greedy neden çalışmaz?' diye sorar. coins=[1,5,11], amount=15 örneğini bil. Ayrica DP tablosunu elle doldurmani isteyebilir — bunu whiteboard'da yapabilmen lazim. Follow-up: 'Hangi paralari kullandigini da dondur' — backtracking ile dp tablosundan geri izleme yap."
     },
     {
       "id": "greedy-01",
       "title": "Jump Game",
       "pattern": "Greedy",
       "difficulty": "orta",
-      "description": "Bir integer dizisi verilir. Her eleman o pozisyondan atlanabilecek MAKSIMUM mesafeyi gosterir. Ilk elemandan baslayarak son elemana ulasabilir misin?\n\nOrnek: nums = [2,3,1,1,4] -> true (0->1->4 veya 0->2->3->4)\nOrnek: nums = [3,2,1,0,4] -> false (index 3'te takilirsin)",
+      "description": "Bir integer dizisi verilir. Her eleman o pozisyondan atlanabilecek MAKSIMUM mesafeyi gosterir. Ilk elemandan baslayarak son elemana ulasabilir misin?\n\nÖrnek: nums = [2,3,1,1,4] -> true (0->1->4 veya 0->2->3->4)\nÖrnek: nums = [3,2,1,0,4] -> false (index 3'te takilirsin)",
       "starter_code": {
         "python": "def can_jump(nums: list[int]) -> bool:\n    \"\"\"\n    Greedy - Maximum Reach pattern:\n    - max_reach: simdiye kadar ulasabilecegimiz en uzak index\n    - Her pozisyonda max_reach'i guncelle: max(max_reach, i + nums[i])\n    - Eger i > max_reach ise bu pozisyona ulasamayiz -> False\n    - max_reach >= son index ise -> True\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert can_jump([2,3,1,1,4]) == True\nassert can_jump([3,2,1,0,4]) == False\nassert can_jump([0]) == True\nassert can_jump([2,0,0]) == True\nassert can_jump([1,0,1,0]) == False\nassert can_jump([2,5,0,0]) == True\nprint(\"Jump Game: All tests passed!\")",
         "javascript": "/**\n * Greedy - Maximum Reach pattern:\n * Her adimda ulasabilecegimiz en uzak noktayi guncelle\n */\nfunction canJump(nums) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(canJump([2,3,1,1,4]) === true);\nconsole.assert(canJump([3,2,1,0,4]) === false);\nconsole.assert(canJump([0]) === true);\nconsole.assert(canJump([1,0,1,0]) === false);\nconsole.log(\"Jump Game: All tests passed!\");"
       },
       "test_cases": [
-        {"input": [[2,3,1,1,4]], "expected": true, "description": "Ulasabilir"},
-        {"input": [[3,2,1,0,4]], "expected": false, "description": "Ulasamaz, 0'da takilir"},
-        {"input": [[0]], "expected": true, "description": "Zaten sonda"},
-        {"input": [[2,0,0]], "expected": true, "description": "Tam yetisiyor"},
-        {"input": [[1,0,1,0]], "expected": false, "description": "0'da takilir"},
-        {"input": [[2,5,0,0]], "expected": true, "description": "Ilk atlamada sona ulasiyor"}
+        {
+          "input": [
+            [
+              2,
+              3,
+              1,
+              1,
+              4
+            ]
+          ],
+          "expected": true,
+          "description": "Ulasabilir"
+        },
+        {
+          "input": [
+            [
+              3,
+              2,
+              1,
+              0,
+              4
+            ]
+          ],
+          "expected": false,
+          "description": "Ulasamaz, 0'da takilir"
+        },
+        {
+          "input": [
+            [
+              0
+            ]
+          ],
+          "expected": true,
+          "description": "Zaten sonda"
+        },
+        {
+          "input": [
+            [
+              2,
+              0,
+              0
+            ]
+          ],
+          "expected": true,
+          "description": "Tam yetisiyor"
+        },
+        {
+          "input": [
+            [
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "expected": false,
+          "description": "0'da takilir"
+        },
+        {
+          "input": [
+            [
+              2,
+              5,
+              0,
+              0
+            ]
+          ],
+          "expected": true,
+          "description": "Ilk atlamada sona ulasiyor"
+        }
       ],
       "hints": [
         "DP ile O(n^2) cozulebilir ama greedy ile O(n) yapilabilir.",
         "Her pozisyonda 'simdiye kadar en uzaga ne kadar ulasabilirim?' sorusunu sor.",
         "max_reach = max(max_reach, i + nums[i]). Eger i > max_reach ise oraya hic ulasamazdik."
       ],
-      "solution_approach": "GREEDY - MAXIMUM REACH PATTERN: Greedy algoritmalar her adimda lokal optimal secimi yaparak global optimale ulasir. Burada her pozisyonda max_reach guncellenir. Eger bir pozisyona ulasamazsak (i > max_reach) cevap False. Bu 'ileriye dogru genisleme' pattern'i Jump Game II, Gas Station gibi problemlerde de kullanilir. Greedy'nin calismasi icin 'greedy choice property' saglanmali — burada her adimda maximum reach tutmak optimal.",
+      "solution_approach": "GREEDY - MAXIMUM REACH PATTERN: Greedy algoritmalar her adimda lokal optimal secimi yaparak global optimale ulasir. Burada her pozisyonda max_reach guncellenir. Eger bir pozisyona ulasamazsak (i > max_reach) cevap False. Bu 'ileriye dogru genisleme' pattern'i Jump Game II, Gas Station gibi problemlerde de kullanilir. Greedy'nin çalışmasi icin 'greedy choice property' saglanmali — burada her adimda maximum reach tutmak optimal.",
       "solution_code": {
         "python": "def can_jump(nums: list[int]) -> bool:\n    max_reach = 0\n    for i in range(len(nums)):\n        if i > max_reach:\n            return False\n        max_reach = max(max_reach, i + nums[i])\n    return True",
         "javascript": "function canJump(nums) {\n    let maxReach = 0;\n    for (let i = 0; i < nums.length; i++) {\n        if (i > maxReach) return false;\n        maxReach = Math.max(maxReach, i + nums[i]);\n    }\n    return true;\n}"
@@ -118,21 +279,90 @@
       "title": "Task Scheduler",
       "pattern": "Greedy",
       "difficulty": "orta",
-      "description": "CPU gorevleri ve bir cooldown suresi n verilir. Ayni gorev tekrar yapilmadan once en az n birim beklenmeli. Tum gorevleri tamamlamak icin gereken minimum zaman birimini bul. Bekleme surelerinde CPU idle kalabilir.\n\nOrnek: tasks = ['A','A','A','B','B','B'], n = 2 -> 8 (A B idle A B idle A B)\nOrnek: tasks = ['A','A','A','B','B','B'], n = 0 -> 6 (bekleme yok)",
+      "description": "CPU gorevleri ve bir cooldown suresi n verilir. Ayni gorev tekrar yapilmadan once en az n birim beklenmeli. Tum gorevleri tamamlamak icin gereken minimum zaman birimini bul. Bekleme surelerinde CPU idle kalabilir.\n\nÖrnek: tasks = ['A','A','A','B','B','B'], n = 2 -> 8 (A B idle A B idle A B)\nÖrnek: tasks = ['A','A','A','B','B','B'], n = 0 -> 6 (bekleme yok)",
       "starter_code": {
-        "python": "from collections import Counter\n\ndef least_interval(tasks: list[str], n: int) -> int:\n    \"\"\"\n    Greedy - Most Frequent First pattern:\n    - En sik gorev kac kez tekrarlaniyor? (max_freq)\n    - Bu gorev cercevesini olustur: (max_freq - 1) blok, her biri (n + 1) uzunlugunda\n    - Son blok: max frekansa sahip gorev sayisi kadar\n    - Sonuc: max(cerceve_uzunlugu, toplam_gorev_sayisi)\n    \n    Neden max? Cunku gorevler cerceveden buyukse idle olmaz.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert least_interval([\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], 2) == 8\nassert least_interval([\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], 0) == 6\nassert least_interval([\"A\",\"A\",\"A\",\"A\",\"A\",\"A\",\"B\",\"C\",\"D\",\"E\",\"F\",\"G\"], 2) == 16\nassert least_interval([\"A\",\"B\",\"C\",\"D\"], 2) == 4\nassert least_interval([\"A\"], 2) == 1\nprint(\"Task Scheduler: All tests passed!\")",
-        "javascript": "/**\n * Greedy - Most Frequent First:\n * Cerceve olustur: (maxFreq - 1) * (n + 1) + maxFreqCount\n * Sonuc: max(cerceve, toplam gorev)\n */\nfunction leastInterval(tasks, n) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(leastInterval([\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], 2) === 8);\nconsole.assert(leastInterval([\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], 0) === 6);\nconsole.assert(leastInterval([\"A\",\"B\",\"C\",\"D\"], 2) === 4);\nconsole.log(\"Task Scheduler: All tests passed!\");"
+        "python": "from collections import Counter\n\ndef least_interval(tasks: list[str], n: int) -> int:\n    \"\"\"\n    Greedy - Most Frequent First pattern:\n    - En sik gorev kac kez tekrarlaniyor? (max_freq)\n    - Bu gorev cercevesini oluştur: (max_freq - 1) blok, her biri (n + 1) uzunlugunda\n    - Son blok: max frekansa sahip gorev sayisi kadar\n    - Sonuc: max(cerceve_uzunlugu, toplam_gorev_sayisi)\n    \n    Neden max? Cunku gorevler cerceveden buyukse idle olmaz.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert least_interval([\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], 2) == 8\nassert least_interval([\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], 0) == 6\nassert least_interval([\"A\",\"A\",\"A\",\"A\",\"A\",\"A\",\"B\",\"C\",\"D\",\"E\",\"F\",\"G\"], 2) == 16\nassert least_interval([\"A\",\"B\",\"C\",\"D\"], 2) == 4\nassert least_interval([\"A\"], 2) == 1\nprint(\"Task Scheduler: All tests passed!\")",
+        "javascript": "/**\n * Greedy - Most Frequent First:\n * Cerceve oluştur: (maxFreq - 1) * (n + 1) + maxFreqCount\n * Sonuc: max(cerceve, toplam gorev)\n */\nfunction leastInterval(tasks, n) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(leastInterval([\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], 2) === 8);\nconsole.assert(leastInterval([\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], 0) === 6);\nconsole.assert(leastInterval([\"A\",\"B\",\"C\",\"D\"], 2) === 4);\nconsole.log(\"Task Scheduler: All tests passed!\");"
       },
       "test_cases": [
-        {"input": [["A","A","A","B","B","B"], 2], "expected": 8, "description": "A B _ A B _ A B"},
-        {"input": [["A","A","A","B","B","B"], 0], "expected": 6, "description": "Cooldown yok"},
-        {"input": [["A","A","A","A","A","A","B","C","D","E","F","G"], 2], "expected": 16, "description": "Cok gorev"},
-        {"input": [["A","B","C","D"], 2], "expected": 4, "description": "Hepsi farkli, idle yok"},
-        {"input": [["A"], 2], "expected": 1, "description": "Tek gorev"}
+        {
+          "input": [
+            [
+              "A",
+              "A",
+              "A",
+              "B",
+              "B",
+              "B"
+            ],
+            2
+          ],
+          "expected": 8,
+          "description": "A B _ A B _ A B"
+        },
+        {
+          "input": [
+            [
+              "A",
+              "A",
+              "A",
+              "B",
+              "B",
+              "B"
+            ],
+            0
+          ],
+          "expected": 6,
+          "description": "Cooldown yok"
+        },
+        {
+          "input": [
+            [
+              "A",
+              "A",
+              "A",
+              "A",
+              "A",
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F",
+              "G"
+            ],
+            2
+          ],
+          "expected": 16,
+          "description": "Cok gorev"
+        },
+        {
+          "input": [
+            [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            2
+          ],
+          "expected": 4,
+          "description": "Hepsi farkli, idle yok"
+        },
+        {
+          "input": [
+            [
+              "A"
+            ],
+            2
+          ],
+          "expected": 1,
+          "description": "Tek gorev"
+        }
       ],
       "hints": [
         "En sik tekrarlanan gorevi bul. Bu cerceveyi belirler.",
-        "Cerceve: (max_freq - 1) blok, her biri (n+1) slot. Ornek: AAA, n=2 -> [A _ _] [A _ _] [A] = 7",
+        "Cerceve: (max_freq - 1) blok, her biri (n+1) slot. Örnek: AAA, n=2 -> [A _ _] [A _ _] [A] = 7",
         "Eger baska gorevler de max frekansa sahipse son blok buyur. Sonuc = max(cerceve, tasks.length) cunku idle olmadan da yapilabilir."
       ],
       "solution_approach": "GREEDY - FREKANSI BAZLI CERCEVE PATTERN: En sik gorev cercevyi belirler. (max_freq - 1) tane n+1 uzunlugunda blok + son blok (max frekansta kac gorev varsa). Bu cerceve minimum sureyi verir. Eger toplam gorev sayisi cerceveden buyukse idle yoktur, gorev sayisi dondurulur. Bu 'frekans analizi + cerceve' teknigi reorganize string, rearrange string gibi problemlerde de kullanilir.",
@@ -142,29 +372,56 @@
       },
       "time_complexity": "O(n) — n = gorev sayisi",
       "space_complexity": "O(1) — en fazla 26 harf",
-      "interview_tip": "Bu problem matematik + greedy bilesimi. Mulakatci formulu turetmeni ister, ezberlemeni degil. Elle ornek ciz: tasks=[A,A,A,B,B,B], n=2 -> [A,B,_] [A,B,_] [A,B] = 8. Formul: (3-1)*(2+1)+2 = 8. Bu gorsellestirme mulakatci gozunde cok deger kazandirir."
+      "interview_tip": "Bu problem matematik + greedy bilesimi. Mulakatci formulu turetmeni ister, ezberlemeni degil. Elle örnek ciz: tasks=[A,A,A,B,B,B], n=2 -> [A,B,_] [A,B,_] [A,B] = 8. Formul: (3-1)*(2+1)+2 = 8. Bu gorsellestirme mulakatci gozunde cok deger kazandirir."
     },
     {
       "id": "backtracking-01",
       "title": "Subsets",
       "pattern": "Backtracking",
       "difficulty": "orta",
-      "description": "Benzersiz elemanlardan olusan bir integer dizisi verilir. Tum alt kumeleri (subsets) uret. Cozum kume tekrarsiz olmali.\n\nOrnek: nums = [1,2,3] -> [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]",
+      "description": "Benzersiz elemanlardan olusan bir integer dizisi verilir. Tum alt kumeleri (subsets) uret. Cozum kume tekrarsiz olmali.\n\nÖrnek: nums = [1,2,3] -> [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]",
       "starter_code": {
         "python": "def subsets(nums: list[int]) -> list[list[int]]:\n    \"\"\"\n    Backtracking template:\n    - Karar agaci: her eleman icin 'al' veya 'alma' karari\n    - Her seviye bir elemani temsil eder\n    - Yaprak node'lar alt kumelerdir\n    \n    Alternatif: index-based backtracking\n    - Her adimda index'ten itibaren elemanlari dene\n    - Secilen elemani path'e ekle, recursive cagri yap, geri al\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nresult = subsets([1,2,3])\nassert len(result) == 8\nassert [] in result\nassert [1,2,3] in result\nassert [1] in result\n\nresult2 = subsets([0])\nassert len(result2) == 2\nassert [] in result2\nassert [0] in result2\n\nassert len(subsets([1,2])) == 4\nprint(\"Subsets: All tests passed!\")",
         "javascript": "/**\n * Backtracking template:\n * Her eleman icin al/alma karari ver\n * veya index-based: her adimda sonraki elemanlari dene\n */\nfunction subsets(nums) {\n    // TODO: Implement\n}\n\n// Test Cases\nconst result = subsets([1,2,3]);\nconsole.assert(result.length === 8);\nconsole.assert(JSON.stringify(result).includes('[]'));\nconsole.log(\"Subsets: All tests passed!\");"
       },
       "test_cases": [
-        {"input": [[1,2,3]], "expected_length": 8, "description": "2^3 = 8 alt kume"},
-        {"input": [[0]], "expected_length": 2, "description": "2^1 = 2 alt kume"},
-        {"input": [[1,2]], "expected_length": 4, "description": "2^2 = 4 alt kume"}
+        {
+          "input": [
+            [
+              1,
+              2,
+              3
+            ]
+          ],
+          "expected_length": 8,
+          "description": "2^3 = 8 alt kume"
+        },
+        {
+          "input": [
+            [
+              0
+            ]
+          ],
+          "expected_length": 2,
+          "description": "2^1 = 2 alt kume"
+        },
+        {
+          "input": [
+            [
+              1,
+              2
+            ]
+          ],
+          "expected_length": 4,
+          "description": "2^2 = 4 alt kume"
+        }
       ],
       "hints": [
         "n elemanli bir kumenin 2^n alt kumesi var. Her eleman ya dahil ya degil.",
         "Backtracking: backtrack(index, current_path). Her adimda nums[index]'i ekle, recursive cagri, geri al.",
         "Base case: index == len(nums) oldugunda current_path bir alt kumedir. PATH'IN KOPYASINI ekle!"
       ],
-      "solution_approach": "BACKTRACKING TEMPLATE PATTERN: Backtracking = karar agaci + geri alma. Her seviyede bir karar verilir, dallar kesilir. Subsets problemi backtracking sablonunun en temel ornegidir. Template: (1) base case kontrol, (2) sonucu ekle, (3) sonraki elemanlari dene, (4) secimi geri al. Bu AYNI sablon Permutations, Combinations, Combination Sum icin de kullanilir — sadece dongu baslangici ve kopyalama mantigi degisir.",
+      "solution_approach": "BACKTRACKING TEMPLATE PATTERN: Backtracking = karar agaci + geri alma. Her seviyede bir karar verilir, dallar kesilir. Subsets problemi backtracking sablonunun en temel örneğidir. Template: (1) base case kontrol, (2) sonucu ekle, (3) sonraki elemanlari dene, (4) secimi geri al. Bu AYNI sablon Permutations, Combinations, Combination Sum icin de kullanilir — sadece dongu baslangici ve kopyalama mantigi degisir.",
       "solution_code": {
         "python": "def subsets(nums: list[int]) -> list[list[int]]:\n    result = []\n    def backtrack(start, path):\n        result.append(path[:])  # kopya!\n        for i in range(start, len(nums)):\n            path.append(nums[i])\n            backtrack(i + 1, path)\n            path.pop()  # geri al\n    backtrack(0, [])\n    return result",
         "javascript": "function subsets(nums) {\n    const result = [];\n    function backtrack(start, path) {\n        result.push([...path]); // kopya!\n        for (let i = start; i < nums.length; i++) {\n            path.push(nums[i]);\n            backtrack(i + 1, path);\n            path.pop(); // geri al\n        }\n    }\n    backtrack(0, []);\n    return result;\n}"
@@ -178,23 +435,51 @@
       "title": "Letter Combinations of a Phone Number",
       "pattern": "Backtracking",
       "difficulty": "orta",
-      "description": "Bir telefon numarasi string'i verilir (2-9 arasi rakamlar). Bu rakamlara karsilik gelen tum harf kombinasyonlarini dondur (telefon tuslarindaki harfler).\n\n2=abc, 3=def, 4=ghi, 5=jkl, 6=mno, 7=pqrs, 8=tuv, 9=wxyz\n\nOrnek: digits = '23' -> ['ad','ae','af','bd','be','bf','cd','ce','cf']\nOrnek: digits = '' -> []\nOrnek: digits = '2' -> ['a','b','c']",
+      "description": "Bir telefon numarasi string'i verilir (2-9 arasi rakamlar). Bu rakamlara karsilik gelen tum harf kombinasyonlarini dondur (telefon tuslarindaki harfler).\n\n2=abc, 3=def, 4=ghi, 5=jkl, 6=mno, 7=pqrs, 8=tuv, 9=wxyz\n\nÖrnek: digits = '23' -> ['ad','ae','af','bd','be','bf','cd','ce','cf']\nÖrnek: digits = '' -> []\nÖrnek: digits = '2' -> ['a','b','c']",
       "starter_code": {
         "python": "def letter_combinations(digits: str) -> list[str]:\n    \"\"\"\n    Backtracking - Mapping + Combination:\n    - Her rakam bir harf grubuna eslenir\n    - Her seviyede o rakamdaki harfleri dene\n    - Path uzunlugu == digits uzunlugu oldugunda sonuca ekle\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nresult = letter_combinations(\"23\")\nassert len(result) == 9\nassert \"ad\" in result\nassert \"cf\" in result\n\nassert letter_combinations(\"\") == []\nassert letter_combinations(\"2\") == [\"a\",\"b\",\"c\"]\nassert len(letter_combinations(\"234\")) == 27\nprint(\"Letter Combinations: All tests passed!\")",
-        "javascript": "/**\n * Backtracking - Mapping + Combination:\n * Her rakam icin harf grubunu dene, path olustur\n */\nfunction letterCombinations(digits) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(letterCombinations(\"23\").length === 9);\nconsole.assert(letterCombinations(\"\").length === 0);\nconsole.assert(letterCombinations(\"2\").length === 3);\nconsole.log(\"Letter Combinations: All tests passed!\");"
+        "javascript": "/**\n * Backtracking - Mapping + Combination:\n * Her rakam icin harf grubunu dene, path oluştur\n */\nfunction letterCombinations(digits) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(letterCombinations(\"23\").length === 9);\nconsole.assert(letterCombinations(\"\").length === 0);\nconsole.assert(letterCombinations(\"2\").length === 3);\nconsole.log(\"Letter Combinations: All tests passed!\");"
       },
       "test_cases": [
-        {"input": ["23"], "expected_length": 9, "description": "3*3 = 9 kombinasyon"},
-        {"input": [""], "expected": [], "description": "Bos input"},
-        {"input": ["2"], "expected": ["a","b","c"], "description": "Tek rakam"},
-        {"input": ["234"], "expected_length": 27, "description": "3*3*3 = 27"}
+        {
+          "input": [
+            "23"
+          ],
+          "expected_length": 9,
+          "description": "3*3 = 9 kombinasyon"
+        },
+        {
+          "input": [
+            ""
+          ],
+          "expected": [],
+          "description": "Bos input"
+        },
+        {
+          "input": [
+            "2"
+          ],
+          "expected": [
+            "a",
+            "b",
+            "c"
+          ],
+          "description": "Tek rakam"
+        },
+        {
+          "input": [
+            "234"
+          ],
+          "expected_length": 27,
+          "description": "3*3*3 = 27"
+        }
       ],
       "hints": [
-        "Oncelikle rakam-harf esleme tablosunu olustur: {'2':'abc', '3':'def', ...}",
+        "Oncelikle rakam-harf esleme tablosunu oluştur: {'2':'abc', '3':'def', ...}",
         "Backtracking: her seviye bir rakama karsilik gelir. O rakamdaki her harfi dene.",
         "path uzunlugu digits uzunluguna esit oldugunda sonuca ekle."
       ],
-      "solution_approach": "BACKTRACKING - CARTESIAN PRODUCT PATTERN: Bu problem birden fazla kumedeki elemanlarin tum kombinasyonlarini uretir (kartezyen carpim). Her rakam bir kume (harf grubu), her seviyede o kumeden bir eleman secilir. Backtracking agacinin derinligi = rakam sayisi, genisligi = her rakamdaki harf sayisi. Bu pattern password cracking, konfigürasyon uretimi gibi 'tum olasi kombinasyonlar' problemlerinde kullanilir.",
+      "solution_approach": "BACKTRACKING - CARTESIAN PRODUCT PATTERN: Bu problem birden fazla kumedeki elemanlarin tum kombinasyonlarini uretir (kartezyen carpim). Her rakam bir kume (harf grubu), her seviyede o kumeden bir eleman secilir. Backtracking agacinin derinligi = rakam sayisi, genisligi = her rakamdaki harf sayisi. Bu pattern password cracking, konfigürasyon üretimi gibi 'tum olasi kombinasyonlar' problemlerinde kullanilir.",
       "solution_code": {
         "python": "def letter_combinations(digits: str) -> list[str]:\n    if not digits:\n        return []\n    phone = {\n        '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl',\n        '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'\n    }\n    result = []\n    def backtrack(index, path):\n        if index == len(digits):\n            result.append(''.join(path))\n            return\n        for letter in phone[digits[index]]:\n            path.append(letter)\n            backtrack(index + 1, path)\n            path.pop()\n    backtrack(0, [])\n    return result",
         "javascript": "function letterCombinations(digits) {\n    if (!digits) return [];\n    const phone = {\n        '2':'abc','3':'def','4':'ghi','5':'jkl',\n        '6':'mno','7':'pqrs','8':'tuv','9':'wxyz'\n    };\n    const result = [];\n    function backtrack(index, path) {\n        if (index === digits.length) {\n            result.push(path.join(''));\n            return;\n        }\n        for (const letter of phone[digits[index]]) {\n            path.push(letter);\n            backtrack(index + 1, path);\n            path.pop();\n        }\n    }\n    backtrack(0, []);\n    return result;\n}"
@@ -208,16 +493,32 @@
       "title": "Number of Islands",
       "pattern": "Graph (BFS/DFS on Grid)",
       "difficulty": "orta",
-      "description": "m x n boyutunda bir grid verilir. '1' karaya, '0' suya karsilik gelir. Birbirine bitisik (yatay/dikey) kara parcalari bir ada olusturur. Toplam ada sayisini bul.\n\nOrnek:\ngrid = [\n  ['1','1','1','1','0'],\n  ['1','1','0','1','0'],\n  ['1','1','0','0','0'],\n  ['0','0','0','0','0']\n] -> 1\n\ngrid = [\n  ['1','1','0','0','0'],\n  ['1','1','0','0','0'],\n  ['0','0','1','0','0'],\n  ['0','0','0','1','1']\n] -> 3",
+      "description": "m x n boyutunda bir grid verilir. '1' karaya, '0' suya karsilik gelir. Birbirine bitisik (yatay/dikey) kara parcalari bir ada oluşturur. Toplam ada sayisini bul.\n\nÖrnek:\ngrid = [\n  ['1','1','1','1','0'],\n  ['1','1','0','1','0'],\n  ['1','1','0','0','0'],\n  ['0','0','0','0','0']\n] -> 1\n\ngrid = [\n  ['1','1','0','0','0'],\n  ['1','1','0','0','0'],\n  ['0','0','1','0','0'],\n  ['0','0','0','1','1']\n] -> 3",
       "starter_code": {
         "python": "def num_islands(grid: list[list[str]]) -> int:\n    \"\"\"\n    Grid BFS/DFS pattern:\n    - Grid'i tara, '1' bulunca yeni ada! Sayaci artir.\n    - O '1'den baslayarak BFS/DFS ile tum bagli '1'leri bul\n    - Ziyaret edilenleri '0' yap (veya visited set kullan)\n    - Bu sekilde her ada bir kez sayilir\n    \n    4 yon: yukari, asagi, sol, sag\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert num_islands([\n    [\"1\",\"1\",\"1\",\"1\",\"0\"],\n    [\"1\",\"1\",\"0\",\"1\",\"0\"],\n    [\"1\",\"1\",\"0\",\"0\",\"0\"],\n    [\"0\",\"0\",\"0\",\"0\",\"0\"]\n]) == 1\n\nassert num_islands([\n    [\"1\",\"1\",\"0\",\"0\",\"0\"],\n    [\"1\",\"1\",\"0\",\"0\",\"0\"],\n    [\"0\",\"0\",\"1\",\"0\",\"0\"],\n    [\"0\",\"0\",\"0\",\"1\",\"1\"]\n]) == 3\n\nassert num_islands([[\"0\"]]) == 0\nassert num_islands([[\"1\"]]) == 1\nprint(\"Number of Islands: All tests passed!\")",
         "javascript": "/**\n * Grid BFS/DFS pattern:\n * '1' bulunca ada sayisini artir, BFS/DFS ile tum bagli '1'leri isle\n */\nfunction numIslands(grid) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(numIslands([\n    [\"1\",\"1\",\"1\",\"1\",\"0\"],\n    [\"1\",\"1\",\"0\",\"1\",\"0\"],\n    [\"1\",\"1\",\"0\",\"0\",\"0\"],\n    [\"0\",\"0\",\"0\",\"0\",\"0\"]\n]) === 1);\nconsole.assert(numIslands([\n    [\"1\",\"1\",\"0\",\"0\",\"0\"],\n    [\"1\",\"1\",\"0\",\"0\",\"0\"],\n    [\"0\",\"0\",\"1\",\"0\",\"0\"],\n    [\"0\",\"0\",\"0\",\"1\",\"1\"]\n]) === 3);\nconsole.log(\"Number of Islands: All tests passed!\");"
       },
       "test_cases": [
-        {"input": "4x5 grid, 1 island", "expected": 1, "description": "Tek buyuk ada"},
-        {"input": "4x5 grid, 3 islands", "expected": 3, "description": "Uc ayri ada"},
-        {"input": "1x1 grid '0'", "expected": 0, "description": "Sadece su"},
-        {"input": "1x1 grid '1'", "expected": 1, "description": "Tek hucre ada"}
+        {
+          "input": "4x5 grid, 1 island",
+          "expected": 1,
+          "description": "Tek buyuk ada"
+        },
+        {
+          "input": "4x5 grid, 3 islands",
+          "expected": 3,
+          "description": "Uc ayri ada"
+        },
+        {
+          "input": "1x1 grid '0'",
+          "expected": 0,
+          "description": "Sadece su"
+        },
+        {
+          "input": "1x1 grid '1'",
+          "expected": 1,
+          "description": "Tek hucre ada"
+        }
       ],
       "hints": [
         "Grid = graph. Her '1' bir node, bitisik '1'ler edge.",
@@ -238,18 +539,117 @@
       "title": "Course Schedule",
       "pattern": "Graph (Topological Sort)",
       "difficulty": "orta",
-      "description": "Toplam numCourses ders ve onkosul listesi (prerequisites) verilir. prerequisites[i] = [a, b] demek: a dersini almak icin once b dersini almalisin. Tum dersleri alabilir misin?\n\nOrnek: numCourses = 2, prerequisites = [[1,0]] -> true (once 0, sonra 1)\nOrnek: numCourses = 2, prerequisites = [[1,0],[0,1]] -> false (dongusel bagimlilk)",
+      "description": "Toplam numCourses ders ve onkosul listesi (prerequisites) verilir. prerequisites[i] = [a, b] demek: a dersini almak icin once b dersini almalisin. Tum dersleri alabilir misin?\n\nÖrnek: numCourses = 2, prerequisites = [[1,0]] -> true (once 0, sonra 1)\nÖrnek: numCourses = 2, prerequisites = [[1,0],[0,1]] -> false (dongusel bagimlilk)",
       "starter_code": {
         "python": "from collections import deque, defaultdict\n\ndef can_finish(num_courses: int, prerequisites: list[list[int]]) -> bool:\n    \"\"\"\n    Topological Sort (Kahn's Algorithm / BFS):\n    - In-degree (giris derecesi): her node'a kac edge giriyor\n    - In-degree 0 olan node'lar: bagimliligi olmayan, hemen alinabilir\n    - BFS: in-degree 0 olanlari isle, komsularinin in-degree'sini azalt\n    - Yeni 0 olanlar queue'ya girer\n    - Islenen node sayisi == numCourses ise tum dersler alinabilir\n    - Degilse dongu var (deadlock)\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert can_finish(2, [[1,0]]) == True\nassert can_finish(2, [[1,0],[0,1]]) == False\nassert can_finish(4, [[1,0],[2,1],[3,2]]) == True\nassert can_finish(3, [[0,1],[1,2],[2,0]]) == False\nassert can_finish(1, []) == True\nassert can_finish(5, [[1,4],[2,4],[3,1],[3,2]]) == True\nprint(\"Course Schedule: All tests passed!\")",
         "javascript": "/**\n * Topological Sort (Kahn's Algorithm):\n * In-degree 0 -> isle, komsularin in-degree azalt, tekrarla\n * Islenen == numCourses ise OK, degilse dongu var\n */\nfunction canFinish(numCourses, prerequisites) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(canFinish(2, [[1,0]]) === true);\nconsole.assert(canFinish(2, [[1,0],[0,1]]) === false);\nconsole.assert(canFinish(4, [[1,0],[2,1],[3,2]]) === true);\nconsole.assert(canFinish(1, []) === true);\nconsole.log(\"Course Schedule: All tests passed!\");"
       },
       "test_cases": [
-        {"input": [2, [[1,0]]], "expected": true, "description": "Basit onkosul"},
-        {"input": [2, [[1,0],[0,1]]], "expected": false, "description": "Dongusel bagimlilk"},
-        {"input": [4, [[1,0],[2,1],[3,2]]], "expected": true, "description": "Zincir bagimlilk"},
-        {"input": [3, [[0,1],[1,2],[2,0]]], "expected": false, "description": "3'lu dongu"},
-        {"input": [1, []], "expected": true, "description": "Tek ders, onkosul yok"},
-        {"input": [5, [[1,4],[2,4],[3,1],[3,2]]], "expected": true, "description": "Karmasik DAG"}
+        {
+          "input": [
+            2,
+            [
+              [
+                1,
+                0
+              ]
+            ]
+          ],
+          "expected": true,
+          "description": "Basit onkosul"
+        },
+        {
+          "input": [
+            2,
+            [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          ],
+          "expected": false,
+          "description": "Dongusel bagimlilk"
+        },
+        {
+          "input": [
+            4,
+            [
+              [
+                1,
+                0
+              ],
+              [
+                2,
+                1
+              ],
+              [
+                3,
+                2
+              ]
+            ]
+          ],
+          "expected": true,
+          "description": "Zincir bagimlilk"
+        },
+        {
+          "input": [
+            3,
+            [
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "expected": false,
+          "description": "3'lu dongu"
+        },
+        {
+          "input": [
+            1,
+            []
+          ],
+          "expected": true,
+          "description": "Tek ders, onkosul yok"
+        },
+        {
+          "input": [
+            5,
+            [
+              [
+                1,
+                4
+              ],
+              [
+                2,
+                4
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                3,
+                2
+              ]
+            ]
+          ],
+          "expected": true,
+          "description": "Karmasik DAG"
+        }
       ],
       "hints": [
         "Bu bir directed graph'ta cycle detection problemidir. Cycle varsa tum dersler alinamaz.",
@@ -270,17 +670,82 @@
       "title": "Kth Largest Element in an Array",
       "pattern": "Heap / Priority Queue",
       "difficulty": "orta",
-      "description": "Bir integer dizisi ve k degeri verilir. Dizideki k. en buyuk elemani bul.\n\nOrnek: nums = [3,2,1,5,6,4], k = 2 -> 5 (sirali: [6,5,4,3,2,1], 2. eleman)\nOrnek: nums = [3,2,3,1,2,4,5,5,6], k = 4 -> 4",
+      "description": "Bir integer dizisi ve k degeri verilir. Dizideki k. en buyuk elemani bul.\n\nÖrnek: nums = [3,2,1,5,6,4], k = 2 -> 5 (sirali: [6,5,4,3,2,1], 2. eleman)\nÖrnek: nums = [3,2,3,1,2,4,5,5,6], k = 4 -> 4",
       "starter_code": {
         "python": "import heapq\n\ndef find_kth_largest(nums: list[int], k: int) -> int:\n    \"\"\"\n    Min-Heap of size k pattern:\n    - k boyutunda bir min-heap tut\n    - Her yeni elemani ekle\n    - Heap boyutu k'yi asarsa en kucugu cikar (heappop)\n    - Sonunda heap'in tepesi (en kucugu) = k. en buyuk eleman\n    \n    Neden min-heap? Cunku k buyugun EN KUCUGU = k. en buyuk.\n    \n    Alternatif: QuickSelect O(n) ortalama ama O(n^2) worst case.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nassert find_kth_largest([3,2,1,5,6,4], 2) == 5\nassert find_kth_largest([3,2,3,1,2,4,5,5,6], 4) == 4\nassert find_kth_largest([1], 1) == 1\nassert find_kth_largest([7,6,5,4,3,2,1], 5) == 3\nassert find_kth_largest([1,2], 2) == 1\nprint(\"Kth Largest Element: All tests passed!\")",
         "javascript": "/**\n * Min-Heap of size k pattern:\n * k boyutunda min-heap tut, sonunda tepedeki k. en buyuk\n * JS'de built-in heap yok, sort-based veya manual heap\n */\nfunction findKthLargest(nums, k) {\n    // TODO: Implement\n}\n\n// Test Cases\nconsole.assert(findKthLargest([3,2,1,5,6,4], 2) === 5);\nconsole.assert(findKthLargest([3,2,3,1,2,4,5,5,6], 4) === 4);\nconsole.assert(findKthLargest([1], 1) === 1);\nconsole.log(\"Kth Largest Element: All tests passed!\");"
       },
       "test_cases": [
-        {"input": [[3,2,1,5,6,4], 2], "expected": 5, "description": "Genel durum"},
-        {"input": [[3,2,3,1,2,4,5,5,6], 4], "expected": 4, "description": "Tekrarli elemanlar"},
-        {"input": [[1], 1], "expected": 1, "description": "Tek eleman"},
-        {"input": [[7,6,5,4,3,2,1], 5], "expected": 3, "description": "Azalan dizi"},
-        {"input": [[1,2], 2], "expected": 1, "description": "2. en buyuk"}
+        {
+          "input": [
+            [
+              3,
+              2,
+              1,
+              5,
+              6,
+              4
+            ],
+            2
+          ],
+          "expected": 5,
+          "description": "Genel durum"
+        },
+        {
+          "input": [
+            [
+              3,
+              2,
+              3,
+              1,
+              2,
+              4,
+              5,
+              5,
+              6
+            ],
+            4
+          ],
+          "expected": 4,
+          "description": "Tekrarli elemanlar"
+        },
+        {
+          "input": [
+            [
+              1
+            ],
+            1
+          ],
+          "expected": 1,
+          "description": "Tek eleman"
+        },
+        {
+          "input": [
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1
+            ],
+            5
+          ],
+          "expected": 3,
+          "description": "Azalan dizi"
+        },
+        {
+          "input": [
+            [
+              1,
+              2
+            ],
+            2
+          ],
+          "expected": 1,
+          "description": "2. en buyuk"
+        }
       ],
       "hints": [
         "Siralama O(n log n). Heap ile O(n log k) yapabilirsin — k kucukse cok daha hizli.",
@@ -301,16 +766,64 @@
       "title": "Merge K Sorted Lists",
       "pattern": "Heap / Priority Queue",
       "difficulty": "zor",
-      "description": "k tane sirali linked list verilir. Hepsini birlestirilmis tek bir sirali linked list olarak dondur.\n\nOrnek: lists = [[1,4,5],[1,3,4],[2,6]] -> [1,1,2,3,4,4,5,6]",
+      "description": "k tane sirali linked list verilir. Hepsini birlestirilmis tek bir sirali linked list olarak dondur.\n\nÖrnek: lists = [[1,4,5],[1,3,4],[2,6]] -> [1,1,2,3,4,4,5,6]",
       "starter_code": {
         "python": "import heapq\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef merge_k_lists(lists: list[ListNode]) -> ListNode:\n    \"\"\"\n    Min-Heap pattern:\n    - Tum listelerin ilk elemanlarini heap'e koy\n    - Heap'ten en kucugu cek, sonuca ekle\n    - Cekilen node'un next'i varsa onu heap'e ekle\n    - Heap bos olana kadar tekrarla\n    \n    Heap'e (val, index, node) tuple'i koy — ayni val olunca\n    index ile karsilastirma yapar (node karsilastirilamaz).\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Helpers\ndef to_linked(arr):\n    dummy = ListNode(0)\n    curr = dummy\n    for val in arr:\n        curr.next = ListNode(val)\n        curr = curr.next\n    return dummy.next\n\ndef to_list(node):\n    result = []\n    while node:\n        result.append(node.val)\n        node = node.next\n    return result\n\n# Test Cases\nassert to_list(merge_k_lists([\n    to_linked([1,4,5]),\n    to_linked([1,3,4]),\n    to_linked([2,6])\n])) == [1,1,2,3,4,4,5,6]\n\nassert to_list(merge_k_lists([])) == []\nassert to_list(merge_k_lists([to_linked([])])) == []\nassert to_list(merge_k_lists([to_linked([1])])) == [1]\nprint(\"Merge K Sorted Lists: All tests passed!\")",
         "javascript": "class ListNode {\n    constructor(val = 0, next = null) {\n        this.val = val;\n        this.next = next;\n    }\n}\n\n/**\n * Min-Heap veya Divide & Conquer:\n * Tum listelerin en kucuk elemanlarini heap'te tut\n * JS'de heap yok: divide & conquer ile 2'ser birlestir\n */\nfunction mergeKLists(lists) {\n    // TODO: Implement (divide & conquer approach)\n}\n\nfunction toLinked(arr) {\n    const dummy = new ListNode(0);\n    let curr = dummy;\n    for (const val of arr) { curr.next = new ListNode(val); curr = curr.next; }\n    return dummy.next;\n}\nfunction toList(node) {\n    const result = [];\n    while (node) { result.push(node.val); node = node.next; }\n    return result;\n}\n\n// Test Cases\nconsole.assert(JSON.stringify(toList(mergeKLists([\n    toLinked([1,4,5]), toLinked([1,3,4]), toLinked([2,6])\n]))) === JSON.stringify([1,1,2,3,4,4,5,6]));\nconsole.log(\"Merge K Sorted Lists: All tests passed!\");"
       },
       "test_cases": [
-        {"input": [[1,4,5],[1,3,4],[2,6]], "expected": [1,1,2,3,4,4,5,6], "description": "3 liste birlestirme"},
-        {"input": [], "expected": [], "description": "Bos input"},
-        {"input": [[]], "expected": [], "description": "Tek bos liste"},
-        {"input": [[1]], "expected": [1], "description": "Tek elemanli tek liste"}
+        {
+          "input": [
+            [
+              1,
+              4,
+              5
+            ],
+            [
+              1,
+              3,
+              4
+            ],
+            [
+              2,
+              6
+            ]
+          ],
+          "expected": [
+            1,
+            1,
+            2,
+            3,
+            4,
+            4,
+            5,
+            6
+          ],
+          "description": "3 liste birlestirme"
+        },
+        {
+          "input": [],
+          "expected": [],
+          "description": "Bos input"
+        },
+        {
+          "input": [
+            []
+          ],
+          "expected": [],
+          "description": "Tek bos liste"
+        },
+        {
+          "input": [
+            [
+              1
+            ]
+          ],
+          "expected": [
+            1
+          ],
+          "description": "Tek elemanli tek liste"
+        }
       ],
       "hints": [
         "Naive: Tum elemanlari topla, sirala -> O(N log N). Daha iyisi var.",
@@ -331,21 +844,41 @@
       "title": "Implement Trie (Prefix Tree)",
       "pattern": "Trie",
       "difficulty": "orta",
-      "description": "Trie (prefix tree) veri yapisini implement et. Uc operasyon desteklemeli:\n- insert(word): Kelimeyi ekle\n- search(word): Kelime var mi? (tam eslesme)\n- startsWith(prefix): Bu prefix ile baslayan kelime var mi?\n\nOrnek:\ntrie.insert('apple')\ntrie.search('apple') -> true\ntrie.search('app') -> false\ntrie.startsWith('app') -> true\ntrie.insert('app')\ntrie.search('app') -> true",
+      "description": "Trie (prefix tree) veri yapisini implement et. Uc operasyon desteklemeli:\n- insert(word): Kelimeyi ekle\n- search(word): Kelime var mi? (tam eslesme)\n- startsWith(prefix): Bu prefix ile baslayan kelime var mi?\n\nÖrnek:\ntrie.insert('apple')\ntrie.search('apple') -> true\ntrie.search('app') -> false\ntrie.startsWith('app') -> true\ntrie.insert('app')\ntrie.search('app') -> true",
       "starter_code": {
-        "python": "class TrieNode:\n    def __init__(self):\n        self.children = {}  # char -> TrieNode\n        self.is_end = False  # Bu node'da bir kelime bitiyor mu?\n\n\nclass Trie:\n    def __init__(self):\n        \"\"\"\n        Trie = Her seviye bir karakter.\n        Root -> 'a' -> 'p' -> 'p' -> 'l' -> 'e' (is_end=True)\n        \"\"\"\n        # TODO: Initialize root node\n        pass\n\n    def insert(self, word: str) -> None:\n        \"\"\"\n        Kelimeyi karakter karakter ekle.\n        Her karakter icin child yoksa yeni TrieNode olustur.\n        Son karakterde is_end = True yap.\n        \"\"\"\n        # TODO: Implement\n        pass\n\n    def search(self, word: str) -> bool:\n        \"\"\"\n        Kelimeyi karakter karakter takip et.\n        Tum karakterler varsa VE son node'da is_end True ise -> True\n        \"\"\"\n        # TODO: Implement\n        pass\n\n    def starts_with(self, prefix: str) -> bool:\n        \"\"\"\n        Prefix'i karakter karakter takip et.\n        Tum karakterler varsa -> True (is_end onemli degil)\n        \"\"\"\n        # TODO: Implement\n        pass\n\n\n# Test Cases\ntrie = Trie()\ntrie.insert(\"apple\")\nassert trie.search(\"apple\") == True\nassert trie.search(\"app\") == False\nassert trie.starts_with(\"app\") == True\ntrie.insert(\"app\")\nassert trie.search(\"app\") == True\n\ntrie.insert(\"banana\")\nassert trie.search(\"banana\") == True\nassert trie.search(\"ban\") == False\nassert trie.starts_with(\"ban\") == True\nassert trie.starts_with(\"xyz\") == False\nprint(\"Trie: All tests passed!\")",
+        "python": "class TrieNode:\n    def __init__(self):\n        self.children = {}  # char -> TrieNode\n        self.is_end = False  # Bu node'da bir kelime bitiyor mu?\n\n\nclass Trie:\n    def __init__(self):\n        \"\"\"\n        Trie = Her seviye bir karakter.\n        Root -> 'a' -> 'p' -> 'p' -> 'l' -> 'e' (is_end=True)\n        \"\"\"\n        # TODO: Initialize root node\n        pass\n\n    def insert(self, word: str) -> None:\n        \"\"\"\n        Kelimeyi karakter karakter ekle.\n        Her karakter icin child yoksa yeni TrieNode oluştur.\n        Son karakterde is_end = True yap.\n        \"\"\"\n        # TODO: Implement\n        pass\n\n    def search(self, word: str) -> bool:\n        \"\"\"\n        Kelimeyi karakter karakter takip et.\n        Tum karakterler varsa VE son node'da is_end True ise -> True\n        \"\"\"\n        # TODO: Implement\n        pass\n\n    def starts_with(self, prefix: str) -> bool:\n        \"\"\"\n        Prefix'i karakter karakter takip et.\n        Tum karakterler varsa -> True (is_end onemli degil)\n        \"\"\"\n        # TODO: Implement\n        pass\n\n\n# Test Cases\ntrie = Trie()\ntrie.insert(\"apple\")\nassert trie.search(\"apple\") == True\nassert trie.search(\"app\") == False\nassert trie.starts_with(\"app\") == True\ntrie.insert(\"app\")\nassert trie.search(\"app\") == True\n\ntrie.insert(\"banana\")\nassert trie.search(\"banana\") == True\nassert trie.search(\"ban\") == False\nassert trie.starts_with(\"ban\") == True\nassert trie.starts_with(\"xyz\") == False\nprint(\"Trie: All tests passed!\")",
         "javascript": "class TrieNode {\n    constructor() {\n        this.children = {};\n        this.isEnd = false;\n    }\n}\n\nclass Trie {\n    constructor() {\n        // TODO: Initialize root\n    }\n\n    insert(word) {\n        // TODO: Implement\n    }\n\n    search(word) {\n        // TODO: Implement\n    }\n\n    startsWith(prefix) {\n        // TODO: Implement\n    }\n}\n\n// Test Cases\nconst trie = new Trie();\ntrie.insert(\"apple\");\nconsole.assert(trie.search(\"apple\") === true);\nconsole.assert(trie.search(\"app\") === false);\nconsole.assert(trie.startsWith(\"app\") === true);\ntrie.insert(\"app\");\nconsole.assert(trie.search(\"app\") === true);\nconsole.log(\"Trie: All tests passed!\");"
       },
       "test_cases": [
-        {"input": "insert 'apple', search 'apple'", "expected": true, "description": "Tam eslesme"},
-        {"input": "search 'app' (insert edilmemis)", "expected": false, "description": "Prefix var ama kelime degil"},
-        {"input": "startsWith 'app'", "expected": true, "description": "Prefix kontrolu"},
-        {"input": "insert 'app', search 'app'", "expected": true, "description": "Kisa kelime ekleme"},
-        {"input": "startsWith 'xyz'", "expected": false, "description": "Olmayan prefix"}
+        {
+          "input": "insert 'apple', search 'apple'",
+          "expected": true,
+          "description": "Tam eslesme"
+        },
+        {
+          "input": "search 'app' (insert edilmemis)",
+          "expected": false,
+          "description": "Prefix var ama kelime degil"
+        },
+        {
+          "input": "startsWith 'app'",
+          "expected": true,
+          "description": "Prefix kontrolu"
+        },
+        {
+          "input": "insert 'app', search 'app'",
+          "expected": true,
+          "description": "Kisa kelime ekleme"
+        },
+        {
+          "input": "startsWith 'xyz'",
+          "expected": false,
+          "description": "Olmayan prefix"
+        }
       ],
       "hints": [
         "Her TrieNode'un children dict'i (char -> TrieNode) ve is_end flag'i var.",
-        "Insert: kelimeyi karakter karakter yuru, child yoksa olustur. Sonda is_end = True.",
+        "Insert: kelimeyi karakter karakter yuru, child yoksa oluştur. Sonda is_end = True.",
         "Search vs startsWith farki: search sonda is_end kontrolu yapar, startsWith yapmaz."
       ],
       "solution_approach": "TRIE DATA STRUCTURE PATTERN: Trie string arama/prefix islemlerinin O(L) cozumudur (L = string uzunlugu). Her node bir karakter temsil eder, children alt karakterlere dallanir. is_end flag'i kelimenin burada bitip bitmedigini belirtir. search ve startsWith ayni traversal'i yapar, tek fark: search is_end kontrolu ister. Trie autocomplete, spell checker, IP routing, word games gibi uygulamalarda kullanilir.",
@@ -362,24 +895,41 @@
       "title": "Word Search II",
       "pattern": "Trie + Backtracking",
       "difficulty": "zor",
-      "description": "m x n grid (her hucre bir harf) ve bir kelime listesi verilir. Grid'de bulunan tum kelimeleri dondur. Kelimeler yatay ve dikey bitisik harflerden olusmali. Ayni hucre bir kelimede birden fazla kullanilamaz.\n\nOrnek:\nboard = [\n  ['o','a','a','n'],\n  ['e','t','a','e'],\n  ['i','h','k','r'],\n  ['i','f','l','v']\n]\nwords = ['oath','pea','eat','rain'] -> ['eat','oath']",
+      "description": "m x n grid (her hucre bir harf) ve bir kelime listesi verilir. Grid'de bulunan tum kelimeleri dondur. Kelimeler yatay ve dikey bitisik harflerden olusmali. Ayni hucre bir kelimede birden fazla kullanilamaz.\n\nÖrnek:\nboard = [\n  ['o','a','a','n'],\n  ['e','t','a','e'],\n  ['i','h','k','r'],\n  ['i','f','l','v']\n]\nwords = ['oath','pea','eat','rain'] -> ['eat','oath']",
       "starter_code": {
-        "python": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n        self.word = None  # Kelime burada bitiyorsa kelimenin kendisi\n\n\ndef find_words(board: list[list[str]], words: list[str]) -> list[str]:\n    \"\"\"\n    Trie + Backtracking pattern:\n    1. Tum kelimeleri Trie'a ekle\n    2. Grid'in her hucresinden backtracking baslat\n    3. Her adimda Trie'daki cocuga git — cocuk yoksa budama (prune)\n    4. Kelime bulununca sonuca ekle ve Trie'dan kaldir (tekrar bulmamak icin)\n    \n    Neden Trie? Her kelimeyi ayri ayri aramak yerine,\n    tum kelimeleri ayni anda Trie uzerinden aramak cok daha verimli.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nresult = find_words(\n    [[\"o\",\"a\",\"a\",\"n\"],[\"e\",\"t\",\"a\",\"e\"],[\"i\",\"h\",\"k\",\"r\"],[\"i\",\"f\",\"l\",\"v\"]],\n    [\"oath\",\"pea\",\"eat\",\"rain\"]\n)\nassert sorted(result) == sorted([\"eat\",\"oath\"])\n\nresult2 = find_words([[\"a\",\"b\"],[\"c\",\"d\"]], [\"abcb\"])\nassert result2 == []\n\nresult3 = find_words([[\"a\"]], [\"a\"])\nassert result3 == [\"a\"]\n\nprint(\"Word Search II: All tests passed!\")",
+        "python": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n        self.word = None  # Kelime burada bitiyorsa kelimenin kendisi\n\n\ndef find_words(board: list[list[str]], words: list[str]) -> list[str]:\n    \"\"\"\n    Trie + Backtracking pattern:\n    1. Tum kelimeleri Trie'a ekle\n    2. Grid'in her hucresinden backtracking baslat\n    3. Her adimda Trie'daki cocuga git — cocuk yoksa budama (prune)\n    4. Kelime bulununca sonuca ekle ve Trie'dan kaldir (tekrar bulmamak icin)\n    \n    Neden Trie? Her kelimeyi ayri ayri aramak yerine,\n    tum kelimeleri ayni anda Trie üzerinden aramak cok daha verimli.\n    \"\"\"\n    # TODO: Implement\n    pass\n\n\n# Test Cases\nresult = find_words(\n    [[\"o\",\"a\",\"a\",\"n\"],[\"e\",\"t\",\"a\",\"e\"],[\"i\",\"h\",\"k\",\"r\"],[\"i\",\"f\",\"l\",\"v\"]],\n    [\"oath\",\"pea\",\"eat\",\"rain\"]\n)\nassert sorted(result) == sorted([\"eat\",\"oath\"])\n\nresult2 = find_words([[\"a\",\"b\"],[\"c\",\"d\"]], [\"abcb\"])\nassert result2 == []\n\nresult3 = find_words([[\"a\"]], [\"a\"])\nassert result3 == [\"a\"]\n\nprint(\"Word Search II: All tests passed!\")",
         "javascript": "class TrieNode {\n    constructor() { this.children = {}; this.word = null; }\n}\n\n/**\n * Trie + Backtracking:\n * 1. Kelimeleri Trie'a ekle\n * 2. Grid'den backtracking ile Trie'da ara\n * 3. Trie'da dallanma yoksa budama yap\n */\nfunction findWords(board, words) {\n    // TODO: Implement\n}\n\n// Test Cases\nconst r1 = findWords(\n    [[\"o\",\"a\",\"a\",\"n\"],[\"e\",\"t\",\"a\",\"e\"],[\"i\",\"h\",\"k\",\"r\"],[\"i\",\"f\",\"l\",\"v\"]],\n    [\"oath\",\"pea\",\"eat\",\"rain\"]\n);\nconsole.assert(r1.sort().toString() === [\"eat\",\"oath\"].sort().toString());\nconsole.log(\"Word Search II: All tests passed!\");"
       },
       "test_cases": [
-        {"input": "4x4 board, words=[oath,pea,eat,rain]", "expected": ["eat","oath"], "description": "Genel durum"},
-        {"input": "2x2 board, words=[abcb]", "expected": [], "description": "Hucre tekrar kullanilamaz"},
-        {"input": "1x1 board 'a', words=[a]", "expected": ["a"], "description": "Tek hucre"}
+        {
+          "input": "4x4 board, words=[oath,pea,eat,rain]",
+          "expected": [
+            "eat",
+            "oath"
+          ],
+          "description": "Genel durum"
+        },
+        {
+          "input": "2x2 board, words=[abcb]",
+          "expected": [],
+          "description": "Hucre tekrar kullanilamaz"
+        },
+        {
+          "input": "1x1 board 'a', words=[a]",
+          "expected": [
+            "a"
+          ],
+          "description": "Tek hucre"
+        }
       ],
       "hints": [
         "Naive: Her kelime icin ayri DFS -> O(words * m * n * 4^L). Trie ile tum kelimeleri ayni anda ara.",
         "Trie'a tum kelimeleri ekle. Grid'in her hucresinden baslayarak Trie'daki yolu takip et.",
         "Trie node'unda cocuk yoksa o dalda devam etme (pruning). Kelime bulununca word = None yap (tekrar eklememek icin)."
       ],
-      "solution_approach": "TRIE + BACKTRACKING PATTERN: Bu iki pattern'in birlesimi: Trie coklu string aramasi icin, Backtracking grid uzerinde gezinme icin. Trie olmadan her kelimeyi ayri aramak cok yavas. Trie ile tum kelimeler ayni anda aranir — ortak prefix'ler sadece bir kez gezilir. Pruning (Trie'da dal yoksa durma) aramavi dramatik hizlandirir. Bu pattern autocomplete with grid, boggle game gibi problemlerin cozumudur.",
+      "solution_approach": "TRIE + BACKTRACKING PATTERN: Bu iki pattern'in birlesimi: Trie coklu string aramasi icin, Backtracking grid üzerinde gezinme icin. Trie olmadan her kelimeyi ayri aramak cok yavas. Trie ile tum kelimeler ayni anda aranir — ortak prefix'ler sadece bir kez gezilir. Pruning (Trie'da dal yoksa durma) aramavi dramatik hizlandirir. Bu pattern autocomplete with grid, boggle game gibi problemlerin cozumudur.",
       "solution_code": {
-        "python": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n        self.word = None\n\ndef find_words(board: list[list[str]], words: list[str]) -> list[str]:\n    # Trie olustur\n    root = TrieNode()\n    for word in words:\n        node = root\n        for char in word:\n            if char not in node.children:\n                node.children[char] = TrieNode()\n            node = node.children[char]\n        node.word = word\n\n    rows, cols = len(board), len(board[0])\n    result = []\n\n    def backtrack(r, c, parent):\n        letter = board[r][c]\n        node = parent.children.get(letter)\n        if not node:\n            return\n        if node.word:\n            result.append(node.word)\n            node.word = None  # tekrar ekleme\n        board[r][c] = '#'  # visited\n        for dr, dc in [(0,1),(0,-1),(1,0),(-1,0)]:\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < rows and 0 <= nc < cols and board[nr][nc] != '#':\n                backtrack(nr, nc, node)\n        board[r][c] = letter  # geri al\n        # Pruning: cocugu kalmamissa sil\n        if not node.children:\n            del parent.children[letter]\n\n    for r in range(rows):\n        for c in range(cols):\n            backtrack(r, c, root)\n    return result",
+        "python": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n        self.word = None\n\ndef find_words(board: list[list[str]], words: list[str]) -> list[str]:\n    # Trie oluştur\n    root = TrieNode()\n    for word in words:\n        node = root\n        for char in word:\n            if char not in node.children:\n                node.children[char] = TrieNode()\n            node = node.children[char]\n        node.word = word\n\n    rows, cols = len(board), len(board[0])\n    result = []\n\n    def backtrack(r, c, parent):\n        letter = board[r][c]\n        node = parent.children.get(letter)\n        if not node:\n            return\n        if node.word:\n            result.append(node.word)\n            node.word = None  # tekrar ekleme\n        board[r][c] = '#'  # visited\n        for dr, dc in [(0,1),(0,-1),(1,0),(-1,0)]:\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < rows and 0 <= nc < cols and board[nr][nc] != '#':\n                backtrack(nr, nc, node)\n        board[r][c] = letter  # geri al\n        # Pruning: cocugu kalmamissa sil\n        if not node.children:\n            del parent.children[letter]\n\n    for r in range(rows):\n        for c in range(cols):\n            backtrack(r, c, root)\n    return result",
         "javascript": "function findWords(board, words) {\n    const root = { children: {}, word: null };\n    for (const word of words) {\n        let node = root;\n        for (const char of word) {\n            if (!node.children[char]) node.children[char] = { children: {}, word: null };\n            node = node.children[char];\n        }\n        node.word = word;\n    }\n    const rows = board.length, cols = board[0].length;\n    const result = [];\n    function backtrack(r, c, parent) {\n        const letter = board[r][c];\n        const node = parent.children[letter];\n        if (!node) return;\n        if (node.word) {\n            result.push(node.word);\n            node.word = null;\n        }\n        board[r][c] = '#';\n        for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {\n            const nr = r + dr, nc = c + dc;\n            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && board[nr][nc] !== '#') {\n                backtrack(nr, nc, node);\n            }\n        }\n        board[r][c] = letter;\n        if (Object.keys(node.children).length === 0) delete parent.children[letter];\n    }\n    for (let r = 0; r < rows; r++)\n        for (let c = 0; c < cols; c++)\n            backtrack(r, c, root);\n    return result;\n}"
       },
       "time_complexity": "O(m * n * 4^L) worst case, ama Trie pruning ile pratikte cok daha hizli",
@@ -388,19 +938,50 @@
     }
   ],
   "evaluation_criteria": [
-    {"criterion": "Dynamic Programming — state tanimlamak ve transition formulu", "points": 15},
-    {"criterion": "Greedy — greedy choice property'yi aciklayabilmek", "points": 15},
-    {"criterion": "Backtracking — template'i dogru uygulamak ve pruning", "points": 15},
-    {"criterion": "Graph — BFS/DFS grid ve topological sort", "points": 15},
-    {"criterion": "Heap — k-way merge ve kth element", "points": 15},
-    {"criterion": "Trie — implement + backtracking bilesimi", "points": 15},
-    {"criterion": "Tum test case'ler gecmesi", "points": 10}
+    {
+      "criterion": "Dynamic Programming — state tanimlamak ve transition formulu",
+      "points": 15
+    },
+    {
+      "criterion": "Greedy — greedy choice property'yi aciklayabilmek",
+      "points": 15
+    },
+    {
+      "criterion": "Backtracking — template'i dogru uygulamak ve pruning",
+      "points": 15
+    },
+    {
+      "criterion": "Graph — BFS/DFS grid ve topological sort",
+      "points": 15
+    },
+    {
+      "criterion": "Heap — k-way merge ve kth element",
+      "points": 15
+    },
+    {
+      "criterion": "Trie — implement + backtracking bilesimi",
+      "points": 15
+    },
+    {
+      "criterion": "Tum test case'ler gecmesi",
+      "points": 10
+    }
   ],
   "hints": [
     "DP: Once recursive cozumu yaz, sonra memoize et, sonra bottom-up cevir. Bu 3 asamayi bilmek sart.",
-    "Greedy vs DP: Greedy her zaman calismaz. Greedy choice property'yi ispatlayamadigin zaman DP kullan.",
+    "Greedy vs DP: Greedy her zaman çalışmaz. Greedy choice property'yi ispatlayamadigin zaman DP kullan.",
     "Backtracking sablonu: result.append(path[:]), for + append + recurse + pop. Bu sablon Subsets, Permutations, Combinations icin ayni.",
     "Graph: Grid = graph. BFS = shortest path / level order. DFS = connected components / cycle detection. Topological sort = dependency resolution."
   ],
-  "tags": ["dsa", "advanced-patterns", "dynamic-programming", "greedy", "backtracking", "graph", "heap", "trie", "interview"]
+  "tags": [
+    "dsa",
+    "advanced-patterns",
+    "dynamic-programming",
+    "greedy",
+    "backtracking",
+    "graph",
+    "heap",
+    "trie",
+    "interview"
+  ]
 }

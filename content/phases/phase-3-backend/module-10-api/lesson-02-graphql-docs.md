@@ -623,7 +623,7 @@ startStandaloneServer(server, { listen: { port: 4000 } })
 
 ### Alistirma 2: Swagger/OpenAPI Dokumantasyonu (Orta)
 
-Express API'ne Swagger dokumantasyonu ekle ve interaktif API explorer olustur.
+Express API'ne Swagger dokumantasyonu ekle ve interaktif API explorer oluştur.
 
 ```javascript
 const swaggerJsdoc = require("swagger-jsdoc");
@@ -683,7 +683,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 ### Alistirma 3: API Testing Koleksiyonu (Zor)
 
-curl, Postman veya Bruno ile kapsamli bir API test koleksiyonu olustur.
+curl, Postman veya Bruno ile kapsamli bir API test koleksiyonu oluştur.
 
 ```bash
 # TODO: Asagidaki test senaryolarini curl ile yaz
@@ -720,7 +720,7 @@ curl -X DELETE http://localhost:3000/api/v1/products/1
 # Bir test.sh script'i olarak kaydet ve calistir
 ```
 
-**Beklenen Sonuc:** En az 10 farkli test senaryosu yazilmis olmali. Her senaryo icin beklenen status code ve response body belirtilmeli. Script olarak kaydedilip otomatik calistirilabilmeli.
+**Beklenen Sonuc:** En az 10 farkli test senaryosu yazilmis olmali. Her senaryo icin beklenen status code ve response body belirtilmeli. Script olarak kaydedilip otomatik çalıştırilabilmeli.
 **Ipucu:** `curl -w "\n%{http_code}\n"` ile status code'u goster. `-s` flag'i ile progress bar'i gizle. `jq` ile JSON response'u formatla.
 :::
 
@@ -753,14 +753,14 @@ explanation: "gRPC, HTTP/2 üzerinde çalışır (multiplexing, header compressi
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "GraphQL'in N+1 query problemini bir blog uygulamasi ornegi ile acikla. 10 post ve her post'un author'unu cektigimde kac SQL sorgusu calisir? DataLoader pattern bu sorunu nasil cozer? Batch loading mekanizmasini adim adim goster."
+> "GraphQL'in N+1 query problemini bir blog uygulamasi örneği ile acikla. 10 post ve her post'un author'unu cektigimde kac SQL sorgusu calisir? DataLoader pattern bu sorunu nasil cozer? Batch loading mekanizmasini adim adim goster."
 
 **2. Pratik Uygulama:**
-> "Apollo Server ile bir GraphQL API olustur: User ve Post type'lari, Query (users, posts, user by ID), Mutation (createUser, createPost) ve iliskisel resolver'lar (User.posts, Post.author). Context'te authentication bilgisi tasi. Input validation ve error handling ekle."
-> Takip: "Simdi bu API icin OpenAPI/Swagger dokumantasyonu olustur. swagger-jsdoc ile JSDoc comment'larindan otomatik spec uret ve /api-docs adresinde Swagger UI sun."
+> "Apollo Server ile bir GraphQL API oluştur: User ve Post type'lari, Query (users, posts, user by ID), Mutation (createUser, createPost) ve iliskisel resolver'lar (User.posts, Post.author). Context'te authentication bilgisi tasi. Input validation ve error handling ekle."
+> Takip: "Simdi bu API icin OpenAPI/Swagger dokumantasyonu oluştur. swagger-jsdoc ile JSDoc comment'larindan otomatik spec uret ve /api-docs adresinde Swagger UI sun."
 
 **3. Mukemmellik Icin:**
 > "Bir mikroservis mimarisinde REST, GraphQL ve gRPC'yi birlikte nasil kullanirim? Public API icin REST, BFF (Backend for Frontend) icin GraphQL, dahili servisler arasi iletisim icin gRPC. Apollo Federation ile birden fazla GraphQL subgraph'i nasil birlestiririm? Bu hybrid mimarinin trade-off'larini analiz et."
@@ -778,7 +778,7 @@ GraphQL schema tasarlarken AI'a schema'ni goster ve sor: "Bu GraphQL schema'sind
 
 **Soru 2: GraphQL'de N+1 query problemi nedir ve nasil cozulur?**
 - **Junior cevabi:** Her alt sorgu icin ayri veritabani sorgulari yapilmasidir, DataLoader ile cozulur.
-- **Senior cevabi:** N+1 problemi: users listesi icin 1 query + her user'in posts'lari icin N ayri query yapilir. DataLoader (Facebook'un kutuphanesi) batch ve cache mekanizmasi saglar: ayni tick'teki tum user ID'lerini toplar ve tek bir `WHERE id IN (...)` sorgusuyla ceker. Per-request DataLoader instance'i olusturulur (request bazli cache). Ayrica: query depth limiting ile recursive sorular engellenir, query cost analysis ile pahali sorgulara limit konur, persisted queries ile sadece izin verilen sorgular calistirilir. APQ (Automatic Persisted Queries) bandwidth tasarrufu saglar.
+- **Senior cevabi:** N+1 problemi: users listesi icin 1 query + her user'in posts'lari icin N ayri query yapilir. DataLoader (Facebook'un kutuphanesi) batch ve cache mekanizmasi saglar: ayni tick'teki tum user ID'lerini toplar ve tek bir `WHERE id IN (...)` sorgusuyla ceker. Per-request DataLoader instance'i oluşturulur (request bazli cache). Ayrica: query depth limiting ile recursive sorular engellenir, query cost analysis ile pahali sorgulara limit konur, persisted queries ile sadece izin verilen sorgular çalıştırilir. APQ (Automatic Persisted Queries) bandwidth tasarrufu saglar.
 :::
 
 :::exercise

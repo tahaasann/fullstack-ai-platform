@@ -62,7 +62,7 @@ Senior muhendisler system design'i sadece kitaptan değil, **gerçek production 
 :::concept
 ### Interview'da Sistematik Yaklaşım
 
-System design interview'lar open-ended sorulardir. "Doğru cevap" yoktur, **düşünme surecin** degerlendirilir.
+System design interview'lar open-ended sorulardir. "Doğru cevap" yoktur, **düşünme sürecin** degerlendirilir.
 
 **4 Adimli Framework:**
 
@@ -1146,7 +1146,7 @@ for key in keys:
 1. **Cross-shard query**: JOIN yapmak çok zor - farkli shard'lardaki veriyi birleştirmek
 2. **Resharding**: Shard sayisini degistirmek çok maliyetli (veri tasima)
 3. **Hotspot**: Bazi shard'lar daha fazla trafik alabilir (unlu kullanıcı)
-4. **Referential integrity**: Foreign key'ler shard'lar arasinda calismaz
+4. **Referential integrity**: Foreign key'ler shard'lar arasinda çalışmaz
 5. **Distributed transactions**: ACID garantileri zorlaşir
 
 **Interview Tavsiyesi**: "Sharding son care. Önce vertical scaling, caching, read replica denerim. Hala yetmezse sharding yaparim."
@@ -1159,7 +1159,7 @@ for key in keys:
 :::concept
 ### CAP Theorem Nedir?
 
-Distributed bir sistemde ayni anda sadece 3 ozellikten 2'sini garanti edebilirsin:
+Distributed bir sistemde ayni anda sadece 3 özellikten 2'sini garanti edebilirsin:
 
 ```
           Consistency (C)
@@ -1833,7 +1833,7 @@ ADIM 7: Olcekleme
 - Rate limiting (IP basina limit)
 ```
 
-**Beklenen Sonuc:** 7 adimin tamamini cevaplayabilmeli. Trade-off'lari aciklayabilmeli (ornegin hash collision vs counter single point of failure). Caching ve sharding stratejileri mantikli olmali.
+**Beklenen Sonuc:** 7 adimin tamamini cevaplayabilmeli. Trade-off'lari aciklayabilmeli (örneğin hash collision vs counter single point of failure). Caching ve sharding stratejileri mantikli olmali.
 **Ipucu:** Read-heavy sistemlerde caching kritik. base62 encoding: [a-zA-Z0-9] ile 7 karakter 3.5 trilyon kombinasyon saglar.
 
 ---
@@ -2085,9 +2085,312 @@ Back-of-envelope:
 - Shard basina 50M dokuman, 20 shard
 ```
 
-**Beklenen Sonuc:** Inverted index yapisi anlatilmali. BM25 ranking onerilmeli. Term-based sharding hotspot olusturur, document-based tercih edilmeli. Near-real-time indexing icin buffer + periodic flush mekanizmasi tanimlanmali.
+**Beklenen Sonuc:** Inverted index yapisi anlatilmali. BM25 ranking onerilmeli. Term-based sharding hotspot oluşturur, document-based tercih edilmeli. Near-real-time indexing icin buffer + periodic flush mekanizmasi tanimlanmali.
 **Ipucu:** Elasticsearch Lucene uzerine kuruludur. Segment-based architecture kullanir: yeni dokumanlar in-memory buffer'da birikir, periyodik olarak disk'e segment olarak yazilir.
 :::
+
+:::exercise
+### Alistirma 11: URL Shortener Tasarimi (Kolay)
+
+bit.ly benzeri bir URL kisaltma servisi tasarla.
+
+```markdown
+# TODO: Gereksinimleri tanimla
+# Fonksiyonel:
+# - Uzun URL -> kisa URL olustur
+# - Kisa URL -> uzun URL'e yonlendir
+# - Ozel alias destegi
+# - Expire suresi
+
+# Non-fonksiyonel:
+# - Gunluk 100M URL kisaltma
+# - Yonlendirme <100ms
+# - %99.9 uptime
+# - URL'ler unique olmali
+
+# TODO: Veritabani semasi tasarla
+# TODO: ID generation stratejisi sec (base62, hash, snowflake)
+# TODO: Caching stratejisi (populer URL'ler)
+# TODO: Read/write orani analiz et (100:1)
+# TODO: Kapasite tahmini yap (storage, bandwidth, QPS)
+```
+
+**Beklenen Sonuc:** Tum gereksinimler karsilanmali. Kapasite tahmini yapilmali. ID generation ve caching stratejisi aciklanmali.
+**Ipucu:** base62 encoding (a-z, A-Z, 0-9) ile 7 karakterlik ID = 62^7 = ~3.5 trilyon unique URL. MD5 hash'in ilk 7 karakteri collision riski tasir.
+:::
+
+:::exercise
+### Alistirma 12: Chat Uygulamasi Tasarimi (Kolay)
+
+WhatsApp benzeri bir mesajlasma sistemi tasarla.
+
+```markdown
+# TODO: Temel ozellikler
+# - 1:1 mesajlasma
+# - Grup mesajlasma (max 256 kisi)
+# - Online/offline durum
+# - Mesaj okundu bildirimi (tick)
+# - Dosya/goruntu paylasimi
+
+# TODO: Iletisim protokolu sec
+# WebSocket vs Server-Sent Events vs Long Polling
+# Neden WebSocket? Cift yonlu, dusuk latency
+
+# TODO: Mesaj depolama
+# - Son mesajlar: Redis (hiz)
+# - Eski mesajlar: Cassandra (olceklenebilirlik)
+# - Dosyalar: S3/MinIO (blob storage)
+
+# TODO: Mesaj teslim garantisi
+# - At-most-once, at-least-once, exactly-once
+# - Message queue (Kafka) ile reliable delivery
+
+# TODO: Push notification akisi
+# TODO: End-to-end encryption stratejisi
+```
+
+**Beklenen Sonuc:** WebSocket tabanli mimari cizilmeli. Mesaj teslim garantisi tanimlanmali. Storage stratejisi aciklanmali.
+**Ipucu:** Chat'te "fan-out on write" (mesaji tum alicilarin inbox'una yaz) vs "fan-out on read" (okuma sirasinda birlestir) karari kritik.
+:::
+
+:::exercise
+### Alistirma 13: Rate Limiter Tasarimi (Kolay)
+
+Dagitik sistem icin rate limiter tasarla.
+
+```markdown
+# TODO: Rate limiting algoritmalari karsilastir
+# 1. Token Bucket: Token doldur, istek gelince token harca
+# 2. Sliding Window: Zaman penceresinde istek say
+# 3. Fixed Window: Sabit zaman diliminde istek say
+# 4. Leaky Bucket: Sabit hizda istek isle
+
+# TODO: Token Bucket implementasyonu (pseudocode)
+# class TokenBucket:
+#   tokens: number
+#   capacity: number
+#   refillRate: number  # tokens/second
+#   lastRefill: timestamp
+#
+#   allowRequest():
+#     refill()
+#     if tokens > 0: tokens--; return true
+#     else: return false
+
+# TODO: Redis ile distributed rate limiter
+# TODO: Per-user vs per-IP rate limiting
+# TODO: Rate limit response headers (X-RateLimit-Remaining)
+```
+
+**Beklenen Sonuc:** 4 algoritma karsilastirilmali. Token Bucket implement edilmeli. Distributed versiyon tasarlanmali.
+**Ipucu:** Token Bucket bursty traffic'e izin verir (biriken token'lar). Leaky Bucket sabit hizda isler (smooth traffic). API gateway'ler genellikle Token Bucket kullanir.
+:::
+
+:::exercise
+### Alistirma 14: Notification System Tasarimi (Orta)
+
+Coklu kanal destekli bildirim sistemi tasarla.
+
+```markdown
+# TODO: Bildirim kanallari
+# - Push notification (mobile)
+# - Email
+# - SMS
+# - In-app notification
+# - WebSocket (real-time)
+
+# TODO: Mimari bilesenleri
+# 1. Notification Service: Bildirim istegini alir
+# 2. Template Engine: Kanal bazli sablon render eder
+# 3. Priority Queue: Onceliklendirme (urgent vs normal)
+# 4. Channel Adapters: Her kanal icin adapter
+# 5. Delivery Tracker: Teslim durumu takibi
+
+# TODO: Kullanici tercihleri (opt-in/opt-out)
+# TODO: Rate limiting (spam onleme)
+# TODO: Retry stratejisi (exponential backoff)
+# TODO: Analytics (open rate, click rate)
+# TODO: Kapasite: 10M bildirim/gun
+```
+
+**Beklenen Sonuc:** Multi-channel mimari cizilmeli. Priority queue ve retry mekanizmasi tanimlanmali.
+**Ipucu:** Bildirim sistemi asenkron olmali — kullanici beklemeyecek. Kafka/RabbitMQ ile queue kullan. Dead letter queue ile basarisiz bildirimleri yonet.
+:::
+
+:::exercise
+### Alistirma 15: Distributed Cache Tasarimi (Orta)
+
+Redis benzeri dagitik cache sistemi tasarla.
+
+```markdown
+# TODO: Gereksinimler
+# - Key-value store
+# - TTL (expire) destegi
+# - LRU eviction policy
+# - Cluster mode (sharding)
+# - Replication (high availability)
+
+# TODO: Consistent hashing ile sharding
+# - Hash ring uzerinde node'lari dagit
+# - Virtual node'lar ile dengeli dagilim
+# - Node eklendiginde/cikarildiginda minimum key tasinmasi
+
+# TODO: Replication stratejisi
+# - Master-slave (async replication)
+# - Leader election (Raft/Paxos)
+# - Split-brain problemi ve cozumu
+
+# TODO: Cache invalidation stratejileri
+# TODO: Hot key problemi (tek key'e cok istek)
+# TODO: Thundering herd problemi ve cozumu
+# TODO: Memory yonetimi (eviction policies: LRU, LFU, FIFO)
+```
+
+**Beklenen Sonuc:** Consistent hashing aciklanmali. Replication stratejisi tanimlanmali. Cache problemleri ve cozumleri listelenmeli.
+**Ipucu:** Consistent hashing'de virtual node sayisi arttikca dagılim daha dengeli olur. Genellikle fiziksel node basina 100-200 virtual node.
+:::
+
+:::exercise
+### Alistirma 16: E-Commerce Platform Tasarimi (Orta)
+
+Amazon benzeri e-ticaret platformu tasarla.
+
+```markdown
+# TODO: Microservice'ler
+# 1. User Service: Kayit, login, profil
+# 2. Product Service: Urun CRUD, arama
+# 3. Cart Service: Sepet yonetimi
+# 4. Order Service: Siparis olusturma
+# 5. Payment Service: Odeme isleme
+# 6. Inventory Service: Stok yonetimi
+# 7. Notification Service: Bildirimler
+
+# TODO: Servisler arasi iletisim
+# - Sync: REST/gRPC (siparis -> odeme)
+# - Async: Event bus (siparis olusturuldu -> stok dusur)
+
+# TODO: Distributed transaction (Saga Pattern)
+# 1. Order created
+# 2. Payment charged
+# 3. Inventory reserved
+# Herhangi biri basarisiz olursa: compensating transactions
+
+# TODO: Arama servisi (Elasticsearch)
+# TODO: Oneri motoru (collaborative filtering)
+# TODO: CDN ile static asset dagilimi
+```
+
+**Beklenen Sonuc:** Microservice mimarisi cizilmeli. Saga pattern ile distributed transaction aciklanmali. Iletisim yontemleri belirlenmeli.
+**Ipucu:** Saga Pattern: her adim basarisiz olursa onceki adimlari geri alir (compensating transaction). Choreography vs orchestration Saga karsilastir.
+:::
+
+:::exercise
+### Alistirma 17: Video Streaming Platform Tasarimi (Orta)
+
+YouTube benzeri video streaming sistemi tasarla.
+
+```markdown
+# TODO: Upload pipeline
+# 1. Kullanici video yukler (presigned URL ile S3'e direkt)
+# 2. Transcoding queue'ya eklenir
+# 3. FFmpeg ile farkli cozunurluklere donusturulur (360p, 720p, 1080p)
+# 4. HLS/DASH segmentlerine bolunur
+# 5. CDN'e dagitilir
+
+# TODO: Streaming akisi
+# - Adaptive bitrate streaming (ABR)
+# - CDN edge caching
+# - P2P destegi (WebRTC)
+
+# TODO: Kapasite tahmini
+# - Gunluk 500 video upload (ortalama 10 dakika)
+# - Storage: raw + transcoded
+# - Bandwidth: peak saatlerde QPS
+
+# TODO: Recommendation engine
+# TODO: Comment ve like sistemi
+# TODO: Live streaming destegi (RTMP -> HLS)
+```
+
+**Beklenen Sonuc:** Upload ve streaming pipeline'lari cizilmeli. CDN stratejisi tanimlanmali. Kapasite tahmini yapilmali.
+**Ipucu:** Video storage maliyetlidir — lifecycle policy ile eski/az izlenen videolari glacier'a tasi. HLS .m3u8 manifest + .ts segment dosyalari kullanir.
+:::
+
+:::exercise
+### Alistirma 18: Monitoring ve Observability Sistemi (Zor)
+
+Dagitik sistem icin monitoring altyapisi tasarla.
+
+```markdown
+# TODO: 3 Pillar of Observability
+
+## 1. Metrics (Prometheus + Grafana)
+# - Business: siparis/dk, gelir/saat
+# - Application: response time (p50, p95, p99), error rate
+# - Infrastructure: CPU, memory, disk, network
+
+## 2. Logs (ELK Stack veya Loki)
+# - Structured logging (JSON)
+# - Log levels: ERROR, WARN, INFO, DEBUG
+# - Correlation ID ile request takibi
+
+## 3. Traces (Jaeger veya Zipkin)
+# - Distributed tracing
+# - Span: tek servis islemei
+# - Trace: end-to-end istek akisi
+
+# TODO: Alerting stratejisi (PagerDuty/OpsGenie)
+# - Critical: Aninda bildirim (SMS + telefon)
+# - Warning: Slack bildirimi
+# - Info: Dashboard'da gorsel
+
+# TODO: SLI, SLO, SLA tanimla
+# TODO: Runbook ornegi yaz (alarm geldiginde ne yapilacak)
+```
+
+**Beklenen Sonuc:** Metrics, logs, traces entegre tasarlanmali. Alerting ve SLO'lar tanimlanmali. Runbook yazilmali.
+**Ipucu:** SLI = olcum (latency p99), SLO = hedef (p99 < 200ms), SLA = sozlesme (%99.9 uptime). SLO'suz monitoring anlamsiz.
+:::
+
+:::exercise
+### Alistirma 19: Full System Design Interview Simulasyonu (Zor)
+
+45 dakikalik system design interview simulasyonu yap.
+
+```markdown
+# Soru: "Twitter/X'in temel ozelliklerini tasarla"
+
+# TODO: 45 dakikaya bol (interview formati)
+
+## 0-5 dk: Gereksinimleri Netlistir
+# - Tweet olusturma (280 karakter + medya)
+# - Timeline (home + user)
+# - Follow/unfollow
+# - Like, retweet
+# - Arama
+# Kapasite: 500M kullanici, 200K tweet/sn read, 5K tweet/sn write
+
+## 5-15 dk: High-Level Design
+# TODO: Temel servisleri ve akislari ciz
+
+## 15-30 dk: Deep Dive
+# TODO: Fan-out stratejisi (home timeline generation)
+# TODO: Celebrity problemi (Beyonce 200M follower)
+# TODO: Database secimi ve sharding
+
+## 30-40 dk: Bottleneck ve Trade-off
+# TODO: Scaling stratejisi
+# TODO: Cache katmanlari
+# TODO: Failure senaryolari
+
+## 40-45 dk: Ekstra Ozellikler
+# TODO: Trending topics, ads, analytics
+```
+
+**Beklenen Sonuc:** 45 dakikalik yapilandirilmis tasarim yapilmali. Trade-off'lar aciklanmali. Bottleneck'ler belirlenmeli.
+**Ipucu:** Interview'da "dogru cevap" yok — iletisim ve trade-off analizi onemli. Her kararin neden'ini acikla. "It depends" yerine "A secerdim cunku..." de.
+:::
+
 
 :::external-resource
 ### Ek Kaynaklar

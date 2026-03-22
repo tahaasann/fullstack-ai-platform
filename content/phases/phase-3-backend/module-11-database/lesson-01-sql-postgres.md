@@ -841,20 +841,20 @@ explanation: "Window Function'lar OVER() clause ile kullanılır. ROW_NUMBER(), 
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "SQL JOIN turlerini (INNER, LEFT, RIGHT, FULL OUTER, CROSS) Venn diyagramlari ve gercek e-ticaret veritabani ornekleriyle acikla. Her JOIN turunun ne zaman kullanildigini, NULL davranisini ve performans etkisini goster. Self-join ve subquery'leri de ornekle."
+> "SQL JOIN turlerini (INNER, LEFT, RIGHT, FULL OUTER, CROSS) Venn diyagramlari ve gercek e-ticaret veritabani örnekleriyle acikla. Her JOIN turunun ne zaman kullanildigini, NULL davranisini ve performans etkisini goster. Self-join ve subquery'leri de örnekle."
 
 **2. Pratik Uygulama:**
-> "PostgreSQL ile bir e-ticaret veritabani tasarla: users, products, categories, orders, order_items tablolari. Foreign key iliskileri, uygun index'ler, CHECK constraint'leri ve transaction ornekleri yaz. Urun arama icin full-text search ve GIN index kullan."
+> "PostgreSQL ile bir e-ticaret veritabani tasarla: users, products, categories, orders, order_items tablolari. Foreign key iliskileri, uygun index'ler, CHECK constraint'leri ve transaction örnekleri yaz. Urun arama icin full-text search ve GIN index kullan."
 > Takip: "EXPLAIN ANALYZE ile yavas sorgulari tespit et. Index'lerin sorgu planini nasil etkiledigini goster ve query optimization stratejileri uygula."
 
 **3. Mukemmellik Icin:**
 > "Production PostgreSQL veritabaninda performans sorunlari yasiyorum. pg_stat_statements ile yavas sorgulari bulma, EXPLAIN ANALYZE ciktisini okuma, index stratejisi (B-tree vs GIN vs GiST), connection pooling (PgBouncer), vacuum/analyze ve partitioning konularini pratikte nasil uygularim?"
 
 ### Pair Programming Ipucu
-SQL yazarken AI'a EXPLAIN ANALYZE ciktisini yapistir ve sor: "Bu sorgunun calisma planini analiz et. Seq Scan neden Index Scan yerine secildi? Hangi index'i eklemeliyim? Estimated rows ile actual rows arasindaki fark neden bu kadar buyuk?"
+SQL yazarken AI'a EXPLAIN ANALYZE ciktisini yapistir ve sor: "Bu sorgunun çalışma planini analiz et. Seq Scan neden Index Scan yerine secildi? Hangi index'i eklemeliyim? Estimated rows ile actual rows arasindaki fark neden bu kadar buyuk?"
 :::
 
 :::exercise
@@ -1315,8 +1315,8 @@ Bir Senior Developer veya CTO, SQL ve veritabanı konusunu öğrenirken şu yakl
 5. **Monitoring ve alerting kurar** - pg_stat_activity ile aktif sorguları, pg_stat_user_tables ile table bloat'ı, dead tuple oranını izler. Slow query log'u analiz eder.
 6. **Partitioning uygular** - Milyonlarca satırlık tabloları date-based range partitioning ile böler. Archive partition'ları ayrı tablespace'e taşır.
 
-**Karar Verme Sureci — PostgreSQL vs MySQL vs MongoDB:**
-- **PostgreSQL**: JSONB, full-text search, CTE, window functions, row-level security, extensions (PostGIS, pgvector). Trade-off: MySQL'e gore baslangicta biraz daha karmasik, cloud managed servislerde MySQL'den pahali olabilir. Kullanim: Neredeyse her sey — ozellikle karmasik sorgular, GIS verileri, AI/ML (pgvector ile embedding storage).
+**Karar Verme Süreci — PostgreSQL vs MySQL vs MongoDB:**
+- **PostgreSQL**: JSONB, full-text search, CTE, window functions, row-level security, extensions (PostGIS, pgvector). Trade-off: MySQL'e gore baslangicta biraz daha karmasik, cloud managed servislerde MySQL'den pahali olabilir. Kullanim: Neredeyse her sey — özellikle karmasik sorgular, GIS verileri, AI/ML (pgvector ile embedding storage).
 - **MySQL**: Daha basit, daha yaygın hosting, replication kurulumu kolay. Trade-off: JSONB destegi sinirli, CTE performansi dusuk, partial index yok. Kullanim: WordPress, legacy projeler, basit CRUD uygulamalar.
 - **MongoDB**: Schema-less, horizontal scaling (sharding) kolay, document model. Trade-off: JOIN yok (lookup var ama yavas), transaction destegi sinirli, data consistency riski (denormalization). Kullanim: Log/event storage, content management, prototipleme. Production'da "MongoDB ile baslayip PostgreSQL'e gecen" cok takım gorduk.
 - **Senior karar agaci**: "Verin iliskisel mi? PostgreSQL. Document-oriented ve olceklenmesi mi lazim? MongoDB. Legacy veya WordPress? MySQL. Emin degilsen? PostgreSQL — yanlış gitmez."
@@ -1324,9 +1324,9 @@ Bir Senior Developer veya CTO, SQL ve veritabanı konusunu öğrenirken şu yakl
 **Anti-pattern Farkindaligi:**
 - **N+1 sorgu problemi**: 100 kullanicinin siparislerini cekerken 1 (users) + 100 (orders per user) = 101 sorgu. Production'da gorduk: sayfa yukleme 8 saniye suruyordu. JOIN veya ORM'de eager loading ile tek sorguya dusuruldu, 200ms'ye indi.
 - **Index olmadan production'a cikmak**: 10K satırda sorun yok, 1M satırda her sorgu 5+ saniye. "Sonra ekleriz" dersen kullanicilar sikayete basladığinda acil index eklemek zorunda kalirsin — ve `CREATE INDEX` buyuk tablolarda tablo lock'lar (CONCURRENTLY kullan!).
-- **Over-normalization**: Her sey 6NF'e kadar normalize. 10 tablo join eden sorgular, okunmasi ve bakimi imkansiz. Bazen kasitli denormalization performans icin gereklidir — ozellikle okuma agirlikli sistemlerde. Materialized view ile denormalize veriyi otomatik guncel tut.
+- **Over-normalization**: Her sey 6NF'e kadar normalize. 10 tablo join eden sorgular, okunmasi ve bakimi imkansiz. Bazen kasitli denormalization performans icin gereklidir — özellikle okuma agirlikli sistemlerde. Materialized view ile denormalize veriyi otomatik guncel tut.
 
-**Gercek Dunya Deneyimi:** Bir e-ticaret projesinde urun arama sayfasi 4 saniyede yukleniyordu. EXPLAIN ANALYZE calistirdim: `orders` tablosunda 5M satir, `WHERE status = 'active'` filtresi var ama index yok, Seq Scan yapıyor. `CREATE INDEX CONCURRENTLY idx_orders_status ON orders (status) WHERE status = 'active'` ile partial index ekledim. Sorgu 4 saniyeden 3ms'ye dustu. Partial index sayesinde sadece aktif siparisler indekslendi, index boyutu %90 kucuk kaldi.
+**Gercek Dunya Deneyimi:** Bir e-ticaret projesinde urun arama sayfasi 4 saniyede yukleniyordu. EXPLAIN ANALYZE çalıştırdim: `orders` tablosunda 5M satir, `WHERE status = 'active'` filtresi var ama index yok, Seq Scan yapıyor. `CREATE INDEX CONCURRENTLY idx_orders_status ON orders (status) WHERE status = 'active'` ile partial index ekledim. Sorgu 4 saniyeden 3ms'ye dustu. Partial index sayesinde sadece aktif siparisler indekslendi, index boyutu %90 kucuk kaldi.
 
 **Profesyonel Mindset:** "Veritabanı, uygulamanın temelidir. Application kodu değişir, framework'ler değişir ama veri kalır. İyi tasarlanmış bir schema ve optimize edilmiş sorgular, uygulamanın ölçeklenebilirliğini belirler. Her sorguyu EXPLAIN ANALYZE ile test et, her tablo tasarımını normalization kurallarıyla doğrula, her production değişikliğini migration ile versiyon kontrolünde tut."
 :::

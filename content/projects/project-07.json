@@ -4535,7 +4535,7 @@
       "steps": [
         {
           "title": "Production Build",
-          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "instructions": "Uygulamayi production modda build et, tum testleri çalıştır, Lighthouse audit yap",
           "code_snippet": "pnpm build && pnpm test",
           "substeps": [
             {
@@ -4950,7 +4950,7 @@
       "postgresql",
       "docker"
     ],
-    "when_to_create": "Milestone 1'in 2. adimini (Document Processing Pipeline) bitirdiginde repo'yu olustur. Ilk commit proje yapisi + document upload endpoint'i olmali.",
+    "when_to_create": "Milestone 1'in 2. adimini (Document Processing Pipeline) bitirdiginde repo'yu oluştur. Ilk commit proje yapisi + document upload endpoint'i olmali.",
     "pin_on_profile": true,
     "pin_priority": 2,
     "readme_sections": [
@@ -4979,7 +4979,7 @@
       "README'de hybrid retrieval vs dense-only karsilastirma tablosu koy (precision, recall, MRR) — bu somut veri recruiter'i etkiler.",
       "Chunking stratejilerini ayri branch'lerde gelistir ve her birinin benchmark sonuclarini commit mesajinda belirt.",
       "Demo GIF'te mutlaka source citation ve confidence score gorunmeli — RAG projesinin en etkileyici kismi budur.",
-      "Evaluation metrics (precision@k, recall@k, MRR) icin ayri bir /evaluation klasoru olustur ve sonuclari README'ye ekle — bu seni diger adaylardan ayirir."
+      "Evaluation metrics (precision@k, recall@k, MRR) icin ayri bir /evaluation klasoru oluştur ve sonuclari README'ye ekle — bu seni diger adaylardan ayirir."
     ]
   },
   "cover_letter_guidance": {
@@ -5015,17 +5015,17 @@
     "code_review": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "Review this RAG pipeline code (FastAPI + LangChain + ChromaDB + OpenAI) for: document parsing robustness, chunk size and overlap optimization, embedding model usage efficiency, hybrid retrieval implementation (dense + BM25), reranking pipeline correctness, LangChain chain composition, conversational memory management, citation accuracy, hallucination detection logic, and FastAPI streaming response with SSE.",
-      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle chunking kalitesi, retrieval dogrulugu ve citation mantigi icin"
+      "when_to_use": "Her step tamamlandiktan sonra kullan — özellikle chunking kalitesi, retrieval dogrulugu ve citation mantigi icin"
     },
     "debugging": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "I'm getting this error in my RAG Q&A system (FastAPI + LangChain + ChromaDB + OpenAI): [error]. The relevant code is: [code]. Document type: [type]. Query: [query]. I'm trying to [goal].",
-      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle ChromaDB embedding hatalari, LangChain chain sorunlari, PDF parsing hatalari ve retrieval kalitesi dusuk oldugunda"
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — özellikle ChromaDB embedding hatalari, LangChain chain sorunlari, PDF parsing hatalari ve retrieval kalitesi dusuk oldugunda"
     },
     "research": {
       "model": "Gemini 2.5 Pro",
       "prompt_template": "Explain [concept] with practical examples for a RAG document Q&A system. Topics I need help with: semantic chunking strategies (recursive, sentence-based, hierarchical), OpenAI embedding models comparison, ChromaDB collection management and metadata filtering, BM25 algorithm implementation, cross-encoder reranking with sentence-transformers, Reciprocal Rank Fusion, LangChain ConversationalRetrievalChain, evaluation metrics (precision@k, recall@k, MRR), and hallucination detection techniques.",
-      "when_to_use": "Yeni bir RAG konsepti ogrenirken kullan — ozellikle chunking, embedding, retrieval ve evaluation metrikleri icin"
+      "when_to_use": "Yeni bir RAG konsepti ogrenirken kullan — özellikle chunking, embedding, retrieval ve evaluation metrikleri icin"
     }
   },
   "deployment_guide": {
@@ -5061,7 +5061,7 @@
       },
       {
         "title": "Test Dokumanlari Yukle",
-        "instructions": "Canli demoda gostermek icin ornek PDF/DOCX yukle ve soru-cevap test et"
+        "instructions": "Canli demoda gostermek icin örnek PDF/DOCX yukle ve soru-cevap test et"
       }
     ],
     "env_vars": [
@@ -5085,7 +5085,7 @@
       "Proje aciklamasi ve motivasyon (2-3 cumle)",
       "Canli demo linki (Vercel/Railway badge ile)",
       "Teknoloji stack badge'leri",
-      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Ekran goruntuleri (en az 3: dashboard, ana özellik, mobile)",
       "Mimari diyagram (ASCII veya draw.io)",
       "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
       "API dokumantasyonu (/docs linki veya Postman collection)",
@@ -5093,7 +5093,7 @@
     ],
     "screenshot_suggestions": [
       "Dashboard/Anasayfa",
-      "Ana ozellik ekrani",
+      "Ana özellik ekrani",
       "Mobile gorunum"
     ],
     "live_demo_url_template": "https://rag-qa-system.vercel.app",
@@ -5102,7 +5102,7 @@
   "transition_guide": {
     "prerequisites": [
       "LLM API kullanimi ve prompt engineering",
-      "Python ile backend gelistirme (FastAPI)",
+      "Python ile backend geliştirme (FastAPI)",
       "Embedding ve vektor benzerlik kavramlari",
       "Temel NLP bilgisi"
     ],

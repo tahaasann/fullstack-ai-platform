@@ -621,7 +621,7 @@ extract() {                                # Her türlü arşivi aç
 :::exercise
 ### Alistirma 1: Dosya ve Klasor Yonetimi (Kolay)
 
-Terminal komutlariyla bir proje yapisi olustur, dosyalari yonet ve iceriklerini incele.
+Terminal komutlariyla bir proje yapisi oluştur, dosyalari yonet ve iceriklerini incele.
 
 ```bash
 # 1. Proje yapisi olustur (tek komutla)
@@ -653,7 +653,7 @@ grep -rn "module" ~/terminal-practice/src/
 ```
 
 **Beklenen Sonuc:** 5 JS dosyasi bulunmali (3 src + 2 test). `find` ile farkli filtreleme yapilabilmeli. `grep -rn` satir numaralariyla eslesen satirlari gostermeli.
-**Ipucu:** `mkdir -p` ic ice klasorleri olusturur, `{}` ile birden fazla klasor tek satirda yapilir.
+**Ipucu:** `mkdir -p` ic ice klasorleri oluşturur, `{}` ile birden fazla klasor tek satirda yapilir.
 
 ---
 
@@ -699,14 +699,14 @@ chmod +x ~/terminal-practice/setup.sh
 ~/terminal-practice/setup.sh
 ```
 
-**Beklenen Sonuc:** Script kurulu araclari tespit edip versiyonlarini gostermeli. Eksik araclari uyarmali. .env dosyasi yoksa .env.example'dan olusturmali.
+**Beklenen Sonuc:** Script kurulu araclari tespit edip versiyonlarini gostermeli. Eksik araclari uyarmali. .env dosyasi yoksa .env.example'dan oluşturmali.
 **Ipucu:** `command -v program` komutu program'in kurulu olup olmadigini kontrol eder. `$?` son komutun cikis kodunu verir (0=basarili).
 
 ---
 
 ### Alistirma 3: Pipe, Redirection ve Text Processing (Zor)
 
-Pipe (`|`) ve redirection (`>`, `>>`, `<`) kullanarak karmasik veri isleme zincirleri olustur.
+Pipe (`|`) ve redirection (`>`, `>>`, `<`) kullanarak karmasik veri isleme zincirleri oluştur.
 
 ```bash
 # 1. Ornek log dosyasi olustur
@@ -785,22 +785,22 @@ model_recommendation: Claude Sonnet 4.5
 prompts:
   - prompt: "Su pipe zincirinin her adimini acikla: find . -name '*.js' -not -path '*/node_modules/*' | xargs wc -l | sort -rn | head -20. Her komutun ne yaptigini, veri akisini ve ciktiyi adim adim goster."
     why: "Pipe zincirlerini okuyup yazmak terminal ustaliginin temelidir. Her komutu ayri ayri anlamak, karmasik zincirleri kendin kurmani saglar."
-    follow_up: "Bir proje icin otomasyon scripti yaz: Node.js kurulu mu kontrol et, bagimliliklaEri yukle, .env dosyasi yoksa ornekten kopyala, dev server'i baslat. Renkli cikti ve hata yonetimi ekle."
+    follow_up: "Bir proje icin otomasyon scripti yaz: Node.js kurulu mu kontrol et, bagimliliklaEri yukle, .env dosyasi yoksa örnekten kopyala, dev server'i baslat. Renkli cikti ve hata yonetimi ekle."
   - prompt: "chmod 755, 644 ve 600 izinlerinin farkini acikla. Hangi dosya turunde hangi izni kullanmaliyim? Bir web sunucusunda dosya izinlerinin yanlis ayarlanmasi hangi güvenlik risklerine yol acar?"
     why: "Dosya izinleri server yonetiminde kritik oneme sahiptir. Yanlis izinler güvenlik aciklarinin en yaygin nedenlerinden biridir."
-pair_programming_tip: "Terminal'de karmasik bir islem yapmak istediginde AI'a amacini anlat: 'Projede tum console.log satirlarini bul, hangi dosyada kac tane oldugunu goster ve en cok olandan en aza sirala.' AI sana dogru komut zincirini olusturur."
+pair_programming_tip: "Terminal'de karmasik bir islem yapmak istediginde AI'a amacini anlat: 'Projede tum console.log satirlarini bul, hangi dosyada kac tane oldugunu goster ve en cok olandan en aza sirala.' AI sana dogru komut zincirini oluşturur."
 :::
 
 :::interview
 ## Mulakat Sorulari
 
 **Soru 1: Linux dosya izinleri nasil calisir? chmod 755 ne anlama gelir?**
-- **Junior cevabi:** chmod dosya izinlerini degistirir, 755 okuma-yazma-calistirma iznidir.
-- **Senior cevabi:** Unix izinleri 3 grup (owner/group/others) ve 3 izin (read=4, write=2, execute=1) icerir. 755 = owner rwx (7), group rx (5), others rx (5). Yani sahibi her seyi yapabilir, digerler okuyabilir ve calistirabilir. Script dosyalari icin 755 (calistiriabilir), config dosyalari icin 644 (sadece owner yazar), secret dosyalar icin 600 (sadece owner erisir). Web server'da yanlis izinler security breach'e yol acar. `chmod -R` recursive, setuid/setgid ise privilege escalation riski tasidigidan dikkatle kullanilmalidir.
+- **Junior cevabi:** chmod dosya izinlerini degistirir, 755 okuma-yazma-çalıştırma iznidir.
+- **Senior cevabi:** Unix izinleri 3 grup (owner/group/others) ve 3 izin (read=4, write=2, execute=1) icerir. 755 = owner rwx (7), group rx (5), others rx (5). Yani sahibi her seyi yapabilir, digerler okuyabilir ve çalıştırabilir. Script dosyalari icin 755 (çalıştıriabilir), config dosyalari icin 644 (sadece owner yazar), secret dosyalar icin 600 (sadece owner erisir). Web server'da yanlis izinler security breach'e yol acar. `chmod -R` recursive, setuid/setgid ise privilege escalation riski tasidigidan dikkatle kullanilmalidir.
 
 **Soru 2: Pipe (|) ve redirection (>, >>) arasindaki fark nedir?**
 - **Junior cevabi:** Pipe bir komutun ciktisini digerine gonderir, > dosyaya yazar.
-- **Senior cevabi:** Pipe (|) stdout'u bir sonraki komutun stdin'ine baglar, Unix felsefesinin temelidir: kucuk programlar birlestirilerek karmasik islemler yapilir. `>` stdout'u dosyaya yazar (uzerine), `>>` ekler. `2>` stderr'i yonlendirir, `2>&1` stderr'i stdout'a birlesitirir. `tee` komutu hem ekrana hem dosyaya yazar. Ornek: `find / -name "*.log" 2>/dev/null | xargs grep "error" | sort | uniq -c | sort -rn | head -10` en cok tekrar eden 10 hatayi bulur.
+- **Senior cevabi:** Pipe (|) stdout'u bir sonraki komutun stdin'ine baglar, Unix felsefesinin temelidir: kucuk programlar birlestirilerek karmasik islemler yapilir. `>` stdout'u dosyaya yazar (uzerine), `>>` ekler. `2>` stderr'i yonlendirir, `2>&1` stderr'i stdout'a birlesitirir. `tee` komutu hem ekrana hem dosyaya yazar. Örnek: `find / -name "*.log" 2>/dev/null | xargs grep "error" | sort | uniq -c | sort -rn | head -10` en cok tekrar eden 10 hatayi bulur.
 :::
 
 :::exercise

@@ -3,10 +3,17 @@
   "title": "Data Fetching Hook",
   "difficulty": "zor",
   "category": "react",
-  "tags": ["custom-hook", "data-fetching", "cache", "retry", "error-handling", "typescript"],
+  "tags": [
+    "custom-hook",
+    "data-fetching",
+    "cache",
+    "retry",
+    "error-handling",
+    "typescript"
+  ],
   "related_lesson": "mod-08-api/lesson-02",
   "description_tr": "Cache mekanizmasi, otomatik retry ve kapsamli hata yonetimi iceren bir useFetch custom hook'u yaz.",
-  "description_detail": "Bir useFetch custom hook'u yazacaksiniz. Hook su ozelliklere sahip olmalidir: (1) Verilen URL'den veri ceker ve { data, error, loading } dondurur. (2) Basit bir in-memory cache tutar - ayni URL icin tekrar istek yapmaz, cache'ten dondurur. (3) Basarisiz istekleri belirli sayida otomatik tekrar dener (retry). (4) Component unmount oldugunda devam eden istegi iptal eder (AbortController). (5) Cache'i manuel olarak temizleyebilecek bir invalidate fonksiyonu dondurur.",
+  "description_detail": "Bir useFetch custom hook'u yazacaksiniz. Hook su özelliklere sahip olmalidir: (1) Verilen URL'den veri ceker ve { data, error, loading } dondurur. (2) Basit bir in-memory cache tutar - ayni URL icin tekrar istek yapmaz, cache'ten dondurur. (3) Basarisiz istekleri belirli sayida otomatik tekrar dener (retry). (4) Component unmount oldugunda devam eden istegi iptal eder (AbortController). (5) Cache'i manuel olarak temizleyebilecek bir invalidate fonksiyonu dondurur.",
   "examples": [
     {
       "input": "const { data, loading, error } = useFetch('https://api.example.com/users');",
@@ -40,45 +47,75 @@
   },
   "test_cases": [
     {
-      "input": {"test": "basic_fetch", "code": "result = await fetch_with_retry('https://jsonplaceholder.typicode.com/users/1')"},
+      "input": {
+        "test": "basic_fetch",
+        "code": "result = await fetch_with_retry('https://jsonplaceholder.typicode.com/users/1')"
+      },
       "expected": "data is not None and error is None"
     },
     {
-      "input": {"test": "cache_hit", "code": "r1 = await fetch_with_retry('/api/data')\nr2 = await fetch_with_retry('/api/data')\nassert r2['from_cache'] == True"},
+      "input": {
+        "test": "cache_hit",
+        "code": "r1 = await fetch_with_retry('/api/data')\nr2 = await fetch_with_retry('/api/data')\nassert r2['from_cache'] == True"
+      },
       "expected": true
     },
     {
-      "input": {"test": "invalidate_works", "code": "await fetch_with_retry('/api/data')\ninvalidate_cache('/api/data')\nr = await fetch_with_retry('/api/data')\nassert r['from_cache'] == False"},
+      "input": {
+        "test": "invalidate_works",
+        "code": "await fetch_with_retry('/api/data')\ninvalidate_cache('/api/data')\nr = await fetch_with_retry('/api/data')\nassert r['from_cache'] == False"
+      },
       "expected": true
     },
     {
-      "input": {"test": "returns_error_on_failure", "code": "result = await fetch_with_retry('https://httpstat.us/500', retries=1)"},
+      "input": {
+        "test": "returns_error_on_failure",
+        "code": "result = await fetch_with_retry('https://httpstat.us/500', retries=1)"
+      },
       "expected": "error is not None"
     },
     {
-      "input": {"test": "no_retry_on_4xx", "code": "# 404 hatasi icin retry yapilmamalidir\nstart = time.time()\nresult = await fetch_with_retry('https://httpstat.us/404', retries=3)\nelapsed = time.time() - start\nassert elapsed < 2  # retry yapilmadigi icin hizli bitmeli"},
+      "input": {
+        "test": "no_retry_on_4xx",
+        "code": "# 404 hatasi icin retry yapilmamalidir\nstart = time.time()\nresult = await fetch_with_retry('https://httpstat.us/404', retries=3)\nelapsed = time.time() - start\nassert elapsed < 2  # retry yapilmadigi icin hizli bitmeli"
+      },
       "expected": true
     },
     {
-      "input": {"test": "clear_all_cache_works", "code": "await fetch_with_retry('/api/a')\nawait fetch_with_retry('/api/b')\nclear_all_cache()\nassert len(_cache) == 0"},
+      "input": {
+        "test": "clear_all_cache_works",
+        "code": "await fetch_with_retry('/api/a')\nawait fetch_with_retry('/api/b')\nclear_all_cache()\nassert len(_cache) == 0"
+      },
       "expected": true
     }
   ],
   "hidden_test_cases": [
     {
-      "input": {"test": "cache_expiry", "code": "# cache_time=1 saniye ile test\nawait fetch_with_retry('/api/data', cache_time=1)\nawait asyncio.sleep(1.5)\nr = await fetch_with_retry('/api/data', cache_time=1)\nassert r['from_cache'] == False"},
+      "input": {
+        "test": "cache_expiry",
+        "code": "# cache_time=1 saniye ile test\nawait fetch_with_retry('/api/data', cache_time=1)\nawait asyncio.sleep(1.5)\nr = await fetch_with_retry('/api/data', cache_time=1)\nassert r['from_cache'] == False"
+      },
       "expected": true
     },
     {
-      "input": {"test": "retry_count_respected", "code": "# retry sayisi asilmamali\ncall_count = 0\n# mock fetch ile test\nassert call_count <= retries + 1"},
+      "input": {
+        "test": "retry_count_respected",
+        "code": "# retry sayisi asilmamali\ncall_count = 0\n# mock fetch ile test\nassert call_count <= retries + 1"
+      },
       "expected": true
     },
     {
-      "input": {"test": "exponential_backoff", "code": "# Retry'lar arasi sure artmali\n# 1. retry: ~1s, 2. retry: ~2s\nstart = time.time()\nresult = await fetch_with_retry('https://httpstat.us/500', retries=2)\nelapsed = time.time() - start\nassert elapsed >= 2.5  # en az 1s + 2s backoff"},
+      "input": {
+        "test": "exponential_backoff",
+        "code": "# Retry'lar arasi sure artmali\n# 1. retry: ~1s, 2. retry: ~2s\nstart = time.time()\nresult = await fetch_with_retry('https://httpstat.us/500', retries=2)\nelapsed = time.time() - start\nassert elapsed >= 2.5  # en az 1s + 2s backoff"
+      },
       "expected": true
     },
     {
-      "input": {"test": "different_urls_different_cache", "code": "r1 = await fetch_with_retry('/api/users')\nr2 = await fetch_with_retry('/api/posts')\n# Farkli URL'ler farkli cache entry'leri olmali\nassert '/api/users' in _cache and '/api/posts' in _cache"},
+      "input": {
+        "test": "different_urls_different_cache",
+        "code": "r1 = await fetch_with_retry('/api/users')\nr2 = await fetch_with_retry('/api/posts')\n# Farkli URL'ler farkli cache entry'leri olmali\nassert '/api/users' in _cache and '/api/posts' in _cache"
+      },
       "expected": true
     }
   ],

@@ -337,7 +337,7 @@ FROM node:20-alpine
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./  # Sadece package dosyalari (nadiren degisir)
 RUN corepack enable && pnpm install --frozen-lockfile  # Cache'ten gelir (package degismediyse)
-COPY . .                    # Kod degisse bile pnpm install tekrar calismaz
+COPY . .                    # Kod degisse bile pnpm install tekrar çalışmaz
 CMD ["node", "server.js"]
 :::
 
@@ -926,7 +926,7 @@ docker run -p 3000:3000 my-api:v1
 curl http://localhost:3000/health
 ```
 
-**Beklenen Sonuc:** Multi-stage build ile image boyutu 200MB altinda olmali. Non-root user ile calismali. Healthcheck tanimli olmali.
+**Beklenen Sonuc:** Multi-stage build ile image boyutu 200MB altinda olmali. Non-root user ile çalışmali. Healthcheck tanimli olmali.
 **Ipucu:** `.dockerignore` dosyasina `node_modules`, `.git`, `dist` ekle. Layer caching icin package.json'i COPY . 'dan once kopyala.
 
 ---
@@ -1081,7 +1081,7 @@ docker run --rm my-app:secure ls -la /app/
 
 ### Alistirma 5: Docker Volume ve Persistent Data (Kolay)
 
-Container silinse bile verilerin kaybolmamasini saglayan volume yapilandirmasi yap.
+Container silinse bile verilerin kaybolmamasini saglayan volume yapılandırmasi yap.
 
 ```bash
 # 1. Named volume ile PostgreSQL
@@ -1108,7 +1108,7 @@ docker run -d --name postgres-test2 -e POSTGRES_PASSWORD=secret -v pgdata:/var/l
 # TODO: Bind mount vs named volume farklarini dene
 ```
 
-**Beklenen Sonuc:** Container silinip yeniden olusturulsa bile veriler korunmali. Volume inspect ile mount point ve boyut bilgileri gorunmeli.
+**Beklenen Sonuc:** Container silinip yeniden oluşturulsa bile veriler korunmali. Volume inspect ile mount point ve boyut bilgileri gorunmeli.
 **Ipucu:** Named volume'lar Docker tarafindan yonetilir ve production'da tercih edilir. Bind mount'lar development'ta (hot reload) kullanilir.
 
 ---
@@ -1154,8 +1154,8 @@ docker images | grep app
 # TODO: Distroless base image ile ucuncu bir varyant dene
 ```
 
-**Beklenen Sonuc:** Optimized image en az %50 daha kucuk olmali. Non-root user ile calismali. Gereksiz build araclari final image'da bulunmamali.
-**Ipucu:** `npm ci --only=production` devDependencies'i atlar. `USER appuser` ile root yetkisiyle calismak engellenir.
+**Beklenen Sonuc:** Optimized image en az %50 daha kucuk olmali. Non-root user ile çalışmali. Gereksiz build araclari final image'da bulunmamali.
+**Ipucu:** `npm ci --only=production` devDependencies'i atlar. `USER appuser` ile root yetkisiyle çalışmak engellenir.
 
 ---
 
@@ -1184,7 +1184,7 @@ docker run -d --name web --network app-network -p 80:80 nginx:alpine
 ```
 
 **Beklenen Sonuc:** Ayni network'teki container'lar birbirlerini isimle bulabilmeli. Farkli network'teki container'lar izole olmali.
-**Ipucu:** Docker Compose otomatik olarak bir bridge network olusturur. Service isimleri DNS olarak cozumlenir.
+**Ipucu:** Docker Compose otomatik olarak bir bridge network oluşturur. Service isimleri DNS olarak cozumlenir.
 
 ---
 
@@ -1226,7 +1226,7 @@ docker run -d \
 
 ---
 
-### Alistirma 9: Docker Compose ile Development Ortami (Zor)
+### Alistirma 9: Docker Compose ile Development Ortamı (Zor)
 
 Production benzeri bir development ortamı kur: hot reload, debug, seeding.
 
@@ -1278,14 +1278,14 @@ volumes:
   pgdata:
 ```
 
-**Beklenen Sonuc:** `docker compose -f docker-compose.dev.yml up` ile tum ortam ayaga kalkmali. Backend kodu degistiginde hot reload calismali. Debugger VS Code'dan baglanabilir olmali.
+**Beklenen Sonuc:** `docker compose -f docker-compose.dev.yml up` ile tum ortam ayaga kalkmali. Backend kodu degistiginde hot reload çalışmali. Debugger VS Code'dan baglanabilir olmali.
 **Ipucu:** `target: development` multi-stage build'de development stage'ini kullanir. `depends_on.condition` ile saglikli servisleri bekleyebilirsin.
 
 ---
 
 ### Alistirma 10: Container Logging ve Monitoring (Zor)
 
-Centralized logging ve basit monitoring yapilandirmasi kur.
+Centralized logging ve basit monitoring yapılandırmasi kur.
 
 ```yaml
 # docker-compose.monitoring.yml
@@ -1334,8 +1334,296 @@ scrape_configs:
 # TODO: Alert rule ekle: response time > 500ms ise bildirim
 ```
 
-**Beklenen Sonuc:** Prometheus app'ten metrikleri toplamalı. Grafana'da gorsel dashboard olusturulmali. Log rotation ile disk dolmasi onlenmeli.
-**Ipucu:** `prom-client` Node.js icin Prometheus metrikleri olusturur. Grafana'da hazir dashboard'lar import edebilirsin (ID: 1860 — Node.js).
+**Beklenen Sonuc:** Prometheus app'ten metrikleri toplamalı. Grafana'da gorsel dashboard oluşturulmali. Log rotation ile disk dolmasi onlenmeli.
+**Ipucu:** `prom-client` Node.js icin Prometheus metrikleri oluşturur. Grafana'da hazir dashboard'lar import edebilirsin (ID: 1860 — Node.js).
+:::
+
+:::exercise
+### Alistirma 11: Docker Layer Analizi ve Cache Debugging (Kolay)
+
+Docker image'inin layer yapisini analiz et ve cache sorunlarini tespit et.
+
+```bash
+# Image'i build et ve layer'lari incele
+docker build -t layer-test:v1 .
+docker history layer-test:v1
+
+# TODO: Dive araci ile layer analizi yap
+# docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive layer-test:v1
+# TODO: Dockerfile'i optimize et — package.json'i COPY . .'dan once kopyala
+# TODO: Yeniden build et ve cache hit/miss farkini gozlemle
+# TODO: docker system df ile disk kullanimini analiz et
+```
+
+**Beklenen Sonuc:** Optimize edilmis Dockerfile'da package.json degismediginde npm install layer'i cache'ten gelmeli. Layer sayisi ve toplam boyut azalmali.
+**Ipucu:** `docker history --no-trunc` ile her layer'in tam komutunu gor. Buyuk layer'lar genellikle gereksiz dosya kopyalamalarindan kaynaklanir.
+:::
+
+:::exercise
+### Alistirma 12: Docker Environment ve Secret Yonetimi (Kolay)
+
+Docker'da environment variable ve secret yonetimini guvenli sekilde uygula.
+
+```yaml
+# docker-compose.yml
+version: "3.8"
+services:
+  app:
+    image: node:20-alpine
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    # TODO: Docker secrets kullan
+    # secrets:
+    #   - db_password
+# TODO: secrets tanimla
+# secrets:
+#   db_password:
+#     file: ./secrets/db_password.txt
+```
+
+```bash
+# TODO: .env dosyasini .dockerignore'a ekle
+# TODO: Build-time secret icin --secret flag kullan
+# docker build --secret id=mysecret,src=secret.txt -t secure-app .
+# TODO: docker inspect ile env variable'lari kontrol et
+```
+
+**Beklenen Sonuc:** Secret'lar image layer'larinda gorunmemeli. Runtime'da environment variable olarak erisilebilir olmali.
+**Ipucu:** Secret'lar `/run/secrets/` altinda dosya olarak mount edilir. ENV ile secret tanimlamak image layer'larinda kalici iz birakir.
+:::
+
+:::exercise
+### Alistirma 13: Docker Resource Limitleri (Kolay)
+
+Container'lara CPU ve memory limitleri koy.
+
+```bash
+# Memory limitli container
+docker run -d --name mem-test --memory=256m --memory-swap=512m node:20-alpine sleep 3600
+
+# CPU limitli container
+docker run -d --name cpu-test --cpus=0.5 node:20-alpine sleep 3600
+
+# TODO: docker stats ile resource kullanimini izle
+# TODO: Stress test yap: apk add stress-ng && stress-ng --vm 1 --vm-bytes 200M
+# TODO: Memory limiti asildiginda OOMKilled durumunu gozlemle
+# docker inspect mem-test --format='{{.State.OOMKilled}}'
+```
+
+**Beklenen Sonuc:** Memory limiti asildiginda container OOMKilled olmali. CPU limiti ile container belirlenen paydan fazlasini kullanamamali.
+**Ipucu:** `--memory-reservation` soft limit, `--memory` hard limittir. Production'da her zaman memory limiti koy.
+:::
+
+:::exercise
+### Alistirma 14: Docker Build Context Optimizasyonu (Orta)
+
+.dockerignore ile build context boyutunu minimize et.
+
+```text
+# .dockerignore icerigi olustur
+.git
+node_modules
+dist
+.env
+.env.*
+*.pem
+*.key
+.vscode
+coverage
+__tests__
+*.test.ts
+docs
+README.md
+Dockerfile*
+docker-compose*
+```
+
+```bash
+# TODO: Build context boyutunu olc (oncesi ve sonrasi)
+# du -sh . --exclude=.git
+# TODO: .dockerignore olmadan build et ve "Sending build context" boyutunu not et
+# TODO: .dockerignore ekle ve tekrar build et, boyut farkini karsilastir
+# TODO: Gereksiz dosyalarin image icinde olmadigini dogrula
+# docker run --rm app ls -la /app
+```
+
+**Beklenen Sonuc:** .dockerignore ile build context boyutu %50+ azalmali. Build suresi kisalmali.
+**Ipucu:** `docker build` ciktisinin ilk satirinda "Sending build context to Docker daemon" boyutunu gosterir.
+:::
+
+:::exercise
+### Alistirma 15: Docker Multi-Container Networking (Orta)
+
+Custom network ile container'lar arasi guvenli iletisim kur.
+
+```bash
+# Custom network olustur
+docker network create my-app-network
+
+# API ve Frontend container'larini ayni network'e ekle
+docker run -d --name api --network my-app-network nginx:alpine
+docker run -d --name frontend --network my-app-network -p 3000:80 nginx:alpine
+
+# TODO: Container'lar arasi iletisimi test et
+# docker exec frontend ping -c 3 api
+# docker exec frontend wget -qO- http://api:80
+
+# TODO: Izole network olustur ve erisim kontrolunu test et
+# docker network create isolated-net
+# docker run -d --name db --network isolated-net postgres:16-alpine
+# docker exec frontend ping -c 1 db  # Basarisiz olmali!
+
+# TODO: Container'i iki network'e bagla
+# docker network connect my-app-network db
+```
+
+**Beklenen Sonuc:** Ayni network'teki container'lar isimle birbirini bulmali. Farkli network'tekiler erisememeli.
+**Ipucu:** Docker embedded DNS (127.0.0.11) container isimlerini otomatik cozer.
+:::
+
+:::exercise
+### Alistirma 16: Docker Volume Backup ve Restore (Orta)
+
+Docker volume'larini yedekle ve geri yukle.
+
+```bash
+# Test veritabani ile volume olustur
+docker volume create db-data
+docker run -d --name test-db -v db-data:/var/lib/postgresql/data \
+  -e POSTGRES_PASSWORD=test123 postgres:16-alpine
+
+# TODO: Volume'u tar ile yedekle
+# docker run --rm -v db-data:/source:ro -v $(pwd)/backup:/backup \
+#   alpine tar czf /backup/db-backup.tar.gz -C /source .
+
+# TODO: Yeni volume olustur ve yedegi geri yukle
+# docker volume create db-data-restored
+# docker run --rm -v db-data-restored:/target -v $(pwd)/backup:/backup \
+#   alpine tar xzf /backup/db-backup.tar.gz -C /target
+
+# TODO: Restore edilen veriyi dogrula
+```
+
+**Beklenen Sonuc:** Yedeklenen volume tam olarak geri yuklenmeli. Tum veriler korunmali.
+**Ipucu:** `:ro` flag'i volume'u read-only mount eder. Buyuk veritabanlarinda `pg_dump` kullanmak daha guvenlidir.
+:::
+
+:::exercise
+### Alistirma 17: Docker Container Lifecycle Management (Orta)
+
+Container yasam dongusunu yonet: restart policy, graceful shutdown, temizlik.
+
+```bash
+# Farkli restart policy'ler
+docker run -d --name always-up --restart=always nginx:alpine
+docker run -d --name on-fail --restart=on-failure:3 nginx:alpine
+
+# TODO: Container'i durdur ve restart davranisini gozlemle
+# docker stop always-up && sleep 3 && docker ps | grep always-up
+
+# TODO: Olu container'lari temizle
+# docker container prune -f
+
+# TODO: Tum kullanilmayan kaynaklari temizle
+# docker system prune -a --volumes
+
+# TODO: Container event'lerini izle
+# docker events --filter type=container --since 5m
+
+# TODO: Graceful shutdown test et (SIGTERM handler)
+```
+
+**Beklenen Sonuc:** `always` policy ile container otomatik yeniden baslamali. Graceful shutdown sirasinda cleanup tamamlanmali.
+**Ipucu:** `--stop-timeout` SIGTERM'den SIGKILL'e kadar bekleme suresidir (varsayilan 10sn).
+:::
+
+:::exercise
+### Alistirma 18: Dockerfile Security Scanning (Zor)
+
+Dockerfile'i guvenlik aciklarina karsi tara ve sertlestir.
+
+```dockerfile
+# Guvensiz Dockerfile — sorunlari bul ve duzelt!
+FROM node:20
+WORKDIR /app
+COPY . .
+RUN npm install
+ENV API_KEY=sk-secret123
+USER root
+EXPOSE 3000 22
+CMD ["node", "index.js"]
+```
+
+```bash
+# TODO: Hadolint ile Dockerfile'i tara
+# docker run --rm -i hadolint/hadolint < Dockerfile
+
+# TODO: Trivy ile image guvenlik taramasi yap
+# docker run --rm aquasec/trivy image my-app
+
+# TODO: Guvenli versiyon yaz:
+# - alpine veya distroless base image
+# - Non-root user (addgroup + adduser)
+# - ENV'de secret yok
+# - Multi-stage build
+# - Sadece gereken dosyalari COPY
+# - Port 22 kaldir
+```
+
+**Beklenen Sonuc:** Hadolint en az 5 uyari vermeli. Guvenli versiyonda tum uyarilar giderilmeli.
+**Ipucu:** Distroless image'lar shell bile icermez. `COPY --chown=node:node` ile dosya sahipligini non-root user'a ata.
+:::
+
+:::exercise
+### Alistirma 19: Docker Production Deployment Simulasyonu (Zor)
+
+Rolling update, health check ve load balancing ile production deployment simule et.
+
+```yaml
+# docker-compose.prod.yml
+version: "3.8"
+services:
+  app:
+    build: .
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    # TODO: Resource limitleri ekle
+    # TODO: Logging driver konfigurasyonu ekle
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    depends_on:
+      app:
+        condition: service_healthy
+    # TODO: nginx.conf ile upstream load balancing ekle
+    # TODO: Rate limiting konfigur et
+```
+
+```bash
+# TODO: Zero-downtime deployment test et
+# Surekli health check yaparak yeni versiyon deploy et
+# Hicbir istek basarisiz olmamali!
+```
+
+**Beklenen Sonuc:** Rolling update sirasinda zero downtime saglanmali. Health check basarisiz olan container'lar otomatik restart edilmeli.
+**Ipucu:** `order: start-first` yeni container'i once baslatir, saglikli oldugunu dogruladiktan sonra eskiyi kaldirir.
 :::
 
 ## Debugging Docker
@@ -1447,17 +1735,17 @@ Her biri ayrı bir container'da çalışır, Docker Compose (development) veya K
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "Docker'da container, image ve layer kavramlarini acikla. Union file system nasil calisir? Dockerfile'daki her instruction neden ayri bir layer olusturur? Layer caching mekanizmasi build suresini nasil etkiler? Multi-stage build ile final image boyutunu nasil minimize ederim?"
+> "Docker'da container, image ve layer kavramlarini acikla. Union file system nasil calisir? Dockerfile'daki her instruction neden ayri bir layer oluşturur? Layer caching mekanizmasi build suresini nasil etkiler? Multi-stage build ile final image boyutunu nasil minimize ederim?"
 
 **2. Pratik Uygulama:**
 > "Bir Node.js + PostgreSQL + Redis uygulamasi icin Docker ortamı kur: Multi-stage Dockerfile (builder + runner), docker-compose.yml (3 servis, network, volume), .dockerignore, environment variables ve health check. Production-ready Dockerfile best practice'lerini uygula (non-root user, minimal base image, layer ordering)."
 > Takip: "Simdi bu Docker setup'ina hot-reload ekle (development mode) ve production build ile development build arasindaki farklari docker-compose.override.yml ile yonet."
 
 **3. Mukemmellik Icin:**
-> "Docker image guvenligini nasil saglarsim? Alpine vs distroless base image karsilastirmasi, multi-stage build ile secret yonetimi, image scanning (Trivy/Snyk), non-root user, read-only filesystem ve Docker Bench Security kullanarak container hardening checklist'i olustur."
+> "Docker image güvenliğini nasil saglarsim? Alpine vs distroless base image karsilastirmasi, multi-stage build ile secret yonetimi, image scanning (Trivy/Snyk), non-root user, read-only filesystem ve Docker Bench Security kullanarak container hardening checklist'i oluştur."
 
 ### Pair Programming Ipucu
 Docker sorunlarinda AI'a docker logs, docker inspect veya Dockerfile ciktisini goster ve sor: "Container neden crash oluyor? Bu Dockerfile'da layer caching neden calismiyor? Image boyutum neden 1.2GB? Optimize et."

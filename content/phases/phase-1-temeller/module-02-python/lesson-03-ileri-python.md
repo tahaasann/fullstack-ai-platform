@@ -120,7 +120,7 @@ class DatabaseConnection:
     def __init__(self, host="localhost", port=5432):
         self.host = host
         self.port = port
-        print(f"Veritabani baglantisi kuruldu: {host}:{port}")
+        print(f"Veritabani bağlantısi kuruldu: {host}:{port}")
 
 # Her çağrıda aynı instance döner
 db1 = DatabaseConnection()
@@ -622,7 +622,7 @@ logger.addHandler(file_handler)
 logger.debug("Detay: x=%d", 42)           # Sadece dosyaya yazılır
 logger.info("Kullanici giris yapti")        # Konsol + dosya
 logger.warning("Disk alani %90 dolu")       # Konsol + dosya
-logger.error("Veritabani baglantisi koptu")  # Konsol + dosya
+logger.error("Veritabani bağlantısi koptu")  # Konsol + dosya
 logger.critical("Sistem coktu!")             # Konsol + dosya
 
 # Exception loglama (traceback dahil)
@@ -766,7 +766,7 @@ except RateLimitError as e:
 
 ### Alistirma 2: Generator Pipeline ile Veri Isleme (Orta)
 
-Generator'lar kullanarak bellek-verimli bir veri isleme pipeline'i olustur.
+Generator'lar kullanarak bellek-verimli bir veri isleme pipeline'i oluştur.
 
 ```python
 import csv
@@ -823,7 +823,7 @@ print(f"  Max Maas: {stats['max_salary']} TL")
 ```
 
 **Beklenen Sonuc:** Muhendislik departmaninda 4 calisan, ortalama maas 17250 TL, toplam yillik maas 828000 TL, max maas 20000 TL. Pipeline bellekte tum veriyi tutmadan satir satir islemeli.
-**Ipucu:** `aggregate_stats` icinde `count`, `total`, `max_val` degiskenlerini sifirdan baslatip her satiri islediginde guncelle.
+**Ipucu:** `aggregate_stats` icinde `count`, `total`, `max_val` değişkenlerini sifirdan baslatip her satiri islediginde guncelle.
 
 ---
 
@@ -893,7 +893,7 @@ with timer("Toplam hesaplama"):
     print(f"Toplam: {total}")
 ```
 
-**Beklenen Sonuc:** ConnectionPool context manager ile baglanti alinip otomatik geri birakilmali. Havuzda baglanti kalmadiginda `RuntimeError` firlatmali. Timer context manager calisma suresini dogru olcmeli. Exception durumunda bile kaynaklar geri birakilmali.
+**Beklenen Sonuc:** ConnectionPool context manager ile bağlantı alinip otomatik geri birakilmali. Havuzda bağlantı kalmadiginda `RuntimeError` firlatmali. Timer context manager çalışma suresini dogru olcmeli. Exception durumunda bile kaynaklar geri birakilmali.
 **Ipucu:** `__exit__` metodunun `exc_type, exc_val, exc_tb` parametreleri exception bilgisini tasir. `False` donerse exception yeniden firlatilir.
 :::
 
@@ -952,7 +952,7 @@ Generator, `yield` ile değer üreten lazy iterator'dır. Normal fonksiyon tüm 
 
 **Onerilen Model:** Claude Opus 4.6
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Konuyu Derinlemesine Anla:**
 > "Python'da decorator'larin altinda yatan closure mekanizmasini adim adim acikla. @timer decorator'u yazarken functools.wraps neden gerekli? Decorator factory (parametreli decorator) 3 katmanli nested fonksiyon nasil calisiyor?"
@@ -962,7 +962,7 @@ Generator, `yield` ile değer üreten lazy iterator'dır. Normal fonksiyon tüm 
 **2. Pratik Uygulama:**
 > "Bir FastAPI projesi icin su decorator'lari yaz: 1) @retry(max_attempts=3, delay=1.0) - basarisiz istekleri tekrar deneyen, 2) @rate_limit(calls=10, period=60) - dakikada max 10 cagri izin veren, 3) @cache_result(ttl=300) - sonuclari 5 dakika onbellekleyen. Her birinde functools.wraps kullan."
 
-*Follow-up:* "Bu decorator'lari bir fonksiyona ust uste uyguladigimda calisma sirasi nasil olur? @retry @rate_limit @cache_result sirasinin onemi ne?"
+*Follow-up:* "Bu decorator'lari bir fonksiyona ust uste uyguladigimda çalışma sirasi nasil olur? @retry @rate_limit @cache_result sirasinin onemi ne?"
 
 **3. Mukemmellik Icin:**
 > "asyncio.gather vs asyncio.create_task vs await sirali cagri arasindaki farklari performans ve hata yonetimi acisindan karsilastir. 10 API istegininin paralel atilmasi senaryosunda her yaklasimin avantaj ve dezavantajlarini goster."
@@ -1756,7 +1756,7 @@ Bir Senior Developer veya CTO, ileri Python kalıplarını öğrenirken şu yakl
 **Okuma Egzersizi:** Python docs'ta "Functional Programming HOWTO" belgesini oku: https://docs.python.org/3/howto/functional.html
 
 **Yazma Pratigi:** Asagidaki commit mesajini Ingilizce yaz: "Veritabani islemleri icin retry decorator eklendi"
--> Ornek: `feat: add retry decorator for database operations`
+-> Örnek: `feat: add retry decorator for database operations`
 :::
 
 :::external-resource

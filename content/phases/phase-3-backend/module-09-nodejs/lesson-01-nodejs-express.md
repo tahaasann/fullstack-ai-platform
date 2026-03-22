@@ -465,7 +465,7 @@ Yaygın hata: Error handling middleware'inde 3 parametre kullanmak. Express, err
 :::exercise
 ### Alistirma 1: Express ile CRUD API (Kolay)
 
-Express.js ile basit bir kullanici yonetim API'si olustur.
+Express.js ile basit bir kullanici yonetim API'si oluştur.
 
 ```javascript
 const express = require("express");
@@ -541,7 +541,7 @@ app.post("/api/users",
 );
 ```
 
-**Beklenen Sonuc:** Her istek renkli olarak loglanmali (basarili=yesil, hatali=kirmizi). Eksik body field'lari icin 400 donmeli. Middleware zinciri dogru calismali.
+**Beklenen Sonuc:** Her istek renkli olarak loglanmali (basarili=yesil, hatali=kirmizi). Eksik body field'lari icin 400 donmeli. Middleware zinciri dogru çalışmali.
 **Ipucu:** `res.on("finish", callback)` response gonderildikten sonra calisir. `next()` cagirmayi unutma, yoksa request asili kalir.
 
 ---
@@ -640,17 +640,17 @@ explanation: "I/O callback'leri poll fazında işlenir. timers fazı setTimeout/
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "Node.js event loop'unu 6 fazini (timers, pending callbacks, idle/prepare, poll, check, close) bir restoran garsonu analojisiyle acikla. setTimeout, setImmediate ve process.nextTick arasindaki oncelik sirasini orneklerle goster. libuv thread pool ne zaman devreye girer?"
+> "Node.js event loop'unu 6 fazini (timers, pending callbacks, idle/prepare, poll, check, close) bir restoran garsonu analojisiyle acikla. setTimeout, setImmediate ve process.nextTick arasindaki oncelik sirasini örneklerle goster. libuv thread pool ne zaman devreye girer?"
 
 **2. Pratik Uygulama:**
-> "Express.js ile bir RESTful API olustur: custom logger middleware, JWT authentication middleware, role-based authorization middleware ve merkezi error handling middleware zincirini kur. asyncHandler wrapper ile try-catch tekrarini onle. Her middleware'in neden o sirada oldugunu acikla."
+> "Express.js ile bir RESTful API oluştur: custom logger middleware, JWT authentication middleware, role-based authorization middleware ve merkezi error handling middleware zincirini kur. asyncHandler wrapper ile try-catch tekrarini onle. Her middleware'in neden o sirada oldugunu acikla."
 > Takip: "Simdi bu API'ye stream kullanarak buyuk bir CSV dosyasini parse eden bir endpoint ekle. Dosyayi bellege yuklemeden satir satir isle."
 
 **3. Mukemmellik Icin:**
-> "Production'da bir Node.js uygulamasinda memory leak tespit ettim. process.memoryUsage(), --inspect flag'i ile Chrome DevTools heap snapshot ve clinic.js ile profiling yaparak memory leak'i nasil bulurum? Yaygin memory leak kaynaklarini (closure'lar, event listener temizlenmemesi, global degiskenler) ve cozumlerini acikla."
+> "Production'da bir Node.js uygulamasinda memory leak tespit ettim. process.memoryUsage(), --inspect flag'i ile Chrome DevTools heap snapshot ve clinic.js ile profiling yaparak memory leak'i nasil bulurum? Yaygin memory leak kaynaklarini (closure'lar, event listener temizlenmemesi, global değişkenler) ve cozumlerini acikla."
 
 ### Pair Programming Ipucu
 Express middleware yazarken AI'a hata loglarini goster ve sor: "Bu error stack trace'i analiz et. Hangi middleware'de hata olustu? Error handling middleware'im neden bu hatayi yakalayamadi? 4 parametreli error handler'imi kontrol et."
@@ -661,10 +661,10 @@ Express middleware yazarken AI'a hata loglarini goster ve sor: "Bu error stack t
 
 **Soru 1: Node.js'in event loop'u nasil calisir?**
 - **Junior cevabi:** Node.js tek thread'dir, event loop async islemleri yonetir.
-- **Senior cevabi:** Event loop 6 fazdan olusur: timers (setTimeout/setInterval), pending callbacks, idle/prepare, poll (I/O), check (setImmediate), close callbacks. Her faz kendi FIFO kuyrugundan callback'leri calistirir. Microtask'lar (Promise.then, process.nextTick) her faz gecisinde oncelikli calisir. process.nextTick microtask queue'da Promise'den once gelir. Uzun sureli senkron islemler event loop'u bloke eder, bu yuzden CPU-intensive isler worker_threads veya child_process ile ayrilir. libuv 4 thread'lik pool ile file I/O, DNS lookup gibi islemleri handle eder.
+- **Senior cevabi:** Event loop 6 fazdan olusur: timers (setTimeout/setInterval), pending callbacks, idle/prepare, poll (I/O), check (setImmediate), close callbacks. Her faz kendi FIFO kuyrugundan callback'leri çalıştırir. Microtask'lar (Promise.then, process.nextTick) her faz gecisinde oncelikli calisir. process.nextTick microtask queue'da Promise'den once gelir. Uzun sureli senkron islemler event loop'u bloke eder, bu yuzden CPU-intensive isler worker_threads veya child_process ile ayrilir. libuv 4 thread'lik pool ile file I/O, DNS lookup gibi islemleri handle eder.
 
 **Soru 2: Express.js'te middleware ne ise yarar ve nasil calisir?**
-- **Junior cevabi:** Middleware request ve response arasinda calistirilan fonksiyonlardir.
+- **Junior cevabi:** Middleware request ve response arasinda çalıştırilan fonksiyonlardir.
 - **Senior cevabi:** Middleware (req, res, next) imzasina sahiptir ve request pipeline'inda sirayla calisir. Sira onemlidir: CORS middleware auth'dan once gelmeli, error handler en sonda olmalidir (4 parametre: err, req, res, next). Yaygin pattern'ler: authentication (JWT verify), authorization (role check), validation (input sanitize), logging (request/response log), rate limiting, compression. app.use() global, router.use() route-specific middleware atar. next('route') ile ayni route'un bir sonraki handler'ina atlanir.
 :::
 

@@ -635,12 +635,12 @@ explanation: "Video streaming'de hız, güvenilirlikten önemlidir. Birkaç kay�
 
 **Onerilen Model:** Claude Opus 4.6
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Konuyu Derinlemesine Anla:**
-> "TCP/IP katman modelini bir mektup gonderme analojisiyle acikla. Her katmanda (Application, Transport, Network, Link) neler oluyor? Her katmanin eklediği header bilgisi ne ise yariyor?"
+> "TCP/IP katman modelini bir mektup gönderme analojisiyle acikla. Her katmanda (Application, Transport, Network, Link) neler oluyor? Her katmanin eklediği header bilgisi ne ise yariyor?"
 
-*Neden:* Soyut network kavramlarini somut orneklerle anlamak, encapsulation surecini kalici hale getirir
+*Neden:* Soyut network kavramlarini somut örneklerle anlamak, encapsulation sürecini kalici hale getirir
 
 **2. Pratik Uygulama:**
 > "curl ile bir HTTP request attigimda arka planda neler oluyor? DNS cozumlemesinden TCP 3-way handshake'e kadar adim adim anlat ve her adimda hangi port ve protokol kullanildigini belirt."

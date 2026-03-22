@@ -10,13 +10,13 @@ prerequisites: ["mod-04-git/lesson-01"]
 # Branching, Merging ve Profesyonel Git Stratejileri
 
 :::realworld
-Profesyonel yazılım gelistirmede hicbir ciddi ekip tek bir branch üzerinde çalışmaz. Branch'ler, Git'in en güçlü ozelligidir ve doğru kullanildiginda ekip uyelerinin birbirini engellemeden paralel çalışmasını sağlar. Bu derste branch olusturmaktan merge conflict cozmeye, rebase stratejilerinden Git Flow'a kadar her seyi ogreneceksin. Bir is mulakatinda "Git workflow'unuz nasil?" sorusuna profesyonelce cevap verebilecek seviyeye geleceksin.
+Profesyonel yazılım geliştirmede hicbir ciddi ekip tek bir branch üzerinde çalışmaz. Branch'ler, Git'in en güçlü ozelligidir ve doğru kullanildiginda ekip uyelerinin birbirini engellemeden paralel çalışmasını sağlar. Bu derste branch oluşturmaktan merge conflict cozmeye, rebase stratejilerinden Git Flow'a kadar her seyi ogreneceksin. Bir is mulakatinda "Git workflow'unuz nasil?" sorusuna profesyonelce cevap verebilecek seviyeye geleceksin.
 :::
 
 ## Branch Nedir, Neden Kullanılır?
 
 :::concept[Branch (Ing: Branch)]
-Branch, mevcut kodun bağımsız bir kopyasi üzerinde calismanizi sağlayan isaretcidir (pointer). Aslinda dosyalari kopyalamaz, sadece commit gecmisinde yeni bir yol oluşturur.
+Branch, mevcut kodun bağımsız bir kopyasi üzerinde çalışmanizi sağlayan isaretcidir (pointer). Aslinda dosyalari kopyalamaz, sadece commit gecmisinde yeni bir yol oluşturur.
 
 **Türkçe karsiligi:** Dal / Dallanma
 **Ne ise yarar:** Ana kodu bozmadan yeni özellik geliştirme, hata duzeltme veya deney yapma imkani verir
@@ -126,7 +126,7 @@ git merge feature/login
 Her iki branch'te de ayrilma noktasindan sonra yeni commit'ler varsa, Git üç noktayi kullanır: ortak ata (common ancestor), her iki branch'in son hali. Sonucta yeni bir merge commit oluşturur.
 
 **Türkçe karsiligi:** Üç Yonlu Birleştirme
-**Ne ise yarar:** Paralel calismalarim birlestirilmesini sağlar
+**Ne ise yarar:** Paralel çalışmalarim birlestirilmesini sağlar
 **Gerçek hayat benzetmesi:** Iki kisinin ayni dokumani ayrı ayrı duzenleyip sonra değişiklikleri birde birlestirmesi gibi
 :::
 
@@ -161,7 +161,7 @@ git merge --no-ff feature/login
 | **Avantaj** | Temiz geçmiş | Branch geçmişi korunur |
 | **Dezavantaj** | Branch'in varligi kaybolur | Geçmiş karmaşık gorunebilir |
 
-**Tavsiye:** Ekip calismalarinda `--no-ff` kullanarak feature branch'lerin gecmiste görünür kalmasini sagla. Kisisel branch'lerde fast-forward tercih edebilirsin.
+**Tavsiye:** Ekip çalışmalarinda `--no-ff` kullanarak feature branch'lerin gecmiste görünür kalmasini sagla. Kisisel branch'lerde fast-forward tercih edebilirsin.
 :::
 
 ### Merge Conflict Çözme
@@ -422,7 +422,7 @@ git bisect run pnpm test
 :::
 
 :::tip
-`git bisect run` komutu ile bisect'i tamamen otomatize edebilirsin. Bir test script'i yaz ve Git her commit'te otomatik calistirsin. "Bu test geciyorsa good, gecmiyorsa bad" mantigi ile hatali commit dakikalar içinde bulunur.
+`git bisect run` komutu ile bisect'i tamamen otomatize edebilirsin. Bir test script'i yaz ve Git her commit'te otomatik çalıştırsin. "Bu test geciyorsa good, gecmiyorsa bad" mantigi ile hatali commit dakikalar içinde bulunur.
 :::
 
 ## Branching Stratejileri
@@ -574,7 +574,7 @@ Yaygin hata: Conflict'te panic yapip `git merge --abort` ile vazgecmek. Conflict
 :::exercise
 ### Alistirma 1: Feature Branch ve Merge Turleri (Kolay)
 
-Feature branch olusturup fast-forward ve no-fast-forward merge farklarini gozlemle.
+Feature branch oluşturup fast-forward ve no-fast-forward merge farklarini gozlemle.
 
 ```bash
 # 1. Repo olustur
@@ -608,7 +608,7 @@ git log --oneline --graph  # Merge commit ile dallanma gorunur
 
 ### Alistirma 2: Merge Conflict Cozme Pratigi (Orta)
 
-Kasitli bir merge conflict olustur ve VS Code ile coz.
+Kasitli bir merge conflict oluştur ve VS Code ile coz.
 
 ```bash
 # 1. Repo ve baslangic dosyasi
@@ -729,7 +729,7 @@ content: Branching, merging ve rebase gibi Git stratejilerini anlamak için AI'd
 model_recommendation: Claude Opus 4.6
 prompts:
   - prompt: "Git'te merge ve rebase arasindaki farki görsel olarak açıkla. Ayni senaryoda her ikisini de uygulayarak commit gecmisinin nasil degistigini adim adim göster. Hangi durumda hangisini secmeliyim?"
-    why: "Merge ve rebase secimi ekip calismasinda en kritik Git kararidir. Görsel açıklama ile farklar kalici olarak öğrenir."
+    why: "Merge ve rebase secimi ekip çalışmasinda en kritik Git kararidir. Görsel açıklama ile farklar kalici olarak öğrenir."
     follow_up: "Interactive rebase ile 5 commit'i 2 temiz commit'e nasil birlestiririm? Squash ve fixup farki ne?"
   - prompt: "Şu senaryoyu adim adim coz: Feature branch'imde çalışırken main'e yeni commit'ler geldi. Merge conflict çıktı. Conflict isaretlerini açıkla, VS Code'da nasil cozecegimi ve git komutlarini sırala."
     why: "Merge conflict çözümü junior developer'larin en çok zorlandigi konudur. Pratik senaryo ile ozguven kazanirsin."
@@ -1437,7 +1437,7 @@ Bir Senior Developer veya CTO, branching ve merge stratejilerini ogrenirken şu 
 
 3. **Branch protection kurallarini konfigure eder** - main branch'e doğrudan push'u engeller, PR zorunlulugu koyar, CI check'lerinin gecmesini şart kosar, minimum reviewer sayisi belirler. Bu kurallar "guven ama doğrula" prensibinin teknik uygulamasidir.
 
-4. **Conflict resolution kulturunu oluşturur** - Conflict cikmasi basarisizlik değil, paralel calismanin dogal sonucudur. Ekibe conflict çözme egitimi verir, pair programming ile zor conflict'leri birlikte çözer. `rerere` gibi araclari ekip genelinde aktiflestirir.
+4. **Conflict resolution kulturunu oluşturur** - Conflict cikmasi basarisizlik değil, paralel çalışmanin dogal sonucudur. Ekibe conflict çözme egitimi verir, pair programming ile zor conflict'leri birlikte çözer. `rerere` gibi araclari ekip genelinde aktiflestirir.
 
 5. **Commit geçmişini bir iletişim araci olarak gorur** - `git log --oneline --graph` ciktisi projenin hikayesini anlatmalidir. Her commit mesaji "neden" sorusuna cevap vermeli. Interactive rebase ile PR'daki commit'leri temizlemeyi takim kulturu haline getirir.
 

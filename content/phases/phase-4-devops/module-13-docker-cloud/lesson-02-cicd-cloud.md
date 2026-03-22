@@ -502,7 +502,7 @@ Cloud Computing, bilgi işlem kaynaklarının (sunucu, depolama, veritabanı, ne
 ### Cloud Service Modelleri
 
 :::comparison
-| Model | Senin Yonetigin | Provider Yonetir | Ornek |
+| Model | Senin Yonetigin | Provider Yonetir | Örnek |
 |-------|----------------|-------------------|-------|
 | **IaaS** (Infrastructure) | OS, Runtime, App | Network, Storage, Compute | AWS EC2, GCP Compute Engine |
 | **PaaS** (Platform) | App, Data | OS, Runtime, Infra | Heroku, AWS Elastic Beanstalk |
@@ -967,7 +967,7 @@ jobs:
 ## Pratik Alistirmalar
 
 ### Alistirma 1: GitHub Actions CI Pipeline
-Bir Node.js projesi icin CI pipeline olusturun:
+Bir Node.js projesi icin CI pipeline oluşturun:
 
 ```yaml
 # .github/workflows/ci.yml
@@ -979,10 +979,10 @@ Bir Node.js projesi icin CI pipeline olusturun:
 # TODO: Test coverage raporu yukle
 ```
 
-**Beklenen sonuc:** PR'larda otomatik lint + test + build calismali, basarisiz olursa merge engellemeli (branch protection), cache ile CI suresi %50+ azalmali.
+**Beklenen sonuc:** PR'larda otomatik lint + test + build çalışmali, basarisiz olursa merge engellemeli (branch protection), cache ile CI suresi %50+ azalmali.
 
 ### Alistirma 2: Multi-Stage Docker Build + Deploy
-Bir React + Express uygulamasi icin production-ready pipeline olusturun:
+Bir React + Express uygulamasi icin production-ready pipeline oluşturun:
 
 ```dockerfile
 # TODO: Multi-stage Dockerfile (build + production)
@@ -1000,7 +1000,7 @@ Bir React + Express uygulamasi icin production-ready pipeline olusturun:
 # 5. Production'a deploy et (manual approval ile)
 ```
 
-**Beklenen sonuc:** Tek commit ile build -> test -> staging -> production pipeline'i calismali, rollback mekanizmasi olmali.
+**Beklenen sonuc:** Tek commit ile build -> test -> staging -> production pipeline'i çalışmali, rollback mekanizmasi olmali.
 
 ### Alistirma 3: Environment Secrets ve Config Yonetimi
 Farkli ortamlar icin konfigurasyoon yonetimi kurun:
@@ -1012,7 +1012,7 @@ Farkli ortamlar icin konfigurasyoon yonetimi kurun:
 # TODO: Slack notification entegrasyonu (deploy basarili/basarisiz)
 ```
 
-**Beklenen sonuc:** Hicbir secret kod icerisinde olmamali, her ortam kendi konfigurasyonuyla calismali, deploy durumlari Slack'te bildirilmeli.
+**Beklenen sonuc:** Hicbir secret kod icerisinde olmamali, her ortam kendi konfigurasyonuyla çalışmali, deploy durumlari Slack'te bildirilmeli.
 
 ---
 
@@ -1053,14 +1053,14 @@ jobs:
 # TODO: Auto-assign reviewer kurali ekle
 ```
 
-**Beklenen Sonuc:** PR acildiginda lint, type-check ve test otomatik calismali. Coverage %80'in altindaysa PR merge edilememeli.
+**Beklenen Sonuc:** PR acildiginda lint, type-check ve test otomatik çalışmali. Coverage %80'in altindaysa PR merge edilememeli.
 **Ipucu:** GitHub Settings > Branches > Branch protection rules ile main branch'i koruyabilirsin.
 
 ---
 
 ### Alistirma 5: Docker Image Build ve Registry Push (Kolay)
 
-CI pipeline'da Docker image olustur ve container registry'ye gonder.
+CI pipeline'da Docker image oluştur ve container registry'ye gonder.
 
 ```yaml
 # .github/workflows/docker-publish.yml
@@ -1159,7 +1159,7 @@ spec:
 # TODO: ConfigMap ve Secret manifest'leri olustur
 ```
 
-**Beklenen Sonuc:** `kubectl apply -f k8s/` ile tum kaynaklar olusturulmali. Pod'lar healthy olmali. Secret'lar environment variable olarak inject edilmeli.
+**Beklenen Sonuc:** `kubectl apply -f k8s/` ile tum kaynaklar oluşturulmali. Pod'lar healthy olmali. Secret'lar environment variable olarak inject edilmeli.
 **Ipucu:** `kubectl get pods -w` ile pod durumlarini canli izle. `kubectl describe pod <name>` ile hata detaylarini gor.
 
 ---
@@ -1197,7 +1197,7 @@ spec:
       maxUnavailable: 0
 ```
 
-**Beklenen Sonuc:** Zero-downtime deployment calismali. Basarisiz deployment otomatik geri alinmali. Rollout history ile gecmis versiyonlara donulebilmeli.
+**Beklenen Sonuc:** Zero-downtime deployment çalışmali. Basarisiz deployment otomatik geri alinmali. Rollout history ile gecmis versiyonlara donulebilmeli.
 **Ipucu:** `maxUnavailable: 0` ile her zaman en az mevcut replica sayisi kadar pod ayakta kalir.
 
 ---
@@ -1241,7 +1241,7 @@ resource "aws_s3_bucket_website_configuration" "frontend" {
 # TODO: variables.tf ve outputs.tf dosyalarini tamamla
 ```
 
-**Beklenen Sonuc:** `terraform plan` ile degisiklikler onizlenebilmeli. `terraform apply` ile altyapi olusturulmali. State dosyasi remote backend'de saklanmali.
+**Beklenen Sonuc:** `terraform plan` ile degisiklikler onizlenebilmeli. `terraform apply` ile altyapi oluşturulmali. State dosyasi remote backend'de saklanmali.
 **Ipucu:** `terraform destroy` ile tum kaynaklari temizleyebilirsin. Production'da state'i S3 + DynamoDB lock ile sakla.
 
 ---
@@ -1346,9 +1346,306 @@ k8s/
 # TODO: Argo CD UI'da sync durumunu izle
 ```
 
-**Beklenen Sonuc:** Git repo'ya push yapildiginda Argo CD otomatik olarak Kubernetes'e deploy etmeli. Staging ve production farkli konfigurasyonlarla calismali.
+**Beklenen Sonuc:** Git repo'ya push yapildiginda Argo CD otomatik olarak Kubernetes'e deploy etmeli. Staging ve production farkli konfigurasyonlarla çalışmali.
 **Ipucu:** GitOps'ta "truth" her zaman Git'tedir. Manuel kubectl degisiklikleri Argo CD tarafindan geri alinir (selfHeal: true).
 :::
+
+:::exercise
+### Alistirma 11: GitHub Actions Workflow Temelleri (Kolay)
+
+Basit bir CI pipeline'i GitHub Actions ile olustur.
+
+```yaml
+# .github/workflows/ci.yml
+name: CI Pipeline
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      # TODO: Test coverage raporu ekle
+      # TODO: Coverage threshold kontrolu ekle (%80 altinda fail)
+      # TODO: Build artifact'ini upload et
+```
+
+**Beklenen Sonuc:** Her push'ta testler otomatik calismali. PR'larda lint ve test sonuclari gorunmeli.
+**Ipucu:** `actions/cache` ile node_modules cache'leyerek CI suresini %40-60 kisaltabilirsin.
+:::
+
+:::exercise
+### Alistirma 12: CI Pipeline'a Lint ve Format Kontrolu Ekleme (Kolay)
+
+CI'da kod kalitesini otomatik kontrol et.
+
+```yaml
+# .github/workflows/quality.yml
+name: Code Quality
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      # TODO: ESLint calistir
+      # - run: npx eslint . --max-warnings 0
+      # TODO: Prettier format kontrolu
+      # - run: npx prettier --check .
+      # TODO: TypeScript type check
+      # - run: npx tsc --noEmit
+```
+
+**Beklenen Sonuc:** Lint hatalari PR'da gorunmeli. Format bozuklugu varsa CI fail olmali.
+**Ipucu:** `--max-warnings 0` ile uyarilari da hata olarak say. Boylece kod kalitesi zamanla dusmez.
+:::
+
+:::exercise
+### Alistirma 13: Docker Image Build ve Push Pipeline (Kolay)
+
+CI'da Docker image build edip registry'ye push et.
+
+```yaml
+# .github/workflows/docker.yml
+name: Docker Build & Push
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # TODO: docker/build-push-action ile image build et ve push et
+      # TODO: cache-from: type=gha kullanarak build hizlandir
+      # TODO: Trivy ile guvenlik taramasi ekle
+      # TODO: Image boyutunu loglara yazdir
+```
+
+**Beklenen Sonuc:** Tag push'unda image otomatik build edilip GHCR'a push edilmeli. Cache ile build hizlanmali.
+**Ipucu:** `cache-from: type=gha` GitHub Actions cache'ini kullanir. Semantic versioning tag'leri kullan: v1.0.0.
+:::
+
+:::exercise
+### Alistirma 14: Multi-Environment Deployment Pipeline (Orta)
+
+Staging ve production ortamlarina ayri deployment pipeline'lari kur.
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+on:
+  push:
+    branches: [main, develop]
+
+jobs:
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      # TODO: Staging'e deploy et
+      # TODO: Smoke test calistir
+      # TODO: Basarisiz olursa Slack'e bildirim gonder
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      # TODO: Production'a deploy et (manual approval gerekli)
+      # TODO: Database migration calistir
+      # TODO: Health check bekle
+      # TODO: Rollback mekanizmasi ekle
+```
+
+**Beklenen Sonuc:** develop branch'i staging'e, main branch'i production'a deploy etmeli. Environment secret'lari ayri olmali.
+**Ipucu:** GitHub Environments ile her ortam icin ayri secret ve approval kurallari tanimlanabilir.
+:::
+
+:::exercise
+### Alistirma 15: Kubernetes Pod ve Service Tanimlama (Orta)
+
+Basit bir uygulamayi Kubernetes'e deploy et.
+
+```yaml
+# k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: app
+          image: my-app:latest
+          ports:
+            - containerPort: 3000
+          # TODO: Resource limits ekle (cpu: 500m, memory: 256Mi)
+          # TODO: Liveness ve readiness probe ekle
+          # TODO: Environment variable'lari ConfigMap'ten al
+---
+# TODO: ClusterIP Service tanimla
+# TODO: Ingress tanimla (host-based routing)
+# TODO: HorizontalPodAutoscaler ekle (CPU %70'de scale)
+```
+
+**Beklenen Sonuc:** 3 replica calismali. Service uzerinden erisim saglanmali. Probe'lar sagliksiz pod'lari tespit etmeli.
+**Ipucu:** Liveness probe container'in canli olup olmadigini, readiness probe trafik alip alamayacagini kontrol eder.
+:::
+
+:::exercise
+### Alistirma 16: Kubernetes ConfigMap ve Secret Yonetimi (Orta)
+
+Kubernetes'te konfigurasyon ve secret yonetimini uygula.
+
+```yaml
+# k8s/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  NODE_ENV: production
+  LOG_LEVEL: info
+  API_URL: https://api.example.com
+---
+# TODO: Secret tanimla (stringData ile)
+# TODO: Deployment'ta envFrom ile ConfigMap ve Secret kullan
+# TODO: Volume olarak mount etmeyi de dene
+# TODO: Sealed Secrets veya External Secrets Operator arastir
+```
+
+**Beklenen Sonuc:** ConfigMap degisiklikleri pod restart ile uygulanmali. Secret'lar base64 encoded saklanmali.
+**Ipucu:** `kubectl create secret generic` komutu ile secret olusturmak YAML yazmaktan daha guvenlidir.
+:::
+
+:::exercise
+### Alistirma 17: CI/CD Pipeline Monitoring ve Alerting (Orta)
+
+CI/CD pipeline'ini izle ve hatalarda bildirim gonder.
+
+```yaml
+# .github/workflows/notify.yml
+name: Pipeline Notification
+on:
+  workflow_run:
+    workflows: ["CI Pipeline", "Deploy"]
+    types: [completed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      # TODO: Basarisiz pipeline'da Slack webhook ile bildirim gonder
+      # TODO: Deployment metriklerini topla (DORA metrikleri)
+      # - Deployment Frequency
+      # - Lead Time for Changes
+      # - Mean Time to Recovery (MTTR)
+      # - Change Failure Rate
+      # TODO: Dashboard olustur
+```
+
+**Beklenen Sonuc:** Basarisiz pipeline'larda Slack bildirimi gelmeli. DORA metrikleri takip edilmeli.
+**Ipucu:** DORA metrikleri DevOps olgunlugunu olcer. Elite takim: gunluk deploy, <1 saat lead time.
+:::
+
+:::exercise
+### Alistirma 18: Cloud Provider Servisleri Karsilastirmasi (Zor)
+
+AWS, GCP ve Azure'un temel servislerini karsilastir.
+
+```markdown
+# TODO: Asagidaki tabloyu tamamla
+
+| Kategori    | AWS             | GCP               | Azure              |
+|-------------|-----------------|--------------------|--------------------|
+| Compute     | EC2, Lambda     | Compute Engine, ?  | VM, ?              |
+| Database    | RDS, DynamoDB   | Cloud SQL, ?       | SQL Database, ?    |
+| Storage     | S3              | Cloud Storage      | Blob Storage       |
+| Container   | ECS, EKS        | GKE                | AKS                |
+| Serverless  | Lambda          | Cloud Functions    | Azure Functions    |
+| CDN         | CloudFront      | Cloud CDN          | ?                  |
+| Monitoring  | CloudWatch      | Cloud Monitoring   | ?                  |
+
+# TODO: Her kategori icin secim kriterlerini yaz
+# - Maliyet, ogrenme egrisi, Turkiye'den erisim performansi
+# - Free tier karsilastirmasi
+# - Hangi senaryoda hangisi tercih edilmeli?
+```
+
+**Beklenen Sonuc:** Tablo eksiksiz doldurulmali. Her servis icin use-case onerileri yazilmali.
+**Ipucu:** AWS en genis ekosisteme, GCP en iyi Kubernetes deneyimine, Azure en iyi enterprise entegrasyonuna sahiptir.
+:::
+
+:::exercise
+### Alistirma 19: GitOps ile Kubernetes Deployment (Zor)
+
+ArgoCD ile GitOps workflow'u kur.
+
+```yaml
+# argocd/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/user/k8s-manifests.git
+    targetRevision: HEAD
+    path: environments/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: my-app
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    # TODO: Sync window tanimla (sadece is saatleri disinda deploy)
+    # TODO: Pre-sync hook ile database migration calistir
+    # TODO: Post-sync hook ile smoke test calistir
+    # TODO: Helm veya Kustomize ile environment farklilastirma ekle
+```
+
+**Beklenen Sonuc:** Git'e push yapildiginda ArgoCD otomatik deploy etmeli. selfHeal ile manuel degisiklikler geri alinmali.
+**Ipucu:** GitOps'ta "single source of truth" Git'tir. Manuel kubectl degisiklikleri ArgoCD tarafindan override edilir.
+:::
+
 
 ## Interview'da CI/CD ve Cloud Soruları
 
@@ -1371,13 +1668,13 @@ k8s/
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "CI/CD pipeline'in her asamasini (commit, build, test, deploy) acikla. Continuous Integration, Continuous Delivery ve Continuous Deployment arasindaki farki goster. GitHub Actions workflow syntax'ini (on, jobs, steps, uses, env, secrets) orneklerle anlat. Matrix strategy ve caching ne ise yarar?"
+> "CI/CD pipeline'in her asamasini (commit, build, test, deploy) acikla. Continuous Integration, Continuous Delivery ve Continuous Deployment arasindaki farki goster. GitHub Actions workflow syntax'ini (on, jobs, steps, uses, env, secrets) örneklerle anlat. Matrix strategy ve caching ne ise yarar?"
 
 **2. Pratik Uygulama:**
-> "GitHub Actions ile tam bir CI/CD pipeline olustur: PR'da lint + test + build calistir, main branch'e merge'de Docker image build et, container registry'ye push et ve Vercel/Railway'e otomatik deploy et. Environment secrets, caching (node_modules) ve status badge ekle."
+> "GitHub Actions ile tam bir CI/CD pipeline oluştur: PR'da lint + test + build çalıştır, main branch'e merge'de Docker image build et, container registry'ye push et ve Vercel/Railway'e otomatik deploy et. Environment secrets, caching (node_modules) ve status badge ekle."
 > Takip: "Simdi bu pipeline'a Kubernetes deployment ekle. Basit bir k8s manifest (Deployment, Service, Ingress) yaz ve kubectl ile deploy et."
 
 **3. Mukemmellik Icin:**

@@ -3,7 +3,14 @@
   "title": "Array Method Zinciri",
   "difficulty": "orta",
   "category": "javascript",
-  "tags": ["array-methods", "map", "filter", "reduce", "chaining", "functional-programming"],
+  "tags": [
+    "array-methods",
+    "map",
+    "filter",
+    "reduce",
+    "chaining",
+    "functional-programming"
+  ],
   "related_lesson": "mod-03-javascript/lesson-03",
   "description_tr": "Verilen bir obje dizisini array method zinciri (map, filter, reduce) kullanarak donustur.",
   "description_detail": "Bir e-ticaret sitesindeki urun listesini islemek icin fonksiyon yazin. Fonksiyon bir urun dizisi alir, belirli kosullara gore filtreler, donusturur ve sonuc uretir. Method chaining (map, filter, reduce) kullanarak tek bir ifadede cozum uretin.",
@@ -27,132 +34,337 @@
     "Fiyatlar ve stok degerleri negatif olmayacaktir"
   ],
   "starter_code": {
-    "python": "def process_products(products: list, category: str) -> dict:\n    # Verilen kategorideki stokta olan urunleri isle\n    # 1. Stokta olan urunleri filtrele (stock > 0)\n    # 2. Belirtilen kategoriye ait olanlari filtrele\n    # 3. Sonuc objesi olustur:\n    #    - totalValue: tum urunlerin (fiyat * stok) toplami\n    #    - productNames: urun isimlerinin listesi\n    #    - averagePrice: ortalama fiyat\n    # Hicbir urun yoksa { totalValue: 0, productNames: [], averagePrice: 0 } dondur\n    pass",
-    "javascript": "function processProducts(products, category) {\n    // Verilen kategorideki stokta olan urunleri isle\n    // 1. Stokta olan urunleri filtrele (stock > 0)\n    // 2. Belirtilen kategoriye ait olanlari filtrele\n    // 3. Sonuc objesi olustur:\n    //    - totalValue: tum urunlerin (fiyat * stok) toplami\n    //    - productNames: urun isimlerinin listesi\n    //    - averagePrice: ortalama fiyat\n    // Hicbir urun yoksa { totalValue: 0, productNames: [], averagePrice: 0 } dondur\n}"
+    "python": "def process_products(products: list, category: str) -> dict:\n    # Verilen kategorideki stokta olan urunleri isle\n    # 1. Stokta olan urunleri filtrele (stock > 0)\n    # 2. Belirtilen kategoriye ait olanlari filtrele\n    # 3. Sonuc objesi oluştur:\n    #    - totalValue: tum urunlerin (fiyat * stok) toplami\n    #    - productNames: urun isimlerinin listesi\n    #    - averagePrice: ortalama fiyat\n    # Hicbir urun yoksa { totalValue: 0, productNames: [], averagePrice: 0 } dondur\n    pass",
+    "javascript": "function processProducts(products, category) {\n    // Verilen kategorideki stokta olan urunleri isle\n    // 1. Stokta olan urunleri filtrele (stock > 0)\n    // 2. Belirtilen kategoriye ait olanlari filtrele\n    // 3. Sonuc objesi oluştur:\n    //    - totalValue: tum urunlerin (fiyat * stok) toplami\n    //    - productNames: urun isimlerinin listesi\n    //    - averagePrice: ortalama fiyat\n    // Hicbir urun yoksa { totalValue: 0, productNames: [], averagePrice: 0 } dondur\n}"
   },
   "test_cases": [
     {
       "input": {
         "products": [
-          {"name": "Laptop", "price": 15000, "category": "elektronik", "stock": 5},
-          {"name": "Kalem", "price": 10, "category": "kirtasiye", "stock": 100},
-          {"name": "Telefon", "price": 8000, "category": "elektronik", "stock": 0},
-          {"name": "Defter", "price": 25, "category": "kirtasiye", "stock": 50}
+          {
+            "name": "Laptop",
+            "price": 15000,
+            "category": "elektronik",
+            "stock": 5
+          },
+          {
+            "name": "Kalem",
+            "price": 10,
+            "category": "kirtasiye",
+            "stock": 100
+          },
+          {
+            "name": "Telefon",
+            "price": 8000,
+            "category": "elektronik",
+            "stock": 0
+          },
+          {
+            "name": "Defter",
+            "price": 25,
+            "category": "kirtasiye",
+            "stock": 50
+          }
         ],
         "category": "elektronik"
       },
-      "expected": {"totalValue": 75000, "productNames": ["Laptop"], "averagePrice": 15000}
+      "expected": {
+        "totalValue": 75000,
+        "productNames": [
+          "Laptop"
+        ],
+        "averagePrice": 15000
+      }
     },
     {
       "input": {
         "products": [
-          {"name": "Bardak", "price": 30, "category": "mutfak", "stock": 20},
-          {"name": "Tabak", "price": 45, "category": "mutfak", "stock": 15}
+          {
+            "name": "Bardak",
+            "price": 30,
+            "category": "mutfak",
+            "stock": 20
+          },
+          {
+            "name": "Tabak",
+            "price": 45,
+            "category": "mutfak",
+            "stock": 15
+          }
         ],
         "category": "mutfak"
       },
-      "expected": {"totalValue": 1275, "productNames": ["Bardak", "Tabak"], "averagePrice": 37.5}
+      "expected": {
+        "totalValue": 1275,
+        "productNames": [
+          "Bardak",
+          "Tabak"
+        ],
+        "averagePrice": 37.5
+      }
     },
     {
       "input": {
         "products": [
-          {"name": "Laptop", "price": 15000, "category": "elektronik", "stock": 5}
+          {
+            "name": "Laptop",
+            "price": 15000,
+            "category": "elektronik",
+            "stock": 5
+          }
         ],
         "category": "giyim"
       },
-      "expected": {"totalValue": 0, "productNames": [], "averagePrice": 0}
+      "expected": {
+        "totalValue": 0,
+        "productNames": [],
+        "averagePrice": 0
+      }
     },
     {
       "input": {
         "products": [],
         "category": "elektronik"
       },
-      "expected": {"totalValue": 0, "productNames": [], "averagePrice": 0}
+      "expected": {
+        "totalValue": 0,
+        "productNames": [],
+        "averagePrice": 0
+      }
     },
     {
       "input": {
         "products": [
-          {"name": "Tisort", "price": 100, "category": "giyim", "stock": 0},
-          {"name": "Pantolon", "price": 250, "category": "giyim", "stock": 0}
+          {
+            "name": "Tisort",
+            "price": 100,
+            "category": "giyim",
+            "stock": 0
+          },
+          {
+            "name": "Pantolon",
+            "price": 250,
+            "category": "giyim",
+            "stock": 0
+          }
         ],
         "category": "giyim"
       },
-      "expected": {"totalValue": 0, "productNames": [], "averagePrice": 0}
+      "expected": {
+        "totalValue": 0,
+        "productNames": [],
+        "averagePrice": 0
+      }
     },
     {
       "input": {
         "products": [
-          {"name": "Mouse", "price": 200, "category": "elektronik", "stock": 30},
-          {"name": "Klavye", "price": 350, "category": "elektronik", "stock": 20},
-          {"name": "Monitor", "price": 5000, "category": "elektronik", "stock": 10}
+          {
+            "name": "Mouse",
+            "price": 200,
+            "category": "elektronik",
+            "stock": 30
+          },
+          {
+            "name": "Klavye",
+            "price": 350,
+            "category": "elektronik",
+            "stock": 20
+          },
+          {
+            "name": "Monitor",
+            "price": 5000,
+            "category": "elektronik",
+            "stock": 10
+          }
         ],
         "category": "elektronik"
       },
-      "expected": {"totalValue": 63000, "productNames": ["Mouse", "Klavye", "Monitor"], "averagePrice": 1850}
+      "expected": {
+        "totalValue": 63000,
+        "productNames": [
+          "Mouse",
+          "Klavye",
+          "Monitor"
+        ],
+        "averagePrice": 1850
+      }
     },
     {
       "input": {
         "products": [
-          {"name": "Kitap", "price": 50, "category": "kirtasiye", "stock": 1}
+          {
+            "name": "Kitap",
+            "price": 50,
+            "category": "kirtasiye",
+            "stock": 1
+          }
         ],
         "category": "kirtasiye"
       },
-      "expected": {"totalValue": 50, "productNames": ["Kitap"], "averagePrice": 50}
+      "expected": {
+        "totalValue": 50,
+        "productNames": [
+          "Kitap"
+        ],
+        "averagePrice": 50
+      }
     }
   ],
   "hidden_test_cases": [
     {
       "input": {
         "products": [
-          {"name": "A", "price": 10, "category": "x", "stock": 1},
-          {"name": "B", "price": 20, "category": "x", "stock": 2},
-          {"name": "C", "price": 30, "category": "x", "stock": 3},
-          {"name": "D", "price": 40, "category": "x", "stock": 4},
-          {"name": "E", "price": 50, "category": "x", "stock": 5}
+          {
+            "name": "A",
+            "price": 10,
+            "category": "x",
+            "stock": 1
+          },
+          {
+            "name": "B",
+            "price": 20,
+            "category": "x",
+            "stock": 2
+          },
+          {
+            "name": "C",
+            "price": 30,
+            "category": "x",
+            "stock": 3
+          },
+          {
+            "name": "D",
+            "price": 40,
+            "category": "x",
+            "stock": 4
+          },
+          {
+            "name": "E",
+            "price": 50,
+            "category": "x",
+            "stock": 5
+          }
         ],
         "category": "x"
       },
-      "expected": {"totalValue": 550, "productNames": ["A", "B", "C", "D", "E"], "averagePrice": 30}
+      "expected": {
+        "totalValue": 550,
+        "productNames": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "averagePrice": 30
+      }
     },
     {
       "input": {
         "products": [
-          {"name": "Urun1", "price": 0, "category": "test", "stock": 10}
+          {
+            "name": "Urun1",
+            "price": 0,
+            "category": "test",
+            "stock": 10
+          }
         ],
         "category": "test"
       },
-      "expected": {"totalValue": 0, "productNames": ["Urun1"], "averagePrice": 0}
+      "expected": {
+        "totalValue": 0,
+        "productNames": [
+          "Urun1"
+        ],
+        "averagePrice": 0
+      }
     },
     {
       "input": {
         "products": [
-          {"name": "Pahalı", "price": 99999, "category": "lux", "stock": 1},
-          {"name": "Ucuz", "price": 1, "category": "lux", "stock": 1}
+          {
+            "name": "Pahalı",
+            "price": 99999,
+            "category": "lux",
+            "stock": 1
+          },
+          {
+            "name": "Ucuz",
+            "price": 1,
+            "category": "lux",
+            "stock": 1
+          }
         ],
         "category": "lux"
       },
-      "expected": {"totalValue": 100000, "productNames": ["Pahalı", "Ucuz"], "averagePrice": 50000}
+      "expected": {
+        "totalValue": 100000,
+        "productNames": [
+          "Pahalı",
+          "Ucuz"
+        ],
+        "averagePrice": 50000
+      }
     },
     {
       "input": {
         "products": [
-          {"name": "StokVar", "price": 100, "category": "mix", "stock": 5},
-          {"name": "StokYok", "price": 200, "category": "mix", "stock": 0},
-          {"name": "StokVar2", "price": 300, "category": "mix", "stock": 2},
-          {"name": "DigerKat", "price": 400, "category": "other", "stock": 10}
+          {
+            "name": "StokVar",
+            "price": 100,
+            "category": "mix",
+            "stock": 5
+          },
+          {
+            "name": "StokYok",
+            "price": 200,
+            "category": "mix",
+            "stock": 0
+          },
+          {
+            "name": "StokVar2",
+            "price": 300,
+            "category": "mix",
+            "stock": 2
+          },
+          {
+            "name": "DigerKat",
+            "price": 400,
+            "category": "other",
+            "stock": 10
+          }
         ],
         "category": "mix"
       },
-      "expected": {"totalValue": 1100, "productNames": ["StokVar", "StokVar2"], "averagePrice": 200}
+      "expected": {
+        "totalValue": 1100,
+        "productNames": [
+          "StokVar",
+          "StokVar2"
+        ],
+        "averagePrice": 200
+      }
     },
     {
       "input": {
         "products": [
-          {"name": "Tek", "price": 777, "category": "tek", "stock": 3}
+          {
+            "name": "Tek",
+            "price": 777,
+            "category": "tek",
+            "stock": 3
+          }
         ],
         "category": "tek"
       },
-      "expected": {"totalValue": 2331, "productNames": ["Tek"], "averagePrice": 777}
+      "expected": {
+        "totalValue": 2331,
+        "productNames": [
+          "Tek"
+        ],
+        "averagePrice": 777
+      }
     }
   ],
   "hints": [

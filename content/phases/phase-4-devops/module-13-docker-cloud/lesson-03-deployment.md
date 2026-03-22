@@ -16,7 +16,7 @@ Spotify'ın mühendislik ekibi günde 100'den fazla deployment yapıyor. GitHub 
 :::senior-learns
 Senior developer deployment'ı bir "son adım" olarak görmez — projenin ilk gününde CI/CD pipeline'ını kurar, staging ortamını ayarlar ve her PR'ın otomatik preview deployment'ı olmasını sağlar. Deployment, development workflow'unun ayrılmaz parçasıdır.
 
-**Karar Verme Sureci — Platform Secimi:**
+**Karar Verme Süreci — Platform Secimi:**
 - **Vercel/Netlify**: Frontend ve Next.js icin optimize, preview deployment, edge functions. Trade-off: Backend sinirli (serverless function limitleri), vendor lock-in riski, buyuk trafiklerde pahali olabilir. Kullanim: React/Next.js frontend, JAMstack siteleri.
 - **Railway/Render**: Heroku alternatifi, container-based, kolay setup. Trade-off: AWS kadar esnek degil, buyuk olcekte maliyet kontrolu zor. Kullanim: MVP, startup, hizli prototip, kucuk-orta backend.
 - **AWS (ECS/EKS/Lambda)**: Tam kontrol, her olcekte calisir, 200+ servis. Trade-off: Ogrenme egrisi cok dik, basit bir deploy icin bile IAM, VPC, security group, load balancer konfigurasyonu gerekir. Kullanim: Enterprise, buyuk olcek, compliance gereksinimleri.
@@ -1417,18 +1417,18 @@ Bu soruya "Vercel'e push ederim" demek junior cevabı. Tüm pipeline'ı anlatan 
 **Görev:** Farkli ortamlar (development, staging, production) icin guvenli environment variable yonetimi kur.
 
 **Adimlar:**
-1. `.env.example` dosyasi olustur (tum degiskenlerin listesi, degerleri bos)
+1. `.env.example` dosyasi oluştur (tum değişkenlerin listesi, degerleri bos)
 2. `dotenv-vault` veya `infisical` ile secret yonetimi kur
 3. CI/CD pipeline'da GitHub Secrets kullanarak inject et
 4. Runtime'da eksik environment variable kontrolu ekle (startup validation)
 
 **Basari kriterleri:**
 - Hicbir secret Git history'sinde bulunmamali
-- Her ortam kendi konfigurasyonuyla calismali
+- Her ortam kendi konfigurasyonuyla çalışmali
 - Eksik env var'da uygulama anlamli hata mesajiyla baslatilmamali
 :::
 
-:::exercise[Egzersiz 6: Domain ve SSL Yapilandirmasi]
+:::exercise[Egzersiz 6: Domain ve SSL Yapılandırmasi]
 **Görev:** Custom domain baglayip SSL sertifikasi yapilandir.
 
 **Adimlar:**
@@ -1441,18 +1441,18 @@ Bu soruya "Vercel'e push ederim" demek junior cevabı. Tüm pipeline'ı anlatan 
 **Basari kriterleri:**
 - `https://yourdomain.com` ile siteye erisim saglanmali
 - SSL Labs testinde A+ rating alinmali
-- HTTP → HTTPS yonlendirmesi calismali
+- HTTP → HTTPS yonlendirmesi çalışmali
 :::
 
 :::exercise[Egzersiz 7: Monitoring ve Error Tracking]
 **Görev:** Production uygulamana monitoring ve hata takip sistemi entegre et.
 
 **Adimlar:**
-1. Sentry free tier hesabi olustur ve SDK'yi entegre et
+1. Sentry free tier hesabi oluştur ve SDK'yi entegre et
 2. Uptime monitoring kur (UptimeRobot veya BetterStack free)
 3. Custom error boundary component'i ekle (React)
 4. Backend'de structured logging ekle (JSON format)
-5. Basit bir Grafana dashboard olustur (opsiyonel)
+5. Basit bir Grafana dashboard oluştur (opsiyonel)
 
 **Basari kriterleri:**
 - Test error'u Sentry dashboard'unda gorunmeli
@@ -1470,25 +1470,25 @@ Bu soruya "Vercel'e push ederim" demek junior cevabı. Tüm pipeline'ı anlatan 
 4. Preview deployment'ta flagi aktif, production'da pasif yap
 
 **Basari kriterleri:**
-- Her PR'da unique preview URL olusturulmali
+- Her PR'da unique preview URL oluşturulmali
 - Feature flag ile özellik acilip kapatilabilmeli
 - Production'da flag pasifken özellik gorunmemeli
 :::
 
 :::exercise[Egzersiz 9: Database Migration ve Seed]
-**Görev:** Production-safe database migration workflow'u olustur.
+**Görev:** Production-safe database migration workflow'u oluştur.
 
 **Adimlar:**
 1. Migration araci sec (Prisma Migrate, Alembic, Drizzle)
-2. Ilk migration'i olustur (initial schema)
+2. Ilk migration'i oluştur (initial schema)
 3. Yeni bir kolon ekleme migration'i yaz
-4. Seed script'i olustur (test/demo verisi)
-5. CI/CD'de migration'i deploy oncesi otomatik calistir
+4. Seed script'i oluştur (test/demo verisi)
+5. CI/CD'de migration'i deploy oncesi otomatik çalıştır
 
 **Basari kriterleri:**
-- Migration'lar sirayla ve idempotent calismali
+- Migration'lar sirayla ve idempotent çalışmali
 - Rollback migration'i mevcut olmali
-- Seed data development ortaminda otomatik yuklenmeli
+- Seed data development ortamında otomatik yuklenmeli
 :::
 
 :::exercise[Egzersiz 10: Load Testing ve Performance Baseline]

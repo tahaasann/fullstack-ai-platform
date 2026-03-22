@@ -3,8 +3,19 @@
   "title": "Design Patterns Challenge: Messy Code Refactoring",
   "difficulty": "advanced",
   "estimated_minutes": 75,
-  "tags": ["design-patterns", "strategy", "observer", "factory", "solid", "refactoring", "clean-code"],
-  "prerequisites": ["mod-18-architecture/lesson-01", "mod-18-architecture/lesson-02"],
+  "tags": [
+    "design-patterns",
+    "strategy",
+    "observer",
+    "factory",
+    "solid",
+    "refactoring",
+    "clean-code"
+  ],
+  "prerequisites": [
+    "mod-18-architecture/lesson-01",
+    "mod-18-architecture/lesson-02"
+  ],
   "description": "Kötü yazılmış bir e-ticaret sipariş sistemini Strategy, Observer ve Factory pattern'larını kullanarak refactor et. SOLID prensiplerine uygun, genişletilebilir ve test edilebilir bir yapıya dönüştür.",
   "learning_objectives": [
     "Mevcut koddaki code smell'leri ve anti-pattern'ları tespit etme",
@@ -20,7 +31,7 @@
       "uv add pytest  # 📌 2026 standardı (legacy: pip install pytest)"
     ],
     "initial_code": {
-      "messy_order_system.py": "# BU KODU REFACTOR EDECEKSIN!\n# Anti-pattern'larla dolu, bakımı zor, test edilemez kod.\n\nclass OrderSystem:\n    \"\"\"God Class - her seyi yapiyor!\"\"\"\n    \n    def __init__(self):\n        self.orders = []\n        self.total_revenue = 0\n    \n    def process_order(self, order):\n        # === PRICING - if/else cehennemi ===\n        if order['customer_type'] == 'regular':\n            total = order['price'] * order['quantity']\n        elif order['customer_type'] == 'premium':\n            total = order['price'] * order['quantity'] * 0.9\n        elif order['customer_type'] == 'vip':\n            total = order['price'] * order['quantity'] * 0.8\n        elif order['customer_type'] == 'wholesale':\n            if order['quantity'] >= 100:\n                total = order['price'] * order['quantity'] * 0.6\n            elif order['quantity'] >= 50:\n                total = order['price'] * order['quantity'] * 0.7\n            else:\n                total = order['price'] * order['quantity'] * 0.75\n        elif order['customer_type'] == 'employee':\n            total = order['price'] * order['quantity'] * 0.5\n        else:\n            total = order['price'] * order['quantity']\n        \n        # === TAX CALCULATION - hardcoded ===\n        if order.get('country') == 'TR':\n            tax = total * 0.20  # KDV %20\n        elif order.get('country') == 'US':\n            tax = total * 0.08\n        elif order.get('country') == 'DE':\n            tax = total * 0.19\n        elif order.get('country') == 'UK':\n            tax = total * 0.20\n        else:\n            tax = total * 0.15  # Default tax\n        \n        total_with_tax = total + tax\n        \n        # === NOTIFICATION - if/else cehennemi ===\n        if order.get('notify_via') == 'email':\n            print(f'EMAIL: Siparis onaylandi. Toplam: {total_with_tax:.2f} TL')\n            # Gercekte email gonderme kodu burada olurdu\n        elif order.get('notify_via') == 'sms':\n            print(f'SMS: Siparis {total_with_tax:.2f} TL')\n        elif order.get('notify_via') == 'push':\n            print(f'PUSH: Yeni siparis! {total_with_tax:.2f} TL')\n        elif order.get('notify_via') == 'slack':\n            print(f'SLACK: #orders kanalina mesaj: {total_with_tax:.2f} TL')\n        elif order.get('notify_via') == 'whatsapp':\n            print(f'WHATSAPP: Siparisiniz hazirlaniyor. {total_with_tax:.2f} TL')\n        \n        # === LOGGING - hardcoded ===\n        print(f'LOG: Order processed - customer={order[\"customer_type\"]}, total={total_with_tax:.2f}')\n        \n        # === ANALYTICS - hardcoded ===\n        print(f'ANALYTICS: revenue={total_with_tax:.2f}, customer_type={order[\"customer_type\"]}')\n        \n        # === INVENTORY - hardcoded ===\n        print(f'INVENTORY: Stok guncelleniyor, {order[\"quantity\"]} adet cikarildi')\n        \n        # === STORE ===\n        order_record = {\n            'customer_type': order['customer_type'],\n            'subtotal': total,\n            'tax': tax,\n            'total': total_with_tax,\n            'quantity': order['quantity'],\n            'status': 'completed'\n        }\n        self.orders.append(order_record)\n        self.total_revenue += total_with_tax\n        \n        return order_record\n    \n    def get_report(self):\n        print(f'Toplam siparis: {len(self.orders)}')\n        print(f'Toplam gelir: {self.total_revenue:.2f} TL')\n        for i, order in enumerate(self.orders):\n            print(f'  #{i+1}: {order[\"customer_type\"]} - {order[\"total\"]:.2f} TL')\n\n\n# Test\nsystem = OrderSystem()\nsystem.process_order({\n    'customer_type': 'vip',\n    'price': 100,\n    'quantity': 5,\n    'country': 'TR',\n    'notify_via': 'email'\n})\nsystem.process_order({\n    'customer_type': 'wholesale',\n    'price': 50,\n    'quantity': 150,\n    'country': 'US',\n    'notify_via': 'slack'\n})\nsystem.get_report()\n"
+      "messy_order_system.py": "# BU KODU REFACTOR EDECEKSIN!\n# Anti-pattern'larla dolu, bakımı zor, test edilemez kod.\n\nclass OrderSystem:\n    \"\"\"God Class - her seyi yapiyor!\"\"\"\n    \n    def __init__(self):\n        self.orders = []\n        self.total_revenue = 0\n    \n    def process_order(self, order):\n        # === PRICING - if/else cehennemi ===\n        if order['customer_type'] == 'regular':\n            total = order['price'] * order['quantity']\n        elif order['customer_type'] == 'premium':\n            total = order['price'] * order['quantity'] * 0.9\n        elif order['customer_type'] == 'vip':\n            total = order['price'] * order['quantity'] * 0.8\n        elif order['customer_type'] == 'wholesale':\n            if order['quantity'] >= 100:\n                total = order['price'] * order['quantity'] * 0.6\n            elif order['quantity'] >= 50:\n                total = order['price'] * order['quantity'] * 0.7\n            else:\n                total = order['price'] * order['quantity'] * 0.75\n        elif order['customer_type'] == 'employee':\n            total = order['price'] * order['quantity'] * 0.5\n        else:\n            total = order['price'] * order['quantity']\n        \n        # === TAX CALCULATION - hardcoded ===\n        if order.get('country') == 'TR':\n            tax = total * 0.20  # KDV %20\n        elif order.get('country') == 'US':\n            tax = total * 0.08\n        elif order.get('country') == 'DE':\n            tax = total * 0.19\n        elif order.get('country') == 'UK':\n            tax = total * 0.20\n        else:\n            tax = total * 0.15  # Default tax\n        \n        total_with_tax = total + tax\n        \n        # === NOTIFICATION - if/else cehennemi ===\n        if order.get('notify_via') == 'email':\n            print(f'EMAIL: Siparis onaylandi. Toplam: {total_with_tax:.2f} TL')\n            # Gercekte email gönderme kodu burada olurdu\n        elif order.get('notify_via') == 'sms':\n            print(f'SMS: Siparis {total_with_tax:.2f} TL')\n        elif order.get('notify_via') == 'push':\n            print(f'PUSH: Yeni siparis! {total_with_tax:.2f} TL')\n        elif order.get('notify_via') == 'slack':\n            print(f'SLACK: #orders kanalina mesaj: {total_with_tax:.2f} TL')\n        elif order.get('notify_via') == 'whatsapp':\n            print(f'WHATSAPP: Siparisiniz hazirlaniyor. {total_with_tax:.2f} TL')\n        \n        # === LOGGING - hardcoded ===\n        print(f'LOG: Order processed - customer={order[\"customer_type\"]}, total={total_with_tax:.2f}')\n        \n        # === ANALYTICS - hardcoded ===\n        print(f'ANALYTICS: revenue={total_with_tax:.2f}, customer_type={order[\"customer_type\"]}')\n        \n        # === INVENTORY - hardcoded ===\n        print(f'INVENTORY: Stok guncelleniyor, {order[\"quantity\"]} adet cikarildi')\n        \n        # === STORE ===\n        order_record = {\n            'customer_type': order['customer_type'],\n            'subtotal': total,\n            'tax': tax,\n            'total': total_with_tax,\n            'quantity': order['quantity'],\n            'status': 'completed'\n        }\n        self.orders.append(order_record)\n        self.total_revenue += total_with_tax\n        \n        return order_record\n    \n    def get_report(self):\n        print(f'Toplam siparis: {len(self.orders)}')\n        print(f'Toplam gelir: {self.total_revenue:.2f} TL')\n        for i, order in enumerate(self.orders):\n            print(f'  #{i+1}: {order[\"customer_type\"]} - {order[\"total\"]:.2f} TL')\n\n\n# Test\nsystem = OrderSystem()\nsystem.process_order({\n    'customer_type': 'vip',\n    'price': 100,\n    'quantity': 5,\n    'country': 'TR',\n    'notify_via': 'email'\n})\nsystem.process_order({\n    'customer_type': 'wholesale',\n    'price': 50,\n    'quantity': 150,\n    'country': 'US',\n    'notify_via': 'slack'\n})\nsystem.get_report()\n"
     }
   },
   "tasks": [
@@ -184,25 +195,45 @@
   "verification": {
     "original_test_cases": [
       {
-        "input": {"customer_type": "vip", "price": 100, "quantity": 5, "country": "TR"},
+        "input": {
+          "customer_type": "vip",
+          "price": 100,
+          "quantity": 5,
+          "country": "TR"
+        },
         "expected_subtotal": 400.0,
         "expected_tax": 80.0,
         "expected_total": 480.0
       },
       {
-        "input": {"customer_type": "wholesale", "price": 50, "quantity": 150, "country": "US"},
+        "input": {
+          "customer_type": "wholesale",
+          "price": 50,
+          "quantity": 150,
+          "country": "US"
+        },
         "expected_subtotal": 4500.0,
         "expected_tax": 360.0,
         "expected_total": 4860.0
       },
       {
-        "input": {"customer_type": "regular", "price": 200, "quantity": 3, "country": "DE"},
+        "input": {
+          "customer_type": "regular",
+          "price": 200,
+          "quantity": 3,
+          "country": "DE"
+        },
         "expected_subtotal": 600.0,
         "expected_tax": 114.0,
         "expected_total": 714.0
       },
       {
-        "input": {"customer_type": "employee", "price": 100, "quantity": 10, "country": "TR"},
+        "input": {
+          "customer_type": "employee",
+          "price": 100,
+          "quantity": 10,
+          "country": "TR"
+        },
         "expected_subtotal": 500.0,
         "expected_tax": 100.0,
         "expected_total": 600.0

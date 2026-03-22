@@ -743,7 +743,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
 ### Alistirma 2: Context + useReducer ile Tema Yonetimi (Orta)
 
-Context API ve useReducer birlestirerek bir tema yonetim sistemi olustur. light/dark tema degisimi, custom renk paleti ve font boyutu ayarlari olmali.
+Context API ve useReducer birlestirerek bir tema yonetim sistemi oluştur. light/dark tema degisimi, custom renk paleti ve font boyutu ayarlari olmali.
 
 ```tsx
 import { createContext, useContext, useReducer, ReactNode } from "react";
@@ -828,7 +828,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "Context API'de neden context degistiginde TUM consumer'lar re-render oluyor? Bu sorunu Zustand selector pattern'i nasil cozuyor? React internal'da useSyncExternalStore hook'u Zustand'da nasil kullaniliyor? Zustand'in source code'undaki temel mekanizmayi acikla."
@@ -1290,7 +1290,7 @@ Bir Senior Developer veya CTO, state patterns ve performance konusunu öğrenirk
 5. **Routing stratejisini SEO ve UX'e göre belirler** - SPA routing mi, SSR routing mi? Prefetching ne zaman yapılmalı? Code splitting stratejisi nasıl olmalı? Bu kararları data ile verir.
 6. **Performance budget koyar** - "Bu sayfa 3 saniyeden fazla yüklenmemeli" gibi metrikler belirler. Lighthouse CI ile her PR'da otomatik ölçüm yapar.
 
-**Karar Verme Sureci — State Nerede Tutulmali?**
+**Karar Verme Süreci — State Nerede Tutulmali?**
 - **URL state (searchParams)**: Filtreleme, siralama, sayfalama gibi paylasılabilir olması gereken state. Trade-off: string parse/serialize maliyeti var ama kullanıcı URL'yi paylaşabilir, back button çalışır. Production'da en çok unutulan state türü.
 - **Local state (useState)**: Sadece o component'te kullanılan, form input'ları, toggle'lar. Trade-off: basit ama prop drilling başlarsa kırılgan.
 - **Lifted state**: İki kardeş component paylaşıyorsa parent'a taşı. Trade-off: parent gereksiz re-render olabilir, ama basit durumlar için yeterli.

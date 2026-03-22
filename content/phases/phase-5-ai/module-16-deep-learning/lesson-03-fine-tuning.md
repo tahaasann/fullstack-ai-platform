@@ -27,7 +27,7 @@ Milyarlarca parametre ile eğitilmiş bir model düşün — GPT-4, LLaMA, BERT.
 > Takip: "Şimdi bu fine-tuned modeli Hugging Face Hub'a push et ve vLLM ile inference optimize et."
 
 **3. Mukemmellik Için:**
-> "Production ortaminda fine-tuning pipeline tasarliyorum. Dataset curation (veri kalitesi, deduplication, contamination check), hyperparameter tuning (learning rate schedule, warmup, rank secimi), evaluation (perplexity, task-specific metrics, A/B testing), deployment (ONNX export, quantization, serving) ve monitoring (drift detection, performance degradation) konularini kapsayan end-to-end bir pipeline oluştur."
+> "Production ortamında fine-tuning pipeline tasarliyorum. Dataset curation (veri kalitesi, deduplication, contamination check), hyperparameter tuning (learning rate schedule, warmup, rank secimi), evaluation (perplexity, task-specific metrics, A/B testing), deployment (ONNX export, quantization, serving) ve monitoring (drift detection, performance degradation) konularini kapsayan end-to-end bir pipeline oluştur."
 
 ### Pair Programming Ipucu
 Fine-tuning yaparken AI'a training loglarini göster ve sor: "Bu loss curve'de overfitting var mi? Learning rate çok mu yüksek? Early stopping ne zaman yapmaliyim? Rank'i artirmali miyim? Veri kalitesini nasil iyilestirebilirim?"
@@ -87,7 +87,7 @@ Gorevine ozel model mi lazim?
 Shopify, milyonlarca urunu otomatik kategorize etmek için BERT modelini fine-tune etti. Sonuç: prompt-based yaklasima gore **10x daha düşük latency**, %15 daha yüksek accuracy. Çünkü fine-tuned model tek bir forward pass'te sonuç veriyor — prompt engineering'deki gibi uzun context yok.
 
 ### Bloomberg — FinBERT
-Bloomberg, finans haberlerini analiz etmek için BERT'i finansal text üzerinde fine-tune ederek **FinBERT**'i olusturdu. Genel BERT sentiment analizinde %80 accuracy verirken, FinBERT finansal sentiment'te %95+ accuracy verdi. Domain-specific veri, genel modeli uzman yapti.
+Bloomberg, finans haberlerini analiz etmek için BERT'i finansal text üzerinde fine-tune ederek **FinBERT**'i oluşturdu. Genel BERT sentiment analizinde %80 accuracy verirken, FinBERT finansal sentiment'te %95+ accuracy verdi. Domain-specific veri, genel modeli uzman yapti.
 
 ### Bir Startup Hikayesi
 Küçük bir Turkiye'deki e-ticaret startup'i, musteri destek chatbot'u için GPT-4o-mini'yi fine-tune etti. 200 örnek conversation ile egitim yaptilar. Sonuç: musteri memnuniyeti %40 artti, çünkü model sirketin urun isimleri, iade politikasi ve uslubunu ogrenip tutarli cevaplar verdi. Maliyet: sadece $5 egitim + $0.0006/1K token inference.
@@ -1067,7 +1067,7 @@ Toplam: $0.57 ile kendi fine-tuned modelini olusturup 1000 sorgu yanıtladin.
 :::
 
 :::beginner-mistake
-## Hata: Çok Az Ornekle Fine-tune Etmek
+## Hata: Çok Az Örnekle Fine-tune Etmek
 
 ```python
 # YANLIS — 5 ornekle fine-tuning
@@ -1563,7 +1563,7 @@ pipeline.generate_report()
 :::exercise
 ## Alıştırma 5: Dataset Hazırlama ve Temizleme
 
-**Görev:** Fine-tuning icin kaliteli dataset olustur ve temizle.
+**Görev:** Fine-tuning icin kaliteli dataset oluştur ve temizle.
 
 ```python
 import json
@@ -1598,8 +1598,8 @@ def prepare_instruction_dataset(raw_data):
 # TODO: Duplicate ve yakin-duplicate kontrol et (cosine similarity ile)
 ```
 
-**Beklenen Sonuc:** En az 30 kaliteli instruction-response cifti olusturulmali. Ortalama response uzunlugu 100+ kelime olmali. Duplicate orani %0 olmali.
-**Ipucu:** Veri kalitesi > veri miktari. 100 kaliteli ornek, 10000 dusuk kaliteli ornekten daha iyi sonuc verir.
+**Beklenen Sonuc:** En az 30 kaliteli instruction-response cifti oluşturulmali. Ortalama response uzunlugu 100+ kelime olmali. Duplicate orani %0 olmali.
+**Ipucu:** Veri kalitesi > veri miktari. 100 kaliteli örnek, 10000 dusuk kaliteli örnekten daha iyi sonuc verir.
 :::
 
 :::exercise
@@ -1828,7 +1828,7 @@ dpo_trainer = DPOTrainer(
 
 **Karar agaci:**
 - Prototip asamasi veya az veri → prompt engineering
-- 50-100+ ornekle tutarli çıktı gerekli → fine-tuning
+- 50-100+ örnekle tutarli çıktı gerekli → fine-tuning
 - Domain-specific dil gerekli (tip, hukuk, finans) → fine-tuning
 - Sik degisen gereksinimler → prompt engineering
 - Latency kritik → fine-tuning

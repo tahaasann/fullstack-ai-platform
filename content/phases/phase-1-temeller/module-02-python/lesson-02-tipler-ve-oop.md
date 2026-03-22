@@ -727,7 +727,7 @@ explanation: "@dataclass varsayılan olarak __init__, __repr__ ve __eq__ oluştu
 
 **Onerilen Model:** Claude Opus 4.6
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Konuyu Derinlemesine Anla:**
 > "Python'da mutable ve immutable tiplerin bellek yonetimi acisindan farklarini anlat. Neden tuple list'ten daha hizli? Mutable default argument tuzagi neden olusur ve CPython bu default degerleri nerede saklar?"
@@ -1490,7 +1490,7 @@ Bir Senior Developer, Python veri tipleri ve OOP konusunu öğrenirken şu yakla
 5. **Descriptor Protocol'ü anlar** - `@property`'nin aslında bir descriptor olduğunu bilir. `__get__`, `__set__`, `__delete__` metodlarıyla kendi descriptor'larını yazar. ORM framework'lerinin field tanımlarının nasıl çalıştığını kavrar.
 6. **Pydantic v2 ile runtime validation yapar** - Dataclass'lar compile-time check sağlarken Pydantic hem compile-time hem runtime validation sunar. API input validation, config management ve data parsing için Pydantic `BaseModel` kullanır.
 
-**Karar Verme Sureci — Dataclass vs Pydantic vs NamedTuple vs TypedDict:**
+**Karar Verme Süreci — Dataclass vs Pydantic vs NamedTuple vs TypedDict:**
 - **NamedTuple**: Immutable, hafif, sadece veri tasiyan yapilar icin. Trade-off: method ekleyemezsin, inheritance sinirli. Kullanim: fonksiyon return degerleri, config sabitleri.
 - **dataclass**: Mutable veya immutable, method eklenebilir, default degerler. Trade-off: runtime validation yok, sadece type checker (mypy) ile statik kontrol. Kullanim: domain modelleri, internal veri yapilari.
 - **Pydantic BaseModel**: Runtime validation + serialization + deserialization. Trade-off: ~10-50x dataclass'tan yavas (Pydantic v2 ile fark cok azaldi ama hala var), dependency ekliyor. Kullanim: API boundary, disaridan gelen veri, config dosyalari.
@@ -1498,7 +1498,7 @@ Bir Senior Developer, Python veri tipleri ve OOP konusunu öğrenirken şu yakla
 - **Senior karar agaci**: "Veri disaridan mi geliyor? Pydantic. Internal mi? dataclass. Immutable mi? NamedTuple. Legacy dict mi? TypedDict."
 
 **Anti-pattern Farkindaligi:**
-- **God Class**: 500+ satirlik tek class, 10+ method, birden fazla sorumluluk. Production'da gordugum en kotu ornek: bir `UserManager` class'i hem auth, hem email, hem billing, hem logging yapiyordu. Bir hatayi fix etmek icin 3 gun harcandik cunku her sey birbiriyle bagli.
+- **God Class**: 500+ satirlik tek class, 10+ method, birden fazla sorumluluk. Production'da gordugum en kotu örnek: bir `UserManager` class'i hem auth, hem email, hem billing, hem logging yapiyordu. Bir hatayi fix etmek icin 3 gun harcandik cunku her sey birbiriyle bagli.
 - **Inheritance zinciri**: 4+ seviye derin kalitim. `Animal > Mammal > Pet > Dog > GoldenRetriever` — bunu debug etmek kabusa doner. MRO (Method Resolution Order) hatalari cok zor bulunur. Cozum: Composition + Protocol. Python'un `super()` sirasi C3 Linearization ile belirlenir ve 4+ seviyede bunu kafadan takip edemezsin.
 - **Premature `__slots__`**: 100 instance'in varken `__slots__` eklemek over-engineering. 100K+ instance veya memory-critical durumlarda dusun.
 

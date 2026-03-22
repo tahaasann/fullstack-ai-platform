@@ -16,13 +16,13 @@ prerequisites: [mod-16-deep-learning/lesson-01]
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
-> "Transformer mimarisindeki Self-Attention mekanizmasini adim adim acikla. Q (Query), K (Key), V (Value) matrix'leri nasil olusturulur? Scaled Dot-Product Attention formulundeki her islemi (QK^T, scaling, softmax, V carpimi) orneklerle goster. Multi-Head Attention neden tek head'den daha iyi?"
+> "Transformer mimarisindeki Self-Attention mekanizmasini adim adim acikla. Q (Query), K (Key), V (Value) matrix'leri nasil oluşturulur? Scaled Dot-Product Attention formulundeki her islemi (QK^T, scaling, softmax, V carpimi) örneklerle goster. Multi-Head Attention neden tek head'den daha iyi?"
 
 **2. Pratik Uygulama:**
-> "Hugging Face Transformers kutuphanesi ile bir metin siniflandirma modeli egit. Pre-trained BERT modelini yukle, kendi dataset'ine fine-tune et (Trainer API ile). Tokenization, padding, attention mask kavramlarini acikla. Model performansini evaluate et ve inference pipeline olustur."
+> "Hugging Face Transformers kutuphanesi ile bir metin siniflandirma modeli egit. Pre-trained BERT modelini yukle, kendi dataset'ine fine-tune et (Trainer API ile). Tokenization, padding, attention mask kavramlarini acikla. Model performansini evaluate et ve inference pipeline oluştur."
 > Takip: "Simdi Vision Transformer (ViT) ile bir goruntu siniflandirma modeli egit. CNN ile performans karsilastirmasi yap."
 
 **3. Mukemmellik Icin:**
@@ -52,7 +52,7 @@ Senior bir AI/ML engineer transformer konusunda:
 5. **Evaluation**: BLEU, ROUGE, perplexity, human evaluation ile model kalitesini ölçer
 6. **Safety**: Prompt injection, hallucination, bias farkındalığı -- guardrails ekler
 
-**Karar Verme Sureci — API vs Self-Hosted vs Fine-Tuned:**
+**Karar Verme Süreci — API vs Self-Hosted vs Fine-Tuned:**
 - **API (OpenAI, Anthropic, Google)**: Sifir infra maliyeti, aninda baslama, surekli guncellenen modeller. Trade-off: Token basina maliyet yuksek olabilir (yuksek hacimde), veri gizliligi endisesi (verini 3. parti servise gonderiyorsun), rate limit ve downtime riski. Kullanim: Prototip, dusuk-orta hacim, genel amacli NLP tasklari.
 - **Self-hosted open-source (LLaMA, Mistral, Qwen)**: Veri gizliligi tam kontrol, yuksek hacimde API'den ucuz, fine-tuning imkani. Trade-off: GPU maliyeti ($1-10/saat), infra yonetimi (CUDA, driver, model serving), model guncelleme manuel. Kullanim: Hassas veri (saglik, finans), yuksek hacim (1M+ token/gun), ozel domain.
 - **Fine-tuned model**: Domain-specific performans cok daha iyi, kucuk model buyuk modelden iyi sonuc verebilir. Trade-off: Egitim verisi hazirlama maliyeti, overfitting riski, model bakimi (veri degistikce retrain). Kullanim: Spesifik task (sentiment, NER, classification), tutarli format gereken ciktilar.
@@ -718,17 +718,17 @@ print(translator("Hello, how are you?"))
 Google Colab'da (ucretsiz T4 GPU):
 1. `datasets` kutuphanesinden `yelp_review_full` dataset'ini yukle
 2. `distilbert-base-uncased` modelini 5-sinifli sentiment icin fine-tune et
-3. Training: 1000 ornek, Eval: 200 ornek, 2 epoch
+3. Training: 1000 örnek, Eval: 200 örnek, 2 epoch
 4. Accuracy'yi raporla
 
 **Beklenen sonuc:** 2 epoch'ta ~55-60% accuracy (5 sinif icin iyi)
 
 ### Alistirma 2: Custom NER
-1. Kendi veri setini olustur: 50 cumle, icerisinde URUN, SIRKET, FIYAT entity'leri isaretli
+1. Kendi veri setini oluştur: 50 cumle, icerisinde URUN, SIRKET, FIYAT entity'leri isaretli
 2. `bert-base-uncased` modelini NER icin fine-tune et
 3. Yeni cumleler üzerinde test et
 
-**Ipucu:** Hugging Face `datasets` kutuphanesinin `Dataset.from_dict()` ile kendi verini olusturabilirsin.
+**Ipucu:** Hugging Face `datasets` kutuphanesinin `Dataset.from_dict()` ile kendi verini oluşturabilirsin.
 :::
 
 ---
@@ -1172,7 +1172,7 @@ for model_name in models:
 
 ### Alıştırma 5: Text Embedding ve Semantic Search (Orta)
 
-Sentence-BERT ile metin embedding'leri olustur ve anlamsal arama yap.
+Sentence-BERT ile metin embedding'leri oluştur ve anlamsal arama yap.
 
 ```python
 from sentence_transformers import SentenceTransformer
@@ -1368,6 +1368,280 @@ class TransformerBlock(nn.Module):
 **Beklenen Sonuc:** Model Shakespeare tarzinda tutarli metin uretebilmeli. Attention pattern'leri gorsellestirildiginde diyagonal ve yakin kelimelere yoğunlasma gorunmeli. 4 katmanli model 100 epoch'ta anlamli cikti uretmeli.
 **Ipucu:** Causal mask ile her token sadece önceki token'lari gorebilir (autoregressive). Pre-norm (LayerNorm once) modern transformer'larda tercih edilir.
 :::
+
+:::exercise
+### Alistirma 9: Multi-Head Attention Implementasyonu (Zor)
+
+Multi-head attention mekanizmasini sifirdan yaz.
+
+```python
+import torch
+import torch.nn as nn
+import math
+
+class MultiHeadAttention(nn.Module):
+    def __init__(self, d_model, n_heads):
+        super().__init__()
+        self.n_heads = n_heads
+        self.d_k = d_model // n_heads
+
+        self.W_q = nn.Linear(d_model, d_model)
+        self.W_k = nn.Linear(d_model, d_model)
+        self.W_v = nn.Linear(d_model, d_model)
+        self.W_o = nn.Linear(d_model, d_model)
+
+    # TODO: forward metodunu yaz
+    # 1. Q, K, V projeksiyonlari
+    # 2. Head'lere bol (reshape)
+    # 3. Scaled dot-product attention: softmax(QK^T / sqrt(d_k)) * V
+    # 4. Head'leri birlestir (concat)
+    # 5. Output projeksiyonu
+
+# TODO: Attention weight'lerini gorsellestir
+# TODO: Causal mask (decoder icin) ekle
+# TODO: 8 head vs 1 head performansini karsilastir
+```
+
+**Beklenen Sonuc:** Multi-head attention dogru calismalai. Attention pattern'leri gorsellestirilmeli.
+**Ipucu:** d_k = d_model / n_heads. Scaling (sqrt(d_k)) buyuk degerlerle softmax'in saturasyona girmesini onler.
+:::
+
+:::exercise
+### Alistirma 10: Fine-tuning BERT ile Sentiment Analysis (Zor)
+
+Hugging Face ile BERT modelini fine-tune et.
+
+```python
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import TrainingArguments, Trainer
+
+# TODO: Model ve tokenizer yukle
+# model_name = "dbmdz/bert-base-turkish-cased"
+# tokenizer = AutoTokenizer.from_pretrained(model_name)
+# model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
+
+# TODO: Veri setini tokenize et
+# def tokenize_function(examples):
+#     return tokenizer(examples['text'], padding='max_length', truncation=True, max_length=128)
+
+# TODO: Training arguments ayarla
+# training_args = TrainingArguments(
+#     output_dir='./results',
+#     num_train_epochs=3,
+#     per_device_train_batch_size=16,
+#     learning_rate=2e-5,
+#     weight_decay=0.01,
+#     evaluation_strategy='epoch',
+# )
+
+# TODO: Trainer ile egit
+# TODO: Test seti ile degerlendir
+# TODO: Yanlis siniflandirilan ornekleri analiz et
+```
+
+**Beklenen Sonuc:** Fine-tuned model %90+ accuracy vermeli. Turkce metin uzerinde calismali.
+**Ipucu:** BERT fine-tuning icin lr=2e-5 ile 3-5 epoch genellikle yeterli. Daha fazla epoch overfitting riski tasir.
+:::
+
+:::exercise
+### Alistirma 11: Text Generation ile GPT Benzeri Model (Zor)
+
+Kucuk bir GPT benzeri model ile metin uret.
+
+```python
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
+
+# TODO: GPT-2 yukle
+# tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+# model = GPT2LMHeadModel.from_pretrained('gpt2')
+
+# TODO: Metin uret
+# input_text = "Artificial intelligence is"
+# inputs = tokenizer(input_text, return_tensors='pt')
+# outputs = model.generate(
+#     inputs.input_ids,
+#     max_length=100,
+#     temperature=0.7,
+#     top_k=50,
+#     top_p=0.9,
+#     do_sample=True
+# )
+
+# TODO: Temperature etkisini goster (0.1 vs 0.7 vs 1.5)
+# TODO: Top-k vs Top-p sampling karsilastir
+# TODO: Beam search vs sampling karsilastir
+# TODO: Repetition penalty etkisini goster
+```
+
+**Beklenen Sonuc:** Farkli sampling parametreleri ile metin kalitesi degismeli. Temperature yuksekse daha yaratici, dusukse daha tekrarci.
+**Ipucu:** Temperature: 0'a yakin = deterministik, 1+ = yaratici. Top-p (nucleus): kumulatif olasilik esigi. Genellikle top_p=0.9 + temperature=0.7 iyi sonuc verir.
+:::
+
+:::exercise
+### Alistirma 12: Tokenizer Karsilastirmasi ve Analiz (Kolay)
+
+Farkli tokenizer'lari karsilastir.
+
+```python
+from transformers import AutoTokenizer
+
+# TODO: Farkli tokenizer'lari yukle
+# bpe = AutoTokenizer.from_pretrained('gpt2')           # BPE
+# wordpiece = AutoTokenizer.from_pretrained('bert-base-uncased')  # WordPiece
+# sentencepiece = AutoTokenizer.from_pretrained('xlnet-base-cased')  # SentencePiece
+
+# TODO: Ayni cumleyi 3 tokenizer ile tokenize et
+# text = "Transformers are revolutionizing NLP applications"
+# Her biri icin token sayisi, token listesi, vocabulary boyutu yazdir
+
+# TODO: Turkce metin ile dene — tokenizer farklari daha belirgin olacak
+# turkce = "Yapay zeka uygulamalari hizla gelisiyor"
+
+# TODO: Subword tokenization'in avantajlarini acikla
+# - OOV (Out of Vocabulary) problemi
+# - Vocabulary boyutu vs coverage tradeoff
+```
+
+**Beklenen Sonuc:** Farkli tokenizer'larin ayni metin icin farkli token sayilari urettigini gostermeli. Turkce'de fark belirgin olmali.
+**Ipucu:** BPE en sik gecen karakter ciftlerini birlestirerek subword olusturur. WordPiece benzer ama maximum likelihood ile secim yapar.
+:::
+
+:::exercise
+### Alistirma 13: Sentence Embeddings ve Semantic Search (Orta)
+
+Cumle embedding'leri ile anlamsal arama yap.
+
+```python
+from sentence_transformers import SentenceTransformer
+import numpy as np
+
+# TODO: Model yukle
+# model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# TODO: Dokuman koleksiyonu olustur
+# documents = [
+#     "Python programlama dili ogrenmeye basladim",
+#     "Machine learning ile tahmin modeli gelistirdim",
+#     "Web uygulamasi icin React kullandim",
+#     "Docker ile uygulamamizy containerize ettik",
+#     "Yapay zeka projesinde derin ogrenme kullandik"
+# ]
+
+# TODO: Tum dokumanlari embed et
+# embeddings = model.encode(documents)
+
+# TODO: Sorgu ile en benzer dokumani bul
+# query = "Derin ogrenme ile yapay zeka projesi"
+# query_embedding = model.encode([query])
+# similarities = cosine_similarity(query_embedding, embeddings)
+# TODO: Top-3 sonucu goster
+```
+
+**Beklenen Sonuc:** Anlamsal olarak benzer dokumanlar yuksek similarity score almali. Keyword eslesmesi gerektirmemeli.
+**Ipucu:** Cosine similarity embedding uzayinda aci olcer. Keyword-based arama "yapay zeka" ve "AI" eslestirmez ama semantic search eslestirir.
+:::
+
+:::exercise
+### Alistirma 14: Model Distillation — Buyuk Modeli Kucult (Orta)
+
+Knowledge distillation ile kucuk ama etkili model olustur.
+
+```python
+import torch.nn as nn
+
+# TODO: Teacher model (buyuk) ve Student model (kucuk) tanimla
+# Teacher: BERT-base (110M param)
+# Student: 3-layer mini BERT (15M param)
+
+# TODO: Distillation loss fonksiyonu
+# alpha = 0.5
+# T = 4  # Temperature
+# distillation_loss = alpha * KL_div(
+#     F.log_softmax(student_logits / T, dim=-1),
+#     F.softmax(teacher_logits / T, dim=-1)
+# ) * T * T
+# student_loss = (1 - alpha) * CrossEntropy(student_logits, labels)
+# total_loss = distillation_loss + student_loss
+
+# TODO: Teacher'i egit
+# TODO: Student'i distillation ile egit
+# TODO: Student'in performansini teacher ile karsilastir
+# TODO: Model boyutu ve inference hizi karsilastirmasi yap
+```
+
+**Beklenen Sonuc:** Student model teacher'in %90+ performansini yakalamali. Model boyutu 5-7x kuculmeli. Inference 3-5x hizlanmali.
+**Ipucu:** Temperature (T) yukseldikce soft label'lar daha bilgilendirici olur. T=1 normal softmax, T=4-8 distillation icin ideal.
+:::
+
+:::exercise
+### Alistirma 15: LoRA ile Efficient Fine-tuning (Orta)
+
+Low-Rank Adaptation ile buyuk modeli verimli fine-tune et.
+
+```python
+from peft import LoraConfig, get_peft_model
+from transformers import AutoModelForCausalLM
+
+# TODO: Base model yukle
+# model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf")
+
+# TODO: LoRA konfigurasyonu
+# lora_config = LoraConfig(
+#     r=16,           # Rank
+#     lora_alpha=32,  # Scaling
+#     target_modules=["q_proj", "v_proj"],
+#     lora_dropout=0.05,
+#     task_type="CAUSAL_LM"
+# )
+
+# TODO: LoRA uygula
+# peft_model = get_peft_model(model, lora_config)
+# peft_model.print_trainable_parameters()
+# # Beklenen: ~0.1% of total params
+
+# TODO: Fine-tune et
+# TODO: LoRA vs Full fine-tuning karsilastir (VRAM, hiz, performans)
+# TODO: Farkli rank degerleri dene (r=4, r=16, r=64)
+```
+
+**Beklenen Sonuc:** LoRA ile egitilen parametre sayisi toplamin %1'inden az olmali. Performans full fine-tuning'e yakin olmali.
+**Ipucu:** LoRA rank (r): dusuk = hizli ama kapasite az, yuksek = yavas ama kapasite fazla. r=16 cogu gorev icin yeterli.
+:::
+
+:::exercise
+### Alistirma 16: Transformer Blogu Sifirdan Yaz (Zor)
+
+Tam bir Transformer encoder blogu implement et.
+
+```python
+import torch
+import torch.nn as nn
+import math
+
+class TransformerBlock(nn.Module):
+    def __init__(self, d_model, n_heads, d_ff, dropout=0.1):
+        super().__init__()
+        # TODO: Multi-head attention
+        # TODO: Layer normalization (pre-norm)
+        # TODO: Feed-forward network (d_model -> d_ff -> d_model)
+        # TODO: Residual connections
+        # TODO: Dropout
+
+    def forward(self, x, mask=None):
+        # TODO: Pre-norm -> Attention -> Residual
+        # TODO: Pre-norm -> FFN -> Residual
+        pass
+
+# TODO: Positional encoding ekle
+# TODO: 4 katmanli encoder stack olustur
+# TODO: Classification head ekle
+# TODO: IMDB sentiment dataset'inde egit
+```
+
+**Beklenen Sonuc:** Sifirdan yazilan transformer calisir durumda olmali. Sentiment analysis'te %85+ accuracy vermeli.
+**Ipucu:** Pre-norm (LayerNorm once) modern transformer'larda tercih edilir — egitim daha stabil. Residual connection gradient akisini kolaylastirir.
+:::
+
 
 :::external-resource
 ## Ek Kaynaklar

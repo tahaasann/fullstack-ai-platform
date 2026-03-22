@@ -57,7 +57,7 @@
         },
         {
           "label": "kariyer.net stratejisi",
-          "template": "kariyer.net — TURKIYE PAZARI\n\n- CV'yi Turkce olarak yükle\n- 'Hemen Basvur' ozelligini kullan\n- Filtreler: Bilgisayar/Yazılım, Deneyimsiz + 1-3 Yıl, tam zamanli\n- Haftalik yeni ilan alarmi kur: 'Full Stack Developer', 'Frontend Developer', 'Backend Developer', 'Yazılım Mühendisi'\n- Turkiye'deki büyük teknoloji sirketlerini elden gec: Trendyol, Getir, Peak Games, Hepsiburada, Insider, Pazarama\n- Başvurudan 1 hafta sonra takip mesaji gonder"
+          "template": "kariyer.net — TURKIYE PAZARI\n\n- CV'yi Türkçe olarak yükle\n- 'Hemen Basvur' ozelligini kullan\n- Filtreler: Bilgisayar/Yazılım, Deneyimsiz + 1-3 Yıl, tam zamanli\n- Haftalik yeni ilan alarmi kur: 'Full Stack Developer', 'Frontend Developer', 'Backend Developer', 'Yazılım Mühendisi'\n- Turkiye'deki büyük teknoloji sirketlerini elden gec: Trendyol, Getir, Peak Games, Hepsiburada, Insider, Pazarama\n- Başvurudan 1 hafta sonra takip mesaji gonder"
         },
         {
           "label": "Global remote platformlar",
@@ -66,7 +66,7 @@
       ],
       "checklist": [
         "LinkedIn profili optimize edildi",
-        "kariyer.net'te Turkce CV yüklendi",
+        "kariyer.net'te Türkçe CV yüklendi",
         "En az 2 global platforma kayıt olundu",
         "Her platformda ilan alarmi kuruldu",
         "Platform bazli dönüş orani takip ediliyor"
@@ -90,7 +90,7 @@
       ],
       "examples": [
         {
-          "label": "Cold message sablonu — LinkedIn (Turkce)",
+          "label": "Cold message sablonu — LinkedIn (Türkçe)",
           "template": "Merhaba [Isim] Bey/Hanim,\n\n[Sirket]'teki çalışmanızı LinkedIn'den takip ediyorum. Özellikle [spesifik proje/paylaşım/teknoloji] hakkindaki paylaşımınız çok ilgimi çekti.\n\nBen KTU Bilgisayar Mühendisliği mezunuyum ve React, TypeScript, Python ile full-stack projeler geliştiriyorum. Su an [hedef pozisyon] pozisyonlarina başvuruyorum.\n\n[Sirket]'teki çalışma kültürünü ve mühendislik süreçlerinizi merak ediyorum. 15 dakikalik kisa bir sohbet için musait olur musunuz?\n\nTeşekkürler,\n[Ad Soyad]"
         },
         {
@@ -99,7 +99,7 @@
         },
         {
           "label": "Turkiye tech communityleri",
-          "template": "Aktif Topluluklar:\n\n1. Kommunity (kommunity.com) — Turkiye'nin en büyük tech community platformu\n   - Etkinliklere katil, konusmacilara soru sor\n   - Istanbul, Ankara, Izmir'de düzenli meetup'lar\n\n2. coderspace.io — Turkce developer communitesi\n   - Hackathon'lara katil — CV için mükemmel\n   - Mentorluk programlari var\n\n3. Frontend Istanbul — Frontend odakli topluluk\n   - Aylik meetup'lar, YouTube'da kayitlar\n   - Konusmaci olarak basvur — gorunurlugunu artir\n\n4. DevIstanbul — Genel developer toplulugi\n   - Discord'da aktif\n   - Is ilanlari kanali var\n\n5. Python Istanbul / Ankara — Python communitesi\n   - AI/ML ilgi alanı olan insanlarla tanisirsin\n\n6. GDG (Google Developer Groups) Turkey\n   - Google teknolojileri odakli\n   - DevFest etkinlikleri networklemek için ideal\n\n7. Twitter/X Tech Turkiye\n   - @nicatmemmedov, @AhsanayevArslan gibi aktif developer'lari takip et\n   - #turkishdev hashtag'ini kullan"
+          "template": "Aktif Topluluklar:\n\n1. Kommunity (kommunity.com) — Turkiye'nin en büyük tech community platformu\n   - Etkinliklere katil, konusmacilara soru sor\n   - Istanbul, Ankara, Izmir'de düzenli meetup'lar\n\n2. coderspace.io — Türkçe developer communitesi\n   - Hackathon'lara katil — CV için mükemmel\n   - Mentorluk programlari var\n\n3. Frontend Istanbul — Frontend odakli topluluk\n   - Aylik meetup'lar, YouTube'da kayitlar\n   - Konusmaci olarak basvur — gorunurlugunu artir\n\n4. DevIstanbul — Genel developer toplulugi\n   - Discord'da aktif\n   - Is ilanlari kanali var\n\n5. Python Istanbul / Ankara — Python communitesi\n   - AI/ML ilgi alanı olan insanlarla tanisirsin\n\n6. GDG (Google Developer Groups) Turkey\n   - Google teknolojileri odakli\n   - DevFest etkinlikleri networklemek için ideal\n\n7. Twitter/X Tech Turkiye\n   - @nicatmemmedov, @AhsanayevArslan gibi aktif developer'lari takip et\n   - #turkishdev hashtag'ini kullan"
         }
       ],
       "checklist": [
@@ -184,7 +184,7 @@
       "content": "3.5 yıldır is ariyorsan umutsuzluk hissedebilirsin — ama her teklif iyi teklif degildir. Koту bir işte 6 ay çalışmak, CV'ne zarar verir ve motivasyonunu kirdir. Su red flag'leri gor ve kendini koru.",
       "tips": [
         "Ücretsiz deneme projesi isteyenlere dikkat — 2-4 saat makul, 1 hafta değil",
-        "Is ilaninda 'dinamik çalışma ortami' = fazla mesai, düşük maas olabilir",
+        "Is ilaninda 'dinamik çalışma ortamı' = fazla mesai, düşük maas olabilir",
         "'Startup ruhu' + düşük maas = sozle kandirma riski",
         "Mülakatta sadece teknik değil, sen de sirketе soru sor",
         "Maas konusulmadan 3+ mülakat = zaman kaybi",

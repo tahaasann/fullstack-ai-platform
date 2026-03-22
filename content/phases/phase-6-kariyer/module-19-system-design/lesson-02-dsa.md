@@ -52,7 +52,7 @@ Senior muhendisler DSA'yi ezbere değil, **pattern tanıma** ile ogrenirler:
 4. Gerçek production'da hangi algoritmanin kullanıldığını bilirler (database index = B-Tree, routing = Dijkstra)
 5. LeetCode'u "grind" etmek yerine, 15-20 core problemi derinlemesine anlarlar
 
-**Karar Verme Sureci — Dogru Data Structure Secimi:**
+**Karar Verme Süreci — Dogru Data Structure Secimi:**
 - **Array vs LinkedList**: Array: O(1) random access, cache-friendly. LinkedList: O(1) insert/delete at known position. Trade-off: LinkedList her node icin ekstra pointer memory kullanir ve cache miss orani yuksektir. Production karari: %99 durumda array/dynamic array kullan. LinkedList sadece cok spesifik durumlarda (LRU cache gibi) deger.
 - **HashMap vs TreeMap**: HashMap: O(1) average lookup. TreeMap: O(log n) ama sirali iterasyon mumkun. Trade-off: HashMap worst-case O(n) (hash collision), TreeMap her zaman O(log n) garanti. Siralama gerekmiyorsa HashMap, range query lazimsa TreeMap.
 - **Queue vs Stack vs Deque**: Queue: FIFO (task processing, BFS). Stack: LIFO (undo, DFS). Deque: Her iki uctan islem (sliding window). Yanlis veri yapisi secimi complexity'yi degistirir.
@@ -109,7 +109,7 @@ O(n²)       →  1,000,000,000,000 (31 YIL!)
 :::
 
 :::code
-### Big-O Ornekleri
+### Big-O Örnekleri
 
 ```python
 # ============================================
@@ -2184,7 +2184,7 @@ assert can_finish(4, [[1, 0], [2, 1], [3, 2]]) == True  # Linear dependency
 assert can_finish(1, []) == True  # Tek ders, ön koşul yok
 ```
 
-**Beklenen sonuc:** Topological sort veya DFS ile O(V+E) cozum. Adjacency list ile graph olustur, in-degree hesapla, BFS ile isle.
+**Beklenen sonuc:** Topological sort veya DFS ile O(V+E) cozum. Adjacency list ile graph oluştur, in-degree hesapla, BFS ile isle.
 
 ---
 
@@ -2222,7 +2222,7 @@ console.assert(rob([]) === 0);
 console.assert(rob([5]) === 5);
 ```
 
-**Beklenen sonuc:** O(n) time, O(1) space DP cozumu. Bottom-up yaklasimla prev1 ve prev2 degiskenleri yeterli.
+**Beklenen sonuc:** O(n) time, O(1) space DP cozumu. Bottom-up yaklasimla prev1 ve prev2 değişkenleri yeterli.
 
 ---
 
@@ -2263,7 +2263,7 @@ assert search_rotated([3, 1], 1) == 1
 
 ### Alistirma 7: Stack — Valid Parentheses ve Monotonic Stack (Orta)
 
-Stack veri yapisiyla parantez dogrulama ve monotonic stack problemlerini coz.
+Stack veri yapisiyla parantez doğrulama ve monotonic stack problemlerini coz.
 
 ```python
 def is_valid_parentheses(s: str) -> bool:
@@ -2483,6 +2483,364 @@ print(trie.search("python"))     # True
 **Beklenen Sonuc:** Insert ve search O(m) time (m = kelime uzunlugu). Autocomplete frequency'ye gore sirali sonuc donmeli. Türkçe karakterler dogru islenmeli.
 **Ipucu:** Trie autocomplete, spell checker ve IP routing'de kullanilir. Memory-efficient varyant: compressed trie (radix tree).
 :::
+
+:::exercise
+### Alistirma 11: Array/String Temel Problemleri (Kolay)
+
+Temel array ve string manipulasyon problemlerini coz.
+
+```python
+# Problem 1: Two Sum
+# Verilen: nums = [2, 7, 11, 15], target = 9
+# Bul: Toplami target olan iki indeksi dondur
+def two_sum(nums, target):
+    # TODO: O(n) cozum (hashmap ile)
+    seen = {}
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i
+
+# Problem 2: Valid Anagram
+# Verilen: s = "anagram", t = "nagaram"
+# TODO: s ve t anagram mi kontrol et
+def is_anagram(s, t):
+    # TODO: O(n) cozum
+    pass
+
+# Problem 3: Best Time to Buy and Sell Stock
+# TODO: Maximum profit hesapla (tek alis-satis)
+def max_profit(prices):
+    # TODO: O(n) cozum (Kadane's benzeri)
+    pass
+```
+
+**Beklenen Sonuc:** Her cozum O(n) olmali. Edge case'ler ele alinmali (bos array, tek eleman).
+**Ipucu:** Two Sum icin brute force O(n^2), hashmap ile O(n). Interview'da once brute force soyle, sonra optimize et.
+:::
+
+:::exercise
+### Alistirma 12: Linked List Islemleri (Kolay)
+
+Linked list temel islemlerini implement et.
+
+```python
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# Problem 1: Reverse Linked List
+def reverse_list(head):
+    # TODO: Iterative cozum O(n)
+    prev = None
+    current = head
+    while current:
+        next_node = current.next
+        current.next = prev
+        prev = current
+        current = next_node
+    return prev
+
+# Problem 2: Detect Cycle (Floyd's Algorithm)
+def has_cycle(head):
+    # TODO: Fast and slow pointer ile O(n) time, O(1) space
+    pass
+
+# Problem 3: Merge Two Sorted Lists
+def merge_two_lists(l1, l2):
+    # TODO: Recursive veya iterative cozum
+    pass
+
+# TODO: Her cozumun zaman ve alan karmasikligini yaz
+```
+
+**Beklenen Sonuc:** Reverse, cycle detection ve merge calismali. Time/space complexity belirtilmeli.
+**Ipucu:** Linked list problemlerinde dummy node ve fast/slow pointer en sik kullanilan teknikler. Kagit uzerinde pointer'lari cizip takip et.
+:::
+
+:::exercise
+### Alistirma 13: Hash Map Implementasyonu (Kolay)
+
+Sifirdan hash map yaz.
+
+```python
+class HashMap:
+    def __init__(self, capacity=16):
+        self.capacity = capacity
+        self.size = 0
+        self.buckets = [[] for _ in range(capacity)]
+
+    def _hash(self, key):
+        return hash(key) % self.capacity
+
+    def put(self, key, value):
+        # TODO: Chaining ile collision handling
+        # TODO: Load factor > 0.75 ise resize (capacity * 2)
+        pass
+
+    def get(self, key):
+        # TODO: Key'e karsilik gelen value'yu dondur
+        pass
+
+    def remove(self, key):
+        # TODO: Key-value ciftini sil
+        pass
+
+# TODO: Hash collision senaryosunu test et
+# TODO: Resize islemini goster
+# TODO: Average case O(1), worst case O(n) acikla
+# TODO: Open addressing vs chaining karsilastir
+```
+
+**Beklenen Sonuc:** put, get, remove O(1) average calismali. Collision handling ve resize calismali.
+**Ipucu:** Load factor = size / capacity. 0.75 ustunde resize cakisma olasiligini azaltir. Java HashMap de bu esigi kullanir.
+:::
+
+:::exercise
+### Alistirma 14: Binary Search Varyasyonlari (Orta)
+
+Farkli binary search varyasyonlarini coz.
+
+```python
+# Problem 1: Klasik Binary Search
+def binary_search(nums, target):
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = left + (right - left) // 2
+        if nums[mid] == target: return mid
+        elif nums[mid] < target: left = mid + 1
+        else: right = mid - 1
+    return -1
+
+# Problem 2: First/Last Occurrence
+def find_first(nums, target):
+    # TODO: Target'in ilk gorunumunu bul
+    pass
+
+# Problem 3: Search in Rotated Sorted Array
+def search_rotated(nums, target):
+    # TODO: [4,5,6,7,0,1,2] icinde target'i bul
+    pass
+
+# Problem 4: Find Peak Element
+def find_peak(nums):
+    # TODO: Komsu elemanlardan buyuk olan elemani bul
+    pass
+
+# TODO: Her varyasyonun while kosulunu ve mid hesabini dikkatle sec
+# TODO: Off-by-one hatalarindan kacinma stratejisi yaz
+```
+
+**Beklenen Sonuc:** 4 varyasyon O(log n) calismali. Edge case'ler ele alinmali.
+**Ipucu:** Binary search'te `mid = left + (right - left) // 2` kullan, `(left + right) // 2` overflow yapabilir. while kosulunu `<=` vs `<` dikkatle sec.
+:::
+
+:::exercise
+### Alistirma 15: BFS ve DFS Graph Traversal (Orta)
+
+Graf uzerinde BFS ve DFS implementasyonu yap.
+
+```python
+from collections import deque
+
+# Graph (adjacency list)
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [], 'E': ['F'], 'F': []
+}
+
+# BFS (Breadth-First Search)
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    result = []
+    # TODO: BFS implement et
+    return result
+
+# DFS (Depth-First Search)
+def dfs(graph, start, visited=None):
+    # TODO: Recursive DFS implement et
+    pass
+
+def dfs_iterative(graph, start):
+    # TODO: Iterative DFS (stack ile)
+    pass
+
+# TODO: Shortest path (unweighted graph) — BFS ile
+# TODO: Cycle detection — DFS ile
+# TODO: Topological sort — DFS ile (DAG icin)
+# TODO: BFS vs DFS kullanim alanlarini karsilastir
+```
+
+**Beklenen Sonuc:** BFS ve DFS dogru calismalai. Shortest path ve cycle detection uygulanmali.
+**Ipucu:** BFS = level-order, shortest path (unweighted). DFS = backtracking, cycle detection, topological sort. BFS -> queue, DFS -> stack/recursion.
+:::
+
+:::exercise
+### Alistirma 16: Dynamic Programming Temelleri (Orta)
+
+DP ile klasik problemleri coz.
+
+```python
+# Problem 1: Fibonacci (DP intro)
+def fib_memo(n, memo={}):
+    if n <= 1: return n
+    if n not in memo:
+        memo[n] = fib_memo(n-1, memo) + fib_memo(n-2, memo)
+    return memo[n]
+
+def fib_tabulation(n):
+    if n <= 1: return n
+    dp = [0] * (n + 1)
+    dp[1] = 1
+    for i in range(2, n + 1):
+        dp[i] = dp[i-1] + dp[i-2]
+    return dp[n]
+
+# Problem 2: Climbing Stairs
+def climb_stairs(n):
+    # TODO: n basamakli merdiveni 1 veya 2 adimla kac sekilde cikabilirsin?
+    pass
+
+# Problem 3: Coin Change
+def coin_change(coins, amount):
+    # TODO: Minimum kac coin ile amount'a ulasabilirsin?
+    pass
+
+# TODO: Top-down (memoization) vs Bottom-up (tabulation) karsilastir
+# TODO: Her problemin state transition formulunu yaz
+# TODO: Space optimization uygula (O(n) -> O(1) mumkun mu?)
+```
+
+**Beklenen Sonuc:** Her problem optimal cozulmeli. Memoization ve tabulation versiyonlari karsilastirilmali.
+**Ipucu:** DP formulu: 1) State tanimla, 2) Transition formulu yaz, 3) Base case belirle, 4) Siralama sec (top-down/bottom-up).
+:::
+
+:::exercise
+### Alistirma 17: Sorting Algoritmalari Karsilastirmasi (Orta)
+
+Temel sorting algoritmalarini implement et ve karsilastir.
+
+```python
+# TODO: Quick Sort
+def quick_sort(arr):
+    if len(arr) <= 1: return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quick_sort(left) + middle + quick_sort(right)
+
+# TODO: Merge Sort
+def merge_sort(arr):
+    pass
+
+# TODO: Heap Sort
+def heap_sort(arr):
+    pass
+
+# TODO: Karsilastirma tablosu
+# | Algoritma  | Best   | Average | Worst  | Space | Stable |
+# |------------|--------|---------|--------|-------|--------|
+# | Quick Sort | O(nlogn)| O(nlogn)| O(n^2) | O(logn)| No   |
+# | Merge Sort | ?      | ?       | ?      | ?     | ?      |
+# | Heap Sort  | ?      | ?       | ?      | ?     | ?      |
+
+# TODO: 10000 elemanli rastgele array ile performans testi yap
+# TODO: Her algoritmanin ne zaman tercih edilecegini acikla
+```
+
+**Beklenen Sonuc:** 3 algoritma implement ve karsilastirilmali. Performans testi yapilmali.
+**Ipucu:** Quick Sort pratikte en hizli (cache-friendly). Merge Sort guaranteed O(nlogn) ve stable. Python'un timsort'u merge sort + insertion sort hibrit.
+:::
+
+:::exercise
+### Alistirma 18: Advanced Data Structures (Zor)
+
+Ileri veri yapilarini implement et.
+
+```python
+# Problem 1: LRU Cache
+class LRUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        # TODO: OrderedDict veya doubly linked list + hashmap kullan
+
+    def get(self, key):
+        # TODO: O(1) time
+        pass
+
+    def put(self, key, value):
+        # TODO: O(1) time, capacity asildirsa en eski elemani cikar
+        pass
+
+# Problem 2: Min Heap (Priority Queue)
+class MinHeap:
+    def __init__(self):
+        self.heap = []
+
+    def push(self, val):
+        # TODO: Sona ekle ve yukari kaydir (bubble up)
+        pass
+
+    def pop(self):
+        # TODO: Root'u cikar ve asagi kaydir (bubble down)
+        pass
+
+# TODO: LRU Cache'i test et (capacity=3 ile)
+# TODO: MinHeap ile Top-K problemi coz
+# TODO: Her yapinin zaman karmasikligini belirt
+```
+
+**Beklenen Sonuc:** LRU Cache O(1) get/put calismali. MinHeap O(log n) push/pop calismali.
+**Ipucu:** LRU Cache: OrderedDict.move_to_end() Python'da en kolay implementasyon. Interview'da doubly linked list + hashmap sorulabilir.
+:::
+
+:::exercise
+### Alistirma 19: Interview Problem Solving Stratejisi (Zor)
+
+UMPIRE method ile sistematik problem cozme pratiği yap.
+
+```markdown
+# UMPIRE Method
+
+## U - Understand
+# Soruyu anla. Ornek input/output iste. Edge case'leri sor.
+# "Negatif sayilar olabilir mi? Array bos olabilir mi? Duplicate var mi?"
+
+## M - Match
+# Bilinen pattern'lerle esle.
+# "Bu problem sliding window'a mi benziyor? Two pointer mi? DFS/BFS mi?"
+
+## P - Plan
+# Pseudocode yaz. Adim adim plani acikla.
+# Zaman ve alan karmasikligini soyle.
+
+## I - Implement
+# Temiz, okunabilir kod yaz.
+# Degisken isimlerini anlamli sec.
+
+## R - Review
+# Kodu gozden gecir. Hata var mi?
+# Edge case'leri test et (bos input, tek eleman, buyuk input).
+
+## E - Evaluate
+# Zaman ve alan karmasikligini analiz et.
+# Daha iyi cozum var mi? Trade-off'lari tart.
+
+# TODO: Asagidaki problemi UMPIRE ile coz:
+# "Verilen bir string'de en uzun tekrarsiz substring'i bul"
+# Ornek: "abcabcbb" -> "abc" (uzunluk 3)
+```
+
+**Beklenen Sonuc:** UMPIRE'in her adimi uygulanmali. Sliding window cozumu O(n) olmali. Edge case'ler ele alinmali.
+**Ipucu:** Interview'da once brute force O(n^2) cozumu soyle, sonra sliding window O(n) optimizasyonuna gec. Dusunme surecini sesli paylas.
+:::
+
 
 :::realworld
 ## Gerçek Dünyada DSA Kullanımı

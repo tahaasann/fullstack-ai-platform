@@ -580,7 +580,7 @@ app.get("/api/profile", authenticate, (req, res) => {
 });
 ```
 
-**Beklenen Sonuc:** Register ile yeni kullanici olusturulabilmeli. Login ile token alinabilmeli. Token olmadan /profile'a erisilemememeli (401). Token ile erisim saglanmali.
+**Beklenen Sonuc:** Register ile yeni kullanici oluşturulabilmeli. Login ile token alinabilmeli. Token olmadan /profile'a erisilemememeli (401). Token ile erisim saglanmali.
 **Ipucu:** `bcrypt.hash(password, 12)` salt rounds ne kadar yuksekse o kadar guvenli ama yavas. 12 iyi bir denge.
 
 ---
@@ -726,7 +726,7 @@ explanation: "401 Unauthorized: Kullanıcının kimliği doğrulanmamış (token
 
 **Onerilen Model:** Claude Opus 4.6 (derin anlayis icin) veya Sonnet 4.5 (hizli sorular icin)
 
-### Prompt Ornekleri
+### Prompt Örnekleri
 
 **1. Derinlemesine Anla:**
 > "JWT token'in Header.Payload.Signature yapisini adim adim acikla. Payload neden sifrelenmemis (sadece Base64)? HMAC-SHA256 ile RSA-SHA256 arasindaki fark nedir? Access token bellekte, refresh token httpOnly cookie'de saklamanin güvenlik gerekceleri neler? XSS ve CSRF saldirilarinda her yaklasimin riski ne?"

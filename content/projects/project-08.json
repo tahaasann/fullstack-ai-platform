@@ -21,7 +21,7 @@
   ],
   "brief": "Bu projede, birden fazla AI agent'in koordineli calisarak musteri destek taleplerini yonettigi kapsamli bir sistem insa edeceksin. Gercek dunyada Zendesk, Intercom gibi platformlarin AI versiyonunu dusun — ama senin sisteminDE her agent'in belirli bir uzmanlik alani var ve LangGraph ile state machine mantigi kullanarak birbirleriyle iletisim kuruyorlar.\n\nModern musteri destek sistemleri artik tek bir chatbot'tan cok daha fazlasi. Router agent gelen mesaji analiz edip dogru uzman agent'a yonlendiriyor. FAQ agent sik sorulan sorulari aninda cevapliyor. Technical support agent karmasik teknik sorunlari cozerken knowledge base'den bilgi cekiyor. Escalation agent ise durumu insana aktarmasi gerektiginde tum context'i koruyarak handoff yapiyor.\n\nBu proje seni AI agent mimarisi, state management, real-time iletisim ve production-ready AI sistemleri konularinda derinlemesine egitecek. Mulakatlarda 'multi-agent sistem tasarladiniz mi?' sorusuna gercek deneyimle cevap verebileceksin.",
   "architecture": {
-    "overview": "Sistem, LangGraph ile orkestre edilen multi-agent mimarisi uzerine kurulu. Her agent bagimsiz bir LLM chain olarak calisir, ancak paylasilan state uzerinden koordine olurlar. WebSocket ile real-time iletisim, Redis ile session management ve caching, PostgreSQL ile kalici veri depolama saglaniyor.",
+    "overview": "Sistem, LangGraph ile orkestre edilen multi-agent mimarisi uzerine kurulu. Her agent bagimsiz bir LLM chain olarak calisir, ancak paylasilan state üzerinden koordine olurlar. WebSocket ile real-time iletisim, Redis ile session management ve caching, PostgreSQL ile kalici veri depolama saglaniyor.",
     "diagram": "\n┌─────────────┐     WebSocket      ┌──────────────┐\n│   React UI  │◄──────────────────►│  Node.js WS  │\n│  (Chat UI)  │                    │   Gateway     │\n└─────────────┘                    └──────┬───────┘\n                                          │\n                                   ┌──────▼───────┐\n                                   │  FastAPI      │\n                                   │  Orchestrator │\n                                   └──────┬───────┘\n                                          │\n                        ┌─────────────────┼─────────────────┐\n                        │                 │                   │\n                 ┌──────▼──────┐  ┌──────▼──────┐  ┌───────▼──────┐\n                 │   Router    │  │  Knowledge  │  │    Redis     │\n                 │   Agent     │  │   Base      │  │  (Sessions)  │\n                 └──────┬──────┘  │  (RAG)      │  └──────────────┘\n                        │         └─────────────┘\n          ┌─────────────┼─────────────┐\n          │             │             │\n   ┌──────▼──────┐ ┌───▼────┐ ┌─────▼──────┐\n   │  FAQ Agent  │ │ Tech   │ │ Escalation │\n   │             │ │ Agent  │ │   Agent    │\n   └─────────────┘ └────────┘ └────────────┘\n        ",
     "decisions": [
       {
@@ -32,7 +32,7 @@
       },
       {
         "decision": "Neden WebSocket + Node.js Gateway?",
-        "reasoning": "Real-time chat icin WebSocket sart. Node.js event-driven yapisi ile binlerce concurrent baglanti verimli yonetilebilir. FastAPI ise AI orchestration tarafinda kalir — separation of concerns.",
+        "reasoning": "Real-time chat icin WebSocket sart. Node.js event-driven yapisi ile binlerce concurrent bağlantı verimli yonetilebilir. FastAPI ise AI orchestration tarafinda kalir — separation of concerns.",
         "alternatives": "FastAPI WebSocket, Socket.io, Server-Sent Events",
         "when_to_choose_alternative": "Tek yonlu streaming yeterliyse SSE daha basit. Kucuk olcekli projede FastAPI WebSocket yeter."
       },
@@ -113,7 +113,7 @@
     {
       "criterion": "Real-time Communication",
       "weight": 15,
-      "description": "WebSocket baglantisi stabil mi, mesajlar aninda iletiyor mu"
+      "description": "WebSocket bağlantısi stabil mi, mesajlar aninda iletiyor mu"
     },
     {
       "criterion": "Knowledge Base & RAG",
@@ -140,7 +140,7 @@
     {
       "id": "p08-m1",
       "title": "Proje Altyapisi & Agent Mimari Tasarimi",
-      "overview": "Monorepo yapisini kur, temel servisleri ayaga kaldir, LangGraph ile ilk agent graph'ini olustur.",
+      "overview": "Monorepo yapisini kur, temel servisleri ayaga kaldir, LangGraph ile ilk agent graph'ini oluştur.",
       "estimated_hours": 10,
       "concepts_covered": [
         "monorepo",
@@ -152,8 +152,8 @@
         {
           "step": 1,
           "title": "Monorepo & Docker Compose Setup",
-          "why": "Multi-service projeler icin tekrarlanabilir ortam sart. docker-compose ile tum servisleri tek komutla ayaga kaldirabilmek gelistirme hizini artirir.",
-          "instructions": "Proje yapisini olustur:\n- /frontend (React + TypeScript)\n- /gateway (Node.js WebSocket server)\n- /orchestrator (FastAPI + LangGraph)\n- /shared (ortak tipler ve config)\n\ndocker-compose.yml ile PostgreSQL, Redis, gateway ve orchestrator servislerini tanimla.",
+          "why": "Multi-service projeler icin tekrarlanabilir ortam sart. docker-compose ile tum servisleri tek komutla ayaga kaldirabilmek geliştirme hizini artirir.",
+          "instructions": "Proje yapisini oluştur:\n- /frontend (React + TypeScript)\n- /gateway (Node.js WebSocket server)\n- /orchestrator (FastAPI + LangGraph)\n- /shared (ortak tipler ve config)\n\ndocker-compose.yml ile PostgreSQL, Redis, gateway ve orchestrator servislerini tanimla.",
           "code_snippet": "# docker-compose.yml\nservices:\n  postgres:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: support\n      POSTGRES_PASSWORD: dev123\n    ports: ['5432:5432']\n  redis:\n    image: redis:7-alpine\n    ports: ['6379:6379']\n  orchestrator:\n    build: ./orchestrator\n    ports: ['8000:8000']\n    depends_on: [postgres, redis]",
           "checkpoint": "docker-compose up ile tum servisler hatasiz ayaga kalkiyor mu?",
           "substeps": [
@@ -329,7 +329,7 @@
           "step": 2,
           "title": "LangGraph Agent Graph Tasarimi",
           "why": "Agent'lar arasi gecis mantigi basinda dogru tasarlanmazsa sonradan degistirmek cok zor olur. Graph-based yaklasimayla agent workflow'u gorunur ve test edilebilir hale gelir.",
-          "instructions": "LangGraph ile temel agent graph'ini olustur:\n1. State schema tanimla (messages, current_agent, metadata)\n2. Router node: intent classification\n3. FAQ node: knowledge base lookup\n4. Tech Support node: step-by-step troubleshooting\n5. Escalation node: human handoff\n6. Conditional edges: router'dan diger agent'lara gecis kurallari",
+          "instructions": "LangGraph ile temel agent graph'ini oluştur:\n1. State schema tanimla (messages, current_agent, metadata)\n2. Router node: intent classification\n3. FAQ node: knowledge base lookup\n4. Tech Support node: step-by-step troubleshooting\n5. Escalation node: human handoff\n6. Conditional edges: router'dan diger agent'lara gecis kurallari",
           "code_snippet": "from langgraph.graph import StateGraph, END\nfrom typing import TypedDict, List\n\nclass AgentState(TypedDict):\n    messages: List[dict]\n    current_agent: str\n    intent: str\n    confidence: float\n    context: dict\n\ngraph = StateGraph(AgentState)\ngraph.add_node('router', router_agent)\ngraph.add_node('faq', faq_agent)\ngraph.add_node('tech', tech_agent)\ngraph.add_node('escalation', escalation_agent)\n\ngraph.add_conditional_edges('router', route_decision, {\n    'faq': 'faq',\n    'technical': 'tech',\n    'escalation': 'escalation'\n})",
           "checkpoint": "Graph compile edip basit bir mesajla router -> faq akisi calisiyor mu?",
           "substeps": [
@@ -873,8 +873,8 @@
           ]
         }
       ],
-      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. LangGraph'te state IMMUTABLE olmali — her node yeni state dondurur\n2. Router agent'in confidence threshold'u cok onemli — 0.7 altinda clarification sor\n3. Agent graph'ini once kagit uzerinde ciz, sonra koda dok\n4. Her agent'in fallback davranisi OLMALI — hata durumunda sistem cokmemeli",
-      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nMulti-agent sistemlerde en buyuk hata: agent'lari cok akilli yapmaya calismak. Her agent TEK BIR IS yapmali — Unix felsefesi. Router siniflandirir, FAQ cevaplar, Tech cozer. Bir agent hem siniflandirip hem cozmeye calisirsa debug cehennem olur.\n\nProduction'da agent routing'i A/B test et. Bazen basit keyword matching, LLM-based routing'den daha hizli ve guvenilir olabilir. Hybrid approach: once keyword match, eslesme yoksa LLM'e sor."
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. LangGraph'te state IMMUTABLE olmali — her node yeni state dondurur\n2. Router agent'in confidence threshold'u cok onemli — 0.7 altinda clarification sor\n3. Agent graph'ini once kagit üzerinde ciz, sonra koda dok\n4. Her agent'in fallback davranisi OLMALI — hata durumunda sistem cokmemeli",
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nMulti-agent sistemlerde en buyuk hata: agent'lari cok akilli yapmaya çalışmak. Her agent TEK BIR IS yapmali — Unix felsefesi. Router siniflandirir, FAQ cevaplar, Tech cozer. Bir agent hem siniflandirip hem cozmeye calisirsa debug cehennem olur.\n\nProduction'da agent routing'i A/B test et. Bazen basit keyword matching, LLM-based routing'den daha hizli ve guvenilir olabilir. Hybrid approach: once keyword match, eslesme yoksa LLM'e sor."
     },
     {
       "id": "p08-m2",
@@ -892,7 +892,7 @@
           "step": 1,
           "title": "FAQ Agent — Knowledge Base Lookup",
           "why": "FAQ'lar musterilerin %60-70'ini kapsar. Bu agent'i iyi yapmak toplam destek kalitesini dramatik artirir.",
-          "instructions": "FAQ Agent icin:\n1. FAQ veritabani olustur (soru-cevap ciftleri)\n2. Semantic search ile en alakali FAQ'lari bul\n3. Bulunan FAQ'larla LLM'e cevap urettir\n4. Cevap bulunamazsa Tech Agent'a yonlendir",
+          "instructions": "FAQ Agent icin:\n1. FAQ veritabani oluştur (soru-cevap ciftleri)\n2. Semantic search ile en alakali FAQ'lari bul\n3. Bulunan FAQ'larla LLM'e cevap urettir\n4. Cevap bulunamazsa Tech Agent'a yonlendir",
           "code_snippet": "async def faq_agent(state: AgentState) -> AgentState:\n    query = state['messages'][-1]['content']\n    \n    # Semantic search in FAQ database\n    relevant_faqs = await search_faqs(query, top_k=3)\n    \n    if not relevant_faqs or relevant_faqs[0].score < 0.7:\n        return {**state, 'current_agent': 'tech', 'intent': 'needs_escalation'}\n    \n    context = '\\n'.join([f.answer for f in relevant_faqs])\n    response = await llm.ainvoke(FAQ_PROMPT.format(\n        question=query, context=context\n    ))\n    \n    return {**state, 'messages': state['messages'] + [{'role': 'assistant', 'content': response}]}",
           "checkpoint": "3 farkli FAQ sorusu ile dogru cevap donuyor mu?",
           "substeps": [
@@ -1142,7 +1142,7 @@
         {
           "step": 3,
           "title": "Agent Gecis Mantigi (Conditional Edges)",
-          "why": "Agent'lar arasi gecis kurallari sistemin beynini olusturur. Yanlis gecis = yanlis agent = mutsuz musteri.",
+          "why": "Agent'lar arasi gecis kurallari sistemin beynini oluşturur. Yanlis gecis = yanlis agent = mutsuz musteri.",
           "instructions": "LangGraph conditional edges:\n1. Router -> FAQ: confidence > 0.8 ve intent='faq'\n2. Router -> Tech: intent='technical'\n3. FAQ -> Tech: FAQ cevap bulamadiysa\n4. Tech -> Escalation: 3 adim sonra cozulemediyse\n5. Any -> Escalation: kullanici kizginlik seviyesi yuksekse",
           "checkpoint": "Tum gecis senaryolarini test et — dogru agent'a yonleniyor mu?",
           "substeps": [
@@ -1227,7 +1227,7 @@
           "step": 4,
           "title": "Conversation State Management",
           "why": "Multi-turn konusmalarda context kaybi en buyuk sorun. Her agent, onceki agent'in ne yaptigini bilmeli.",
-          "instructions": "State'e metadata ekle:\n- conversation_summary: uzun konusmalarda ozet\n- attempted_solutions: denenimis cozumler\n- customer_sentiment: musteri duygu durumu\n- escalation_reason: neden eskale edildi",
+          "instructions": "State'e metadata ekle:\n- conversation_summary: uzun konusmalarda özet\n- attempted_solutions: denenimis cozumler\n- customer_sentiment: musteri duygu durumu\n- escalation_reason: neden eskale edildi",
           "checkpoint": "5 mesajlik bir konusmada context korunuyor mu? Agent onceki mesajlari hatirlıyor mu?",
           "substeps": [
             {
@@ -1816,9 +1816,9 @@
         {
           "step": 1,
           "title": "Sliding Window + Summary Memory",
-          "why": "LLM context window sinirli. 20+ mesajlik konusmada tum mesajlari gondermek hem yavas hem pahali.",
-          "instructions": "Memory stratejisi:\n1. Son 5 mesaji tam gonder (recent context)\n2. Onceki mesajlari ozetlerle (rolling summary)\n3. Onemli bilgileri ayri key-value store'da tut\n4. Agent gecislerinde summary otomatik guncelle",
-          "checkpoint": "20 mesajlik bir konusmada agent hala ilk mesajihatirliyor mu (summary uzerinden)?",
+          "why": "LLM context window sinirli. 20+ mesajlik konusmada tum mesajlari göndermek hem yavas hem pahali.",
+          "instructions": "Memory stratejisi:\n1. Son 5 mesaji tam gonder (recent context)\n2. Onceki mesajlari özetlerle (rolling summary)\n3. Onemli bilgileri ayri key-value store'da tut\n4. Agent gecislerinde summary otomatik guncelle",
+          "checkpoint": "20 mesajlik bir konusmada agent hala ilk mesajihatirliyor mu (summary üzerinden)?",
           "substeps": [
             {
               "order": "1.1",
@@ -2038,8 +2038,8 @@
         {
           "step": 3,
           "title": "Context-Aware Agent Handoff",
-          "why": "Agent degistiginde kullanici 'tekrar anlatmak zorunda kalmamali'. Onceki agent'in ozeti yeni agent'a aktarilmali.",
-          "instructions": "Handoff protocol:\n1. Cikan agent: conversation summary olustur\n2. Transfer metadata: neden gecis yapildi, ne denendi\n3. Giren agent: summary'yi oku ve 'Anliyorum, [ozet]. Simdi [yeni yaklasiM]' de\n4. Kullaniciya seffaf gecis bildirimi",
+          "why": "Agent degistiginde kullanici 'tekrar anlatmak zorunda kalmamali'. Onceki agent'in özeti yeni agent'a aktarilmali.",
+          "instructions": "Handoff protocol:\n1. Cikan agent: conversation summary oluştur\n2. Transfer metadata: neden gecis yapildi, ne denendi\n3. Giren agent: summary'yi oku ve 'Anliyorum, [özet]. Simdi [yeni yaklasiM]' de\n4. Kullaniciya seffaf gecis bildirimi",
           "checkpoint": "FAQ -> Tech gecisinde Tech agent onceki konusmayi biliyor mu?",
           "substeps": [
             {
@@ -2149,7 +2149,7 @@
           "step": 1,
           "title": "Escalation Karar Mantigi",
           "why": "Ne zaman insana aktarilacagi kritik bir karar. Cok erken = AI'in faydasiz olmasi. Cok gec = mutsuz musteri.",
-          "instructions": "Escalation triggers:\n1. Musteri acikca insan talep etti\n2. Sentiment score < 2/5 (kizgin musteri)\n3. Agent 3+ denemede cozemedi\n4. Confidence score surekli dusuk\n5. Hassas konu (guvenlik, odeme sorunlari)",
+          "instructions": "Escalation triggers:\n1. Musteri acikca insan talep etti\n2. Sentiment score < 2/5 (kizgin musteri)\n3. Agent 3+ denemede cozemedi\n4. Confidence score surekli dusuk\n5. Hassas konu (güvenlik, odeme sorunlari)",
           "checkpoint": "Tum escalation trigger'lari calisiyor mu? False positive orani kabul edilebilir mi?",
           "substeps": [
             {
@@ -2293,7 +2293,7 @@
           "step": 2,
           "title": "Context Transfer & Queue",
           "why": "Insan agent'a geciste tum bilgi aktarilmali. 'Tekrar anlatir misiniz?' demek kabul edilemez.",
-          "instructions": "Handoff package:\n1. Konusma ozeti (AI tarafindan olusturulmus)\n2. Musteri bilgileri\n3. Denenmis cozumler listesi\n4. Escalation nedeni\n5. Oncelik seviyesi (P1-P4)\n\nQueue sistemi:\n- Priority queue (P1 once)\n- Agent skill-based routing\n- Estimated wait time",
+          "instructions": "Handoff package:\n1. Konusma özeti (AI tarafindan oluşturulmus)\n2. Musteri bilgileri\n3. Denenmis cozumler listesi\n4. Escalation nedeni\n5. Oncelik seviyesi (P1-P4)\n\nQueue sistemi:\n- Priority queue (P1 once)\n- Agent skill-based routing\n- Estimated wait time",
           "checkpoint": "Insan agent handoff'u aldiginda tum context'i goruyor mu?",
           "substeps": [
             {
@@ -2525,7 +2525,7 @@
           ]
         }
       ],
-      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Escalation HER ZAMAN mumkun olmali — AI'i zorla kullandirma\n2. Context transfer'de PII (kisisel bilgi) filtreleme gerekebilir\n3. Kuyruk bosken bile tahmini bekleme suresi goster\n4. Insan agent AI ozetini duzenleyebilmeli — AI yanlis ozetlerse",
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Escalation HER ZAMAN mumkun olmali — AI'i zorla kullandirma\n2. Context transfer'de PII (kisisel bilgi) filtreleme gerekebilir\n3. Kuyruk bosken bile tahmini bekleme suresi goster\n4. Insan agent AI özetini duzenleyebilmeli — AI yanlis özetlerse",
       "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nHuman handoff'un kalitesi AI sisteminin basarisini belirler. 'AI bana yardimci olamadi' deneyimi, 'hemen bir insanla konustum' deneyiminden cok daha kotu. Escalation hizli ve sorunsuz olmali.\n\nMetrikler: escalation rate, resolution after escalation, customer satisfaction before/after handoff. Bu metrikleri izleyerek AI agent'lari surekli iyilestir."
     },
     {
@@ -2803,7 +2803,7 @@
           "title": "WebSocket Integration",
           "why": "Production chat deneyimi icin real-time iletisim sart. REST polling kabul edilemez.",
           "instructions": "WebSocket:\n1. Node.js WS gateway\n2. Connection lifecycle (connect, auth, disconnect)\n3. Message format standardization\n4. Reconnection logic (client-side)\n5. Heartbeat/ping-pong",
-          "checkpoint": "Chat mesajlari aninda iletiyor mu? Baglanti kopunca reconnect calisiyor mu?",
+          "checkpoint": "Chat mesajlari aninda iletiyor mu? Bağlantı kopunca reconnect calisiyor mu?",
           "substeps": [
             {
               "order": "3.1",
@@ -3027,7 +3027,7 @@
         {
           "step": 4,
           "title": "Docker & Production Hardening",
-          "why": "Tum servislerin container'da calismasi deployment tutarliligini ve olceklenebilirligini saglar.",
+          "why": "Tum servislerin container'da çalışmasi deployment tutarliligini ve olceklenebilirligini saglar.",
           "instructions": "Production checklist:\n1. Multi-stage Dockerfile (her servis)\n2. docker-compose.prod.yml\n3. Environment variable management\n4. Health checks\n5. Logging (structured JSON)\n6. Rate limiting\n7. Error tracking (Sentry)",
           "checkpoint": "docker-compose -f docker-compose.prod.yml up ile tum sistem hatasiz calisiyor mu?",
           "substeps": [
@@ -3189,7 +3189,7 @@
           ]
         }
       ],
-      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Her LLM cagrisini logla — maliyet takibi icin kritik\n2. WebSocket reconnection client'ta ZORUNLU — mobilde baglanti sik kopar\n3. Production'da her zaman structured logging kullan — JSON format\n4. Rate limiting hem API hem WebSocket icin ayri ayri kur",
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Her LLM cagrisini logla — maliyet takibi icin kritik\n2. WebSocket reconnection client'ta ZORUNLU — mobilde bağlantı sik kopar\n3. Production'da her zaman structured logging kullan — JSON format\n4. Rate limiting hem API hem WebSocket icin ayri ayri kur",
       "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nAI destek sistemlerinin ROI'si net olmali: AI ile resolve edilen konusma basina X TL tasarruf. Bu metrik yoneticiyi ikna eder.\n\nObservability stack: logs (ne oldu), metrics (ne kadar oldu), traces (neden oldu). Production AI sistemi icin ucune de ihtiyacin var. OpenTelemetry ile vendor-agnostic observability kur."
     },
     {
@@ -3199,7 +3199,7 @@
       "steps": [
         {
           "title": "Production Build",
-          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "instructions": "Uygulamayi production modda build et, tum testleri çalıştır, Lighthouse audit yap",
           "code_snippet": "pnpm build && pnpm test",
           "substeps": [
             {
@@ -3413,9 +3413,9 @@
       "Multi-agent sisteminizde agent'lar arasi iletisimi nasil yonettiniz?",
       "LangGraph'i neden sectiniz? Alternatifleri degerlendirdiniz mi?",
       "Conversation memory yonetiminde ne yaklasim kullandiniz?",
-      "Human handoff surecinde context kaybi yasanmamasi icin ne yaptiniz?",
+      "Human handoff sürecinde context kaybi yasanmamasi icin ne yaptiniz?",
       "Agent routing'de accuracy'yi nasil olctunuz ve iyilestirdiniz?",
-      "WebSocket baglantisi koptiginda ne oluyor?",
+      "WebSocket bağlantısi koptiginda ne oluyor?",
       "Token maliyetini nasil optimize ettiniz?",
       "Bu sistemi 10x trafik icin nasil olceklerdiniz?",
       "RAG pipeline'indan retrieval kalitesini nasil olcuyorsunuz?",
@@ -3423,7 +3423,7 @@
     ],
     "talking_points": [
       "LangGraph ile stateful workflow — neden state machine mantigi onemli",
-      "Router agent'in klasifikasyon accuracy'si ve iyilestirme sureci",
+      "Router agent'in klasifikasyon accuracy'si ve iyilestirme süreci",
       "Redis session management ile horizontal scaling hazirligi",
       "Human-in-the-loop pattern — AI limitlerini kabul etmenin onemi",
       "Token maliyet optimizasyonu — summarization stratejisi",
@@ -3571,7 +3571,7 @@
       "human-in-the-loop",
       "docker"
     ],
-    "when_to_create": "Milestone 1'in 2. adimini (LangGraph Agent Graph Tasarimi) bitirdiginde repo'yu olustur. Ilk commit docker-compose + LangGraph graph skeleton olmali.",
+    "when_to_create": "Milestone 1'in 2. adimini (LangGraph Agent Graph Tasarimi) bitirdiginde repo'yu oluştur. Ilk commit docker-compose + LangGraph graph skeleton olmali.",
     "pin_on_profile": true,
     "pin_priority": 3,
     "readme_sections": [
@@ -3598,7 +3598,7 @@
     "daily_commit_target": "Günde en az 3-5 anlamlı commit. Contribution graph'ın yeşil kalması önemli.",
     "pro_tips": [
       "LangGraph agent graph'ini README'de gorsel olarak goster (Mermaid diagram veya ASCII) — multi-agent mimarisi en etkileyici kisim.",
-      "Her agent icin ayri test dosyasi olustur ve routing accuracy metriklerini commit mesajlarinda belirt — 'test: router agent achieves 92% intent classification accuracy'.",
+      "Her agent icin ayri test dosyasi oluştur ve routing accuracy metriklerini commit mesajlarinda belirt — 'test: router agent achieves 92% intent classification accuracy'.",
       "WebSocket reconnection ve heartbeat logic'ini production-ready yap — mulakatta 'real-time sistem tasarladiniz mi?' sorusuna somut cevap olur.",
       "Human handoff flow'unu demo GIF'te mutlaka goster — AI'dan insana gecis ve context transfer recruiter'i etkiler."
     ]
@@ -3636,17 +3636,17 @@
     "code_review": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "Review this multi-agent system code (FastAPI + LangGraph + LangChain + WebSocket + Redis) for: LangGraph state immutability and node design, agent prompt engineering quality, intent classification accuracy, conversation memory management and token efficiency, WebSocket connection lifecycle handling, Redis session management, RAG retrieval quality, human handoff context completeness, error handling and fallback behavior, and agent transition edge conditions.",
-      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle LangGraph graph yapisi, agent prompt'lari ve handoff mantigi icin"
+      "when_to_use": "Her step tamamlandiktan sonra kullan — özellikle LangGraph graph yapisi, agent prompt'lari ve handoff mantigi icin"
     },
     "debugging": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "I'm getting this error in my multi-agent support system (FastAPI + LangGraph + LangChain + WebSocket + Redis): [error]. The relevant code is: [code]. Agent state: [state]. Graph node: [node]. I'm trying to [goal].",
-      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle LangGraph state hatalari, agent gecis sorunlari, WebSocket baglanti kopmalari ve Redis session kayiplari icin"
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — özellikle LangGraph state hatalari, agent gecis sorunlari, WebSocket bağlantı kopmalari ve Redis session kayiplari icin"
     },
     "research": {
       "model": "Gemini 2.5 Pro",
       "prompt_template": "Explain [concept] with practical examples for a multi-agent customer support system. Topics I need help with: LangGraph StateGraph and conditional edges, multi-agent design patterns, intent classification with LLMs, conversation summarization for memory management, WebSocket with Node.js (ws library), Redis pub/sub and session management, RAG for knowledge base, human-in-the-loop patterns, sentiment analysis approaches, and agent performance metrics.",
-      "when_to_use": "Yeni bir multi-agent veya LangGraph konsepti ogrenirken kullan — ozellikle state machine, agent routing ve human handoff patterns icin"
+      "when_to_use": "Yeni bir multi-agent veya LangGraph konsepti ogrenirken kullan — özellikle state machine, agent routing ve human handoff patterns icin"
     }
   },
   "deployment_guide": {
@@ -3713,7 +3713,7 @@
       "Proje aciklamasi ve motivasyon (2-3 cumle)",
       "Canli demo linki (Vercel/Railway badge ile)",
       "Teknoloji stack badge'leri",
-      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Ekran goruntuleri (en az 3: dashboard, ana özellik, mobile)",
       "Mimari diyagram (ASCII veya draw.io)",
       "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
       "API dokumantasyonu (/docs linki veya Postman collection)",
@@ -3721,7 +3721,7 @@
     ],
     "screenshot_suggestions": [
       "Dashboard/Anasayfa",
-      "Ana ozellik ekrani",
+      "Ana özellik ekrani",
       "Mobile gorunum"
     ],
     "live_demo_url_template": "https://multi-agent-support.vercel.app",
@@ -3729,10 +3729,10 @@
   },
   "transition_guide": {
     "prerequisites": [
-      "RAG sistemi gelistirme deneyimi",
+      "RAG sistemi geliştirme deneyimi",
       "LangChain/LangGraph kullanimi",
       "Agent ve tool-calling kavramlari",
-      "Full-stack web uygulama gelistirme"
+      "Full-stack web uygulama geliştirme"
     ],
     "what_you_should_know": [
       "Phase 5 Module 17 - AI Agents ve LangChain ileri konular",

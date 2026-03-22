@@ -3766,7 +3766,7 @@
       "steps": [
         {
           "title": "Production Build",
-          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "instructions": "Uygulamayi production modda build et, tum testleri çalıştır, Lighthouse audit yap",
           "code_snippet": "pnpm build && pnpm test",
           "substeps": [
             {
@@ -4178,17 +4178,17 @@
     "code_review": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "Review this Node.js/Express + Prisma code for: proper layered architecture (controller/service/repository), Prisma query optimization and relation handling, JWT token security (httpOnly cookies, token rotation), TypeScript type safety, error handling middleware, input validation, SQL injection prevention, and RESTful API design. Also check React component structure and drag-and-drop implementation.",
-      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle Prisma sorgulari, auth middleware ve drag-and-drop mantigi icin"
+      "when_to_use": "Her step tamamlandiktan sonra kullan — özellikle Prisma sorgulari, auth middleware ve drag-and-drop mantigi icin"
     },
     "debugging": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "I'm getting this error in my Trello clone project (React + Express + PostgreSQL + Prisma + JWT): [error]. The relevant code is: [code]. My Prisma schema is: [schema]. I'm trying to [goal].",
-      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle Prisma migration hatalari, JWT token sorunlari ve drag-and-drop state yonetimi icin"
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — özellikle Prisma migration hatalari, JWT token sorunlari ve drag-and-drop state yonetimi icin"
     },
     "research": {
       "model": "Gemini 2.5 Pro",
       "prompt_template": "Explain [concept] with practical examples for a full-stack kanban board app. Topics I need help with: Prisma ORM relations and nested writes, JWT refresh token rotation, @dnd-kit library, optimistic updates with React Query, Express middleware patterns, Docker Compose multi-service setup, and integration testing with Supertest.",
-      "when_to_use": "Yeni bir kutuphane veya pattern ogrenirken kullan — ozellikle Prisma, drag-and-drop ve JWT icin"
+      "when_to_use": "Yeni bir kutuphane veya pattern ogrenirken kullan — özellikle Prisma, drag-and-drop ve JWT icin"
     }
   },
   "deployment_guide": {
@@ -4201,7 +4201,7 @@
       {
         "title": "Neon Database Olustur",
         "commands": [
-          "# neon.tech'e git, yeni proje olustur",
+          "# neon.tech'e git, yeni proje oluştur",
           "# Connection string'i kopyala"
         ],
         "instructions": "Neon ucretsiz tier: 0.5 GB storage, 190 compute hours/ay"
@@ -4241,7 +4241,7 @@
     "cost": "Ucretsiz (tum servisler hobby tier)",
     "demo_checklist": [
       "Kayit/giris calisiyor",
-      "Board olusturma/silme",
+      "Board oluşturma/silme",
       "Kart surukle-birak",
       "Real-time guncelleme",
       "JWT token yenileme"
@@ -4252,7 +4252,7 @@
       "Proje aciklamasi ve motivasyon (2-3 cumle)",
       "Canli demo linki (Vercel/Railway badge ile)",
       "Teknoloji stack badge'leri",
-      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Ekran goruntuleri (en az 3: dashboard, ana özellik, mobile)",
       "Mimari diyagram (ASCII veya draw.io)",
       "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
       "API dokumantasyonu (/docs linki veya Postman collection)",
@@ -4260,7 +4260,7 @@
     ],
     "screenshot_suggestions": [
       "Dashboard/Anasayfa",
-      "Ana ozellik ekrani",
+      "Ana özellik ekrani",
       "Mobile gorunum"
     ],
     "live_demo_url_template": "https://trello-clone.vercel.app",
@@ -4280,6 +4280,6 @@
       "Phase 3 Module 11 - SQL ve PostgreSQL"
     ],
     "next_project": "project-03",
-    "skills_bridge": "Bu projede ogrendigin full-stack CRUD, authentication ve state management bilgisi, sonraki projede real-time iletisim ve WebSocket kullanimi icin saglam bir altyapi olusturacak. Prisma ORM deneyimin veritabani islemlerini hizlandiracak."
+    "skills_bridge": "Bu projede ogrendigin full-stack CRUD, authentication ve state management bilgisi, sonraki projede real-time iletisim ve WebSocket kullanimi icin saglam bir altyapi oluşturacak. Prisma ORM deneyimin veritabani islemlerini hizlandiracak."
   }
 }

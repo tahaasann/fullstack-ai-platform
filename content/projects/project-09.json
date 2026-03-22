@@ -19,7 +19,7 @@
     "MLOps Engineer",
     "Data Engineer"
   ],
-  "brief": "Bu projede, veri toplama asamasindan model deployment'a kadar end-to-end bir ML pipeline platformu insa edeceksin. Gercek dunyada Amazon SageMaker, Google Vertex AI veya Databricks'in kucuk ama fonksiyonel bir versiyonunu dusun.\n\nPlatform su asamalari kapsar: veri ingestion, feature engineering, model training, experiment tracking (MLflow), model registry, A/B testing, real-time inference API, model monitoring ve drift detection. Her asama bagimsiz calisabilir ama birlikte orkestre edilebilir.\n\nBu proje MLOps'un temellerini ogretir — sadece model egitmek degil, modeli production'da guvenle calistirmak, monitor etmek ve gerektiginde otomatik olarak yeniden egitmek. Mulakatlarda 'ML modeli nasil production'a alirsiniz?' sorusuna pratik deneyimle cevap vereceksin.",
+  "brief": "Bu projede, veri toplama asamasindan model deployment'a kadar end-to-end bir ML pipeline platformu insa edeceksin. Gercek dunyada Amazon SageMaker, Google Vertex AI veya Databricks'in kucuk ama fonksiyonel bir versiyonunu dusun.\n\nPlatform su asamalari kapsar: veri ingestion, feature engineering, model training, experiment tracking (MLflow), model registry, A/B testing, real-time inference API, model monitoring ve drift detection. Her asama bagimsiz calisabilir ama birlikte orkestre edilebilir.\n\nBu proje MLOps'un temellerini ogretir — sadece model egitmek degil, modeli production'da guvenle çalıştırmak, monitor etmek ve gerektiginde otomatik olarak yeniden egitmek. Mulakatlarda 'ML modeli nasil production'a alirsiniz?' sorusuna pratik deneyimle cevap vereceksin.",
   "architecture": {
     "overview": "Platform, mikro-servis benzeri bir mimaride tasarlanmis. FastAPI ana API gateway, Celery ile asenkron pipeline orchestration, MLflow ile experiment tracking ve model registry, Redis ile job queue management, PostgreSQL ile metadata storage saglaniyor.",
     "diagram": "\n┌──────────────┐     ┌──────────────┐     ┌──────────────┐\n│   React UI   │────►│  FastAPI      │────►│  PostgreSQL  │\n│  Dashboard   │     │  API Gateway  │     │  (Metadata)  │\n└──────────────┘     └──────┬───────┘     └──────────────┘\n                            │\n              ┌─────────────┼─────────────┐\n              │             │             │\n       ┌──────▼──────┐ ┌───▼────┐ ┌─────▼──────┐\n       │   Celery    │ │MLflow  │ │   Redis    │\n       │  Workers    │ │Server  │ │  (Queue)   │\n       │             │ │        │ │            │\n       │ - Training  │ │ - Exp  │ └────────────┘\n       │ - Feature   │ │   Track│\n       │ - Eval      │ │ - Model│\n       └─────────────┘ │   Reg  │\n                       └────────┘\n        ",
@@ -32,7 +32,7 @@
       },
       {
         "decision": "Neden Celery + Redis?",
-        "reasoning": "Model training uzun sureli islem — API request icinde yapilamaz. Celery distributed task queue olarak training, evaluation ve feature engineering job'larini asenkron calistirir. Redis hem message broker hem result backend.",
+        "reasoning": "Model training uzun sureli islem — API request icinde yapilamaz. Celery distributed task queue olarak training, evaluation ve feature engineering job'larini asenkron çalıştırir. Redis hem message broker hem result backend.",
         "alternatives": "RQ (Redis Queue), Dramatiq, Airflow, Prefect",
         "when_to_choose_alternative": "Basit job queue icin RQ yeter. Karmasik DAG orchestration icin Airflow/Prefect daha uygun."
       },
@@ -131,7 +131,7 @@
     {
       "id": "p09-m1",
       "title": "Proje Altyapisi & Veri Pipeline Tasarimi",
-      "overview": "Proje yapisini kur, veritabani semaalarini olustur, veri yukleme ve temizleme pipeline'ini implement et.",
+      "overview": "Proje yapisini kur, veritabani semaalarini oluştur, veri yukleme ve temizleme pipeline'ini implement et.",
       "estimated_hours": 8,
       "concepts_covered": [
         "project structure",
@@ -144,7 +144,7 @@
           "step": 1,
           "title": "Proje Yapisi & Docker Setup",
           "why": "ML projeleri cok bilesenden olusur — temiz yapi bastan sart.",
-          "instructions": "FastAPI + Celery + MLflow + PostgreSQL + Redis icin docker-compose olustur. Her servis ayri container.",
+          "instructions": "FastAPI + Celery + MLflow + PostgreSQL + Redis icin docker-compose oluştur. Her servis ayri container.",
           "code_snippet": "# Proje yapisi\n/api          # FastAPI app\n/workers      # Celery workers\n/ml           # ML pipeline modules\n/features     # Feature engineering\n/monitoring   # Drift detection\n/frontend     # React dashboard",
           "checkpoint": "docker-compose up ile tum servisler calisiyor mu?",
           "substeps": [
@@ -304,7 +304,7 @@
           "step": 2,
           "title": "Veri Ingestion Pipeline",
           "why": "ML pipeline'in ilk adimi veriyi guvenli sekilde sisteme almak.",
-          "instructions": "CSV/JSON upload endpoint'i olustur. Pydantic ile sema validasyonu. Buyuk dosyalar icin streaming upload. Veri profiling (column types, missing values, distributions).",
+          "instructions": "CSV/JSON upload endpoint'i oluştur. Pydantic ile sema validasyonu. Buyuk dosyalar icin streaming upload. Veri profiling (column types, missing values, distributions).",
           "checkpoint": "CSV yukleyip veri profili goruntuleniyor mu?",
           "substeps": [
             {
@@ -885,7 +885,7 @@
     {
       "id": "p09-m2",
       "title": "Feature Engineering & Feature Store",
-      "overview": "Reusable feature'lar olustur, feature store pattern'ini implement et, online ve offline serving ayir.",
+      "overview": "Reusable feature'lar oluştur, feature store pattern'ini implement et, online ve offline serving ayir.",
       "estimated_hours": 10,
       "concepts_covered": [
         "feature engineering",
@@ -1360,7 +1360,7 @@
         }
       ],
       "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Training-serving skew en buyuk MLOps sorunu — ayni transform'u ikisinde de kullan\n2. Feature pipeline'ini SERIALIZE et (pickle/joblib) ve model ile birlikte kaydet\n3. Feature store'da metadata ZORUNLU: ne zaman hesaplandi, hangi kaynak, hangi transform\n4. One-hot encoding sonrasi boyut patlamasina dikkat — high cardinality'de target encoding kullan",
-      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nFeature store buyuk takimlarda en onemli MLOps bilesenlerinden biri. Data scientist A'nin olusturdugu feature'i Data scientist B tekrar hesaplamak zorunda kalmamali.\n\nOnline (real-time) vs offline (batch) feature serving farki: online = Redis'ten milisaniyede oku, offline = batch job ile hesapla. Ikisinin tutarli olmasi sart."
+      "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nFeature store buyuk takimlarda en onemli MLOps bilesenlerinden biri. Data scientist A'nin oluşturdugu feature'i Data scientist B tekrar hesaplamak zorunda kalmamali.\n\nOnline (real-time) vs offline (batch) feature serving farki: online = Redis'ten milisaniyede oku, offline = batch job ile hesapla. Ikisinin tutarli olmasi sart."
     },
     {
       "id": "p09-m3",
@@ -1652,7 +1652,7 @@
           "step": 2,
           "title": "MLflow Experiment Tracking",
           "why": "Her experiment'in parametrelerini, metriklerini ve artifact'larini kaydetmek model secimi ve karsilastirmasi icin sart.",
-          "instructions": "MLflow entegrasyonu:\n1. Experiment olustur\n2. Her run'da: parametreler, metrikler, modeli logla\n3. Artifact'lar: confusion matrix, feature importance plot\n4. Tag'ler: model tipi, dataset versiyonu\n5. Frontend'de experiment comparison",
+          "instructions": "MLflow entegrasyonu:\n1. Experiment oluştur\n2. Her run'da: parametreler, metrikler, modeli logla\n3. Artifact'lar: confusion matrix, feature importance plot\n4. Tag'ler: model tipi, dataset versiyonu\n5. Frontend'de experiment comparison",
           "checkpoint": "MLflow UI'da experiment'leri karsilastirabiliyormusun?",
           "substeps": [
             {
@@ -2358,7 +2358,7 @@
           "step": 3,
           "title": "Batch Prediction Endpoint",
           "why": "Buyuk veri setleri icin tek tek prediction yapmak verimsiz. Batch endpoint toplu isleme saglar.",
-          "instructions": "Batch prediction:\n1. CSV upload ile toplu prediction\n2. Celery worker'da calistir\n3. Sonuclari indirilebilir CSV olarak sun\n4. Progress tracking",
+          "instructions": "Batch prediction:\n1. CSV upload ile toplu prediction\n2. Celery worker'da çalıştır\n3. Sonuclari indirilebilir CSV olarak sun\n4. Progress tracking",
           "checkpoint": "1000 satirlik CSV ile batch prediction calisiyor mu?",
           "substeps": [
             {
@@ -2601,7 +2601,7 @@
           ]
         }
       ],
-      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Model serving'de input validation ZORUNLU — production'da beklenmedik input gelir\n2. Model cache invalidation dogru calismali — eski model ile prediction yapmak tehlikeli\n3. A/B test sonuclarinda istatistiksel anlamlilik kontrol et — az veri ile karar verme\n4. Inference latency'yi MONITOR et — model buyurse latency artar",
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Model serving'de input validation ZORUNLU — production'da beklenmedik input gelir\n2. Model cache invalidation dogru çalışmali — eski model ile prediction yapmak tehlikeli\n3. A/B test sonuclarinda istatistiksel anlamlilik kontrol et — az veri ile karar verme\n4. Inference latency'yi MONITOR et — model buyurse latency artar",
       "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nModel serving iki kategori: real-time (< 100ms, API) ve batch (dakikalar, job). Ikisi farkli altyapi gerektirir. Cogu ML sistemi ikisine de ihtiyac duyar.\n\nShadow deployment: yeni modeli production trafige maruz birak ama sonuclari kullanma — sadece logla ve compare et. En guvenli deployment stratejisi."
     },
     {
@@ -3038,7 +3038,7 @@
           "step": 4,
           "title": "Auto-retraining Pipeline",
           "why": "Drift tespit edildiginde modeli otomatik yeniden egitmek downtime'i minimuma indirir.",
-          "instructions": "Auto-retraining:\n1. Drift alert -> retraining trigger\n2. Son N gunun verisi ile yeni model egit\n3. Yeni modeli staging'e kaydet\n4. Validation testleri calistir\n5. Testler gecerse auto-promote (opsiyonel) veya insan onayi bekle",
+          "instructions": "Auto-retraining:\n1. Drift alert -> retraining trigger\n2. Son N gunun verisi ile yeni model egit\n3. Yeni modeli staging'e kaydet\n4. Validation testleri çalıştır\n5. Testler gecerse auto-promote (opsiyonel) veya insan onayi bekle",
           "checkpoint": "Drift tetikleyip otomatik yeni model egitiliyor mu?",
           "substeps": [
             {
@@ -3644,7 +3644,7 @@
           "title": "Model Card & Documentation",
           "why": "Her modelin ne yaptigi, limitasyonlari ve kullanim kilavuzu dokumante edilmeli.",
           "instructions": "Model card sablonu:\n1. Model amaci ve kapsam\n2. Training data aciklamasi\n3. Performance metrikleri\n4. Limitasyonlar ve bias'lar\n5. Kullanim talimatlari\n6. Versiyon gecmisi",
-          "checkpoint": "Her model icin model card olusturulmus mu?",
+          "checkpoint": "Her model icin model card oluşturulmus mu?",
           "substeps": [
             {
               "order": "4.1",
@@ -3776,7 +3776,7 @@
           ]
         }
       ],
-      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Dashboard'da 'Deploy to Production' butonu koymadan once approval workflow kur\n2. Docker volume mount'lari dogru yapilandir — model artifact'lari kaybolmasin\n3. Model card yazmak sikici ama ZORUNLU — regulatory compliance icin gerekebilir\n4. Health check'ler sadece 200 donmemeli — model'in yuklu oldugunu da dogrulamali",
+      "must_note": "📝 Bunu Kesinlikle Not Al:\n1. Dashboard'da 'Deploy to Production' butonu koymadan once approval workflow kur\n2. Docker volume mount'lari dogru yapilandir — model artifact'lari kaybolmasin\n3. Model card yazmak sikici ama ZORUNLU — regulatory compliance icin gerekebilir\n4. Health check'ler sadece 200 donmemeli — model'in yuklu oldugunu da doğrulamali",
       "senior_learns": "🎩 Senior/CTO Boyle Ogrenir:\nMLOps maturity model: Level 0 (manual), Level 1 (ML pipeline automation), Level 2 (CI/CD for ML). Bu projede Level 1'e ulasiyorsun. Level 2 icin model validation testleri CI/CD pipeline'ina entegre et.\n\nModel card kavrami Google'dan geliyor. Responsible AI icin her modelin limitasyonlarini ve bias'larini dokumante etmek artik industry standard."
     },
     {
@@ -3786,7 +3786,7 @@
       "steps": [
         {
           "title": "Production Build",
-          "instructions": "Uygulamayi production modda build et, tum testleri calistir, Lighthouse audit yap",
+          "instructions": "Uygulamayi production modda build et, tum testleri çalıştır, Lighthouse audit yap",
           "code_snippet": "pnpm build && pnpm test",
           "substeps": []
         },
@@ -3818,7 +3818,7 @@
       "Data drift'i nasil tespit ediyorsunuz?",
       "Model'i production'a nasil deploy ediyorsunuz? Rollback nasil yapilir?",
       "A/B testing framework'unuz nasil calisiyor?",
-      "Auto-retraining ne zaman tetiklenir? Guvenlik onlemleri neler?",
+      "Auto-retraining ne zaman tetiklenir? Güvenlik onlemleri neler?",
       "Model monitoring'de hangi metrikleri takip ediyorsunuz?",
       "Bu pipeline'i 100x veri ile nasil olceklerdiniz?"
     ],
@@ -3828,7 +3828,7 @@
       "Feature engineering pipeline pattern — scikit-learn Pipeline",
       "Data drift detection — KS test ve PSI metrikleri",
       "A/B testing infrastructure — istatistiksel anlamlilik",
-      "Auto-retraining ve guvenlik guardrail'leri",
+      "Auto-retraining ve güvenlik guardrail'leri",
       "Model card ve responsible AI dokumantasyonu"
     ]
   },
@@ -3836,7 +3836,7 @@
     {
       "title": "MLflow Documentation",
       "url": "https://mlflow.org/docs/latest/index.html",
-      "why": "MLflow'un tum ozelliklerini anlamak icin resmi dokuman"
+      "why": "MLflow'un tum özelliklerini anlamak icin resmi dokuman"
     },
     {
       "title": "Made With ML - MLOps",
@@ -3846,7 +3846,7 @@
     {
       "title": "scikit-learn Pipeline Guide",
       "url": "https://scikit-learn.org/stable/modules/compose.html",
-      "why": "Feature pipeline olusturmak icin resmi rehber"
+      "why": "Feature pipeline oluşturmak icin resmi rehber"
     },
     {
       "title": "Celery Documentation",
@@ -3975,7 +3975,7 @@
       "machine-learning",
       "model-monitoring"
     ],
-    "when_to_create": "Milestone 1'in 2. adimini (Veri Ingestion Pipeline) bitirdiginde repo'yu olustur. Ilk commit docker-compose + veri upload endpoint'i olmali.",
+    "when_to_create": "Milestone 1'in 2. adimini (Veri Ingestion Pipeline) bitirdiginde repo'yu oluştur. Ilk commit docker-compose + veri upload endpoint'i olmali.",
     "pin_on_profile": true,
     "pin_priority": 2,
     "readme_sections": [
@@ -4002,7 +4002,7 @@
     "daily_commit_target": "Günde en az 3-5 anlamlı commit. Contribution graph'ın yeşil kalması önemli.",
     "pro_tips": [
       "MLflow experiment sonuclarini README'de tablo olarak goster (model tipi, accuracy, F1, training suresi) — somut metrikler recruiter'i etkiler.",
-      "Drift detection icin gercek bir senaryo olustur: baseline veri ile egit, dagiliimi degistirmis veri ile test et, sonuclari README'ye ekle.",
+      "Drift detection icin gercek bir senaryo oluştur: baseline veri ile egit, dagiliimi degistirmis veri ile test et, sonuclari README'ye ekle.",
       "Feature store pattern'ini ayri bir modül olarak tasarla ve README'de 'training-serving skew prevention' bolumu yaz — bu MLOps olgunlugunu gosterir.",
       "Auto-retraining pipeline'inin akis diyagramini README'ye koy: drift alert → retrain → validate → promote/reject — end-to-end MLOps anlayisini gosterir."
     ]
@@ -4040,17 +4040,17 @@
     "code_review": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "Review this MLOps platform code (FastAPI + MLflow + scikit-learn + Celery + Redis) for: data validation and cleaning pipeline robustness, scikit-learn Pipeline serialization for training-serving consistency, MLflow experiment logging completeness, Celery task error handling and retry logic, model serving API input validation and caching, A/B testing statistical significance, drift detection threshold calibration, auto-retraining safety guardrails, and Docker multi-service health checks.",
-      "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle feature pipeline, MLflow entegrasyonu ve drift detection mantigi icin"
+      "when_to_use": "Her step tamamlandiktan sonra kullan — özellikle feature pipeline, MLflow entegrasyonu ve drift detection mantigi icin"
     },
     "debugging": {
       "model": "Claude Sonnet 4.5",
       "prompt_template": "I'm getting this error in my ML pipeline platform (FastAPI + MLflow + scikit-learn + Celery + Redis + PostgreSQL): [error]. The relevant code is: [code]. Pipeline config: [config]. I'm trying to [goal].",
-      "when_to_use": "15 dakikadan fazla takildiginda kullan — ozellikle MLflow logging hatalari, scikit-learn pipeline uyumsuzluklari, Celery task failure'lari ve model serving latency sorunlari icin"
+      "when_to_use": "15 dakikadan fazla takildiginda kullan — özellikle MLflow logging hatalari, scikit-learn pipeline uyumsuzluklari, Celery task failure'lari ve model serving latency sorunlari icin"
     },
     "research": {
       "model": "Gemini 2.5 Pro",
       "prompt_template": "Explain [concept] with practical examples for an MLOps pipeline platform. Topics I need help with: MLflow experiment tracking and model registry API, scikit-learn Pipeline and ColumnTransformer, feature store design patterns, Celery distributed task queue with Redis, Kolmogorov-Smirnov test for data drift, Population Stability Index (PSI), A/B testing with statistical significance, model serving best practices (caching, warmup), hyperparameter optimization (grid/random search), and Docker volume management for ML artifacts.",
-      "when_to_use": "Yeni bir MLOps konsepti ogrenirken kullan — ozellikle MLflow, drift detection, feature engineering ve model serving icin"
+      "when_to_use": "Yeni bir MLOps konsepti ogrenirken kullan — özellikle MLflow, drift detection, feature engineering ve model serving icin"
     }
   },
   "deployment_guide": {
@@ -4074,7 +4074,7 @@
         "commands": [
           "railway up"
         ],
-        "instructions": "MLflow'u ayri bir Railway service olarak calistir. Env vars: DATABASE_URL (backend store), ARTIFACT_ROOT"
+        "instructions": "MLflow'u ayri bir Railway service olarak çalıştır. Env vars: DATABASE_URL (backend store), ARTIFACT_ROOT"
       },
       {
         "title": "Backend + Celery Deploy (Railway)",
@@ -4101,7 +4101,7 @@
     "estimated_time": "50 dakika",
     "cost": "~$5-10/ay (Railway hobby tier servisleri)",
     "demo_checklist": [
-      "ML pipeline calistirma (data > feature > train > eval)",
+      "ML pipeline çalıştırma (data > feature > train > eval)",
       "MLflow dashboard'da experiment'lar gorunuyor",
       "Model registry'de model versiyonlari",
       "Real-time inference API calisiyor (<50ms latency)",
@@ -4114,7 +4114,7 @@
       "Proje aciklamasi ve motivasyon (2-3 cumle)",
       "Canli demo linki (Vercel/Railway badge ile)",
       "Teknoloji stack badge'leri",
-      "Ekran goruntuleri (en az 3: dashboard, ana ozellik, mobile)",
+      "Ekran goruntuleri (en az 3: dashboard, ana özellik, mobile)",
       "Mimari diyagram (ASCII veya draw.io)",
       "Kurulum talimatlari (git clone > pnpm install > .env > pnpm dev)",
       "API dokumantasyonu (/docs linki veya Postman collection)",
@@ -4122,7 +4122,7 @@
     ],
     "screenshot_suggestions": [
       "Dashboard/Anasayfa",
-      "Ana ozellik ekrani",
+      "Ana özellik ekrani",
       "Mobile gorunum"
     ],
     "live_demo_url_template": "https://ml-pipeline.vercel.app",

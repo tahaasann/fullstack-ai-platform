@@ -8,7 +8,7 @@
       "id": "q1",
       "type": "multiple_choice",
       "difficulty": "orta",
-      "question": "CAP Theorem'e gore, distributed bir sistemde network partition oldugunda hangi iki ozellik arasinda secim yapilmak zorundadir?",
+      "question": "CAP Theorem'e gore, distributed bir sistemde network partition oldugunda hangi iki özellik arasinda secim yapilmak zorundadir?",
       "options": [
         "Consistency ve Availability",
         "Consistency ve Partition Tolerance",
@@ -46,14 +46,14 @@
         "Her tweet hem cache'e hem database'e ayni anda yazilir"
       ],
       "correct": 1,
-      "explanation": "Hybrid model: Normal kullanicilar tweet attiginda takipcilerin timeline cache'ine push edilir (hizli read). Ama 10M+ takipcisi olan unlulerin tweetleri push edilmez (cok pahali). Timeline olusturulurken bu tweetler pull ile cekilir ve merge edilir."
+      "explanation": "Hybrid model: Normal kullanicilar tweet attiginda takipcilerin timeline cache'ine push edilir (hizli read). Ama 10M+ takipcisi olan unlulerin tweetleri push edilmez (cok pahali). Timeline oluşturulurken bu tweetler pull ile cekilir ve merge edilir."
     },
     {
       "id": "q5",
       "type": "explain_code",
       "difficulty": "orta",
       "question": "Asagidaki kodun ne yaptigini ve time complexity'sini aciklayin:\n\ndef mystery(nums, k):\n    heap = nums[:k]\n    heapq.heapify(heap)\n    for num in nums[k:]:\n        if num > heap[0]:\n            heapq.heapreplace(heap, num)\n    return heap[0]",
-      "correct": "Bu fonksiyon, verilen bir dizideki k. en buyuk elemani bulur. K boyutunda bir min-heap olusturur. Kalan elemanlar icinde heap'in tepesinden (en kucukten) buyuk olanlar heap'e eklenir. Sonunda heap'in tepesindeki eleman k. en buyuk degerdir. Time complexity: O(n log k).",
+      "correct": "Bu fonksiyon, verilen bir dizideki k. en buyuk elemani bulur. K boyutunda bir min-heap oluşturur. Kalan elemanlar icinde heap'in tepesinden (en kucukten) buyuk olanlar heap'e eklenir. Sonunda heap'in tepesindeki eleman k. en buyuk degerdir. Time complexity: O(n log k).",
       "explanation": "Min-heap kullanarak k. en buyuk elemani bulmak klasik bir interview sorusudur. Heap size'i k'da sabit tutarak O(n log k) elde edilir. Full sort O(n log n) olacagindan bu daha verimlidir."
     },
     {
@@ -81,7 +81,12 @@
         "Belirli alanlara derinles (deep dive)",
         "High-level sistem diagrami ciz"
       ],
-      "correct": [1, 0, 3, 2],
+      "correct": [
+        1,
+        0,
+        3,
+        2
+      ],
       "explanation": "System design interview sirasi: (1) Requirements - ne yapilacagini anla, (2) Estimation - buyuklukleri hesapla, (3) High-Level Design - komponentleri ciz, (4) Deep Dive - bottleneck'leri incele. Hemen cozume atlamak en buyuk hata."
     },
     {
@@ -90,7 +95,7 @@
       "difficulty": "orta",
       "question": "Dijkstra algoritmasi negative weight edge'ler iceren graph'larda dogru sonuc verir.",
       "correct": false,
-      "explanation": "Dijkstra algoritmasi negative weight edge'lerde YANLIS sonuc verir. Cunku greedy yaklasimla bir node'u 'kesinlestirdiginde', daha sonra negative edge uzerinden daha kisa yol bulunabilir. Negative weight'ler icin Bellman-Ford algoritmasi kullanilmalidir."
+      "explanation": "Dijkstra algoritmasi negative weight edge'lerde YANLIS sonuc verir. Cunku greedy yaklasimla bir node'u 'kesinlestirdiginde', daha sonra negative edge üzerinden daha kisa yol bulunabilir. Negative weight'ler icin Bellman-Ford algoritmasi kullanilmalidir."
     },
     {
       "id": "q9",
@@ -104,7 +109,7 @@
         "Collision olasiligi sifirdir"
       ],
       "correct": 1,
-      "explanation": "Normal hash'te node sayisi degisince (N degisince) neredeyse tum key'ler yer degistirir. Consistent hashing'te sadece K/N (K=toplam key, N=node sayisi) key etkilenir. Bu ozellikle cache server'lar eklenip cikarildiginda buyuk avantaj saglar."
+      "explanation": "Normal hash'te node sayisi degisince (N degisince) neredeyse tum key'ler yer degistirir. Consistent hashing'te sadece K/N (K=toplam key, N=node sayisi) key etkilenir. Bu özellikle cache server'lar eklenip cikarildiginda buyuk avantaj saglar."
     },
     {
       "id": "q10",
