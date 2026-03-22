@@ -260,23 +260,25 @@
             {
               "why": "BaseSettings .env dosyasından değişkenleri otomatik okur ve tip dönüşümü yapar. Varsayılan değerler development için — production'da .env'den override edilir.",
               "code": "class Settings(BaseSettings):\n    app_name: str = \"RAG Document QA\"\n    openai_api_key: str\n    database_url: str = \"postgresql://user:pass@localhost:5432/ragdb\"\n    chroma_persist_dir: str = \"./chroma_data\"\n    upload_dir: str = \"./uploads\"\n    max_file_size_mb: int = 50\n    chunk_size: int = 512",
-              "order": "1.9a",
+              "order": "1.10",
               "action": "Settings sınıfını BaseSettings'ten türet ve alanları yaz",
-              "type": "code_write",
-              "file": "backend/app/core/config.py"
+              "type": "code_add",
+              "file": "backend/app/core/config.py",
+              "position": "bottom"
             },
             {
               "why": "RAG-specific ayarlar: embedding modeli, LLM modeli, reranker modeli. Config.env_file ile .env dosya yolunu belirtiyoruz. lru_cache ile singleton pattern — her çağrıda .env tekrar okunmaz.",
               "code": "chunk_overlap: int = 50\n    embedding_model: str = \"text-embedding-3-small\"\n    llm_model: str = \"gpt-4o-mini\"\n    reranker_model: str = \"cross-encoder/ms-marco-MiniLM-L-6-v2\"\n",
-              "order": "1.9b",
+              "order": "1.11",
               "action": "RAG-specific ayarları (embedding, LLM, reranker) ekle",
-              "type": "code_write",
-              "file": "backend/app/core/config.py"
+              "type": "code_add",
+              "file": "backend/app/core/config.py",
+              "position": "bottom"
             },
             {
               "why": "Sınıf metotlarının devamı — iş mantığı implementasyonu.",
               "code": "    class Config:\n        env_file = \".env\"\n\n@lru_cache()\ndef get_settings() -> Settings:\n    return Settings()",
-              "order": "1.9c",
+              "order": "1.12",
               "action": "Sınıf metotlarını tamamla — iş mantığı implementasyonu",
               "type": "code_add",
               "file": "backend/app/core/config.py"
@@ -362,7 +364,7 @@
             {
               "why": "Önce ne yapacağımızı yazıyoruz: Base class, engine factory ve dependency injection için get_db generator. Import'ları sonra ekleyeceğiz.",
               "code": "Base = declarative_base()\n\ndef get_engine():\n    settings = get_settings()\n    return create_engine(settings.database_url)\n\ndef get_db():",
-              "order": "2.1a",
+              "order": "2.2",
               "action": "Base class, engine factory ve get_db fonksiyonlarının iskeletini yaz",
               "type": "code_write",
               "file": "backend/app/core/database.py"
@@ -370,7 +372,7 @@
             {
               "why": "Hata yakalama — beklenmeyen durumlar gracefully handle ediliyor.",
               "code": "    engine = get_engine()\n    SessionLocal = sessionmaker(bind=engine)\n    db = SessionLocal()\n    try:\n        yield db\n    finally:\n        db.close()",
-              "order": "2.1b",
+              "order": "2.3",
               "action": "Hata yakalama bloğunu yaz — except/finally",
               "type": "code_add",
               "file": "backend/app/core/database.py"
@@ -394,7 +396,7 @@
             {
               "why": "ProcessingStatus enum ile dökümanın işlem durumunu takip ediyoruz. str mixin ile JSON serialization otomatik çalışır. 4 durum: pending → processing → completed/failed.",
               "code": "class ProcessingStatus(str, enum.Enum):\n    PENDING = \"pending\"\n    PROCESSING = \"processing\"\n    COMPLETED = \"completed\"\n    FAILED = \"failed\"\n\nclass Document(Base):\n    __tablename__ = \"documents\"",
-              "order": "2.4a",
+              "order": "2.6",
               "action": "ProcessingStatus enum ve Document model iskeletini yaz",
               "type": "code_write",
               "file": "backend/app/models/document.py"
@@ -402,18 +404,20 @@
             {
               "why": "Döküman alanları: dosya bilgileri, işleme sonuçları ve koleksiyon ilişkisi. ForeignKey ile koleksiyona bağlıyoruz. error_message nullable — sadece failed durumda dolar.",
               "code": "id = Column(String, primary_key=True)\n    filename = Column(String(500), nullable=False)\n    file_type = Column(String(20), nullable=False)\n    file_size = Column(Integer, nullable=False)\n    page_count = Column(Integer, default=0)\n    chunk_count = Column(Integer, default=0)\n    collection_id = Column(String, ForeignKey(\"collections.id\"),",
-              "order": "2.4b",
+              "order": "2.7",
               "action": "Document modeli alanlarını tanımla — dosya bilgileri ve ForeignKey",
-              "type": "code_write",
-              "file": "backend/app/models/document.py"
+              "type": "code_add",
+              "file": "backend/app/models/document.py",
+              "position": "bottom"
             },
             {
               "why": "Veritabanı sütun tanımları — ilişkiler ve kısıtlamalar ile veri bütünlüğü sağlanıyor.",
               "code": "        nullable=False)\n    status = Column(Enum(ProcessingStatus),\n        default=ProcessingStatus.PENDING)\n    error_message = Column(Text, nullable=True)\n    processing_time_ms = Column(Integer, nullable=True)\n    created_at = Column(DateTime, default=datetime.utcnow)\n    collection = relationship(\"Collection\",\n        back_populates=\"documents\")",
-              "order": "2.4c",
+              "order": "2.8",
               "action": "Document modeli status, error ve relationship alanlarını ekle",
-              "type": "code_write",
-              "file": "backend/app/models/document.py"
+              "type": "code_add",
+              "file": "backend/app/models/document.py",
+              "position": "bottom"
             },
             {
               "order": "2.6",
@@ -427,26 +431,29 @@
             {
               "why": "Collection dökümanları gruplar (ör: 'Şirket Politikaları'). relationship ile 1-N ilişki kuruyoruz — collection.documents ile tüm dökümanlarına erişilebilir.",
               "code": "class Collection(Base):\n    __tablename__ = \"collections\"\n    id = Column(String, primary_key=True)\n    name = Column(String(200), nullable=False, unique=True)\n    description = Column(Text, nullable=True)\n    created_at = Column(DateTime, default=datetime.utcnow)\n    documents = relationship(\"Document\",\n        back_populates=\"collection\")",
-              "order": "2.6a",
+              "order": "2.10",
               "action": "Collection modelini yaz — koleksiyon yönetimi",
-              "type": "code_write",
-              "file": "backend/app/models/document.py"
+              "type": "code_add",
+              "file": "backend/app/models/document.py",
+              "position": "bottom"
             },
             {
               "why": "ChatMessage konuşma geçmişini saklar — multi-turn Q&A için gerekli. JSON column ile kaynakları yapısal olarak tutuyoruz. session_id ile mesajlar konuşma bazında gruplandırılır.",
               "code": "class ChatMessage(Base):\n    __tablename__ = \"chat_messages\"\n    id = Column(String, primary_key=True)\n    session_id = Column(String, ForeignKey(\"chat_sessions.id\"),\n        nullable=False)",
-              "order": "2.6b",
+              "order": "2.11",
               "action": "ChatMessage modelini yaz — konuşma geçmişi",
-              "type": "code_write",
-              "file": "backend/app/models/document.py"
+              "type": "code_add",
+              "file": "backend/app/models/document.py",
+              "position": "bottom"
             },
             {
               "why": "Veritabanı sütun tanımları — ilişkiler ve kısıtlamalar ile veri bütünlüğü sağlanıyor.",
               "code": "    role = Column(String(20), nullable=False)\n    content = Column(Text, nullable=False)\n    sources = Column(JSON, nullable=True)\n    confidence = Column(Integer, nullable=True)\n    created_at = Column(DateTime, default=datetime.utcnow)",
-              "order": "2.6c",
+              "order": "2.12",
               "action": "ChatMessage alanlarını tamamla — role, content, sources, confidence",
-              "type": "code_write",
-              "file": "backend/app/models/document.py"
+              "type": "code_add",
+              "file": "backend/app/models/document.py",
+              "position": "bottom"
             },
             {
               "order": "2.8",
@@ -555,7 +562,7 @@
             {
               "why": "İlk iş validasyon: dosya tipi ve boyutu kontrol edilir. Kötü niyetli kullanıcı .exe yüklemeye veya 1GB dosya göndermeye çalışabilir. Erken reject etmek sunucu kaynaklarını korur.",
               "code": "@router.post(\"/upload\")\nasync def upload_document(\n    background_tasks: BackgroundTasks,\n    file: UploadFile = File(...),\n    collection_id: str = Form(...),\n    db: Session = Depends(get_db),\n):",
-              "order": "3.5a",
+              "order": "3.6",
               "action": "upload_document endpoint iskeletini yaz — validasyon mantığı",
               "type": "code_add",
               "file": "backend/app/api/documents.py"
@@ -563,7 +570,7 @@
             {
               "why": "Asenkron işlem — event loop bloklanmadan çalışır.",
               "code": "    # 1. Dosya tipi kontrolü\n    if file.content_type not in ALLOWED_TYPES:\n        raise HTTPException(400, f\"Desteklenmeyen dosya tipi: {file.content_type}\")\n    # 2. Dosya boyutu kontrolü\n    content = await file.read()\n    if len(content) > MAX_SIZE:\n        raise HTTPException(400, f\"Dosya boyutu {MAX_SIZE // 1024 // 1024}MB'ı aşamaz\")",
-              "order": "3.5b",
+              "order": "3.7",
               "action": "Asenkron dosya işleme ve validasyon kodunu yaz",
               "type": "code_add",
               "file": "backend/app/api/documents.py"
@@ -580,15 +587,16 @@
             {
               "why": "Status PENDING olarak başlıyor — processing pipeline arka planda çalışacak. BackgroundTasks ile kullanıcı cevabı hemen alır, dosya işleme arka planda devam eder.",
               "code": "# 4. Veritabanı kaydı oluştur\n    document = Document(\n        id=doc_id, filename=file.filename,\n        file_type=file_ext, file_size=len(content),\n        collection_id=collection_id,\n        status=ProcessingStatus.PENDING,",
-              "order": "3.7a",
+              "order": "3.9",
               "action": "Veritabanı kaydı oluştur ve BackgroundTasks ile işleme başlat",
-              "type": "code_write",
-              "file": "backend/app/api/documents.py"
+              "type": "code_add",
+              "file": "backend/app/api/documents.py",
+              "position": "bottom"
             },
             {
               "why": "Sonuç sözlüğü/listesi döndürülüyor — çağıran kod bu yapıyı kullanacak.",
               "code": "    )\n    db.add(document)\n    db.commit()\n    # 5. Arka plan işlemi başlat\n    background_tasks.add_task(process_document, doc_id, file_path)\n    return {\"id\": doc_id, \"status\": \"pending\", \"message\": \"Döküman işleme kuyruğuna eklendi\"}",
-              "order": "3.7b",
+              "order": "3.10",
               "action": "Sonuç sözlüğünü/listesini oluştur ve döndür",
               "type": "code_add",
               "file": "backend/app/api/documents.py"
@@ -649,7 +657,7 @@
             {
               "why": "ExtractedPage veri sınıfı: her sayfa content, page_number ve metadata tutar. Tüm extractor'lar bu ortak formatta veri döndürecek.",
               "code": "class ExtractedPage:\n    content: str\n    page_number: int\n    metadata: dict\n\nclass PDFExtractor:\n    def extract(self, file_path: str) -> list:\n        pass",
-              "order": "4.1a",
+              "order": "4.2",
               "action": "ExtractedPage dataclass ve PDFExtractor iskeletini yaz",
               "type": "code_write",
               "file": "backend/app/services/extractors.py"
@@ -657,23 +665,25 @@
             {
               "why": "DOCX ve TXT extractor iskeletleri. Aynı extract() arayüzü — polimorfizm sayesinde çağıran kod hangi extractor'ı kullandığını bilmek zorunda değil.",
               "code": "\nclass DOCXExtractor:\n    def extract(self, file_path: str) -> list:\n        pass\n\nclass TXTExtractor:\n    def extract(self, file_path: str) -> list:\n        pass",
-              "order": "4.1b",
+              "order": "4.3",
               "action": "DOCXExtractor ve TXTExtractor iskeletlerini yaz",
-              "type": "code_write",
-              "file": "backend/app/services/extractors.py"
+              "type": "code_add",
+              "file": "backend/app/services/extractors.py",
+              "position": "bottom"
             },
             {
               "why": "Factory pattern: dosya tipine göre doğru extractor'ı döndürür. Yeni format eklemek için sadece sözlüğe bir satır ekle. Desteklenmeyen tip için anlamlı hata fırlat.",
               "code": "def get_extractor(file_type: str):\n    extractors = {\n        \"pdf\": PDFExtractor(),\n        \"docx\": DOCXExtractor(),",
-              "order": "4.1c",
+              "order": "4.4",
               "action": "Factory pattern ile get_extractor fonksiyonunu yaz",
-              "type": "code_write",
-              "file": "backend/app/services/extractors.py"
+              "type": "code_add",
+              "file": "backend/app/services/extractors.py",
+              "position": "bottom"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "        \"txt\": TXTExtractor()\n    }\n    if file_type not in extractors:\n        raise ValueError(f\"Desteklenmeyen dosya tipi: {file_type}\")\n    return extractors[file_type]",
-              "order": "4.1d",
+              "order": "4.5",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/extractors.py"
@@ -698,15 +708,16 @@
             {
               "why": "pypdf her sayfayı ayrı ayrı okur. Boş sayfaları filtreliyoruz (if text.strip()). page.images ile sayfada görsel olup olmadığını metadata'ya ekliyoruz.",
               "code": "class PDFExtractor:\n    def extract(self, file_path: str) -> List[ExtractedPage]:\n        reader = PdfReader(file_path)\n        pages = []\n        for i, page in enumerate(reader.pages):\n            text = page.extract_text() or \"\"\n            text = self._clean_text(text)",
-              "order": "4.4a",
+              "order": "4.8",
               "action": "PDFExtractor.extract metodunu implement et — sayfa sayfa okuma",
-              "type": "code_write",
-              "file": "backend/app/services/extractors.py"
+              "type": "code_add",
+              "file": "backend/app/services/extractors.py",
+              "position": "bottom"
             },
             {
               "why": "Listeye eleman ekleme — döngü içinde sonuçlar biriktiriliyor.",
               "code": "            if text.strip():\n                pages.append(ExtractedPage(\n                    content=text, page_number=i + 1,\n                    metadata={\"source_type\": \"pdf\", \"has_images\": len(page.images) > 0}\n                ))\n        return pages",
-              "order": "4.4b",
+              "order": "4.9",
               "action": "Döngü içinde sonuçları listeye ekle",
               "type": "code_add",
               "file": "backend/app/services/extractors.py"
@@ -729,7 +740,7 @@
               "why": "DOCX'te fiziksel sayfa kavramı yok — PDF gibi sayfa sayfa okuyamıyoruz. Heading'lere göre mantıksal bölümler oluşturacağız. Önce değişkenleri hazırlıyoruz."
             },
             {
-              "order": "4.7a",
+              "order": "4.12",
               "action": "GERİ DÖN — paragrafları iterate et ve heading'e göre böl",
               "type": "code_modify",
               "file": "backend/app/services/extractors.py",
@@ -737,7 +748,7 @@
               "why": "Her Heading stili yeni bir bölüm başlatır. Önceki paragrafları ExtractedPage olarak kaydedip yeni bölüme geçiyoruz. Bu yapı chunking aşamasında daha anlamlı parçalar üretir."
             },
             {
-              "order": "4.7b",
+              "order": "4.13",
               "action": "GERİ DÖN — son bölümü ekle (kalan paragraflar)",
               "type": "code_modify",
               "file": "backend/app/services/extractors.py",
@@ -747,15 +758,16 @@
             {
               "why": "Tablolar ayrı extract edilmeli — paragraph iteration tabloları atlar. Her tablo ayrı bir ExtractedPage olarak metadata'da 'type: table' ile işaretlenir.",
               "code": "for table in doc.tables:\n            table_text = self._extract_table(table)\n            if table_text:\n                pages.append(ExtractedPage(\n                    content=table_text,",
-              "order": "4.7c",
+              "order": "4.14",
               "action": "DOCX tablolarını ayrı extract et — tablo metadata'sı ekle",
-              "type": "code_write",
-              "file": "backend/app/services/extractors.py"
+              "type": "code_add",
+              "file": "backend/app/services/extractors.py",
+              "position": "bottom"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "                    page_number=len(pages) + 1,\n                    metadata={\"type\": \"table\",\n                        \"source_type\": \"docx\"}\n                ))\n        return pages",
-              "order": "4.7d",
+              "order": "4.15",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/extractors.py"
@@ -763,10 +775,11 @@
             {
               "why": "Her satırı pipe (|) ile ayırarak okunabilir tablo formatı oluşturuyoruz. strip() ile boşlukları temizliyoruz. Bu format LLM'in tabloyu anlaması için yeterli.",
               "code": "    def _extract_table(self, table) -> str:\n        rows = []\n        for row in table.rows:\n            cells = [cell.text.strip() for cell in row.cells]\n            rows.append(\" | \".join(cells))\n        return \"\\n\".join(rows)",
-              "order": "4.7e",
+              "order": "4.16",
               "action": "_extract_table yardımcı metodunu yaz — pipe formatında tablo",
-              "type": "code_write",
-              "file": "backend/app/services/extractors.py"
+              "type": "code_add",
+              "file": "backend/app/services/extractors.py",
+              "position": "bottom"
             },
             {
               "order": "4.9",
@@ -777,7 +790,7 @@
               "why": "TXT dosyalarının encoding'i belirsizdir — UTF-8, Windows-1254 veya ISO-8859-9 olabilir. chardet kütüphanesi byte pattern'lerini analiz ederek encoding'i otomatik algılar."
             },
             {
-              "order": "4.9a",
+              "order": "4.18",
               "action": "GERİ DÖN — satırları 100'lük chunk'lara böl",
               "type": "code_modify",
               "file": "backend/app/services/extractors.py",
@@ -785,7 +798,7 @@
               "why": "TXT dosyalarında sayfa kavramı yok. Her 100 satırı bir sayfa olarak grupluyoruz — bu, chunking aşamasında makul boyutta parçalar üretir. encoding metadata'ya ekleniyor."
             },
             {
-              "order": "4.9b",
+              "order": "4.19",
               "action": "GERİ DÖN — kalan satırları son chunk olarak ekle",
               "type": "code_modify",
               "file": "backend/app/services/extractors.py",
@@ -840,7 +853,7 @@
             {
               "why": "Önce fonksiyonun yapısını belirliyoruz: try/except/finally pattern'i ile her durumda status güncellenir ve DB bağlantısı kapatılır.",
               "code": "async def process_document(doc_id: str, file_path: str):\n    \"\"\"Dökümanı işle: extract -> status güncelle.\"\"\"\n    db = get_db_session()\n    start_time = time.time()\n    try:",
-              "order": "5.1a",
+              "order": "5.2",
               "action": "process_document async fonksiyonunun iskeletini yaz",
               "type": "code_write",
               "file": "backend/app/services/processor.py"
@@ -848,7 +861,7 @@
             {
               "why": "Hata yakalama — beklenmeyen durumlar gracefully handle ediliyor.",
               "code": "# 1. Status'u PROCESSING yap\n        # 2. Extract et\n        # 3. Başarılı: COMPLETED yap\n        pass\n    except Exception as e:",
-              "order": "5.1b",
+              "order": "5.3",
               "action": "Hata yakalama bloğunu yaz — except/finally",
               "type": "code_add",
               "file": "backend/app/services/processor.py"
@@ -856,7 +869,7 @@
             {
               "why": "Döküman bölümünün devamı — içerik yapısı tamamlanıyor.",
               "code": "        # Hata: FAILED yap\n        pass\n    finally:\n        db.close()",
-              "order": "5.1c",
+              "order": "5.4",
               "action": "Döküman yapısının devam bölümünü tamamla",
               "type": "code_add",
               "file": "backend/app/services/processor.py"
@@ -881,15 +894,16 @@
             {
               "why": "Boş döküman kontrolü önemli: corrupt PDF boş sayfa döndürebilir. Süre ölçümü ile performans takibi. COMPLETED status'u ve page_count güncelleniyor.",
               "code": "extractor = get_extractor(doc.file_type)\n        pages = extractor.extract(file_path)\n        if not pages:\n            raise ValueError(\"Döküman boş veya okunamıyor\")\n        elapsed_ms = int((time.time() - start_time) * 1000)",
-              "order": "5.4a",
+              "order": "5.7",
               "action": "Extract işlemini çalıştır ve boş döküman kontrolü yap",
-              "type": "code_write",
-              "file": "backend/app/services/processor.py"
+              "type": "code_add",
+              "file": "backend/app/services/processor.py",
+              "position": "bottom"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "        doc.page_count = len(pages)\n        doc.status = ProcessingStatus.COMPLETED\n        doc.processing_time_ms = elapsed_ms\n        db.commit()\n        logger.info(f\"Document processed: {doc.filename}, {len(pages)} pages, {elapsed_ms}ms\")\n        return pages",
-              "order": "5.4b",
+              "order": "5.8",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/processor.py"
@@ -905,7 +919,7 @@
             {
               "why": "Frontend dökümanın işlenip işlenmediğini polling ile kontrol edecek. Bu endpoint status, sayfa sayısı ve varsa hata mesajını döndürür.",
               "code": "@router.get(\"/{doc_id}/status\")\nasync def get_document_status(doc_id: str, db: Session = Depends(get_db)):\n    doc = db.query(Document).filter(Document.id == doc_id).first()\n    if not doc:\n        raise HTTPException(404, \"Döküman bulunamadı\")",
-              "order": "5.6a",
+              "order": "5.10",
               "action": "Döküman status endpoint'ini yaz — polling için",
               "type": "code_add",
               "file": "backend/app/services/processor.py"
@@ -913,7 +927,7 @@
             {
               "why": "Sonuç sözlüğü/listesi döndürülüyor — çağıran kod bu yapıyı kullanacak.",
               "code": "    return {\n        \"id\": doc.id, \"filename\": doc.filename,\n        \"status\": doc.status, \"page_count\": doc.page_count,\n        \"processing_time_ms\": doc.processing_time_ms,\n        \"error_message\": doc.error_message,\n    }",
-              "order": "5.6b",
+              "order": "5.11",
               "action": "Sonuç sözlüğünü/listesini oluştur ve döndür",
               "type": "code_add",
               "file": "backend/app/services/processor.py"
@@ -1001,7 +1015,7 @@
             {
               "why": "Önce sınıfın şeklini çiziyoruz. chunk_size=512 token OpenAI embedding modeli için optimal. chunk_overlap=50 token ile bağlam korunur.",
               "code": "class Chunk:\n    content: str\n    metadata: dict\n    token_count: int = 0\n\nclass FixedSizeChunker:",
-              "order": "1.1a",
+              "order": "1.2",
               "action": "Chunk dataclass ve FixedSizeChunker iskeletini yaz",
               "type": "code_write",
               "file": "backend/app/services/chunkers/fixed_size.py"
@@ -1009,7 +1023,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "    def __init__(self, chunk_size: int = 512, chunk_overlap: int = 50):\n        self.chunk_size = chunk_size\n        self.chunk_overlap = chunk_overlap\n\n    def chunk(self, pages: list, doc_id: str) -> list:\n        pass",
-              "order": "1.1b",
+              "order": "1.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/chunkers/fixed_size.py"
@@ -1042,15 +1056,16 @@
             {
               "why": "Token tabanlı sliding window: encode -> dilimle -> decode. start her iterasyonda (chunk_size - overlap) kadar ilerler. Overlap sayesinde sınırda bölünen metin en az bir chunk'ta tam olarak yer alır.",
               "code": "def chunk(self, pages: list, doc_id: str) -> List[Chunk]:\n        chunks = []\n        for page in pages:\n            tokens = self.tokenizer.encode(page.content)\n            start = 0\n            while start < len(tokens):",
-              "order": "1.5a",
+              "order": "1.7",
               "action": "chunk() metodunu yaz — token tabanlı sliding window",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/fixed_size.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/fixed_size.py",
+              "position": "bottom"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "                end = min(start + self.chunk_size, len(tokens))\n                chunk_tokens = tokens[start:end]\n                chunk_text = self.tokenizer.decode(chunk_tokens)\n                # Chunk oluştur\n                start += self.chunk_size - self.chunk_overlap\n        return chunks",
-              "order": "1.5b",
+              "order": "1.8",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/chunkers/fixed_size.py"
@@ -1058,15 +1073,16 @@
             {
               "why": "Her chunk'a zengin metadata ekliyoruz: doc_id (hangi döküman), page_number (hangi sayfa), chunk_index (kaçıncı chunk), chunk_strategy (hangi yöntem). **page.metadata ile extractiondan gelen metadata'yı da taşıyoruz.",
               "code": "chunks.append(Chunk(\n                    content=chunk_text,\n                    metadata={\n                        \"doc_id\": doc_id,\n                        \"page_number\": page.page_number,\n                        \"chunk_index\": len(chunks),",
-              "order": "1.5c",
+              "order": "1.9",
               "action": "Chunk objesini metadata ile oluştur ve listeye ekle",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/fixed_size.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/fixed_size.py",
+              "position": "bottom"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
-              "code": "                        \"chunk_strategy\": \"fixed_size\",\n                        \"token_count\": len(chunk_tokens),\n                        **page.metadata\n                    },\n                    token_count=len(chunk_tokens)\n                ))",
-              "order": "1.5d",
+              "code": "                        \"chunk_strategy\": \"fixed_size\",\n                        \"token_count\": len(chunk_tokens),\n                        **page.metadata\n                    token_count=len(chunk_tokens)",
+              "order": "1.10",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/chunkers/fixed_size.py"
@@ -1135,7 +1151,7 @@
             {
               "why": "_split_sentences: regex ile cümle ayrımı. chunk: cümleleri biriktirerek chunk_size'ı aşmayacak şekilde grupla. Overlap cümle bazlı.",
               "code": "class SentenceChunker:\n    def __init__(self, chunk_size: int = 512, chunk_overlap_sentences: int = 1):\n        self.chunk_size = chunk_size\n        self.overlap_sentences = chunk_overlap_sentences\n\n    def _split_sentences(self, text: str) -> list:",
-              "order": "2.1a",
+              "order": "2.2",
               "action": "SentenceChunker iskeletini yaz — cümle bazlı chunking",
               "type": "code_write",
               "file": "backend/app/services/chunkers/sentence.py"
@@ -1143,7 +1159,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "        \"\"\"Metni cümlelere ayır.\"\"\"\n        pass\n\n    def chunk(self, pages: list, doc_id: str) -> list:\n        \"\"\"Cümleleri chunk'lara grupla.\"\"\"\n        pass",
-              "order": "2.1b",
+              "order": "2.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/chunkers/sentence.py"
@@ -1168,23 +1184,25 @@
             {
               "why": "Regex ile cümle sonu (. ! ?) sonrası büyük harfle başlayan yeni cümleyi algılıyoruz. Türkçe büyük harfler (Ç,Ğ,İ,Ö,Ş,Ü) de dahil edilmeli.",
               "code": "    def _split_sentences(self, text: str) -> List[str]:\n        pattern = r'(?<=[.!?])\\s+(?=[A-ZÇĞIÖŞÜA-Za-z])'\n        sentences = re.split(pattern, text)\n        merged = []\n        buffer = \"\"",
-              "order": "2.4a",
+              "order": "2.6",
               "action": "_split_sentences metodunu implement et — regex ile cümle ayırma",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/sentence.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/sentence.py",
+              "position": "bottom"
             },
             {
               "why": "Çok kısa cümleleri (50 tokenden az) birleştiriyoruz — küçük chunk'lar retrieval kalitesini düşürür. Buffer mantığı: biriktir, limit aşılınca yeni chunk başlat.",
               "code": "for s in sentences:\n            if len(self.tokenizer.encode(buffer + \" \" + s)) < 50 \\\n                    and buffer:\n                buffer += \" \" + s\n            else:",
-              "order": "2.4b",
+              "order": "2.7",
               "action": "Kısa cümleleri birleştirme mantığını yaz",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/sentence.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/sentence.py",
+              "position": "bottom"
             },
             {
               "why": "Listeye eleman ekleme — döngü içinde sonuçlar biriktiriliyor.",
               "code": "                if buffer:\n                    merged.append(buffer.strip())\n                buffer = s\n        if buffer:\n            merged.append(buffer.strip())\n        return merged",
-              "order": "2.4c",
+              "order": "2.8",
               "action": "Döngü içinde sonuçları listeye ekle",
               "type": "code_add",
               "file": "backend/app/services/chunkers/sentence.py"
@@ -1192,15 +1210,16 @@
             {
               "why": "Cümleleri biriktiriyoruz, token limiti aşılınca chunk oluşturuyoruz. Her chunk'ın page_number, chunk_index ve cümle sayısı metadata'da saklanır.",
               "code": "def chunk(self, pages: list, doc_id: str) -> List[Chunk]:\n        chunks = []\n        for page in pages:\n            sentences = self._split_sentences(page.content)",
-              "order": "2.4d",
+              "order": "2.9",
               "action": "chunk() metodunun cümle biriktirme mantığını yaz",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/sentence.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/sentence.py",
+              "position": "bottom"
             },
             {
               "why": "Döngü ile elemanlar işleniyor — her iterasyonda bir sonuç üretiliyor.",
               "code": "            current_sentences = []\n            current_tokens = 0\n            for sentence in sentences:\n                sentence_tokens = len(\n                    self.tokenizer.encode(sentence))",
-              "order": "2.4e",
+              "order": "2.10",
               "action": "Döngü ile elemanları işle ve sonuçları biriktir",
               "type": "code_add",
               "file": "backend/app/services/chunkers/sentence.py"
@@ -1208,26 +1227,29 @@
             {
               "why": "Token limiti aşılınca chunk oluştur. Metadata'da sayfa numarası, index ve strateji adı kaydediliyor.",
               "code": "                if current_tokens + sentence_tokens \\\n                        > self.chunk_size \\\n                        and current_sentences:\n                    chunks.append(Chunk(\n                        content=\" \".join(current_sentences),\n                        metadata={\"doc_id\": doc_id,\n                            \"page_number\": page.page_number,\n                            \"chunk_index\": len(chunks),",
-              "order": "2.4f",
+              "order": "2.11",
               "action": "Chunk objesini metadata ile oluştur ve listeye ekle",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/sentence.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/sentence.py",
+              "position": "bottom"
             },
             {
               "why": "Chunk metadata: strateji adı ve cümle sayısı. token_count ile chunk boyutunu takip ediyoruz.",
               "code": "                            \"chunk_strategy\": \"sentence\",\n                            \"sentence_count\":\n                                len(current_sentences)},\n                        token_count=current_tokens))",
-              "order": "2.4g",
+              "order": "2.12",
               "action": "Chunk metadata'sına strateji adı ve cümle sayısı ekle",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/sentence.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/sentence.py",
+              "position": "bottom"
             },
             {
               "why": "Overlap: son N cümleyi sonraki chunk'a taşı — bağlam korunur. Token sayısını yeniden hesapla. Yeni cümleyi ekle.",
               "code": "                    current_sentences = current_sentences[\n                        -self.overlap_sentences:]\n                    current_tokens = sum(\n                        len(self.tokenizer.encode(s))\n                        for s in current_sentences)\n                current_sentences.append(sentence)\n                current_tokens += sentence_tokens",
-              "order": "2.4h",
+              "order": "2.13",
               "action": "Overlap cümlelerini sonraki chunk'a taşı",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/sentence.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/sentence.py",
+              "position": "bottom"
             },
             {
               "order": "2.7",
@@ -1302,7 +1324,7 @@
             {
               "why": "Parent 1024 token (LLM context), child 256 token (retrieval hassasiyeti). 4:1 oranı pratikte iyi çalışır.",
               "code": "class HierarchicalChunker:\n    def __init__(self, parent_chunk_size=1024, child_chunk_size=256, child_overlap=30):\n        self.parent_size = parent_chunk_size\n        self.child_size = child_chunk_size\n        self.child_overlap = child_overlap\n",
-              "order": "3.1a",
+              "order": "3.2",
               "action": "HierarchicalChunker iskeletini yaz — parent/child chunking",
               "type": "code_write",
               "file": "backend/app/services/chunkers/hierarchical.py"
@@ -1310,7 +1332,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "    def chunk(self, pages: list, doc_id: str) -> dict:\n        pass\n\n    def get_parent_for_child(self, child_chunk, parents: list):\n        pass",
-              "order": "3.1b",
+              "order": "3.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/chunkers/hierarchical.py"
@@ -1335,50 +1357,56 @@
             {
               "why": "Tüm sayfaları birleştirip token'lara dönüştürüyoruz. Sliding window ile parent chunk'lara bölüyoruz — her parent benzersiz parent_id alıyor.",
               "code": "    def chunk(self, pages: list, doc_id: str) -> Dict[str, List[Chunk]]:\n        parents = []\n        children = []\n        full_text = \"\\n\\n\".join([p.content for p in pages])\n        tokens = self.tokenizer.encode(full_text)\n        parent_start = 0\n        parent_idx = 0",
-              "order": "3.4a",
+              "order": "3.6",
               "action": "chunk() metodunu yaz — token tabanlı sliding window",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/hierarchical.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/hierarchical.py",
+              "position": "bottom"
             },
             {
               "why": "While döngüsü ile token dizisi üzerinde parent_size kadar ilerleyerek parent chunk'lar oluşturuyoruz.",
               "code": "        while parent_start < len(tokens):\n            parent_end = min(\n                parent_start + self.parent_size,\n                len(tokens))\n            parent_tokens = tokens[\n                parent_start:parent_end]\n            parent_text = self.tokenizer.decode(\n                parent_tokens)",
-              "order": "3.4b",
+              "order": "3.7",
               "action": "Parent chunk'ları sliding window ile oluştur",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/hierarchical.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/hierarchical.py",
+              "position": "bottom"
             },
             {
               "why": "Parent chunk'ı metadata ile kaydediyoruz. chunk_id benzersiz tanımlayıcı — child'lar bu ID ile parent'a referans verecek.",
               "code": "            parent_id = f\"{doc_id}_parent_{parent_idx}\"\n            parents.append(Chunk(\n                content=parent_text,\n                metadata={\"doc_id\": doc_id,\n                    \"chunk_id\": parent_id,\n                    \"chunk_type\": \"parent\",\n                    \"chunk_index\": parent_idx,\n                    \"chunk_strategy\": \"hierarchical\"}))",
-              "order": "3.4c",
+              "order": "3.8",
               "action": "Parent chunk'ı metadata ile kaydet",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/hierarchical.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/hierarchical.py",
+              "position": "bottom"
             },
             {
               "why": "İç içe sliding window: her parent'ın içinde child_size kadar küçük parçalar oluşturuyoruz. parent_id metadata'da saklanır — retrieval sırasında child bulunur, parent'a erişilir.",
               "code": "            child_start = 0\n            child_idx = 0\n            while child_start < len(parent_tokens):\n                child_end = min(child_start + self.child_size,\n                    len(parent_tokens))\n                child_tokens = parent_tokens[child_start:child_end]\n                child_text = self.tokenizer.decode(child_tokens)",
-              "order": "3.4d",
+              "order": "3.9",
               "action": "Her parent içinde child chunk'lar oluştur",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/hierarchical.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/hierarchical.py",
+              "position": "bottom"
             },
             {
               "why": "Child chunk metadata'sında parent_id saklanır. Retrieval sırasında child bulunur → parent_id ile daha geniş context'e erişilir.",
               "code": "                children.append(Chunk(\n                    content=child_text,\n                    metadata={\"doc_id\": doc_id,\n                        \"parent_id\": parent_id,\n                        \"chunk_type\": \"child\",\n                        \"chunk_index\": child_idx,\n                        \"parent_index\": parent_idx,\n                        \"chunk_strategy\": \"hierarchical\"}",
-              "order": "3.4e",
+              "order": "3.10",
               "action": "Child chunk'ı parent_id referansı ile kaydet",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/hierarchical.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/hierarchical.py",
+              "position": "bottom"
             },
             {
               "why": "Overlap ile child'lar arasında bağlam paylaşımı. Parent loop ilerler ve sonunda parents + children sözlüğü döndürülür.",
               "code": "                ))\n                child_start += self.child_size \\\n                    - self.child_overlap\n                child_idx += 1\n            parent_start += self.parent_size\n            parent_idx += 1\n        return {\"parents\": parents,\n            \"children\": children}",
-              "order": "3.4f",
+              "order": "3.11",
               "action": "Child loop ilerlemesini ve parents/children dönüşünü yaz",
-              "type": "code_write",
-              "file": "backend/app/services/chunkers/hierarchical.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunkers/hierarchical.py",
+              "position": "bottom"
             },
             {
               "order": "3.7",
@@ -1452,7 +1480,7 @@
             {
               "why": "_text_hash: cache key oluştur. embed_texts: batch embedding. embed_query: tek sorgu kısayolu. Cache ile aynı text'i tekrar embed etmeyi önlüyoruz.",
               "code": "class EmbeddingService:\n    def __init__(self, model=\"text-embedding-3-small\", batch_size=100):\n        self.model = model\n        self.batch_size = batch_size\n        self._cache = {}\n\n    def _text_hash(self, text: str) -> str:",
-              "order": "4.1a",
+              "order": "4.2",
               "action": "EmbeddingService iskeletini yaz — cache ve batch embedding",
               "type": "code_write",
               "file": "backend/app/services/embedding.py"
@@ -1460,7 +1488,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "        pass\n\n    def embed_texts(self, texts: list) -> list:\n        pass\n\n    def embed_query(self, query: str) -> list:\n        pass",
-              "order": "4.1b",
+              "order": "4.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/embedding.py"
@@ -1493,15 +1521,16 @@
             {
               "why": "Önce cache'te var mı kontrol ediyoruz. Cache hit'leri API çağrısı yapmadan doğrudan döndürülür — hem hız hem maliyet tasarrufu.",
               "code": "def embed_texts(self, texts: List[str]) -> List[List[float]]:\n        all_embeddings = [None] * len(texts)\n        texts_to_embed = []\n        for i, text in enumerate(texts):\n            cache_key = self._text_hash(text)\n            if cache_key in self._cache:",
-              "order": "4.5a",
+              "order": "4.7",
               "action": "embed_texts metodunun cache kontrolü kısmını yaz",
-              "type": "code_write",
-              "file": "backend/app/services/embedding.py"
+              "type": "code_add",
+              "file": "backend/app/services/embedding.py",
+              "position": "bottom"
             },
             {
               "why": "Listeye eleman ekleme — döngü içinde sonuçlar biriktiriliyor.",
               "code": "                all_embeddings[i] = self._cache[cache_key]\n            else:\n                texts_to_embed.append((i, text))\n        cache_hits = len(texts) - len(texts_to_embed)\n        if cache_hits > 0:\n            logger.info(f\"Embedding cache: {cache_hits}/{len(texts)} hits\")",
-              "order": "4.5b",
+              "order": "4.8",
               "action": "Döngü içinde sonuçları listeye ekle",
               "type": "code_add",
               "file": "backend/app/services/embedding.py"
@@ -1509,34 +1538,38 @@
             {
               "why": "100'lük batch'ler halinde API'ye gönderiyoruz. Her batch'in embedding sonuçlarını orijinal index ile eşleştirip cache'e yazıyoruz.",
               "code": "        for batch_start in range(0, len(texts_to_embed),\n                self.batch_size):\n            batch = texts_to_embed[\n                batch_start:batch_start + self.batch_size]\n            batch_texts = [t[1] for t in batch]\n            try:\n                response = self.client.embeddings.create(\n                    model=self.model, input=batch_texts)",
-              "order": "4.5c",
+              "order": "4.9",
               "action": "Batch halinde OpenAI API'ye embedding isteği gönder",
-              "type": "code_write",
-              "file": "backend/app/services/embedding.py"
+              "type": "code_add",
+              "file": "backend/app/services/embedding.py",
+              "position": "bottom"
             },
             {
               "why": "Embedding sonuçlarını orijinal index ile eşleştir ve cache'e yaz. text_hash ile aynı metin tekrar gönderilmez.",
               "code": "                for j, embedding_data in enumerate(\n                        response.data):\n                    original_idx = batch[j][0]\n                    embedding = embedding_data.embedding\n                    all_embeddings[original_idx] = embedding\n                    self._cache[\n                        self._text_hash(\n                            batch_texts[j])] = embedding",
-              "order": "4.5d",
+              "order": "4.10",
               "action": "Embedding sonuçlarını orijinal index ile eşleştir ve cache'e yaz",
-              "type": "code_write",
-              "file": "backend/app/services/embedding.py"
+              "type": "code_add",
+              "file": "backend/app/services/embedding.py",
+              "position": "bottom"
             },
             {
               "why": "Rate limit 429 hatası gelirse 10 saniye bekle ve fonksiyonu baştan çağır (recursive retry).",
               "code": "            except Exception as e:\n                if \"rate_limit\" in str(e).lower():\n                    logger.warning(\n                        \"Rate limited, waiting 10s...\")\n                    time.sleep(10)\n                    return self.embed_texts(texts)\n                raise",
-              "order": "4.5e",
+              "order": "4.11",
               "action": "Rate limit hatası yakalama ve retry mantığını yaz",
-              "type": "code_write",
-              "file": "backend/app/services/embedding.py"
+              "type": "code_add",
+              "file": "backend/app/services/embedding.py",
+              "position": "bottom"
             },
             {
               "why": "Batch arası 0.5s bekleme rate limit'e takılmayı önler. Son batch'ten sonra beklemeye gerek yok. Tüm embedding'leri döndür.",
               "code": "            if batch_start + self.batch_size \\\n                    < len(texts_to_embed):\n                time.sleep(0.5)\n        return all_embeddings",
-              "order": "4.5f",
+              "order": "4.12",
               "action": "Batch arası bekleme ve final return'ü yaz",
-              "type": "code_write",
-              "file": "backend/app/services/embedding.py"
+              "type": "code_add",
+              "file": "backend/app/services/embedding.py",
+              "position": "bottom"
             },
             {
               "order": "4.8",
@@ -1603,7 +1636,7 @@
             {
               "why": "evaluate_strategy tek stratejiyi ölçer, compare_strategies hepsini karşılaştırır. Embedding service ile retrieval simülasyonu yapacağız.",
               "code": "class ChunkingEvaluator:\n    def __init__(self, embedding_service):\n        self.embedding_service = embedding_service\n",
-              "order": "5.1a",
+              "order": "5.2",
               "action": "ChunkingEvaluator iskeletini yaz — strateji karşılaştırma",
               "type": "code_write",
               "file": "backend/app/services/chunking_evaluator.py"
@@ -1611,7 +1644,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "    def evaluate_strategy(self, chunks, test_queries):\n        pass\n\n    def compare_strategies(self, strategies, test_queries):\n        pass",
-              "order": "5.1b",
+              "order": "5.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/chunking_evaluator.py"
@@ -1636,7 +1669,7 @@
             {
               "why": "Her test sorusu için top-5 chunk'ı kosinüs benzerlikle buluyoruz. argsort ile en yüksek 5 skoru seçip beklenen chunk'ların orada olup olmadığını kontrol ediyoruz.",
               "code": "hits = 0\n        total = 0\n        for query_data in test_queries:\n            query_emb = self.embedding_service.embed_query(\n                query_data[\"query\"])",
-              "order": "5.4a",
+              "order": "5.6",
               "action": "evaluate_strategy içinde kosinüs benzerlik hesapla",
               "type": "code_add",
               "file": "backend/app/services/chunking_evaluator.py"
@@ -1644,7 +1677,7 @@
             {
               "why": "Döngü ile elemanlar işleniyor — her iterasyonda bir sonuç üretiliyor.",
               "code": "            similarities = [\n                np.dot(query_emb, ce) /\n                    (np.linalg.norm(query_emb) * np.linalg.norm(ce))\n                for ce in chunk_embeddings\n            ]\n            top_5_indices = np.argsort(similarities)[-5:][::-1]",
-              "order": "5.4b",
+              "order": "5.7",
               "action": "Döngü ile elemanları işle ve sonuçları biriktir",
               "type": "code_add",
               "file": "backend/app/services/chunking_evaluator.py"
@@ -1652,18 +1685,20 @@
             {
               "why": "Beklenen chunk'ların top-5'te olup olmadığını kontrol ediyoruz. any() ile kısmi eşleşme yeterli — exact match çok katı olurdu.",
               "code": "            top_5_texts = [chunk_texts[i]\n                for i in top_5_indices]\n            for expected in query_data.get(\n                    \"expected_chunks\", []):\n                if any(expected.lower() in t.lower()\n                        for t in top_5_texts):\n                    hits += 1\n                total += 1",
-              "order": "5.4c",
+              "order": "5.8",
               "action": "Top-5 sonuçlarda beklenen chunk'ları kontrol et",
-              "type": "code_write",
-              "file": "backend/app/services/chunking_evaluator.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunking_evaluator.py",
+              "position": "bottom"
             },
             {
               "why": "precision@5 = bulunan/toplam. avg_tokens ve std_tokens chunk boyut dağılımını raporlar — çok büyük veya küçük chunk'lar kaliteyi düşürür.",
               "code": "        precision = hits / total if total > 0 else 0\n        return {\n            \"num_chunks\": len(chunks),\n            \"avg_tokens\": float(np.mean(token_counts)),\n            \"std_tokens\": float(np.std(token_counts)),\n            \"precision_at_5\": precision,\n        }",
-              "order": "5.4d",
+              "order": "5.9",
               "action": "Precision@5 ve chunk istatistiklerini hesapla ve döndür",
-              "type": "code_write",
-              "file": "backend/app/services/chunking_evaluator.py"
+              "type": "code_add",
+              "file": "backend/app/services/chunking_evaluator.py",
+              "position": "bottom"
             },
             {
               "order": "5.6",
@@ -1760,7 +1795,7 @@
             {
               "why": "Önce 5 temel metodun arayüzünü belirliyoruz: collection oluştur, chunk ekle, arama yap, sil, istatistik al.",
               "code": "class VectorStoreService:\n    def __init__(self, persist_dir=\"./chroma_data\"):\n        pass\n    def get_or_create_collection(self, collection_name):\n        pass\n    def add_chunks(self, collection_name, chunks):",
-              "order": "1.1a",
+              "order": "1.2",
               "action": "VectorStoreService iskeletini yaz — 5 temel metod",
               "type": "code_write",
               "file": "backend/app/services/vector_store.py"
@@ -1768,7 +1803,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "        pass\n    def search(self, collection_name, query_embedding, n_results=10):\n        pass\n    def delete_document_chunks(self, collection_name, doc_id):\n        pass\n    def get_collection_stats(self, collection_name):\n        pass",
-              "order": "1.1b",
+              "order": "1.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/vector_store.py"
@@ -1785,15 +1820,16 @@
             {
               "why": "PersistentClient verileri disk'e yazar — uygulama restart'ta veriler korunur. cosine distance metric embedding benzerliği için standart tercih.",
               "code": "def __init__(self, persist_dir: str = \"./chroma_data\"):\n        self.client = chromadb.PersistentClient(\n            path=persist_dir,\n            settings=ChromaSettings(anonymized_telemetry=False)\n        )",
-              "order": "1.3a",
+              "order": "1.5",
               "action": "ChromaDB PersistentClient ile __init__ metodunu implement et",
-              "type": "code_write",
-              "file": "backend/app/services/vector_store.py"
+              "type": "code_add",
+              "file": "backend/app/services/vector_store.py",
+              "position": "bottom"
             },
             {
               "why": "Fonksiyonun geri dönüş değeri — hesaplanan sonuç çağırana iletiliyor.",
               "code": "\n    def get_or_create_collection(self, collection_name: str):\n        return self.client.get_or_create_collection(\n            name=collection_name,\n            metadata={\"hnsw:space\": \"cosine\"}\n        )",
-              "order": "1.3b",
+              "order": "1.6",
               "action": "Fonksiyonun geri dönüş değerini yaz",
               "type": "code_add",
               "file": "backend/app/services/vector_store.py"
@@ -1809,15 +1845,16 @@
             {
               "why": "ChromaDB query API: embedding ile benzer dökümanları arıyoruz. where parametresi ile metadata filtreleme (ör: belirli bir doc_id) yapabilirsin.",
               "code": "def search(self, collection_name: str,\n            query_embedding: List[float],\n            n_results: int = 10,\n            where: Optional[Dict] = None) -> List[Dict]:\n        collection = self.get_or_create_collection(collection_name)",
-              "order": "1.5a",
+              "order": "1.8",
               "action": "search metodunun iskeletini yaz — query parametreleri",
-              "type": "code_write",
-              "file": "backend/app/services/vector_store.py"
+              "type": "code_add",
+              "file": "backend/app/services/vector_store.py",
+              "position": "bottom"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "        results = collection.query(\n            query_embeddings=[query_embedding],\n            n_results=n_results, where=where,\n            include=[\"documents\", \"metadatas\", \"distances\"]\n        )",
-              "order": "1.5b",
+              "order": "1.9",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/vector_store.py"
@@ -1825,7 +1862,7 @@
             {
               "why": "ChromaDB cosine distance döndürür (0-2). score = 1 - distance ile benzerlik score'una çeviriyoruz. Sonuçları standart dict formatında döndürüyoruz.",
               "code": "formatted = []\n        for i in range(len(results[\"ids\"][0])):\n            formatted.append({\n                \"id\": results[\"ids\"][0][i],\n                \"text\": results[\"documents\"][0][i],",
-              "order": "1.5c",
+              "order": "1.10",
               "action": "Sonuçları standart dict formatına dönüştür",
               "type": "code_add",
               "file": "backend/app/services/vector_store.py"
@@ -1833,7 +1870,7 @@
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "                \"metadata\": results[\"metadatas\"][0][i],\n                \"distance\": results[\"distances\"][0][i],\n                \"score\": 1 - results[\"distances\"][0][i],\n            })\n        return formatted",
-              "order": "1.5d",
+              "order": "1.11",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/vector_store.py"
@@ -1910,7 +1947,7 @@
             {
               "why": "3 metod: _tokenize (kelime listesi), index (corpus indexle), search (sorguyu ara). BM25 TF-IDF tabanlı — sık geçen ama nadir olan kelimeler yüksek skor alır.",
               "code": "class BM25Retriever:\n    def __init__(self):\n        self.bm25 = None\n        self.chunks = []\n\n    def _tokenize(self, text: str) -> list:",
-              "order": "2.1a",
+              "order": "2.2",
               "action": "BM25Retriever iskeletini yaz — sparse retrieval",
               "type": "code_write",
               "file": "backend/app/services/retrieval/bm25.py"
@@ -1918,7 +1955,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "        pass\n\n    def index(self, chunks: list):\n        pass\n\n    def search(self, query: str, n_results: int = 10) -> list:\n        pass",
-              "order": "2.1b",
+              "order": "2.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/retrieval/bm25.py"
@@ -1951,15 +1988,16 @@
             {
               "why": "BM25 sorguyu tokenize edip tüm chunk'lara skor veriyor. argsort ile en yüksek skorlular bulunur. Skor 0 olanları filtreliyoruz — hiç eşleşme yok demek.",
               "code": "    def search(self, query: str,\n            n_results: int = 10) -> List[Dict]:\n        if not self.bm25:\n            return []\n        tokenized_query = self._tokenize(query)\n        scores = self.bm25.get_scores(tokenized_query)\n        top_indices = scores.argsort()[-n_results:][::-1]",
-              "order": "2.5a",
+              "order": "2.7",
               "action": "search metodunu implement et — BM25 skor hesaplama",
-              "type": "code_write",
-              "file": "backend/app/services/retrieval/bm25.py"
+              "type": "code_add",
+              "file": "backend/app/services/retrieval/bm25.py",
+              "position": "bottom"
             },
             {
               "why": "Sonuçları standart dict formatında döndürüyoruz. bm25_score float'a çeviriliyor çünkü numpy float64 JSON serializable değil.",
               "code": "results = []\n        for idx in top_indices:\n            if scores[idx] > 0:\n                results.append({\n                    \"id\": self.chunks[idx].get(\"id\"),",
-              "order": "2.5b",
+              "order": "2.8",
               "action": "Sıralanmış sonuçları dict formatında oluştur",
               "type": "code_add",
               "file": "backend/app/services/retrieval/bm25.py"
@@ -1967,7 +2005,7 @@
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "                    \"text\": self.chunks[idx][\"text\"],\n                    \"metadata\": self.chunks[idx].get(\n                        \"metadata\", {}),\n                    \"bm25_score\": float(scores[idx]),\n                })\n        return results",
-              "order": "2.5c",
+              "order": "2.9",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/retrieval/bm25.py"
@@ -2042,7 +2080,7 @@
             {
               "why": "alpha=0.7: dense'e %70, sparse'a %30 ağırlık. Genelde dense daha güçlü ama teknik terimlerde sparse kritik.",
               "code": "class HybridRetriever:\n    def __init__(self, vector_store, bm25_retriever, embedding_service, alpha=0.7):",
-              "order": "3.1a",
+              "order": "3.2",
               "action": "HybridRetriever iskeletini yaz — dense + sparse fusion",
               "type": "code_write",
               "file": "backend/app/services/retrieval/hybrid.py"
@@ -2050,7 +2088,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "        self.vector_store = vector_store\n        self.bm25 = bm25_retriever\n        self.embedding_service = embedding_service\n        self.alpha = alpha\n\n    def search(self, query, collection_name, n_results=10, n_candidates=20):\n        pass",
-              "order": "3.1b",
+              "order": "3.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/retrieval/hybrid.py"
@@ -2075,15 +2113,16 @@
             {
               "why": "RRF formülü: 1/(k + rank). k=60 standart değer — sıralama farklarını yumuşatır. alpha ile dense ağırlığı çarpılır.",
               "code": "# 3. Reciprocal Rank Fusion\n        k = 60  # RRF sabiti\n        fusion_scores = defaultdict(lambda: {\"score\": 0.0, \"data\": None})\n        for rank, result in enumerate(dense_results):",
-              "order": "3.4a",
+              "order": "3.6",
               "action": "Reciprocal Rank Fusion skorlamasını başlat",
-              "type": "code_write",
-              "file": "backend/app/services/retrieval/hybrid.py"
+              "type": "code_add",
+              "file": "backend/app/services/retrieval/hybrid.py",
+              "position": "bottom"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "            chunk_id = result[\"id\"]\n            rrf_score = self.alpha * (1.0 / (k + rank + 1))\n            fusion_scores[chunk_id][\"score\"] += rrf_score\n            fusion_scores[chunk_id][\"data\"] = result\n            fusion_scores[chunk_id][\"dense_rank\"] = rank + 1",
-              "order": "3.4b",
+              "order": "3.7",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/retrieval/hybrid.py"
@@ -2100,15 +2139,16 @@
             {
               "why": "found_by ile hangi retrieval yönteminin chunk'ı bulduğunu takip ediyoruz. İkisi de bulduysa ['dense', 'sparse'] olur. Bu bilgi metrics ve debugging için değerli.",
               "code": "# 4. Sırala ve final sonuçları oluştur\n        sorted_results = sorted(fusion_scores.items(), key=lambda x: x[1][\"score\"], reverse=True)[:n_results]\n        final_results = []\n        for chunk_id, info in sorted_results:\n            result = info[\"data\"]\n            result[\"hybrid_score\"] = info[\"score\"]\n            result[\"dense_rank\"] = info.get(\"dense_rank\")",
-              "order": "3.6a",
+              "order": "3.9",
               "action": "Reciprocal Rank Fusion skorlamasını başlat",
-              "type": "code_write",
-              "file": "backend/app/services/retrieval/hybrid.py"
+              "type": "code_add",
+              "file": "backend/app/services/retrieval/hybrid.py",
+              "position": "bottom"
             },
             {
               "why": "Listeye eleman ekleme — döngü içinde sonuçlar biriktiriliyor.",
               "code": "            result[\"sparse_rank\"] = info.get(\"sparse_rank\")\n            result[\"found_by\"] = []\n            if \"dense_rank\" in info: result[\"found_by\"].append(\"dense\")\n            if \"sparse_rank\" in info: result[\"found_by\"].append(\"sparse\")\n            final_results.append(result)\n        return final_results",
-              "order": "3.6b",
+              "order": "3.10",
               "action": "Döngü içinde sonuçları listeye ekle",
               "type": "code_add",
               "file": "backend/app/services/retrieval/hybrid.py"
@@ -2175,7 +2215,7 @@
             {
               "why": "İki sınıf: CrossEncoderReranker (sıralama iyileştir) ve RetrievalPipeline (hybrid + reranking birleştir).",
               "code": "class CrossEncoderReranker:\n    def __init__(self, model_name=\"cross-encoder/ms-marco-MiniLM-L-6-v2\"):\n        pass\n    def rerank(self, query, results, top_k=5, score_threshold=0.0):\n        pass\n",
-              "order": "4.1a",
+              "order": "4.2",
               "action": "CrossEncoderReranker iskeletini yaz",
               "type": "code_write",
               "file": "backend/app/services/retrieval/reranker.py"
@@ -2183,7 +2223,7 @@
             {
               "why": "Sınıf metotlarının devamı — iş mantığı implementasyonu.",
               "code": "class RetrievalPipeline:\n    def __init__(self, hybrid_retriever, reranker):\n        self.hybrid = hybrid_retriever\n        self.reranker = reranker\n    def retrieve(self, query, collection_name, top_k=5):\n        pass",
-              "order": "4.1b",
+              "order": "4.3",
               "action": "Sınıf metotlarını tamamla — iş mantığı implementasyonu",
               "type": "code_add",
               "file": "backend/app/services/retrieval/reranker.py"
@@ -2294,7 +2334,7 @@
             {
               "why": "Temel metrikler: sorgu bilgisi, zamanlama (latency) ve sonuç sayıları. Retrieval ve rerank sürelerini ayrı ölçmek darboğazı bulmayı kolaylaştırır.",
               "code": "class RetrievalMetrics:\n    query: str\n    collection_name: str\n    retrieval_latency_ms: float\n    rerank_latency_ms: float\n    total_latency_ms: float\n    num_candidates: int\n    num_results: int",
-              "order": "5.1a",
+              "order": "5.2",
               "action": "RetrievalMetrics dataclass iskeletini yaz — zamanlama alanları",
               "type": "code_write",
               "file": "backend/app/services/retrieval/metrics.py"
@@ -2302,10 +2342,11 @@
             {
               "why": "Kalite metrikleri: top/avg/min score ile sonuç kalitesini, score_spread ile ayırt ediciliği ölçüyoruz. dense/sparse/both sayıları hybrid retrieval'ın katkısını gösterir.",
               "code": "    top_score: float\n    avg_score: float\n    min_score: float\n    score_spread: float\n    dense_only_count: int\n    sparse_only_count: int\n    both_count: int",
-              "order": "5.1b",
+              "order": "5.3",
               "action": "RetrievalMetrics skor ve retrieval yöntemi alanlarını ekle",
-              "type": "code_write",
-              "file": "backend/app/services/retrieval/metrics.py"
+              "type": "code_add",
+              "file": "backend/app/services/retrieval/metrics.py",
+              "position": "bottom"
             },
             {
               "order": "5.3",
@@ -2319,7 +2360,7 @@
             {
               "why": "@dataclass ile __init__, __repr__ otomatik oluşur. asdict(metrics) ile kolayca JSON'a çevirebilirsin. Zamanlama ve sayaç alanları.",
               "code": "@dataclass\nclass RetrievalMetrics:",
-              "order": "5.3a",
+              "order": "5.5",
               "action": "@dataclass decorator'ını RetrievalMetrics'e ekle",
               "type": "code_add",
               "file": "backend/app/services/retrieval/metrics.py"
@@ -2327,7 +2368,7 @@
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "    query: str\n    collection_name: str\n    retrieval_latency_ms: float\n    rerank_latency_ms: float\n    total_latency_ms: float\n    num_candidates: int\n    num_results: int",
-              "order": "5.3b",
+              "order": "5.6",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/retrieval/metrics.py"
@@ -2335,23 +2376,25 @@
             {
               "why": "Skor dağılımı ve retrieval yöntemi analizi alanları. Bu veriler dashboard'da görselleştirilecek — hangi yöntem daha çok katkı sağlıyor?",
               "code": "    top_score: float\n    avg_score: float\n    min_score: float\n    score_spread: float\n    dense_only_count: int\n    sparse_only_count: int\n    both_count: int",
-              "order": "5.3c",
+              "order": "5.7",
               "action": "RetrievalMetrics skor ve retrieval yöntemi alanlarını ekle",
-              "type": "code_write",
-              "file": "backend/app/services/retrieval/metrics.py"
+              "type": "code_add",
+              "file": "backend/app/services/retrieval/metrics.py",
+              "position": "bottom"
             },
             {
               "why": "MetricsCollector pipeline'ı sarmalayarak her query'nin performansını ölçer ve kaydeder.",
               "code": "class MetricsCollector:\n    def __init__(self, db_session):\n        self.db = db_session\n",
-              "order": "5.3d",
+              "order": "5.8",
               "action": "MetricsCollector sınıf iskeletini yaz",
-              "type": "code_write",
-              "file": "backend/app/services/retrieval/metrics.py"
+              "type": "code_add",
+              "file": "backend/app/services/retrieval/metrics.py",
+              "position": "bottom"
             },
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "    def measure_retrieval(self, pipeline, query, collection_name, top_k=5):\n        pass\n\n    def _save_metrics(self, metrics):\n        pass",
-              "order": "5.3e",
+              "order": "5.9",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/retrieval/metrics.py"
@@ -2367,7 +2410,7 @@
             {
               "why": "Sonuçlardan skorları ve hangi retrieval yöntemiyle bulunduğunu çıkarıyoruz. RetrievalMetrics objesini tüm hesaplanmış değerlerle oluşturuyoruz.",
               "code": "scores = [r.get(\"rerank_score\", 0) for r in results]\n        found_by = [set(r.get(\"found_by\", []))\n            for r in candidates]\n        metrics = RetrievalMetrics(\n            query=query, collection_name=collection_name,",
-              "order": "5.6a",
+              "order": "5.11",
               "action": "Retrieval sonuçlarından metrikleri hesapla",
               "type": "code_add",
               "file": "backend/app/services/retrieval/metrics.py"
@@ -2375,7 +2418,7 @@
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "            retrieval_latency_ms=round(retrieval_time, 1),\n            rerank_latency_ms=round(rerank_time, 1),\n            total_latency_ms=round(\n                retrieval_time + rerank_time, 1),",
-              "order": "5.6b",
+              "order": "5.12",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/retrieval/metrics.py"
@@ -2383,23 +2426,25 @@
             {
               "why": "Sayaç ve skor alanlarını dolduruyoruz. top/avg/min score sonuç kalitesini, score_spread ayırt ediciliği gösterir.",
               "code": "            num_candidates=len(candidates),\n            num_results=len(results),\n            top_score=max(scores) if scores else 0,\n            avg_score=sum(scores) / len(scores)\n                if scores else 0,\n            min_score=min(scores) if scores else 0,\n            score_spread=(max(scores) - min(scores))\n                if scores else 0,",
-              "order": "5.6c",
+              "order": "5.13",
               "action": "RetrievalMetrics sayaç ve skor alanlarını doldur",
-              "type": "code_write",
-              "file": "backend/app/services/retrieval/metrics.py"
+              "type": "code_add",
+              "file": "backend/app/services/retrieval/metrics.py",
+              "position": "bottom"
             },
             {
               "why": "Dense/sparse/both sayıları: her chunk'ın hangi yöntemle bulunduğunu sayıyoruz. Set karşılaştırma ile kesin eşleşme.",
               "code": "            dense_only_count=sum(\n                1 for f in found_by\n                if f == {\"dense\"}),\n            sparse_only_count=sum(\n                1 for f in found_by\n                if f == {\"sparse\"}),\n            both_count=sum(1 for f in found_by\n                if f == {\"dense\", \"sparse\"}))",
-              "order": "5.6d",
+              "order": "5.14",
               "action": "Dense/sparse/both sayılarını hesapla",
-              "type": "code_write",
-              "file": "backend/app/services/retrieval/metrics.py"
+              "type": "code_add",
+              "file": "backend/app/services/retrieval/metrics.py",
+              "position": "bottom"
             },
             {
               "why": "Metrikleri dosyaya/DB'ye kaydet ve sonuçları döndür. Caller hem results hem metrics alarak UI'da gösterebilir.",
               "code": "        self._save_metrics(metrics)\n        return results, metrics",
-              "order": "5.6e",
+              "order": "5.15",
               "action": "Metrikleri kaydet ve sonuçları döndür",
               "type": "code_add",
               "file": "backend/app/services/retrieval/metrics.py"
@@ -2485,7 +2530,7 @@
             {
               "why": "System prompt'taki kurallar hallucination'ı azaltır. 'SADECE kaynak metinlerde bulunan bilgileri kullan' en kritik kural — LLM kendi bilgisini eklemez.",
               "code": "RAG_SYSTEM_PROMPT = \"\"\"Sen bir döküman analiz asistanısın.\nKullanıcının sorularını SADECE verilen kaynak\ndökümanlara dayanarak cevaplamalısın.\n",
-              "order": "1.1a",
+              "order": "1.2",
               "action": "RAG system prompt'unu yaz — hallucination önleme kuralları",
               "type": "code_write",
               "file": "backend/app/services/llm/prompts.py"
@@ -2493,7 +2538,7 @@
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "KURALLAR:\n1. SADECE aşağıdaki kaynak metinlerde bulunan bilgileri\n   kullan. Kendi bilgini EKLEME.\n2. Her iddiayı kaynak göstererek destekle.\n   Format: [Kaynak: döküman_adı, Sayfa: X]",
-              "order": "1.1b",
+              "order": "1.3",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/llm/prompts.py"
@@ -2501,15 +2546,16 @@
             {
               "why": "Bilgi bulunamazsa açıkça söyle kuralı hallucination'ın en güçlü önleyicisi. Cevap formatı: kısa, maddeli, kaynak gösterimli — structured output LLM'in tutarlı cevap vermesini sağlar.",
               "code": "3. Eğer kaynak metinlerde sorunun cevabı YOKSA, açıkça\n   \\\"Bu bilgi mevcut dökümanlarda bulunamadı\\\" de.\n4. Birden fazla kaynak aynı konuyu ele alıyorsa,\n   hepsine referans ver.\n5. Cevabın emin olmadığın kısımlarını belirt.\n6. Teknik terimleri açıkla, jargon kullanma.\n",
-              "order": "1.1c",
+              "order": "1.4",
               "action": "Bilgi bulunamadığında davranış kurallarını ekle",
-              "type": "code_write",
-              "file": "backend/app/services/llm/prompts.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/prompts.py",
+              "position": "bottom"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "CEVAP FORMATI:\n- Kısa ve öz cevap ver\n- Madde işaretleri kullan (uygun olduğunda)\n- Her paragrafın sonunda kaynak göster\n- Cevabın sonunda kullanılan kaynakların listesini ver\"\"\"",
-              "order": "1.1d",
+              "order": "1.5",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/llm/prompts.py"
@@ -2526,15 +2572,16 @@
             {
               "why": "Multi-turn Q&A'da önceki konuşma da context olarak verilir. LLM hem kaynakları hem geçmişi dikkate alarak cevap verir.",
               "code": "CONVERSATIONAL_USER_PROMPT = \"\"\"KAYNAK METİNLER:\n{context}\n\n---\n\nÖNCEKİ KONUŞMA:",
-              "order": "1.3a",
+              "order": "1.7",
               "action": "Konuşma geçmişli user prompt template'ini yaz",
-              "type": "code_write",
-              "file": "backend/app/services/llm/prompts.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/prompts.py",
+              "position": "bottom"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "{chat_history}\n\n---\n\nKULLANICININ YENİ SORUSU: {question}\n\nÖnceki konuşma bağlamını da dikkate alarak, kaynak metinlere dayanarak soruyu cevapla.\"\"\"",
-              "order": "1.3b",
+              "order": "1.8",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/llm/prompts.py"
@@ -2551,15 +2598,16 @@
             {
               "why": "Konuşma geçmişi var mı yok mu'ya göre doğru template döndürülür. Factory pattern ile kullanım basitleşir.",
               "code": "def build_rag_prompt(with_history: bool = False) -> ChatPromptTemplate:\n    if with_history:\n        return ChatPromptTemplate.from_messages([\n            SystemMessagePromptTemplate.from_template(RAG_SYSTEM_PROMPT),\n            HumanMessagePromptTemplate.from_template(CONVERSATIONAL_USER_PROMPT),",
-              "order": "1.5a",
+              "order": "1.10",
               "action": "RAG system prompt'unu yaz — hallucination önleme kuralları",
-              "type": "code_write",
-              "file": "backend/app/services/llm/prompts.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/prompts.py",
+              "position": "bottom"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "        ])\n    return ChatPromptTemplate.from_messages([\n        SystemMessagePromptTemplate.from_template(RAG_SYSTEM_PROMPT),\n        HumanMessagePromptTemplate.from_template(RAG_USER_PROMPT),\n    ])",
-              "order": "1.5b",
+              "order": "1.11",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/llm/prompts.py"
@@ -2637,7 +2685,7 @@
             {
               "why": "4 metod: answer (ana akış), _format_history (geçmiş), _extract_citations (referans çıkar), _calculate_confidence (güven skoru).",
               "code": "class RAGChain:\n    def __init__(self, retrieval_pipeline, model=\"gpt-4o-mini\", temperature=0.1):\n        self.retrieval = retrieval_pipeline\n    async def answer(self, question, collection_name, chat_history=None, top_k=5):\n        pass\n    def _format_history(self, history):",
-              "order": "2.1a",
+              "order": "2.2",
               "action": "RAGChain iskeletini yaz — 4 temel metod",
               "type": "code_write",
               "file": "backend/app/services/llm/rag_chain.py"
@@ -2645,7 +2693,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "        pass\n    def _extract_citations(self, answer, retrieved):\n        pass\n    def _calculate_confidence(self, retrieved, answer):\n        pass",
-              "order": "2.1b",
+              "order": "2.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/llm/rag_chain.py"
@@ -2678,15 +2726,16 @@
             {
               "why": "Chat history varsa with_history prompt'unu, yoksa basit prompt'u kullanıyoruz. format_messages ile değişkenler prompt template'e enjekte edilir.",
               "code": "if chat_history:\n            history_str = self._format_history(chat_history)\n            prompt = build_rag_prompt(with_history=True)\n            messages = prompt.format_messages(\n                context=context,",
-              "order": "2.5a",
+              "order": "2.7",
               "action": "Chat history varsa konuşma prompt'unu kullan",
-              "type": "code_write",
-              "file": "backend/app/services/llm/rag_chain.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/rag_chain.py",
+              "position": "bottom"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "                chat_history=history_str,\n                question=question)\n        else:\n            prompt = build_rag_prompt(with_history=False)\n            messages = prompt.format_messages(\n                context=context, question=question)",
-              "order": "2.5b",
+              "order": "2.8",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/llm/rag_chain.py"
@@ -2694,15 +2743,16 @@
             {
               "why": "ainvoke async LLM çağrısı — event loop bloklanmaz. Cevaptan citation ve confidence çıkarılır.",
               "code": "        response = await self.llm.ainvoke(messages)\n        answer_text = response.content\n        citations = self._extract_citations(\n            answer_text, retrieved)\n        confidence = self._calculate_confidence(\n            retrieved, answer_text)",
-              "order": "2.5c",
+              "order": "2.9",
               "action": "LLM'i async çağır ve cevaptan citation/confidence çıkar",
-              "type": "code_write",
-              "file": "backend/app/services/llm/rag_chain.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/rag_chain.py",
+              "position": "bottom"
             },
             {
               "why": "Structured response: cevap, kaynaklar, güven skoru ve retrieve edilen chunk'ların önizlemesi. text[:200] ile uzun chunk'ları kısaltıyoruz.",
               "code": "        return {\n            \"answer\": answer_text,\n            \"sources\": citations,\n            \"confidence\": confidence,\n            \"retrieved_chunks\": [{\"text\": r[\"text\"][:200],\n                \"score\": r.get(\"rerank_score\", 0),\n                \"metadata\": r[\"metadata\"]}\n                for r in retrieved]}",
-              "order": "2.5d",
+              "order": "2.10",
               "action": "Structured response sözlüğünü oluştur ve döndür",
               "type": "code_add",
               "file": "backend/app/services/llm/rag_chain.py"
@@ -2718,15 +2768,16 @@
             {
               "why": "Regex ile [Kaynak 1], [Kaynak: 2] formatlarını yakalar. set(matches) ile tekrarları önlüyoruz.",
               "code": "def _extract_citations(self, answer: str, retrieved: List[Dict]) -> List[Dict]:\n        citations = []\n        pattern = r'\\[Kaynak[:\\s]*(\\d+)'\n        matches = re.findall(pattern, answer)\n        for match in set(matches):",
-              "order": "2.7a",
+              "order": "2.12",
               "action": "_extract_citations metodunu implement et — regex ile kaynak çıkarma",
-              "type": "code_write",
-              "file": "backend/app/services/llm/rag_chain.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/rag_chain.py",
+              "position": "bottom"
             },
             {
               "why": "Listeye eleman ekleme — döngü içinde sonuçlar biriktiriliyor.",
               "code": "            idx = int(match) - 1\n            if 0 <= idx < len(retrieved):\n                chunk = retrieved[idx]\n                citations.append({\"source_index\": idx + 1, \"document\": chunk[\"metadata\"].get(\"filename\", \"?\"), \"page\": chunk[\"metadata\"].get(\"page_number\", \"?\"), \"text_preview\": chunk[\"text\"][:150], \"relevance_score\": chunk.get(\"rerank_score\", 0)})\n        return citations",
-              "order": "2.7b",
+              "order": "2.13",
               "action": "Döngü içinde sonuçları listeye ekle",
               "type": "code_add",
               "file": "backend/app/services/llm/rag_chain.py"
@@ -2734,15 +2785,16 @@
             {
               "why": "5 faktör: top score, spread, bulunamadı cezası, citation sayısı, cevap uzunluğu. 0-100 arası normalize. İleride ConfidenceCalibrator ile kalibre edilecek.",
               "code": "def _calculate_confidence(self, retrieved: List[Dict], answer: str) -> int:\n        if not retrieved: return 0\n        top_score = max(r.get(\"rerank_score\", 0) for r in retrieved)\n        score_factor = min(40, int(top_score * 40))\n        scores = [r.get(\"rerank_score\", 0) for r in retrieved]\n        spread = max(scores) - min(scores) if len(scores) > 1 else 0\n        spread_factor = min(20, int(spread * 30))",
-              "order": "2.7c",
+              "order": "2.14",
               "action": "Retrieval sonuçlarından metrikleri hesapla",
-              "type": "code_write",
-              "file": "backend/app/services/llm/rag_chain.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/rag_chain.py",
+              "position": "bottom"
             },
             {
               "why": "Koşullu mantık — farklı durumlar için farklı davranış tanımlanıyor.",
               "code": "        not_found_penalty = -30 if \"bulunamadı\" in answer.lower() else 0\n        citation_count = len(re.findall(r'\\[Kaynak', answer))\n        citation_factor = min(20, citation_count * 5)\n        length_factor = min(20, len(answer) // 20)\n        confidence = max(0, min(100, score_factor + spread_factor + not_found_penalty + citation_factor + length_factor))\n        return confidence",
-              "order": "2.7d",
+              "order": "2.15",
               "action": "Koşullu mantık bloklarını yaz",
               "type": "code_add",
               "file": "backend/app/services/llm/rag_chain.py"
@@ -2795,7 +2847,7 @@
             {
               "why": "Condense tekniği: 'Bunu açıkla' -> 'RAG sisteminin chunking stratejilerini açıkla'. Bağımsız soru retrieval için kullanılır.",
               "code": "CONDENSE_PROMPT = \"\"\"Aşağıdaki konuşma geçmişi ve yeni soruyu okuyarak, yeni soruyu BAĞIMSIZ bir soru haline getir.\nYani önceki konuşmaya bakmadan anlaşılabilecek şekilde yeniden yaz.\nEğer yeni soru zaten bağımsızsa, olduğu gibi bırak.\n\nKONUŞMA GEÇMİŞİ:",
-              "order": "3.1a",
+              "order": "3.2",
               "action": "CONDENSE_PROMPT template'ini yaz — soru bağımsızlaştırma",
               "type": "code_write",
               "file": "backend/app/services/llm/conversation.py"
@@ -2803,7 +2855,7 @@
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "{chat_history}\n\nYENİ SORU: {question}\n\nBAĞIMSIZ SORU:\"\"\"",
-              "order": "3.1b",
+              "order": "3.3",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/llm/conversation.py"
@@ -2811,15 +2863,16 @@
             {
               "why": "4 metod: ask (ana akış), _condense (soruyu bağımsızlaştır), _get_history (geçmişi çek), _save_message (mesajı kaydet).",
               "code": "class ConversationManager:\n    def __init__(self, rag_chain, db_session):\n        self.rag_chain = rag_chain\n        self.db = db_session\n    async def ask(self, question, session_id=None, collection_name=\"default\"):\n        pass\n    async def _condense_question(self, question, history):",
-              "order": "3.1c",
+              "order": "3.4",
               "action": "ConversationManager iskeletini yaz — 4 metod",
-              "type": "code_write",
-              "file": "backend/app/services/llm/conversation.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/conversation.py",
+              "position": "bottom"
             },
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "        pass\n    def _get_history(self, session_id):\n        pass\n    def _save_message(self, session_id, role, content, sources=None, confidence=None):\n        pass",
-              "order": "3.1d",
+              "order": "3.5",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/llm/conversation.py"
@@ -2844,15 +2897,16 @@
             {
               "why": "Akış: 1) Session yoksa oluştur, 2) Geçmiş varsa condense et, 3) RAG chain'e sor, 4) Mesajları kaydet. Response'ta her iki soruyu da döndürüyoruz — debug için.",
               "code": "async def ask(self, question: str, session_id: Optional[str] = None, collection_name: str = \"default\") -> Dict:\n        if not session_id:\n            session_id = str(uuid4())\n        history = self._get_history(session_id)\n        if history:\n            standalone_question = await self._condense_question(question, history)",
-              "order": "3.5a",
+              "order": "3.8",
               "action": "ask() ana akışını yaz — session, condense, RAG chain",
-              "type": "code_write",
-              "file": "backend/app/services/llm/conversation.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/conversation.py",
+              "position": "bottom"
             },
             {
               "why": "Sonuç sözlüğü/listesi döndürülüyor — çağıran kod bu yapıyı kullanacak.",
               "code": "        else:\n            standalone_question = question\n        result = await self.rag_chain.answer(question=standalone_question, collection_name=collection_name, chat_history=history)\n        self._save_message(session_id, \"user\", question)\n        self._save_message(session_id, \"assistant\", result[\"answer\"], sources=result[\"sources\"], confidence=result[\"confidence\"])\n        return {\"session_id\": session_id, \"original_question\": question, \"standalone_question\": standalone_question, **result}",
-              "order": "3.5b",
+              "order": "3.9",
               "action": "Sonuç sözlüğünü/listesini oluştur ve döndür",
               "type": "code_add",
               "file": "backend/app/services/llm/conversation.py"
@@ -2929,7 +2983,7 @@
             {
               "why": "Önce endpoint yapısını ve request modelini belirliyoruz. SSE ile streaming cevap vereceğiz.",
               "code": "class ChatRequest:\n    question: str\n    collection_name: str = \"default\"\n    session_id: str = None\n",
-              "order": "4.1a",
+              "order": "4.2",
               "action": "ChatRequest Pydantic modelini yaz",
               "type": "code_write",
               "file": "backend/app/api/chat.py"
@@ -2937,7 +2991,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "router = APIRouter(prefix=\"/api/chat\", tags=[\"chat\"])\n\n@router.post(\"/stream\")\nasync def stream_answer(request: ChatRequest):\n    pass",
-              "order": "4.1b",
+              "order": "4.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/api/chat.py"
@@ -2962,7 +3016,7 @@
             {
               "why": "3 aşamalı SSE: sources (retrieval sonuçları ilk), token (LLM cevabı parça parça), done (tamamlandı + confidence). Her event 'data: {...}\\n\\n' formatında.",
               "code": "@router.post(\"/stream\")\nasync def stream_answer(request: ChatRequest):\n    async def event_generator():",
-              "order": "4.4a",
+              "order": "4.6",
               "action": "SSE stream endpoint'ini yaz — event_generator async",
               "type": "code_add",
               "file": "backend/app/api/chat.py"
@@ -2970,7 +3024,7 @@
             {
               "why": "Döküman bölümünün devamı — içerik yapısı tamamlanıyor.",
               "code": "        # 1. Kaynakları gönder\n        yield f'data: {json.dumps({\"type\": \"sources\", \"data\": []})}\\n\\n'\n        # 2. Token token cevap gönder\n        yield f'data: {json.dumps({\"type\": \"token\", \"data\": \"Cevap üretiliyor...\"})}\\n\\n'\n        # 3. Tamamlandı sinyali\n        yield f'data: {json.dumps({\"type\": \"done\", \"data\": {\"confidence\": 75}})}\\n\\n'\n    return StreamingResponse(event_generator(), media_type=\"text/event-stream\")",
-              "order": "4.4b",
+              "order": "4.7",
               "action": "Döküman yapısının devam bölümünü tamamla",
               "type": "code_add",
               "file": "backend/app/api/chat.py"
@@ -2978,15 +3032,16 @@
             {
               "why": "Retrieval sonuçları ilk gönderilir — kullanıcı kaynakları hemen görür. Token'lar arası 50ms gecikme typing effect oluşturur. Production'da LLM.astream() kullanılacak.",
               "code": "async def event_generator():\n        # 1. Retrieval\n        retrieved = []  # pipeline.retrieve(request.question, request.collection_name)\n        sources = [{\"document\": r[\"metadata\"].get(\"filename\", \"?\"), \"page\": r[\"metadata\"].get(\"page_number\", \"?\"), \"score\": r.get(\"rerank_score\", 0), \"preview\": r[\"text\"][:100]} for r in retrieved]\n        yield f\"data: {json.dumps({'type': 'sources', 'data': sources})}\\n\\n\"\n        # 2. LLM streaming (TODO: astream entegrasyonu)",
-              "order": "4.4c",
+              "order": "4.8",
               "action": "event_generator'ın retrieval ve streaming mantığını yaz",
-              "type": "code_write",
-              "file": "backend/app/api/chat.py"
+              "type": "code_add",
+              "file": "backend/app/api/chat.py",
+              "position": "bottom"
             },
             {
               "why": "Döngü ile elemanlar işleniyor — her iterasyonda bir sonuç üretiliyor.",
               "code": "        full_response = \"Cevap burada olacak\"\n        for token in full_response.split():\n            yield f\"data: {json.dumps({'type': 'token', 'data': token + ' '})}\\n\\n\"\n            await asyncio.sleep(0.05)\n        yield f\"data: {json.dumps({'type': 'done', 'data': {'confidence': 75}})}\\n\\n\"",
-              "order": "4.4d",
+              "order": "4.9",
               "action": "Döngü ile elemanları işle ve sonuçları biriktir",
               "type": "code_add",
               "file": "backend/app/api/chat.py"
@@ -3080,7 +3135,7 @@
             {
               "why": "cross_document_answer birden fazla dökümanı sorgular. _group_by_document sonuçları döküman bazında gruplar.",
               "code": "class MultiDocumentRAG:\n    def __init__(self, rag_chain):\n        self.rag_chain = rag_chain\n",
-              "order": "1.1a",
+              "order": "1.2",
               "action": "MultiDocumentRAG iskeletini yaz — cross-document Q&A",
               "type": "code_write",
               "file": "backend/app/services/llm/multi_doc.py"
@@ -3088,7 +3143,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "    async def cross_document_answer(self, question, collection_name, top_k_per_doc=3, max_docs=5):\n        pass\n\n    def _group_by_document(self, results):\n        pass",
-              "order": "1.1b",
+              "order": "1.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/llm/multi_doc.py"
@@ -3113,15 +3168,16 @@
             {
               "why": "Tüm chunk'ları retrieve edip döküman bazında grupluyoruz. Response'a documents_used ve chunks_per_document ekliyoruz — kullanıcı hangi dökümanlardan cevap geldiğini görür.",
               "code": "async def cross_document_answer(self, question: str, collection_name: str, top_k_per_doc: int = 3, max_docs: int = 5) -> Dict:\n        all_results = self.rag_chain.retrieval.retrieve(\n            query=question, collection_name=collection_name, top_k=top_k_per_doc * max_docs\n        )\n        grouped = self._group_by_document(all_results)",
-              "order": "1.4a",
+              "order": "1.6",
               "action": "cross_document_answer metodunu implement et",
-              "type": "code_write",
-              "file": "backend/app/services/llm/multi_doc.py"
+              "type": "code_add",
+              "file": "backend/app/services/llm/multi_doc.py",
+              "position": "bottom"
             },
             {
               "why": "Döngü ile elemanlar işleniyor — her iterasyonda bir sonuç üretiliyor.",
               "code": "        result = await self.rag_chain.answer(\n            question=question, collection_name=collection_name, top_k=top_k_per_doc * max_docs\n        )\n        result[\"documents_used\"] = list(grouped.keys())\n        result[\"chunks_per_document\"] = {doc: len(chunks) for doc, chunks in grouped.items()}\n        return result",
-              "order": "1.4b",
+              "order": "1.7",
               "action": "Döngü ile elemanları işle ve sonuçları biriktir",
               "type": "code_add",
               "file": "backend/app/services/llm/multi_doc.py"
@@ -3205,7 +3261,7 @@
             {
               "why": "Citation veri sınıfı: kaynak index'i, döküman adı, sayfa numarası, alıntı yapılan metin. start_char/end_char ile cevaptaki pozisyonu kaydediyoruz — frontend highlight yapabilir.",
               "code": "class Citation:",
-              "order": "2.1a",
+              "order": "2.2",
               "action": "Citation dataclass iskeletini yaz",
               "type": "code_write",
               "file": "backend/app/services/citation.py"
@@ -3213,7 +3269,7 @@
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "    source_index: int\n    document_name: str\n    page_number: int\n    cited_text: str\n    chunk_text: str\n    relevance_score: float\n    start_char: int\n    end_char: int",
-              "order": "2.1b",
+              "order": "2.3",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/citation.py"
@@ -3221,10 +3277,11 @@
             {
               "why": "CitationEngine cevaptaki referansları parse eder (extract_citations) ve highlight için işaretler (highlight_citations). İçlerini adım adım dolduracağız.",
               "code": "\nclass CitationEngine:\n    def extract_citations(self, answer, retrieved_chunks):\n        pass\n\n    def highlight_citations(self, answer):\n        pass",
-              "order": "2.1c",
+              "order": "2.4",
               "action": "CitationEngine iskeletini yaz — extract ve highlight",
-              "type": "code_write",
-              "file": "backend/app/services/citation.py"
+              "type": "code_add",
+              "file": "backend/app/services/citation.py",
+              "position": "bottom"
             },
             {
               "order": "2.3",
@@ -3238,7 +3295,7 @@
             {
               "why": "@dataclass ile temiz veri yapısı. Her alan bir bilgiyi temsil eder.",
               "code": "@dataclass\nclass Citation:",
-              "order": "2.3a",
+              "order": "2.6",
               "action": "Citation dataclass iskeletini yaz",
               "type": "code_add",
               "file": "backend/app/services/citation.py"
@@ -3246,7 +3303,7 @@
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "    source_index: int\n    document_name: str\n    page_number: int\n    cited_text: str\n    chunk_text: str\n    relevance_score: float\n    start_char: int\n    end_char: int",
-              "order": "2.3b",
+              "order": "2.7",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/citation.py"
@@ -3254,15 +3311,16 @@
             {
               "why": "re.finditer ile tüm [Kaynak X] pattern'lerini buluyoruz. group(1) ile kaynak numarasını çıkarıyoruz. Index sınır kontrolü (0 <= idx < len) güvenli erişim sağlar.",
               "code": "    def extract_citations(self, answer: str,\n            retrieved_chunks: List[Dict]) -> List[Citation]:\n        citations = []\n        pattern = r'\\[Kaynak[:\\s]*(\\d+)[^\\]]*\\]'\n        for match in re.finditer(pattern, answer):\n            idx = int(match.group(1)) - 1\n            if 0 <= idx < len(retrieved_chunks):\n                chunk = retrieved_chunks[idx]",
-              "order": "2.3c",
+              "order": "2.8",
               "action": "extract_citations metodunu implement et — regex ile parse",
-              "type": "code_write",
-              "file": "backend/app/services/citation.py"
+              "type": "code_add",
+              "file": "backend/app/services/citation.py",
+              "position": "bottom"
             },
             {
               "why": "Citation objesi: kaynak index, döküman adı, sayfa numarası ve alıntı yapılan metin. Frontend'de highlight için start/end char pozisyonları saklanır.",
               "code": "citations.append(Citation(\n                    source_index=idx + 1,\n                    document_name=chunk[\"metadata\"]\n                        .get(\"filename\", \"?\"),",
-              "order": "2.3d",
+              "order": "2.9",
               "action": "Citation objesi oluştur ve listeye ekle",
               "type": "code_add",
               "file": "backend/app/services/citation.py"
@@ -3270,7 +3328,7 @@
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "                    page_number=chunk[\"metadata\"]\n                        .get(\"page_number\", 0),\n                    cited_text=answer[\n                        max(0, match.start()-100):\n                        match.end()],",
-              "order": "2.3e",
+              "order": "2.10",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "backend/app/services/citation.py"
@@ -3278,10 +3336,11 @@
             {
               "why": "chunk_text önizleme (200 karakter), relevance_score ile kalite skoru ve cevaptaki pozisyon bilgisi. return ile tüm citation listesini döndürüyoruz.",
               "code": "                    chunk_text=chunk[\"text\"][:200],\n                    relevance_score=chunk.get(\n                        \"rerank_score\", 0),\n                    start_char=match.start(),\n                    end_char=match.end(),\n                ))\n        return citations",
-              "order": "2.3f",
+              "order": "2.11",
               "action": "Citation chunk_text, relevance_score ve pozisyon alanlarını tamamla",
-              "type": "code_write",
-              "file": "backend/app/services/citation.py"
+              "type": "code_add",
+              "file": "backend/app/services/citation.py",
+              "position": "bottom"
             },
             {
               "order": "2.6",
@@ -3361,7 +3420,7 @@
             {
               "why": "3 metod: calibrate (harita oluştur), get_calibrated_score (skoru kalibre et), calculate_ece (hata hesapla).",
               "code": "class ConfidenceCalibrator:\n    def __init__(self):\n        self.calibration_map = {}\n\n    def calibrate(self, feedback_data):\n        pass\n",
-              "order": "3.1a",
+              "order": "3.2",
               "action": "ConfidenceCalibrator iskeletini yaz — 3 metod",
               "type": "code_write",
               "file": "backend/app/services/confidence_calibrator.py"
@@ -3369,7 +3428,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "    def get_calibrated_score(self, raw_score):\n        pass\n\n    def calculate_ece(self, feedback_data):\n        pass",
-              "order": "3.1b",
+              "order": "3.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/confidence_calibrator.py"
@@ -3386,15 +3445,16 @@
             {
               "why": "Her 10'luk bin (0-10, 10-20, ...) için gerçek doğruluk oranını hesapla. confidence=80 olan cevapların %60'ı doğruysa, kalibre edilmiş score 60 olmalı.",
               "code": "def calibrate(self, feedback_data: List[Dict]) -> Dict:\n        bins = {}\n        for item in feedback_data:\n            bin_key = (item[\"confidence\"] // 10) * 10\n            if bin_key not in bins:\n                bins[bin_key] = {\"correct\": 0, \"total\": 0}\n            bins[bin_key][\"total\"] += 1\n            if item[\"rating\"] == \"positive\":",
-              "order": "3.3a",
+              "order": "3.5",
               "action": "calibrate metodunu implement et — bin bazlı doğruluk hesaplama",
-              "type": "code_write",
-              "file": "backend/app/services/confidence_calibrator.py"
+              "type": "code_add",
+              "file": "backend/app/services/confidence_calibrator.py",
+              "position": "bottom"
             },
             {
               "why": "Döngü ile elemanlar işleniyor — her iterasyonda bir sonuç üretiliyor.",
               "code": "                bins[bin_key][\"correct\"] += 1\n        self.calibration_map = {}\n        for bin_key, data in bins.items():\n            accuracy = data[\"correct\"] / data[\"total\"] if data[\"total\"] > 0 else 0\n            self.calibration_map[bin_key] = int(accuracy * 100)\n        return self.calibration_map",
-              "order": "3.3b",
+              "order": "3.6",
               "action": "Döngü ile elemanları işle ve sonuçları biriktir",
               "type": "code_add",
               "file": "backend/app/services/confidence_calibrator.py"
@@ -3410,15 +3470,16 @@
             {
               "why": "ECE (Expected Calibration Error): her bin'in confidence'ı ile gerçek accuracy'si arasındaki farkın ağırlıklı ortalaması. ECE < 0.05 iyi kalibre edilmiş demek.",
               "code": "def calculate_ece(self, feedback_data: List[Dict]) -> float:\n        bins = {}\n        for item in feedback_data:\n            bin_key = (item[\"confidence\"] // 10) * 10\n            if bin_key not in bins:\n                bins[bin_key] = []\n            bins[bin_key].append(1 if item[\"rating\"] == \"positive\" else 0)",
-              "order": "3.5a",
+              "order": "3.8",
               "action": "calculate_ece metodunu implement et — Expected Calibration Error",
-              "type": "code_write",
-              "file": "backend/app/services/confidence_calibrator.py"
+              "type": "code_add",
+              "file": "backend/app/services/confidence_calibrator.py",
+              "position": "bottom"
             },
             {
               "why": "Döngü ile elemanlar işleniyor — her iterasyonda bir sonuç üretiliyor.",
               "code": "        ece = 0.0\n        total = len(feedback_data)\n        for bin_key, outcomes in bins.items():\n            bin_confidence = (bin_key + 5) / 100\n            bin_accuracy = np.mean(outcomes)\n            ece += (len(outcomes) / total) * abs(bin_accuracy - bin_confidence)\n        return round(ece, 4)",
-              "order": "3.5b",
+              "order": "3.9",
               "action": "Döngü ile elemanları işle ve sonuçları biriktir",
               "type": "code_add",
               "file": "backend/app/services/confidence_calibrator.py"
@@ -3493,7 +3554,7 @@
             {
               "why": "3 metod: submit_feedback (kaydet), analyze_negative_feedback (analiz et), _classify_failure (retrieval mi generation mi?).",
               "code": "class FeedbackAnalyzer:\n    def __init__(self, db_session):\n        self.db = db_session\n\n    async def submit_feedback(self, message_id, rating, comment=None):\n        pass\n",
-              "order": "4.1a",
+              "order": "4.2",
               "action": "FeedbackAnalyzer iskeletini yaz — feedback analizi",
               "type": "code_write",
               "file": "backend/app/services/feedback.py"
@@ -3501,7 +3562,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "    async def analyze_negative_feedback(self, collection_name, days=7):\n        pass\n\n    def _classify_failure(self, message):\n        pass",
-              "order": "4.1b",
+              "order": "4.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/feedback.py"
@@ -3518,15 +3579,16 @@
             {
               "why": "rating: 'positive' (thumbs up) veya 'negative' (thumbs down). comment opsiyonel — kullanıcı neden beğenmediğini yazabilir.",
               "code": "async def submit_feedback(self, message_id: str, rating: str, comment: Optional[str] = None) -> Dict:\n        feedback = {\n            \"message_id\": message_id,\n            \"rating\": rating,  # \"positive\" veya \"negative\"\n            \"comment\": comment,",
-              "order": "4.3a",
+              "order": "4.5",
               "action": "submit_feedback metodunu implement et — feedback kaydetme",
-              "type": "code_write",
-              "file": "backend/app/services/feedback.py"
+              "type": "code_add",
+              "file": "backend/app/services/feedback.py",
+              "position": "bottom"
             },
             {
               "why": "Sonuç sözlüğü/listesi döndürülüyor — çağıran kod bu yapıyı kullanacak.",
               "code": "            \"created_at\": datetime.utcnow()\n        }\n        # DB'ye kaydet\n        return {\"status\": \"saved\", \"message_id\": message_id}",
-              "order": "4.3b",
+              "order": "4.6",
               "action": "Sonuç sözlüğünü/listesini oluştur ve döndür",
               "type": "code_add",
               "file": "backend/app/services/feedback.py"
@@ -3542,23 +3604,25 @@
             {
               "why": "Son N günün negatif feedback'lerini çekip her birini retrieval vs generation failure olarak sınıflandırıyoruz. Bu ayrım iyileştirme yönünü belirler.",
               "code": "    async def analyze_negative_feedback(\n            self, collection_name: str,\n            days: int = 7) -> Dict:\n        cutoff = datetime.utcnow() - timedelta(days=days)\n        negative_feedbacks = []\n        # DB query: son N günün negatif feedback'leri\n        retrieval_failures = 0\n        generation_failures = 0",
-              "order": "4.5a",
+              "order": "4.8",
               "action": "analyze_negative_feedback metodunu implement et — son N gün analizi",
-              "type": "code_write",
-              "file": "backend/app/services/feedback.py"
+              "type": "code_add",
+              "file": "backend/app/services/feedback.py",
+              "position": "bottom"
             },
             {
               "why": "Her feedback'i sınıflandır: retrieval failure (doğru chunk bulunamadı) vs generation failure (chunk bulundu ama cevap kötü). Bu ayrım iyileştirme yönünü belirler.",
               "code": "        for fb in negative_feedbacks:\n            failure_type = self._classify_failure(fb)\n            if failure_type == \"retrieval\":\n                retrieval_failures += 1\n            else:\n                generation_failures += 1\n        total = len(negative_feedbacks)",
-              "order": "4.5b",
+              "order": "4.9",
               "action": "Her feedback'i retrieval/generation failure olarak sınıflandır",
-              "type": "code_write",
-              "file": "backend/app/services/feedback.py"
+              "type": "code_add",
+              "file": "backend/app/services/feedback.py",
+              "position": "bottom"
             },
             {
               "why": "Analiz raporu: toplam negatif, retrieval/generation ayrımı ve oran. Oran yüksekse chunking iyileştir, düşükse prompt iyileştir.",
               "code": "        return {\n            \"period_days\": days,\n            \"total_negative\": total,\n            \"retrieval_failures\": retrieval_failures,\n            \"generation_failures\": generation_failures,\n            \"retrieval_failure_rate\":\n                retrieval_failures / total\n                if total > 0 else 0}",
-              "order": "4.5c",
+              "order": "4.10",
               "action": "Analiz raporu sözlüğünü oluştur ve döndür",
               "type": "code_add",
               "file": "backend/app/services/feedback.py"
@@ -3654,7 +3718,7 @@
             {
               "why": "TypeScript interface'leri ile veri yapısını belirliyoruz. Message backend'in döndürdüğü formata uygun. isStreaming ile streaming sırasında UI davranışını kontrol edeceğiz.",
               "code": "interface Message {\n  id: string;\n  role: 'user' | 'assistant';\n  content: string;\n  sources?: Source[];\n  confidence?: number;\n  isStreaming?: boolean;\n}",
-              "order": "1.1a",
+              "order": "1.2",
               "action": "Message TypeScript interface'ini tanımla",
               "type": "code_write",
               "file": "frontend/src/components/ChatInterface.tsx"
@@ -3662,18 +3726,20 @@
             {
               "why": "Source interface: döküman adı, sayfa, skor ve önizleme. Bu format backend'in döndürdüğü kaynak yapısına uygun.",
               "code": "interface Source {\n  document: string;\n  page: number;\n  score: number;\n  preview: string;\n}",
-              "order": "1.1b",
+              "order": "1.3",
               "action": "Source TypeScript interface'ini tanımla",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "why": "ChatInterface iskeleti — dark tema (bg-gray-900) ile başlıyoruz. collectionId prop olarak alınır. İçeriği adım adım dolduracağız.",
               "code": "export function ChatInterface(\n    { collectionId }: { collectionId: string }) {\n  return (\n    <div className=\"flex h-full bg-gray-900\">\n      <div className=\"flex-1\"></div>\n    </div>\n  );\n}",
-              "order": "1.1c",
+              "order": "1.4",
               "action": "ChatInterface component iskeletini yaz — dark tema",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "order": "1.3",
@@ -3687,23 +3753,25 @@
             {
               "why": "Mesaj baloncuğu: kullanıcı emerald-600, asistan gray-800. max-w-[70%] ile balon ekranın %70'ini aşmaz. whitespace-pre-wrap satır kırılmalarını korur.",
               "code": "              <div className={`max-w-[70%] rounded-lg p-3 ${\n                msg.role === 'user'\n                  ? 'bg-emerald-600 text-white'\n                  : 'bg-gray-800 text-gray-300'}`}>\n                <p className=\"whitespace-pre-wrap\">\n                  {msg.content}\n                  {msg.isStreaming && '▌'}</p>",
-              "order": "1.3a",
+              "order": "1.6",
               "action": "Mesaj baloncuğu stillerini yaz — kullanıcı/asistan renkleri",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "why": "Confidence bar ve auto-scroll referansı. messagesEndRef ile yeni mesaj geldiğinde otomatik aşağı kaydırma sağlanır.",
               "code": "{msg.confidence !== undefined && (\n                  <div className=\"mt-2 text-xs text-gray-400\">\n                    Güven: %{msg.confidence}</div>\n                )}",
-              "order": "1.3b",
+              "order": "1.7",
               "action": "Confidence gösterimi ve auto-scroll referansını ekle",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
-              "code": "              </div>\n            </div>\n          ))}\n          <div ref={messagesEndRef} />\n        </div>",
-              "order": "1.3c",
+              "code": "              </div>\n            </div>\n          <div ref={messagesEndRef} />\n        </div>",
+              "order": "1.8",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "frontend/src/components/ChatInterface.tsx"
@@ -3720,15 +3788,16 @@
             {
               "why": "Fetch isteğini gönderiyoruz. SSE için özel header gerekmez — normal POST. ReadableStream reader ile response body'yi parça parça okuyacağız.",
               "code": "try {\n      const response = await fetch(\n        '/api/chat/stream', {\n        method: 'POST',\n        headers: { 'Content-Type':",
-              "order": "1.5a",
+              "order": "1.10",
               "action": "SSE fetch isteğini gönder — ReadableStream hazırlığı",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "          'application/json' },\n        body: JSON.stringify({ question: input,\n          collection_name: collectionId,\n          session_id: sessionId })});\n      const reader = response.body?.getReader();\n      const decoder = new TextDecoder();",
-              "order": "1.5b",
+              "order": "1.11",
               "action": "Veri yapısının alanlarını ve değerlerini tamamla",
               "type": "code_add",
               "file": "frontend/src/components/ChatInterface.tsx"
@@ -3736,39 +3805,42 @@
             {
               "why": "While döngüsü ile stream'den chunk'ları okuyoruz. Her chunk birden fazla SSE event içerebilir — satırlara bölüp 'data: ' ile başlayanları parse ediyoruz.",
               "code": "      while (reader) {\n        const { done, value } = await reader.read();\n        if (done) break;\n        const text = decoder.decode(value);\n        const lines = text.split('\\n')\n          .filter(l => l.startsWith('data: '));\n        for (const line of lines) {\n          const data = JSON.parse(line.slice(6));",
-              "order": "1.5c",
+              "order": "1.12",
               "action": "Stream reader döngüsünü yaz — SSE event'lerini parse et",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "why": "Token event: her gelen parçayı mevcut mesaj content'ine ekle. Immutable state update — spread ile yeni obje oluştur.",
               "code": "          if (data.type === 'token') {\n            setMessages(prev => prev.map(m =>\n              m.id === assistantMsg.id\n                ? { ...m,\n                    content: m.content + data.data }\n                : m));",
-              "order": "1.5d",
+              "order": "1.13",
               "action": "Token event handler'ını yaz — mesaj content'ini güncelle",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "why": "Sources event: backend kaynak listesini gönderdiğinde mesaja bağla. Bu kaynaklar mesajın altında gösterilecek.",
               "code": "          } else if (data.type === 'sources') {\n            setMessages(prev => prev.map(m =>\n              m.id === assistantMsg.id\n                ? { ...m, sources: data.data }\n                : m));",
-              "order": "1.5e",
+              "order": "1.14",
               "action": "Sources event handler'ını yaz — kaynakları mesaja bağla",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "why": "Done event: streaming bitti — isStreaming=false yap ve confidence skorunu ekle. Loop ve try bloklarının kapanışları.",
               "code": "          } else if (data.type === 'done') {\n            setMessages(prev => prev.map(m =>\n              m.id === assistantMsg.id\n                ? { ...m, isStreaming: false,\n                    confidence: data.data?.confidence }\n                : m));\n          }\n        }",
-              "order": "1.5f",
+              "order": "1.15",
               "action": "Done event handler'ını yaz — streaming'i bitir",
               "type": "code_add",
               "file": "frontend/src/components/ChatInterface.tsx"
             },
             {
               "why": "While loop ve try-catch kapanışı. Hata durumunda console.error ile logla. setIsLoading(false) ile UI'ı serbest bırak. Dependency array ile memoize.",
-              "code": "      }\n    } catch (e) {\n      console.error('Streaming error:', e);\n    }\n    setIsLoading(false);\n  }, [input, isLoading,\n      collectionId, sessionId]);",
-              "order": "1.5g",
+              "code": "    } catch (e) {\n      console.error('Streaming error:', e);\n    setIsLoading(false);\n  }, [input, isLoading,\n      collectionId, sessionId]);",
+              "order": "1.16",
               "action": "Hata yakalama ve loading state temizliğini yaz",
               "type": "code_add",
               "file": "frontend/src/components/ChatInterface.tsx"
@@ -3776,7 +3848,7 @@
             {
               "why": "Mesaj listesi container: overflow-y-auto ile scroll edilebilir. Her mesaj role'e göre sağa (kullanıcı) veya sola (asistan) hizalanır.",
               "code": "  return (\n    <div className=\"flex h-full bg-gray-900\">\n      <div className=\"flex flex-1 flex-col\">\n        <div className=\"flex-1 overflow-y-auto p-4 space-y-4\">\n          {messages.map(msg => (\n            <div key={msg.id} className={`flex ${\n              msg.role === 'user'\n                ? 'justify-end' : 'justify-start'}`}>",
-              "order": "1.5h",
+              "order": "1.17",
               "action": "JSX return bloğunu yaz — mesaj listesi container",
               "type": "code_add",
               "file": "frontend/src/components/ChatInterface.tsx"
@@ -3784,23 +3856,25 @@
             {
               "why": "Dark tema renkleri: kullanıcı emerald-600, asistan gray-800. Streaming sırasında ▌ cursor gösteriliyor. messagesEndRef ile otomatik scroll. Confidence bar kullanıcıya güven seviyesini gösterir.",
               "code": "              <div className={`max-w-[70%]\n                rounded-lg p-3 ${\n                msg.role === 'user'\n                  ? 'bg-emerald-600 text-white'\n                  : 'bg-gray-800 text-gray-300'}`}>\n                <p className=\"whitespace-pre-wrap\">\n                  {msg.content}\n                  {msg.isStreaming && '▌'}</p>",
-              "order": "1.5i",
+              "order": "1.18",
               "action": "Mesaj baloncuğu stillerini yaz — kullanıcı/asistan renkleri",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "why": "Enter ile gönderme, disabled state ile çift gönderimi önleme. focus:ring ile aktif input belirgin. Dark tema tutarlı.",
               "code": "<div className=\"border-t border-gray-700 p-4\">\n          <div className=\"flex gap-2\">\n            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMessage()} placeholder=\"Sorunuzu yazın...\" className=\"flex-1 rounded-lg bg-gray-800 px-4 py-2 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500\" />\n            <button onClick={sendMessage} disabled={isLoading} className=\"rounded-lg bg-emerald-600 px-6 py-2 text-white hover:bg-emerald-700 disabled:opacity-50\">Gönder</button>",
-              "order": "1.5j",
+              "order": "1.19",
               "action": "Input alanı ve gönder butonu JSX'ini yaz",
-              "type": "code_write",
-              "file": "frontend/src/components/ChatInterface.tsx"
+              "type": "code_add",
+              "file": "frontend/src/components/ChatInterface.tsx",
+              "position": "bottom"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "          </div>\n        </div>\n      </div>\n    </div>\n  );",
-              "order": "1.5k",
+              "order": "1.20",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "frontend/src/components/ChatInterface.tsx"
@@ -3860,8 +3934,8 @@
             },
             {
               "why": "Interface'ler backend'in döndürdüğü yapıya uygun. Dark tema ile tutarlı.",
-              "code": "interface Collection { id: string; name: string; description?: string; document_count: number; }\ninterface Document { id: string; filename: string; file_type: string; status: 'pending' | 'processing' | 'completed' | 'failed'; page_count: number; created_at: string; }\n\nexport function DocumentsPage() {",
-              "order": "2.1a",
+              "code": "interface Collection { id: string; name: string; description?: string; document_count: number; }\ninterface Document { id: string; filename: string; file_type: string; status: 'pending' | 'processing' | 'completed' | 'failed'; page_count: number; created_at: string; }\n\nexport function DocumentsPage() {\n  // TODO: implement\n}",
+              "order": "2.2",
               "action": "Collection ve Document TypeScript interface'lerini tanımla",
               "type": "code_write",
               "file": "frontend/src/pages/DocumentsPage.tsx"
@@ -3869,7 +3943,7 @@
             {
               "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
               "code": "  return (\n    <div className=\"min-h-screen bg-gray-900 p-6\">\n      <h1 className=\"text-2xl font-bold text-white mb-6\">Döküman Yönetimi</h1>\n    </div>\n  );\n}",
-              "order": "2.1b",
+              "order": "2.3",
               "action": "DocumentsPage JSX return iskeletini yaz",
               "type": "code_add",
               "file": "frontend/src/pages/DocumentsPage.tsx"
@@ -3894,31 +3968,34 @@
             {
               "why": "onDrop callback: dosyalar bırakıldığında koleksiyon seçili mi kontrol et, sonra her dosyayı FormData ile backend'e yükle.",
               "code": "  const onDrop = useCallback(\n    async (acceptedFiles: File[]) => {\n    if (!selectedCollection) return;\n    setIsUploading(true);\n    for (const file of acceptedFiles) {\n      const formData = new FormData();\n      formData.append('file', file);\n      formData.append('collection_id', selectedCollection);",
-              "order": "2.4a",
+              "order": "2.6",
               "action": "onDrop callback'ini yaz — dosya yükleme mantığı",
-              "type": "code_write",
-              "file": "frontend/src/pages/DocumentsPage.tsx"
+              "type": "code_add",
+              "file": "frontend/src/pages/DocumentsPage.tsx",
+              "position": "bottom"
             },
             {
               "why": "Fetch ile dosyayı POST et ve yükleme durumunu kapat. useCallback dependency array'i selectedCollection — değişince callback yeniden oluşturulur.",
-              "code": "      await fetch('/api/documents/upload',\n        { method: 'POST', body: formData });\n    }\n    setIsUploading(false);\n  }, [selectedCollection]);",
-              "order": "2.4b",
+              "code": "      await fetch('/api/documents/upload',\n        { method: 'POST', body: formData });\n    setIsUploading(false);\n  }, [selectedCollection]);",
+              "order": "2.7",
               "action": "FormData ile backend'e dosya yükle",
-              "type": "code_write",
-              "file": "frontend/src/pages/DocumentsPage.tsx"
+              "type": "code_add",
+              "file": "frontend/src/pages/DocumentsPage.tsx",
+              "position": "bottom"
             },
             {
               "why": "useDropzone hook'u onDrop callback'ini alıp getRootProps (div'e ekle), getInputProps (hidden input) ve isDragActive (sürükleme durumu) döndürür. accept ile sadece izin verilen formatlar kabul edilir.",
               "code": "  const { getRootProps, getInputProps, isDragActive }\n    = useDropzone({\n    onDrop,\n    accept: { 'application/pdf': ['.pdf'],\n      'application/vnd.openxmlformats-officedocument\\\n        .wordprocessingml.document': ['.docx'],\n      'text/plain': ['.txt'] },\n  });",
-              "order": "2.4c",
+              "order": "2.8",
               "action": "useDropzone hook'unu yapılandır — kabul edilen dosya tipleri",
-              "type": "code_write",
-              "file": "frontend/src/pages/DocumentsPage.tsx"
+              "type": "code_add",
+              "file": "frontend/src/pages/DocumentsPage.tsx",
+              "position": "bottom"
             },
             {
               "why": "Sol panel: koleksiyon listesi. Seçili olan emerald vurgusu alır. Document count her koleksiyonda kaç döküman olduğunu gösterir.",
               "code": "return (\n    <div className=\"min-h-screen bg-gray-900 p-6\">\n      <h1 className=\"text-2xl font-bold text-white mb-6\">Döküman Yönetimi</h1>\n      <div className=\"grid grid-cols-4 gap-6\">\n        <div className=\"col-span-1 space-y-2\">\n          <h2 className=\"text-lg font-semibold text-gray-300\">Koleksiyonlar</h2>",
-              "order": "2.4d",
+              "order": "2.9",
               "action": "DocumentsPage JSX return iskeletini yaz",
               "type": "code_add",
               "file": "frontend/src/pages/DocumentsPage.tsx"
@@ -3926,7 +4003,7 @@
             {
               "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
               "code": "          {collections.map(c => (\n            <button key={c.id} onClick={() => setSelectedCollection(c.id)} className={`w-full rounded-lg p-3 text-left ${selectedCollection === c.id ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>\n              <div className=\"font-medium\">{c.name}</div>\n              <div className=\"text-sm text-gray-400\">{c.document_count} döküman</div>\n            </button>\n          ))}\n        </div>",
-              "order": "2.4e",
+              "order": "2.10",
               "action": "UI elementlerinin stil ve kapanış kısımlarını yaz",
               "type": "code_add",
               "file": "frontend/src/pages/DocumentsPage.tsx"
@@ -3934,39 +4011,50 @@
             {
               "why": "Drag & drop alanı: getRootProps ile tüm div tıklanabilir ve sürüklenebilir. isDragActive'de yeşil border ile görsel geri bildirim.",
               "code": "        <div className=\"col-span-3 space-y-4\">\n          <div {...getRootProps()}\n            className={`rounded-lg border-2 border-dashed p-8\n              text-center cursor-pointer ${isDragActive\n                ? 'border-emerald-500 bg-emerald-500/10'\n                : 'border-gray-600 hover:border-gray-500'}`}>\n            <input {...getInputProps()} />",
-              "order": "2.4f",
+              "order": "2.11",
               "action": "Sağ panel — drag & drop alanı ve döküman listesi",
-              "type": "code_write",
-              "file": "frontend/src/pages/DocumentsPage.tsx"
+              "type": "code_add",
+              "file": "frontend/src/pages/DocumentsPage.tsx",
+              "position": "bottom"
             },
             {
               "why": "Durum mesajı: sürükleme, yükleme veya varsayılan metin. Döküman listesi her dosyayı satır olarak gösteriyor — sayfa sayısı ile birlikte.",
-              "code": "            <p className=\"text-gray-400\">\n              {isDragActive ? 'Dosyaları bırak...' :\n               isUploading ? 'Yükleniyor...' :\n               'Sürükle veya tıkla (PDF, DOCX, TXT)'}\n            </p>\n          </div>\n          <div className=\"space-y-2\">\n            {documents.map(doc => (",
-              "order": "2.4g",
+              "code": "            <p className=\"text-gray-400\">\n              {isDragActive ? 'Dosyaları bırak...' :\n               isUploading ? 'Yükleniyor...' :\n               'Sürükle veya tıkla (PDF, DOCX, TXT)'}\n            </p>\n          </div>",
+              "order": "2.12",
               "action": "Drag & drop durum mesajlarını yaz",
-              "type": "code_write",
+              "type": "code_add",
+              "file": "frontend/src/pages/DocumentsPage.tsx",
+              "position": "bottom"
+            },
+            {
+              "order": "2.112",
+              "action": "Drag & drop durum mesajlarını yaz (devam)",
+              "type": "code_add",
+              "code": "          <div className=\"space-y-2\">\n            {documents.map(doc => (\n  // TODO: implement\n)",
+              "why": "Drag & drop durum mesajlarını yaz.",
               "file": "frontend/src/pages/DocumentsPage.tsx"
             },
             {
               "why": "Her döküman satırında dosya adı ve sayfa sayısı gösteriliyor. items-center ile dikey ortalama, justify-between ile iki yana yaslama.",
               "code": "              <div key={doc.id}\n                className=\"flex items-center\n                  justify-between rounded-lg\n                  bg-gray-800 p-4\">\n                <div>\n                  <span className=\"font-medium\n                    text-white\">{doc.filename}</span>\n                  <span className=\"ml-2 text-sm text-gray-400\">{doc.page_count} sayfa</span></div>",
-              "order": "2.4h",
+              "order": "2.13",
               "action": "Döküman satırı — dosya adı ve sayfa sayısı gösterimi",
-              "type": "code_write",
-              "file": "frontend/src/pages/DocumentsPage.tsx"
+              "type": "code_add",
+              "file": "frontend/src/pages/DocumentsPage.tsx",
+              "position": "bottom"
             },
             {
               "why": "Status badge'i renk kodlu: completed=yeşil, failed=kırmızı, diğer=sarı. Koşullu className ile dinamik renklendirme. Kapanış etiketleri.",
               "code": "                <span className={`rounded px-2 py-1\n                  text-xs font-medium ${\n                  doc.status === 'completed'\n                    ? 'bg-emerald-600/20 text-emerald-400'\n                    : doc.status === 'failed'\n                    ? 'bg-red-600/20 text-red-400'\n                    : 'bg-yellow-600/20 text-yellow-400'\n                }`}>{doc.status}</span>",
-              "order": "2.4i",
+              "order": "2.14",
               "action": "Status badge'i — renk kodlu durum gösterimi",
               "type": "code_add",
               "file": "frontend/src/pages/DocumentsPage.tsx"
             },
             {
               "why": "Döküman listesi ve sayfa kapanış etiketleri. Tüm container div'leri kapatılıyor.",
-              "code": "              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </div>\n  );",
-              "order": "2.4j",
+              "code": "              </div>\n          </div>\n        </div>\n      </div>\n    </div>",
+              "order": "2.15",
               "action": "Döküman listesi ve sayfa kapanış etiketlerini yaz",
               "type": "code_add",
               "file": "frontend/src/pages/DocumentsPage.tsx"
@@ -4036,7 +4124,7 @@
             {
               "why": "3 seviye cache: embedding, retrieval, response. In-memory dict ile başla, production'da Redis'e geç.",
               "code": "class RAGCache:\n    def __init__(self):\n        self._cache = {}  # Production'da Redis kullan\n    def _make_key(self, prefix, *args):\n        pass\n    def get(self, prefix, *args):",
-              "order": "3.1a",
+              "order": "3.2",
               "action": "RAGCache iskeletini yaz — 3 seviye cache",
               "type": "code_write",
               "file": "backend/app/services/cache.py"
@@ -4044,7 +4132,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "        pass\n    def set(self, prefix, value, ttl_seconds=3600, *args):\n        pass\n    def invalidate(self, prefix, *args):\n        pass",
-              "order": "3.1b",
+              "order": "3.3",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/app/services/cache.py"
@@ -4069,15 +4157,16 @@
             {
               "why": "TTL ile cache entry'leri otomatik expire olur. get'te expire kontrolü yapılır — süresi dolmuşsa silinir ve None döner.",
               "code": "def get(self, prefix: str, *args) -> Optional[Any]:\n        key = self._make_key(prefix, *args)\n        if key in self._cache:\n            entry = self._cache[key]\n            if entry[\"expires_at\"] > datetime.utcnow():",
-              "order": "3.4a",
+              "order": "3.6",
               "action": "get metodunu implement et — TTL kontrolü ile cache okuma",
-              "type": "code_write",
-              "file": "backend/app/services/cache.py"
+              "type": "code_add",
+              "file": "backend/app/services/cache.py",
+              "position": "bottom"
             },
             {
               "why": "Fonksiyonun geri dönüş değeri — hesaplanan sonuç çağırana iletiliyor.",
               "code": "                return entry[\"value\"]\n            del self._cache[key]\n        return None\n\n    def set(self, prefix: str, value: Any, ttl_seconds: int = 3600, *args):\n        key = self._make_key(prefix, *args)\n        self._cache[key] = {\"value\": value, \"expires_at\": datetime.utcnow() + timedelta(seconds=ttl_seconds)}",
-              "order": "3.4b",
+              "order": "3.7",
               "action": "Fonksiyonun geri dönüş değerini yaz",
               "type": "code_add",
               "file": "backend/app/services/cache.py"
@@ -4093,23 +4182,25 @@
             {
               "why": "Cache decorator factory: prefix ve ttl parametreleri ile yapılandırılabilir. @cache_response('rag_answer', ttl=1800) gibi kullanılır — mevcut fonksiyona cache eklemek için sadece decorator ekle.",
               "code": "rag_cache = RAGCache()\n\ndef cache_response(prefix: str, ttl: int = 3600):\n    def decorator(func):\n        @wraps(func)\n        async def wrapper(*args, **kwargs):\n            cache_key_args = tuple(\n                str(a) for a in args[1:])",
-              "order": "3.6a",
+              "order": "3.9",
               "action": "Cache decorator factory fonksiyonunu yaz",
-              "type": "code_write",
-              "file": "backend/app/services/cache.py"
+              "type": "code_add",
+              "file": "backend/app/services/cache.py",
+              "position": "bottom"
             },
             {
               "why": "Önce cache'te var mı bak — varsa direkt döndür (DB/API çağrısı yapılmaz). Yoksa fonksiyonu çalıştır, sonucu cache'e yaz ve döndür. Kod değişikliği minimum.",
               "code": "cached = rag_cache.get(prefix, *cache_key_args)\n            if cached is not None:\n                return cached\n            result = await func(*args, **kwargs)",
-              "order": "3.6b",
+              "order": "3.10",
               "action": "Decorator içinde cache kontrol ve fonksiyon çağrısı yaz",
-              "type": "code_write",
-              "file": "backend/app/services/cache.py"
+              "type": "code_add",
+              "file": "backend/app/services/cache.py",
+              "position": "bottom"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "            rag_cache.set(prefix, result, ttl,\n                *cache_key_args)\n            return result\n        return wrapper\n    return decorator",
-              "order": "3.6c",
+              "order": "3.11",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "backend/app/services/cache.py"
@@ -4178,7 +4269,7 @@
             {
               "why": "Frontend container port 3000'de, backend 8000'de çalışır. depends_on ile başlatma sırası: backend hazır olmadan frontend başlamaz.",
               "code": "services:\n  frontend:\n    build: ./frontend\n    ports: ['3000:80']\n    depends_on: [backend]\n  backend:\n    build: ./backend\n    ports: ['8000:8000']",
-              "order": "4.1a",
+              "order": "4.2",
               "action": "docker-compose.yml frontend ve backend servislerini yaz",
               "type": "code_add",
               "file": "docker-compose.yml"
@@ -4186,7 +4277,7 @@
             {
               "why": "Environment variables ile DB bağlantısı ve API key'ler container'a aktarılır. ${OPENAI_API_KEY} host'un .env dosyasından okunur. DB healthcheck ile hazır olana kadar backend bekler.",
               "code": "    environment:\n      DATABASE_URL: postgresql://raguser:ragpass@db:5432/ragdb\n      CHROMA_HOST: chromadb\n      OPENAI_API_KEY: ${OPENAI_API_KEY}\n    depends_on:\n      db: { condition: service_healthy }\n      chromadb: { condition: service_started }",
-              "order": "4.1b",
+              "order": "4.3",
               "action": "Backend environment variables tanımla",
               "type": "code_write",
               "file": "docker-compose.yml"
@@ -4194,7 +4285,7 @@
             {
               "why": "PostgreSQL container: kullanıcı, şifre, veritabanı adı environment ile ayarlanır. Named volume ile veri korunur.",
               "code": "  db:\n    image: postgres:16\n    environment:\n      POSTGRES_USER: raguser\n      POSTGRES_PASSWORD: ragpass\n      POSTGRES_DB: ragdb\n    volumes:\n      - pgdata:/var/lib/postgresql/data",
-              "order": "4.1c",
+              "order": "4.4",
               "action": "PostgreSQL container yapılandırmasını yaz",
               "type": "code_add",
               "file": "docker-compose.yml"
@@ -4202,7 +4293,7 @@
             {
               "why": "Healthcheck: pg_isready komutu ile DB hazır olduğunu doğruluyoruz. 5 retry ile başlangıç süresine tolerans — backend bu hazır olana kadar bekler.",
               "code": "    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U raguser']\n      interval: 5s\n      timeout: 5s\n      retries: 5",
-              "order": "4.1d",
+              "order": "4.5",
               "action": "PostgreSQL healthcheck yapılandırmasını yaz",
               "type": "code_add",
               "file": "docker-compose.yml"
@@ -4210,7 +4301,7 @@
             {
               "why": "ChromaDB vector store container'ı. Named volumes (pgdata, chromadata) ile veriler container silinse bile korunur — docker-compose down sonrası veri kaybı olmaz.",
               "code": "  chromadb:\n    image: chromadb/chroma:latest\n    ports: ['8001:8000']\n    volumes: ['chromadata:/chroma/chroma']\nvolumes:\n  pgdata:\n  chromadata:",
-              "order": "4.1e",
+              "order": "4.6",
               "action": "ChromaDB container ve named volumes yapılandırmasını yaz",
               "type": "code_add",
               "file": "docker-compose.yml"
@@ -4240,7 +4331,7 @@
             {
               "why": "Multi-stage build: Node ile build et, sadece dist/'i Nginx'e kopyala. Final imaj ~25MB.",
               "code": "FROM node:20-slim AS build\nWORKDIR /app\nCOPY package.json pnpm-lock.yaml ./\nRUN corepack enable && pnpm install --frozen-lockfile\nCOPY . .\nRUN pnpm build\n",
-              "order": "4.6a",
+              "order": "4.10",
               "action": "Frontend Dockerfile — multi-stage build (Node + Nginx)",
               "type": "code_add",
               "file": "frontend/Dockerfile"
@@ -4248,7 +4339,7 @@
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "FROM nginx:alpine\nCOPY --from=build /app/dist /usr/share/nginx/html\nCOPY nginx.conf /etc/nginx/conf.d/default.conf\nEXPOSE 80",
-              "order": "4.6b",
+              "order": "4.11",
               "action": "Önceki adımda başlanan kod yapısını tamamla",
               "type": "code_add",
               "file": "frontend/Dockerfile"
@@ -4357,7 +4448,7 @@
             {
               "why": "3 test: citation regex doğru çalışıyor mu, confidence 0-100 arasında mı, hallucination kontrolü.",
               "code": "class TestRAGQuality:\n    QUALITY_TESTS = [\n        {\"question\": \"Projede hangi teknolojiler kullanılıyor?\", \"expected_keywords\": [\"React\", \"TypeScript\", \"FastAPI\"], \"should_cite\": True},\n        {\"question\": \"Bu dökümanda bahsedilmeyen konu?\", \"expected_in_answer\": [\"bulunamadı\"], \"should_cite\": False},\n    ]\n    def test_citation_regex(self):",
-              "order": "5.6a",
+              "order": "5.7",
               "action": "TestRAGQuality test sınıfını yaz — kalite testleri",
               "type": "code_write",
               "file": "backend/tests/test_rag_quality.py"
@@ -4365,7 +4456,7 @@
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "        pass\n    def test_confidence_range(self):\n        pass\n    def test_hallucination_detection(self):\n        pass",
-              "order": "5.6b",
+              "order": "5.8",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/tests/test_rag_quality.py"
@@ -4382,23 +4473,25 @@
             {
               "why": "Citation regex'in farklı formatları ([Kaynak 1] ve [Kaynak: 2]) yakaladığını doğruluyoruz. re.findall ile tüm eşleşmeleri bulup sayısını kontrol ediyoruz.",
               "code": "    def test_citation_regex(self):\n        pattern = r'\\[Kaynak[:\\s]*(\\d+)'\n        test_text = 'Cevap [Kaynak 1] ve [Kaynak: 2]'\\\n            ' referansları içerir.'\n        matches = re.findall(pattern, test_text)\n        assert len(matches) == 2\n        assert '1' in matches and '2' in matches",
-              "order": "5.8a",
+              "order": "5.10",
               "action": "test_citation_regex testini implement et",
-              "type": "code_write",
-              "file": "backend/tests/test_rag_quality.py"
+              "type": "code_add",
+              "file": "backend/tests/test_rag_quality.py",
+              "position": "bottom"
             },
             {
               "why": "Confidence 0-100 sınırları içinde olmalı. Hallucination detection: 'bulunamadı' kelimesi cevaptaysa bilgi dökümanlardan gelmemiş demek — bu kontrol UI'da uyarı göstermek için kullanılır.",
               "code": "def test_confidence_range(self):\n        # Confidence 0-100 arası olmalı\n        from app.services.llm.rag_chain import RAGChain\n        # Mock test\n        assert 0 <= 75 <= 100\n",
-              "order": "5.8b",
+              "order": "5.11",
               "action": "test_confidence_range ve test_hallucination testlerini yaz",
-              "type": "code_write",
-              "file": "backend/tests/test_rag_quality.py"
+              "type": "code_add",
+              "file": "backend/tests/test_rag_quality.py",
+              "position": "bottom"
             },
             {
               "why": "Fonksiyon implementasyonunun devamı.",
               "code": "    def test_hallucination_detection(self):\n        answer = \"Bu bilgi mevcut dökümanlarda bulunamadı.\"\n        assert \"bulunamadı\" in answer.lower()",
-              "order": "5.8c",
+              "order": "5.12",
               "action": "Fonksiyon iskeletlerinin metot imzalarını yaz",
               "type": "code_add",
               "file": "backend/tests/test_rag_quality.py"
@@ -4573,7 +4666,7 @@
             {
               "why": "README başlığı ve özellik listesi. > ile blockquote kısa açıklama verir. Madde işaretleri ile öne çıkan özellikler hızlıca taranabilir.",
               "code": "# RAG Document QA System\n\n> Enterprise-grade document question-answering system\n> with RAG pipeline\n\n## Features\n- PDF/DOCX/TXT document upload and processing\n- Hybrid retrieval (Dense + BM25 + Reranking)",
-              "order": "3.1a",
+              "order": "3.2",
               "action": "README başlık ve özellik listesini yaz",
               "type": "code_add",
               "file": "README.md"
@@ -4581,7 +4674,7 @@
             {
               "why": "Streaming ve cross-referencing gibi ileri özellikleri ekliyoruz. Tech stack bölümü recruiter'ların hızlıca teknoloji yığınını görmesini sağlar.",
               "code": "- Streaming conversational Q&A with source citations\n- Multi-document cross-referencing\n\n## Tech Stack\n- **Backend:** FastAPI, LangChain, ChromaDB, PostgreSQL\n- **Frontend:** React, TypeScript, Tailwind CSS\n- **AI:** OpenAI GPT-4o-mini, text-embedding-3-small",
-              "order": "3.1b",
+              "order": "3.3",
               "action": "README tech stack bölümünü yaz",
               "type": "code_write",
               "file": "README.md"
@@ -4589,7 +4682,7 @@
             {
               "why": "Quick Start ile tek komutla çalıştırma — recruiter'lar docker-compose up yazarak projeyi test edebilir. Architecture ve Screenshots bölümleri doldurulacak placeholder'lar.",
               "code": "## Quick Start\n```bash\ndocker-compose up --build\n```\n",
-              "order": "3.1c",
+              "order": "3.4",
               "action": "README Quick Start bölümünü yaz",
               "type": "code_add",
               "file": "README.md"
@@ -4597,7 +4690,7 @@
             {
               "why": "Döküman bölümünün devamı — içerik yapısı tamamlanıyor.",
               "code": "## Architecture\n[Mimari diyagramını ekle]\n\n## Screenshots\n[Ekran görüntülerini ekle]",
-              "order": "3.1d",
+              "order": "3.5",
               "action": "Döküman yapısının devam bölümünü tamamla",
               "type": "code_add",
               "file": "README.md"

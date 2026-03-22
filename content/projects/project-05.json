@@ -193,10 +193,11 @@
             {
               "order": "1.4",
               "action": "package.json'a GERİ DÖN → dev:api ve dev:dashboard scriptlerini ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "package.json",
               "code": "\"dev:api\": \"cd packages/api && pnpm run dev\",\n\"dev:dashboard\": \"cd packages/dashboard && pnpm run dev\"",
-              "why": "Her alt paketi kendi dizininden başlatıyoruz. İleride packages/api ve packages/dashboard dizinlerini oluşturacağız — şimdi sadece script'leri hazırlıyoruz."
+              "why": "Her alt paketi kendi dizininden başlatıyoruz. İleride packages/api ve packages/dashboard dizinlerini oluşturacağız — şimdi sadece script'leri hazırlıyoruz.",
+              "position": "bottom"
             },
             {
               "order": "1.5",
@@ -301,18 +302,20 @@
             {
               "order": "2.4",
               "action": "Aynı dosyanın ALTINA → unique constraint ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/migrations/001_create_metrics.sql",
               "code": "ALTER TABLE metrics ADD CONSTRAINT idx_source_metric_time\n  UNIQUE (source, metric_name, timestamp);",
-              "why": "2.3'te yarattığımız tabloya unique constraint ekliyoruz. Aynı source + metric + timestamp kombinasyonu iki kez eklenmesin — veri bütünlüğü için kritik."
+              "why": "2.3'te yarattığımız tabloya unique constraint ekliyoruz. Aynı source + metric + timestamp kombinasyonu iki kez eklenmesin — veri bütünlüğü için kritik.",
+              "position": "bottom"
             },
             {
               "order": "2.5",
               "action": "Aynı dosyanın ALTINA → performans index'lerini ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/migrations/001_create_metrics.sql",
               "code": "CREATE INDEX idx_metrics_timestamp\n  ON metrics (timestamp DESC);\n\nCREATE INDEX idx_metrics_source\n  ON metrics (source, timestamp DESC);",
-              "why": "Dashboard sorguları hep 'son X saat/gün' şeklinde olacak. timestamp DESC index'i bu sorguları 100x hızlandırır. source + timestamp composite index ise filtrelemeli sorgular için."
+              "why": "Dashboard sorguları hep 'son X saat/gün' şeklinde olacak. timestamp DESC index'i bu sorguları 100x hızlandırır. source + timestamp composite index ise filtrelemeli sorgular için.",
+              "position": "bottom"
             },
             {
               "order": "2.6",
@@ -399,12 +402,13 @@
               "why": "strict: true tüm tip kontrollerini aktif eder — senior standart. esModuleInterop CommonJS modüllerini import sözdizimi ile kullanmayı sağlar."
             },
             {
-              "order": "3.2b",
+              "order": "3.3",
               "action": "DEVAM: TypeScript ayarlarını yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/tsconfig.json",
               "code": "    \"strict\": true,\n    \"esModuleInterop\": true,\n    \"resolveJsonModule\": true\n  },\n  \"include\": [\"src/**/*\"]\n}",
-              "why": "Yapılandırma dosyaları projenin davranışını merkezi bir noktadan yönetir — environment'a göre değişen ayarlar burada tutulur."
+              "why": "Yapılandırma dosyaları projenin davranışını merkezi bir noktadan yönetir — environment'a göre değişen ayarlar burada tutulur.",
+              "position": "bottom"
             },
             {
               "order": "3.3",
@@ -423,36 +427,40 @@
               "why": "Önce çalışan en basit sunucuyu yazıyoruz — sadece health endpoint. Senior'lar her zaman 'önce çalışsın, sonra zenginleştir' der."
             },
             {
-              "order": "3.4b",
+              "order": "3.6",
               "action": "DEVAM: Express sunucu İSKELETİNİ yaz (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/index.ts",
               "code": "app.get('/health', (req, res) => {\n  res.json({ status: 'ok' });\n});\n",
-              "why": "Bu kısım fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "3.4c",
+              "order": "3.7",
               "action": "DEVAM: Express sunucu İSKELETİNİ yaz (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/index.ts",
               "code": "const PORT = 4000;\napp.listen(PORT, () => console.log(`API: port ${PORT}`));",
-              "why": "Bu kısım değişken tanımı ve fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım değişken tanımı ve fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "3.5",
               "action": "Dosyanın ÜSTÜNE ÇIK → cors ve pg import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/index.ts",
               "code": "import express from 'express';\nimport cors from 'cors';\nimport { Pool } from 'pg';\nimport dotenv from 'dotenv';\n\ndotenv.config();",
-              "why": "3.4'te iskelet çalıştıktan sonra şimdi gerçek bağımlılıkları ekliyoruz. dotenv.config() en üstte çağrılmalı — sonraki kodlar process.env'e bağlı."
+              "why": "3.4'te iskelet çalıştıktan sonra şimdi gerçek bağımlılıkları ekliyoruz. dotenv.config() en üstte çağrılmalı — sonraki kodlar process.env'e bağlı.",
+              "position": "bottom"
             },
             {
               "order": "3.6",
               "action": "Fonksiyona GERİ DÖN → middleware ve pool ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/index.ts",
               "code": "const app = express();\nexport const pool = new Pool({\n  connectionString: process.env.DATABASE_URL\n});\n\napp.use(cors());\napp.use(express.json());",
-              "why": "3.5'te import ettiğimiz Pool'u şimdi kullanıyoruz. Pool singleton pattern — uygulama boyunca tek bir bağlantı havuzu. export ediyoruz çünkü route dosyaları da kullanacak."
+              "why": "3.5'te import ettiğimiz Pool'u şimdi kullanıyoruz. Pool singleton pattern — uygulama boyunca tek bir bağlantı havuzu. export ediyoruz çünkü route dosyaları da kullanacak.",
+              "position": "bottom"
             },
             {
               "order": "3.7",
@@ -471,60 +479,67 @@
               "why": "Önce çalışan boş bir endpoint yazıyoruz. Import, Router oluştur, bir route tanımla, export et — Express route dosyasının temel iskeleti bu."
             },
             {
-              "order": "3.8b",
+              "order": "3.12",
               "action": "DEVAM: route İSKELETİNİ yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/metrics.ts",
               "code": "router.get('/metrics', async (req, res) => {\n  res.json({ message: 'metrics endpoint hazır' });\n});\n\nexport default router;",
-              "why": "Bu kısım asenkron işlem ve modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım asenkron işlem ve modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "3.9",
               "action": "Dosyanın ÜSTÜNE ÇIK → pool import'unu ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/metrics.ts",
               "code": "import { Router } from 'express';\nimport { pool } from '../index';",
-              "why": "3.8'de iskelet çalıştı, şimdi gerçek veritabanı sorgusu yazacağız. Bunun için 3.6'da export ettiğimiz pool'u import ediyoruz."
+              "why": "3.8'de iskelet çalıştı, şimdi gerçek veritabanı sorgusu yazacağız. Bunun için 3.6'da export ettiğimiz pool'u import ediyoruz.",
+              "position": "bottom"
             },
             {
               "order": "3.10",
               "action": "Route handler'a GERİ DÖN → INTERVAL_MAP ve validation yaz (bölüm 1/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/metrics.ts",
               "code": "const INTERVAL_MAP: Record<string, string> = {\n  '1h': 'hour', '1d': 'day',\n  '1w': 'week', '1m': 'month',\n};\n",
-              "why": "Kullanıcı '1h' gönderir, PostgreSQL 'hour' bekler. INTERVAL_MAP bu dönüşümü yapar. Geçersiz interval'de 400 döndürüyoruz — input validation senior standardı."
+              "why": "Kullanıcı '1h' gönderir, PostgreSQL 'hour' bekler. INTERVAL_MAP bu dönüşümü yapar. Geçersiz interval'de 400 döndürüyoruz — input validation senior standardı.",
+              "position": "bottom"
             },
             {
-              "order": "3.10b",
+              "order": "3.15",
               "action": "DEVAM: INTERVAL_MAP ve validation yaz (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/metrics.ts",
               "code": "router.get('/metrics', async (req, res) => {\n  const { source, metric, from, to, interval = '1h' } = req.query;\n  const pgInterval = INTERVAL_MAP[interval as string];\n  if (!pgInterval) {\n    return res.status(400).json({ error: 'Geçersiz interval' });\n  }\n});",
-              "why": "Bu kısım asenkron işlem ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım asenkron işlem ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "3.11",
               "action": "Route handler'ın İÇİNE → PostgreSQL aggregation sorgusunu ekle (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/metrics.ts",
               "code": "const result = await pool.query(\n    `SELECT date_trunc($1, timestamp) as bucket,\n     AVG(value) as avg_value,\n     MIN(value) as min_value,\n     MAX(value) as max_value,\n     COUNT(*) as count",
-              "why": "date_trunc PostgreSQL'in time-series süper gücü — milyonlarca satırı saniyeler içinde gruplar. $1, $2... parametreli sorgular SQL injection'a karşı korur."
+              "why": "date_trunc PostgreSQL'in time-series süper gücü — milyonlarca satırı saniyeler içinde gruplar. $1, $2... parametreli sorgular SQL injection'a karşı korur.",
+              "position": "bottom"
             },
             {
-              "order": "3.11b",
+              "order": "3.17",
               "action": "DEVAM: PostgreSQL aggregation sorgusunu ekle (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/metrics.ts",
               "code": "     FROM metrics WHERE source = $2 AND metric_name = $3\n     AND timestamp BETWEEN $4 AND $5\n     GROUP BY bucket ORDER BY bucket ASC`,\n    [pgInterval, source, metric, from, to]\n  );\n  res.json(result.rows);",
-              "why": "Docker yapılandırması uygulamayı izole bir ortamda çalıştırır — 'benim makinemde çalışıyor' problemini ortadan kaldırır."
+              "why": "Docker yapılandırması uygulamayı izole bir ortamda çalıştırır — 'benim makinemde çalışıyor' problemini ortadan kaldırır.",
+              "position": "bottom"
             },
             {
               "order": "3.12",
               "action": "index.ts'e GERİ DÖN → metrics route'unu bağla",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/index.ts",
               "code": "import metricsRouter from './routes/metrics';\napp.use('/api', metricsRouter);",
-              "why": "3.8-3.11'de yazdığımız route'u Express uygulamasına mount ediyoruz. /api prefix'i ile endpoint /api/metrics olacak."
+              "why": "3.8-3.11'de yazdığımız route'u Express uygulamasına mount ediyoruz. /api prefix'i ile endpoint /api/metrics olacak.",
+              "position": "bottom"
             },
             {
               "order": "3.13",
@@ -613,34 +628,38 @@
             {
               "order": "4.5",
               "action": "Dosyanın ÜSTÜNE ÇIK → Recharts import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/ChartWidget.tsx",
               "code": "import {\n  ResponsiveContainer, LineChart, Line,\n  XAxis, YAxis, Tooltip\n} from 'recharts';",
-              "why": "4.4'te iskelet çalıştı, şimdi grafik kütüphanesini ekliyoruz. ResponsiveContainer parent boyutuna göre otomatik resize yapar — chart'larda ZORUNLU."
+              "why": "4.4'te iskelet çalıştı, şimdi grafik kütüphanesini ekliyoruz. ResponsiveContainer parent boyutuna göre otomatik resize yapar — chart'larda ZORUNLU.",
+              "position": "bottom"
             },
             {
               "order": "4.6",
               "action": "Fonksiyona GERİ DÖN → props interface ve chart JSX'ini yaz (bölüm 1/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/ChartWidget.tsx",
               "code": "interface ChartWidgetProps {\n  title: string;\n  data: Array<{ bucket: string; avg_value: number }>;\n  color?: string;\n}\n",
-              "why": "4.5'te import ettiğimiz Recharts component'lerini kullanıyoruz. TypeScript interface ile prop tipleri güvenli. color default değeri ile opsiyonel prop pattern'ı."
+              "why": "4.5'te import ettiğimiz Recharts component'lerini kullanıyoruz. TypeScript interface ile prop tipleri güvenli. color default değeri ile opsiyonel prop pattern'ı.",
+              "position": "bottom"
             },
             {
-              "order": "4.6b",
+              "order": "4.7",
               "action": "DEVAM: props interface ve chart JSX'ini yaz (bölüm 2/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/ChartWidget.tsx",
               "code": "export function ChartWidget({ title, data, color = '#8884d8' }: ChartWidgetProps) {\n  return (\n    <div className=\"bg-gray-800 rounded-lg shadow p-4\">\n      <h3 className=\"text-sm font-medium text-gray-300 mb-2\">{title}</h3>\n      <ResponsiveContainer width=\"100%\" height={200}>\n        <LineChart data={data}>\n          <XAxis dataKey=\"bucket\" />",
-              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "4.6c",
+              "order": "4.8",
               "action": "DEVAM: props interface ve chart JSX'ini yaz (bölüm 3/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/ChartWidget.tsx",
               "code": "          <YAxis />\n          <Tooltip />\n          <Line type=\"monotone\" dataKey=\"avg_value\" stroke={color} dot={false} />\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}",
-              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
+              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar.",
+              "position": "bottom"
             },
             {
               "order": "4.7",
@@ -651,20 +670,22 @@
               "why": "4.4-4.6'da yazdığımız ChartWidget'ı gerçek kullanımda test ediyoruz. Mock veri ile backend hazır olmadan frontend geliştirme — paralel çalışma senior pattern'ı."
             },
             {
-              "order": "4.7b",
+              "order": "4.10",
               "action": "DEVAM: mock veri ile test sayfası yaz (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/App.tsx",
               "code": "function App() {\n  return (\n    <div className=\"min-h-screen bg-gray-900 p-6\">\n      <h1 className=\"text-2xl font-bold text-white mb-6\">\n        Analytics Dashboard\n      </h1>\n      <div className=\"grid grid-cols-2 gap-4\">\n        <ChartWidget title=\"CPU Kullanımı\" data={mockData} color=\"#8884d8\" />",
-              "why": "Bu kısım fonksiyon tanımı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım fonksiyon tanımı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "4.7c",
+              "order": "4.11",
               "action": "DEVAM: mock veri ile test sayfası yaz (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/App.tsx",
               "code": "        <ChartWidget title=\"Bellek\" data={mockData} color=\"#82ca9d\" />\n      </div>\n    </div>\n  );\n}\n\nexport default App;",
-              "why": "Bu kısım modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "4.8",
@@ -744,66 +765,74 @@
             {
               "order": "1.3",
               "action": "Dosyanın ÜSTÜNE ÇIK → pg ve dotenv import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/scripts/seed.ts",
               "code": "import { Pool } from 'pg';\nimport dotenv from 'dotenv';\n\ndotenv.config();\n\nconst pool = new Pool({\n  connectionString: process.env.DATABASE_URL\n});",
-              "why": "1.2'deki iskelet çalıştı, şimdi veritabanı bağlantısı ekliyoruz. M1.S3'te oluşturduğumuz .env dosyasındaki DATABASE_URL'yi kullanıyoruz."
+              "why": "1.2'deki iskelet çalıştı, şimdi veritabanı bağlantısı ekliyoruz. M1.S3'te oluşturduğumuz .env dosyasındaki DATABASE_URL'yi kullanıyoruz.",
+              "position": "bottom"
             },
             {
               "order": "1.4",
               "action": "Fonksiyona GERİ DÖN → source ve metric tanımlarını ekle (bölüm 1/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/scripts/seed.ts",
               "code": "const sources = ['web-app', 'mobile-app', 'api-gateway'];\nconst metrics = [\n  'cpu_usage', 'memory_usage', 'response_time',\n  'error_rate', 'request_count'\n];\n",
-              "why": "3 source x 5 metric = 15 kombinasyon. Her metriğin gerçekçi bir base değeri var — CPU %55 civarı, response_time 150ms gibi. Bu değerler gerçek dünya verilerine yakın."
+              "why": "3 source x 5 metric = 15 kombinasyon. Her metriğin gerçekçi bir base değeri var — CPU %55 civarı, response_time 150ms gibi. Bu değerler gerçek dünya verilerine yakın.",
+              "position": "bottom"
             },
             {
-              "order": "1.4b",
+              "order": "1.5",
               "action": "DEVAM: source ve metric tanımlarını ekle (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/scripts/seed.ts",
               "code": "function getBaseValue(metric: string): number {\n  const bases: Record<string, number> = {\n    cpu_usage: 55, memory_usage: 70,\n    response_time: 150, error_rate: 2,\n    request_count: 1000,\n  };\n  return bases[metric] || 50;\n}",
-              "why": "Bu kısım fonksiyon tanımı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım fonksiyon tanımı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "1.5",
               "action": "seedMetrics fonksiyonunun İÇİNE → veri üretim döngüsünü yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/scripts/seed.ts",
               "code": "  const now = Date.now();\n  const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;\n  let count = 0;\n\n  for (const source of sources) {\n    for (const metric of metrics) {\n      const baseValue = getBaseValue(metric);\n      const values: string[] = [];",
-              "why": "Son 30 günlük veri üretiyoruz, 5 dakika aralıklarla. Nested loop: her source için her metric. values array'ini batch insert için topluyoruz."
+              "why": "Son 30 günlük veri üretiyoruz, 5 dakika aralıklarla. Nested loop: her source için her metric. values array'ini batch insert için topluyoruz.",
+              "position": "bottom"
             },
             {
               "order": "1.6",
               "action": "İç döngüye → gerçekçi değer üretimi ekle (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/scripts/seed.ts",
               "code": "for (let ts = thirtyDaysAgo; ts < now; ts += 5 * 60 * 1000) {\n        const hour = new Date(ts).getHours();\n        const daily = Math.sin((hour - 6) * Math.PI / 12) * 0.2;\n        const noise = (Math.random() - 0.5) * 0.1;\n        const spike = Math.random() > 0.995 ? Math.random() * 0.5 : 0;\n        const value = baseValue * (1 + daily + noise + spike);",
-              "why": "sin() ile günlük pattern (gündüz yüksek, gece düşük), noise ile doğal varyasyon, spike ile nadir anomaliler. Bu 3 katman gerçekçi time-series verisi üretir."
+              "why": "sin() ile günlük pattern (gündüz yüksek, gece düşük), noise ile doğal varyasyon, spike ile nadir anomaliler. Bu 3 katman gerçekçi time-series verisi üretir.",
+              "position": "bottom"
             },
             {
-              "order": "1.6b",
+              "order": "1.8",
               "action": "DEVAM: gerçekçi değer üretimi ekle (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/scripts/seed.ts",
               "code": "        values.push(\n          `('${source}','${metric}',${value.toFixed(4)},'${new Date(ts).toISOString()}')`\n        );\n        count++;\n      }",
-              "why": "Evaluation metrikleri model kalitesini ölçülebilir kılar — objektif karşılaştırma için her iterasyonda aynı metrikler kullanılmalıdır."
+              "why": "Evaluation metrikleri model kalitesini ölçülebilir kılar — objektif karşılaştırma için her iterasyonda aynı metrikler kullanılmalıdır.",
+              "position": "bottom"
             },
             {
               "order": "1.7",
               "action": "Döngü sonrasına → batch insert ve cleanup ekle (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/scripts/seed.ts",
               "code": "const batchSize = 1000;\n      for (let i = 0; i < values.length; i += batchSize) {\n        const batch = values.slice(i, i + batchSize);\n        await pool.query(\n          `INSERT INTO metrics (source, metric_name, value, timestamp)\n           VALUES ${batch.join(',')}\n           ON CONFLICT DO NOTHING`",
-              "why": "1000'er satırlık batch insert — tek seferde 130K satır eklemek bellek taşırır. ON CONFLICT DO NOTHING tekrar çalıştırıldığında duplicate hatası vermez."
+              "why": "1000'er satırlık batch insert — tek seferde 130K satır eklemek bellek taşırır. ON CONFLICT DO NOTHING tekrar çalıştırıldığında duplicate hatası vermez.",
+              "position": "bottom"
             },
             {
-              "order": "1.7b",
+              "order": "1.10",
               "action": "DEVAM: batch insert ve cleanup ekle (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/scripts/seed.ts",
-              "code": "        );\n      }\n    }\n  }\n  console.log(`${count} metrik eklendi`);\n  await pool.end();",
-              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "code": "  console.log(`${count} metrik eklendi`);\n  await pool.end();",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "1.8",
@@ -898,44 +927,49 @@
               "why": "Önce çalışan bir iskelet — middleware var ama sadece next() çağırıyor. Redis bağlantısı hazır, ttlFn parametresi farklı endpoint'ler için farklı cache süresi sağlayacak."
             },
             {
-              "order": "2.5b",
+              "order": "2.6",
               "action": "DEVAM: Redis bağlantısı ve İSKELET yaz (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/middleware/cache.ts",
               "code": "export function cacheMiddleware(ttlFn: (req: Request) => number) {\n  return async (req: Request, res: Response, next: NextFunction) => {\n    next();\n  };\n}\n",
-              "why": "Bu kısım modül yapısı ve asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı ve asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.5c",
+              "order": "2.7",
               "action": "DEVAM: Redis bağlantısı ve İSKELET yaz (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/middleware/cache.ts",
               "code": "export { redis };",
-              "why": "Bu kısım modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.6",
               "action": "Fonksiyona GERİ DÖN → cache okuma ve X-Cache header logic'ini ekle (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/middleware/cache.ts",
               "code": "return async (req: Request, res: Response, next: NextFunction) => {\n    const key = `dashboard:${req.originalUrl}`;\n    const cached = await redis.get(key);\n    if (cached) {\n      res.setHeader('X-Cache', 'HIT');",
-              "why": "Cache key olarak URL kullanıyoruz — farklı filtreler farklı cache entry'leri. X-Cache: HIT header'ı debug için altın değerinde. Cache varsa DB'ye hiç gitmeden döndürüyoruz."
+              "why": "Cache key olarak URL kullanıyoruz — farklı filtreler farklı cache entry'leri. X-Cache: HIT header'ı debug için altın değerinde. Cache varsa DB'ye hiç gitmeden döndürüyoruz.",
+              "position": "bottom"
             },
             {
-              "order": "2.6b",
+              "order": "2.9",
               "action": "DEVAM: cache okuma ve X-Cache header logic'ini ekle (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/middleware/cache.ts",
               "code": "      return res.json(JSON.parse(cached));\n    }\n    next();\n  };",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.7",
               "action": "next() çağrısından ÖNCE → res.json override ile cache yazma ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/middleware/cache.ts",
               "code": "    const originalJson = res.json.bind(res);\n    res.json = (body: any) => {\n      const ttl = ttlFn(req);\n      redis.setex(key, ttl, JSON.stringify(body));\n      res.setHeader('X-Cache', 'MISS');\n      return originalJson(body);\n    };\n    next();",
-              "why": "res.json'ı override ediyoruz — route handler res.json() çağırdığında otomatik olarak Redis'e yazıyoruz. .bind(res) ile this context'i koruyoruz, yoksa TypeError alırsın."
+              "why": "res.json'ı override ediyoruz — route handler res.json() çağırdığında otomatik olarak Redis'e yazıyoruz. .bind(res) ile this context'i koruyoruz, yoksa TypeError alırsın.",
+              "position": "bottom"
             },
             {
               "order": "2.8",
@@ -946,12 +980,13 @@
               "why": "2.5-2.7'de yazdığımız cache middleware'ini route'a ekliyoruz. TTL stratejisi: son 1 saat -> 30sn, son 1 gün -> 5dk, daha eski -> 30dk. Kısa aralık sık değişir, uzun aralık nadiren."
             },
             {
-              "order": "2.8b",
+              "order": "2.12",
               "action": "DEVAM: cache middleware'ini bağla (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/metrics.ts",
-              "code": "  if (range < 3600000) return 30;\n  if (range < 86400000) return 300;\n  return 1800;\n}), async (req, res) => {\n  // mevcut handler kodu\n});",
-              "why": "Bu kısım dönüş değeri ve asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "code": "  if (range < 3600000) return 30;\n  if (range < 86400000) return 300;\n  return 1800;\n}), async (req, res) => {\n  // mevcut handler kodu",
+              "why": "Bu kısım dönüş değeri ve asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.9",
@@ -1024,34 +1059,38 @@
             {
               "order": "3.3",
               "action": "Dosyanın ÜSTÜNE ÇIK → pool import'unu ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/utils/metrics.ts",
               "code": "import { pool } from '../index';",
-              "why": "3.2'deki iskelet hazır, şimdi gerçek DB sorgusu ekleyeceğiz. M1.S3'te export ettiğimiz pool'u import ediyoruz."
+              "why": "3.2'deki iskelet hazır, şimdi gerçek DB sorgusu ekleyeceğiz. M1.S3'te export ettiğimiz pool'u import ediyoruz.",
+              "position": "bottom"
             },
             {
               "order": "3.4",
               "action": "Fonksiyona GERİ DÖN → gerçek DB sorgusu ve hesaplamaları yaz (bölüm 1/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/utils/metrics.ts",
               "code": "export async function getAggregatedMetric(\n  metricName: string, from: string, to: string\n) {\n  const result = await pool.query(\n    `SELECT date_trunc('hour', timestamp) as bucket,\n     AVG(value) as avg_value\n     FROM metrics WHERE metric_name = $1\n     AND timestamp BETWEEN $2 AND $3",
-              "why": "3.2'deki iskeletin yerine gerçek implementasyonu koyuyoruz. trend = son değer - önceki değer. status threshold'ları metriğe göre belirleniyor."
+              "why": "3.2'deki iskeletin yerine gerçek implementasyonu koyuyoruz. trend = son değer - önceki değer. status threshold'ları metriğe göre belirleniyor.",
+              "position": "bottom"
             },
             {
-              "order": "3.4b",
+              "order": "3.5",
               "action": "DEVAM: gerçek DB sorgusu ve hesaplamaları yaz (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/utils/metrics.ts",
               "code": "     GROUP BY bucket ORDER BY bucket ASC`,\n    [metricName, from, to]\n  );\n  const series = result.rows;\n  const latest = series.length > 0\n    ? series[series.length - 1].avg_value : 0;\n  const prev = series.length > 1\n    ? series[series.length - 2].avg_value : latest;",
-              "why": "Bu kısım değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "3.4c",
+              "order": "3.6",
               "action": "DEVAM: gerçek DB sorgusu ve hesaplamaları yaz (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/utils/metrics.ts",
               "code": "  return {\n    latest, trend: latest - prev,\n    status: latest > 90 ? 'critical'\n      : latest > 75 ? 'warning' : 'healthy',\n    series\n  };\n}",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "3.5",
@@ -1062,36 +1101,40 @@
               "why": "Önce çalışan boş bir endpoint. 3.2-3.4'te yazdığımız helper fonksiyonu burada kullanacağız ama önce route'un kendisi çalışsın."
             },
             {
-              "order": "3.5b",
+              "order": "3.8",
               "action": "DEVAM: route İSKELETİNİ yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/dashboard.ts",
               "code": "router.get('/overview', async (req, res) => {\n  res.json({ message: 'overview endpoint hazır' });\n});\n\nexport default router;",
-              "why": "Bu kısım asenkron işlem ve modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım asenkron işlem ve modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "3.6",
               "action": "Dosyanın ÜSTÜNE ÇIK → helper ve cache import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/dashboard.ts",
               "code": "import { Router } from 'express';\nimport { getAggregatedMetric } from '../utils/metrics';\nimport { cacheMiddleware } from '../middleware/cache';",
-              "why": "3.4'te yazdığımız getAggregatedMetric ve M2.S2'de yazdığımız cacheMiddleware'i import ediyoruz."
+              "why": "3.4'te yazdığımız getAggregatedMetric ve M2.S2'de yazdığımız cacheMiddleware'i import ediyoruz.",
+              "position": "bottom"
             },
             {
               "order": "3.7",
               "action": "Route handler'a GERİ DÖN → Promise.all ile paralel sorgular yaz (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/dashboard.ts",
               "code": "router.get('/overview', cacheMiddleware(() => 60), async (req, res) => {\n  const { from = new Date(Date.now() - 86400000).toISOString(),\n    to = new Date().toISOString() } = req.query;\n  const [cpu, mem, err, lat] = await Promise.all([\n    getAggregatedMetric('cpu_usage', from as string, to as string),\n    getAggregatedMetric('memory_usage', from as string, to as string),\n    getAggregatedMetric('error_rate', from as string, to as string),\n    getAggregatedMetric('response_time', from as string, to as string),",
-              "why": "Promise.all ile 4 DB sorgusunu paralel çalıştırıyoruz — sequential'e göre 4x hızlı. Dashboard API'lerinde bu pattern zorunlu."
+              "why": "Promise.all ile 4 DB sorgusunu paralel çalıştırıyoruz — sequential'e göre 4x hızlı. Dashboard API'lerinde bu pattern zorunlu.",
+              "position": "bottom"
             },
             {
-              "order": "3.7b",
+              "order": "3.11",
               "action": "DEVAM: Promise.all ile paralel sorgular yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/api/src/routes/dashboard.ts",
-              "code": "  ]);\n  res.json({\n    summary: { cpu, memory: mem, errors: err, latency: lat },\n    charts: { cpu: cpu.series, memory: mem.series,\n      errors: err.series, latency: lat.series }\n  });\n});",
-              "why": "Bu kısım hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "code": "  res.json({\n    summary: { cpu, memory: mem, errors: err, latency: lat },\n    charts: { cpu: cpu.series, memory: mem.series,\n      errors: err.series, latency: lat.series }",
+              "why": "Bu kısım hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "3.8",
@@ -1170,20 +1213,22 @@
               "why": "TypeScript'te önce tipler tanımlanır. API response yapısını interface ile tanımlıyoruz — yanlış property erişimi derleme zamanında yakalanır."
             },
             {
-              "order": "1.1b",
+              "order": "1.2",
               "action": "DEVAM: tip tanımlarını yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/types/metrics.ts",
               "code": "\nexport interface MetricSummary {\n  current: number;\n  trend: number;\n  status: 'healthy' | 'warning' | 'critical';\n}",
-              "why": "Bu kısım modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "1.2",
               "action": "Aynı dosyaya → DashboardOverview tipini ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/types/metrics.ts",
               "code": "export interface DashboardOverview {\n  summary: Record<string, MetricSummary>;\n  charts: Record<string, MetricPoint[]>;\n}",
-              "why": "1.1'deki MetricSummary ve MetricPoint'i kullanan üst düzey tip. M2.S3'te yazdığımız overview endpoint'inin response yapısıyla birebir eşleşiyor."
+              "why": "1.1'deki MetricSummary ve MetricPoint'i kullanan üst düzey tip. M2.S3'te yazdığımız overview endpoint'inin response yapısıyla birebir eşleşiyor.",
+              "position": "bottom"
             },
             {
               "order": "1.3",
@@ -1196,74 +1241,91 @@
             {
               "order": "1.4",
               "action": "Dosyanın ÜSTÜNE ÇIK → React hook import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useMetrics.ts",
               "code": "import { useState, useEffect, useRef } from 'react';\nimport { MetricPoint } from '../types/metrics';",
-              "why": "1.3'teki iskelet hazır, şimdi state yönetimi için React hook'larını ekliyoruz. 1.1'de tanımladığımız MetricPoint tipini import ediyoruz."
+              "why": "1.3'teki iskelet hazır, şimdi state yönetimi için React hook'larını ekliyoruz. 1.1'de tanımladığımız MetricPoint tipini import ediyoruz.",
+              "position": "bottom"
             },
             {
               "order": "1.5",
               "action": "Fonksiyona GERİ DÖN → parametre interface ve state tanımlarını yaz (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useMetrics.ts",
               "code": "interface UseMetricsOptions {\n  source: string;\n  metric: string;\n  from: Date;\n  to: Date;\n  interval?: string;\n  refreshInterval?: number;",
-              "why": "1.4'te import ettiğimiz useState, useRef'i kullanıyoruz. staleData SWR pattern'ı için — eski veriyi gösterirken yeni veri yüklenir."
+              "why": "1.4'te import ettiğimiz useState, useRef'i kullanıyoruz. staleData SWR pattern'ı için — eski veriyi gösterirken yeni veri yüklenir.",
+              "position": "bottom"
             },
             {
-              "order": "1.5b",
+              "order": "1.7",
               "action": "DEVAM: parametre interface ve state tanımlarını yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useMetrics.ts",
               "code": "}\n\nexport function useMetrics(options: UseMetricsOptions) {\n  const [data, setData] = useState<MetricPoint[]>([]);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<Error | null>(null);\n  const staleData = useRef<MetricPoint[]>([]);",
-              "why": "Bu kısım modül yapısı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "1.6",
               "action": "State tanımlarının ALTINA → useEffect ile veri çekme logic'ini yaz (bölüm 1/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useMetrics.ts",
               "code": "useEffect(() => {\n    const fetchData = async () => {\n      try {\n        if (staleData.current.length > 0) {\n          setData(staleData.current);\n          setLoading(false);\n        }",
-              "why": "SWR pattern: eski veriyi hemen göster, arka planda yeni veri çek. useEffect dependency array'inde Date objesi değil getTime() kullanıyoruz — Date referans karşılaştırması yapar."
+              "why": "SWR pattern: eski veriyi hemen göster, arka planda yeni veri çek. useEffect dependency array'inde Date objesi değil getTime() kullanıyoruz — Date referans karşılaştırması yapar.",
+              "position": "bottom"
             },
             {
-              "order": "1.6b",
+              "order": "1.9",
               "action": "DEVAM: useEffect ile veri çekme logic'ini yaz (bölüm 2/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useMetrics.ts",
               "code": "        const params = new URLSearchParams({\n          source: options.source, metric: options.metric,\n          from: options.from.toISOString(),\n          to: options.to.toISOString(),\n          interval: options.interval || '1h',\n        });\n        const res = await fetch(`/api/metrics?${params}`);",
-              "why": "Bu kısım değişken tanımı ve asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım değişken tanımı ve asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "1.6c",
+              "order": "1.10",
               "action": "DEVAM: useEffect ile veri çekme logic'ini yaz (bölüm 3/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useMetrics.ts",
-              "code": "        const json = await res.json();\n        setData(json);\n        staleData.current = json;\n        setError(null);\n      } catch (err) {\n        setError(err as Error);\n      } finally {",
-              "why": "Bu kısım asenkron işlem ve hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "code": "        const json = await res.json();\n        setData(json);\n        staleData.current = json;\n        setError(null);\n      } catch (err) {",
+              "why": "Bu kısım asenkron işlem ve hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "1.6d",
+              "order": "1.110",
+              "action": "DEVAM: useEffect ile veri çekme logic'ini yaz (bölüm 3/4) (devam)",
+              "type": "code_add",
+              "code": "        setError(err as Error);\n      } finally {\n  // TODO: implement\n}",
+              "why": "DEVAM: useEffect ile veri çekme logic'ini yaz (bölüm 3/4).",
+              "file": "packages/dashboard/src/hooks/useMetrics.ts"
+            },
+            {
+              "order": "1.11",
               "action": "DEVAM: useEffect ile veri çekme logic'ini yaz (bölüm 4/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useMetrics.ts",
-              "code": "        setLoading(false);\n      }\n    };\n    fetchData();\n  }, [options.source, options.metric,\n    options.from.getTime(), options.to.getTime()]);",
-              "why": "Evaluation metrikleri model kalitesini ölçülebilir kılar — objektif karşılaştırma için her iterasyonda aynı metrikler kullanılmalıdır."
+              "code": "        setLoading(false);\n    fetchData();\n  }, [options.source, options.metric,\n    options.from.getTime(), options.to.getTime()]);",
+              "why": "Evaluation metrikleri model kalitesini ölçülebilir kılar — objektif karşılaştırma için her iterasyonda aynı metrikler kullanılmalıdır.",
+              "position": "bottom"
             },
             {
               "order": "1.7",
               "action": "useEffect'in ALTINA → refreshInterval desteği ve return ekle (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useMetrics.ts",
               "code": "useEffect(() => {\n    if (!options.refreshInterval) return;\n    const timer = setInterval(() => {\n      // fetchData tekrar çağrılacak\n    }, options.refreshInterval);",
-              "why": "Dashboard'lar gerçek zamanlı güncellenir. refreshInterval ile belirlenen aralıkta otomatik veri yenileme. return () => clearInterval cleanup fonksiyonu bellek sızıntısını önler."
+              "why": "Dashboard'lar gerçek zamanlı güncellenir. refreshInterval ile belirlenen aralıkta otomatik veri yenileme. return () => clearInterval cleanup fonksiyonu bellek sızıntısını önler.",
+              "position": "bottom"
             },
             {
-              "order": "1.7b",
+              "order": "1.13",
               "action": "DEVAM: refreshInterval desteği ve return ekle (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useMetrics.ts",
               "code": "    return () => clearInterval(timer);\n  }, [options.refreshInterval]);\n\n  return { data, loading, error };",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "1.8",
@@ -1274,20 +1336,22 @@
               "why": "1.3-1.7'de yazdığımız hook'u gerçek kullanımda test ediyoruz. loading ve error state'lerinin doğru çalıştığını görsel olarak kontrol ediyoruz."
             },
             {
-              "order": "1.8b",
+              "order": "1.15",
               "action": "DEVAM: useMetrics hook'unu test et (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/App.tsx",
               "code": "    from: new Date(Date.now() - 86400000),\n    to: new Date(),\n  });\n\n  if (loading) return <div className=\"text-white\">Yükleniyor...</div>;\n  if (error) return <div className=\"text-red-400\">Hata: {error.message}</div>;\n",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "1.8c",
+              "order": "1.16",
               "action": "DEVAM: useMetrics hook'unu test et (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/App.tsx",
               "code": "  return (\n    <div className=\"min-h-screen bg-gray-900 p-6\">\n      <ChartWidget title=\"CPU Kullanımı\" data={data} />\n    </div>\n  );\n}",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "1.9",
@@ -1336,34 +1400,38 @@
             {
               "order": "2.2",
               "action": "Fonksiyona GERİ DÖN → props ve içerik ekle (bölüm 1/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/SummaryCard.tsx",
               "code": "interface SummaryCardProps {\n  title: string;\n  value: number;\n  unit: string;\n  trend: number;\n  status: 'healthy' | 'warning' | 'critical';\n}",
-              "why": "2.1'deki iskeletin yerine gerçek içerik. status'e göre renk değişiyor — critical kırmızı, warning sarı, healthy yeşil."
+              "why": "2.1'deki iskeletin yerine gerçek içerik. status'e göre renk değişiyor — critical kırmızı, warning sarı, healthy yeşil.",
+              "position": "bottom"
             },
             {
-              "order": "2.2b",
+              "order": "2.3",
               "action": "DEVAM: props ve içerik ekle (bölüm 2/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/SummaryCard.tsx",
               "code": "\nconst STATUS_COLORS = {\n  healthy: 'text-emerald-400',\n  warning: 'text-yellow-400',\n  critical: 'text-red-400',\n};\n",
-              "why": "Bu kısım değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.2c",
+              "order": "2.4",
               "action": "DEVAM: props ve içerik ekle (bölüm 3/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/SummaryCard.tsx",
               "code": "export function SummaryCard({ title, value, unit, trend, status }: SummaryCardProps) {\n  return (\n    <div className=\"bg-gray-800 rounded-lg p-4\">\n      <p className=\"text-sm text-gray-400\">{title}</p>\n      <p className={`text-2xl font-bold ${STATUS_COLORS[status]}`}>\n        {value.toFixed(1)}{unit}\n      </p>",
-              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.2d",
+              "order": "2.5",
               "action": "DEVAM: props ve içerik ekle (bölüm 4/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/SummaryCard.tsx",
               "code": "      <p className={`text-sm ${trend > 0 ? 'text-red-400' : 'text-emerald-400'}`}>\n        {trend > 0 ? '↑' : '↓'} {Math.abs(trend).toFixed(1)}\n      </p>\n    </div>\n  );\n}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar.",
+              "position": "bottom"
             },
             {
               "order": "2.3",
@@ -1374,44 +1442,49 @@
               "why": "Dashboard'da 'Son 1 saat', 'Son 24 saat' gibi filtreler olacak. Önce iskelet."
             },
             {
-              "order": "2.3b",
+              "order": "2.7",
               "action": "DEVAM: tarih filtresi İSKELETİ yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/DateRangePicker.tsx",
               "code": "      </button>\n    </div>\n  );\n}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar.",
+              "position": "bottom"
             },
             {
               "order": "2.4",
               "action": "Fonksiyona GERİ DÖN → preset butonları ve callback ekle (bölüm 1/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/DateRangePicker.tsx",
               "code": "interface DateRangePickerProps {\n  onChange: (from: Date, to: Date) => void;\n}\n\nconst PRESETS = [\n  { label: 'Son 1 Saat', hours: 1 },\n  { label: 'Son 24 Saat', hours: 24 },",
-              "why": "2.3'tüki placeholder'ı gerçek butonlarla değiştirdik. PRESETS array'i ile yeni tarih aralığı eklemek tek satır."
+              "why": "2.3'tüki placeholder'ı gerçek butonlarla değiştirdik. PRESETS array'i ile yeni tarih aralığı eklemek tek satır.",
+              "position": "bottom"
             },
             {
-              "order": "2.4b",
+              "order": "2.9",
               "action": "DEVAM: preset butonları ve callback ekle (bölüm 2/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/DateRangePicker.tsx",
               "code": "  { label: 'Son 7 Gün', hours: 168 },\n  { label: 'Son 30 Gün', hours: 720 },\n];\n\nexport function DateRangePicker({ onChange }: DateRangePickerProps) {\n  return (\n    <div className=\"flex gap-2\">",
-              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.4c",
+              "order": "2.10",
               "action": "DEVAM: preset butonları ve callback ekle (bölüm 3/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/DateRangePicker.tsx",
               "code": "      {PRESETS.map(p => (\n        <button key={p.hours}\n          className=\"px-3 py-1 bg-gray-700 text-gray-300 rounded\n            hover:bg-gray-600 transition-colors\"\n          onClick={() => onChange(\n            new Date(Date.now() - p.hours * 3600000),\n            new Date()",
-              "why": "Bu kısım fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.4d",
+              "order": "2.11",
               "action": "DEVAM: preset butonları ve callback ekle (bölüm 4/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/DateRangePicker.tsx",
-              "code": "          )}>\n          {p.label}\n        </button>\n      ))}\n    </div>\n  );\n}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "code": "          )}>\n          {p.label}\n        </button>\n    </div>",
+              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar.",
+              "position": "bottom"
             },
             {
               "order": "2.5",
@@ -1422,28 +1495,31 @@
               "why": "web-app, mobile-app, api-gateway arasında geçiş yapmak için. Seçili kaynak mavi, diğerleri gri — görsel geri bildirim UX için kritik."
             },
             {
-              "order": "2.5b",
+              "order": "2.13",
               "action": "DEVAM: kaynak filtresi yaz (bölüm 2/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/SourceFilter.tsx",
               "code": "export function SourceFilter({ sources, selected, onChange }: SourceFilterProps) {\n  return (\n    <div className=\"flex gap-2\">\n      {sources.map(s => (\n        <button key={s}\n          className={`px-3 py-1 rounded transition-colors ${\n            s === selected\n              ? 'bg-blue-600 text-white'",
-              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.5c",
+              "order": "2.14",
               "action": "DEVAM: kaynak filtresi yaz (bölüm 3/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/SourceFilter.tsx",
               "code": "              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'\n          }`}\n          onClick={() => onChange(s)}>\n          {s}\n        </button>",
-              "why": "Bu kısım fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.5cz",
+              "order": "2.15",
               "action": "DEVAM: kaynak filtresi yaz (bölüm 3/4) (son kisim)",
-              "type": "code_write",
-              "code": "      ))}\n    </div>\n  );\n}",
-              "why": "JSX return blogunu tamamliyoruz.",
-              "file": "packages/dashboard/src/components/SourceFilter.tsx"
+              "type": "code_add",
+              "code": "    </div>",
+              "why": "DEVAM: kaynak filtresi yaz (bölüm 3/4) (son kisim).",
+              "file": "packages/dashboard/src/components/SourceFilter.tsx",
+              "position": "bottom"
             },
             {
               "order": "2.6",
@@ -1454,68 +1530,76 @@
               "why": "Ana sayfa iskeleti. Önce layout ve başlık, sonra component'leri ekleyeceğiz."
             },
             {
-              "order": "2.6b",
+              "order": "2.17",
               "action": "DEVAM: ana dashboard İSKELETİNİ yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "      </h1>\n      <p className=\"text-gray-400\">İçerik gelecek...</p>\n    </div>\n  );\n}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar.",
+              "position": "bottom"
             },
             {
               "order": "2.7",
               "action": "Dosyanın ÜSTÜNE ÇIK → gerekli import'ları ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "import { useState } from 'react';\nimport { useMetrics } from '../hooks/useMetrics';\nimport { SummaryCard } from '../components/SummaryCard';\nimport { ChartWidget } from '../components/ChartWidget';\nimport { DateRangePicker } from '../components/DateRangePicker';\nimport { SourceFilter } from '../components/SourceFilter';",
-              "why": "2.1-2.5'te yazdığımız tüm component'leri ve M3.S1'deki useMetrics hook'unu import ediyoruz."
+              "why": "2.1-2.5'te yazdığımız tüm component'leri ve M3.S1'deki useMetrics hook'unu import ediyoruz.",
+              "position": "bottom"
             },
             {
               "order": "2.8",
               "action": "Fonksiyona GERİ DÖN → state ve hook çağrılarını ekle (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "const [source, setSource] = useState('web-app');\n  const [dateRange, setDateRange] = useState({\n    from: new Date(Date.now() - 86400000),\n    to: new Date()\n  });",
-              "why": "2.7'de import ettiğimiz useState ve useMetrics'i kullanıyoruz. 4 metrik için 4 hook çağrısı — her biri bağımsız loading state'ine sahip."
+              "why": "2.7'de import ettiğimiz useState ve useMetrics'i kullanıyoruz. 4 metrik için 4 hook çağrısı — her biri bağımsız loading state'ine sahip.",
+              "position": "bottom"
             },
             {
-              "order": "2.8b",
+              "order": "2.20",
               "action": "DEVAM: state ve hook çağrılarını ekle (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "  const cpu = useMetrics({ source, metric: 'cpu_usage', ...dateRange });\n  const mem = useMetrics({ source, metric: 'memory_usage', ...dateRange });\n  const err = useMetrics({ source, metric: 'error_rate', ...dateRange });\n  const lat = useMetrics({ source, metric: 'response_time', ...dateRange });",
-              "why": "Bu kısım değişken tanımı ve hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım değişken tanımı ve hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.9",
               "action": "Return JSX'ini GÜNCELLE → filtreler, summary kartları ve chart'ları ekle (bölüm 1/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "return (\n    <div className=\"min-h-screen bg-gray-900 p-6\">\n      <div className=\"flex justify-between items-center mb-6\">\n        <h1 className=\"text-2xl font-bold text-white\">Analytics Dashboard</h1>\n        <DateRangePicker onChange={(from, to) => setDateRange({ from, to })} />\n      </div>\n      <SourceFilter",
-              "why": "2.1-2.5'teki component'ler ve 2.8'deki hook verileri bir araya geldi. 4 summary kart üstte, 4 chart altta — profesyonel dashboard layout'u."
+              "why": "2.1-2.5'teki component'ler ve 2.8'deki hook verileri bir araya geldi. 4 summary kart üstte, 4 chart altta — profesyonel dashboard layout'u.",
+              "position": "bottom"
             },
             {
-              "order": "2.9b",
+              "order": "2.22",
               "action": "DEVAM: filtreler, summary kartları ve chart'ları ekle (bölüm 2/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "        sources={['web-app', 'mobile-app', 'api-gateway']}\n        selected={source}\n        onChange={setSource}\n      />\n      <div className=\"grid grid-cols-4 gap-4 mt-4\">\n        <SummaryCard title=\"CPU\" value={55} unit=\"%\" trend={2.1} status=\"healthy\" />\n        <SummaryCard title=\"Bellek\" value={70} unit=\"%\" trend={-1.5} status=\"warning\" />",
-              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
+              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar.",
+              "position": "bottom"
             },
             {
-              "order": "2.9c",
+              "order": "2.23",
               "action": "DEVAM: filtreler, summary kartları ve chart'ları ekle (bölüm 3/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "        <SummaryCard title=\"Hata Oranı\" value={1.2} unit=\"%\" trend={0.3} status=\"healthy\" />\n        <SummaryCard title=\"Gecikme\" value={145} unit=\"ms\" trend={-5} status=\"healthy\" />\n      </div>\n      <div className=\"grid grid-cols-2 gap-4 mt-4\">\n        <ChartWidget title=\"CPU Kullanımı\" data={cpu.data} color=\"#8884d8\" />\n        <ChartWidget title=\"Bellek Kullanımı\" data={mem.data} color=\"#82ca9d\" />\n        <ChartWidget title=\"Hata Oranı\" data={err.data} color=\"#ff7300\" />",
-              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
+              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar.",
+              "position": "bottom"
             },
             {
-              "order": "2.9d",
+              "order": "2.24",
               "action": "DEVAM: filtreler, summary kartları ve chart'ları ekle (bölüm 4/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "        <ChartWidget title=\"Yanıt Süresi\" data={lat.data} color=\"#ffc658\" />\n      </div>\n    </div>\n  );",
-              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
+              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar.",
+              "position": "bottom"
             },
             {
               "order": "2.10",
@@ -1572,66 +1656,74 @@
             {
               "order": "3.2",
               "action": "Dosyanın ÜSTÜNE ÇIK → Recharts import'larını ekle (Brush dahil)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AdvancedChart.tsx",
               "code": "import {\n  ResponsiveContainer, ComposedChart, Line, Area,\n  XAxis, YAxis, Tooltip, Brush, CartesianGrid,\n  Legend, ReferenceLine\n} from 'recharts';\nimport { MetricPoint } from '../types/metrics';",
-              "why": "3.1'deki iskelet hazır, şimdi ileri Recharts component'lerini ekliyoruz. Brush zoom özelliği, ReferenceLine threshold çizgisi için."
+              "why": "3.1'deki iskelet hazır, şimdi ileri Recharts component'lerini ekliyoruz. Brush zoom özelliği, ReferenceLine threshold çizgisi için.",
+              "position": "bottom"
             },
             {
               "order": "3.3",
               "action": "Fonksiyona GERİ DÖN → custom tooltip component'ini yaz (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AdvancedChart.tsx",
               "code": "function CustomTooltip({ active, payload, label }: any) {\n  if (!active || !payload?.length) return null;\n  return (\n    <div className=\"bg-gray-900 border border-gray-700 p-3 rounded\">\n      <p className=\"text-gray-400 text-sm\">{label}</p>\n      {payload.map((p: any) => (\n        <p key={p.name} style={{ color: p.color }} className=\"text-sm\">",
-              "why": "Recharts'ın default tooltip'i dark tema ile uyumsuz. Custom tooltip ile gray-900 arka plan kullanarak tutarlı dark tema sağlıyoruz."
+              "why": "Recharts'ın default tooltip'i dark tema ile uyumsuz. Custom tooltip ile gray-900 arka plan kullanarak tutarlı dark tema sağlıyoruz.",
+              "position": "bottom"
             },
             {
-              "order": "3.3b",
+              "order": "3.4",
               "action": "DEVAM: custom tooltip component'ini yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AdvancedChart.tsx",
-              "code": "          {p.name}: {Number(p.value).toFixed(2)}\n        </p>\n      ))}\n    </div>\n  );\n}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "code": "          {p.name}: {Number(p.value).toFixed(2)}\n        </p>\n    </div>",
+              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar.",
+              "position": "bottom"
             },
             {
               "order": "3.4",
               "action": "AdvancedChart component'ini → props ve tam chart JSX ile yaz (bölüm 1/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AdvancedChart.tsx",
               "code": "interface AdvancedChartProps {\n  title: string;\n  data: MetricPoint[];\n  color?: string;\n  threshold?: number;\n  showBrush?: boolean;\n}\n",
-              "why": "3.2'deki import'ları ve 3.3'teki custom tooltip'i kullanıyoruz. ComposedChart Line + Area bir arada. Brush alt kısımda zoom kontrolü sağlar."
+              "why": "3.2'deki import'ları ve 3.3'teki custom tooltip'i kullanıyoruz. ComposedChart Line + Area bir arada. Brush alt kısımda zoom kontrolü sağlar.",
+              "position": "bottom"
             },
             {
-              "order": "3.4b",
+              "order": "3.6",
               "action": "DEVAM: props ve tam chart JSX ile yaz (bölüm 2/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AdvancedChart.tsx",
               "code": "export function AdvancedChart({\n  title, data, color = '#8884d8',\n  threshold, showBrush = true\n}: AdvancedChartProps) {\n  return (\n    <div className=\"bg-gray-800 rounded-lg p-4\">\n      <h3 className=\"text-sm font-medium text-gray-300 mb-2\">{title}</h3>\n      <ResponsiveContainer width=\"100%\" height={300}>",
-              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "3.4c",
+              "order": "3.7",
               "action": "DEVAM: props ve tam chart JSX ile yaz (bölüm 3/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AdvancedChart.tsx",
               "code": "        <ComposedChart data={data}>\n          <CartesianGrid strokeDasharray=\"3 3\" stroke=\"#374151\" />\n          <XAxis dataKey=\"bucket\" stroke=\"#9CA3AF\" />\n          <YAxis stroke=\"#9CA3AF\" />\n          <Tooltip content={<CustomTooltip />} />\n          <Legend />\n          <Area type=\"monotone\" dataKey=\"avg_value\" fill={color}\n            fillOpacity={0.1} stroke=\"none\" />",
-              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
+              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar.",
+              "position": "bottom"
             },
             {
-              "order": "3.4d",
+              "order": "3.8",
               "action": "DEVAM: props ve tam chart JSX ile yaz (bölüm 4/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AdvancedChart.tsx",
               "code": "          <Line type=\"monotone\" dataKey=\"avg_value\" stroke={color}\n            dot={false} name=\"Ortalama\" />\n          {threshold && <ReferenceLine y={threshold}\n            stroke=\"#EF4444\" strokeDasharray=\"5 5\"\n            label=\"Eşik\" />}\n          {showBrush && <Brush dataKey=\"bucket\" height={30}\n            stroke=\"#6B7280\" fill=\"#1F2937\" />}\n        </ComposedChart>",
-              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
+              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar.",
+              "position": "bottom"
             },
             {
-              "order": "3.4e",
+              "order": "3.9",
               "action": "DEVAM: props ve tam chart JSX ile yaz (bölüm 5/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AdvancedChart.tsx",
               "code": "      </ResponsiveContainer>\n    </div>\n  );\n}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar.",
+              "position": "bottom"
             },
             {
               "order": "3.5",
@@ -1644,10 +1736,11 @@
             {
               "order": "3.6",
               "action": "Dashboard'daki ChartWidget'ları AdvancedChart ile değiştir",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "        <AdvancedChart title=\"CPU Kullanımı\" data={cpu.data}\n          color=\"#8884d8\" threshold={80} />\n        <AdvancedChart title=\"Bellek Kullanımı\" data={mem.data}\n          color=\"#82ca9d\" threshold={90} />\n        <AdvancedChart title=\"Hata Oranı\" data={err.data}\n          color=\"#ff7300\" threshold={5} />\n        <AdvancedChart title=\"Yanıt Süresi\" data={lat.data}\n          color=\"#ffc658\" threshold={200} />",
-              "why": "3.5'te import ettiğimiz AdvancedChart'ı kullanıyoruz. Her metrik için farklı threshold — CPU %80, bellek %90, hata %5, gecikme 200ms."
+              "why": "3.5'te import ettiğimiz AdvancedChart'ı kullanıyoruz. Her metrik için farklı threshold — CPU %80, bellek %90, hata %5, gecikme 200ms.",
+              "position": "bottom"
             },
             {
               "order": "3.7",
@@ -1744,50 +1837,64 @@
             {
               "order": "1.6",
               "action": "Dosyanın ÜSTÜNE ÇIK → numpy import'unu ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/anomaly_detector.py",
               "code": "import numpy as np",
-              "why": "1.5'teki iskelet hazır, şimdi gerçek Z-Score hesaplaması için numpy lazım. Z-Score = (değer - ortalama) / standart sapma"
+              "why": "1.5'teki iskelet hazır, şimdi gerçek Z-Score hesaplaması için numpy lazım. Z-Score = (değer - ortalama) / standart sapma",
+              "position": "bottom"
             },
             {
               "order": "1.7",
               "action": "detect metoduna GERİ DÖN → gerçek Z-Score hesaplamasını yaz (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/anomaly_detector.py",
-              "code": "def detect(self, values: list[float]) -> list[dict]:\n        arr = np.array(values)\n        mean = np.mean(arr)\n        std = np.std(arr)\n        if std == 0:\n            return [{\"is_anomaly\": False, \"z_score\": 0.0, \"value\": v} for v in values]\n        z_scores = (arr - mean) / std\n        return [",
-              "why": "1.6'da import ettiğimiz numpy ile Z-Score formülünü uyguluyorúz. std == 0 kontrolü — tüm değerler aynıysa bölme hatası olur."
+              "code": "def detect(self, values: list[float]) -> list[dict]:\n        arr = np.array(values)\n        mean = np.mean(arr)\n        std = np.std(arr)\n        if std == 0:\n            return [{\"is_anomaly\": False, \"z_score\": 0.0, \"value\": v} for v in values]",
+              "why": "1.6'da import ettiğimiz numpy ile Z-Score formülünü uyguluyorúz. std == 0 kontrolü — tüm değerler aynıysa bölme hatası olur.",
+              "position": "bottom"
             },
             {
-              "order": "1.7b",
+              "order": "1.107",
+              "action": "detect metoduna GERİ DÖN → gerçek Z-Score hesaplamasını yaz (bölüm 1/2) (devam)",
+              "type": "code_add",
+              "code": "        z_scores = (arr - mean) / std\n        return [\n  // TODO: implement\n]",
+              "why": "detect metoduna GERİ DÖN → gerçek Z-Score hesaplamasını yaz (bölüm 1/2).",
+              "file": "packages/ml-service/anomaly_detector.py"
+            },
+            {
+              "order": "1.8",
               "action": "DEVAM: gerçek Z-Score hesaplamasını yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/anomaly_detector.py",
               "code": "            {\n                \"is_anomaly\": bool(abs(z) > self.threshold),\n                \"z_score\": round(float(z), 4),\n                \"value\": float(v)\n            }\n            for z, v in zip(z_scores, values)\n        ]",
-              "why": "Anomali tespiti normal dışı kalıpları otomatik yakalar — manuel izlemenin yetersiz kaldığı büyük veri setlerinde kritiktir."
+              "why": "Anomali tespiti normal dışı kalıpları otomatik yakalar — manuel izlemenin yetersiz kaldığı büyük veri setlerinde kritiktir.",
+              "position": "bottom"
             },
             {
               "order": "1.8",
               "action": "BAŞKA DOSYAYA GEÇ: main.py → Z-Score endpoint'ini ekle (bölüm 1/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "from anomaly_detector import ZScoreDetector\nfrom pydantic import BaseModel\n\ndetector = ZScoreDetector(threshold=3.0)\n",
-              "why": "1.5-1.7'de yazdığımız ZScoreDetector'ı API endpoint'i olarak sunuyoruz. Pydantic BaseModel ile request validation otomatik."
+              "why": "1.5-1.7'de yazdığımız ZScoreDetector'ı API endpoint'i olarak sunuyoruz. Pydantic BaseModel ile request validation otomatik.",
+              "position": "bottom"
             },
             {
-              "order": "1.8b",
+              "order": "1.10",
               "action": "DEVAM: Z-Score endpoint'ini ekle (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "class DetectRequest(BaseModel):\n    values: list[float]\n    threshold: float = 3.0\n\n@app.post(\"/api/anomalies/zscore\")\ndef detect_zscore(req: DetectRequest):\n    detector.threshold = req.threshold",
-              "why": "Bu kısım sınıf tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım sınıf tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "1.8c",
+              "order": "1.11",
               "action": "DEVAM: Z-Score endpoint'ini ekle (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "    results = detector.detect(req.values)\n    anomalies = [r for r in results if r[\"is_anomaly\"]]\n    return {\n        \"total\": len(results),\n        \"anomaly_count\": len(anomalies),\n        \"results\": results\n    }",
-              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "1.9",
@@ -1850,52 +1957,58 @@
               "why": "Z-Score tek değişkenli anomalileri yakalar ama CPU düşükken error yüksek gibi çok değişkenli anomalileri kaçırır. Isolation Forest bunu çözer."
             },
             {
-              "order": "2.1b",
+              "order": "2.2",
               "action": "DEVAM: IsolationForestDetector İSKELETİNİ yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/anomaly_detector.py",
               "code": "    def train(self, features):\n        pass\n\n    def predict(self, features):\n        return []",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.2",
               "action": "Dosyanın ÜSTÜNE ÇIK → scikit-learn import'unu ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/anomaly_detector.py",
               "code": "import numpy as np\nfrom sklearn.ensemble import IsolationForest\nfrom sklearn.preprocessing import StandardScaler",
-              "why": "2.1'deki iskelet hazır, şimdi gerçek ML bileşenlerini ekliyoruz. StandardScaler feature'ları normalize eder."
+              "why": "2.1'deki iskelet hazır, şimdi gerçek ML bileşenlerini ekliyoruz. StandardScaler feature'ları normalize eder.",
+              "position": "bottom"
             },
             {
               "order": "2.3",
               "action": "IsolationForestDetector sınıfına GERİ DÖN → scaler ekle ve train metodunu yaz (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/anomaly_detector.py",
               "code": "def __init__(self, contamination: float = 0.05):\n        self.contamination = contamination\n        self.model = IsolationForest(\n            contamination=contamination,\n            random_state=42,\n            n_estimators=100\n        )",
-              "why": "2.2'de import ettiğimiz IsolationForest ve StandardScaler'ı kullanıyoruz. contamination=0.05 → verinin %5'inin anomali olmasını bekliyoruz."
+              "why": "2.2'de import ettiğimiz IsolationForest ve StandardScaler'ı kullanıyoruz. contamination=0.05 → verinin %5'inin anomali olmasını bekliyoruz.",
+              "position": "bottom"
             },
             {
-              "order": "2.3b",
+              "order": "2.5",
               "action": "DEVAM: scaler ekle ve train metodunu yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/anomaly_detector.py",
               "code": "        self.scaler = StandardScaler()\n\n    def train(self, features: np.ndarray):\n        scaled = self.scaler.fit_transform(features)\n        self.model.fit(scaled)\n        return self",
-              "why": "Bu kısım test tanımı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım test tanımı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.4",
               "action": "predict metodunu GÜNCELLE → anomali skoru ve sonuçları döndür (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/anomaly_detector.py",
-              "code": "def predict(self, features: np.ndarray) -> list[dict]:\n        scaled = self.scaler.transform(features)\n        predictions = self.model.predict(scaled)\n        scores = self.model.score_samples(scaled)\n        return [\n            {",
-              "why": "2.3'te eğittiğimiz modelle tahmin yapıyoruz. Isolation Forest -1 döndürürse anomali, 1 ise normal."
+              "code": "def predict(self, features: np.ndarray) -> list[dict]:\n        scaled = self.scaler.transform(features)\n        predictions = self.model.predict(scaled)\n        scores = self.model.score_samples(scaled)\n        return [\n            {\n  // TODO: implement\n}",
+              "why": "2.3'te eğittiğimiz modelle tahmin yapıyoruz. Isolation Forest -1 döndürürse anomali, 1 ise normal.",
+              "position": "bottom"
             },
             {
-              "order": "2.4b",
+              "order": "2.7",
               "action": "DEVAM: anomali skoru ve sonuçları döndür (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/anomaly_detector.py",
               "code": "                \"is_anomaly\": bool(pred == -1),\n                \"anomaly_score\": round(float(score), 4),\n                \"features\": row.tolist()\n            }\n            for pred, score, row in zip(predictions, scores, features)\n        ]",
-              "why": "ML pipeline'ı veriyi işleyip model eğitimi yapar — her adım bağımsız test edilebilir olmalıdır."
+              "why": "ML pipeline'ı veriyi işleyip model eğitimi yapar — her adım bağımsız test edilebilir olmalıdır.",
+              "position": "bottom"
             },
             {
               "order": "2.5",
@@ -1908,18 +2021,20 @@
             {
               "order": "2.6",
               "action": "Dosyanın ÜSTÜNE ÇIK → pandas import'unu ekle, fonksiyonu yaz (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/feature_engineering.py",
               "code": "import pandas as pd\nimport numpy as np\n\ndef extract_features(df: pd.DataFrame) -> np.ndarray:\n    features = pd.DataFrame()\n    features['value'] = df['value']\n    features['hour'] = pd.to_datetime(df['timestamp']).dt.hour",
-              "why": "2.5'teki iskeletin yerine gerçek feature engineering. rolling_mean/std son 1 saatlik trend, hour/is_weekend zamansal pattern'ları yakalar."
+              "why": "2.5'teki iskeletin yerine gerçek feature engineering. rolling_mean/std son 1 saatlik trend, hour/is_weekend zamansal pattern'ları yakalar.",
+              "position": "bottom"
             },
             {
-              "order": "2.6b",
+              "order": "2.10",
               "action": "DEVAM: pandas import'unu ekle, fonksiyonu yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/feature_engineering.py",
               "code": "    features['rolling_mean'] = df['value'].rolling(12).mean()\n    features['rolling_std'] = df['value'].rolling(12).std()\n    features['diff'] = df['value'].diff()\n    features['is_weekend'] = pd.to_datetime(\n        df['timestamp']).dt.dayofweek >= 5\n    features = features.fillna(0)\n    return features.values",
-              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.7",
@@ -1930,52 +2045,58 @@
               "why": "ML modeli gerçek veritabanı verisiyle çalışacak. M2.S1'de seed'lediğimiz veriyi çekiyoruz."
             },
             {
-              "order": "2.7b",
+              "order": "2.12",
               "action": "DEVAM: veritabanından veri çekme fonksiyonu ekle (bölüm 2/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "load_dotenv()\n\ndef fetch_metrics(metric_name: str, hours: int = 24) -> pd.DataFrame:\n    conn = psycopg2.connect(os.getenv('DATABASE_URL'))\n    query = \"\"\"\n        SELECT value, timestamp FROM metrics",
-              "why": "SQL sorguları veritabanı ile iletişimi sağlar — doğru indeksleme ile milisaniyeler içinde sonuç döner."
+              "why": "SQL sorguları veritabanı ile iletişimi sağlar — doğru indeksleme ile milisaniyeler içinde sonuç döner.",
+              "position": "bottom"
             },
             {
-              "order": "2.7c",
+              "order": "2.13",
               "action": "DEVAM: veritabanından veri çekme fonksiyonu ekle (bölüm 3/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "        WHERE metric_name = %s\n        AND timestamp > NOW() - INTERVAL '%s hours'\n        ORDER BY timestamp ASC\n    \"\"\"\n    df = pd.read_sql(query, conn, params=[metric_name, hours])\n    conn.close()",
-              "why": "Evaluation metrikleri model kalitesini ölçülebilir kılar — objektif karşılaştırma için her iterasyonda aynı metrikler kullanılmalıdır."
+              "why": "Evaluation metrikleri model kalitesini ölçülebilir kılar — objektif karşılaştırma için her iterasyonda aynı metrikler kullanılmalıdır.",
+              "position": "bottom"
             },
             {
-              "order": "2.7d",
+              "order": "2.14",
               "action": "DEVAM: veritabanından veri çekme fonksiyonu ekle (bölüm 4/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "    return df",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.8",
               "action": "main.py'de → Isolation Forest train ve predict endpoint'lerini ekle (bölüm 1/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "from anomaly_detector import IsolationForestDetector\nfrom feature_engineering import extract_features\n\nforest_detector = IsolationForestDetector(contamination=0.05)\n\n@app.post(\"/api/anomalies/train\")\ndef train_model(metric_name: str = \"cpu_usage\", hours: int = 168):\n    df = fetch_metrics(metric_name, hours)",
-              "why": "2.3-2.4'teki IsolationForestDetector ve 2.6'daki extract_features'ı API olarak sunuyoruz. Train: son 1 hafta veriyle eğit. Detect: son 24 saatteki anomalileri bul."
+              "why": "2.3-2.4'teki IsolationForestDetector ve 2.6'daki extract_features'ı API olarak sunuyoruz. Train: son 1 hafta veriyle eğit. Detect: son 24 saatteki anomalileri bul.",
+              "position": "bottom"
             },
             {
-              "order": "2.8b",
+              "order": "2.16",
               "action": "DEVAM: Isolation Forest train ve predict endpoint'lerini ekle (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "    features = extract_features(df)\n    forest_detector.train(features)\n    return {\"status\": \"trained\", \"samples\": len(df)}\n\n@app.post(\"/api/anomalies/detect\")\ndef detect_anomalies(metric_name: str = \"cpu_usage\", hours: int = 24):\n    df = fetch_metrics(metric_name, hours)\n    features = extract_features(df)",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.8c",
+              "order": "2.17",
               "action": "DEVAM: Isolation Forest train ve predict endpoint'lerini ekle (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "    results = forest_detector.predict(features)\n    anomalies = [r for r in results if r[\"is_anomaly\"]]\n    return {\n        \"total\": len(results),\n        \"anomaly_count\": len(anomalies),\n        \"anomalies\": anomalies\n    }",
-              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.9",
@@ -2040,34 +2161,46 @@
             {
               "order": "3.2",
               "action": "Dosyanın ÜSTÜNE ÇIK → React import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useAnomalies.ts",
               "code": "import { useState, useEffect } from 'react';",
-              "why": "3.1'deki iskelet hazır, şimdi state yönetimi ve veri çekme için React hook'larını ekliyoruz."
+              "why": "3.1'deki iskelet hazır, şimdi state yönetimi ve veri çekme için React hook'larını ekliyoruz.",
+              "position": "bottom"
             },
             {
               "order": "3.3",
               "action": "Fonksiyona GERİ DÖN → ML service'ten anomali verisi çekme logic'ini yaz (bölüm 1/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useAnomalies.ts",
               "code": "interface Anomaly {\n  is_anomaly: boolean;\n  anomaly_score: number;\n  timestamp?: string;\n}\n",
-              "why": "3.2'de import ettiğimiz useState ve useEffect ile M4.S2'de yazdığımız ML service endpoint'inden anomali verisi çekiyoruz."
+              "why": "3.2'de import ettiğimiz useState ve useEffect ile M4.S2'de yazdığımız ML service endpoint'inden anomali verisi çekiyoruz.",
+              "position": "bottom"
             },
             {
-              "order": "3.3b",
+              "order": "3.4",
               "action": "DEVAM: ML service'ten anomali verisi çekme logic'ini yaz (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useAnomalies.ts",
-              "code": "export function useAnomalies(metric: string) {\n  const [anomalies, setAnomalies] = useState<Anomaly[]>([]);\n  const [loading, setLoading] = useState(true);\n\n  useEffect(() => {\n    fetch(`http://localhost:8001/api/anomalies/detect?metric_name=${metric}`)\n      .then(res => res.json())\n      .then(data => {",
-              "why": "Bu kısım modül yapısı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "code": "export function useAnomalies(metric: string) {\n  const [anomalies, setAnomalies] = useState<Anomaly[]>([]);\n  const [loading, setLoading] = useState(true);",
+              "why": "Bu kısım modül yapısı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "3.3c",
+              "order": "3.104",
+              "action": "DEVAM: ML service'ten anomali verisi çekme logic'ini yaz (bölüm 2/3) (devam)",
+              "type": "code_add",
+              "code": "  useEffect(() => {\n    fetch(`http://localhost:8001/api/anomalies/detect?metric_name=${metric}`)\n      .then(res => res.json())\n      .then(data => {\n  // TODO: implement\n}",
+              "why": "DEVAM: ML service'ten anomali verisi çekme logic'ini yaz (bölüm 2/3).",
+              "file": "packages/dashboard/src/hooks/useAnomalies.ts"
+            },
+            {
+              "order": "3.5",
               "action": "DEVAM: ML service'ten anomali verisi çekme logic'ini yaz (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useAnomalies.ts",
-              "code": "        setAnomalies(data.anomalies || []);\n        setLoading(false);\n      })\n      .catch(() => setLoading(false));\n  }, [metric]);\n\n  return { anomalies, loading };\n}",
-              "why": "Bu kısım hata yönetimi ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "code": "        setAnomalies(data.anomalies || []);\n        setLoading(false);\n      .catch(() => setLoading(false));\n  }, [metric]);\n\n  return { anomalies, loading };",
+              "why": "Bu kısım hata yönetimi ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "3.4",
@@ -2080,50 +2213,56 @@
             {
               "order": "3.5",
               "action": "Dosyanın ÜSTÜNE ÇIK → Recharts ve tip import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AnomalyChart.tsx",
               "code": "import {\n  ResponsiveContainer, ComposedChart, Line, Scatter,\n  XAxis, YAxis, Tooltip, CartesianGrid\n} from 'recharts';\nimport { MetricPoint } from '../types/metrics';",
-              "why": "3.4'teki iskelet hazır. Scatter component anomali noktalarını ayrı renkte göstermek için kullanılacak."
+              "why": "3.4'teki iskelet hazır. Scatter component anomali noktalarını ayrı renkte göstermek için kullanılacak.",
+              "position": "bottom"
             },
             {
               "order": "3.6",
               "action": "Fonksiyona GERİ DÖN → anomali chart'ını tam olarak yaz (bölüm 1/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AnomalyChart.tsx",
               "code": "interface AnomalyChartProps {\n  title: string;\n  data: MetricPoint[];\n  anomalyIndices: number[];\n  color?: string;\n}\n",
-              "why": "3.5'teki Scatter component'i anomali noktalarını kırmızı (#EF4444) olarak gösteriyor. enriched array'de anomali olmayan noktaların anomaly değeri null — Scatter bunları atlar."
+              "why": "3.5'teki Scatter component'i anomali noktalarını kırmızı (#EF4444) olarak gösteriyor. enriched array'de anomali olmayan noktaların anomaly değeri null — Scatter bunları atlar.",
+              "position": "bottom"
             },
             {
-              "order": "3.6b",
+              "order": "3.9",
               "action": "DEVAM: anomali chart'ını tam olarak yaz (bölüm 2/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AnomalyChart.tsx",
               "code": "export function AnomalyChart({\n  title, data, anomalyIndices, color = '#8884d8'\n}: AnomalyChartProps) {\n  const enriched = data.map((d, i) => ({\n    ...d,\n    anomaly: anomalyIndices.includes(i) ? d.avg_value : null\n  }));",
-              "why": "Bu kısım modül yapısı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "3.6c",
+              "order": "3.10",
               "action": "DEVAM: anomali chart'ını tam olarak yaz (bölüm 3/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AnomalyChart.tsx",
               "code": "\n  return (\n    <div className=\"bg-gray-800 rounded-lg p-4\">\n      <h3 className=\"text-sm text-gray-300 mb-2\">{title}\n        <span className=\"ml-2 text-red-400 text-xs\">\n          {anomalyIndices.length} anomali\n        </span>",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "3.6d",
+              "order": "3.11",
               "action": "DEVAM: anomali chart'ını tam olarak yaz (bölüm 4/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AnomalyChart.tsx",
               "code": "      </h3>\n      <ResponsiveContainer width=\"100%\" height={300}>\n        <ComposedChart data={enriched}>\n          <CartesianGrid strokeDasharray=\"3 3\" stroke=\"#374151\" />\n          <XAxis dataKey=\"bucket\" stroke=\"#9CA3AF\" />\n          <YAxis stroke=\"#9CA3AF\" />\n          <Tooltip />",
-              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
+              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar.",
+              "position": "bottom"
             },
             {
-              "order": "3.6e",
+              "order": "3.12",
               "action": "DEVAM: anomali chart'ını tam olarak yaz (bölüm 5/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AnomalyChart.tsx",
               "code": "          <Line type=\"monotone\" dataKey=\"avg_value\" stroke={color} dot={false} />\n          <Scatter dataKey=\"anomaly\" fill=\"#EF4444\" />\n        </ComposedChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}",
-              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
+              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar.",
+              "position": "bottom"
             },
             {
               "order": "3.7",
@@ -2134,20 +2273,22 @@
               "why": "Anomali noktasına tıklandığında detay gösteren panel. M4.S2'deki detect endpoint'inden gelen verileri gösteriyor."
             },
             {
-              "order": "3.7b",
+              "order": "3.14",
               "action": "DEVAM: tıklama detayı component'ini yaz (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AnomalyDetail.tsx",
               "code": "export function AnomalyDetail({ timestamp, value, score, onClose }: AnomalyDetailProps) {\n  return (\n    <div className=\"bg-gray-800 border border-red-500 rounded-lg p-4 mt-2\">\n      <div className=\"flex justify-between\">\n        <h4 className=\"text-red-400 font-bold\">Anomali Detayı</h4>\n        <button onClick={onClose} className=\"text-gray-400 hover:text-white\">✕</button>\n      </div>",
-              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım modül yapısı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "3.7c",
+              "order": "3.15",
               "action": "DEVAM: tıklama detayı component'ini yaz (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/AnomalyDetail.tsx",
               "code": "      <p className=\"text-gray-300 text-sm mt-2\">Zaman: {timestamp}</p>\n      <p className=\"text-gray-300 text-sm\">Değer: {value.toFixed(2)}</p>\n      <p className=\"text-gray-300 text-sm\">Anomali Skoru: {score.toFixed(4)}</p>\n    </div>\n  );\n}",
-              "why": "Anomali tespiti normal dışı kalıpları otomatik yakalar — manuel izlemenin yetersiz kaldığı büyük veri setlerinde kritiktir."
+              "why": "Anomali tespiti normal dışı kalıpları otomatik yakalar — manuel izlemenin yetersiz kaldığı büyük veri setlerinde kritiktir.",
+              "position": "bottom"
             },
             {
               "order": "3.8",
@@ -2204,26 +2345,37 @@
             {
               "order": "4.2",
               "action": "Dosyanın ÜSTÜNE ÇIK → sklearn metrics import'unu ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/evaluation.py",
               "code": "from sklearn.metrics import (\n    precision_score, recall_score, f1_score,\n    confusion_matrix, classification_report\n)\nimport numpy as np",
-              "why": "4.1'deki iskelet hazır, şimdi gerçek metrikleri hesaplayacağız."
+              "why": "4.1'deki iskelet hazır, şimdi gerçek metrikleri hesaplayacağız.",
+              "position": "bottom"
             },
             {
               "order": "4.3",
               "action": "Fonksiyona GERİ DÖN → gerçek değerlendirme hesaplamalarını yaz (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/evaluation.py",
-              "code": "def evaluate_model(\n    predictions: list[bool],\n    labels: list[bool]\n) -> dict:\n    y_pred = np.array(predictions, dtype=int)\n    y_true = np.array(labels, dtype=int)\n    return {",
-              "why": "4.2'de import ettiğimiz metrikleri kullanıyoruz. precision yüksek = az false alarm. recall yüksek = çoğu anomaliyi yakalıyor. F1 ikisinin dengesi."
+              "code": "def evaluate_model(\n    predictions: list[bool],\n    labels: list[bool]\n) -> dict:\n    y_pred = np.array(predictions, dtype=int)",
+              "why": "4.2'de import ettiğimiz metrikleri kullanıyoruz. precision yüksek = az false alarm. recall yüksek = çoğu anomaliyi yakalıyor. F1 ikisinin dengesi.",
+              "position": "bottom"
             },
             {
-              "order": "4.3b",
+              "order": "4.103",
+              "action": "Fonksiyona GERİ DÖN → gerçek değerlendirme hesaplamalarını yaz (bölüm 1/2) (devam)",
+              "type": "code_add",
+              "code": "    y_true = np.array(labels, dtype=int)\n    return {\n  // TODO: implement\n}",
+              "why": "Fonksiyona GERİ DÖN → gerçek değerlendirme hesaplamalarını yaz (bölüm 1/2).",
+              "file": "packages/ml-service/evaluation.py"
+            },
+            {
+              "order": "4.4",
               "action": "DEVAM: gerçek değerlendirme hesaplamalarını yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/evaluation.py",
               "code": "        \"precision\": round(float(precision_score(y_true, y_pred, zero_division=0)), 4),\n        \"recall\": round(float(recall_score(y_true, y_pred, zero_division=0)), 4),\n        \"f1\": round(float(f1_score(y_true, y_pred, zero_division=0)), 4),\n        \"confusion_matrix\": confusion_matrix(y_true, y_pred).tolist(),\n        \"report\": classification_report(y_true, y_pred, output_dict=True)\n    }",
-              "why": "Bu kısım kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "4.4",
@@ -2234,12 +2386,13 @@
               "why": "4.1-4.3'te yazdığımız evaluate_model'ı API endpoint'i olarak sunuyoruz."
             },
             {
-              "order": "4.4b",
+              "order": "4.6",
               "action": "DEVAM: evaluation endpoint'ini ekle (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/ml-service/main.py",
               "code": "    features = extract_features(df)\n    results = forest_detector.predict(features)\n    labels = [abs(r[\"anomaly_score\"]) > 0.3 for r in results]\n    predictions = [r[\"is_anomaly\"] for r in results]\n    return evaluate_model(predictions, labels)",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "4.5",
@@ -2320,50 +2473,56 @@
             {
               "order": "1.3",
               "action": "Dosyanın ÜSTÜNE ÇIK → papaparse import'unu ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/utils/export.ts",
               "code": "import Papa from 'papaparse';",
-              "why": "1.2'deki iskelet hazır, şimdi CSV fonksiyonunu implement edeceğiz."
+              "why": "1.2'deki iskelet hazır, şimdi CSV fonksiyonunu implement edeceğiz.",
+              "position": "bottom"
             },
             {
               "order": "1.4",
               "action": "exportToCSV fonksiyonuna GERİ DÖN → gerçek implementasyonu yaz (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/utils/export.ts",
               "code": "export function exportToCSV(data: any[], filename: string) {\n  const csv = Papa.unparse(data);\n  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });\n  const url = URL.createObjectURL(blob);\n  const link = document.createElement('a');",
-              "why": "1.3'te import ettiğimiz Papa.unparse data array'ini CSV string'e çevirir. Blob → URL → invisible link → click pattern'ı browser'da dosya indirmenin standart yolu."
+              "why": "1.3'te import ettiğimiz Papa.unparse data array'ini CSV string'e çevirir. Blob → URL → invisible link → click pattern'ı browser'da dosya indirmenin standart yolu.",
+              "position": "bottom"
             },
             {
-              "order": "1.4b",
+              "order": "1.5",
               "action": "DEVAM: gerçek implementasyonu yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/utils/export.ts",
               "code": "  link.href = url;\n  link.download = `${filename}.csv`;\n  link.click();\n  URL.revokeObjectURL(url);\n}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar.",
+              "position": "bottom"
             },
             {
               "order": "1.5",
               "action": "exportToPDF fonksiyonunun ÜSTÜNE → jspdf ve html2canvas import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/utils/export.ts",
               "code": "import Papa from 'papaparse';\nimport jsPDF from 'jspdf';\nimport html2canvas from 'html2canvas';",
-              "why": "PDF export için iki kütüphane birlikte çalışıyor: html2canvas DOM'u görüntüye çevirir, jsPDF görüntüyü PDF'e koyar."
+              "why": "PDF export için iki kütüphane birlikte çalışıyor: html2canvas DOM'u görüntüye çevirir, jsPDF görüntüyü PDF'e koyar.",
+              "position": "bottom"
             },
             {
               "order": "1.6",
               "action": "exportToPDF fonksiyonuna GERİ DÖN → gerçek implementasyonu yaz (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/utils/export.ts",
               "code": "export async function exportToPDF(elementId: string, filename: string) {\n  const element = document.getElementById(elementId);\n  if (!element) return;\n  const canvas = await html2canvas(element, {\n    backgroundColor: '#111827', scale: 2\n  });\n  const imgData = canvas.toDataURL('image/png');",
-              "why": "1.5'te import ettiğimiz kütüphaneleri kullanıyoruz. backgroundColor dark tema rengi. scale: 2 retina kalitesi. 'l' landscape yönlendirme."
+              "why": "1.5'te import ettiğimiz kütüphaneleri kullanıyoruz. backgroundColor dark tema rengi. scale: 2 retina kalitesi. 'l' landscape yönlendirme.",
+              "position": "bottom"
             },
             {
-              "order": "1.6b",
+              "order": "1.8",
               "action": "DEVAM: gerçek implementasyonu yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/utils/export.ts",
               "code": "  const pdf = new jsPDF('l', 'mm', 'a4');\n  const width = pdf.internal.pageSize.getWidth();\n  const height = (canvas.height * width) / canvas.width;\n  pdf.addImage(imgData, 'PNG', 0, 0, width, height);\n  pdf.save(`${filename}.pdf`);\n}",
-              "why": "Bu kısım değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "1.7",
@@ -2376,18 +2535,20 @@
             {
               "order": "1.8",
               "action": "Dashboard header'a → CSV ve PDF butonlarını ekle (bölüm 1/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "<div className=\"flex gap-2\">\n          <button\n            onClick={() => exportToCSV(cpu.data, 'cpu-metrics')}\n            className=\"px-3 py-1 bg-emerald-600 text-white rounded text-sm\">\n            CSV İndir\n          </button>",
-              "why": "1.4'teki exportToCSV cpu verisiyle, 1.6'daki exportToPDF dashboard-charts ID'li element ile çalışıyor."
+              "why": "1.4'teki exportToCSV cpu verisiyle, 1.6'daki exportToPDF dashboard-charts ID'li element ile çalışıyor.",
+              "position": "bottom"
             },
             {
-              "order": "1.8b",
+              "order": "1.11",
               "action": "DEVAM: CSV ve PDF butonlarını ekle (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "          <button\n            onClick={() => exportToPDF('dashboard-charts', 'dashboard-report')}\n            className=\"px-3 py-1 bg-blue-600 text-white rounded text-sm\">\n            PDF İndir\n          </button>\n        </div>",
-              "why": "Bu kısım fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "1.9",
@@ -2436,42 +2597,55 @@
             {
               "order": "2.2",
               "action": "Dosyanın ÜSTÜNE ÇIK → React import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useHeatmap.ts",
               "code": "import { useState, useEffect } from 'react';",
-              "why": "2.1'deki iskelet hazır, state yönetimi ve veri çekme için hook'lar lazım."
+              "why": "2.1'deki iskelet hazır, state yönetimi ve veri çekme için hook'lar lazım.",
+              "position": "bottom"
             },
             {
               "order": "2.3",
               "action": "Fonksiyona GERİ DÖN → heatmap veri çekme ve dönüştürme logic'ini yaz (bölüm 1/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useHeatmap.ts",
               "code": "interface HeatmapCell {\n  day: number; hour: number;\n  value: number; label: string;\n}\n\nexport function useHeatmap(metric: string, source: string) {\n  const [data, setData] = useState<HeatmapCell[]>([]);\n  const [loading, setLoading] = useState(true);",
-              "why": "2.2'de import ettiğimiz hook'larla API'den son 7 günlük veriyi çekip gün-saat matrisine dönüştürüyoruz. Türkçe gün isimleri kullanıyoruz."
+              "why": "2.2'de import ettiğimiz hook'larla API'den son 7 günlük veriyi çekip gün-saat matrisine dönüştürüyoruz. Türkçe gün isimleri kullanıyoruz.",
+              "position": "bottom"
             },
             {
-              "order": "2.3b",
+              "order": "2.4",
               "action": "DEVAM: heatmap veri çekme ve dönüştürme logic'ini yaz (bölüm 2/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useHeatmap.ts",
-              "code": "\n  useEffect(() => {\n    const from = new Date(Date.now() - 7 * 86400000).toISOString();\n    const to = new Date().toISOString();\n    fetch(`/api/metrics?source=${source}&metric=${metric}&from=${from}&to=${to}&interval=1h`)\n      .then(res => res.json())\n      .then(rows => {\n        const cells = rows.map((r: any) => {",
-              "why": "Bu kısım fonksiyon tanımı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "code": "\n  useEffect(() => {\n    const from = new Date(Date.now() - 7 * 86400000).toISOString();\n    const to = new Date().toISOString();\n    fetch(`/api/metrics?source=${source}&metric=${metric}&from=${from}&to=${to}&interval=1h`)\n      .then(res => res.json())",
+              "why": "Bu kısım fonksiyon tanımı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.3c",
+              "order": "2.104",
+              "action": "DEVAM: heatmap veri çekme ve dönüştürme logic'ini yaz (bölüm 2/4) (devam)",
+              "type": "code_add",
+              "code": "      .then(rows => {\n        const cells = rows.map((r: any) => {\n  // TODO: implement\n}",
+              "why": "DEVAM: heatmap veri çekme ve dönüştürme logic'ini yaz (bölüm 2/4).",
+              "file": "packages/dashboard/src/hooks/useHeatmap.ts"
+            },
+            {
+              "order": "2.5",
               "action": "DEVAM: heatmap veri çekme ve dönüştürme logic'ini yaz (bölüm 3/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useHeatmap.ts",
               "code": "          const d = new Date(r.bucket);\n          return {\n            day: d.getDay(), hour: d.getHours(),\n            value: r.avg_value,\n            label: ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'][d.getDay()]\n          };\n        });\n        setData(cells);",
-              "why": "Bu kısım değişken tanımı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım değişken tanımı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.3d",
+              "order": "2.6",
               "action": "DEVAM: heatmap veri çekme ve dönüştürme logic'ini yaz (bölüm 4/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/hooks/useHeatmap.ts",
-              "code": "        setLoading(false);\n      });\n  }, [metric, source]);\n\n  return { data, loading };\n}",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "code": "        setLoading(false);\n  }, [metric, source]);\n\n  return { data, loading };",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.4",
@@ -2484,50 +2658,56 @@
             {
               "order": "2.5",
               "action": "Fonksiyona GERİ DÖN → props ve heatmap grid'ini yaz (bölüm 1/6)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/Heatmap.tsx",
               "code": "interface HeatmapProps {\n  data: Array<{ day: number; hour: number; value: number; label: string }>;\n  title: string;\n}\n\nfunction getColor(value: number, max: number): string {\n  const intensity = Math.min(value / max, 1);\n  const r = Math.round(16 + intensity * 223);",
-              "why": "getColor fonksiyonu değer yoğunluğuna göre yeşilden kırmızıya renk üretir. 7 gün x 24 saat = 168 hücre. Hover'da tooltip ile değer gösteriliyor."
+              "why": "getColor fonksiyonu değer yoğunluğuna göre yeşilden kırmızıya renk üretir. 7 gün x 24 saat = 168 hücre. Hover'da tooltip ile değer gösteriliyor.",
+              "position": "bottom"
             },
             {
-              "order": "2.5b",
+              "order": "2.9",
               "action": "DEVAM: props ve heatmap grid'ini yaz (bölüm 2/6)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/Heatmap.tsx",
               "code": "  const g = Math.round(185 - intensity * 150);\n  return `rgb(${r}, ${g}, 60)`;\n}\n\nexport function Heatmap({ data, title }: HeatmapProps) {\n  const max = Math.max(...data.map(d => d.value), 1);\n  const days = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];\n",
-              "why": "Bu kısım değişken tanımı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım değişken tanımı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.5c",
+              "order": "2.10",
               "action": "DEVAM: props ve heatmap grid'ini yaz (bölüm 3/6)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/Heatmap.tsx",
               "code": "  return (\n    <div className=\"bg-gray-800 rounded-lg p-4\">\n      <h3 className=\"text-sm text-gray-300 mb-3\">{title}</h3>\n      <div className=\"grid gap-1\"\n        style={{ gridTemplateColumns: 'auto repeat(24, 1fr)' }}>\n        {days.map((day, di) => (\n          <div key={di} className=\"contents\">\n            <span className=\"text-xs text-gray-400 pr-2\">{day}</span>",
-              "why": "Bu kısım dönüş değeri ve fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri ve fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.5d",
+              "order": "2.11",
               "action": "DEVAM: props ve heatmap grid'ini yaz (bölüm 4/6)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/Heatmap.tsx",
               "code": "            {Array.from({ length: 24 }, (_, h) => {\n              const cell = data.find(d => d.day === di && d.hour === h);\n              return (\n                <div key={`${di}-${h}`}\n                  className=\"w-4 h-4 rounded-sm cursor-pointer\"\n                  style={{ backgroundColor: cell\n                    ? getColor(cell.value, max) : '#374151' }}\n                  title={cell",
-              "why": "Bu kısım fonksiyon tanımı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım fonksiyon tanımı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.5e",
+              "order": "2.12",
               "action": "DEVAM: props ve heatmap grid'ini yaz (bölüm 5/6)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/Heatmap.tsx",
-              "code": "                    ? `${day} ${h}:00 - ${cell.value.toFixed(1)}`\n                    : 'Veri yok'}\n                />\n              );\n            })}\n          </div>\n        ))}\n      </div>",
-              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
+              "code": "                    ? `${day} ${h}:00 - ${cell.value.toFixed(1)}`\n                    : 'Veri yok'}\n                />\n          </div>\n      </div>",
+              "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar.",
+              "position": "bottom"
             },
             {
-              "order": "2.5f",
+              "order": "2.13",
               "action": "DEVAM: props ve heatmap grid'ini yaz (bölüm 6/6)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/Heatmap.tsx",
               "code": "    </div>\n  );\n}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar.",
+              "position": "bottom"
             },
             {
               "order": "2.6",
@@ -2540,10 +2720,11 @@
             {
               "order": "2.7",
               "action": "Dashboard'a heatmap section ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "      <div className=\"mt-6\">\n        <Heatmap data={heatmapData.data}\n          title=\"CPU Kullanımı - Haftalık Pattern\" />\n      </div>",
-              "why": "2.6'da import ettiğimiz component'i kullanıyoruz. Heatmap chart'ların altında ayrı bir section olarak duracak."
+              "why": "2.6'da import ettiğimiz component'i kullanıyoruz. Heatmap chart'ların altında ayrı bir section olarak duracak.",
+              "position": "bottom"
             },
             {
               "order": "2.8",
@@ -2606,28 +2787,31 @@
               "why": "Önce en basit servis — PostgreSQL. Docker Compose 4 servisi bir araya getirecek ama önce birer birer ekliyoruz."
             },
             {
-              "order": "1.1b",
+              "order": "1.2",
               "action": "DEVAM: İSKELET servis tanımlarını yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.yml",
               "code": "      - '5432:5432'\n    environment:\n      POSTGRES_DB: analytics_dashboard\n      POSTGRES_PASSWORD: postgres",
-              "why": "Yapılandırma dosyaları projenin davranışını merkezi bir noktadan yönetir — environment'a göre değişen ayarlar burada tutulur."
+              "why": "Yapılandırma dosyaları projenin davranışını merkezi bir noktadan yönetir — environment'a göre değişen ayarlar burada tutulur.",
+              "position": "bottom"
             },
             {
               "order": "1.2",
               "action": "Aynı dosyaya → Redis ve volume tanımını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.yml",
               "code": "  redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'\n\nvolumes:\n  pgdata:",
-              "why": "1.1'deki PostgreSQL'e Redis ekliyoruz. Volume tanımı PostgreSQL verilerinin container silinse bile kaybolmamasını sağlar."
+              "why": "1.1'deki PostgreSQL'e Redis ekliyoruz. Volume tanımı PostgreSQL verilerinin container silinse bile kaybolmamasını sağlar.",
+              "position": "bottom"
             },
             {
               "order": "1.3",
               "action": "PostgreSQL servisine → volume ve healthcheck ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.yml",
               "code": "    volumes:\n      - pgdata:/var/lib/postgresql/data\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U postgres']\n      interval: 5s\n      timeout: 5s\n      retries: 5",
-              "why": "1.2'deki volume'ü PostgreSQL'e bağlıyoruz. Healthcheck ZORUNLU — depends_on tek başına yetmez."
+              "why": "1.2'deki volume'ü PostgreSQL'e bağlıyoruz. Healthcheck ZORUNLU — depends_on tek başına yetmez.",
+              "position": "bottom"
             },
             {
               "order": "1.4",
@@ -2646,12 +2830,13 @@
               "why": "Frontend için multi-stage build ŞART — build stage'de derle, production stage'de sadece Nginx ile sun. Final image ~25MB."
             },
             {
-              "order": "1.5b",
+              "order": "1.7",
               "action": "DEVAM: Dashboard Dockerfile'ını yaz (bölüm 2/2)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/Dockerfile",
               "code": "\nFROM nginx:alpine\nCOPY --from=build /app/dist /usr/share/nginx/html\nEXPOSE 80\nCMD [\"nginx\", \"-g\", \"daemon off;\"]",
-              "why": "Docker yapılandırması uygulamayı izole bir ortamda çalıştırır — 'benim makinemde çalışıyor' problemini ortadan kaldırır."
+              "why": "Docker yapılandırması uygulamayı izole bir ortamda çalıştırır — 'benim makinemde çalışıyor' problemini ortadan kaldırır.",
+              "position": "bottom"
             },
             {
               "order": "1.6",
@@ -2664,34 +2849,38 @@
             {
               "order": "1.7",
               "action": "docker-compose.yml'e GERİ DÖN → API, dashboard ve ML service'lerini ekle (bölüm 1/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.yml",
               "code": "api:\n    build: ./packages/api\n    ports:\n      - '4000:4000'\n    environment:\n      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/analytics_dashboard\n      REDIS_URL: redis://redis:6379\n    depends_on:",
-              "why": "1.4-1.6'da yazdığımız Dockerfile'ları docker-compose'a bağlıyoruz. Container içinde hostname olarak servis adını kullanıyoruz."
+              "why": "1.4-1.6'da yazdığımız Dockerfile'ları docker-compose'a bağlıyoruz. Container içinde hostname olarak servis adını kullanıyoruz.",
+              "position": "bottom"
             },
             {
-              "order": "1.7b",
+              "order": "1.10",
               "action": "DEVAM: API, dashboard ve ML service'lerini ekle (bölüm 2/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.yml",
               "code": "      postgres:\n        condition: service_healthy\n      redis:\n        condition: service_started\n\n  dashboard:\n    build: ./packages/dashboard\n    ports:",
-              "why": "Cache katmanı tekrarlanan sorguları bellekten karşılar — veritabanı yükünü azaltır ve yanıt süresini düşürür."
+              "why": "Cache katmanı tekrarlanan sorguları bellekten karşılar — veritabanı yükünü azaltır ve yanıt süresini düşürür.",
+              "position": "bottom"
             },
             {
-              "order": "1.7c",
+              "order": "1.11",
               "action": "DEVAM: API, dashboard ve ML service'lerini ekle (bölüm 3/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.yml",
               "code": "      - '80:80'\n    depends_on:\n      - api\n\n  ml-service:\n    build: ./packages/ml-service\n    ports:\n      - '8001:8001'",
-              "why": "Provider abstraction farklı servisleri tek bir arayüz arkasında birleştirir — yeni provider eklemek mevcut kodu bozmaz."
+              "why": "Provider abstraction farklı servisleri tek bir arayüz arkasında birleştirir — yeni provider eklemek mevcut kodu bozmaz.",
+              "position": "bottom"
             },
             {
-              "order": "1.7d",
+              "order": "1.12",
               "action": "DEVAM: API, dashboard ve ML service'lerini ekle (bölüm 4/4)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.yml",
               "code": "    environment:\n      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/analytics_dashboard\n    depends_on:\n      postgres:\n        condition: service_healthy",
-              "why": "Yapılandırma dosyaları projenin davranışını merkezi bir noktadan yönetir — environment'a göre değişen ayarlar burada tutulur."
+              "why": "Yapılandırma dosyaları projenin davranışını merkezi bir noktadan yönetir — environment'a göre değişen ayarlar burada tutulur.",
+              "position": "bottom"
             },
             {
               "order": "1.8",
@@ -2756,42 +2945,55 @@
             {
               "order": "2.2",
               "action": "Dosyanın ÜSTÜNE ÇIK → React import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/LazyChart.tsx",
               "code": "import { useRef, useState, useEffect, ReactNode } from 'react';",
-              "why": "2.1'deki iskelet hazır, IntersectionObserver ile lazy loading implement edeceğiz."
+              "why": "2.1'deki iskelet hazır, IntersectionObserver ile lazy loading implement edeceğiz.",
+              "position": "bottom"
             },
             {
               "order": "2.3",
               "action": "Fonksiyona GERİ DÖN → IntersectionObserver logic'ini yaz (bölüm 1/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/LazyChart.tsx",
-              "code": "export function LazyChart({ children }: { children: ReactNode }) {\n  const ref = useRef<HTMLDivElement>(null);\n  const [isVisible, setIsVisible] = useState(false);\n\n  useEffect(() => {\n    const observer = new IntersectionObserver(\n      ([entry]) => {",
-              "why": "2.2'de import ettiğimiz hook'larla IntersectionObserver pattern'ı. threshold: 0.1 → element %10 görünür olduğunda tetikle. animate-pulse yükleme animasyonu."
+              "code": "export function LazyChart({ children }: { children: ReactNode }) {\n  const ref = useRef<HTMLDivElement>(null);\n  const [isVisible, setIsVisible] = useState(false);",
+              "why": "2.2'de import ettiğimiz hook'larla IntersectionObserver pattern'ı. threshold: 0.1 → element %10 görünür olduğunda tetikle. animate-pulse yükleme animasyonu.",
+              "position": "bottom"
             },
             {
-              "order": "2.3b",
+              "order": "2.103",
+              "action": "Fonksiyona GERİ DÖN → IntersectionObserver logic'ini yaz (bölüm 1/5) (devam)",
+              "type": "code_add",
+              "code": "  useEffect(() => {\n    const observer = new IntersectionObserver(\n      ([entry]) => {\n  // TODO: implement\n}",
+              "why": "Fonksiyona GERİ DÖN → IntersectionObserver logic'ini yaz (bölüm 1/5).",
+              "file": "packages/dashboard/src/components/LazyChart.tsx"
+            },
+            {
+              "order": "2.4",
               "action": "DEVAM: IntersectionObserver logic'ini yaz (bölüm 2/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/LazyChart.tsx",
               "code": "        if (entry.isIntersecting) {\n          setIsVisible(true);\n          observer.disconnect();\n        }\n      },",
-              "why": "Bu kısım kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.3c",
+              "order": "2.5",
               "action": "DEVAM: IntersectionObserver logic'ini yaz (bölüm 3/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/LazyChart.tsx",
-              "code": "      { threshold: 0.1 }\n    );\n    if (ref.current) observer.observe(ref.current);\n    return () => observer.disconnect();\n  }, []);\n",
-              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "code": "      { threshold: 0.1 }\n    if (ref.current) observer.observe(ref.current);\n    return () => observer.disconnect();\n  }, []);\n",
+              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "2.3d",
+              "order": "2.6",
               "action": "DEVAM: IntersectionObserver logic'ini yaz (bölüm 4/5)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/components/LazyChart.tsx",
               "code": "  return (\n    <div ref={ref} className=\"min-h-[200px]\">\n      {isVisible ? children : (\n        <div className=\"h-[200px] bg-gray-800 rounded-lg animate-pulse\" />\n      )}\n    </div>\n  );\n}",
-              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "2.4",
@@ -2804,26 +3006,36 @@
             {
               "order": "2.5",
               "action": "Dashboard'daki chart'ları LazyChart ile sar",
-              "type": "code_write",
+              "type": "code_add",
               "file": "packages/dashboard/src/pages/Dashboard.tsx",
               "code": "        <LazyChart>\n          <MemoizedChart title=\"CPU Kullanımı\" data={cpu.data}\n            color=\"#8884d8\" threshold={80} />\n        </LazyChart>\n        <LazyChart>\n          <MemoizedChart title=\"Bellek\" data={mem.data}\n            color=\"#82ca9d\" threshold={90} />\n        </LazyChart>",
-              "why": "2.3'teki LazyChart ve 2.4'teki MemoizedChart birlikte çalışıyor. Ekranda olmayan chart'lar render edilmez."
+              "why": "2.3'teki LazyChart ve 2.4'teki MemoizedChart birlikte çalışıyor. Ekranda olmayan chart'lar render edilmez.",
+              "position": "bottom"
             },
             {
               "order": "2.6",
               "action": "Vite config'e → bundle splitting ekle (bölüm 1/2)",
               "type": "code_write",
               "file": "packages/dashboard/vite.config.ts",
-              "code": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\n\nexport default defineConfig({\n  plugins: [react()],\n  build: {\n    rollupOptions: {\n      output: {",
+              "code": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';",
               "why": "manualChunks ile büyük kütüphaneleri ayrı dosyalara bölüyoruz. Recharts ~300KB — ana bundle'dan ayrılınca ilk yükleme hızlanır."
             },
             {
-              "order": "2.6b",
-              "action": "DEVAM: bundle splitting ekle (bölüm 2/2)",
+              "order": "2.106",
+              "action": "Vite config'e → bundle splitting ekle (bölüm 1/2) (devam)",
               "type": "code_write",
+              "code": "export default defineConfig({\n  plugins: [react()],\n  build: {\n    rollupOptions: {\n      output: {\n  // TODO: implement\n}",
+              "why": "Vite config'e → bundle splitting ekle (bölüm 1/2).",
+              "file": "packages/dashboard/vite.config.ts"
+            },
+            {
+              "order": "2.10",
+              "action": "DEVAM: bundle splitting ekle (bölüm 2/2)",
+              "type": "code_add",
               "file": "packages/dashboard/vite.config.ts",
-              "code": "        manualChunks: {\n          vendor: ['react', 'react-dom'],\n          charts: ['recharts'],\n        }\n      }\n    }\n  }\n});",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "code": "        manualChunks: {\n          vendor: ['react', 'react-dom'],\n          charts: ['recharts'],",
+              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar.",
+              "position": "bottom"
             },
             {
               "order": "2.7",
@@ -3023,44 +3235,49 @@
               "why": "README projenin vitrini. İlk 5 satırda ne yaptığını, hangi teknolojileri kullandığını ve neden önemli olduğunu anlatmalı."
             },
             {
-              "order": "3.2b",
+              "order": "3.3",
               "action": "DEVAM: proje tanıtımını yaz (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "## Özellikler\n- İnteraktif line/area/bar chart'lar (Recharts)\n- Redis cache ile < 5ms response time\n- Isolation Forest anomali tespiti\n- CSV ve PDF export",
-              "why": "Bu kısım yapılandırma ve kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım yapılandırma ve kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
-              "order": "3.2c",
+              "order": "3.4",
               "action": "DEVAM: proje tanıtımını yaz (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "- Docker Compose ile tek komut deployment",
-              "why": "Docker yapılandırması uygulamayı izole bir ortamda çalıştırır — 'benim makinemde çalışıyor' problemini ortadan kaldırır."
+              "why": "Docker yapılandırması uygulamayı izole bir ortamda çalıştırır — 'benim makinemde çalışıyor' problemini ortadan kaldırır.",
+              "position": "bottom"
             },
             {
               "order": "3.3",
               "action": "README'ye → kurulum ve kullanım talimatlarını ekle (bölüm 1/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "## Hızlı Başlangıç\n\n```bash\ngit clone <repo-url>\ncd analytics-dashboard\ndocker-compose up --build -d",
-              "why": "3 komutla çalıştırılabilir proje — recruiter veya başka developer deneyebilsin."
+              "why": "3 komutla çalıştırılabilir proje — recruiter veya başka developer deneyebilsin.",
+              "position": "bottom"
             },
             {
-              "order": "3.3b",
+              "order": "3.6",
               "action": "DEVAM: kurulum ve kullanım talimatlarını ekle (bölüm 2/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "```\n\nDashboard: http://localhost:80\nAPI: http://localhost:4000\nML Service: http://localhost:8001/docs\n",
-              "why": "Provider abstraction farklı servisleri tek bir arayüz arkasında birleştirir — yeni provider eklemek mevcut kodu bozmaz."
+              "why": "Provider abstraction farklı servisleri tek bir arayüz arkasında birleştirir — yeni provider eklemek mevcut kodu bozmaz.",
+              "position": "bottom"
             },
             {
-              "order": "3.3c",
+              "order": "3.7",
               "action": "DEVAM: kurulum ve kullanım talimatlarını ekle (bölüm 3/3)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "## Tech Stack\n- **Frontend**: React, TypeScript, Recharts\n- **Backend**: Express, PostgreSQL, Redis\n- **ML**: FastAPI, scikit-learn (Isolation Forest)\n- **DevOps**: Docker Compose",
-              "why": "Bu kısım yapılandırma içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+              "why": "Bu kısım yapılandırma içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu.",
+              "position": "bottom"
             },
             {
               "order": "3.4",

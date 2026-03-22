@@ -205,12 +205,13 @@
               "why": "Önce veritabanı servisini tanımlıyoruz — diğer servisler buna bağımlı. volumes ile PostgreSQL verisi container silinse bile kalıcı olur."
             },
             {
-              "order": "1.6a",
+              "order": "1.7",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.yml",
               "code": "      POSTGRES_PASSWORD: dev123\n    ports:\n      - '5432:5432'\n    volumes:\n      - pgdata:/var/lib/postgresql/data",
-              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır.",
+              "position": "bottom"
             },
             {
               "order": "1.7",
@@ -222,7 +223,7 @@
               "why": "depends_on ile başlatma sırası belirlenir: önce DB ve Redis, sonra orchestrator, en son gateway. Environment variable'lar container içi iletişimi sağlar."
             },
             {
-              "order": "1.7a",
+              "order": "1.9",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.yml",
@@ -231,7 +232,7 @@
               "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
-              "order": "1.7b",
+              "order": "1.10",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.yml",
@@ -240,7 +241,7 @@
               "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
-              "order": "1.7c",
+              "order": "1.11",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.yml",
@@ -273,7 +274,7 @@
               "why": "CORS middleware frontend'den gelen isteklere izin verir. Geliştirme ortamında allow_origins=[\"*\"] hızlı başlamak için yeterli."
             },
             {
-              "order": "1.10a",
+              "order": "1.15",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/main.py",
@@ -364,7 +365,7 @@
               "why": "Her alan bir sorumluluğa karşılık gelir: current_agent hangi agent aktif, intent nereye yönlendirilecek, confidence ne kadar emin. Bu alanlar ilerideki route_decision fonksiyonunda kullanılacak."
             },
             {
-              "order": "2.4a",
+              "order": "2.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/state.py",
@@ -381,7 +382,7 @@
               "why": "Her agent şimdilik placeholder — ileride LLM ile dolduracağız. Ama graph yapısını test edebilmemiz için return formatı doğru olmalı: dict döndürmeliler."
             },
             {
-              "order": "2.6a",
+              "order": "2.7",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
@@ -390,7 +391,7 @@
               "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
-              "order": "2.6b",
+              "order": "2.8",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
@@ -408,7 +409,7 @@
               "why": "route_decision conditional edge fonksiyonu — router'ın intent'ine göre hangi agent'a gidileceğini belirler. Confidence düşükse fail-safe olarak escalation'a yönlendirir."
             },
             {
-              "order": "2.7a",
+              "order": "2.10",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
@@ -426,7 +427,7 @@
               "why": "2.5-2.7'de yazdığımız tüm parçalar burada birleşiyor. set_entry_point router'ı başlangıç yapar. conditional_edges intent'e göre yönlendirir. Her agent sonunda END'e gider — ileride bunu değiştireceğiz."
             },
             {
-              "order": "2.8a",
+              "order": "2.12",
               "action": "GERİ DÖN — devamını ekle",
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
@@ -443,20 +444,22 @@
               "why": "Graph'i compile edip basit bir mesajla test etmek, agent geçişlerinin doğru çalıştığını erken aşamada doğrular."
             },
             {
-              "order": "2.9a",
+              "order": "2.14",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/test_graph.py",
-              "code": "            \"content\": \"Şifremi nasıl değiştirebilirim?\"}],\n        \"current_agent\": \"\", \"intent\": \"\",\n        \"confidence\": 0.0, \"context\": {},\n        \"customer_sentiment\": 3,\n        \"attempted_solutions\": [],\n        \"escalation_reason\": None,\n    })",
-              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
+              "code": "            \"content\": \"Şifremi nasıl değiştirebilirim?\"}],\n        \"current_agent\": \"\", \"intent\": \"\",\n        \"confidence\": 0.0, \"context\": {},\n        \"customer_sentiment\": 3,\n        \"attempted_solutions\": [],\n        \"escalation_reason\": None,",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır.",
+              "position": "bottom"
             },
             {
-              "order": "2.9b",
+              "order": "2.15",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/test_graph.py",
               "code": "    print(\"Final state:\", result)\nasyncio.run(main())",
-              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır.",
+              "position": "bottom"
             },
             {
               "order": "2.10",
@@ -525,7 +528,7 @@
               "why": "JSON çıktı formatı belirtmek yapılandırılmış yanıt almayı garanti eder. Kategoriler net ve ayrışık olmalı — overlap varsa router hata yapar."
             },
             {
-              "order": "3.3a",
+              "order": "3.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/prompts.py",
@@ -542,7 +545,7 @@
               "why": "Her agent'ın system prompt'u kısa ve odaklı olmalı — 500 token'dan fazla olmamalı. 3.3'teki router prompt'u ile aynı dosyada tutmak yönetimi kolaylaştırır."
             },
             {
-              "order": "3.4a",
+              "order": "3.6",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/agents/prompts.py",
@@ -551,7 +554,7 @@
               "why": "Agent prompt'larını tamamlıyoruz. Yapılandırılmış talimatlar ile LLM daha tutarlı yanıtlar üretir."
             },
             {
-              "order": "3.4b",
+              "order": "3.7",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/agents/prompts.py",
@@ -564,8 +567,16 @@
               "action": "BAŞKA DOSYAYA GEÇ — orchestrator/config.py oluştur, env değişkenlerini yükle",
               "type": "code_write",
               "file": "orchestrator/config.py",
-              "code": "from dotenv import load_dotenv\nimport os\n\nload_dotenv()\n\nOPENAI_API_KEY = os.getenv(\"OPENAI_API_KEY\")\nREDIS_URL = os.getenv(",
+              "code": "from dotenv import load_dotenv\nimport os",
               "why": "Config modülü ortam değişkenlerini merkezi bir yerden yönetir. Varsayılan değerler geliştirme ortamı için kolaylık sağlar."
+            },
+            {
+              "order": "3.105",
+              "action": "BAŞKA DOSYAYA GEÇ — orchestrator/config.py oluştur, env değişkenlerini yükle (devam)",
+              "type": "code_write",
+              "code": "load_dotenv()\n\nOPENAI_API_KEY = os.getenv(\"OPENAI_API_KEY\")\nREDIS_URL = os.getenv(\n  // TODO: implement\n)",
+              "why": "BAŞKA DOSYAYA GEÇ — orchestrator/config.py oluştur, env değişkenlerini yükle.",
+              "file": "orchestrator/config.py"
             },
             {
               "order": "3.6",
@@ -593,7 +604,7 @@
               "why": "2.6'daki placeholder'ı şimdi gerçek LLM çağrısıyla değiştiriyoruz. JSON parse hatası olursa fallback olarak escalation'a yönlendirir — sistem asla çökmemeli."
             },
             {
-              "order": "3.8a",
+              "order": "3.12",
               "action": "GERİ DÖN — devamını ekle",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -601,7 +612,7 @@
               "why": "Hata yönetimi ile beklenmedik durumları yakalıyoruz. LLM çağrıları timeout, rate limit veya API hatası verebilir — graceful degradation sağlıyoruz."
             },
             {
-              "order": "3.8aa",
+              "order": "3.13",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -675,7 +686,7 @@
               "why": "4.2'de yazdığımız MessageRequest ile gelen veriyi alırız, buradaki response modelleri ile yapılandırılmış yanıt döneriz. FastAPI bu modelleri Swagger dokümantasyonunda da gösterir."
             },
             {
-              "order": "4.3a",
+              "order": "4.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/models.py",
@@ -684,7 +695,7 @@
               "why": "Pydantic modellerini tamamlıyoruz. Tip güvenliği ve otomatik validasyon sağlanır."
             },
             {
-              "order": "4.3b",
+              "order": "4.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/models.py",
@@ -713,11 +724,19 @@
               "action": "ÜSTE ÇIK — model ve graph import'larını ekle",
               "type": "code_modify",
               "file": "orchestrator/api/conversations.py",
-              "code": "from fastapi import APIRouter, HTTPException\nfrom uuid import uuid4\nfrom datetime import datetime\nfrom ..models import MessageRequest, ConversationCreate\nfrom ..agents.graph import build_graph\n\nrouter = APIRouter(",
+              "code": "from fastapi import APIRouter, HTTPException\nfrom uuid import uuid4\nfrom datetime import datetime\nfrom ..models import MessageRequest, ConversationCreate\nfrom ..agents.graph import build_graph",
               "why": "4.2-4.3'te yazdığımız Pydantic modellerini ve 2.8'de yazdığımız build_graph'ı import ediyoruz. graph = build_graph() compile edilmiş graph'ı bir kez oluşturur."
             },
             {
-              "order": "4.6a",
+              "order": "4.106",
+              "action": "ÜSTE ÇIK — model ve graph import'larını ekle (devam)",
+              "type": "code_modify",
+              "code": "router = APIRouter(\n  // TODO: implement\n)",
+              "why": "ÜSTE ÇIK — model ve graph import'larını ekle.",
+              "file": "orchestrator/api/conversations.py"
+            },
+            {
+              "order": "4.9",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/api/conversations.py",
@@ -734,7 +753,7 @@
               "why": "İki temel endpoint: POST /api/conversations yeni konuşma başlatır, POST /{id}/messages mesaj gönderir. Henüz graph çağrısı yok — önce endpoint'lerin çalıştığını doğrulayacağız."
             },
             {
-              "order": "4.7a",
+              "order": "4.11",
               "action": "GERİ DÖN — devamını ekle",
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
@@ -743,12 +762,12 @@
               "why": "Hata yönetimi ile beklenmedik durumları yakalıyoruz. LLM çağrıları timeout, rate limit veya API hatası verebilir — graceful degradation sağlıyoruz."
             },
             {
-              "order": "4.7ax",
+              "order": "4.12",
               "action": "GERİ DÖN — devamını ekle (devam)",
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
               "code": "        raise HTTPException(404, \"Not found\")\n    conv = conversations[conv_id]\n    conv[\"messages\"].append(\n        {\"role\": msg.role, \"content\": msg.content})",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "GERİ DÖN — devamını ekle (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "order": "4.8",
@@ -760,7 +779,7 @@
               "why": "2.8'de build ettiğimiz graph'ı burada çağırıyoruz. graph.ainvoke tüm agent akışını çalıştırır ve sonucu döndürür."
             },
             {
-              "order": "4.8a",
+              "order": "4.14",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
@@ -778,7 +797,7 @@
               "why": "GET endpoint'leri konuşma detayını ve listesini döndürür. Frontend'de konuşma geçmişini göstermek için kullanacağız."
             },
             {
-              "order": "4.9a",
+              "order": "4.16",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
@@ -791,11 +810,19 @@
               "action": "GERİ DÖN main.py'ye — router'ı include et",
               "type": "code_modify",
               "file": "orchestrator/main.py",
-              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom api.conversations import router as conv_router\n\napp = FastAPI(\n    title=\"Multi-Agent Support Orchestrator\")\napp.add_middleware(",
+              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom api.conversations import router as conv_router",
               "why": "1.9-1.11'de yazdığımız main.py'ye şimdi API router'ını ekliyoruz. include_router modüler API yapısı sağlar."
             },
             {
-              "order": "4.10a",
+              "order": "4.110",
+              "action": "GERİ DÖN main.py'ye — router'ı include et (devam)",
+              "type": "code_modify",
+              "code": "app = FastAPI(\n    title=\"Multi-Agent Support Orchestrator\")\napp.add_middleware(\n  // TODO: implement\n)",
+              "why": "GERİ DÖN main.py'ye — router'ı include et.",
+              "file": "orchestrator/main.py"
+            },
+            {
+              "order": "4.18",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/main.py",
@@ -910,12 +937,13 @@
               "why": "Önce veri yapısını (dataclass) tanımlıyoruz. FAQResult arama sonuçlarını temsil eder — score alanı sonuçları sıralamak için kullanılacak."
             },
             {
-              "order": "1.5a",
+              "order": "1.6",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/services/faq_service.py",
               "code": "    id: str\n    question: str\n    answer: str\n    score: float",
-              "why": "FAQ arama fonksiyonunu tamamlıyoruz. Sonuçlar skora göre sıralanıp en alakalı FAQ'lar döndürülür."
+              "why": "FAQ arama fonksiyonunu tamamlıyoruz. Sonuçlar skora göre sıralanıp en alakalı FAQ'lar döndürülür.",
+              "position": "bottom"
             },
             {
               "order": "1.6",
@@ -927,7 +955,7 @@
               "why": "1.2-1.3'te oluşturduğumuz faqs.json'ı yüklüyor. İlk aşamada basit keyword matching — hızlı sonuç verir. İleride M3'te embedding-based semantic search ekleyeceğiz."
             },
             {
-              "order": "1.6a",
+              "order": "1.8",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/faq_service.py",
@@ -936,7 +964,7 @@
               "why": "FAQ arama fonksiyonunu tamamlıyoruz. Sonuçlar skora göre sıralanıp en alakalı FAQ'lar döndürülür."
             },
             {
-              "order": "1.6b",
+              "order": "1.9",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/faq_service.py",
@@ -962,7 +990,7 @@
               "why": "M0 Step 2'deki placeholder'ı gerçek implementasyonla değiştiriyoruz. Önce 1.6'daki search_faqs ile arama yapar, sonuç yoksa tech'e yönlendirir, varsa LLM'e context vererek doğal cevap üretir."
             },
             {
-              "order": "1.8a",
+              "order": "1.12",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -970,7 +998,7 @@
               "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
-              "order": "1.8b",
+              "order": "1.13",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -1028,12 +1056,13 @@
               "why": "Senior developer tek bir kayıtla başlar, yapının doğru olduğunu doğrular."
             },
             {
-              "order": "2.1a",
+              "order": "2.2",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/data/troubleshooting.json",
-              "code": "     \"4. Uygulamayı silip yeniden yükleyin\"],\n   \"category\": \"app\",\n   \"keywords\": [\"açılmıyor\", \"crash\", \"çöküyor\"]}\n]",
-              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
+              "code": "     \"4. Uygulamayı silip yeniden yükleyin\"],\n   \"category\": \"app\",\n   \"keywords\": [\"açılmıyor\", \"crash\", \"çöküyor\"]}",
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır.",
+              "position": "bottom"
             },
             {
               "order": "2.2",
@@ -1052,7 +1081,7 @@
               "why": "M0 Step 2'deki placeholder'ı gerçek implementasyonla değiştiriyoruz. Tech agent önceki denemeleri takip eder (attempted_solutions) ve tekrar etmez. 5 adım sonra çözemezse otomatik escalation yapar."
             },
             {
-              "order": "2.4a",
+              "order": "2.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -1060,7 +1089,7 @@
               "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
-              "order": "2.4b",
+              "order": "2.6",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -1068,7 +1097,7 @@
               "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
-              "order": "2.4c",
+              "order": "2.7",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -1126,7 +1155,7 @@
               "why": "M0 Step 2'de yazdığımız basit route_decision'ı genişletiyoruz. Artık üç faktör değerlendiriliyor: intent, confidence ve sentiment. Bilinmeyen intent'ler her zaman escalation'a — fail-safe yaklaşım."
             },
             {
-              "order": "3.1a",
+              "order": "3.2",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -1143,7 +1172,7 @@
               "why": "Agent'lar arası zincirleme geçiş: FAQ cevap bulamazsa Tech'e, Tech çözemezse Escalation'a. Bu kademeli yükseltme müşteri deneyimini iyileştirir."
             },
             {
-              "order": "3.2a",
+              "order": "3.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
@@ -1210,7 +1239,7 @@
               "why": "M0 Step 2'de yazdığımız state'i genişletiyoruz. conversation_summary uzun konuşmalarda özet tutar. turn_count konuşma uzunluğunu izler. agent_history geçiş tarihçesini korur."
             },
             {
-              "order": "4.1a",
+              "order": "4.2",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/state.py",
@@ -1235,7 +1264,7 @@
               "why": "4.2'de oluşturduğumuz LLM instance'ını kullanarak sentiment analizi yapıyoruz. Hata olursa nötr (3) döner — fail-safe."
             },
             {
-              "order": "4.3a",
+              "order": "4.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/sentiment.py",
@@ -1248,11 +1277,19 @@
               "action": "GERİ DÖN router_agent'a — sentiment ve turn tracking ekle",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "async def router_agent(state: AgentState) -> dict:\n    last_message = state[\"messages\"][-1]\n    user_msg = (last_message.content\n        if hasattr(last_message, 'content')\n        else last_message[\"content\"])\n    sentiment = await analyze_sentiment(user_msg)\n    response = await llm.ainvoke([",
+              "code": "async def router_agent(state: AgentState) -> dict:\n    last_message = state[\"messages\"][-1]\n    user_msg = (last_message.content\n        if hasattr(last_message, 'content')\n        else last_message[\"content\"])",
               "why": "M0 Step 3'te yazdığımız router_agent'ı genişletiyoruz. Artık her mesajda sentiment analizi yapıyor, turn sayısını ve agent geçiş tarihçesini takip ediyor."
             },
             {
-              "order": "4.5a",
+              "order": "4.105",
+              "action": "GERİ DÖN router_agent'a — sentiment ve turn tracking ekle (devam)",
+              "type": "code_modify",
+              "code": "    sentiment = await analyze_sentiment(user_msg)\n    response = await llm.ainvoke([\n  // TODO: implement\n]",
+              "why": "GERİ DÖN router_agent'a — sentiment ve turn tracking ekle.",
+              "file": "orchestrator/agents/graph.py"
+            },
+            {
+              "order": "4.7",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -1260,7 +1297,7 @@
               "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
-              "order": "4.5b",
+              "order": "4.8",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -1268,7 +1305,7 @@
               "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
-              "order": "4.5c",
+              "order": "4.9",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -1359,12 +1396,13 @@
               "why": "Heading-based chunking için ideal yapıda Markdown. Her ## bölümü ayrı bir chunk olacak."
             },
             {
-              "order": "1.3a",
+              "order": "1.4",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/data/knowledge_base/getting-started.md",
               "code": "1. Profil bilgilerinizi doldurun\n2. Tercihlerinizi ayarlayın\n3. Bildirim ayarlarını yapın",
-              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır.",
+              "position": "bottom"
             },
             {
               "order": "1.4",
@@ -1375,12 +1413,13 @@
               "why": "Önce veri yapısını tanımlıyoruz. DocumentChunk her metin parçasını, metadata'sını ve kimliğini tutar."
             },
             {
-              "order": "1.4a",
+              "order": "1.6",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
               "code": "    content: str\n    metadata: dict\n    chunk_id: str",
-              "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
+              "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir.",
+              "position": "bottom"
             },
             {
               "order": "1.5",
@@ -1392,7 +1431,7 @@
               "why": "Heading-based chunking Markdown dokümanları için en uygun strateji. Her bölüm bağımsız chunk olur — semantik bütünlük korunur."
             },
             {
-              "order": "1.5a",
+              "order": "1.8",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
@@ -1401,7 +1440,7 @@
               "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
             },
             {
-              "order": "1.5b",
+              "order": "1.9",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
@@ -1410,7 +1449,7 @@
               "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
             },
             {
-              "order": "1.5c",
+              "order": "1.10",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
@@ -1419,7 +1458,7 @@
               "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
             },
             {
-              "order": "1.5d",
+              "order": "1.11",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
@@ -1433,11 +1472,19 @@
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
               "position": "bottom",
-              "code": "def load_knowledge_base(\n        kb_dir: str) -> List[DocumentChunk]:\n    all_chunks = []\n    kb_path = Path(kb_dir)\n    for md_file in kb_path.glob(\"*.md\"):\n        text = md_file.read_text(encoding=\"utf-8\")\n        chunks = chunk_markdown(",
+              "code": "def load_knowledge_base(\n        kb_dir: str) -> List[DocumentChunk]:\n    all_chunks = []\n    kb_path = Path(kb_dir)\n    for md_file in kb_path.glob(\"*.md\"):",
               "why": "1.2-1.3'te oluşturduğumuz knowledge_base klasöründeki tüm Markdown dosyalarını okuyup chunk'lar. 1.5'teki chunk_markdown'ı her dosya için çağırır."
             },
             {
-              "order": "1.6a",
+              "order": "1.106",
+              "action": "load_knowledge_base fonksiyonunu ekle (devam)",
+              "type": "code_add",
+              "code": "        text = md_file.read_text(encoding=\"utf-8\")\n        chunks = chunk_markdown(\n  // TODO: implement\n)",
+              "why": "load_knowledge_base fonksiyonunu ekle.",
+              "file": "orchestrator/services/document_processor.py"
+            },
+            {
+              "order": "1.13",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
@@ -1454,12 +1501,13 @@
               "why": "Senior developer önce minimal çalışan class iskeletini yazar. ChromaDB embedded modda çalışır — ayrı sunucu gerekmez."
             },
             {
-              "order": "1.7a",
+              "order": "1.15",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/services/vector_store.py",
               "code": "        self.client = chromadb.Client()\n        self.collection = (\n            self.client.get_or_create_collection(\n                name=\"knowledge_base\",\n                metadata={\"hnsw:space\": \"cosine\"}))",
-              "why": "VectorStore metodlarını tamamlıyoruz. Doküman ekleme, arama ve toplu yükleme işlemleri sağlanır."
+              "why": "VectorStore metodlarını tamamlıyoruz. Doküman ekleme, arama ve toplu yükleme işlemleri sağlanır.",
+              "position": "bottom"
             },
             {
               "order": "1.8",
@@ -1471,7 +1519,7 @@
               "why": "1.4-1.6'da yazdığımız document processor'ı burada kullanıyoruz. Singleton pattern ile uygulama boyunca tek VectorStore instance'ı kullanılır."
             },
             {
-              "order": "1.8a",
+              "order": "1.17",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/vector_store.py",
@@ -1480,7 +1528,7 @@
               "why": "VectorStore metodlarını tamamlıyoruz. Doküman ekleme, arama ve toplu yükleme işlemleri sağlanır."
             },
             {
-              "order": "1.8b",
+              "order": "1.18",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/vector_store.py",
@@ -1489,7 +1537,7 @@
               "why": "VectorStore metodlarını tamamlıyoruz. Doküman ekleme, arama ve toplu yükleme işlemleri sağlanır."
             },
             {
-              "order": "1.8c",
+              "order": "1.19",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/vector_store.py",
@@ -1556,12 +1604,13 @@
               "why": "Önce import'lar ve class iskeleti. 1.7-1.8'de yazdığımız vector_store ve document_processor'ı import ediyoruz."
             },
             {
-              "order": "2.2a",
+              "order": "2.3",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
               "code": "        self.chunks = []\n        self.bm25 = None",
-              "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
+              "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir.",
+              "position": "bottom"
             },
             {
               "order": "2.3",
@@ -1573,7 +1622,7 @@
               "why": "initialize hem BM25 index'ini hem ChromaDB'yi hazırlar. search hem dense (embedding) hem sparse (keyword) sonuçları alır ve birleştirir."
             },
             {
-              "order": "2.3a",
+              "order": "2.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
@@ -1582,7 +1631,7 @@
               "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
             },
             {
-              "order": "2.3b",
+              "order": "2.6",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
@@ -1600,7 +1649,7 @@
               "why": "Reciprocal Rank Fusion (RRF) iki listenin güçlü yanlarını birleştirir. k=60 standart RRF parametresi. Singleton pattern ile uygulama boyunca tek instance."
             },
             {
-              "order": "2.4a",
+              "order": "2.8",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
@@ -1609,7 +1658,7 @@
               "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
             },
             {
-              "order": "2.4b",
+              "order": "2.9",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
@@ -1618,7 +1667,7 @@
               "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
             },
             {
-              "order": "2.4c",
+              "order": "2.10",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
@@ -1703,7 +1752,7 @@
               "why": "Step 1'deki hybrid retrieval sonuçlarından metadata çıkararak citation oluşturuyoruz. Müşteri 'bu bilgiyi nereden aldın?' diye sorduğunda gösterilir."
             },
             {
-              "order": "3.3a",
+              "order": "3.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -1780,12 +1829,13 @@
               "why": "Memory management servisi uzun konuşmalarda token maliyetini kontrol eder. Önce LLM instance ve prompt'u tanımlıyoruz."
             },
             {
-              "order": "1.1a",
+              "order": "1.2",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/services/memory.py",
               "code": "SUMMARY_PROMPT = (\n    \"Aşağıdaki konuşmayı kısa özetle. Müşteri adı, \"\n    \"sorun detayı, denenen çözümleri koru. Maks 3 cümle.\")",
-              "why": "Memory management fonksiyonlarını tamamlıyoruz. Özet + son mesajlar stratejisi token maliyetini düşürür."
+              "why": "Memory management fonksiyonlarını tamamlıyoruz. Özet + son mesajlar stratejisi token maliyetini düşürür.",
+              "position": "bottom"
             },
             {
               "order": "1.2",
@@ -1806,16 +1856,24 @@
               "why": "get_context 20 mesajlık konuşmayı 6 mesaja indirger: 1 özet + 5 son mesaj. Bu strateji token kullanımını %50 azaltır."
             },
             {
-              "order": "1.3a",
+              "order": "1.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/memory.py",
               "position": "inside_class",
-              "code": "            old = messages[:-self.window_size]\n            summary = await self._summarize(old)\n        return [{\"role\": \"system\",\n                 \"content\": f\"Önceki konuşma özeti: \"\n                            f\"{summary}\"}] + recent\n\n    async def _summarize(",
+              "code": "            old = messages[:-self.window_size]\n            summary = await self._summarize(old)\n        return [{\"role\": \"system\",\n                 \"content\": f\"Önceki konuşma özeti: \"\n                            f\"{summary}\"}] + recent",
               "why": "Memory management fonksiyonlarını tamamlıyoruz. Özet + son mesajlar stratejisi token maliyetini düşürür."
             },
             {
-              "order": "1.3b",
+              "order": "1.105",
+              "action": "GERİ DÖN — devamını yaz (devam)",
+              "type": "code_add",
+              "code": "    async def _summarize(\n  // TODO: implement\n)",
+              "why": "GERİ DÖN — devamını yaz.",
+              "file": "orchestrator/services/memory.py"
+            },
+            {
+              "order": "1.6",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/memory.py",
@@ -1824,7 +1882,7 @@
               "why": "Memory management fonksiyonlarını tamamlıyoruz. Özet + son mesajlar stratejisi token maliyetini düşürür."
             },
             {
-              "order": "1.3c",
+              "order": "1.7",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/memory.py",
@@ -1883,12 +1941,13 @@
               "why": "Redis'te session tutmak server restart ve horizontal scaling'e dayanıklı yapar. TTL ile eski session'lar otomatik temizlenir."
             },
             {
-              "order": "2.1a",
+              "order": "2.2",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/services/session_store.py",
               "code": "        self.redis = redis.from_url(\n            redis_url, decode_responses=True)\n        self.ttl = 86400  # 24 saat",
-              "why": "Redis session CRUD operasyonlarını tamamlıyoruz. TTL ile eski session'lar otomatik temizlenir."
+              "why": "Redis session CRUD operasyonlarını tamamlıyoruz. TTL ile eski session'lar otomatik temizlenir.",
+              "position": "bottom"
             },
             {
               "order": "2.2",
@@ -1896,20 +1955,36 @@
               "type": "code_add",
               "file": "orchestrator/services/session_store.py",
               "position": "inside_class",
-              "code": "async def save_session(self, conv_id: str,\n                           state: dict):\n        await self.redis.setex(\n            f\"session:{conv_id}\", self.ttl,\n            json.dumps(state, default=str))\n\n    async def get_session(",
+              "code": "async def save_session(self, conv_id: str,\n                           state: dict):\n        await self.redis.setex(\n            f\"session:{conv_id}\", self.ttl,\n            json.dumps(state, default=str))",
               "why": "2.1'deki iskeletin üzerine CRUD metodları ekliyoruz. setex TTL ile birlikte kaydetir. default=str datetime serializasyonunu halleder."
             },
             {
-              "order": "2.2a",
+              "order": "2.102",
+              "action": "GERİ DÖN — CRUD metodlarını ve singleton'ı ekle (devam)",
+              "type": "code_add",
+              "code": "    async def get_session(\n  // TODO: implement\n)",
+              "why": "GERİ DÖN — CRUD metodlarını ve singleton'ı ekle.",
+              "file": "orchestrator/services/session_store.py"
+            },
+            {
+              "order": "2.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/session_store.py",
               "position": "inside_class",
-              "code": "            self, conv_id: str) -> Optional[dict]:\n        data = await self.redis.get(\n            f\"session:{conv_id}\")\n        return json.loads(data) if data else None\n\n    async def delete_session(self, conv_id: str):\n        await self.redis.delete(",
+              "code": "            self, conv_id: str) -> Optional[dict]:\n        data = await self.redis.get(\n            f\"session:{conv_id}\")\n        return json.loads(data) if data else None",
               "why": "Redis session CRUD operasyonlarını tamamlıyoruz. TTL ile eski session'lar otomatik temizlenir."
             },
             {
-              "order": "2.2b",
+              "order": "2.104",
+              "action": "GERİ DÖN — devamını yaz (devam)",
+              "type": "code_add",
+              "code": "    async def delete_session(self, conv_id: str):\n        await self.redis.delete(\n  // TODO: implement\n)",
+              "why": "GERİ DÖN — devamını yaz.",
+              "file": "orchestrator/services/session_store.py"
+            },
+            {
+              "order": "2.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/session_store.py",
@@ -1976,12 +2051,13 @@
               "why": "Handoff özeti giren agent'ın konuşmayı sıfırdan anlamasını sağlar. Müşteri 'tekrar anlatmak zorunda kalmamalı' — en önemli UX kuralı."
             },
             {
-              "order": "3.1a",
+              "order": "3.2",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/services/handoff.py",
               "code": "HANDOFF_PROMPT = (\n    \"Müşteri destek konuşmasını özetle: \"\n    \"1.Asıl sorun 2.Denenen çözümler \"\n    \"3.Duygu durumu 4.Geçiş nedeni. Maks 4 cümle.\")",
-              "why": "Handoff paketini tamamlıyoruz. Tüm context bilgisi yeni agent'a aktarılır."
+              "why": "Handoff paketini tamamlıyoruz. Tüm context bilgisi yeni agent'a aktarılır.",
+              "position": "bottom"
             },
             {
               "order": "3.2",
@@ -1993,7 +2069,7 @@
               "why": "Son 10 mesajı özetleyip transfer metadata'sı oluşturur. 3.1'deki prompt ile LLM kısa özet üretir."
             },
             {
-              "order": "3.2a",
+              "order": "3.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/handoff.py",
@@ -2002,7 +2078,7 @@
               "why": "Handoff paketini tamamlıyoruz. Tüm context bilgisi yeni agent'a aktarılır."
             },
             {
-              "order": "3.2b",
+              "order": "3.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/handoff.py",
@@ -2094,7 +2170,7 @@
               "why": "Birden fazla faktörü değerlendiren escalation kararı. Önce tüm girdileri çıkarıyoruz — sentiment, deneme sayısı, confidence ve son mesaj."
             },
             {
-              "order": "1.2a",
+              "order": "1.3",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
@@ -2108,11 +2184,19 @@
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
               "position": "inside_determine",
-              "code": "human_kw = [\"insan\", \"gerçek kişi\",\n                \"yönetici\", \"müdür\", \"temsilci\"]\n    if any(kw in last_msg for kw in human_kw):\n        triggers.append(\"Müşteri insan talep etti\")\n        priority = Priority.P2\n    if sentiment <= 2:\n        triggers.append(",
+              "code": "human_kw = [\"insan\", \"gerçek kişi\",\n                \"yönetici\", \"müdür\", \"temsilci\"]\n    if any(kw in last_msg for kw in human_kw):\n        triggers.append(\"Müşteri insan talep etti\")\n        priority = Priority.P2",
               "why": "1.2'de çıkardığımız girdileri kontrol ediyoruz. İnsan talebi P2, kızgın müşteri P1, çözülemeyen sorun P3. Trigger yoksa None döner — escalation gerekmez."
             },
             {
-              "order": "1.3a",
+              "order": "1.103",
+              "action": "GERİ DÖN — trigger kontrol mantığını ekle (devam)",
+              "type": "code_add",
+              "code": "    if sentiment <= 2:\n        triggers.append(\n  // TODO: implement\n)",
+              "why": "GERİ DÖN — trigger kontrol mantığını ekle.",
+              "file": "orchestrator/services/escalation.py"
+            },
+            {
+              "order": "1.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
@@ -2121,7 +2205,7 @@
               "why": "Escalation trigger mantığını tamamlıyoruz. Birden fazla faktör değerlendirilerek karar verilir."
             },
             {
-              "order": "1.3b",
+              "order": "1.6",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
@@ -2130,7 +2214,7 @@
               "why": "Escalation trigger mantığını tamamlıyoruz. Birden fazla faktör değerlendirilerek karar verilir."
             },
             {
-              "order": "1.3c",
+              "order": "1.7",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
@@ -2143,11 +2227,19 @@
               "action": "GERİ DÖN escalation_agent'a — placeholder'ı gerçek implementasyonla değiştir",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "async def escalation_agent(\n        state: AgentState) -> dict:\n    handoff = await create_handoff_summary(state)\n    esc = determine_escalation(state) or {\n        \"priority\": \"p3\",\n        \"reason\": \"Genel escalation\"}\n    message = (",
+              "code": "async def escalation_agent(\n        state: AgentState) -> dict:\n    handoff = await create_handoff_summary(state)\n    esc = determine_escalation(state) or {\n        \"priority\": \"p3\",",
               "why": "M0 Step 2'deki placeholder'ı gerçek implementasyonla değiştiriyoruz. M3 Step 3'teki create_handoff_summary ile özet oluşturup, 1.1-1.3'teki determine_escalation ile öncelik belirleyip müşteriye bilgi veriyor."
             },
             {
-              "order": "1.5a",
+              "order": "1.105",
+              "action": "GERİ DÖN escalation_agent'a — placeholder'ı gerçek implementasyonla değiştir (devam)",
+              "type": "code_modify",
+              "code": "        \"reason\": \"Genel escalation\"}\n    message = (\n  // TODO: implement\n)",
+              "why": "GERİ DÖN escalation_agent'a — placeholder'ı gerçek implementasyonla değiştir.",
+              "file": "orchestrator/agents/graph.py"
+            },
+            {
+              "order": "1.9",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -2155,7 +2247,7 @@
               "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
-              "order": "1.5b",
+              "order": "1.10",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
@@ -2213,12 +2305,13 @@
               "why": "Redis Sorted Set ile priority queue oluşturulur — P1 ticket'lar otomatik olarak önce işlenir."
             },
             {
-              "order": "2.1a",
+              "order": "2.2",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/services/queue.py",
               "code": "                 redis_url='redis://localhost:6379'):\n        self.redis = redis.from_url(\n            redis_url, decode_responses=True)",
-              "why": "Priority queue operasyonlarını tamamlıyoruz. Redis Sorted Set ile öncelik sıralaması sağlanır."
+              "why": "Priority queue operasyonlarını tamamlıyoruz. Redis Sorted Set ile öncelik sıralaması sağlanır.",
+              "position": "bottom"
             },
             {
               "order": "2.2",
@@ -2230,16 +2323,24 @@
               "why": "zadd score ile P1=4, P4=1 şeklinde puanlama yapar. zrevrange ile en yüksek puanlı (en acil) ticket önce çıkar."
             },
             {
-              "order": "2.2a",
+              "order": "2.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
               "position": "inside_class",
-              "code": "            \"reason\": escalation.get(\"reason\", \"\"),\n            \"summary\": handoff.get(\"summary\", \"\"),\n            \"created_at\":\n                datetime.utcnow().isoformat(),\n            \"status\": \"waiting\"}\n        score = {\"p1\":4, \"p2\":3,\n                 \"p3\":2, \"p4\":1}.get(",
+              "code": "            \"reason\": escalation.get(\"reason\", \"\"),\n            \"summary\": handoff.get(\"summary\", \"\"),\n            \"created_at\":\n                datetime.utcnow().isoformat(),\n            \"status\": \"waiting\"}",
               "why": "Priority queue operasyonlarını tamamlıyoruz. Redis Sorted Set ile öncelik sıralaması sağlanır."
             },
             {
-              "order": "2.2b",
+              "order": "2.104",
+              "action": "GERİ DÖN — devamını yaz (devam)",
+              "type": "code_add",
+              "code": "        score = {\"p1\":4, \"p2\":3,\n                 \"p3\":2, \"p4\":1}.get(\n  // TODO: implement\n)",
+              "why": "GERİ DÖN — devamını yaz.",
+              "file": "orchestrator/services/queue.py"
+            },
+            {
+              "order": "2.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
@@ -2253,11 +2354,19 @@
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
               "position": "inside_class",
-              "code": "async def dequeue(self) -> Optional[Dict]:\n        results = await self.redis.zrevrange(\n            \"escalation_queue\", 0, 0)\n        if not results:\n            return None\n        ticket = json.loads(results[0])\n        await self.redis.zrem(",
+              "code": "async def dequeue(self) -> Optional[Dict]:\n        results = await self.redis.zrevrange(\n            \"escalation_queue\", 0, 0)\n        if not results:\n            return None",
               "why": "2.2'deki enqueue ile eklenen ticket'ları burada çıkarıyoruz. zrevrange(0, 0) en yüksek skorlu (en acil) ticket'ı alır."
             },
             {
-              "order": "2.3a",
+              "order": "2.103",
+              "action": "GERİ DÖN — dequeue, status ve singleton ekle (devam)",
+              "type": "code_add",
+              "code": "        ticket = json.loads(results[0])\n        await self.redis.zrem(\n  // TODO: implement\n)",
+              "why": "GERİ DÖN — dequeue, status ve singleton ekle.",
+              "file": "orchestrator/services/queue.py"
+            },
+            {
+              "order": "2.7",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
@@ -2266,7 +2375,7 @@
               "why": "Priority queue operasyonlarını tamamlıyoruz. Redis Sorted Set ile öncelik sıralaması sağlanır."
             },
             {
-              "order": "2.3b",
+              "order": "2.8",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
@@ -2283,12 +2392,13 @@
               "why": "2.1-2.3'te yazdığımız queue servisini API endpoint'leri ile sunuyoruz. İnsan agent'lar bu endpoint'ler ile kuyruktan ticket alır."
             },
             {
-              "order": "2.4a",
+              "order": "2.10",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/api/escalation.py",
               "code": "@router.get(\"/queue\")\nasync def get_queue():\n    return await escalation_queue.get_queue_status()\n\n@router.post(\"/dequeue\")\nasync def dequeue_ticket():\n    ticket = await escalation_queue.dequeue()\n    return ticket or {\"message\": \"Kuyruk boş\"}",
-              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır.",
+              "position": "bottom"
             },
             {
               "order": "2.5",
@@ -2353,7 +2463,7 @@
               "why": "M4 Step 2'deki queue servisini ve M3 Step 2'deki session_store'u kullanarak dashboard verileri oluşturuyoruz."
             },
             {
-              "order": "3.2a",
+              "order": "3.3",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/api/dashboard.py",
@@ -2361,15 +2471,23 @@
               "why": "Dashboard endpoint'lerini tamamlıyoruz. Operasyonel verileri API üzerinden sunuyoruz."
             },
             {
-              "order": "3.2b",
+              "order": "3.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/api/dashboard.py",
-              "code": "                       \"available\": 0}}\n\n@router.get(\"/active-conversations\")\nasync def get_active_conversations():\n    keys = []\n    async for key in \\\n            session_store.redis.scan_iter(",
+              "code": "                       \"available\": 0}}\n\n@router.get(\"/active-conversations\")\nasync def get_active_conversations():\n    keys = []",
               "why": "Dashboard endpoint'lerini tamamlıyoruz. Operasyonel verileri API üzerinden sunuyoruz."
             },
             {
-              "order": "3.2c",
+              "order": "3.104",
+              "action": "GERİ DÖN — devamını yaz (devam)",
+              "type": "code_modify",
+              "code": "    async for key in \\\n            session_store.redis.scan_iter(\n  // TODO: implement\n)",
+              "why": "GERİ DÖN — devamını yaz.",
+              "file": "orchestrator/api/dashboard.py"
+            },
+            {
+              "order": "3.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/api/dashboard.py",
@@ -2439,12 +2557,13 @@
               "why": "Analytics servisi Redis hash'leri ile günlük metrikler tutar. hincrby ile atomik sayaçlar — concurrent erişimde veri kaybı olmaz."
             },
             {
-              "order": "1.1a",
+              "order": "1.2",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "code": "                 redis_url='redis://localhost:6379'):\n        self.redis = redis.from_url(\n            redis_url, decode_responses=True)",
-              "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
+              "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir.",
+              "position": "bottom"
             },
             {
               "order": "1.2",
@@ -2452,11 +2571,19 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "async def track_event(self, event_type: str,\n                          data: dict):\n        event = {\"type\": event_type,\n                 \"data\": data,\n                 \"timestamp\":\n                     datetime.utcnow().isoformat()}\n        await self.redis.lpush(",
+              "code": "async def track_event(self, event_type: str,\n                          data: dict):\n        event = {\"type\": event_type,\n                 \"data\": data,\n                 \"timestamp\":",
               "why": "track_event hem event listesine ekler hem günlük sayacı artırır. İki farklı veri yapısı: detaylı analiz için events listesi, hızlı dashboard için daily hash."
             },
             {
-              "order": "1.2a",
+              "order": "1.102",
+              "action": "GERİ DÖN — track_event ve get_agent_metrics metodlarını ekle (devam)",
+              "type": "code_add",
+              "code": "                     datetime.utcnow().isoformat()}\n        await self.redis.lpush(\n  // TODO: implement\n)",
+              "why": "GERİ DÖN — track_event ve get_agent_metrics metodlarını ekle.",
+              "file": "orchestrator/services/analytics.py"
+            },
+            {
+              "order": "1.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
@@ -2465,16 +2592,24 @@
               "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
-              "order": "1.2b",
+              "order": "1.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "\n    async def get_agent_metrics(self) -> Dict:\n        date_key = datetime.utcnow().strftime(\n            \"%Y-%m-%d\")\n        daily = await self.redis.hgetall(\n            f\"analytics:daily:{date_key}\")\n        return {",
+              "code": "\n    async def get_agent_metrics(self) -> Dict:\n        date_key = datetime.utcnow().strftime(\n            \"%Y-%m-%d\")\n        daily = await self.redis.hgetall(",
               "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
-              "order": "1.2c",
+              "order": "1.105",
+              "action": "GERİ DÖN — devamını yaz (devam)",
+              "type": "code_add",
+              "code": "            f\"analytics:daily:{date_key}\")\n        return {\n  // TODO: implement\n}",
+              "why": "GERİ DÖN — devamını yaz.",
+              "file": "orchestrator/services/analytics.py"
+            },
+            {
+              "order": "1.6",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
@@ -2492,7 +2627,7 @@
               "why": "1.2'deki günlük hash'leri son 7 gün için çekerek trend analizi sağlar."
             },
             {
-              "order": "1.3a",
+              "order": "1.8",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
@@ -2501,12 +2636,12 @@
               "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
-              "order": "1.3ax",
+              "order": "1.9",
               "action": "GERİ DÖN — devamını yaz (devam)",
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
-              "code": "                    for k, v in data.items()}})\n        return trends\n\nanalytics_service = AnalyticsService()",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "code": "                    for k, v in data.items()}})\n        return trends\nanalytics_service = AnalyticsService()",
+              "why": "GERİ DÖN — devamını yaz (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "order": "1.5",
@@ -2525,20 +2660,22 @@
               "why": "1.1-1.3'te yazdığımız analytics servisini API endpoint'leri ile sunuyoruz. Dashboard'da performans metriklerini ve trendleri gösterecek."
             },
             {
-              "order": "1.6a",
+              "order": "1.12",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/api/analytics.py",
               "code": "@router.get(\"/metrics\")\nasync def get_metrics():\n    return await \\\n        analytics_service.get_agent_metrics()\n\n@router.get(\"/trends\")\nasync def get_trends():",
-              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır.",
+              "position": "bottom"
             },
             {
-              "order": "1.6b",
+              "order": "1.13",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "orchestrator/api/analytics.py",
               "code": "    return await \\\n        analytics_service.get_weekly_trends()",
-              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır.",
+              "position": "bottom"
             },
             {
               "order": "1.7",
@@ -2587,7 +2724,7 @@
               "why": "Step 1'deki track_event ile kaydedilen verileri analiz ediyoruz. Intent dağılımı en sık sorulan sorun tiplerini gösterir."
             },
             {
-              "order": "2.1a",
+              "order": "2.2",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
@@ -2605,7 +2742,7 @@
               "why": "Ortalama konuşma uzunluğu agent verimliliğinin göstergesi. Kısa konuşma = hızlı çözüm = iyi performans."
             },
             {
-              "order": "2.2a",
+              "order": "2.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
@@ -2623,7 +2760,7 @@
               "why": "2.1-2.2'de yazdığımız analiz fonksiyonlarını API endpoint'leri ile sunuyoruz."
             },
             {
-              "order": "2.3a",
+              "order": "2.6",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/api/analytics.py",
@@ -2677,12 +2814,13 @@
               "why": "Önce server iskeleti ve konfigürasyon. M0 Step 1'de npm install ettiğimiz ws, http ve uuid'yi kullanıyoruz."
             },
             {
-              "order": "3.1a",
+              "order": "3.2",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "gateway/index.js",
               "code": "const ORCHESTRATOR_URL =\n  process.env.ORCHESTRATOR_URL ||\n  'http://localhost:8000';\nconst connections = new Map();",
-              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
+              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir.",
+              "position": "bottom"
             },
             {
               "order": "3.2",
@@ -2694,7 +2832,7 @@
               "why": "3.1'deki wss'ye connection handler ekliyoruz. Her bağlantıya benzersiz clientId atanır. M0 Step 4'teki API endpoint'lerine fetch ile istek atar."
             },
             {
-              "order": "3.2a",
+              "order": "3.4",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
@@ -2703,7 +2841,7 @@
               "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
-              "order": "3.2b",
+              "order": "3.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
@@ -2712,16 +2850,16 @@
               "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
-              "order": "3.2c",
+              "order": "3.6",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "bottom",
-              "code": "          data: conv }));\n      }\n    } catch (err) {\n      ws.send(JSON.stringify({\n        type: 'error',\n        message: err.message })); }\n  });",
+              "code": "          data: conv }));\n    } catch (err) {\n      ws.send(JSON.stringify({\n        type: 'error',\n        message: err.message })); }",
               "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
-              "order": "3.2d",
+              "order": "3.7",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
@@ -2739,7 +2877,7 @@
               "why": "3.2'de start_conversation'ı yazdık, şimdi send_message'ı ekliyoruz. M0 Step 4'teki POST /messages endpoint'ine istek atar ve yanıtı client'a iletir."
             },
             {
-              "order": "3.3a",
+              "order": "3.9",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
@@ -2748,12 +2886,12 @@
               "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
-              "order": "3.3b",
+              "order": "3.10",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "inside_message_handler",
-              "code": "            body: JSON.stringify({\n              content: msg.content }) });\n        ws.send(JSON.stringify({\n          type: 'agent_response',\n          data: await res.json() }));\n      }",
+              "code": "            body: JSON.stringify({\n              content: msg.content }) });\n        ws.send(JSON.stringify({\n          type: 'agent_response',\n          data: await res.json() }));",
               "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
@@ -2766,7 +2904,7 @@
               "why": "Heartbeat her 30 saniyede ping gönderir — yanıt vermeyen bağlantıları terminate eder. Zombie connection'ları temizler."
             },
             {
-              "order": "3.4a",
+              "order": "3.12",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
@@ -2791,12 +2929,13 @@
               "why": "Custom hook WebSocket bağlantısını yönetir. useRef ile WebSocket instance'ı re-render'larda korunur."
             },
             {
-              "order": "3.6a",
+              "order": "3.15",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "frontend/src/hooks/useWebSocket.ts",
               "code": "    useState<any[]>([]);\n  const reconnectRef =\n    useRef<NodeJS.Timeout>();",
-              "why": "Bağlantı koptuğunda 3 saniye sonra otomatik reconnect dener. Mobilde bağlantı sık kopar — kullanıcı fark etmeden yeniden bağlanır."
+              "why": "Bağlantı koptuğunda 3 saniye sonra otomatik reconnect dener. Mobilde bağlantı sık kopar — kullanıcı fark etmeden yeniden bağlanır.",
+              "position": "bottom"
             },
             {
               "order": "3.7",
@@ -2804,20 +2943,36 @@
               "type": "code_add",
               "file": "frontend/src/hooks/useWebSocket.ts",
               "position": "inside_hook",
-              "code": "const connect = useCallback(() => {\n    const ws = new WebSocket(url);\n    wsRef.current = ws;\n    ws.onopen = () => setIsConnected(true);\n    ws.onmessage = (e) =>\n      setMessages(prev =>\n        [...prev, JSON.parse(e.data)]);\n    ws.onclose = () => {",
+              "code": "const connect = useCallback(() => {\n    const ws = new WebSocket(url);\n    wsRef.current = ws;\n    ws.onopen = () => setIsConnected(true);\n    ws.onmessage = (e) =>\n      setMessages(prev =>",
               "why": "3.6'daki iskeletin üzerine bağlantı yönetimi ekliyoruz. Otomatik reconnection 3 saniye sonra tekrar dener — mobilde bağlantı sık kopar."
             },
             {
-              "order": "3.7a",
+              "order": "3.107",
+              "action": "GERİ DÖN — connect, send ve cleanup fonksiyonlarını ekle (devam)",
+              "type": "code_add",
+              "code": "        [...prev, JSON.parse(e.data)]);\n    ws.onclose = () => {\n  // TODO: implement\n}",
+              "why": "GERİ DÖN — connect, send ve cleanup fonksiyonlarını ekle.",
+              "file": "frontend/src/hooks/useWebSocket.ts"
+            },
+            {
+              "order": "3.17",
               "action": "GERİ DÖN — devamını ekle",
               "type": "code_add",
               "file": "frontend/src/hooks/useWebSocket.ts",
               "position": "inside_hook",
-              "code": "      setIsConnected(false);\n      reconnectRef.current =\n        setTimeout(connect, 3000); };\n    ws.onerror = (err) =>\n      console.error('WS error:', err);\n  }, [url]);\n\n  useEffect(() => {",
+              "code": "      setIsConnected(false);\n      reconnectRef.current =\n        setTimeout(connect, 3000); };\n    ws.onerror = (err) =>\n      console.error('WS error:', err);\n  }, [url]);",
               "why": "Bağlantı koptuğunda 3 saniye sonra otomatik reconnect dener. Mobilde bağlantı sık kopar — kullanıcı fark etmeden yeniden bağlanır."
             },
             {
-              "order": "3.7b",
+              "order": "3.117",
+              "action": "GERİ DÖN — devamını ekle (devam)",
+              "type": "code_add",
+              "code": "  useEffect(() => {\n  // TODO: implement\n}",
+              "why": "GERİ DÖN — devamını ekle.",
+              "file": "frontend/src/hooks/useWebSocket.ts"
+            },
+            {
+              "order": "3.18",
               "action": "GERİ DÖN — devamını ekle",
               "type": "code_add",
               "file": "frontend/src/hooks/useWebSocket.ts",
@@ -2826,12 +2981,12 @@
               "why": "WebSocket event handler'ları ile gerçek zamanlı mesajlaşmayı yönetiyoruz. Her bağlantı için ayrı handler — binlerce eşzamanlı kullanıcıyı destekler."
             },
             {
-              "order": "3.7c",
+              "order": "3.19",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "frontend/src/hooks/useWebSocket.ts",
               "position": "inside_hook",
-              "code": "        WebSocket.OPEN)\n      wsRef.current.send(JSON.stringify(msg));\n  }, []);\n\n  return { isConnected, messages, send };\n}",
+              "code": "        WebSocket.OPEN)\n      wsRef.current.send(JSON.stringify(msg));\n  }, []);\n  return { isConnected, messages, send };",
               "why": "WebSocket event handler'ları ile gerçek zamanlı mesajlaşmayı yönetiyoruz. Her bağlantı için ayrı handler — binlerce eşzamanlı kullanıcıyı destekler."
             },
             {
@@ -2894,7 +3049,7 @@
               "why": "4.1'deki builder'dan sadece kurulu paketleri kopyalıyoruz. Health check M0 Step 1'deki /health endpoint'ini kullanır. 4 worker production trafiği için."
             },
             {
-              "order": "4.2a",
+              "order": "4.3",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/Dockerfile.prod",
@@ -2911,20 +3066,22 @@
               "why": "M0 Step 1'deki docker-compose.yml'in production versiyonu. Health check, restart policy ve env var'lar eklendi."
             },
             {
-              "order": "4.3a",
+              "order": "4.5",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.prod.yml",
               "code": "      POSTGRES_PASSWORD: ${DB_PASSWORD}\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    restart: unless-stopped\n    healthcheck:\n      test: ['CMD-SHELL',\n             'pg_isready -U admin']",
-              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır.",
+              "position": "bottom"
             },
             {
-              "order": "4.3b",
+              "order": "4.6",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.prod.yml",
               "code": "      interval: 10s\n      timeout: 5s\n      retries: 5",
-              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır.",
+              "position": "bottom"
             },
             {
               "order": "4.4",
@@ -2936,7 +3093,7 @@
               "why": "4.3'teki postgres servisinin üzerine Redis, orchestrator ve gateway'i ekliyoruz. 4.1-4.2'de yazdığımız Dockerfile.prod kullanılıyor."
             },
             {
-              "order": "4.4a",
+              "order": "4.8",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.prod.yml",
@@ -2945,7 +3102,7 @@
               "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
-              "order": "4.4b",
+              "order": "4.9",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.prod.yml",
@@ -2954,7 +3111,7 @@
               "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
-              "order": "4.4c",
+              "order": "4.10",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.prod.yml",
@@ -2967,24 +3124,34 @@
               "action": "BAŞKA DOSYAYA GEÇ — structured logging modülü oluştur",
               "type": "code_write",
               "file": "orchestrator/logging_config.py",
-              "code": "import logging\nimport json\nfrom datetime import datetime\n\nclass JSONFormatter(logging.Formatter):\n    def format(self, record):\n        return json.dumps({",
+              "code": "import logging\nimport json\nfrom datetime import datetime",
               "why": "Structured JSON logging production'da log analiz araçları (ELK, Datadog) ile uyumludur. Her log satırı parse edilebilir."
             },
             {
-              "order": "4.5a",
-              "action": "GERİ DÖN — devamını yaz",
+              "order": "4.105",
+              "action": "BAŞKA DOSYAYA GEÇ — structured logging modülü oluştur (devam)",
               "type": "code_write",
-              "file": "orchestrator/logging_config.py",
-              "code": "            \"timestamp\":\n                datetime.utcnow().isoformat(),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"module\": record.module})\n\ndef setup_logging():",
-              "why": "Logging konfigürasyonunu tamamlıyoruz. JSON formatter ile yapılandırılmış loglar üretilir."
+              "code": "class JSONFormatter(logging.Formatter):\n    def format(self, record):\n        return json.dumps({\n  // TODO: implement\n}",
+              "why": "BAŞKA DOSYAYA GEÇ — structured logging modülü oluştur.",
+              "file": "orchestrator/logging_config.py"
             },
             {
-              "order": "4.5b",
+              "order": "4.12",
               "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
+              "file": "orchestrator/logging_config.py",
+              "code": "            \"timestamp\":\n                datetime.utcnow().isoformat(),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"module\": record.module})\n\ndef setup_logging():",
+              "why": "Logging konfigürasyonunu tamamlıyoruz. JSON formatter ile yapılandırılmış loglar üretilir.",
+              "position": "bottom"
+            },
+            {
+              "order": "4.13",
+              "action": "GERİ DÖN — devamını yaz",
+              "type": "code_add",
               "file": "orchestrator/logging_config.py",
               "code": "    handler = logging.StreamHandler()\n    handler.setFormatter(JSONFormatter())\n    logging.basicConfig(\n        level=logging.INFO,\n        handlers=[handler])",
-              "why": "Logging konfigürasyonunu tamamlıyoruz. JSON formatter ile yapılandırılmış loglar üretilir."
+              "why": "Logging konfigürasyonunu tamamlıyoruz. JSON formatter ile yapılandırılmış loglar üretilir.",
+              "position": "bottom"
             },
             {
               "order": "4.6",
@@ -3166,7 +3333,7 @@
               "why": "3.2'deki başlığın altına detayları ekliyoruz. M0-M6 boyunca inşa ettiğimiz tüm özellikleri burada sergiliyoruz."
             },
             {
-              "order": "3.3a",
+              "order": "3.4",
               "action": "GERİ DÖN — devamını ekle",
               "type": "code_add",
               "file": "README.md",
@@ -3175,7 +3342,7 @@
               "why": "WebSocket event handler'ları ile gerçek zamanlı mesajlaşmayı yönetiyoruz. Her bağlantı için ayrı handler — binlerce eşzamanlı kullanıcıyı destekler."
             },
             {
-              "order": "3.3b",
+              "order": "3.5",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "README.md",

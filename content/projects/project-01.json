@@ -191,7 +191,7 @@
               "why": "src/app/ altında layout.tsx ve page.tsx dosyalarının varlığı, App Router'ın aktif olduğunu gösterir. 1.3'te oluşturduğumuz projenin doğru yapılandırıldığını kanıtlıyoruz."
             },
             {
-              "order": "1.5b",
+              "order": "1.6",
               "action": "next.config.mjs dosyasını aç ve yapısını incele",
               "type": "file_open",
               "file": "next.config.mjs",
@@ -205,7 +205,7 @@
               "why": "1.3'te create-next-app'in kurduğu paketlerin versiyonlarını görmek önemli. next, react, typescript, tailwindcss paketlerinin doğru versiyonlarda olduğunu doğruluyoruz."
             },
             {
-              "order": "1.7b",
+              "order": "1.8",
               "action": "tailwind.config.ts dosyasını kontrol et — Tailwind v4 mü?",
               "type": "file_open",
               "file": "tailwind.config.ts",
@@ -219,7 +219,7 @@
               "why": "1.3'te --import-alias \"@/*\" flag'i ile oluşturduk. tsconfig.json'da paths: { \"@/*\": [\"./src/*\"] } tanımlı olmalı — bu, import'larda relative path yerine temiz alias kullanmamızı sağlar."
             },
             {
-              "order": "1.8b",
+              "order": "1.10",
               "action": "DevTools Console'da hata olmadığını doğrula",
               "type": "validate",
               "validation": "Tarayıcıda F12 ile DevTools aç, Console sekmesinde kırmızı hata olmamalı. Warning'ler olabilir — bunlar şimdilik önemli değil.",
@@ -325,7 +325,7 @@
               "why": "Prettier'ın build çıktıları ve bağımlılıkları formatlamaya çalışmasını önlüyoruz. Bu olmadan gereksiz işlem yükü ve beklenmedik hatalar oluşabilir."
             },
             {
-              "order": "2.5b",
+              "order": "2.7",
               "action": "Prettier'ın Tailwind class sıralamasını doğrula",
               "type": "validate",
               "validation": "Bir .tsx dosyasında Tailwind class'larını rastgele sırada yaz (örn: 'text-white bg-blue-500 p-4'). Kaydet — Prettier 'bg-blue-500 p-4 text-white' şeklinde yeniden sıralamalı.",
@@ -339,7 +339,7 @@
               "why": "ESLint ile Prettier'ın çakışmasını önlemek için eslint-config-prettier'ı ESLint konfigürasyonuna eklememiz gerekiyor. 2.1'de kurduğumuz eslint-config-prettier paketini burada aktifleştireceğiz."
             },
             {
-              "order": "2.7b",
+              "order": "2.9",
               "action": "ESLint'in çalıştığını doğrula",
               "type": "terminal",
               "command": "pnpm lint",
@@ -432,7 +432,7 @@
               "why": "3.3'te yaptığımız değişikliğin Tailwind'i bozmadığını doğruluyoruz. Her büyük değişiklikten sonra doğrulama yapmak, hata birikimini önler."
             },
             {
-              "order": "3.4b",
+              "order": "3.5",
               "action": "Tailwind v4 CSS-first yaklaşımını anla",
               "type": "explain",
               "why": "Tailwind v4'te konfigürasyon CSS dosyasında yapılır — tailwind.config.ts yerine @theme ve @plugin direktifleri kullanılır. Bu yaklaşım build tooling'den bağımsızdır ve daha hızlı build süreleri sağlar. v3'ten v4'e geçişte en büyük fark budur."
@@ -449,14 +449,14 @@
             {
               "why": "Renk paletini @theme içinde tanımlamak, tüm projede tutarlı renk kullanımını sağlar. primary-600 ana vurgu rengi olacak. Bu 'design token' yaklaşımı, renk değişikliğini tek yerden yapmayı mümkün kılar.",
               "code": "@theme {\n  --color-primary-50: #eff6ff;\n  --color-primary-100: #dbeafe;\n  --color-primary-200: #bfdbfe;\n  --color-primary-300: #93c5fd;\n  --color-primary-400: #60a5fa;",
-              "order": "3.5a",
+              "order": "3.7",
               "action": "Renk paletini @theme içinde tanımlamak, tüm projede tutarlı renk kullanımını sağlar",
               "type": "code_write"
             },
             {
               "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
               "code": "  --color-primary-500: #3b82f6;\n  --color-primary-600: #2563eb;\n  --color-primary-700: #1d4ed8;\n  --color-primary-800: #1e40af;\n  --color-primary-900: #1e3a8a;\n}",
-              "order": "3.5b",
+              "order": "3.8",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -479,7 +479,7 @@
               "why": "Font tanımlarını 3.6'da başlattığımız @theme bloğuna ekliyoruz. Inter modern UI için, JetBrains Mono kod blokları için ideal fontlar."
             },
             {
-              "order": "3.8b",
+              "order": "3.11",
               "action": "@theme bloğunun son halini kontrol et",
               "type": "validate",
               "validation": "globals.css'te @theme bloğu içinde primary renk paleti (50-900), dark mode renkleri (dark-bg, dark-card, dark-text) ve font tanımları olmalı. Toplam 16+ CSS custom property.",
@@ -548,14 +548,14 @@
             {
               "why": "Senior developer önce çalışan en basit iskeleti yazar. lang='tr' Türkçe içerik için SEO ve screen reader açısından önemli. Şimdi adım adım üzerine ekleyeceğiz.",
               "code": "import './globals.css';\n\nexport default function RootLayout({\n  children,\n}: {\n  children: React.ReactNode;",
-              "order": "4.1a",
+              "order": "4.2",
               "action": "Senior developer önce çalışan en basit iskeleti yazar",
               "type": "code_write"
             },
             {
               "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
               "code": "}) {\n  return (\n    <html lang=\"tr\">\n      <body>{children}</body>\n    </html>\n  );\n}",
-              "order": "4.1b",
+              "order": "4.3",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz",
               "type": "code_write"
             },
@@ -595,7 +595,7 @@
               "why": "4.4'teki Inter ile aynı pattern. variable: '--font-mono' globals.css'teki --font-mono ile eşleşiyor. Her font ayrı CSS variable'a atanır."
             },
             {
-              "order": "4.6b",
+              "order": "4.8",
               "action": "İki font'un birlikte çalıştığını test et",
               "type": "validate",
               "validation": "page.tsx'te geçici olarak <code className='font-mono'>test</code> ekle. JetBrains Mono fontu görünmeli. Normal metin Inter ile render edilmeli. Test sonrası kodu sil.",
@@ -628,15 +628,15 @@
               "why": "template ile alt sayfalar otomatik 'Sayfa Adı | Adın Soyadın' formatında title alır. Bu SEO için kritik — Google sayfa başlığını arama sonuçlarında gösterir."
             },
             {
-              "order": "4.9x",
+              "order": "4.12",
               "action": "Font tanımlarının ALTINA metadata objesini tanımla (devam)",
               "type": "code_add",
               "file": "src/app/layout.tsx",
               "code": "  },\n  description: 'Full Stack Developer portfolio ve teknik blog',\n  keywords: ['Full Stack Developer', 'React', 'Next.js', 'TypeScript'],\n};",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "Font tanımlarının ALTINA metadata objesini tanımla (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
-              "order": "4.9b",
+              "order": "4.13",
               "action": "Title template'inin çalıştığını doğrula",
               "type": "validate",
               "validation": "Tarayıcı sekmesinde 'Adın Soyadın | Full Stack Developer' yazmalı. Bu, 4.9'da tanımladığımız default title.",
@@ -740,56 +740,56 @@
             {
               "why": "Önce boş iskeleti oluşturuyoruz. sticky top-0 header'ı üste sabitler, backdrop-blur-md glassmorphism efekti verir. 5.4'te import ettiğimiz usePathname'i burada kullanıyoruz.",
               "code": "export function Header() {\n  const pathname = usePathname();\n",
-              "order": "5.5a",
+              "order": "5.6",
               "action": "Önce boş iskeleti oluşturuyoruz",
               "type": "code_write"
             },
             {
               "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
               "code": "  return (\n    <header className=\"sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-dark-bg/80\">\n      <nav className=\"mx-auto flex max-w-5xl items-center justify-between px-4 py-4\">\n      </nav>\n    </header>\n  );\n}",
-              "order": "5.5b",
+              "order": "5.7",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz",
               "type": "code_write"
             },
             {
               "why": "5.5'te tanımladığımız navigation dizisini map ile dönerek linkleri render ediyoruz. 5.4'te import ettiğimiz usePathname ile aktif sayfa vurgulanır.",
-              "code": "<nav className=\"mx-auto flex max-w-5xl items-center justify-between px-4 py-4\">\n  <Link href=\"/\" className=\"text-xl font-bold text-primary-600 dark:text-primary-400\">{'<AD />'}</Link>\n  <div className=\"flex items-center gap-6\">\n    {navigation.map((item) => (\n      <Link key={item.href} href={item.href}\n        className={`text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${",
-              "order": "5.5c",
+              "code": "<nav className=\"mx-auto flex max-w-5xl items-center justify-between px-4 py-4\">\n  <Link href=\"/\" className=\"text-xl font-bold text-primary-600 dark:text-primary-400\">{'<AD />'}</Link>\n  <div className=\"flex items-center gap-6\">\n    {navigation.map((item) => (\n      <Link key={item.href} href={item.href}\n        className={`text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${\n  // TODO: implement\n}",
+              "order": "5.8",
               "action": "5",
               "type": "code_write"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
-              "code": "          pathname === item.href\n            ? 'font-semibold text-primary-600 dark:text-primary-400'\n            : 'text-gray-600 dark:text-gray-400'\n        }`}>{item.name}</Link>\n    ))}\n  </div>\n</nav>",
-              "order": "5.5d",
+              "code": "          pathname === item.href\n            ? 'font-semibold text-primary-600 dark:text-primary-400'\n            : 'text-gray-600 dark:text-gray-400'\n        }`}>{item.name}</Link>\n  </div>\n</nav>",
+              "order": "5.9",
               "action": "Bir önceki adımda başlanan yapıyı tamamla",
               "type": "code_add"
             },
             {
               "why": "Footer iskeletini oluşturuyoruz. border-t üst kenarlık ile header'dan ayrımı sağlar. flex-col + sm:flex-row mobilde dikey, desktop'ta yatay düzen.",
               "code": "export function Footer() {\n  return (\n    <footer className=\"border-t border-gray-200 dark:border-gray-800\">\n      <div className=\"mx-auto max-w-5xl px-4 py-8\">\n        <div className=\"flex flex-col items-center\n          justify-between gap-4 sm:flex-row\">",
-              "order": "5.5e",
+              "order": "5.10",
               "action": "Footer iskeletini oluşturuyoruz",
               "type": "code_write"
             },
             {
               "why": "Copyright metni — new Date().getFullYear() ile yıl her yıl otomatik güncellenir. text-sm ve gray-500 ile geri planda kalır.",
               "code": "          <p className=\"text-sm text-gray-500\n            dark:text-gray-400\">\n            &copy; {new Date().getFullYear()} Adın Soyadın.\n            Tüm hakları saklıdır.\n          </p>",
-              "order": "5.5f",
+              "order": "5.11",
               "action": "Copyright metni — new Date()",
               "type": "code_modify"
             },
             {
               "why": "Sosyal medya linkleri. noopener noreferrer güvenlik için zorunlu — target='_blank' açılan sekmede referrer bilgisi sızdırabilir. hover efekti etkileşim gösterir.",
               "code": "          <div className=\"flex gap-4\">\n            <a href=\"https://github.com/username\"\n              target=\"_blank\" rel=\"noopener noreferrer\"\n              className=\"text-gray-500 transition-colors\n                hover:text-primary-600\">GitHub</a>\n            <a href=\"https://linkedin.com/in/username\"\n              target=\"_blank\" rel=\"noopener noreferrer\"\n              className=\"text-gray-500 transition-colors hover:text-primary-600\">LinkedIn</a>",
-              "order": "5.5g",
+              "order": "5.12",
               "action": "Sosyal medya linkleri",
               "type": "code_write"
             },
             {
               "why": "Footer'ın kapanış etiketleri. Tüm div'leri kapatıyoruz — JSX'te her açılan etiket kapatılmalı, eksik kapanış build hatası verir.",
               "code": "          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}",
-              "order": "5.5h",
+              "order": "5.13",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -905,31 +905,31 @@
               "why": "CTA butonlarında sayfa yönlendirmesi yapacağız. Link component'i client-side navigation sağlar — sayfa yenilenmeden geçiş yapar."
             },
             {
-              "order": "1.3b",
+              "order": "1.4",
               "action": "HomePage'i async yaparak Server Component avantajını hazırla",
               "type": "code_modify",
               "file": "src/app/page.tsx",
-              "code": "export default async function HomePage() {",
+              "code": "export default async function HomePage() {\n  // TODO: implement\n}",
               "why": "async anahtar kelimesini ekliyoruz çünkü ileride (M2 Step 6) getRecentPosts çağıracağız. Server Component olduğu için async/await doğrudan kullanılabilir — bu React hook'larından farklıdır."
             },
             {
               "why": "tracking-tight büyük başlıklarda harf aralığını azaltır. sm:text-6xl ile mobilde küçük, desktop'ta büyük font — responsive typography. max-w-2xl paragrafın 65-75 karakter genişliğinde kalmasını sağlar.",
               "code": "<main>\n  {/* Hero Section */}",
-              "order": "1.3a",
+              "order": "1.5",
               "action": "tracking-tight büyük başlıklarda harf aralığını azaltır",
               "type": "code_write"
             },
             {
               "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
               "code": "<section className=\"mx-auto max-w-5xl px-4 py-20\">\n    <div className=\"space-y-6\">\n      <p className=\"text-lg text-primary-600 dark:text-primary-400\">Merhaba, ben</p>\n      <h1 className=\"text-5xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl\">Adın Soyadın</h1>\n      <h2 className=\"text-2xl text-gray-600 dark:text-gray-400 sm:text-3xl\">Full Stack Developer</h2>",
-              "order": "1.3b",
+              "order": "1.6",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
             {
               "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
               "code": "      <p className=\"max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400\">\n        React, Node.js ve AI teknolojileriyle modern web uygulamaları geliştiriyorum.\n      </p>\n    </div>\n  </section>\n</main>",
-              "order": "1.3c",
+              "order": "1.7",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -950,7 +950,7 @@
               "why": "1.2-1.5'te yaptığımız çalışmayı görsel olarak doğruluyoruz. CSS sorunlarını erken yakalamak önemli."
             },
             {
-              "order": "1.6b",
+              "order": "1.10",
               "action": "CTA butonlarının hover efektini test et",
               "type": "validate",
               "validation": "İki CTA butonuna mouse ile hover et. Birincil butonun rengi koyulaşmalı (bg-primary-700), ikincil butonun arka planı hafifçe grileşmeli. Geçiş yumuşak olmalı (transition-colors).",
@@ -964,7 +964,7 @@
               "why": "Mobile-first yaklaşımda her component eklendikten sonra mobil görünümü kontrol etmek şart. Web trafiğinin %60'ı mobilden gelir."
             },
             {
-              "order": "1.8b",
+              "order": "1.12",
               "action": "Semantic HTML kontrolü yap",
               "type": "validate",
               "validation": "DevTools > Elements'te sayfa yapısını kontrol et: main > section > div > h1, h2, p hiyerarşisi doğru olmalı. h1 sadece bir tane olmalı.",
@@ -1094,14 +1094,14 @@
             {
               "why": "Interface tanımlayarak bu fonksiyonu kullanan her yerde otomatik tamamlama ve hata kontrolü sağlıyoruz. Yanlış alan adı kullanımı derleme zamanında yakalanır.",
               "code": "export interface Post {\n  slug: string;\n  title: string;\n  date: string;",
-              "order": "2.9a",
+              "order": "2.10",
               "action": "Post TypeScript interface tanımını yaz",
               "type": "validate"
             },
             {
               "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
               "code": "  summary: string;\n  tags: string[];\n  readingTime: string;\n  content: string;\n}",
-              "order": "2.9b",
+              "order": "2.11",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -1114,7 +1114,7 @@
               "why": "Fonksiyonun dönüş tipini Post[] olarak belirtiyoruz ve klasör yoksa boş dizi döndürüyoruz. Defensive programming — dosya sistemi hataları önlenir."
             },
             {
-              "order": "2.11a",
+              "order": "2.13",
               "action": "GERİ DÖN — dosya listesini oku ve .mdx filtrele",
               "type": "code_modify",
               "file": "src/lib/mdx.ts",
@@ -1122,7 +1122,7 @@
               "why": "fs.readdirSync ile klasördeki tüm dosyaları okuyoruz, sonra sadece .mdx uzantılı olanları filtreliyoruz. .DS_Store gibi sistem dosyalarını işlemekten kaçınıyoruz."
             },
             {
-              "order": "2.11b",
+              "order": "2.14",
               "action": "GERİ DÖN — dosyaları map ile Post objesine dönüştür",
               "type": "code_modify",
               "file": "src/lib/mdx.ts",
@@ -1130,7 +1130,7 @@
               "why": "Her .mdx dosyasını okuyup gray-matter ile frontmatter ayrıştırıyoruz. readingTime ile tahmini okuma süresi hesaplanıyor. slug, dosya adından .mdx uzantısı çıkarılarak elde ediliyor."
             },
             {
-              "order": "2.11c",
+              "order": "2.15",
               "action": "GERİ DÖN — tarihe göre sırala ve return et",
               "type": "code_modify",
               "file": "src/lib/mdx.ts",
@@ -1140,21 +1140,21 @@
             {
               "why": "Slug'dan dosya yolunu oluşturup dosyanın var olup olmadığını kontrol ediyoruz. Yoksa null döndürerek 404 handle'ı mümkün kılıyoruz. gray-matter ile frontmatter parse edilir.",
               "code": "\nexport async function getPostBySlug(slug: string): Promise<Post | null> {\n  const filePath = path.join(POSTS_PATH, `${slug}.mdx`);\n  if (!fs.existsSync(filePath)) return null;\n\n  const source = fs.readFileSync(filePath, 'utf-8');\n  const { data, content } = matter(source);\n  const stats = readingTime(content);",
-              "order": "2.11a",
+              "order": "2.16",
               "action": "Slug'dan dosya yolunu oluşturup dosyanın var olup olmadığını kontrol ediyoruz",
               "type": "validate"
             },
             {
               "why": "Post objesini döndürüyoruz. tags varsayılan boş dizi (|| []) ile opsiyonel. readingTime.text '3 min read' formatında string döner.",
               "code": "return {\n    slug,\n    title: data.title,\n    date: data.date,",
-              "order": "2.11b",
+              "order": "2.17",
               "action": "Post objesini döndürüyoruz",
               "type": "code_write"
             },
             {
               "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
               "code": "    summary: data.summary,\n    tags: data.tags || [],\n    readingTime: stats.text, content,\n  };\n}",
-              "order": "2.11c",
+              "order": "2.18",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -1209,24 +1209,24 @@
             },
             {
               "why": "Önce çalışan boş bir component oluşturuyoruz. async function çünkü Server Component'te doğrudan await kullanacağız.",
-              "code": "export default async function BlogPage() {",
-              "order": "3.1a",
+              "code": "export default async function BlogPage() {\n  // TODO: implement\n}",
+              "order": "3.2",
               "action": "Önce çalışan boş bir component oluşturuyoruz",
               "type": "code_write"
             },
             {
               "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
               "code": "  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">Blog</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Yazılım geliştirme deneyimlerimi ve öğrendiklerimi paylaştığım teknik blog.",
-              "order": "3.1b",
+              "order": "3.3",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz",
               "type": "code_write"
             },
             {
-              "order": "3.1bz",
+              "order": "3.4",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz (son kisim)",
               "type": "code_write",
               "code": "      </p>\n    </main>\n  );\n}",
-              "why": "JSX return blogunu tamamliyoruz."
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz (son kisim)."
             },
             {
               "order": "3.3",
@@ -1273,7 +1273,7 @@
               "why": "Server Component olduğu için doğrudan await kullanabiliyoruz — useEffect veya state gerekmiyor. getAllPosts tüm MDX dosyalarını okuyup sıralı döndürür."
             },
             {
-              "order": "3.7a",
+              "order": "3.10",
               "action": "GERİ DÖN — posts.map ile yazı kartlarını oluştur",
               "type": "code_modify",
               "file": "src/app/blog/page.tsx",
@@ -1281,7 +1281,7 @@
               "why": "Her yazıyı article ile sarıyoruz. key={post.slug} React reconciliation için gerekli. group class'ı child elementlerde hover efekti için kullanılacak."
             },
             {
-              "order": "3.7b",
+              "order": "3.11",
               "action": "GERİ DÖN — Link içine tarih ve okuma süresi ekle",
               "type": "code_modify",
               "file": "src/app/blog/page.tsx",
@@ -1289,7 +1289,7 @@
               "why": "Tarih ve okuma süresi kullanıcıya içeriğin ne kadar güncel ve uzun olduğunu gösterir. Ortadaki nokta (·) görsel ayırıcı olarak kullanılıyor."
             },
             {
-              "order": "3.7c",
+              "order": "3.12",
               "action": "GERİ DÖN — başlık ve özet ekle",
               "type": "code_modify",
               "file": "src/app/blog/page.tsx",
@@ -1297,7 +1297,7 @@
               "why": "group-hover ile parent article üzerine gelince başlık rengi değişir — kullanıcıya tıklanabilir olduğunu gösterir. summary frontmatter'dan gelir ve kısa özet sunar."
             },
             {
-              "order": "3.7d",
+              "order": "3.13",
               "action": "GERİ DÖN — tag etiketlerini ekle",
               "type": "code_modify",
               "file": "src/app/blog/page.tsx",
@@ -1315,14 +1315,14 @@
             {
               "why": "Önce en basit iskeleti yazıyoruz — slug'ı gösteriyor, bu kadar. Şimdi adım adım dolduracağız.",
               "code": "interface Props {\n  params: Promise<{ slug: string }>;\n}\n\nexport default async function BlogPostPage({ params }: Props) {\n  const { slug } = await params;",
-              "order": "3.8a",
+              "order": "3.15",
               "action": "Önce en basit iskeleti yazıyoruz — slug'ı gösteriyor, bu kadar",
               "type": "code_write"
             },
             {
               "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
               "code": "\n  return (\n    <article className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1>{slug}</h1>\n    </article>\n  );\n}",
-              "order": "3.8b",
+              "order": "3.16",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz",
               "type": "code_write"
             },
@@ -1374,42 +1374,42 @@
             {
               "why": "Params'tan slug çekip getPostBySlug ile veriyi alıyoruz. Post yoksa notFound() ile Next.js 404 sayfasını gösteriyoruz.",
               "code": "export default async function BlogPostPage({ params }: Props) {\n  const { slug } = await params;\n  const post = await getPostBySlug(slug);\n  if (!post) notFound();",
-              "order": "3.14a",
+              "order": "3.22",
               "action": "Params'tan slug çekip getPostBySlug ile veriyi alıyoruz",
               "type": "code_write"
             },
             {
               "why": "Article header: tarih, okuma süresi ve başlık. time elementi semantik HTML — SEO ve ekran okuyucular için önemli. tracking-tight başlıkta harfler arası boşluğu azaltır.",
               "code": "return (\n    <article className=\"mx-auto max-w-3xl px-4 py-16\">\n      <header className=\"mb-8\">\n        <div className=\"flex items-center gap-3 text-sm text-gray-500\">\n          <time>{post.date}</time>",
-              "order": "3.14b",
+              "order": "3.23",
               "action": "Article header: tarih, okuma süresi ve başlık",
               "type": "code_write"
             },
             {
               "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
               "code": "          <span>·</span>\n          <span>{post.readingTime}</span>\n        </div>\n        <h1 className=\"mt-4 text-4xl font-bold tracking-tight\n          text-gray-900 dark:text-white\">{post.title}</h1>\n      </header>",
-              "order": "3.14c",
+              "order": "3.24",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
             {
               "why": "tracking-tight başlıkta harfler arası boşluğu azaltır — büyük fontlarda daha güzel görünür.",
               "code": "        <h1 className=\"mt-4 text-4xl font-bold\n          tracking-tight text-gray-900\n          dark:text-white\">{post.title}</h1>\n      </header>",
-              "order": "3.14d",
+              "order": "3.25",
               "action": "tracking-tight başlıkta harfler arası boşluğu azaltır — büyük fontlarda daha güzel görünür",
               "type": "code_write"
             },
             {
               "why": "MDXRemote ile MDX render. prose class'ı tipografi, rehypeHighlight kod renklendirme, rehypeSlug başlıklara anchor ekler.",
-              "code": "<div className=\"prose prose-lg\n        dark:prose-invert max-w-none\">\n        <MDXRemote source={post.content}\n          options={{ mdxOptions: {",
-              "order": "3.14e",
+              "code": "<div className=\"prose prose-lg\n        dark:prose-invert max-w-none\">\n        <MDXRemote source={post.content}\n          options={{ mdxOptions: {\n  // TODO: implement\n}",
+              "order": "3.26",
               "action": "MDXRemote ile MDX render",
               "type": "code_add"
             },
             {
               "why": "Kapanış etiketleri — tüm JSX elementlerini kapatıyoruz. Eksik kapanış build hatası verir.",
-              "code": "            rehypePlugins: [\n              rehypeHighlight, rehypeSlug]\n          } }} />\n      </div>\n    </article>);\n}",
-              "order": "3.14f",
+              "code": "            rehypePlugins: [\n              rehypeHighlight, rehypeSlug]\n          } }} />\n      </div>\n    </article>);",
+              "order": "3.27",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -1460,33 +1460,33 @@
             {
               "why": "Önce tip tanımını yazıyoruz. demo ve image opsiyonel (?) çünkü her projenin demo'su olmayabilir. featured flag'i ana sayfada hangilerinin öne çıkacağını belirler.",
               "code": "export interface Project {\n  title: string;\n  description: string;\n  tech: string[];",
-              "order": "4.1a",
+              "order": "4.2",
               "action": "Önce tip tanımını yazıyoruz",
               "type": "code_write"
             },
             {
               "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
               "code": "  github: string;\n  demo?: string;\n  image?: string;\n  featured: boolean;\n}",
-              "order": "4.1b",
+              "order": "4.3",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
             {
               "why": "4.2'de tanımladığımız Project interface'ine uygun veri oluşturuyoruz. Bu projeyi (şu an yaptığımız) ilk proje olarak eklemek mantıklı.",
               "code": "export const projects: Project[] = [\n  {\n    title: 'Portfolio & Blog',\n    description: 'Next.js 16 ile oluşturulmuş kişisel portfolio ve MDX blog sitesi.',\n    tech: ['Next.js', 'TypeScript', 'Tailwind CSS', 'MDX'],",
-              "order": "4.1c",
+              "order": "4.4",
               "action": "4",
               "type": "code_write"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "    github: 'https://github.com/username/portfolio',\n    demo: 'https://portfolio.vercel.app',\n    featured: true,\n  },\n];",
-              "order": "4.1d",
+              "order": "4.5",
               "action": "Bir önceki adımda başlanan yapıyı tamamla",
               "type": "code_add"
             },
             {
-              "order": "4.3b",
+              "order": "4.6",
               "action": "TypeScript'in Project interface'ini doğru uyguladığını kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -1495,24 +1495,24 @@
             },
             {
               "why": "Önce çalışan boş sayfa. Adım adım proje kartlarını ekleyeceğiz.",
-              "code": "export default function ProjectsPage() {",
-              "order": "4.3a",
+              "code": "export default function ProjectsPage() {\n  // TODO: implement\n}",
+              "order": "4.7",
               "action": "Önce çalışan boş sayfa",
               "type": "code_write"
             },
             {
               "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
               "code": "  return (\n    <main className=\"mx-auto max-w-5xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">Projeler</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Üzerinde çalıştığım bazı projeler. Tamamı açık kaynaklıdır.",
-              "order": "4.3b",
+              "order": "4.8",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz",
               "type": "code_write"
             },
             {
-              "order": "4.3bz",
+              "order": "4.9",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz (son kisim)",
               "type": "code_write",
               "code": "      </p>\n    </main>\n  );\n}",
-              "why": "JSX return blogunu tamamliyoruz."
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz (son kisim)."
             },
             {
               "order": "4.5",
@@ -1533,7 +1533,7 @@
               "why": "Her sayfanın kendi metadata'sı olmalı. 'Projeler | Adın Soyadın' formatında title oluşur."
             },
             {
-              "order": "4.7b",
+              "order": "4.12",
               "action": "Projeler sayfasında hover efektini test et",
               "type": "validate",
               "validation": "Proje kartına hover et. border rengi değişmeli ve shadow belirmeli (hover:border-primary-300 hover:shadow-lg). Geçiş yumuşak olmalı.",
@@ -1542,54 +1542,54 @@
             {
               "why": "Sayfa başlığı ve açıklama ile başlıyoruz. max-w-5xl ile okunabilir genişlik sınırı. mb-12 ile açıklama ve grid arası yeterli boşluk.",
               "code": "export default function ProjectsPage() {\n  return (\n    <main className=\"mx-auto max-w-5xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold\n        text-gray-900 dark:text-white\">Projeler</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Üzerinde çalıştığım bazı projeler.\n        Tamamı açık kaynaklıdır.</p>",
-              "order": "4.7a",
+              "order": "4.13",
               "action": "Sayfa başlığı ve açıklama ile başlıyoruz",
               "type": "code_write"
             },
             {
               "why": "Grid layout: mobilde tek sütun, md'de iki sütun. map ile her proje kartı oluşturulur. group class'ı hover efekti için parent referansı sağlar.",
               "code": "      <div className=\"grid gap-6 md:grid-cols-2\">\n        {projects.map((project) => (\n          <div key={project.title}\n            className=\"group rounded-xl border\n              border-gray-200 p-6 transition-all\n              hover:border-primary-300 hover:shadow-lg\n              dark:border-gray-800\n              dark:hover:border-primary-700\">",
-              "order": "4.7b",
+              "order": "4.14",
               "action": "Grid layout: mobilde tek sütun, md'de iki sütun",
               "type": "code_write"
             },
             {
               "why": "Proje başlığı ve açıklaması. Kart içinde h2 ile proje adını, p ile kısa açıklamayı gösteriyoruz.",
               "code": "            <h2 className=\"text-xl font-semibold\n              text-gray-900 dark:text-white\">\n              {project.title}</h2>\n            <p className=\"mt-2 text-gray-600\n              dark:text-gray-400\">\n              {project.description}</p>",
-              "order": "4.7c",
+              "order": "4.15",
               "action": "Proje başlığı ve açıklaması",
               "type": "code_write"
             },
             {
               "why": "Tech stack badge'leri. flex-wrap ile etiketler satıra sığmazsa alt satıra geçer. rounded-md bg-gray-100 ile ince etiket görünümü.",
               "code": "            <div className=\"mt-4 flex flex-wrap gap-2\">\n              {project.tech.map((t) => (\n                <span key={t}\n                  className=\"rounded-md bg-gray-100 px-2 py-1\n                    text-xs text-gray-700 dark:bg-gray-800\n                    dark:text-gray-300\">{t}</span>\n              ))}\n            </div>",
-              "order": "4.7d",
+              "order": "4.16",
               "action": "Tech stack badge'leri",
               "type": "code_write"
             },
             {
               "why": "GitHub ve demo linkleri. Koşullu render: project.demo varsa demo linki göster. noopener noreferrer güvenlik standardı.",
               "code": "            <div className=\"mt-4 flex gap-4\">\n              <a href={project.github} target=\"_blank\"\n                rel=\"noopener noreferrer\"\n                className=\"text-sm font-medium text-primary-600\n                  hover:text-primary-700\">GitHub →</a>\n              {project.demo && (\n                <a href={project.demo} target=\"_blank\"\n                  rel=\"noopener noreferrer\"",
-              "order": "4.7e",
+              "order": "4.17",
               "action": "GitHub ve demo linkleri",
               "type": "code_write"
             },
             {
               "why": "Demo linki class'ları ve kartın kapanış etiketleri. Sayfanın tüm JSX'ini kapatıyoruz.",
               "code": "className=\"text-sm font-medium\n                    text-primary-600\n                    hover:text-primary-700\">\n                  Demo →</a>)}",
-              "order": "4.7f",
+              "order": "4.18",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
             {
               "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
-              "code": "            </div>\n          </div>\n        ))}\n      </div>\n    </main>);\n}",
-              "order": "4.7g",
+              "code": "            </div>\n          </div>\n      </div>\n    </main>);",
+              "order": "4.19",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
             {
-              "order": "4.8b",
+              "order": "4.20",
               "action": "About sayfasının prose tipografisini kontrol et",
               "type": "validate",
               "validation": "/about sayfasında paragraflar arası boşluk düzgün olmalı, font boyutu okunabilir olmalı. prose class'ı @tailwindcss/typography'den geliyor — M1 Step 3'te kurmuştuk.",
@@ -1598,35 +1598,35 @@
             {
               "why": "Metadata ile sayfa başlığı ve açıklamasını SEO için tanımlıyoruz. Next.js bu objeyi otomatik olarak <head> etiketlerine çevirir.",
               "code": "import type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Hakkımda',\n  description: 'Full Stack Developer olarak becerilerim,\n    deneyimim ve hikayem',\n};",
-              "order": "4.8a",
+              "order": "4.21",
               "action": "Metadata ile sayfa başlığı ve açıklamasını SEO için tanımlıyoruz",
               "type": "code_write"
             },
             {
               "why": "Metadata ile sayfa başlığı ve açıklamasını SEO için tanımlıyoruz. Next.js bu objeyi otomatik <head> etiketlerine çevirir.",
               "code": "import type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Hakkımda',\n  description: 'Full Stack Developer olarak\n    becerilerim, deneyimim ve hikayem',\n};",
-              "order": "4.8b",
+              "order": "4.22",
               "action": "Metadata ile sayfa başlığı ve açıklamasını SEO için tanımlıyoruz",
               "type": "code_write"
             },
             {
               "why": "Sayfa iskeleti: prose class'ı @tailwindcss/typography'den gelir — paragraflar otomatik güzel görünür. dark:prose-invert dark modda renkleri çevirir.",
               "code": "export default function AboutPage() {\n  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold\n        text-gray-900 dark:text-white\">Hakkımda</h1>\n      <div className=\"prose prose-lg dark:prose-invert\">",
-              "order": "4.8c",
+              "order": "4.23",
               "action": "AboutPage fonksiyonunun iskeletini yaz",
               "type": "code_write"
             },
             {
               "why": "Tanıtım paragrafları. İleride Milestone 3'te SkillsSection ve Timeline component'leri bu sayfaya eklenecek.",
               "code": "<p>Merhaba! Ben bir Full Stack Developer'ım.\n          React, Next.js, Node.js ve TypeScript ile\n          modern web uygulamaları geliştiriyorum.</p>\n        <p>Temiz kod, iyi mimari ve kullanıcı deneyimine",
-              "order": "4.8d",
+              "order": "4.24",
               "action": "Tanıtım paragrafları",
               "type": "code_add"
             },
             {
               "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
               "code": "          önem veriyorum.</p>\n      </div>\n    </main>\n  );\n}",
-              "order": "4.8e",
+              "order": "4.25",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -1714,26 +1714,26 @@
             {
               "why": "5.5'te tanımladığımız form ve status state'lerini kullanarak form gönderimini handle ediyoruz. 5.3'teki FormEvent tipini parametre olarak kullanıyoruz.",
               "code": "const handleSubmit = async (e: FormEvent) => {\n    e.preventDefault();\n    setStatus('loading');\n    try {\n      const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {\n        method: 'POST',",
-              "order": "5.5a",
+              "order": "5.6",
               "action": "5",
               "type": "code_write"
             },
             {
               "why": "Koşullu mantık — farklı durumlar için farklı davranış tanımlanıyor.",
-              "code": "        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify(form),\n      });\n      if (res.ok) { setStatus('success'); setForm({ name: '', email: '', message: '' }); }\n      else { setStatus('error'); }\n    } catch { setStatus('error'); }\n  };",
-              "order": "5.5b",
+              "code": "        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify(form),\n      if (res.ok) { setStatus('success'); setForm({ name: '', email: '', message: '' }); }\n      else { setStatus('error'); }\n    } catch { setStatus('error'); }",
+              "order": "5.7",
               "action": "Koşullu mantık — farklı durumlar için farklı davranış tanımlanıyor",
               "type": "code_write"
             },
             {
-              "order": "5.6b",
+              "order": "5.8",
               "action": "Loading state'ini test et — buton 'Gönderiliyor...' göstermeli",
               "type": "validate",
               "validation": "Formu doldurup gönder butonuna tıkla. Buton metni geçici olarak 'Gönderiliyor...' olmalı ve disabled görünmeli (opacity azalmış). Bu, çift tıklamayı önler.",
               "why": "5.5'te tanımladığımız status state'inin 'loading' değerinin doğru çalıştığını doğruluyoruz."
             },
             {
-              "order": "5.7b",
+              "order": "5.9",
               "action": "Form validation'ı test et — boş form gönderilemememeli",
               "type": "validate",
               "validation": "Hiçbir alan doldurmadan 'Gönder' butonuna tıkla. Tarayıcı 'Bu alan zorunludur' gibi bir uyarı göstermeli. required attribute'u çalışıyor olmalı.",
@@ -1742,49 +1742,49 @@
             {
               "why": "Form'un ana yapısını (main, başlık, açıklama, form etiketi) oluşturuyoruz. handleSubmit'i form'a bağlamak, Enter tuşuyla da gönderim sağlar.",
               "code": "  return (\n    <main className=\"mx-auto max-w-2xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">İletişim</h1>\n      <p className=\"mb-8 text-gray-600 dark:text-gray-400\">\n        Benimle iletişime geçmek için aşağıdaki formu doldurabilirsin.\n      </p>\n      <form onSubmit={handleSubmit} className=\"space-y-6\">\n        {/* Input alanları buraya gelecek */}",
-              "order": "5.7a",
+              "order": "5.10",
               "action": "Form'un ana yapısını (main, başlık, açıklama, form etiketi) oluşturuyoruz",
               "type": "code_write"
             },
             {
               "why": "Her input'u label ile eşleştiriyoruz (htmlFor-id). Controlled component pattern: value={form.name} ile React state'i input'a bağlıyoruz. onChange ile her tuş vuruşunda state güncellenir.",
               "code": "        <div>\n          <label htmlFor=\"name\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">İsim</label>\n          <input id=\"name\" type=\"text\" required value={form.name}\n            onChange={(e) => setForm({ ...form, name: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2\n              focus:border-primary-500 focus:outline-none focus:ring-2\n              focus:ring-primary-500/20 dark:border-gray-700\n              dark:bg-dark-card dark:text-white\" />",
-              "order": "5.7b",
+              "order": "5.11",
               "action": "Her input'u label ile eşleştiriyoruz (htmlFor-id)",
               "type": "code_modify"
             },
             {
               "why": "E-posta (type='email' ile tarayıcı doğrulaması), mesaj (textarea rows={5}) ve gönder butonu ekliyoruz. disabled={status === 'loading'} çift gönderimi önler. Status mesajları kullanıcıya geri bildirim verir.",
               "code": "        <div>\n          <label htmlFor=\"email\"\n            className=\"mb-2 block text-sm font-medium\n              text-gray-700 dark:text-gray-300\">E-posta</label>\n          <input id=\"email\" type=\"email\" required\n            value={form.email}\n            onChange={(e) => setForm({ ...form, email: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-dark-card dark:text-white\" />",
-              "order": "5.7c",
+              "order": "5.12",
               "action": "JSX yapısını tamamla — kapanış etiketlerini yaz",
               "type": "validate"
             },
             {
               "why": "Mesaj textarea'sı ile çok satırlı girdi alıyoruz. rows={5} ile varsayılan yüksekliği ayarlıyoruz. Aynı Tailwind class'ları tutarlılık sağlıyor.",
               "code": "        </div>\n        <div>\n          <label htmlFor=\"message\"\n            className=\"mb-2 block text-sm font-medium\n              text-gray-700 dark:text-gray-300\">Mesaj</label>\n          <textarea id=\"message\" required rows={5}\n            value={form.message}\n            onChange={(e) => setForm({ ...form, message: e.target.value })} className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-dark-card dark:text-white\" />",
-              "order": "5.7d",
+              "order": "5.13",
               "action": "Mesaj textarea'sı ile çok satırlı girdi alıyoruz",
               "type": "code_write"
             },
             {
               "why": "Submit butonu: loading state'inde devre dışı kalır (disabled:opacity-50). Ternary ile buton metni değişir — kullanıcı gönderim durumunu görür.",
               "code": "        </div>\n        <button type=\"submit\"\n          disabled={status === 'loading'}\n          className=\"w-full rounded-lg bg-primary-600 px-6 py-3\n            font-medium text-white transition-colors\n            hover:bg-primary-700 disabled:opacity-50\">\n          {status === 'loading' ? 'Gönderiliyor...' : 'Gönder'}\n        </button>",
-              "order": "5.7e",
+              "order": "5.14",
               "action": "Submit butonu: loading state'inde devre dışı kalır (disabled:opacity-50)",
               "type": "code_write"
             },
             {
               "why": "Başarı/hata mesajları ve form kapanışı. Koşullu render ile sadece ilgili status'ta görünürler — yeşil başarı, kırmızı hata.",
               "code": "{status === 'success' && (\n          <p className=\"text-center text-green-600\">\n            Mesajın gönderildi!</p>)}",
-              "order": "5.7f",
+              "order": "5.15",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
             {
               "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
               "code": "        {status === 'error' && (\n          <p className=\"text-center text-red-600\">\n            Bir hata oluştu, tekrar dene.</p>)}\n      </form>\n    </main>\n  );",
-              "order": "5.7g",
+              "order": "5.16",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -1810,7 +1810,7 @@
               "why": "formspree.io'da ücretsiz hesap oluştur. Yeni form ekle ve verilen ID'yi YOUR_FORM_ID yerine yaz. Ücretsiz plan ayda 50 submission destekler. Test gönderimi yap ve e-postanı kontrol et."
             },
             {
-              "order": "5.extra1",
+              "order": "5.20",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -1818,7 +1818,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "5.extra2",
+              "order": "5.21",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
@@ -1866,29 +1866,29 @@
             {
               "why": "Blog yazısının giriş bölümü: başlık ve motivasyon. İyi bir teknik yazı problemi tanımlayarak başlar.",
               "code": "\n# Next.js 16 App Router ile Portfolio Sitesi Oluşturma\n\nBu yazıda, Next.js 16'ün yeni App Router yapısıyla\nbir portfolio sitesi oluşturmayı anlatacağım.",
-              "order": "6.2a",
+              "order": "6.3",
               "action": "Blog yazısının giriş bölümü: başlık ve motivasyon",
               "type": "code_write"
             },
             {
-              "order": "6.2ax",
+              "order": "6.4",
               "action": "Blog yazısının giriş bölümü: başlık ve motivasyon (devam)",
               "type": "code_write",
               "file": "",
               "code": "## Neden Next.js?\n\nNext.js, React tabanlı framework'ler arasında en popüleridir...",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "Blog yazısının giriş bölümü: başlık ve motivasyon (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "why": "Kurulum adımı — ```bash ile terminal komutunu syntax highlighting ile gösteriyoruz. pnpm dlx ile geçici paket çalıştırma, --tailwind flag'i ile Tailwind dahil.",
               "code": "\n## Kurulum\n\n```bash\npnpm dlx create-next-app@latest my-portfolio --tailwind\n```\n\n## Server Components vs Client Components",
-              "order": "6.2b",
+              "order": "6.5",
               "action": "Kurulum adımı — ```bash ile terminal komutunu syntax highlighting ile gösteriyoruz",
               "type": "code_write"
             },
             {
               "why": "Server vs Client Components açıklaması ve sonuç bölümü. Her blog yazısı bir sonuçla kapanmalı — öğrenilen dersi özetler.",
               "code": "\nApp Router'da tüm component'ler varsayılan olarak\nServer Component'tir...\n\n## Sonuç\n\nNext.js 16, modern web geliştirme için güçlü araçlar sunar...",
-              "order": "6.2c",
+              "order": "6.6",
               "action": "Server vs Client Components açıklaması ve sonuç bölümü",
               "type": "code_write"
             },
@@ -1910,36 +1910,36 @@
             {
               "why": "Blog yazısının giriş kısmı: başlık ve 'TypeScript nedir?' sorusunu cevaplıyoruz. Okuyucuyu konuya çekecek kısa bir tanıtım.",
               "code": "\n# TypeScript Temelleri: Neden ve Nasıl?\n\nTypeScript, JavaScript'in tip güvenli bir süper kümesidir.",
-              "order": "6.5a",
+              "order": "6.9",
               "action": "Blog yazısının giriş kısmı: başlık ve 'TypeScript nedir?' sorusunu cevaplıyoruz",
               "type": "code_write"
             },
             {
-              "order": "6.5ax",
+              "order": "6.10",
               "action": "Blog yazısının giriş kısmı: başlık ve 'TypeScript nedir?' sorusunu cevaplıyoruz (devam)",
               "type": "code_write",
               "file": "",
               "code": "## TypeScript Nedir?\n\nTypeScript, Microsoft tarafından geliştirilen,\nJavaScript'e statik tip sistemi ekleyen bir programlama dilidir...",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "Blog yazısının giriş kısmı: başlık ve 'TypeScript nedir?' sorusunu cevaplıyoruz (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "why": "Temel tipler bölümü — ```typescript dil belirteci rehype-highlight'ın doğru renklendirme yapması için zorunlu. let ile değişken tanımları en temel TypeScript kullanımı.",
               "code": "\n## Temel Tipler\n\n```typescript\nlet name: string = 'John';\nlet age: number = 25;\nlet isActive: boolean = true;\n```",
-              "order": "6.5b",
+              "order": "6.11",
               "action": "Kod bloğunu yaz",
               "type": "code_write"
             },
             {
               "why": "Interface tanımı TypeScript'in en güçlü özelliği. Opsiyonel alan (age?) gerçek dünya kullanımını gösteriyor. Sonuç bölümü yazıyı bağlıyor.",
               "code": "## Interface ve Type\n\n```typescript\ninterface User {\n  name: string;\n  email: string;",
-              "order": "6.5c",
+              "order": "6.12",
               "action": "Interface tanımı TypeScript'in en güçlü özelliği",
               "type": "code_write"
             },
             {
               "why": "Kod örneği bloğu — syntax highlighting ile gösterilecek.",
               "code": "  age?: number;\n}\n```\n\n## Sonuç\n\nTypeScript, daha güvenilir ve bakımı kolay kod yazmayı sağlar...",
-              "order": "6.5d",
+              "order": "6.13",
               "action": "Kod örneği bloğu — syntax highlighting ile gösterilecek",
               "type": "code_write"
             },
@@ -1985,56 +1985,56 @@
             {
               "why": "Blog kartı: article elementi semantik. Tarih ve başlık gösteriliyor. Link ile tıklanabilir başlık — slug bazlı yönlendirme.",
               "code": "          {recentPosts.map((post) => (\n            <article key={post.slug}\n              className=\"rounded-xl border border-gray-200\n                p-6 transition-shadow hover:shadow-lg\n                dark:border-gray-800\">\n              <time className=\"text-sm text-gray-500\">\n                {post.date}</time>",
-              "order": "6.11a",
+              "order": "6.19",
               "action": "Blog kartı: article elementi semantik",
               "type": "code_write"
             },
             {
               "why": "Başlık linki ve özet. summary ile kısa açıklama — kartın altında okuyucu konuyu anlar. Section kapanışları.",
               "code": "<h3 className=\"mt-2 text-lg font-semibold\n                text-gray-900 dark:text-white\">\n                <Link href={`/blog/${post.slug}`}>\n                  {post.title}</Link>",
-              "order": "6.11b",
+              "order": "6.20",
               "action": "Başlık linki ve özet",
               "type": "code_add"
             },
             {
               "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
-              "code": "              </h3>\n              <p className=\"mt-2 text-sm text-gray-600\n                dark:text-gray-400\">{post.summary}</p>\n            </article>\n          ))}",
-              "order": "6.11c",
+              "code": "              </h3>\n              <p className=\"mt-2 text-sm text-gray-600\n                dark:text-gray-400\">{post.summary}</p>\n            </article>",
+              "order": "6.21",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "        </div>\n      </section>",
-              "order": "6.11d",
+              "order": "6.22",
               "action": "Bir önceki adımda başlanan yapıyı tamamla",
               "type": "code_add"
             },
             {
               "why": "Blog bölümü başlığı ve grid yapısı. md:grid-cols-3 ile desktop'ta 3 sütunlu kart dizilimi oluşturuyoruz.",
               "code": "      {/* Son Blog Yazıları */}\n      <section className=\"mx-auto max-w-5xl px-4 py-16\">\n        <h2 className=\"mb-8 text-2xl font-bold text-gray-900\n          dark:text-white\">Son Yazılar</h2>\n        <div className=\"grid gap-6 md:grid-cols-3\">",
-              "order": "6.11e",
+              "order": "6.23",
               "action": "Blog bölümü başlığı ve grid yapısı",
               "type": "code_write"
             },
             {
               "why": "Blog kartı: article elementi semantik. Tarih gösteriliyor. hover:shadow-lg ile etkileşim hissi.",
               "code": "          {recentPosts.map((post) => (\n            <article key={post.slug}\n              className=\"rounded-xl border\n                border-gray-200 p-6 transition-shadow\n                hover:shadow-lg dark:border-gray-800\">\n              <time className=\"text-sm text-gray-500\">\n                {post.date}</time>",
-              "order": "6.11f",
+              "order": "6.24",
               "action": "Blog kartı: article elementi semantik",
               "type": "code_write"
             },
             {
               "why": "Başlık Link ile tıklanabilir — slug bazlı yönlendirme. summary ile kısa açıklama. Section kapanışları.",
               "code": "<h3 className=\"mt-2 text-lg font-semibold\n                text-gray-900 dark:text-white\">\n                <Link href={`/blog/${post.slug}`}>\n                  {post.title}</Link></h3>\n              <p className=\"mt-2 text-sm text-gray-600\n                dark:text-gray-400\">{post.summary}</p>\n            </article>))}",
-              "order": "6.11g",
+              "order": "6.25",
               "action": "Başlık Link ile tıklanabilir — slug bazlı yönlendirme",
               "type": "code_add"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "        </div>\n      </section>",
-              "order": "6.11h",
+              "order": "6.26",
               "action": "Bir önceki adımda başlanan yapıyı tamamla",
               "type": "code_add"
             }
@@ -2147,35 +2147,35 @@
             {
               "why": "useTheme ile tema bilgisini çekiyoruz. useState(false) + useEffect ile component'in client'ta mount olduğunu takip ediyoruz — hydration mismatch önlenir.",
               "code": "\nexport function ThemeToggle() {\n  const { theme, setTheme } = useTheme();\n  const [mounted, setMounted] = useState(false);\n\n  useEffect(() => setMounted(true), []);\n\n  if (!mounted) return <div className=\"h-9 w-9\" />;",
-              "order": "1.7a",
+              "order": "1.8",
               "action": "useTheme ile tema bilgisini çekiyoruz",
               "type": "code_write"
             },
             {
               "why": "Toggle butonu: tıklayınca dark↔light geçişi. aria-label ekran okuyucular için şart. rounded-lg p-2 ile ikon boyutunda tıklanabilir alan.",
               "code": "\n  return (\n    <button\n      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}\n      className=\"rounded-lg p-2 transition-colors\n        hover:bg-gray-100 dark:hover:bg-gray-800\"\n      aria-label=\"Tema değiştir\"\n    >",
-              "order": "1.7b",
+              "order": "1.9",
               "action": "Toggle butonu: tıklayınca dark↔light geçişi",
               "type": "code_write"
             },
             {
               "why": "Dark modda güneş ikonu (sarı), light modda ay ikonu (gri) gösteriyoruz. SVG inline olarak kullanılır — ek paket gerektirmez. fill='currentColor' ile renk text-color'dan gelir.",
               "code": "{theme === 'dark' ? (\n        <svg className=\"h-5 w-5 text-yellow-500\"\n          fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path fillRule=\"evenodd\" d=\"M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z\" clipRule=\"evenodd\" />",
-              "order": "1.7c",
+              "order": "1.10",
               "action": "Dark modda güneş ikonu (sarı), light modda ay ikonu (gri) gösteriyoruz",
               "type": "code_write"
             },
             {
               "why": "UI elementlerinin Tailwind CSS ile stillendirmesi. Dark/light mod desteği dahil.",
               "code": "        </svg>\n      ) : (\n        <svg className=\"h-5 w-5 text-gray-700\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path d=\"M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z\" />\n        </svg>)}",
-              "order": "1.7d",
+              "order": "1.11",
               "action": "UI elementlerinin Tailwind CSS ile stillendirmesi",
               "type": "code_write"
             },
             {
               "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
               "code": "    </button>);\n}",
-              "order": "1.7e",
+              "order": "1.12",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -2286,47 +2286,47 @@
             {
               "why": "md:hidden ile bu component sadece 768px altında görünür. 2.2'deki useState ile menü durumunu, 2.3'teki usePathname ile aktif sayfayı yönetiyoruz.",
               "code": "export function MobileNav() {\n  const [isOpen, setIsOpen] = useState(false);\n  const pathname = usePathname();\n",
-              "order": "2.4a",
+              "order": "2.5",
               "action": "md:hidden ile bu component sadece 768px altında görünür",
               "type": "code_write"
             },
             {
               "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
               "code": "  return (\n    <div className=\"md:hidden\">\n    </div>\n  );\n}",
-              "order": "2.4b",
+              "order": "2.6",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz",
               "type": "code_write"
             },
             {
               "why": "aria-label screen reader'lara butonun amacını söyler. aria-expanded={isOpen} menünün açık mı kapalı mı olduğunu bildirir — WCAG zorunluluğu. 2.5'teki isOpen state'ine göre ikon değişir.",
               "code": "<button onClick={() => setIsOpen(!isOpen)} className=\"rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800\" aria-label=\"Menüyü aç\" aria-expanded={isOpen}>\n        <svg className=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          {isOpen ? (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M6 18L18 6M6 6l12 12\" />\n          ) : (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M4 6h16M4 12h16M4 18h16\" />\n          )}",
-              "order": "2.4c",
+              "order": "2.7",
               "action": "aria-label screen reader'lara butonun amacını söyler",
               "type": "code_write"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "        </svg>\n      </button>",
-              "order": "2.4d",
+              "order": "2.8",
               "action": "Bir önceki adımda başlanan yapıyı tamamla",
               "type": "code_add"
             },
             {
               "why": "2.4'teki navigation dizisini map ile dönerek linkleri render ediyoruz. onClick={() => setIsOpen(false)} linke tıklanınca menüyü kapatır. 2.3'teki pathname ile aktif sayfa vurgulanır.",
-              "code": "{isOpen && (\n        <div className=\"absolute left-0 right-0 top-full border-b border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-dark-bg\">\n          <nav className=\"flex flex-col space-y-3\">\n            {navigation.map((item) => (\n              <Link key={item.href} href={item.href} onClick={() => setIsOpen(false)}\n                className={`rounded-lg px-4 py-2 text-sm transition-colors ${",
-              "order": "2.4e",
+              "code": "{isOpen && (\n        <div className=\"absolute left-0 right-0 top-full border-b border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-dark-bg\">\n          <nav className=\"flex flex-col space-y-3\">\n            {navigation.map((item) => (\n              <Link key={item.href} href={item.href} onClick={() => setIsOpen(false)}\n                className={`rounded-lg px-4 py-2 text-sm transition-colors ${\n  // TODO: implement\n}",
+              "order": "2.9",
               "action": "2",
               "type": "code_write"
             },
             {
               "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
-              "code": "                  pathname === item.href\n                    ? 'bg-primary-50 font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'\n                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'\n                }`}>{item.name}</Link>\n            ))}\n          </nav>\n        </div>\n      )}",
-              "order": "2.4f",
+              "code": "                  pathname === item.href\n                    ? 'bg-primary-50 font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'\n                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'\n                }`}>{item.name}</Link>\n          </nav>\n        </div>",
+              "order": "2.10",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
             {
-              "order": "2.7b",
+              "order": "2.11",
               "action": "Menü açıkken scroll'u kontrol et",
               "type": "validate",
               "validation": "Mobil menü açıkken sayfayı kaydırmayı dene. Menü sabit kalmalı, arka plan kaymalı. Menünün içeriğin arkasına düşmemesi için z-index doğru olmalı.",
@@ -2350,7 +2350,7 @@
               "why": "hidden md:flex ile desktop linkler 768px altında gizlenir. MobileNav zaten md:hidden olduğundan ikisi birbirini tamamlar."
             },
             {
-              "order": "2.9b",
+              "order": "2.14",
               "action": "Header'ın tüm breakpoint'lerde düzgün göründüğünü doğrula",
               "type": "validate",
               "validation": "DevTools'ta tarayıcıyı yavaş yavaş daralt ve genişlet. 768px geçişinde hamburger <-> desktop linkleri geçişi pürüzsüz olmalı. İkisi aynı anda görünmemeli.",
@@ -2431,14 +2431,14 @@
             {
               "why": "3.2'de tanımladığımız skillCategories dizisini map ile dönerek kartları oluşturuyoruz. sm:grid-cols-2 ile mobile-first responsive grid.",
               "code": "<div className=\"grid gap-6 sm:grid-cols-2\">\n        {skillCategories.map((category) => (\n          <div key={category.title} className=\"rounded-xl border border-gray-200 p-6 dark:border-gray-800\">\n            <h3 className=\"mb-4 font-semibold text-gray-900 dark:text-white\">{category.title}</h3>\n            <div className=\"flex flex-wrap gap-2\">\n              {category.skills.map((skill) => (\n                <span key={skill} className=\"rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-primary-900/30 dark:text-primary-300\">{skill}</span>\n              ))}",
-              "order": "3.3a",
+              "order": "3.4",
               "action": "3",
               "type": "code_write"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
-              "code": "            </div>\n          </div>\n        ))}\n      </div>",
-              "order": "3.3b",
+              "code": "            </div>\n          </div>\n      </div>",
+              "order": "3.5",
               "action": "Bir önceki adımda başlanan yapıyı tamamla",
               "type": "code_add"
             },
@@ -2469,14 +2469,14 @@
             {
               "why": "3.6'daki experiences dizisini render ediyoruz. border-l-2 ile sol çizgi, absolute ile daire konumlandırması — CSS-only timeline, library dependency yok.",
               "code": "<div className=\"space-y-8\">\n        {experiences.map((exp, i) => (\n          <div key={i} className=\"relative border-l-2 border-primary-200 pl-6 dark:border-primary-800\">\n            <div className=\"absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 border-primary-500 bg-white dark:bg-dark-bg\" />\n            <p className=\"text-sm text-gray-500 dark:text-gray-400\">{exp.period}</p>",
-              "order": "3.7a",
+              "order": "3.9",
               "action": "3",
               "type": "code_write"
             },
             {
               "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
-              "code": "            <h3 className=\"mt-1 font-semibold text-gray-900 dark:text-white\">{exp.title}</h3>\n            <p className=\"text-sm text-primary-600 dark:text-primary-400\">{exp.company}</p>\n            <p className=\"mt-2 text-gray-600 dark:text-gray-400\">{exp.description}</p>\n          </div>\n        ))}\n      </div>",
-              "order": "3.7b",
+              "code": "            <h3 className=\"mt-1 font-semibold text-gray-900 dark:text-white\">{exp.title}</h3>\n            <p className=\"text-sm text-primary-600 dark:text-primary-400\">{exp.company}</p>\n            <p className=\"mt-2 text-gray-600 dark:text-gray-400\">{exp.description}</p>\n          </div>\n      </div>",
+              "order": "3.10",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
@@ -2608,7 +2608,7 @@
               "why": "focus-visible sadece klavye ile odaklanıldığında outline gösterir. Mouse tıklamasında gereksiz outline olmaz — hem UX hem erişilebilirlik."
             },
             {
-              "order": "4.7b",
+              "order": "4.8",
               "action": "Focus-visible stilinin çalıştığını test et",
               "type": "validate",
               "validation": "Tab tuşu ile sayfadaki elementler arasında gezin. Her odaklanan elementte mavi outline (2px solid primary-500) görünmeli. Mouse ile tıklayınca outline görünmemeli.",
@@ -2623,7 +2623,7 @@
               "why": "4.2'de tanımladığımız animate-fade-in class'ını Hero section'a ekliyoruz. Sayfaya giriş hissini yumuşatır."
             },
             {
-              "order": "4.8b",
+              "order": "4.10",
               "action": "Blog ve projeler sayfalarına da animasyon class'ları ekle",
               "type": "code_modify",
               "file": "src/app/blog/page.tsx",
@@ -2721,14 +2721,14 @@
             {
               "why": "LinkedIn veya Facebook'ta paylaşıldığında büyük görsel kartı oluşturur. 1200x630px tüm platformlarda optimal çalışan standart.",
               "code": "openGraph: {\n    type: 'website',\n    locale: 'tr_TR',\n    url: 'https://your-domain.com',",
-              "order": "1.3a",
+              "order": "1.4",
               "action": "LinkedIn veya Facebook'ta paylaşıldığında büyük görsel kartı oluşturur",
               "type": "code_write"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "    siteName: 'Adın Soyadın',\n    title: 'Adın Soyadın | Full Stack Developer',\n    description: 'Full Stack Developer portfolio ve teknik blog.',\n    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Adın Soyadın Portfolio' }],\n  },",
-              "order": "1.3b",
+              "order": "1.5",
               "action": "Veri yapısının devamı — alanlar/değerler tanımlanıyor",
               "type": "code_write"
             },
@@ -2744,14 +2744,14 @@
             {
               "why": "Google bot'una sayfayı indexlemesi ve linkleri takip etmesi gerektiğini söylüyoruz. max-image-preview: 'large' arama sonuçlarında büyük görsel önizleme gösterilmesine izin verir.",
               "code": "robots: {\n    index: true,\n    follow: true,\n    googleBot: {\n      index: true,",
-              "order": "1.5a",
+              "order": "1.7",
               "action": "Google bot'una sayfayı indexlemesi ve linkleri takip etmesi gerektiğini söylüyoruz",
               "type": "code_write"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "      follow: true,\n      'max-video-preview': -1,\n      'max-image-preview': 'large',\n      'max-snippet': -1,\n    },\n  },",
-              "order": "1.5b",
+              "order": "1.8",
               "action": "Bir önceki adımda başlanan yapıyı tamamla",
               "type": "code_add"
             },
@@ -2762,7 +2762,7 @@
               "why": "1200x630px boyutunda bir görsel oluşturup public/og-image.png olarak kaydet. Figma, Canva veya başka bir araçla oluşturulabilir."
             },
             {
-              "order": "1.7b",
+              "order": "1.10",
               "action": "Blog detay sayfalarında da dinamik OG meta'yı kontrol et",
               "type": "validate",
               "validation": "/blog/nextjs-portfolio-rehberi sayfasında DevTools > Elements > head'de og:title'ın blog yazısının başlığı olduğunu doğrula. Her yazının kendi meta'sı olmalı.",
@@ -2798,7 +2798,7 @@
               "why": "JSON-LD, arama motorlarına sayfanın içeriğini yapılandırılmış formatta bildirir. Google'ın zengin snippet'ler (yıldız, tarih, yazar) göstermesini sağlar. Bu adım opsiyonel ama SEO'yu bir üst seviyeye taşır."
             },
             {
-              "order": "1.extra1",
+              "order": "1.15",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -2806,7 +2806,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "1.extra2",
+              "order": "1.16",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
@@ -2872,40 +2872,40 @@
             {
               "why": "Blog yazılarını sitemap'e ekliyoruz. Her post'un URL'si, son güncelleme tarihi ve priority'si var. changeFrequency arama motorlarına ne sıklıkla tarayacağını söyler.",
               "code": "export default async function sitemap()\n    : Promise<MetadataRoute.Sitemap> {\n  const posts = await getAllPosts();\n  const baseUrl = 'https://your-domain.com';",
-              "order": "2.4a",
+              "order": "2.5",
               "action": "Blog yazılarını sitemap'e ekliyoruz",
               "type": "code_modify"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
               "code": "  const blogPosts = posts.map((post) => ({\n    url: `${baseUrl}/blog/${post.slug}`,\n    lastModified: new Date(post.date),\n    changeFrequency: 'monthly' as const, priority: 0.7,\n  }));",
-              "order": "2.4b",
+              "order": "2.6",
               "action": "Veri yapısının devamı — alanlar/değerler tanımlanıyor",
               "type": "code_write"
             },
             {
               "why": "Statik sayfalar elle tanımlanır. Ana sayfa priority 1.0 (en önemli). changeFrequency ile tarama sıklığı belirtilir.",
               "code": "  const staticPages = [\n    { url: baseUrl, lastModified: new Date(),\n      changeFrequency: 'weekly' as const,\n      priority: 1.0 },\n    { url: `${baseUrl}/about`,\n      lastModified: new Date(),\n      changeFrequency: 'monthly' as const,\n      priority: 0.8 },",
-              "order": "2.4c",
+              "order": "2.7",
               "action": "Statik sayfalar elle tanımlanır",
               "type": "code_write"
             },
             {
               "why": "Projeler ve blog sık güncellenir (weekly), iletişim nadiren (yearly, priority 0.5). Spread ile iki diziyi birleştirip döndürüyoruz.",
               "code": "{ url: `${baseUrl}/projects`,\n      lastModified: new Date(),\n      changeFrequency: 'weekly' as const,\n      priority: 0.8 },\n    { url: `${baseUrl}/blog`,\n      lastModified: new Date(),\n      changeFrequency: 'weekly' as const,",
-              "order": "2.4d",
+              "order": "2.8",
               "action": "Projeler ve blog sık güncellenir (weekly), iletişim nadiren (yearly, priority 0",
               "type": "code_modify"
             },
             {
               "why": "Sonuç sözlüğü/listesi döndürülüyor — çağıran kod bu yapıyı kullanacak.",
-              "code": "      priority: 0.9 },\n    { url: `${baseUrl}/contact`,\n      lastModified: new Date(),\n      changeFrequency: 'yearly' as const,\n      priority: 0.5 }];\n  return [...staticPages, ...blogPosts];\n}",
-              "order": "2.4e",
+              "code": "      priority: 0.9 },\n    { url: `${baseUrl}/contact`,\n      lastModified: new Date(),\n      changeFrequency: 'yearly' as const,\n      priority: 0.5 }];\n  return [...staticPages, ...blogPosts];",
+              "order": "2.9",
               "action": "Sonuç sözlüğü/listesi döndürülüyor — çağıran kod bu yapıyı kullanacak",
               "type": "code_write"
             },
             {
-              "order": "2.5b",
+              "order": "2.10",
               "action": "Sitemap'in dev server'da çalıştığını hızlıca kontrol et",
               "type": "validate",
               "validation": "http://localhost:3000/sitemap.xml adresini aç. XML formatında URL listesi görünmeli. Hata varsa import'ları kontrol et.",
@@ -2957,7 +2957,7 @@
               "why": "getAllPosts dinamik olarak dosyaları okuduğu için yeni .mdx dosyası eklediğinde sitemap otomatik güncellenir. Bu, file-based CMS yaklaşımının avantajıdır — ayrı bir sitemap güncelleme adımı gerekmez."
             },
             {
-              "order": "2.extra1",
+              "order": "2.17",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -2965,7 +2965,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "2.extra2",
+              "order": "2.18",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
@@ -3020,29 +3020,29 @@
               "why": "TypeScript interface ile prop tiplerini tanımlamak, component'in nasıl kullanılacağını belgeliyor. alt zorunlu çünkü erişilebilirlik için her görselin açıklaması olmalı (WCAG zorunluluğu). priority opsiyonel çünkü sadece above-the-fold görsellerde kullanılacak."
             },
             {
-              "order": "3.3x",
+              "order": "3.4",
               "action": "OptimizedImageProps interface'ini tanımla (devam)",
               "type": "code_add",
               "file": "src/components/optimized-image.tsx",
               "code": "  height: number;\n  priority?: boolean;\n  className?: string;\n}",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "OptimizedImageProps interface'ini tanımla (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "why": "priority = false varsayılan değeri, çoğu görselin lazy load olmasını sağlar — sadece above-the-fold görseller priority={true} alır. Destructuring ile prop'ları tek tek çıkarmak, JSX'te doğrudan kullanımı temizler.",
               "code": "export function OptimizedImage({\n  src,\n  alt,\n  width,",
-              "order": "3.3a",
+              "order": "3.5",
               "action": "OptimizedImage fonksiyonunun iskeletini yaz",
               "type": "code_write"
             },
             {
               "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
               "code": "  height,\n  priority = false,\n  className,\n}: OptimizedImageProps) {\n}",
-              "order": "3.3b",
+              "order": "3.6",
               "action": "Kod bloğunu tamamla — kapanış etiketlerini yaz",
               "type": "code_add"
             },
             {
-              "order": "3.4b",
+              "order": "3.7",
               "action": "priority prop'unun ne zaman kullanılacağını anla",
               "type": "explain",
               "why": "priority={true} SADECE above-the-fold (ilk ekran) görseller için kullanılır — preload hint ekler ve lazy loading'i devre dışı bırakır. Tüm görsellere priority vermek, hiçbirine vermemekle aynı etkiyi yapar — önceliklendirmenin anlamını kaybettirir."
@@ -3050,14 +3050,14 @@
             {
               "why": "sizes prop'u tarayıcıya hangi viewport genişliğinde hangi boyutta görsel yüklemesi gerektiğini söyler. Mobilde (768px altı) tam genişlik, tablette yarım, masaüstünde üçte bir. Bu olmadan tarayıcı en büyük boyutu yükler ve bant genişliğini israf eder.",
               "code": "return (\n    <Image\n      src={src}\n      alt={alt}\n      width={width}",
-              "order": "3.4a",
+              "order": "3.8",
               "action": "Component return bloğunu yaz",
               "type": "code_write"
             },
             {
               "why": "UI elementlerinin Tailwind CSS ile stillendirmesi. Dark/light mod desteği dahil.",
               "code": "      height={height}\n      priority={priority}\n      className={className}\n      sizes=\"(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw\"\n    />\n  );",
-              "order": "3.4b",
+              "order": "3.9",
               "action": "UI elementlerinin Tailwind CSS ile stillendirmesi",
               "type": "code_write"
             },
@@ -3086,14 +3086,14 @@
             {
               "why": "Hero'daki profil fotoğrafı sayfa yüklendiğinde hemen görünmesi gereken (above-the-fold) bir görseldir, bu yüzden priority={true} ile preload hint eklenir. Lazy loading devre dışı kalır çünkü kullanıcı bu görseli beklemek zorunda kalmamalı.",
               "code": "import { OptimizedImage } from '@/components/optimized-image';\n\n<OptimizedImage\n  src=\"/images/profile.jpg\"\n  alt=\"Profil fotoğrafı\"\n  width={400}",
-              "order": "3.8a",
+              "order": "3.13",
               "action": "Gerekli import ifadelerini ekle",
               "type": "code_write"
             },
             {
               "why": "UI elementlerinin Tailwind CSS ile stillendirmesi. Dark/light mod desteği dahil.",
               "code": "  height={400}\n  priority={true}\n  className=\"rounded-full\"\n/>",
-              "order": "3.8b",
+              "order": "3.14",
               "action": "UI elementlerinin Tailwind CSS ile stillendirmesi",
               "type": "code_write"
             },
@@ -3113,7 +3113,7 @@
               "why": "Image optimizasyonu tamamlandı — WebP/AVIF format dönüşümü, lazy loading ve priority preload."
             },
             {
-              "order": "3.extra1",
+              "order": "3.17",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -3121,7 +3121,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "3.extra2",
+              "order": "3.18",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
@@ -3160,24 +3160,24 @@
             },
             {
               "why": "sr-only class'ı elementi görsel olarak gizler ama screen reader'lar tarafından okunmasını sağlar. focus:not-sr-only ile Tab tuşuna basıldığında link görünür hale gelir. focus:fixed ve focus:z-50 ile sayfanın en üstünde, tüm içeriğin üzerinde gösterilir.",
-              "code": "export function SkipNav() {",
-              "order": "4.1a",
+              "code": "export function SkipNav() {\n  // TODO: implement\n}",
+              "order": "4.2",
               "action": "sr-only class'ı elementi görsel olarak gizler ama screen reader'lar tarafından okunmasını sağlar",
               "type": "code_write"
             },
             {
               "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
               "code": "  return (\n    <a\n      href=\"#main-content\"\n      className=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white\"\n    >",
-              "order": "4.1b",
+              "order": "4.3",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz",
               "type": "code_write"
             },
             {
-              "order": "4.1bz",
+              "order": "4.4",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz (son kisim)",
               "type": "code_write",
               "code": "      İçeriğe atla\n    </a>\n  );\n}",
-              "why": "JSX return blogunu tamamliyoruz."
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz (son kisim)."
             },
             {
               "order": "4.3",
@@ -3188,7 +3188,7 @@
               "why": "SkipNav root layout'ta import edilmeli çünkü her sayfada bulunması gereken bir erişilebilirlik öğesidir. Sadece belirli sayfalara eklemek, diğer sayfalarda erişilebilirlik eksikliğine yol açar."
             },
             {
-              "order": "4.3b",
+              "order": "4.6",
               "action": "SkipNav'ı ThemeProvider'dan ÖNCE konumlandır",
               "type": "explain",
               "why": "Tab sıralamasında SkipNav ilk odaklanan element olmalı. ThemeProvider'dan bile önce gelmeli — aksi halde kullanıcı önce tema butonuna Tab'lar ve skip link amacını kaybeder."
@@ -3210,7 +3210,7 @@
               "why": "SkipNav'ın href='#main-content' hedefi, main elementindeki id ile eşleşmeli. Bu bağlantı olmadan skip link tıklandığında hiçbir şey olmaz. id attribute'u sayfada benzersiz olmalı — aynı id iki kez kullanılamaz."
             },
             {
-              "order": "4.5b",
+              "order": "4.9",
               "action": "Screen reader ile test etmeyi düşün",
               "type": "explain",
               "why": "Windows'ta NVDA (ücretsiz), Mac'te VoiceOver (built-in) ile siteyi gezmeyi dene. Heading'ler arası gezinme (H tuşu), link listesi (K tuşu) ve landmark navigasyonu (D tuşu) çalışmalı. Bu deneyim, erişilebilirlik konusundaki anlayışını derinleştirir."
@@ -3224,7 +3224,7 @@
               "why": "Screen reader kullanıcıları görselleri göremez, bu yüzden her ikon butonun ne yaptığını aria-label ile açıklamalıyız. 'Buraya tıkla' gibi anlamsız link metinleri yerine 'Hakkımda' gibi açıklayıcı metinler kullanmak, ekran okuyucu deneyimini iyileştirir."
             },
             {
-              "order": "4.7b",
+              "order": "4.11",
               "action": "Tüm img elementlerinde alt attribute'u kontrol et",
               "type": "validate",
               "validation": "DevTools > Elements'te tüm img tag'lerini ara. Her birinde anlamlı alt attribute'u olmalı. Dekoratif görsellerde alt='' (boş string) olmalı — screen reader bunları atlar.",
@@ -3300,14 +3300,14 @@
             {
               "why": "X-Content-Type-Options: nosniff, tarayıcının dosya türünü tahmin etmesini (MIME sniffing) önler — bu, kötü niyetli dosyaların script olarak çalıştırılmasını engeller. X-Frame-Options: DENY, sitenin iframe içine yerleştirilmesini engeller ve clickjacking saldırılarını önler.",
               "code": "async headers() {\n  return [\n    {\n      source: '/(.*)',\n      headers: [\n        { key: 'X-Content-Type-Options', value: 'nosniff' },",
-              "order": "5.1a",
+              "order": "5.2",
               "action": "Component return bloğunu yaz",
               "type": "code_write"
             },
             {
               "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
-              "code": "        { key: 'X-Frame-Options', value: 'DENY' },\n      ],\n    },\n  ];\n},",
-              "order": "5.1b",
+              "code": "        { key: 'X-Frame-Options', value: 'DENY' },",
+              "order": "5.3",
               "action": "Veri yapısının devamı — alanlar/değerler tanımlanıyor",
               "type": "code_write"
             },
@@ -3320,7 +3320,7 @@
               "why": "CSP, XSS (Cross-Site Scripting) saldırılarının en etkili savunmasıdır. default-src 'self' sadece kendi domain'imizden kaynak yüklenmesini izin verir. unsafe-inline Next.js'in inline script/style kullanımı için gerekli — production'da nonce-based yaklaşıma geçilebilir."
             },
             {
-              "order": "5.3b",
+              "order": "5.5",
               "action": "CSP header'ını test et — inline script/style çalışıyor mu?",
               "type": "validate",
               "validation": "Sayfayı aç ve DevTools Console'da CSP ile ilgili hata olup olmadığını kontrol et. 'Refused to execute inline script' hatası varsa script-src'ye 'unsafe-inline' eklenmeli.",
@@ -3343,7 +3343,7 @@
               "why": "lucide-react gibi büyük ikon kütüphanelerinde tüm ikonlar import edilir ama sadece birkaçı kullanılır. optimizePackageImports, tree-shaking'i geliştirir ve kullanılmayan ikonları bundle'dan çıkarır — bundle size dramatik şekilde azalır."
             },
             {
-              "order": "5.5b",
+              "order": "5.8",
               "action": "images.formats ayarını kontrol et",
               "type": "validate",
               "validation": "next.config.mjs'te images: { formats: ['image/avif', 'image/webp'] } tanımlı olmalı. M4 Step 3'te eklediğimiz bu ayar AVIF desteğini aktifleştirir.",
@@ -3358,7 +3358,7 @@
               "why": "Lighthouse audit'i development mode'da yapılmamalı çünkü dev mode'da hot reload, source maps ve debug araçları performansı düşürür. Production build, minification ve optimizasyonları uygular — gerçek performansı yansıtır."
             },
             {
-              "order": "5.7b",
+              "order": "5.10",
               "action": "Lighthouse'u Incognito mode'da çalıştır",
               "type": "validate",
               "validation": "Incognito pencerede (Ctrl+Shift+N) Lighthouse audit çalıştır. Extension'lar ve cache olmadan daha doğru sonuç verir. Her kategori 95+ olmalı.",
@@ -3478,7 +3478,7 @@
               "why": "git add . tüm dosyaları izlemeye alır. .gitignore'daki pattern'ler otomatik olarak dışlanır — bu yüzden önce .gitignore'u doğru ayarlamak kritiktir."
             },
             {
-              "order": "1.4b",
+              "order": "1.5",
               "action": "Staging'deki dosyalarda hassas bilgi olmadığını kontrol et",
               "type": "terminal",
               "command": "git status | grep -i env",
@@ -3538,7 +3538,7 @@
               "why": "Recruiter'lar GitHub profilini kontrol eder — temiz repo profesyonellik göstergesidir."
             },
             {
-              "order": "1.extra1",
+              "order": "1.13",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -3546,7 +3546,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "1.extra2",
+              "order": "1.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
@@ -3607,7 +3607,7 @@
               "why": "İlk 'vercel' komutu projeyi Vercel'e bağlar ve preview deploy yapar. Preview deploy, production'a çıkmadan önce test etme imkanı verir."
             },
             {
-              "order": "2.4b",
+              "order": "2.5",
               "action": "Preview URL'de tüm sayfaları gez",
               "type": "validate",
               "validation": "Preview URL'yi aç. Ana sayfa, hakkımda, projeler, blog, iletişim sayfalarını tek tek kontrol et. Görseller yükleniyor mu, dark mode çalışıyor mu bak.",
@@ -3662,7 +3662,7 @@
               "why": "CI/CD pipeline'ı sıfır konfigürasyonla hazır. Her push otomatik deploy tetikler."
             },
             {
-              "order": "2.extra1",
+              "order": "2.13",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -3670,7 +3670,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "2.extra2",
+              "order": "2.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
@@ -3729,14 +3729,14 @@
               "why": "Dark mode'da kontrast sorunları sıkça kaçırılır. Özellikle gri tonları dark arka planda okunaksız olabilir."
             },
             {
-              "order": "3.4b",
+              "order": "3.5",
               "action": "Loading state'lerini kontrol et",
               "type": "validate",
               "validation": "Yavaş ağ simülasyonunda (DevTools > Network > Slow 3G) sayfaların yüklenmesi sırasında beyaz ekran olmamalı. Font'lar display:swap ile yüklendiğinden sistem fontu geçici olarak görünmeli.",
               "why": "Gerçek dünyada tüm kullanıcılar hızlı internet kullanmıyor. Yavaş bağlantıda da iyi deneyim sağlamak profesyonel kaliteyi gösterir."
             },
             {
-              "order": "3.5b",
+              "order": "3.6",
               "action": "SEO meta tag'lerini production URL'de doğrula",
               "type": "validate",
               "validation": "Production URL'de View Page Source (Ctrl+U) ile HTML'i aç. og:title, og:image, description meta tag'lerinin var olduğunu doğrula. Client-side değil server-side render edilmeli.",
@@ -3744,22 +3744,22 @@
             },
             {
               "why": "Custom 404 sayfası, kullanıcı deneyimini iyileştirir. Varsayılan Next.js 404 sayfası profesyonel görünmez ve ziyaretçiyi kaybettirir.",
-              "code": "import Link from 'next/link';\n\nexport default function NotFound() {",
-              "order": "3.5a",
+              "code": "import Link from 'next/link';\n\nexport default function NotFound() {\n  // TODO: implement\n}",
+              "order": "3.7",
               "action": "Custom 404 sayfası, kullanıcı deneyimini iyileştirir",
               "type": "code_write"
             },
             {
               "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
               "code": "return (\n    <main className=\"mx-auto flex max-w-3xl flex-col items-center justify-center px-4 py-32 text-center\">\n      <h1 className=\"text-6xl font-bold text-gray-900 dark:text-white\">404</h1>\n      <p className=\"mt-4 text-xl text-gray-600 dark:text-gray-400\">Sayfa bulunamadı</p>",
-              "order": "3.5b",
+              "order": "3.8",
               "action": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz",
               "type": "code_write"
             },
             {
               "why": "UI elementlerinin Tailwind CSS ile stillendirmesi. Dark/light mod desteği dahil.",
               "code": "      <Link href=\"/\" className=\"mt-8 rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700\">\n        Ana Sayfaya Dön\n      </Link>\n    </main>\n  );\n}",
-              "order": "3.5c",
+              "order": "3.9",
               "action": "UI elementlerinin Tailwind CSS ile stillendirmesi",
               "type": "code_write"
             },
@@ -3771,7 +3771,7 @@
               "why": "404 sayfasının gerçekten aktif olduğunu doğrulamak gerekir — dosya doğru yerde değilse Next.js varsayılan 404'ü gösterir."
             },
             {
-              "order": "3.7b",
+              "order": "3.11",
               "action": "Sitemap.xml'i production URL'de kontrol et",
               "type": "validate",
               "validation": "https://your-domain.vercel.app/sitemap.xml adresini aç. Tüm sayfalar ve blog yazıları listelenmiş olmalı.",
@@ -3853,7 +3853,7 @@
               "why": "Başlık ve tek satırlık açıklama, projenin ne olduğunu ilk bakışta anlatır. GitHub'da repo adının altında bu açıklama görünür."
             },
             {
-              "order": "4.2b",
+              "order": "4.3",
               "action": "Canlı demo linkini README'nin en üstüne ekle",
               "type": "code_add",
               "file": "README.md",
@@ -3872,14 +3872,14 @@
             {
               "why": "Özellikler listesi, projenin kapsamını ve teknik derinliğini gösterir. Recruiter'lar bu listeye bakarak projenin seviyesini değerlendirir.",
               "code": "## Özellikler\n\n- Next.js 16 App Router ile SSG\n- MDX blog sistemi\n- Dark/Light mode\n- Responsive tasarım (mobile-first)",
-              "order": "4.3a",
+              "order": "4.5",
               "action": "Özellikler listesi, projenin kapsamını ve teknik derinliğini gösterir",
               "type": "code_write"
             },
             {
               "why": "Bir önceki adımda başlanan yapının tamamlanması.",
               "code": "- SEO optimizasyonu (Open Graph, sitemap, robots.txt)\n- Lighthouse 95+ skor\n- WCAG 2.1 AA uyumu\n- Vercel Edge Network deployment",
-              "order": "4.3b",
+              "order": "4.6",
               "action": "Bir önceki adımda başlanan yapıyı tamamla",
               "type": "code_add"
             },
@@ -3894,33 +3894,33 @@
             {
               "why": "Proje yapısı, code reviewer'ların kodu hızla anlamasını sağlar. Hangi klasörün ne işe yaradığını göstermek, büyük projelerde navigasyonu kolaylaştırır.",
               "code": "## Proje Yapısı\n\n```\nsrc/\n├── app/          # Next.js App Router sayfaları\n├── components/   # Yeniden kullanılabilir UI bileşenleri\n├── lib/          # Yardımcı fonksiyonlar (MDX parser vb.)",
-              "order": "4.5a",
+              "order": "4.8",
               "action": "Proje yapısı, code reviewer'ların kodu hızla anlamasını sağlar",
               "type": "code_write"
             },
             {
               "why": "Kod örneği bloğu — syntax highlighting ile gösterilecek.",
               "code": "└── data/         # Statik veri dosyaları\ncontent/\n└── blog/         # MDX blog yazıları\n```",
-              "order": "4.5b",
+              "order": "4.9",
               "action": "Kod örneği bloğu — syntax highlighting ile gösterilecek",
               "type": "code_write"
             },
             {
               "why": "Lighthouse skorları projenin teknik kalitesini kanıtlar. Canlı demo linki, recruiter'ın projeyi hemen görmesini sağlar — statik screenshot'tan çok daha etkilidir.",
               "code": "## Performans\n\n- Performance: 95+\n- Accessibility: 95+\n- Best Practices: 95+\n- SEO: 95+\n",
-              "order": "4.5c",
+              "order": "4.10",
               "action": "Lighthouse skorları projenin teknik kalitesini kanıtlar",
               "type": "code_write"
             },
             {
               "why": "Döküman bölümünün devamı — içerik yapısı tamamlanıyor.",
               "code": "## Canlı Demo\n\n[portfolio-site.vercel.app](https://portfolio-site.vercel.app)",
-              "order": "4.5d",
+              "order": "4.11",
               "action": "Bir önceki adımda başlanan yapıyı tamamla",
               "type": "code_add"
             },
             {
-              "order": "4.6b",
+              "order": "4.12",
               "action": "'Öğrendiklerim' bölümünü ekle",
               "type": "code_add",
               "file": "README.md",
@@ -4013,7 +4013,7 @@
               "why": "Production build, tüm sayfaları optimize eder ve statik HTML üretir. Build hatası varsa deploy başarısız olur."
             },
             {
-              "order": "1.3b",
+              "order": "1.4",
               "action": "Prettier ile tüm dosyaları formatla",
               "type": "terminal",
               "command": "pnpm dlx prettier --write src/",
@@ -4028,7 +4028,7 @@
               "why": "Büyük bundle boyutu sayfa yükleme süresini artırır. 100KB üzeri First Load JS, mobil kullanıcılar için ciddi performans sorunu yaratır."
             },
             {
-              "order": "1.4b",
+              "order": "1.6",
               "action": "Build çıktısında her route'un boyutunu incele",
               "type": "validate",
               "validation": "Build çıktısında her route'un First Load JS boyutu < 100KB olmalı. Kırmızı renkle işaretlenen büyük sayfalar varsa optimize edilmeli.",
@@ -4080,7 +4080,7 @@
               "why": "Production build doğrulaması tamamlandı."
             },
             {
-              "order": "Production Build.extra1",
+              "order": "Production Build.13",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -4088,7 +4088,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "Production Build.extra2",
+              "order": "Production Build.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
@@ -4159,14 +4159,14 @@
               "why": "SSG sayfalarının build sırasında doğru üretildiğini doğrulamak gerekir. Dinamik route'lar ([slug]) özellikle sorunlu olabilir."
             },
             {
-              "order": "2.6b",
+              "order": "2.7",
               "action": "İletişim formunu production'da test et",
               "type": "validate",
               "validation": "İletişim formunu test verisiyle doldur ve gönder. Formspree'den e-posta geldiğini doğrula.",
               "why": "Form submission production'da farklı davranabilir — özellikle CORS ayarları lokal ile farklı olabilir."
             },
             {
-              "order": "2.7b",
+              "order": "2.8",
               "action": "Gerçek telefonda test et",
               "type": "validate",
               "validation": "Gerçek bir telefonda production URL'yi aç. Navigation, görseller ve form çalışmalı.",
@@ -4200,7 +4200,7 @@
               "why": "Deploy sonrası Google Search Console'da 'Sitemap' bölümünden https://your-domain.com/sitemap.xml URL'sini submit et. Bu, Google'ın siteyi hızlıca indexlemesini sağlar."
             },
             {
-              "order": "Deploy.extra1",
+              "order": "Deploy.13",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -4208,7 +4208,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "Deploy.extra2",
+              "order": "Deploy.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
@@ -4250,7 +4250,7 @@
               "why": "Siteyi 3 farklı açıdan screenshot al: ana sayfa (desktop), bir blog yazısı ve mobil görünüm. docs/ klasörüne kaydet ve README'ye ![Screenshot](./docs/screenshot-home.png) formatında ekle."
             },
             {
-              "order": "3.3b",
+              "order": "3.4",
               "action": "Screenshot'ları docs/ klasörüne ekle",
               "type": "explain",
               "why": "Siteyi 3 farklı açıdan screenshot al: ana sayfa (desktop), blog yazısı ve mobil görünüm. docs/ klasörüne kaydet ve README'ye bağla."
@@ -4284,7 +4284,7 @@
               "why": "GitHub repo > Settings > General bölümünden Description ve Website alanlarını doldur. Topics ekle: nextjs, typescript, tailwindcss, portfolio, blog. Bu bilgiler GitHub arama sonuçlarında görünür."
             },
             {
-              "order": "3.7b",
+              "order": "3.9",
               "action": "GitHub repo topics ve description ekle",
               "type": "explain",
               "why": "GitHub repo > Settings'ten Description alanını doldur ve Topics ekle: nextjs, typescript, tailwindcss, portfolio, blog. Bu bilgiler GitHub arama sonuçlarında görünür."
@@ -4312,7 +4312,7 @@
               "why": "GitHub profili dijital CV'nin parçasıdır. Pinned repo'lar ilk izlenimi oluşturur."
             },
             {
-              "order": "Profesyonel README.extra1",
+              "order": "Profesyonel README.13",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -4320,7 +4320,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "Profesyonel README.extra2",
+              "order": "Profesyonel README.14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",
@@ -4353,7 +4353,7 @@
               "why": "2-3 dakikalık video için senaryo: 1) Ana sayfayı göster, 2) Sayfalar arası gezin, 3) Dark mode toggle, 4) Mobil görünüm, 5) Blog yazısı aç, 6) İletişim formu göster. Plansız video dağınık ve uzun olur."
             },
             {
-              "order": "4.2b",
+              "order": "4.3",
               "action": "Demo senaryosunu planla — 2-3 dakikalık script",
               "type": "explain",
               "why": "Senaryo: 1) Ana sayfa hero, 2) Sayfalar arası gezinti, 3) Dark mode toggle, 4) Mobil görünüm (DevTools), 5) Blog yazısı, 6) İletişim formu. Plansız video dağınık ve uzun olur."
@@ -4371,7 +4371,7 @@
               "why": "DevTools'ta responsive modu aç ve mobil görünümü göster. Dark mode toggle'ı kullan. Bu iki özellik, projenin teknik derinliğini gösterir."
             },
             {
-              "order": "4.4b",
+              "order": "4.6",
               "action": "Mimari kararları kısa açıkla",
               "type": "explain",
               "why": "Video'nun son 30 saniyesinde: 'Next.js App Router tercih ettim çünkü SSG ile performans avantajı sağlıyor. MDX ile blog sistemi kurdum. Lighthouse 95+ skor elde ettim.' Bu, teknik iletişim becerisini gösterir."
@@ -4419,7 +4419,7 @@
               "why": "Tüm proje tamamlandı. Son push ile Vercel otomatik deploy tetiklenir ve canlı site güncellenir."
             },
             {
-              "order": "Demo Video (Opsiyonel).extra1",
+              "order": "Demo Video (Opsiyonel).13",
               "action": "Bu adimda yazilan kodun TypeScript uyumluluğunu kontrol et",
               "type": "terminal",
               "command": "pnpm tsc --noEmit",
@@ -4427,7 +4427,7 @@
               "why": "Her buyuk degisiklikten sonra TypeScript derleyicisini calistirmak, tip hatalarinin birikmesini onler. Hatayi erken yakalamak, gec hata ayiklamadan cok daha verimli."
             },
             {
-              "order": "Demo Video (Opsiyonel).extra2",
+              "order": "Demo Video (Opsiyonel).14",
               "action": "Tarayicida sayfayi yenile ve DevTools Console kontrolu yap",
               "type": "validate",
               "validation": "Sayfayi yenile (F5). DevTools Console sekmesinde kirmizi hata olmamali. Sari uyarilar incelenebilir ama su an icin kritik degil.",

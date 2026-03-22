@@ -441,17 +441,8 @@
               "action": "GERİ DÖN — providers dizisine GitHub provider'ı ekle",
               "type": "code_modify",
               "file": "frontend/src/lib/auth.ts",
-              "code": "providers: [\n    GitHub({\n      clientId: process.env.GITHUB_CLIENT_ID!,\n      clientSecret: process.env.GITHUB_CLIENT_SECRET!,\n      authorization: {\n        params: {\n          scope: 'repo read:org read:user',\n        },",
+              "code": "providers: [\n    GitHub({\n      clientId: process.env.GITHUB_CLIENT_ID!,\n      clientSecret: process.env.GITHUB_CLIENT_SECRET!,\n      authorization: {\n        params: {\n          scope: 'repo read:org read:user',\n        },\n      },\n    }),\n  ],",
               "why": "scope: 'repo read:org' ile kullanıcının repo'larına ve organizasyon bilgilerine erişim izni alınır. clientId ve clientSecret ortam değişkenlerinden okunur — hardcoded değil."
-            },
-            {
-              "order": "2.6",
-              "action": "DEVAM — providers dizisine GitHub provider'ı ekle",
-              "type": "code_add",
-              "file": "frontend/src/lib/auth.ts",
-              "code": "      },\n    }),\n  ],",
-              "why": "Önceki adımda başladığımız yapının devamını yazıyoruz — },...",
-              "position": "bottom"
             },
             {
               "order": "2.7",
@@ -490,7 +481,7 @@
               "action": "GERİ DÖN — Providers bileşenini yaz",
               "type": "code_add",
               "file": "frontend/src/components/providers.tsx",
-              "code": "export function Providers({ children }: { children: React.ReactNode }) {\n  const [queryClient] = useState(() => new QueryClient());\n\n  return (",
+              "code": "export function Providers({ children }: { children: React.ReactNode }) {\n  const [queryClient] = useState(() => new QueryClient());\n\n  return (\n  // TODO: implement\n)",
               "why": "useState ile QueryClient her render'da yeniden oluşturulmaz. SessionProvider tüm bileşenlerde oturum bilgisine, QueryClientProvider veri yönetimine erişim sağlar.",
               "position": "bottom"
             },
@@ -514,10 +505,11 @@
             {
               "order": "2.14",
               "action": "GERİ DÖN — başlık ve kapanış taglarını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "frontend/src/app/login/page.tsx",
               "code": "        <h1 className=\"text-2xl font-bold text-gray-100 mb-6 text-center\">\n          AI Code Review\n        </h1>\n      </div>\n    </div>\n  );\n}",
-              "why": "Uygulama adı büyük ve ortalanmış. mb-6 ile altına eklenecek form elemanları için boşluk bırakılır."
+              "why": "Uygulama adı büyük ve ortalanmış. mb-6 ile altına eklenecek form elemanları için boşluk bırakılır.",
+              "position": "bottom"
             },
             {
               "order": "2.15",
@@ -676,12 +668,12 @@
               "why": "compare_digest timing attack'lara karşı korur — normal string karşılaştırma yerine sabit zamanlı karşılaştırma yapar. Bu güvenlik fonksiyonunu endpoint'ten önce tanımlıyoruz."
             },
             {
-              "order": "3.10x",
+              "order": "3.11",
               "action": "GERİ DÖN — signature doğrulama fonksiyonunu endpoint'in ÜSTÜNE yaz (devam)",
               "type": "code_add",
               "file": "backend/app/api/webhooks.py",
               "code": "        hashlib.sha256\n    ).hexdigest()\n    return hmac.compare_digest(expected, signature)\n",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "GERİ DÖN — signature doğrulama fonksiyonunu endpoint'in ÜSTÜNE yaz (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "order": "3.11",
@@ -1142,7 +1134,7 @@
               "action": "GERİ DÖN — _parse_generic metodunu implement et",
               "type": "code_modify",
               "file": "analysis/parsers/language_router.py",
-              "code": "def _parse_generic(self, code: str) -> dict:\n        lines = code.splitlines()\n        return {",
+              "code": "def _parse_generic(self, code: str) -> dict:\n        lines = code.splitlines()\n        return {\n  // TODO: implement\n}",
               "why": "AST desteklenmeyen diller için satır bazlı analiz. Toplam satır, boş satır ve yorum satırı sayısı basit ama faydalı metrikler."
             },
             {
@@ -1279,7 +1271,7 @@
               "type": "code_add",
               "file": "analysis/metrics/complexity.py",
               "position": "bottom",
-              "code": "try:\n        tree = ast.parse(code)\n    except SyntaxError:\n        return ComplexityResult(",
+              "code": "try:\n        tree = ast.parse(code)\n    except SyntaxError:\n        return ComplexityResult(\n  // TODO: implement\n)",
               "why": "Parse edilemeyen kod (syntax hatası) uygulamayı çökertmemeli. Varsayılan değerlerle ComplexityResult döndürüyoruz — graceful degradation."
             },
             {
@@ -1328,12 +1320,12 @@
               "why": "Cyclomatic complexity = karar noktası sayısı + 1. If, while, for, except, and/or — her biri bir karar noktası. Yüksek CC = karmaşık, test edilmesi zor kod."
             },
             {
-              "order": "2.11x",
+              "order": "2.12",
               "action": "GERİ DÖN — _cyclomatic_complexity yardımcı fonksiyonunu yaz (devam)",
               "type": "code_add",
               "file": "analysis/metrics/complexity.py",
               "code": "                             ast.ExceptHandler, ast.With,\n                             ast.Assert, ast.BoolOp)):\n            complexity += 1\n    return complexity",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "GERİ DÖN — _cyclomatic_complexity yardımcı fonksiyonunu yaz (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "order": "2.12",
@@ -1552,12 +1544,12 @@
               "why": "TODO/FIXME yorumları teknik borcu gösterir. Bunları takip etmek ve sprint planlamasına dahil etmek kodun zamanla bozulmasını önler."
             },
             {
-              "order": "3.13x",
+              "order": "3.14",
               "action": "GERİ DÖN — TODO/FIXME yorum tespitini ekle (devam)",
               "type": "code_add",
               "file": "analysis/metrics/pattern_detector.py",
               "code": "                f'Satır {i}\\'de çözülmemiş TODO/FIXME yorumu',\n                'Teknik borcu takip et ve sprint planlamasına ekle.',\n            ))\n",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "GERİ DÖN — TODO/FIXME yorum tespitini ekle (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "order": "3.14",
@@ -1702,12 +1694,12 @@
               "why": "Her metrik 0-100 aralığına normalize edilir. invert=True ile yüksek complexity = düşük skor. Cyclomatic complexity %50, nesting %30, fonksiyon uzunluğu %20 ağırlıkta."
             },
             {
-              "order": "4.5x",
+              "order": "4.6",
               "action": "calculate_score fonksiyonunun alt skor hesaplamalarını yaz (devam)",
               "type": "code_add",
               "file": "analysis/metrics/scoring.py",
               "code": ") -> ScoreBreakdown:\n    cc_score = _normalize(complexity.cyclomatic_complexity, 1, 30, invert=True)\n    nesting_score = _normalize(complexity.max_nesting_depth, 0, 8, invert=True)\n    func_len_score = _normalize(complexity.max_function_length, 0, 100, invert=True)",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "calculate_score fonksiyonunun alt skor hesaplamalarını yaz (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "order": "4.6",
@@ -1930,7 +1922,7 @@
               "type": "code_add",
               "file": "analysis/prompts/review_prompts.py",
               "position": "bottom",
-              "code": "      \"severity\": \"critical|warning|suggestion|praise\",\n      \"category\": \"security|performance|readability|logic|style|best_practice\",\n      \"message\": \"<sorun açıklaması>\",\n      \"suggestion\": \"<düzeltme önerisi>\",\n      \"code_fix\": \"<düzeltilmiş kod>\",\n      \"confidence\": <0.0-1.0>\n    }}\n  ],",
+              "code": "      \"severity\": \"critical|warning|suggestion|praise\",\n      \"category\": \"security|performance|readability|logic|style|best_practice\",\n      \"message\": \"<sorun açıklaması>\",\n      \"suggestion\": \"<düzeltme önerisi>\",\n      \"code_fix\": \"<düzeltilmiş kod>\",\n      \"confidence\": <0.0-1.0>",
               "why": "Önceki adımda başladığımız yapının devamını yazıyoruz — \"severity\": \"critical|warning|suggestion|praise\",..."
             },
             {
@@ -1966,7 +1958,7 @@
               "type": "code_add",
               "file": "analysis/prompts/review_prompts.py",
               "position": "bottom",
-              "code": "      \"description\": \"<açıklama>\",\n      \"exploit_scenario\": \"<nasıl sömürülebilir>\",\n      \"fix\": \"<düzeltme>\",\n      \"code_fix\": \"<düzeltilmiş kod>\"\n    }}\n  ]\n}}\n\"\"\"",
+              "code": "      \"description\": \"<açıklama>\",\n      \"exploit_scenario\": \"<nasıl sömürülebilir>\",\n      \"fix\": \"<düzeltme>\",\n      \"code_fix\": \"<düzeltilmiş kod>\"\n\"\"\"",
               "why": "Önceki adımda başladığımız yapının devamını yazıyoruz — \"description\": \"<açıklama>\",..."
             },
             {
@@ -2144,8 +2136,16 @@
               "type": "code_add",
               "file": "analysis/parsers/context_manager.py",
               "position": "bottom",
-              "code": "\n    contexts = []\n    remaining = available\n    for f, priority in scored:\n        estimated_tokens = len(f.patch or '') // 4 if f.patch else 100\n        budget = min(estimated_tokens, remaining)\n        if budget > 0:\n            contexts.append(FileContext(",
+              "code": "\n    contexts = []\n    remaining = available\n    for f, priority in scored:\n        estimated_tokens = len(f.patch or '') // 4 if f.patch else 100\n        budget = min(estimated_tokens, remaining)",
               "why": "Önceki adımda başladığımız yapının devamını yazıyoruz — contexts = []..."
+            },
+            {
+              "order": "2.105",
+              "action": "DEVAM — prioritize_files fonksiyonunu yaz (devam)",
+              "type": "code_add",
+              "code": "        if budget > 0:\n            contexts.append(FileContext(\n  // TODO: implement\n)",
+              "why": "DEVAM — prioritize_files fonksiyonunu yaz.",
+              "file": "analysis/parsers/context_manager.py"
             },
             {
               "order": "2.6",
@@ -3088,12 +3088,12 @@
               "why": "Güvenlik özetinin ilk kısmı pass/fail durumunu gösterir. Kritik bulgu yoksa yeşil tik, varsa kırmızı çarpı ile anında durumu belirtir."
             },
             {
-              "order": "3.7x",
+              "order": "3.8",
               "action": "github_comment_service.py'ye GERİ DÖN — güvenlik özeti başlangıcını yaz (devam)",
               "type": "code_add",
               "file": "backend/app/services/github_comment_service.py",
               "code": "        if summary.get('pass'):\n            text += '✅ **BAŞARILI** — Kritik güvenlik açığı bulunamadı.\\n\\n'\n        else:\n            text += f\"❌ **BAŞARISIZ** — {summary.get('critical', 0)} kritik, {summary.get('high', 0)} yüksek seviye bulgu.\\n\\n\"",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "github_comment_service.py'ye GERİ DÖN — güvenlik özeti başlangıcını yaz (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "order": "3.8",
@@ -3201,12 +3201,13 @@
               "why": "Önce minimum layout iskeletini yazıyoruz — dark tema arka planı ve flex yapısı. Sidebar ve auth kontrolünü adım adım ekleyeceğiz."
             },
             {
-              "order": "1.1z",
+              "order": "1.2",
               "action": "frontend/src/app/dashboard/layout.tsx dosyasını oluştur — dashboard layout iskeletini yaz (son kisim)",
-              "type": "code_write",
+              "type": "code_add",
               "code": "      </main>\n    </div>\n  );\n}",
-              "why": "JSX return blogunu tamamliyoruz.",
-              "file": "frontend/src/app/dashboard/layout.tsx"
+              "why": "frontend/src/app/dashboard/layout.tsx dosyasını oluştur — dashboard layout iskeletini yaz (son kisim).",
+              "file": "frontend/src/app/dashboard/layout.tsx",
+              "position": "bottom"
             },
             {
               "order": "1.3",
@@ -3292,7 +3293,7 @@
               "action": "GERİ DÖN — kullanıcı profili ve çıkış bölümünü ekle",
               "type": "code_add",
               "file": "frontend/src/components/sidebar.tsx",
-              "code": "))}\n      </nav>\n      <div className=\"p-4 border-t border-gray-700\">",
+              "code": "      </nav>\n      <div className=\"p-4 border-t border-gray-700\">",
               "why": "GitHub profil resmi ve ismi altta gösterilir. Çıkış butonu hover'da kırmızıya döner — dikkat çekici ama rahatsız etmeyen.",
               "position": "bottom"
             },
@@ -3319,7 +3320,7 @@
               "action": "BAŞKA DOSYAYA GEÇ — Dashboard ana sayfasını oluştur, veri çekme fonksiyonu yaz",
               "type": "code_write",
               "file": "frontend/src/app/dashboard/page.tsx",
-              "code": "import { auth } from '@/lib/auth';\n\nasync function getRepos(accessToken: string) {",
+              "code": "import { auth } from '@/lib/auth';\n\nasync function getRepos(accessToken: string) {\n  // TODO: implement\n}",
               "why": "Server component ile GitHub API'den repo listesi sunucu tarafında çekilir — hızlı yükleme. revalidate: 60 ile her dakika cache yenilenir."
             },
             {
@@ -3354,7 +3355,7 @@
               "action": "GERİ DÖN — dil etiketi ve kapanış taglarını ekle",
               "type": "code_add",
               "file": "frontend/src/app/dashboard/page.tsx",
-              "code": "              <span className=\"text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded\">{repo.language}</span>\n            </div>\n          </a>\n        ))}\n      </div>\n    </div>\n  );\n}",
+              "code": "              <span className=\"text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded\">{repo.language}</span>\n            </div>\n          </a>\n      </div>\n    </div>",
               "why": "Her repo kartının sağ üstünde programlama dili badge'i gösterilir. Kullanıcı kartı tıklayarak repo detay sayfasına gider.",
               "position": "bottom"
             },
@@ -3434,7 +3435,7 @@
               "action": "DEVAM — bileşen iskeletini yaz",
               "type": "code_add",
               "file": "frontend/src/components/diff-viewer.tsx",
-              "code": "\nexport default function DiffViewer({ oldCode, newCode, filename, issues = [] }: DiffViewerProps) {\n  return (",
+              "code": "\nexport default function DiffViewer({ oldCode, newCode, filename, issues = [] }: DiffViewerProps) {\n  return (\n  // TODO: implement\n)",
               "why": "Sonuçları hesaplayıp döndürüyoruz — fonksiyonun çıktısını oluşturuyoruz.",
               "position": "bottom"
             },
@@ -3469,8 +3470,16 @@
               "action": "GERİ DÖN — ReactDiffViewer bileşenini render et",
               "type": "code_modify",
               "file": "frontend/src/components/diff-viewer.tsx",
-              "code": "<ReactDiffViewer\n        oldValue={oldCode}\n        newValue={newCode}\n        splitView={true}\n        compareMethod={DiffMethod.WORDS}\n        useDarkTheme={true}\n        styles={{\n          variables: {",
+              "code": "<ReactDiffViewer\n        oldValue={oldCode}\n        newValue={newCode}\n        splitView={true}\n        compareMethod={DiffMethod.WORDS}\n        useDarkTheme={true}",
               "why": "Side-by-side diff görünümü geliştiricilerin alıştığı format. Dark tema renkleri (koyu yeşil eklenen, koyu kırmızı silinen) ile uyumlu."
+            },
+            {
+              "order": "2.106",
+              "action": "GERİ DÖN — ReactDiffViewer bileşenini render et (devam)",
+              "type": "code_modify",
+              "code": "        styles={{\n          variables: {\n  // TODO: implement\n}",
+              "why": "GERİ DÖN — ReactDiffViewer bileşenini render et.",
+              "file": "frontend/src/components/diff-viewer.tsx"
             },
             {
               "order": "2.7",
@@ -3486,7 +3495,7 @@
               "action": "DEVAM — ReactDiffViewer bileşenini render et",
               "type": "code_add",
               "file": "frontend/src/components/diff-viewer.tsx",
-              "code": "          },\n        }}\n      />\n    </div>\n  );",
+              "code": "      />\n    </div>",
               "why": "Önceki adımda başladığımız yapının devamını yazıyoruz — },...",
               "position": "bottom"
             },
@@ -3503,7 +3512,7 @@
               "action": "GERİ DÖN — ReviewDetailPage bileşenini ve diff görünümünü yaz",
               "type": "code_add",
               "file": "frontend/src/app/dashboard/reviews/[id]/page.tsx",
-              "code": "export default async function ReviewDetailPage({ params }: { params: { id: string } }) {\n  const review = await getReview(params.id);\n  return (",
+              "code": "export default async function ReviewDetailPage({ params }: { params: { id: string } }) {\n  const review = await getReview(params.id);\n  return (\n  // TODO: implement\n)",
               "why": "2.1'de oluşturduğumuz DiffViewer bileşenini kullanıyoruz. Skor renginin dinamik değişmesi (yeşil/sarı/kırmızı) hızlı görsel değerlendirme sağlar.",
               "position": "bottom"
             },
@@ -3604,7 +3613,7 @@
               "action": "frontend/src/app/dashboard/analytics/page.tsx dosyasını oluştur — analytics sayfası iskeletini yaz",
               "type": "code_write",
               "file": "frontend/src/app/dashboard/analytics/page.tsx",
-              "code": "'use client';\n\nexport default function AnalyticsPage() {\n  return (",
+              "code": "'use client';\n\nexport default function AnalyticsPage() {\n  return (\n  // TODO: implement\n)",
               "why": "Önce sayfa iskeletini yazıyoruz — başlık ve grid yapısı. Grafikleri adım adım ekleyeceğiz."
             },
             {
@@ -4077,12 +4086,13 @@
               "why": "Önce varsayılan konfigürasyonu tanımlıyoruz. Bu değerler .codereview.yml yoksa kullanılır — sensible defaults ile hemen çalışabilir."
             },
             {
-              "order": "2.1z",
+              "order": "2.2",
               "action": "analysis/rules/config_parser.py dosyasını oluştur — YAML parser iskeletini yaz (son kisim)",
-              "type": "code_write",
+              "type": "code_add",
               "code": "    'max_nesting': 4,\n    'severity_overrides': {},\n    'custom_rules': [],\n}",
-              "why": "JSX return blogunu tamamliyoruz.",
-              "file": "analysis/rules/config_parser.py"
+              "why": "analysis/rules/config_parser.py dosyasını oluştur — YAML parser iskeletini yaz (son kisim).",
+              "file": "analysis/rules/config_parser.py",
+              "position": "bottom"
             },
             {
               "order": "2.3",
@@ -4103,12 +4113,12 @@
               "why": "YAML parse hatası olursa varsayılan config kullanılır — uygulama kırılmaz. merged ile kullanıcı değerleri varsayılanların üstüne yazılır."
             },
             {
-              "order": "2.4x",
+              "order": "2.5",
               "action": "GERİ DÖN — parse_config ve apply_config_to_engine fonksiyonlarını yaz (devam)",
               "type": "code_add",
               "file": "analysis/rules/config_parser.py",
               "code": "        return DEFAULT_CONFIG.copy()\n    merged = DEFAULT_CONFIG.copy()\n    merged.update(config)\n    return merged",
-              "why": "Onceki adimda baslanan kodun mantiksal devami."
+              "why": "GERİ DÖN — parse_config ve apply_config_to_engine fonksiyonlarını yaz (devam) — bu kod parcasi projenin bu asamasinda gerekli."
             },
             {
               "order": "2.5",
@@ -4297,15 +4307,23 @@
               "action": "GERİ DÖN — check run API çağrısını yaz",
               "type": "code_modify",
               "file": "backend/app/services/status_check_service.py",
-              "code": "response = await self.client.post(\n            f'/repos/{owner}/{repo}/check-runs',\n            json={\n                'name': 'AI Code Review',\n                'head_sha': head_sha,\n                'status': 'completed',\n                'conclusion': 'success' if passed else 'failure',\n                'output': {",
+              "code": "response = await self.client.post(\n            f'/repos/{owner}/{repo}/check-runs',\n            json={\n                'name': 'AI Code Review',\n                'head_sha': head_sha,\n                'status': 'completed',",
               "why": "conclusion: success/failure PR'ın merge edilebilirliğini belirler. output ile skor detayları GitHub UI'da gösterilir."
+            },
+            {
+              "order": "1.105",
+              "action": "GERİ DÖN — check run API çağrısını yaz (devam)",
+              "type": "code_modify",
+              "code": "                'conclusion': 'success' if passed else 'failure',\n                'output': {\n  // TODO: implement\n}",
+              "why": "GERİ DÖN — check run API çağrısını yaz.",
+              "file": "backend/app/services/status_check_service.py"
             },
             {
               "order": "1.6",
               "action": "DEVAM — check run API çağrısını yaz",
               "type": "code_add",
               "file": "backend/app/services/status_check_service.py",
-              "code": "                    'title': f\"Skor: {score}/100 — {'Geçti ✅' if passed else 'Kaldı ❌'}\",\n                    'summary': f'**Kod Kalitesi:** {score}/100\\n**Bulgu:** {issues_count}\\n**Kritik:** {critical_count}',\n                },\n            },\n        )\n        response.raise_for_status()\n        return response.json()",
+              "code": "                    'title': f\"Skor: {score}/100 — {'Geçti ✅' if passed else 'Kaldı ❌'}\",\n                    'summary': f'**Kod Kalitesi:** {score}/100\\n**Bulgu:** {issues_count}\\n**Kritik:** {critical_count}',\n        response.raise_for_status()\n        return response.json()",
               "why": "Sonuçları hesaplayıp döndürüyoruz — fonksiyonun çıktısını oluşturuyoruz.",
               "position": "bottom"
             },
@@ -4954,7 +4972,7 @@
               "type": "code_add",
               "file": "backend/app/api/metrics.py",
               "position": "bottom",
-              "code": "\n@router.get('/health')\nasync def detailed_health():\n    return {",
+              "code": "\n@router.get('/health')\nasync def detailed_health():\n    return {\n  // TODO: implement\n}",
               "why": "detailed_health fonksiyonını implement ediyoruz — 2."
             },
             {
@@ -4972,8 +4990,16 @@
               "type": "code_add",
               "file": "backend/app/services/claude_service.py",
               "position": "bottom",
-              "code": "def _track_cost(self, message) -> dict:\n        input_tokens = message.usage.input_tokens\n        output_tokens = message.usage.output_tokens\n        input_cost = input_tokens * 0.003 / 1000\n        output_cost = output_tokens * 0.015 / 1000\n        total_cost = input_cost + output_cost\n        return {",
+              "code": "def _track_cost(self, message) -> dict:\n        input_tokens = message.usage.input_tokens\n        output_tokens = message.usage.output_tokens\n        input_cost = input_tokens * 0.003 / 1000\n        output_cost = output_tokens * 0.015 / 1000",
               "why": "Her API çağrısının maliyetini hesaplamak bütçe kontrolü için zorunludur. Token kullanımı ve maliyet metrik dashboard'unda gösterilir."
+            },
+            {
+              "order": "2.106",
+              "action": "claude_service.py'ye GERİ DÖN — LLM maliyet takibi ekle (devam)",
+              "type": "code_add",
+              "code": "        total_cost = input_cost + output_cost\n        return {\n  // TODO: implement\n}",
+              "why": "claude_service.py'ye GERİ DÖN — LLM maliyet takibi ekle.",
+              "file": "backend/app/services/claude_service.py"
             },
             {
               "order": "2.7",

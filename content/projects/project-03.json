@@ -962,9 +962,17 @@
               "action": "Konuşma bulunamazsa yeni oluştur",
               "type": "code_add",
               "file": "server/src/services/conversation.service.ts",
-              "code": "\n    if (!conversation) {\n      conversation = await Conversation.create({\n        type: 'direct',\n        participants: [userId, targetUserId],\n      });\n      conversation = await conversation.populate('participants', 'name avatar isOnline lastSeen');\n\n}",
+              "code": "\n    if (!conversation) {\n      conversation = await Conversation.create({\n        type: 'direct',\n        participants: [userId, targetUserId],\n      });\n      conversation = await conversation.populate('participants', 'name avatar isOnline lastSeen');",
               "why": "Yoksa OLUŞTUR pattern'ı 'upsert' mantığıdır. Yeni konuşma oluşturulduktan sonra populate ile katılımcı bilgileri doldurulur.",
               "position": "bottom"
+            },
+            {
+              "order": "1.105",
+              "action": "Konuşma bulunamazsa yeni oluştur (devam)",
+              "type": "code_add",
+              "code": "}",
+              "why": "Konuşma bulunamazsa yeni oluştur.",
+              "file": "server/src/services/conversation.service.ts"
             },
             {
               "order": "1.6",
@@ -1607,8 +1615,16 @@
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
               "position": "after:setMessages",
-              "code": "\n  setTyping: (conversationId, userId, isTyping) => {\n    set((state) => {\n      const current = state.typingUsers[conversationId] || [];\n      const updated = isTyping\n        ? [...new Set([...current, userId])]\n)\n  }\n}",
+              "code": "\n  setTyping: (conversationId, userId, isTyping) => {\n    set((state) => {\n      const current = state.typingUsers[conversationId] || [];\n      const updated = isTyping",
               "why": "Set ile typing users'da duplicate ÖNLENIR. isTyping true ise kullanıcıyı ekle, false ise çıkar."
+            },
+            {
+              "order": "1.119",
+              "action": "setMessages'ın altına — setTyping fonksiyonunu başlat (devam)",
+              "type": "code_add",
+              "code": "        ? [...new Set([...current, userId])]",
+              "why": "setMessages'ın altına — setTyping fonksiyonunu başlat.",
+              "file": "client/src/stores/chat-store.ts"
             },
             {
               "order": "1.20",
@@ -2791,9 +2807,17 @@
               "action": "sanitizeUserInput fonksiyonunu başlat ve kalıp kontrolü yap",
               "type": "code_add",
               "file": "server/src/utils/prompt-guard.ts",
-              "code": "\nexport function sanitizeUserInput(input: string): string {\n  for (const pattern of BLOCKED_PATTERNS) {\n    if (pattern.test(input)) {\n      return '[Güvenlik: Bu tür komutlar engellenmiştir]';\n    }\n\n  }\n}",
+              "code": "\nexport function sanitizeUserInput(input: string): string {\n  for (const pattern of BLOCKED_PATTERNS) {\n    if (pattern.test(input)) {\n      return '[Güvenlik: Bu tür komutlar engellenmiştir]';\n    }",
               "why": "Her regex kalıbı case-insensitive test edilir. Eşleşme bulunursa orijinal mesaj yerine güvenlik uyarısı döndürülür.",
               "position": "bottom"
+            },
+            {
+              "order": "4.106",
+              "action": "sanitizeUserInput fonksiyonunu başlat ve kalıp kontrolü yap (devam)",
+              "type": "code_add",
+              "code": "  }\n}",
+              "why": "sanitizeUserInput fonksiyonunu başlat ve kalıp kontrolü yap.",
+              "file": "server/src/utils/prompt-guard.ts"
             },
             {
               "order": "4.7",

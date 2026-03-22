@@ -213,7 +213,7 @@
               "why": "Express, cors ve morgan JavaScript ile yazılmış — TypeScript tipleri ayrı @types/ paketlerinde sunulur. Bu tipler olmadan IDE otomatik tamamlama çalışmaz."
             },
             {
-              "order": "1.8a",
+              "order": "1.8",
               "action": "TypeScript konfigürasyonunu oluştur ve özelleştir — temel yapı",
               "type": "code_write",
               "file": "server/tsconfig.json",
@@ -221,7 +221,7 @@
               "why": "Dosyanın temel yapısı ve bağımlılıkları tanımlanıyor — modülün çalışması için gerekli altyapı."
             },
             {
-              "order": "1.8b",
+              "order": "1.9",
               "action": "TypeScript konfigürasyonunu oluştur ve özelleştir — devam",
               "type": "code_add",
               "file": "server/tsconfig.json",
@@ -401,7 +401,7 @@
           "checkpoint": "curl http://localhost:3001/api/health komutu { status: 'ok' } dönmeli. CORS header'ları response'ta görünmeli. Olmayan route'a istek 404 dönmeli.",
           "substeps": [
             {
-              "order": "3.1a",
+              "order": "3.1",
               "action": "server/src/config.ts dosyasını oluştur — environment variable'ları tek noktadan oku — import'lar",
               "type": "code_write",
               "file": "server/src/config.ts",
@@ -409,7 +409,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "3.1b",
+              "order": "3.2",
               "action": "server/src/config.ts dosyasını oluştur — environment variable'ları tek noktadan oku — devam",
               "type": "code_add",
               "file": "server/src/config.ts",
@@ -418,7 +418,7 @@
               "position": "bottom"
             },
             {
-              "order": "3.2a",
+              "order": "3.3",
               "action": "server/src/middleware/error-handler.ts dosyasını oluştur — AppError sınıfı ve handler — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/middleware/error-handler.ts",
@@ -426,7 +426,7 @@
               "why": "Sınıf tanımı ve constructor ile temel yapı oluşturuluyor — her instance kendi state'ini taşır."
             },
             {
-              "order": "3.2b",
+              "order": "3.4",
               "action": "server/src/middleware/error-handler.ts dosyasını oluştur — AppError sınıfı ve handler — devam",
               "type": "code_add",
               "file": "server/src/middleware/error-handler.ts",
@@ -435,7 +435,7 @@
               "position": "bottom"
             },
             {
-              "order": "3.3a",
+              "order": "3.5",
               "action": "AppError'un ALTINA error handler middleware fonksiyonunu ekle — temel yapı",
               "type": "code_add",
               "file": "server/src/middleware/error-handler.ts",
@@ -444,16 +444,16 @@
               "why": "Koşul kontrolü ve erken dönüş pattern'ı — geçersiz durumlar erkenden yakalanıp uygun hata mesajı döner."
             },
             {
-              "order": "3.3b",
+              "order": "3.6",
               "action": "AppError'un ALTINA error handler middleware fonksiyonunu ekle — devam",
               "type": "code_add",
               "file": "server/src/middleware/error-handler.ts",
               "position": "bottom",
-              "code": "    })\n  }\n  console.error(err)\n  res.status(500).json({ error: 'Internal server error' })\n}",
+              "code": "  console.error(err)\n  res.status(500).json({ error: 'Internal server error' })",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
-              "order": "3.4a",
+              "order": "3.7",
               "action": "server/src/index.ts dosyasını oluştur — önce en basit çalışan server — import'lar",
               "type": "code_write",
               "file": "server/src/index.ts",
@@ -461,7 +461,7 @@
               "why": "Fonksiyon tanımı — tek bir sorumluluğu olan, test edilebilir ve tekrar kullanılabilir bir birim."
             },
             {
-              "order": "3.4b",
+              "order": "3.8",
               "action": "server/src/index.ts dosyasını oluştur — önce en basit çalışan server — devam",
               "type": "code_add",
               "file": "server/src/index.ts",
@@ -478,7 +478,7 @@
               "why": "3.4'te yazdığımız iskeleti test ediyoruz. {status: ok} görüyorsak Express doğru çalışıyor demektir. Hata varsa burada yakalıyoruz — üzerine ekleme yapmadan önce."
             },
             {
-              "order": "3.6a",
+              "order": "3.10",
               "action": "index.ts'e GERİ DÖN — güvenlik ve loglama middleware'lerini ekle — import'lar",
               "type": "code_add",
               "file": "server/src/index.ts",
@@ -487,7 +487,7 @@
               "why": "Gerekli modüller ve bağımlılıklar import ediliyor — her import belirli bir sorumluluğu olan bir kütüphane veya dosyayı temsil eder."
             },
             {
-              "order": "3.6b",
+              "order": "3.11",
               "action": "index.ts'e GERİ DÖN — güvenlik ve loglama middleware'lerini ekle — devam",
               "type": "code_add",
               "file": "server/src/index.ts",
@@ -573,7 +573,7 @@
               "why": "generator client: Prisma'ya TypeScript client üretmesini söylüyoruz. datasource db: PostgreSQL kullanacağız ve bağlantı bilgisi .env'den okunacak."
             },
             {
-              "order": "4.5a",
+              "order": "4.5",
               "action": "İlk model olarak User'ı ekle — en basit modelden başla — temel yapı",
               "type": "code_add",
               "file": "server/prisma/schema.prisma",
@@ -582,7 +582,7 @@
               "why": "User modelinin alanlarını tanımlıyoruz — her alan veritabanındaki bir kolona karşılık gelir."
             },
             {
-              "order": "4.5b",
+              "order": "4.6",
               "action": "İlk model olarak User'ı ekle — en basit modelden başla — devam",
               "type": "code_add",
               "file": "server/prisma/schema.prisma",
@@ -591,7 +591,7 @@
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
-              "order": "4.6a",
+              "order": "4.7",
               "action": "User'ın ALTINA Board modelini ekle — User ile ilişkili — temel yapı",
               "type": "code_add",
               "file": "server/prisma/schema.prisma",
@@ -600,7 +600,7 @@
               "why": "Board modelinin alanlarını tanımlıyoruz — her alan veritabanındaki bir kolona karşılık gelir."
             },
             {
-              "order": "4.6b",
+              "order": "4.8",
               "action": "User'ın ALTINA Board modelini ekle — User ile ilişkili — devam",
               "type": "code_add",
               "file": "server/prisma/schema.prisma",
@@ -609,7 +609,7 @@
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
-              "order": "4.7a",
+              "order": "4.9",
               "action": "Board'un ALTINA List ve Card modellerini ekle — temel yapı",
               "type": "code_add",
               "file": "server/prisma/schema.prisma",
@@ -618,7 +618,7 @@
               "why": "List modelinin alanlarını tanımlıyoruz — her alan veritabanındaki bir kolona karşılık gelir."
             },
             {
-              "order": "4.7b",
+              "order": "4.10",
               "action": "Board'un ALTINA List ve Card modellerini ekle — devam",
               "type": "code_add",
               "file": "server/prisma/schema.prisma",
@@ -627,7 +627,7 @@
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
-              "order": "4.8a",
+              "order": "4.11",
               "action": "List'in ALTINA Card modelini ekle — en detaylı model — temel yapı",
               "type": "code_add",
               "file": "server/prisma/schema.prisma",
@@ -636,7 +636,7 @@
               "why": "Card modelinin alanlarını tanımlıyoruz — her alan veritabanındaki bir kolona karşılık gelir."
             },
             {
-              "order": "4.8b",
+              "order": "4.12",
               "action": "List'in ALTINA Card modelini ekle — en detaylı model — devam",
               "type": "code_add",
               "file": "server/prisma/schema.prisma",
@@ -697,7 +697,7 @@
               "why": "Seed data'da kullanıcı oluşturacağız — parolaları düz metin saklamak güvenlik açığı. bcrypt ile hash'leyeceğiz. @types/bcrypt TypeScript desteği ekler."
             },
             {
-              "order": "5.2a",
+              "order": "5.2",
               "action": "server/prisma/seed.ts dosyasını oluştur — iskelet ve hata yakalama — import ve temel yapı",
               "type": "code_write",
               "file": "server/prisma/seed.ts",
@@ -705,7 +705,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "5.2b",
+              "order": "5.3",
               "action": "server/prisma/seed.ts dosyasını oluştur — iskelet ve hata yakalama — devam",
               "type": "code_add",
               "file": "server/prisma/seed.ts",
@@ -714,7 +714,7 @@
               "position": "bottom"
             },
             {
-              "order": "5.3a",
+              "order": "5.4",
               "action": "main() İÇİNE — önce mevcut veriyi temizle, sonra kullanıcı oluştur — temel yapı",
               "type": "code_add",
               "file": "server/prisma/seed.ts",
@@ -723,7 +723,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "5.3b",
+              "order": "5.5",
               "action": "main() İÇİNE — önce mevcut veriyi temizle, sonra kullanıcı oluştur — devam",
               "type": "code_add",
               "file": "server/prisma/seed.ts",
@@ -732,7 +732,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "5.4a",
+              "order": "5.6",
               "action": "User oluşturmanın ALTINA — Board ve varsayılan listelerini oluştur — temel yapı",
               "type": "code_add",
               "file": "server/prisma/seed.ts",
@@ -741,16 +741,16 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "5.4b",
+              "order": "5.7",
               "action": "User oluşturmanın ALTINA — Board ve varsayılan listelerini oluştur — devam",
               "type": "code_add",
               "file": "server/prisma/seed.ts",
               "position": "after:user create",
-              "code": "          { title: 'Devam Eden', position: 1 },\n          { title: 'Tamamlanan', position: 2 }\n        ]\n      }\n    }\n  })",
+              "code": "          { title: 'Devam Eden', position: 1 },\n          { title: 'Tamamlanan', position: 2 }",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
-              "order": "5.5a",
+              "order": "5.8",
               "action": "Board oluşturmanın ALTINA — listelere örnek kartlar ekle — temel yapı",
               "type": "code_add",
               "file": "server/prisma/seed.ts",
@@ -759,12 +759,12 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "5.5b",
+              "order": "5.9",
               "action": "Board oluşturmanın ALTINA — listelere örnek kartlar ekle — devam",
               "type": "code_add",
               "file": "server/prisma/seed.ts",
               "position": "after:board create",
-              "code": "      { title: 'API tasarımı', position: 1, listId: lists[0].id },\n      { title: 'Login sayfası', position: 0, listId: lists[1].id }\n    ]\n  })\n\n  console.log('Seed completed: 1 user, 1 board, 3 lists, 3 cards')",
+              "code": "      { title: 'API tasarımı', position: 1, listId: lists[0].id },\n      { title: 'Login sayfası', position: 0, listId: lists[1].id }\n\n  console.log('Seed completed: 1 user, 1 board, 3 lists, 3 cards')",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
@@ -855,16 +855,17 @@
               "why": "findMany ile kullanıcıya ait tüm board'ları çekiyoruz. include ile ilişkili List ve Card verilerini de getiriyoruz — frontend'in ayrı istek atmasına gerek kalmaz."
             },
             {
-              "order": "1.4a",
-              "code": "  async getById(id: string, userId: string) {\n    return prisma.board.findFirst({\n      where: { id, ownerId: userId },\n      include: {\n        lists: {",
-              "type": "code_write",
+              "order": "1.4",
+              "code": "  async getById(id: string, userId: string) {\n    return prisma.board.findFirst({\n      where: { id, ownerId: userId },\n      include: {\n        lists: {\n  // TODO: implement\n}",
+              "type": "code_add",
               "file": "server/src/services/board.service.ts",
               "action": "İş mantığını ekle",
-              "why": "İş mantığının devamı — önceki adımda başlanan yapıya yeni fonksiyonellik ekleniyor."
+              "why": "İş mantığının devamı — önceki adımda başlanan yapıya yeni fonksiyonellik ekleniyor.",
+              "position": "bottom"
             },
             {
-              "order": "1.4b",
-              "code": "          orderBy: { position: 'asc' },\n          include: { cards: { orderBy: { position: 'asc' } } }\n        }\n      }\n    })\n  }",
+              "order": "1.5",
+              "code": "          orderBy: { position: 'asc' },\n          include: { cards: { orderBy: { position: 'asc' } } }",
               "type": "code_add",
               "file": "server/src/services/board.service.ts",
               "action": "Yapıyı tamamla",
@@ -872,7 +873,7 @@
               "position": "bottom"
             },
             {
-              "order": "1.5a",
+              "order": "1.6",
               "action": "getById'un ALTINA create metodunu ekle — varsayılan listeler dahil — temel yapı",
               "type": "code_add",
               "file": "server/src/services/board.service.ts",
@@ -881,16 +882,16 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "1.5b",
+              "order": "1.7",
               "action": "getById'un ALTINA create metodunu ekle — varsayılan listeler dahil — devam",
               "type": "code_add",
               "file": "server/src/services/board.service.ts",
               "position": "after:getById",
-              "code": "          { title: 'Tamamlanan', position: 2 }\n        ] }\n      }, include: { lists: true }\n    })\n  }",
+              "code": "          { title: 'Tamamlanan', position: 2 }\n      }, include: { lists: true }",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
-              "order": "1.6a",
+              "order": "1.8",
               "action": "create'in ALTINA update ve delete metodlarını ekle — temel yapı",
               "type": "code_add",
               "file": "server/src/services/board.service.ts",
@@ -899,7 +900,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "1.6b",
+              "order": "1.9",
               "action": "delete fonksiyonunu ekle",
               "type": "code_add",
               "file": "server/src/services/board.service.ts",
@@ -952,7 +953,7 @@
               "why": "Zod, runtime'da veri doğrulama yapar VE TypeScript tipleri üretir. Aynı schema'dan hem validation hem tip elde edersin — DRY prensibi."
             },
             {
-              "order": "2.2a",
+              "order": "2.2",
               "action": "Board validation schema'larını yaz — create ve update — import'lar",
               "type": "code_write",
               "file": "server/src/validators/board.validator.ts",
@@ -960,7 +961,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "2.2b",
+              "order": "2.3",
               "action": "Board validation schema'larını yaz — create ve update — devam",
               "type": "code_add",
               "file": "server/src/validators/board.validator.ts",
@@ -969,7 +970,7 @@
               "position": "bottom"
             },
             {
-              "order": "2.3a",
+              "order": "2.4",
               "action": "Validate middleware fonksiyonunu yaz — tüm endpoint'lerde kullanılacak — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/middleware/validate.ts",
@@ -977,7 +978,7 @@
               "why": "Koşul kontrolü ve erken dönüş pattern'ı — geçersiz durumlar erkenden yakalanıp uygun hata mesajı döner."
             },
             {
-              "order": "2.3b",
+              "order": "2.5",
               "action": "Validate middleware fonksiyonunu yaz — tüm endpoint'lerde kullanılacak — devam",
               "type": "code_add",
               "file": "server/src/middleware/validate.ts",
@@ -986,7 +987,7 @@
               "position": "bottom"
             },
             {
-              "order": "2.4a",
+              "order": "2.6",
               "action": "Card validation schema'larını yaz — priority ve dueDate ile — import'lar",
               "type": "code_write",
               "file": "server/src/validators/card.validator.ts",
@@ -994,7 +995,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "2.4b",
+              "order": "2.7",
               "action": "Card validation schema'larını yaz — priority ve dueDate ile — devam",
               "type": "code_add",
               "file": "server/src/validators/card.validator.ts",
@@ -1003,7 +1004,7 @@
               "position": "bottom"
             },
             {
-              "order": "2.5a",
+              "order": "2.8",
               "action": "List validation schema'larını yaz — create ve reorder — import'lar",
               "type": "code_write",
               "file": "server/src/validators/list.validator.ts",
@@ -1011,7 +1012,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "2.5b",
+              "order": "2.9",
               "action": "List validation schema'larını yaz — create ve reorder — devam",
               "type": "code_add",
               "file": "server/src/validators/list.validator.ts",
@@ -1109,7 +1110,7 @@
               "why": "3.5'deki update ile aynı pattern. 204 No Content silme işleminde kullanılır — response body yok."
             },
             {
-              "order": "3.7a",
+              "order": "3.7",
               "action": "Board route tanımlarını yaz — validate middleware ile birlikte — import'lar",
               "type": "code_write",
               "file": "server/src/routes/board.routes.ts",
@@ -1117,7 +1118,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "3.7b",
+              "order": "3.8",
               "action": "Route tanımlarını ekle",
               "type": "code_add",
               "file": "server/src/routes/board.routes.ts",
@@ -1171,7 +1172,7 @@
           "checkpoint": "Kart oluşturma, güncelleme, silme ve listeler arası taşıma çalışmalı. Taşıma sonrası pozisyonlar tutarlı olmalı. Transaction hatalarında rollback çalışmalı.",
           "substeps": [
             {
-              "order": "4.1a",
+              "order": "4.1",
               "action": "ListService iskeletini ve create metodunu yaz — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/services/list.service.ts",
@@ -1179,16 +1180,16 @@
               "why": "Sınıf tanımı ve constructor ile temel yapı oluşturuluyor — her instance kendi state'ini taşır."
             },
             {
-              "order": "4.1b",
+              "order": "4.2",
               "action": "ListService iskeletini ve create metodunu yaz — devam",
               "type": "code_add",
               "file": "server/src/services/list.service.ts",
-              "code": "    })\n    return prisma.list.create({\n      data: { title, boardId, position: (maxPos._max.position ?? -1) + 1 }\n    })\n  }\n}",
+              "code": "    return prisma.list.create({\n      data: { title, boardId, position: (maxPos._max.position ?? -1) + 1 }",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor.",
               "position": "bottom"
             },
             {
-              "order": "4.2a",
+              "order": "4.3",
               "action": "ListService'e reorder metodunu ekle — sürükle-bırak için — temel yapı",
               "type": "code_add",
               "file": "server/src/services/list.service.ts",
@@ -1197,7 +1198,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "4.2b",
+              "order": "4.4",
               "action": "delete fonksiyonunu ekle",
               "type": "code_add",
               "file": "server/src/services/list.service.ts",
@@ -1206,7 +1207,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "4.3a",
+              "order": "4.5",
               "action": "CardService iskeletini ve create metodunu yaz — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/services/card.service.ts",
@@ -1214,16 +1215,16 @@
               "why": "Sınıf tanımı ve constructor ile temel yapı oluşturuluyor — her instance kendi state'ini taşır."
             },
             {
-              "order": "4.3b",
+              "order": "4.6",
               "action": "CardService iskeletini ve create metodunu yaz — devam",
               "type": "code_add",
               "file": "server/src/services/card.service.ts",
-              "code": "    })\n    return prisma.card.create({\n      data: { ...data, listId, position: (maxPos._max.position ?? -1) + 1 }\n    })\n  }\n}",
+              "code": "    return prisma.card.create({\n      data: { ...data, listId, position: (maxPos._max.position ?? -1) + 1 }",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor.",
               "position": "bottom"
             },
             {
-              "order": "4.4a",
+              "order": "4.7",
               "action": "CardService'e move metodunu ekle — listeler arası kart taşıma — temel yapı",
               "type": "code_add",
               "file": "server/src/services/card.service.ts",
@@ -1232,7 +1233,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "4.4b",
+              "order": "4.8",
               "action": "update fonksiyonunu ekle",
               "type": "code_add",
               "file": "server/src/services/card.service.ts",
@@ -1241,41 +1242,57 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "4.5a",
+              "order": "4.9",
               "action": "List controller'ını yaz — create, reorder, delete handler'ları — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/controllers/list.controller.ts",
-              "code": "import { Request, Response, NextFunction } from 'express'\nimport { ListService } from '../services/list.service'\n\nconst listService = new ListService()\n\nexport class ListController {\n  async create(req: Request, res: Response, next: NextFunction) {\n    try {",
+              "code": "import { Request, Response, NextFunction } from 'express'\nimport { ListService } from '../services/list.service'",
               "why": "Sınıf tanımı ve constructor ile temel yapı oluşturuluyor — her instance kendi state'ini taşır."
             },
             {
-              "order": "4.5b",
+              "order": "4.109",
+              "action": "List controller'ını yaz — create, reorder, delete handler'ları — import ve temel yapı (devam)",
+              "type": "code_write",
+              "code": "const listService = new ListService()\n\nexport class ListController {\n  async create(req: Request, res: Response, next: NextFunction) {\n    try {\n  // TODO: implement\n}",
+              "why": "List controller'ını yaz — create, reorder, delete handler'ları — import ve temel yapı.",
+              "file": "server/src/controllers/list.controller.ts"
+            },
+            {
+              "order": "4.10",
               "action": "List controller'ını yaz — create, reorder, delete handler'ları — devam",
               "type": "code_add",
               "file": "server/src/controllers/list.controller.ts",
-              "code": "      const list = await listService.create(req.params.boardId, req.body.title)\n      res.status(201).json({ data: list })\n    } catch (err) { next(err) }\n  }\n}",
+              "code": "      const list = await listService.create(req.params.boardId, req.body.title)\n      res.status(201).json({ data: list })\n    } catch (err) { next(err) }",
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır.",
               "position": "bottom"
             },
             {
-              "order": "4.6a",
+              "order": "4.11",
               "action": "Card controller'ını yaz — create, move, update, delete handler'ları — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/controllers/card.controller.ts",
-              "code": "import { Request, Response, NextFunction } from 'express'\nimport { CardService } from '../services/card.service'\n\nconst cardService = new CardService()\n\nexport class CardController {\n  async create(req: Request, res: Response, next: NextFunction) {\n    try {",
+              "code": "import { Request, Response, NextFunction } from 'express'\nimport { CardService } from '../services/card.service'",
               "why": "Sınıf tanımı ve constructor ile temel yapı oluşturuluyor — her instance kendi state'ini taşır."
             },
             {
-              "order": "4.6b",
+              "order": "4.111",
+              "action": "Card controller'ını yaz — create, move, update, delete handler'ları — import ve temel yapı (devam)",
+              "type": "code_write",
+              "code": "const cardService = new CardService()\n\nexport class CardController {\n  async create(req: Request, res: Response, next: NextFunction) {\n    try {\n  // TODO: implement\n}",
+              "why": "Card controller'ını yaz — create, move, update, delete handler'ları — import ve temel yapı.",
+              "file": "server/src/controllers/card.controller.ts"
+            },
+            {
+              "order": "4.12",
               "action": "Card controller'ını yaz — create, move, update, delete handler'ları — devam",
               "type": "code_add",
               "file": "server/src/controllers/card.controller.ts",
-              "code": "      const card = await cardService.create(req.params.listId, req.body)\n      res.status(201).json({ data: card })\n    } catch (err) { next(err) }\n  }\n}",
+              "code": "      const card = await cardService.create(req.params.listId, req.body)\n      res.status(201).json({ data: card })\n    } catch (err) { next(err) }",
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır.",
               "position": "bottom"
             },
             {
-              "order": "4.7a",
+              "order": "4.13",
               "action": "CardController'a update ve delete handler'larını ekle — temel yapı",
               "type": "code_add",
               "file": "server/src/controllers/card.controller.ts",
@@ -1284,7 +1301,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "4.7b",
+              "order": "4.14",
               "action": "delete fonksiyonunu ekle",
               "type": "code_add",
               "file": "server/src/controllers/card.controller.ts",
@@ -1293,7 +1310,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "4.8a",
+              "order": "4.15",
               "action": "List ve Card route dosyalarını oluştur — import'lar",
               "type": "code_write",
               "file": "server/src/routes/list.routes.ts",
@@ -1301,7 +1318,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "4.8b",
+              "order": "4.16",
               "action": "Route tanımlarını ekle",
               "type": "code_add",
               "file": "server/src/routes/list.routes.ts",
@@ -1310,7 +1327,7 @@
               "position": "bottom"
             },
             {
-              "order": "4.9a",
+              "order": "4.17",
               "action": "Card route dosyasını oluştur ve index.ts'e bağla — import'lar",
               "type": "code_write",
               "file": "server/src/routes/card.routes.ts",
@@ -1318,7 +1335,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "4.9b",
+              "order": "4.18",
               "action": "Route tanımlarını ekle",
               "type": "code_add",
               "file": "server/src/routes/card.routes.ts",
@@ -1363,7 +1380,7 @@
           "checkpoint": "Tüm API response'ları { status, data, meta } formatında olmalı. Error response'ları { status: 'error', message } formatında olmalı.",
           "substeps": [
             {
-              "order": "5.1a",
+              "order": "5.1",
               "action": "API response helper fonksiyonlarını oluştur — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/lib/api-response.ts",
@@ -1371,7 +1388,7 @@
               "why": "Fonksiyon tanımı — tek bir sorumluluğu olan, test edilebilir ve tekrar kullanılabilir bir birim."
             },
             {
-              "order": "5.1b",
+              "order": "5.2",
               "action": "export sendError fonksiyonunu ekle",
               "type": "code_add",
               "file": "server/src/lib/api-response.ts",
@@ -1457,15 +1474,23 @@
               "why": "JWT (JSON Web Token) stateless authentication sağlar. Kullanıcı giriş yapınca token alır, her istekte bu token'ı gönderir — server'da session saklamaya gerek yok."
             },
             {
-              "order": "1.2a",
+              "order": "1.2",
               "action": "AuthService iskeletini yaz — import'lar ve class — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/services/auth.service.ts",
-              "code": "import { prisma } from '../lib/prisma'\nimport { AppError } from '../middleware/error-handler'\nimport bcrypt from 'bcrypt'\nimport jwt from 'jsonwebtoken'\nimport { config } from '../config'\n\nexport class AuthService {",
+              "code": "import { prisma } from '../lib/prisma'\nimport { AppError } from '../middleware/error-handler'\nimport bcrypt from 'bcrypt'\nimport jwt from 'jsonwebtoken'\nimport { config } from '../config'",
               "why": "Sınıf tanımı ve constructor ile temel yapı oluşturuluyor — her instance kendi state'ini taşır."
             },
             {
-              "order": "1.2b",
+              "order": "1.102",
+              "action": "AuthService iskeletini yaz — import'lar ve class — import ve temel yapı (devam)",
+              "type": "code_write",
+              "code": "export class AuthService {\n  // TODO: implement\n}",
+              "why": "AuthService iskeletini yaz — import'lar ve class — import ve temel yapı.",
+              "file": "server/src/services/auth.service.ts"
+            },
+            {
+              "order": "1.3",
               "action": "AuthService iskeletini yaz — import'lar ve class — devam",
               "type": "code_add",
               "file": "server/src/services/auth.service.ts",
@@ -1474,7 +1499,7 @@
               "position": "bottom"
             },
             {
-              "order": "1.3a",
+              "order": "1.4",
               "action": "AuthService'e register metodunu ekle — email kontrolü ve parola hash'leme — temel yapı",
               "type": "code_add",
               "file": "server/src/services/auth.service.ts",
@@ -1483,16 +1508,16 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "1.3b",
+              "order": "1.5",
               "action": "AuthService'e register metodunu ekle — email kontrolü ve parola hash'leme — devam",
               "type": "code_add",
               "file": "server/src/services/auth.service.ts",
               "position": "in:class AuthService",
-              "code": "    })\n    return this.generateTokens(user.id)\n  }",
+              "code": "    return this.generateTokens(user.id)",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
-              "order": "1.4a",
+              "order": "1.6",
               "action": "register'ın ALTINA login metodunu ekle — parola doğrulama — temel yapı",
               "type": "code_add",
               "file": "server/src/services/auth.service.ts",
@@ -1501,7 +1526,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "1.4b",
+              "order": "1.7",
               "action": "register'ın ALTINA login metodunu ekle — parola doğrulama — devam",
               "type": "code_add",
               "file": "server/src/services/auth.service.ts",
@@ -1510,21 +1535,29 @@
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
-              "order": "1.5a",
+              "order": "1.8",
               "action": "login'in ALTINA generateTokens ve getMe helper'larını ekle — temel yapı",
               "type": "code_add",
               "file": "server/src/services/auth.service.ts",
               "position": "after:login",
-              "code": "  private generateTokens(userId: string) {\n    const accessToken = jwt.sign({ userId }, config.jwtSecret, { expiresIn: '15m' })\n    const refreshToken = jwt.sign({ userId }, config.jwtSecret, { expiresIn: '7d' })\n    return { accessToken, refreshToken }\n  }\n\n  async getMe(userId: string) {\n    return prisma.user.findUnique({",
+              "code": "  private generateTokens(userId: string) {\n    const accessToken = jwt.sign({ userId }, config.jwtSecret, { expiresIn: '15m' })\n    const refreshToken = jwt.sign({ userId }, config.jwtSecret, { expiresIn: '7d' })\n    return { accessToken, refreshToken }\n  }",
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "1.5b",
+              "order": "1.108",
+              "action": "login'in ALTINA generateTokens ve getMe helper'larını ekle — temel yapı (devam)",
+              "type": "code_add",
+              "code": "  async getMe(userId: string) {\n    return prisma.user.findUnique({\n  // TODO: implement\n}",
+              "why": "login'in ALTINA generateTokens ve getMe helper'larını ekle — temel yapı.",
+              "file": "server/src/services/auth.service.ts"
+            },
+            {
+              "order": "1.9",
               "action": "login'in ALTINA generateTokens ve getMe helper'larını ekle — devam",
               "type": "code_add",
               "file": "server/src/services/auth.service.ts",
               "position": "after:login",
-              "code": "      where: { id: userId },\n      select: { id: true, email: true, name: true, createdAt: true }\n    })\n  }",
+              "code": "      where: { id: userId },\n      select: { id: true, email: true, name: true, createdAt: true }",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
@@ -1580,15 +1613,16 @@
               "why": "Authorization header'ından Bearer token çıkarılır. Token yoksa hemen 401 döner. jwt.verify ile doğrulamayı sonraki adımda ekleyeceğiz."
             },
             {
-              "order": "2.3a",
+              "order": "2.3",
               "code": "  try {\n    const token = header.split(' ')[1]\n    const decoded = jwt.verify(token, config.jwtSecret) as { userId: string }",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/middleware/auth.middleware.ts",
               "action": "İş mantığını ekle",
-              "why": "İş mantığının devamı — önceki adımda başlanan yapıya yeni fonksiyonellik ekleniyor."
+              "why": "İş mantığının devamı — önceki adımda başlanan yapıya yeni fonksiyonellik ekleniyor.",
+              "position": "bottom"
             },
             {
-              "order": "2.3b",
+              "order": "2.4",
               "code": "    req.userId = decoded.userId\n    next()\n  } catch {\n    res.status(401).json({ error: 'Geçersiz token' })\n  }\n}",
               "type": "code_add",
               "file": "server/src/middleware/auth.middleware.ts",
@@ -1649,7 +1683,7 @@
               "why": "Rate limiting, brute force saldırılarını önler. Bir IP'den dakikada belirli sayıda istek sınırı koyar."
             },
             {
-              "order": "3.2a",
+              "order": "3.2",
               "action": "Genel ve auth özel rate limiter'larını yaz — import'lar",
               "type": "code_write",
               "file": "server/src/middleware/rate-limit.ts",
@@ -1657,7 +1691,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "3.2b",
+              "order": "3.3",
               "action": "Genel ve auth özel rate limiter'larını yaz — devam",
               "type": "code_add",
               "file": "server/src/middleware/rate-limit.ts",
@@ -1711,7 +1745,7 @@
           "checkpoint": "POST /api/auth/register ile yeni kullanıcı oluşturulabilmeli. POST /api/auth/login ile token alınabilmeli. POST /api/auth/refresh ile yeni access token alınabilmeli.",
           "substeps": [
             {
-              "order": "4.1a",
+              "order": "4.1",
               "action": "Auth validation schema'larını yaz — register ve login — import'lar",
               "type": "code_write",
               "file": "server/src/validators/auth.validator.ts",
@@ -1719,7 +1753,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "4.1b",
+              "order": "4.2",
               "action": "Auth validation schema'larını yaz — register ve login — devam",
               "type": "code_add",
               "file": "server/src/validators/auth.validator.ts",
@@ -1728,19 +1762,27 @@
               "position": "bottom"
             },
             {
-              "order": "4.2a",
+              "order": "4.3",
               "action": "Auth controller'ını yaz — register, login, getMe handler'ları — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/controllers/auth.controller.ts",
-              "code": "import { Request, Response, NextFunction } from 'express'\nimport { AuthService } from '../services/auth.service'\n\nconst authService = new AuthService()\n\nexport class AuthController {\n  async register(req: Request, res: Response, next: NextFunction) {\n    try {",
+              "code": "import { Request, Response, NextFunction } from 'express'\nimport { AuthService } from '../services/auth.service'",
               "why": "Sınıf tanımı ve constructor ile temel yapı oluşturuluyor — her instance kendi state'ini taşır."
             },
             {
-              "order": "4.2b",
+              "order": "4.103",
+              "action": "Auth controller'ını yaz — register, login, getMe handler'ları — import ve temel yapı (devam)",
+              "type": "code_write",
+              "code": "const authService = new AuthService()\n\nexport class AuthController {\n  async register(req: Request, res: Response, next: NextFunction) {\n    try {\n  // TODO: implement\n}",
+              "why": "Auth controller'ını yaz — register, login, getMe handler'ları — import ve temel yapı.",
+              "file": "server/src/controllers/auth.controller.ts"
+            },
+            {
+              "order": "4.4",
               "action": "Auth controller'ını yaz — register, login, getMe handler'ları — devam",
               "type": "code_add",
               "file": "server/src/controllers/auth.controller.ts",
-              "code": "      const tokens = await authService.register(req.body.email, req.body.password, req.body.name)\n      res.status(201).json({ data: tokens })\n    } catch (err) { next(err) }\n  }\n}",
+              "code": "      const tokens = await authService.register(req.body.email, req.body.password, req.body.name)\n      res.status(201).json({ data: tokens })\n    } catch (err) { next(err) }",
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır.",
               "position": "bottom"
             },
@@ -1754,7 +1796,7 @@
               "why": "getMe, M3 2.2'deki authenticate middleware'den gelen req.userId ile kullanıcı bilgisini döner. Frontend uygulama açıldığında 'kim giriş yapmış?' sorusunu bu endpoint'le cevaplar."
             },
             {
-              "order": "4.4a",
+              "order": "4.6",
               "action": "Auth route tanımlarını yaz — public ve protected ayrımıyla — import'lar",
               "type": "code_write",
               "file": "server/src/routes/auth.routes.ts",
@@ -1762,7 +1804,7 @@
               "why": "Gerekli modüller ve bağımlılıklar import ediliyor — her import belirli bir sorumluluğu olan bir kütüphane veya dosyayı temsil eder."
             },
             {
-              "order": "4.4b",
+              "order": "4.7",
               "action": "Auth route tanımlarını yaz — public ve protected ayrımıyla — devam",
               "type": "code_add",
               "file": "server/src/routes/auth.routes.ts",
@@ -1833,7 +1875,7 @@
               "why": "Her API isteğine otomatik token ekler — her component'te manuel header yazmak yerine. localStorage'dan token okunur. Token yoksa header eklenmez — public endpoint'ler çalışır."
             },
             {
-              "order": "5.3a",
+              "order": "5.3",
               "action": "Request interceptor'un ALTINA — response interceptor ekle (token yenileme) — temel yapı",
               "type": "code_add",
               "file": "client/src/lib/api.ts",
@@ -1842,7 +1884,7 @@
               "why": "Fonksiyon tanımı — tek bir sorumluluğu olan, test edilebilir ve tekrar kullanılabilir bir birim."
             },
             {
-              "order": "5.3b",
+              "order": "5.4",
               "action": "Request interceptor'un ALTINA — response interceptor ekle (token yenileme) — devam",
               "type": "code_add",
               "file": "client/src/lib/api.ts",
@@ -1851,7 +1893,7 @@
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
-              "order": "5.4a",
+              "order": "5.5",
               "action": "Auth context iskeletini oluştur — interface ve createContext — import'lar",
               "type": "code_write",
               "file": "client/src/contexts/auth-context.tsx",
@@ -1859,7 +1901,7 @@
               "why": "TypeScript interface ile tip tanımı yapılıyor — IDE otomatik tamamlama ve derleme zamanı hata yakalama sağlar."
             },
             {
-              "order": "5.4b",
+              "order": "5.6",
               "action": "Auth context iskeletini oluştur — interface ve createContext — devam",
               "type": "code_add",
               "file": "client/src/contexts/auth-context.tsx",
@@ -1868,7 +1910,7 @@
               "position": "bottom"
             },
             {
-              "order": "5.5a",
+              "order": "5.7",
               "action": "AuthProvider component'ini yaz — state ve useEffect — temel yapı",
               "type": "code_add",
               "file": "client/src/contexts/auth-context.tsx",
@@ -1877,7 +1919,7 @@
               "why": "React hook'ları ile component state'i ve side effect'ler tanımlanıyor — her hook belirli bir sorumluluğu yönetir."
             },
             {
-              "order": "5.5b",
+              "order": "5.8",
               "action": "AuthProvider component'ini yaz — state ve useEffect — devam",
               "type": "code_add",
               "file": "client/src/contexts/auth-context.tsx",
@@ -1895,7 +1937,7 @@
               "why": "Login: API'ye credentials gönder → token al → localStorage'a kaydet → kullanıcı bilgisini çek. 5.2'deki interceptor sonraki isteklere token'ı otomatik ekler."
             },
             {
-              "order": "5.7a",
+              "order": "5.10",
               "action": "login'in ALTINA register ve logout fonksiyonlarını ekle — temel yapı",
               "type": "code_add",
               "file": "client/src/contexts/auth-context.tsx",
@@ -1904,7 +1946,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "5.7b",
+              "order": "5.11",
               "action": "login'in ALTINA register ve logout fonksiyonlarını ekle — devam",
               "type": "code_add",
               "file": "client/src/contexts/auth-context.tsx",
@@ -1913,7 +1955,7 @@
               "why": "Fonksiyon tanımı — tek bir sorumluluğu olan, test edilebilir ve tekrar kullanılabilir bir birim."
             },
             {
-              "order": "5.8a",
+              "order": "5.12",
               "action": "AuthProvider'ın return'ünü ve useAuth hook'unu yaz — temel yapı",
               "type": "code_add",
               "file": "client/src/contexts/auth-context.tsx",
@@ -1922,7 +1964,7 @@
               "why": "Dosyanın temel yapısı ve bağımlılıkları tanımlanıyor — modülün çalışması için gerekli altyapı."
             },
             {
-              "order": "5.8b",
+              "order": "5.13",
               "action": "export useAuth fonksiyonunu ekle",
               "type": "code_add",
               "file": "client/src/contexts/auth-context.tsx",
@@ -1984,7 +2026,7 @@
           "checkpoint": "Login olmadan / adresine gidince /login'e yönlendirmeli. Login olduktan sonra board listesi görünmeli. URL değişimlerinde doğru sayfalar render olmalı.",
           "substeps": [
             {
-              "order": "1.1a",
+              "order": "1.1",
               "action": "App.tsx'i aç — Router ve tek route ile iskelet yaz — import ve temel yapı",
               "type": "code_write",
               "file": "client/src/App.tsx",
@@ -1992,7 +2034,7 @@
               "why": "Component'in JSX çıktısını tanımlıyoruz — React, bu yapıyı DOM'a render eder."
             },
             {
-              "order": "1.1b",
+              "order": "1.2",
               "action": "App.tsx'i aç — Router ve tek route ile iskelet yaz — devam",
               "type": "code_add",
               "file": "client/src/App.tsx",
@@ -2017,7 +2059,7 @@
               "why": "Layout tüm sayfaları sarar. useAuth ile kullanıcı bilgisi alınır. Dark tema: bg-gray-900 arka plan. Header ve main alanını ayrı ekleyeceğiz."
             },
             {
-              "order": "1.4a",
+              "order": "1.5",
               "action": "Layout'un header ve main alanını tamamla — temel yapı",
               "type": "code_add",
               "file": "client/src/components/Layout.tsx",
@@ -2026,7 +2068,7 @@
               "why": "UI elementlerini oluşturuyoruz — className ile Tailwind stilleri, event handler'lar ile kullanıcı etkileşimi tanımlanır."
             },
             {
-              "order": "1.4b",
+              "order": "1.6",
               "action": "UI elementlerini ekle",
               "type": "code_add",
               "file": "client/src/components/Layout.tsx",
@@ -2079,7 +2121,7 @@
           "checkpoint": "Board listesi API'den yüklenmeli. Yeni board oluşturunca liste güncellenmeli. Loading sırasında skeleton gösterilmeli.",
           "substeps": [
             {
-              "order": "2.1a",
+              "order": "2.1",
               "code": "import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'\nimport api from '../lib/api'\n",
               "type": "code_write",
               "file": "client/src/hooks/use-boards.ts",
@@ -2087,7 +2129,7 @@
               "why": "Gerekli modüller import ediliyor ve temel yapı oluşturuluyor."
             },
             {
-              "order": "2.1b",
+              "order": "2.2",
               "code": "export function useBoards() {\n  return useQuery({\n    queryKey: ['boards'],\n    queryFn: () => api.get('/boards').then(res => res.data.data)\n  })\n}",
               "type": "code_add",
               "file": "client/src/hooks/use-boards.ts",
@@ -2113,7 +2155,7 @@
               "why": "2.1 ve 2.2'deki hook'ları import ediyoruz. useState ile form state yönetimi. isLoading ile yükleme durumu kontrol edilir."
             },
             {
-              "order": "2.4a",
+              "order": "2.5",
               "action": "BoardsPage'in return'ünü yaz — form ve board listesi — temel yapı",
               "type": "code_add",
               "file": "client/src/pages/BoardsPage.tsx",
@@ -2122,7 +2164,7 @@
               "why": "Component'in JSX çıktısını tanımlıyoruz — React, bu yapıyı DOM'a render eder."
             },
             {
-              "order": "2.4b",
+              "order": "2.6",
               "action": "BoardsPage'in return'ünü yaz — form ve board listesi — devam",
               "type": "code_add",
               "file": "client/src/pages/BoardsPage.tsx",
@@ -2140,7 +2182,7 @@
               "why": "2.3'te başlayan JSX'i tamamlıyoruz. Link ile board'a tıklayınca M4 1.4'teki /boards/:id route'una gider. Grid layout ile board kartları responsive gösterilir."
             },
             {
-              "order": "2.6a",
+              "order": "2.8",
               "action": "Form'un ALTINA board grid listesini ekle — temel yapı",
               "type": "code_add",
               "file": "client/src/pages/BoardsPage.tsx",
@@ -2149,7 +2191,7 @@
               "why": "UI elementlerini oluşturuyoruz — className ile Tailwind stilleri, event handler'lar ile kullanıcı etkileşimi tanımlanır."
             },
             {
-              "order": "2.6b",
+              "order": "2.9",
               "action": "Form'un ALTINA board grid listesini ekle — devam",
               "type": "code_add",
               "file": "client/src/pages/BoardsPage.tsx",
@@ -2194,7 +2236,7 @@
           "checkpoint": "Board detay sayfasında listeler yatay, kartlar dikey olarak görünmeli. Yatay scroll çalışmalı. Kart etiketleri ve tarihleri gösterilmeli.",
           "substeps": [
             {
-              "order": "3.1a",
+              "order": "3.1",
               "action": "BoardDetailPage iskeletini yaz — useParams ve useQuery ile — import ve temel yapı",
               "type": "code_write",
               "file": "client/src/pages/BoardDetailPage.tsx",
@@ -2202,7 +2244,7 @@
               "why": "React hook'ları ile component state'i ve side effect'ler tanımlanıyor — her hook belirli bir sorumluluğu yönetir."
             },
             {
-              "order": "3.1b",
+              "order": "3.2",
               "action": "BoardDetailPage iskeletini yaz — useParams ve useQuery ile — devam",
               "type": "code_add",
               "file": "client/src/pages/BoardDetailPage.tsx",
@@ -2211,7 +2253,7 @@
               "position": "bottom"
             },
             {
-              "order": "3.2a",
+              "order": "3.3",
               "action": "BoardDetailPage'in return'ünde listeleri kolon olarak göster — temel yapı",
               "type": "code_add",
               "file": "client/src/pages/BoardDetailPage.tsx",
@@ -2220,12 +2262,12 @@
               "why": "Component'in JSX çıktısını tanımlıyoruz — React, bu yapıyı DOM'a render eder."
             },
             {
-              "order": "3.2b",
+              "order": "3.4",
               "action": "BoardDetailPage'in return'ünde listeleri kolon olarak göster — devam",
               "type": "code_add",
               "file": "client/src/pages/BoardDetailPage.tsx",
               "position": "after:if (!board)",
-              "code": "        ))}\n      </div>\n    </div>\n  )\n}",
+              "code": "      </div>\n    </div>",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor."
             },
             {
@@ -2237,7 +2279,7 @@
               "why": "3.2'deki inline JSX'i ayrı component'e taşıyoruz. Props interface ile tip güvenliği. boardId ileride kart ekleme için lazım."
             },
             {
-              "order": "3.4a",
+              "order": "3.6",
               "action": "KanbanList'in kart listesi ve kapanış JSX'ini yaz — temel yapı",
               "type": "code_add",
               "file": "client/src/components/KanbanList.tsx",
@@ -2246,7 +2288,7 @@
               "why": "UI elementlerini oluşturuyoruz — className ile Tailwind stilleri, event handler'lar ile kullanıcı etkileşimi tanımlanır."
             },
             {
-              "order": "3.4b",
+              "order": "3.7",
               "action": "KanbanList'in kart listesi ve kapanış JSX'ini yaz — devam",
               "type": "code_add",
               "file": "client/src/components/KanbanList.tsx",
@@ -2299,7 +2341,7 @@
           "checkpoint": "Listeye yeni kart eklenebilmeli. Enter ile gönder, Escape ile iptal çalışmalı. Kart eklenince liste anında güncellenmeli.",
           "substeps": [
             {
-              "order": "4.1a",
+              "order": "4.1",
               "action": "useCreateCard hook'unu yaz — kart mutation'ı — import ve temel yapı",
               "type": "code_write",
               "file": "client/src/hooks/use-cards.ts",
@@ -2307,16 +2349,16 @@
               "why": "React hook'ları ile component state'i ve side effect'ler tanımlanıyor — her hook belirli bir sorumluluğu yönetir."
             },
             {
-              "order": "4.1b",
+              "order": "4.2",
               "action": "useCreateCard hook'unu yaz — kart mutation'ı — devam",
               "type": "code_add",
               "file": "client/src/hooks/use-cards.ts",
-              "code": "    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['board', boardId] })\n  })\n}",
+              "code": "    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['board', boardId] })",
               "why": "Fonksiyon tanımı — tek bir sorumluluğu olan, test edilebilir ve tekrar kullanılabilir bir birim.",
               "position": "bottom"
             },
             {
-              "order": "4.2a",
+              "order": "4.3",
               "action": "AddCard component'ini oluştur — toggle form — import ve temel yapı",
               "type": "code_write",
               "file": "client/src/components/AddCard.tsx",
@@ -2324,7 +2366,7 @@
               "why": "TypeScript interface ile tip tanımı yapılıyor — IDE otomatik tamamlama ve derleme zamanı hata yakalama sağlar."
             },
             {
-              "order": "4.2b",
+              "order": "4.4",
               "action": "AddCard component'ini oluştur — toggle form — devam",
               "type": "code_add",
               "file": "client/src/components/AddCard.tsx",
@@ -2351,7 +2393,7 @@
               "why": "4.3'te buton gösterdik, isOpen true iken bu form gösterilir. Submit'te createCard.mutate çağrılır ve form kapanır."
             },
             {
-              "order": "4.5a",
+              "order": "4.7",
               "action": "Form'un input ve butonlarını ekle — temel yapı",
               "type": "code_add",
               "file": "client/src/components/AddCard.tsx",
@@ -2360,7 +2402,7 @@
               "why": "UI elementlerini oluşturuyoruz — className ile Tailwind stilleri, event handler'lar ile kullanıcı etkileşimi tanımlanır."
             },
             {
-              "order": "4.5b",
+              "order": "4.8",
               "action": "Form'un input ve butonlarını ekle — devam",
               "type": "code_add",
               "file": "client/src/components/AddCard.tsx",
@@ -2421,7 +2463,7 @@
               "why": "Loading state için görsel spinner. Tailwind animate-spin ile CSS animasyonu. border-t-transparent ile dönen halka efekti oluşur."
             },
             {
-              "order": "5.2a",
+              "order": "5.2",
               "action": "EmptyState component'ini oluştur — boş liste mesajı — temel yapı",
               "type": "code_write",
               "file": "client/src/components/EmptyState.tsx",
@@ -2429,7 +2471,7 @@
               "why": "TypeScript interface ile tip tanımı yapılıyor — IDE otomatik tamamlama ve derleme zamanı hata yakalama sağlar."
             },
             {
-              "order": "5.2b",
+              "order": "5.3",
               "action": "UI elementlerini ekle",
               "type": "code_add",
               "file": "client/src/components/EmptyState.tsx",
@@ -2438,7 +2480,7 @@
               "position": "bottom"
             },
             {
-              "order": "5.3a",
+              "order": "5.4",
               "action": "ErrorFallback component'ini oluştur — hata mesajı ve tekrar dene — temel yapı",
               "type": "code_write",
               "file": "client/src/components/ErrorFallback.tsx",
@@ -2446,7 +2488,7 @@
               "why": "TypeScript interface ile tip tanımı yapılıyor — IDE otomatik tamamlama ve derleme zamanı hata yakalama sağlar."
             },
             {
-              "order": "5.3b",
+              "order": "5.5",
               "action": "UI elementlerini ekle",
               "type": "code_add",
               "file": "client/src/components/ErrorFallback.tsx",
@@ -2524,7 +2566,7 @@
               "why": "@dnd-kit/core: temel drag-drop altyapısı. @dnd-kit/sortable: sıralama desteği. @dnd-kit/utilities: CSS transform helper'ları. React için en performanslı DnD kütüphanesi."
             },
             {
-              "order": "1.2a",
+              "order": "1.2",
               "action": "KanbanBoard component'i oluştur — DndContext iskelet — import'lar",
               "type": "code_write",
               "file": "client/src/components/KanbanBoard.tsx",
@@ -2532,7 +2574,7 @@
               "why": "Gerekli modüller ve bağımlılıklar import ediliyor — her import belirli bir sorumluluğu olan bir kütüphane veya dosyayı temsil eder."
             },
             {
-              "order": "1.2b",
+              "order": "1.3",
               "action": "export default KanbanBoard fonksiyonunu ekle",
               "type": "code_add",
               "file": "client/src/components/KanbanBoard.tsx",
@@ -2541,7 +2583,7 @@
               "position": "bottom"
             },
             {
-              "order": "1.3a",
+              "order": "1.4",
               "action": "KanbanBoard'un handleDragEnd ve return'ünü yaz — temel yapı",
               "type": "code_add",
               "file": "client/src/components/KanbanBoard.tsx",
@@ -2550,7 +2592,7 @@
               "why": "Koşul kontrolü ve erken dönüş pattern'ı — geçersiz durumlar erkenden yakalanıp uygun hata mesajı döner."
             },
             {
-              "order": "1.3b",
+              "order": "1.5",
               "action": "UI elementlerini ekle",
               "type": "code_add",
               "file": "client/src/components/KanbanBoard.tsx",
@@ -2603,7 +2645,7 @@
           "checkpoint": "Kartlar smooth animasyonla sürüklenmeli. Sürüklenen kartın orijinal yeri yarı saydam olmalı. Bırakıldığında animasyonla yerine oturmalı.",
           "substeps": [
             {
-              "order": "2.1a",
+              "order": "2.1",
               "action": "SortableCard component'ini oluştur — useSortable ile sürüklenebilir kart — import'lar",
               "type": "code_write",
               "file": "client/src/components/SortableCard.tsx",
@@ -2611,7 +2653,7 @@
               "why": "Gerekli modüller ve bağımlılıklar import ediliyor — her import belirli bir sorumluluğu olan bir kütüphane veya dosyayı temsil eder."
             },
             {
-              "order": "2.1b",
+              "order": "2.2",
               "action": "export default SortableCard fonksiyonunu ekle",
               "type": "code_add",
               "file": "client/src/components/SortableCard.tsx",
@@ -2620,7 +2662,7 @@
               "position": "bottom"
             },
             {
-              "order": "2.2a",
+              "order": "2.3",
               "action": "SortableCard'ın return JSX'ini yaz — priority badge dahil — temel yapı",
               "type": "code_add",
               "file": "client/src/components/SortableCard.tsx",
@@ -2629,7 +2671,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "2.2b",
+              "order": "2.4",
               "action": "Component return JSX'ini yaz",
               "type": "code_add",
               "file": "client/src/components/SortableCard.tsx",
@@ -2638,15 +2680,16 @@
               "why": "Component'in JSX çıktısını tanımlıyoruz — React, bu yapıyı DOM'a render eder."
             },
             {
-              "order": "2.3a",
+              "order": "2.5",
               "code": "      <div className=\"flex items-center gap-2\">\n        <span className={`w-2 h-2 rounded-full ${\n          {high:'bg-red-500',medium:'bg-yellow-500',low:'bg-green-500'}[card.priority||'medium']\n        }`} />",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/SortableCard.tsx",
               "action": "İş mantığını ekle",
-              "why": "İş mantığının devamı — önceki adımda başlanan yapıya yeni fonksiyonellik ekleniyor."
+              "why": "İş mantığının devamı — önceki adımda başlanan yapıya yeni fonksiyonellik ekleniyor.",
+              "position": "bottom"
             },
             {
-              "order": "2.3b",
+              "order": "2.6",
               "code": "        <span>{card.title}</span>\n      </div>\n    </div>\n  )\n}",
               "type": "code_add",
               "file": "client/src/components/SortableCard.tsx",
@@ -2707,7 +2750,7 @@
           "checkpoint": "Kart bir listeden diğerine sürüklendiğinde anında taşınmalı (API yanıtı beklenmeden). Bırakıldığında API çağrısı yapılmalı. Hata durumunda eski haline dönmeli.",
           "substeps": [
             {
-              "order": "3.1a",
+              "order": "3.1",
               "code": "// Mevcut useCreateCard'ın ALTINA ekle:\nexport function useMoveCard(boardId: string) {\n  const queryClient = useQueryClient()",
               "type": "code_write",
               "file": "client/src/hooks/use-cards.ts",
@@ -2715,7 +2758,7 @@
               "why": "İş mantığının devamı — önceki adımda başlanan yapıya yeni fonksiyonellik ekleniyor."
             },
             {
-              "order": "3.1b",
+              "order": "3.2",
               "code": "  return useMutation({\n    mutationFn: (data: { cardId: string; listId: string; position: number }) =>\n      api.put(`/cards/${data.cardId}/move`, { listId: data.listId, position: data.position }),\n    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['board', boardId] })\n  })\n}",
               "type": "code_add",
               "file": "client/src/hooks/use-cards.ts",
@@ -2732,7 +2775,7 @@
               "why": "1.3'teki placeholder'ı gerçek taşıma mantığı ile değiştiriyoruz. active.id kartı tanımlar, over.id hedef listeyi tanımlar. 3.1'deki useMoveCard ile API'ye bildirilir."
             },
             {
-              "order": "3.3a",
+              "order": "3.4",
               "action": "handleDragEnd'de liste içi ve listeler arası taşımayı ayırt et — temel yapı",
               "type": "code_modify",
               "file": "client/src/components/KanbanBoard.tsx",
@@ -2740,7 +2783,7 @@
               "why": "Fonksiyon tanımı — tek bir sorumluluğu olan, test edilebilir ve tekrar kullanılabilir bir birim."
             },
             {
-              "order": "3.3b",
+              "order": "3.5",
               "action": "handleDragEnd'de liste içi ve listeler arası taşımayı ayırt et — devam",
               "type": "code_modify",
               "file": "client/src/components/KanbanBoard.tsx",
@@ -2922,7 +2965,7 @@
               "why": "Jest: test runner. ts-jest: TypeScript desteği. supertest: HTTP endpoint'lerini test eder — gerçek server başlatmadan API testleri yazabilirsin."
             },
             {
-              "order": "1.2a",
+              "order": "1.2",
               "action": "Jest config dosyasını oluştur — import'lar",
               "type": "code_write",
               "file": "server/jest.config.ts",
@@ -2930,7 +2973,7 @@
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "1.2b",
+              "order": "1.3",
               "action": "Jest config dosyasını oluştur — devam",
               "type": "code_add",
               "file": "server/jest.config.ts",
@@ -2955,7 +2998,7 @@
               "why": "Test'te supertest kendi port'unu açar — app.listen çakışır. M1 3.4'te yazdığımız index.ts'i test-friendly yapıyoruz."
             },
             {
-              "order": "1.5a",
+              "order": "1.6",
               "action": "Auth test dosyasını oluştur — register ve login testleri — import'lar",
               "type": "code_write",
               "file": "server/src/__tests__/auth.test.ts",
@@ -2963,7 +3006,7 @@
               "why": "Test suite iskeletini oluşturuyoruz — describe bloğu ilgili testleri gruplar, beforeEach/beforeAll test ortamını hazırlar."
             },
             {
-              "order": "1.5b",
+              "order": "1.7",
               "action": "Test case'lerini ekle",
               "type": "code_add",
               "file": "server/src/__tests__/auth.test.ts",
@@ -2972,15 +3015,16 @@
               "position": "bottom"
             },
             {
-              "order": "1.6a",
+              "order": "1.8",
               "code": "  it('should reject duplicate email', async () => {\n    await request(app).post('/api/auth/register')\n      .send({ email: 'a@b.com', password: '123456', name: 'T' })\n    const res = await request(app).post('/api/auth/register')\n      .send({ email: 'a@b.com', password: '123456', name: 'T' })\n    expect(res.status).toBe(409)\n  })\n",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/__tests__/auth.test.ts",
               "action": "Test case'leri ekle",
-              "why": "Test case'leri ekleniyor — her test bağımsız çalışır ve belirli bir davranışı doğrular."
+              "why": "Test case'leri ekleniyor — her test bağımsız çalışır ve belirli bir davranışı doğrular.",
+              "position": "bottom"
             },
             {
-              "order": "1.6b",
+              "order": "1.9",
               "code": "  it('should login correctly', async () => {\n    await request(app).post('/api/auth/register')\n      .send({ email: 'a@b.com', password: '123456', name: 'T' })\n    const res = await request(app).post('/api/auth/login')\n      .send({ email: 'a@b.com', password: '123456' })\n    expect(res.status).toBe(200)\n  })\n})",
               "type": "code_add",
               "file": "server/src/__tests__/auth.test.ts",
@@ -3025,7 +3069,7 @@
           "checkpoint": "Board CRUD testleri (create, read, update, delete) geçmeli. Authorization testleri (başka kullanıcı erişimi engellenmeli) geçmeli.",
           "substeps": [
             {
-              "order": "2.1a",
+              "order": "2.1",
               "action": "Board test dosyasını oluştur — auth helper ve ilk CRUD testi — import ve temel yapı",
               "type": "code_write",
               "file": "server/src/__tests__/board.test.ts",
@@ -3033,7 +3077,7 @@
               "why": "Asenkron işlem fonksiyonu tanımlanıyor — await ile veritabanı/API çağrıları sıralı şekilde çalıştırılır."
             },
             {
-              "order": "2.1b",
+              "order": "2.2",
               "action": "Board test dosyasını oluştur — auth helper ve ilk CRUD testi — devam",
               "type": "code_add",
               "file": "server/src/__tests__/board.test.ts",
@@ -3042,7 +3086,7 @@
               "position": "bottom"
             },
             {
-              "order": "2.2a",
+              "order": "2.3",
               "action": "Board CRUD test case'lerini ekle — create, getAll, getById — temel yapı",
               "type": "code_add",
               "file": "server/src/__tests__/board.test.ts",
@@ -3051,7 +3095,7 @@
               "why": "Test case'leri ekleniyor — her test bağımsız çalışır ve belirli bir davranışı doğrular."
             },
             {
-              "order": "2.2b",
+              "order": "2.4",
               "action": "Test case'lerini ekle",
               "type": "code_add",
               "file": "server/src/__tests__/board.test.ts",
@@ -3060,7 +3104,7 @@
               "why": "Test case'leri ekleniyor — her test bağımsız çalışır ve belirli bir davranışı doğrular."
             },
             {
-              "order": "2.3a",
+              "order": "2.5",
               "action": "Token olmadan erişim testini ve delete testini ekle — temel yapı",
               "type": "code_add",
               "file": "server/src/__tests__/board.test.ts",
@@ -3069,12 +3113,12 @@
               "why": "Test case'leri ekleniyor — her test bağımsız çalışır ve belirli bir davranışı doğrular."
             },
             {
-              "order": "2.3b",
+              "order": "2.6",
               "action": "Token olmadan erişim testini ve delete testini ekle — devam",
               "type": "code_add",
               "file": "server/src/__tests__/board.test.ts",
               "position": "after:list test",
-              "code": "      .set('Authorization', `Bearer ${token}`)\n      .send({ title: 'To Delete' })\n    const res = await request(app).delete(`/api/boards/${create.body.data.id}`)\n      .set('Authorization', `Bearer ${token}`)\n    expect(res.status).toBe(204)\n  })\n})",
+              "code": "      .set('Authorization', `Bearer ${token}`)\n      .send({ title: 'To Delete' })\n    const res = await request(app).delete(`/api/boards/${create.body.data.id}`)\n      .set('Authorization', `Bearer ${token}`)\n    expect(res.status).toBe(204)",
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
@@ -3199,7 +3243,7 @@
               "why": "GitHub Actions, .github/workflows/ klasöründeki YAML dosyalarını otomatik çalıştırır. Her push'ta testler koşar."
             },
             {
-              "order": "4.2a",
+              "order": "4.2",
               "action": "CI workflow dosyasını oluştur — lint, type check ve test — temel yapı",
               "type": "code_write",
               "file": ".github/workflows/ci.yml",
@@ -3207,7 +3251,7 @@
               "why": "Dosyanın temel yapısı ve bağımlılıkları tanımlanıyor — modülün çalışması için gerekli altyapı."
             },
             {
-              "order": "4.2b",
+              "order": "4.3",
               "action": "CI workflow dosyasını oluştur — lint, type check ve test — devam",
               "type": "code_add",
               "file": ".github/workflows/ci.yml",
@@ -3216,7 +3260,7 @@
               "position": "bottom"
             },
             {
-              "order": "4.2c",
+              "order": "4.4",
               "action": "CI workflow dosyasını oluştur — lint, type check ve test — tamamla",
               "type": "code_add",
               "file": ".github/workflows/ci.yml",
@@ -3225,7 +3269,7 @@
               "position": "bottom"
             },
             {
-              "order": "4.3a",
+              "order": "4.5",
               "action": "CI workflow'a build ve test adımlarını ekle — temel yapı",
               "type": "code_add",
               "file": ".github/workflows/ci.yml",
@@ -3234,7 +3278,7 @@
               "why": "Dosyanın temel yapısı ve bağımlılıkları tanımlanıyor — modülün çalışması için gerekli altyapı."
             },
             {
-              "order": "4.3b",
+              "order": "4.6",
               "action": "CI workflow'a build ve test adımlarını ekle — devam",
               "type": "code_add",
               "file": ".github/workflows/ci.yml",
@@ -3312,16 +3356,25 @@
               "why": "5.3'te token aldık, burada test board'u ve ilk listId'yi alıyoruz. M2 1.5'teki create servisimiz otomatik 3 liste oluşturur."
             },
             {
-              "order": "5.5a",
-              "code": "  it('should create a card', async () => {\n    const res = await request(app).post(`/api/lists/${listId}/cards`)\n      .set('Authorization', `Bearer ${token}`)\n      .send({ title: 'Test Card' })\n    expect(res.status).toBe(201)\n  })\n\n  it('should delete a card', async () => {",
-              "type": "code_write",
+              "order": "5.5",
+              "code": "  it('should create a card', async () => {\n    const res = await request(app).post(`/api/lists/${listId}/cards`)\n      .set('Authorization', `Bearer ${token}`)\n      .send({ title: 'Test Card' })\n    expect(res.status).toBe(201)\n  })",
+              "type": "code_add",
               "file": "server/src/__tests__/card.test.ts",
               "action": "Test case'leri ekle",
-              "why": "Test case'leri ekleniyor — her test bağımsız çalışır ve belirli bir davranışı doğrular."
+              "why": "Test case'leri ekleniyor — her test bağımsız çalışır ve belirli bir davranışı doğrular.",
+              "position": "bottom"
             },
             {
-              "order": "5.5b",
-              "code": "    const create = await request(app).post(`/api/lists/${listId}/cards`)\n      .set('Authorization', `Bearer ${token}`)\n      .send({ title: 'To Delete' })\n    const res = await request(app).delete(`/api/cards/${create.body.data.id}`)\n      .set('Authorization', `Bearer ${token}`)\n    expect(res.status).toBe(204)\n  })\n})",
+              "order": "5.105",
+              "action": "Test case'leri ekle (devam)",
+              "type": "code_add",
+              "code": "  it('should delete a card', async () => {\n  // TODO: implement\n}",
+              "why": "Test case'leri ekle.",
+              "file": "server/src/__tests__/card.test.ts"
+            },
+            {
+              "order": "5.6",
+              "code": "    const create = await request(app).post(`/api/lists/${listId}/cards`)\n      .set('Authorization', `Bearer ${token}`)\n      .send({ title: 'To Delete' })\n    const res = await request(app).delete(`/api/cards/${create.body.data.id}`)\n      .set('Authorization', `Bearer ${token}`)\n    expect(res.status).toBe(204)",
               "type": "code_add",
               "file": "server/src/__tests__/card.test.ts",
               "action": "Yapıyı tamamla",
@@ -3389,7 +3442,7 @@
               "why": "Multi-stage build: build aşamasında devDependencies dahil, production'da sadece runtime. --frozen-lockfile ile lock dosyası değiştirilmez — reproducible build garantisi."
             },
             {
-              "order": "1.2a",
+              "order": "1.2",
               "action": "Dockerfile'a PRODUCTION aşamasını ekle — sadece runtime — temel yapı",
               "type": "code_add",
               "file": "server/Dockerfile",
@@ -3398,7 +3451,7 @@
               "why": "Dosyanın temel yapısı ve bağımlılıkları tanımlanıyor — modülün çalışması için gerekli altyapı."
             },
             {
-              "order": "1.2b",
+              "order": "1.3",
               "action": "Dockerfile'a PRODUCTION aşamasını ekle — sadece runtime — devam",
               "type": "code_add",
               "file": "server/Dockerfile",
@@ -3459,19 +3512,27 @@
               "why": "swagger-jsdoc: JSDoc comment'lerden OpenAPI spec üretir. swagger-ui-express: interaktif API dokümantasyonu web arayüzü."
             },
             {
-              "order": "2.2a",
+              "order": "2.2",
               "action": "Swagger config dosyasını oluştur — import'lar",
               "type": "code_write",
               "file": "server/src/config/swagger.ts",
-              "code": "import swaggerJsdoc from 'swagger-jsdoc'\n\nexport const swaggerSpec = swaggerJsdoc({\n  definition: {\n    openapi: '3.0.0',\n    info: { title: 'TaskBoard API', version: '1.0.0' },\n    servers: [{ url: 'http://localhost:3001' }],\n    components: {",
+              "code": "import swaggerJsdoc from 'swagger-jsdoc'\n\nexport const swaggerSpec = swaggerJsdoc({\n  definition: {\n    openapi: '3.0.0',\n    info: { title: 'TaskBoard API', version: '1.0.0' },",
               "why": "Konfigürasyon sabitleri tanımlanıyor — merkezi tanım ile değerlerin tutarlılığı sağlanır."
             },
             {
-              "order": "2.2b",
+              "order": "2.102",
+              "action": "Swagger config dosyasını oluştur — import'lar (devam)",
+              "type": "code_write",
+              "code": "    servers: [{ url: 'http://localhost:3001' }],\n    components: {\n  // TODO: implement\n}",
+              "why": "Swagger config dosyasını oluştur — import'lar.",
+              "file": "server/src/config/swagger.ts"
+            },
+            {
+              "order": "2.3",
               "action": "Swagger config dosyasını oluştur — devam",
               "type": "code_add",
               "file": "server/src/config/swagger.ts",
-              "code": "      securitySchemes: {\n        bearerAuth: { type: 'http', scheme: 'bearer' }\n      }\n    }\n  },\n  apis: ['./src/routes/*.ts']\n})",
+              "code": "      securitySchemes: {\n        bearerAuth: { type: 'http', scheme: 'bearer' }\n  apis: ['./src/routes/*.ts']",
               "why": "Modülün tamamlayıcı kısmı — önceki adımlarda tanımlanan yapıyı sonlandırıp dışa aktarıyor.",
               "position": "bottom"
             },
@@ -3485,7 +3546,7 @@
               "why": "M1 3.6'da eklediğimiz middleware'lerin altına Swagger UI ekliyoruz. /api/docs URL'inde interaktif API dokümantasyonu erişilebilir olacak."
             },
             {
-              "order": "2.4a",
+              "order": "2.5",
               "action": "Auth route dosyasına JSDoc comment'leri ekle — temel yapı",
               "type": "code_add",
               "file": "server/src/routes/auth.routes.ts",
@@ -3494,7 +3555,7 @@
               "why": "Dosyanın temel yapısı ve bağımlılıkları tanımlanıyor — modülün çalışması için gerekli altyapı."
             },
             {
-              "order": "2.4b",
+              "order": "2.6",
               "action": "Auth route dosyasına JSDoc comment'leri ekle — devam",
               "type": "code_add",
               "file": "server/src/routes/auth.routes.ts",
@@ -3591,7 +3652,7 @@
               "why": "README, projenin vitrin sayfası. Recruiter'lar ilk buraya bakar. Teknoloji listesi hangi becerilere sahip olduğunu gösterir."
             },
             {
-              "order": "4.2a",
+              "order": "4.2",
               "action": "README'ye kurulum talimatlarını ekle — temel yapı",
               "type": "code_add",
               "file": "README.md",
@@ -3600,7 +3661,7 @@
               "why": "Dosyanın temel yapısı ve bağımlılıkları tanımlanıyor — modülün çalışması için gerekli altyapı."
             },
             {
-              "order": "4.2b",
+              "order": "4.3",
               "action": "README'ye kurulum talimatlarını ekle — devam",
               "type": "code_add",
               "file": "README.md",
