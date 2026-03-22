@@ -511,6 +511,20 @@
           "prerequisites": [],
           "lessons": [
             {
+              "id": "mod-05-terminal/lesson-00",
+              "title": "Geliştirme Ortamı Kurulumu",
+              "description": "Node.js, Python, Git, VS Code kurulumu, PATH ayarları, terminal konfigürasyonu ve ilk proje oluşturma",
+              "order_index": 0,
+              "content_path": "phases/phase-1-temeller/module-05-terminal/lesson-00-ortam-kurulumu.md",
+              "estimated_minutes": 45,
+              "tags": [
+                "setup",
+                "installation",
+                "environment",
+                "configuration"
+              ]
+            },
+            {
               "id": "mod-05-terminal/lesson-01",
               "title": "Terminal/CLI: Linux Komutları ve Shell Temelleri",
               "description": "ls, cd, mkdir, rm, grep, find, chmod, pipe, yönlendirme, shell scripting temelleri",
@@ -537,6 +551,20 @@
                 "pnpm",
                 "debugging"
               ]
+            },
+            {
+              "id": "mod-05-terminal/lesson-03",
+              "title": "Debugging ve Troubleshooting",
+              "description": "Sistematik hata ayıklama, browser DevTools, Node.js debugging, log analizi, yaygın hatalar ve çözümleri",
+              "order_index": 3,
+              "content_path": "phases/phase-1-temeller/module-05-terminal/lesson-03-debugging.md",
+              "estimated_minutes": 50,
+              "tags": [
+                "debugging",
+                "troubleshooting",
+                "devtools",
+                "error-handling"
+              ]
             }
           ],
           "quizzes": [
@@ -544,7 +572,7 @@
               "id": "mod-05-terminal/quiz-01",
               "title": "Terminal & VS Code Quiz",
               "description": "Linux komutları, shell ve VS Code bilgini test et",
-              "after_lesson_id": "mod-05-terminal/lesson-02",
+              "after_lesson_id": "mod-05-terminal/lesson-03",
               "passing_score": 70,
               "content_path": "phases/phase-1-temeller/module-05-terminal/quizzes/quiz-01.json",
               "order_index": 1
@@ -616,6 +644,21 @@
           "estimated_hours": 16,
           "prerequisites": [],
           "lessons": [
+            {
+              "id": "mod-06-css/lesson-00",
+              "title": "CSS Temelleri",
+              "description": "CSS söz dizimi, seçiciler, kutu modeli, renkler, tipografi, birimler ve temel stil kavramları",
+              "order_index": 0,
+              "content_path": "phases/phase-2-frontend/module-06-html-css/lesson-00-css-temeller.md",
+              "estimated_minutes": 45,
+              "tags": [
+                "css",
+                "basics",
+                "selectors",
+                "box-model",
+                "typography"
+              ]
+            },
             {
               "id": "mod-06-css/lesson-01",
               "title": "Semantic HTML5 ve Accessibility",
@@ -2034,6 +2077,21 @@
                 "linkedin",
                 "open-source"
               ]
+            },
+            {
+              "id": "mod-20-career/lesson-03",
+              "title": "Agile/Scrum Temelleri",
+              "description": "Agile manifesto, Scrum framework, sprint planlama, daily standup, retrospektif, Kanban, Jira kullanımı",
+              "order_index": 3,
+              "content_path": "phases/phase-6-kariyer/module-20-career/lesson-03-agile.md",
+              "estimated_minutes": 45,
+              "tags": [
+                "agile",
+                "scrum",
+                "kanban",
+                "sprint",
+                "jira"
+              ]
             }
           ],
           "quizzes": [
@@ -2041,7 +2099,7 @@
               "id": "mod-20-career/quiz-01",
               "title": "Kariyer & Mülakat Quiz",
               "description": "Mülakat hazırlığı ve kariyer stratejisi bilgini test et",
-              "after_lesson_id": "mod-20-career/lesson-02",
+              "after_lesson_id": "mod-20-career/lesson-03",
               "passing_score": 70,
               "content_path": "phases/phase-6-kariyer/module-20-career/quizzes/quiz-01.json",
               "order_index": 1
