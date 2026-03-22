@@ -179,7 +179,7 @@
               "type": "terminal",
               "command": "pnpm create vite@latest client -- --template react-ts && cd client && pnpm install socket.io-client axios react-router-dom zustand",
               "expected_output": "Scaffolding project in ./client\ndependencies:\n+ socket.io-client\n+ zustand",
-              "why": "Vite en hızlı React geliştirme sunucusudur. socket.io-client WebSocket bağlantısı, zustand global state yönetimi, axios HTTP istekleri için gerekli. Hepsini şimdi kuruyoruz ki sonra geri dönmek zorunda kalmayalım."
+              "why": "Vite en hızlı React geliştirme sunucusudur. socket.io-client WebSocket bağlantısı, zustand global state yönetimi, axios HTTP istekleri için gerekli."
             },
             {
               "order": "1.5",
@@ -190,15 +190,16 @@
               "why": "Docker Compose ile MongoDB'yi tek komutla başlatacağız. Volume tanımı ile MongoDB verisi container silinse bile korunur."
             },
             {
-              "order": "1.5b",
+              "order": "1.6",
               "action": "MongoDB'nin altına Redis servisini ve volume tanımını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.yml",
               "code": "  redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'\nvolumes:\n  mongodata:",
-              "why": "Redis'i şimdi kuruyoruz çünkü Milestone 1'in sonunda Socket.io adapter olarak bağlayacağız. alpine imajı standart imajdan çok daha küçüktür."
+              "why": "Redis'i şimdi kuruyoruz çünkü Milestone 1'in sonunda Socket.io adapter olarak bağlayacağız. alpine imajı standart imajdan çok daha küçüktür.",
+              "position": "bottom"
             },
             {
-              "order": "1.6",
+              "order": "1.7",
               "action": "Docker servislerini başlat ve doğrula",
               "type": "terminal",
               "command": "docker-compose up -d && docker-compose ps",
@@ -206,7 +207,7 @@
               "why": "Veritabanı servislerinin çalıştığını doğrulamak kritik — sonraki adımlarda bağlantı hatası almamak için ŞIMDI kontrol ediyoruz."
             },
             {
-              "order": "1.7",
+              "order": "1.8",
               "action": "server/package.json dosyasına GERİ DÖN — dev script'ini ekle",
               "type": "code_modify",
               "file": "server/package.json",
@@ -215,7 +216,7 @@
               "why": "1.3'te TypeScript'i kurduk ama çalıştırma script'ini eklemedik. ts-node-dev, TypeScript dosyalarını doğrudan çalıştırır ve değişikliklerde otomatik yeniden başlatır."
             },
             {
-              "order": "1.8",
+              "order": "1.9",
               "action": ".gitignore dosyasını oluştur — hassas dosyaları git'ten hariç tut",
               "type": "code_write",
               "file": "server/.gitignore",
@@ -223,7 +224,7 @@
               "why": ".env dosyası gizli bilgiler içerir ve ASLA git'e commit edilmez. node_modules ve dist klasörleri gereksiz büyüklük oluşturur."
             },
             {
-              "order": "1.9",
+              "order": "1.10",
               "action": "Her iki projeyi de başlatıp çalıştığını doğrula",
               "type": "validate",
               "validation": "docker-compose ps ile MongoDB ve Redis 'Up' durumunda olmalı. cd server && pnpm run dev çalışmalı (henüz index.ts yok ama komut tanınmalı). cd client && pnpm run dev çalışmalı.",
@@ -260,19 +261,20 @@
           "substeps": [
             {
               "order": "2.1",
-              "action": "server/src/models/user.model.ts dosyasını aç — İSKELET yaz",
+              "action": "server/src/models/user.model.ts dosyasını aç — IUser iskelet yapısını yaz",
               "type": "code_write",
               "file": "server/src/models/user.model.ts",
-              "code": "export {};  // placeholder",
-              "why": "Her zaman iskelet ile başlıyoruz. Dosyayı oluşturup TypeScript'in tanımasını sağlıyoruz."
+              "code": "import mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IUser extends Document {\n  // alanlar buraya gelecek\n}\n\n// Schema ve model tanımı eklenecek",
+              "why": "Mongoose model dosyasını oluşturuyoruz. User modeli kimlik doğrulama ve kullanıcı yönetiminin TEMELİ — email, password ve online durum bilgisini saklayacak."
             },
             {
               "order": "2.2",
               "action": "ÜSTE ÇIK — mongoose import'unu ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/models/user.model.ts",
               "code": "import mongoose, { Schema, Document } from 'mongoose';",
-              "why": "Mongoose'u kullanacağız çünkü şimdi schema tanımlayacağız. Import'u KULLANMADAN ÖNCE ekliyoruz."
+              "why": "Mongoose'u kullanacağız çünkü şimdi schema tanımlayacağız. Import'u KULLANMADAN ÖNCE ekliyoruz.",
+              "position": "top"
             },
             {
               "order": "2.3",
@@ -280,11 +282,11 @@
               "type": "code_add",
               "file": "server/src/models/user.model.ts",
               "position": "after:import",
-              "code": "\nexport interface IUser extends Document {\n  email: string;\n  name: string;\n  password: string;",
+              "code": "\nexport interface IUser extends Document {\n  email: string;\n  name: string;\n  password: string;\n\n}",
               "why": "Document'ı extend ediyoruz çünkü Mongoose doküman metodlarına erişmek istiyoruz. email ve name zorunlu, avatar opsiyonel."
             },
             {
-              "order": "2.3b",
+              "order": "2.4",
               "action": "Interface'e online durum alanlarını ekle ve kapat",
               "type": "code_add",
               "file": "server/src/models/user.model.ts",
@@ -293,16 +295,16 @@
               "why": "isOnline ve lastSeen alanları real-time presence sistemi için gerekli — M1 Adım 5'te Redis ile bu alanları güncelleyeceğiz."
             },
             {
-              "order": "2.4",
+              "order": "2.5",
               "action": "Interface'in altına — userSchema'yı başlat (email, name, password)",
               "type": "code_add",
               "file": "server/src/models/user.model.ts",
               "position": "after:interface",
-              "code": "\nconst userSchema = new Schema<IUser>({\n  email: { type: String, required: true, unique: true, lowercase: true },\n  name: { type: String, required: true, minlength: 2 },\n  password: { type: String, required: true, select: false },",
+              "code": "\nconst userSchema = new Schema<IUser>({\n  email: { type: String, required: true, unique: true, lowercase: true },\n  name: { type: String, required: true, minlength: 2 },\n  password: { type: String, required: true, select: false },\n)\n}",
               "why": "select: false ile password varsayılan sorgularda dönmez — güvenlik için ŞART. unique: true ile aynı email'den iki kayıt oluşmaz."
             },
             {
-              "order": "2.4b",
+              "order": "2.6",
               "action": "Schema'ya avatar, online durum alanlarını ekle ve timestamps ile kapat",
               "type": "code_add",
               "file": "server/src/models/user.model.ts",
@@ -311,7 +313,7 @@
               "why": "timestamps: true otomatik createdAt ve updatedAt ekler. Date.now varsayılan değeri ile lastSeen kaydı oluşturulur."
             },
             {
-              "order": "2.5",
+              "order": "2.7",
               "action": "Schema'nın altına — model export'unu ekle",
               "type": "code_add",
               "file": "server/src/models/user.model.ts",
@@ -320,7 +322,7 @@
               "why": "Schema'yı Mongoose model'ine çeviriyoruz. IUser generic tipi ile model metodları TypeScript tip güvenliğine sahip olur."
             },
             {
-              "order": "2.6",
+              "order": "2.8",
               "action": "BAŞKA DOSYAYA GEÇ — server/src/models/conversation.model.ts aç — import yaz",
               "type": "code_write",
               "file": "server/src/models/conversation.model.ts",
@@ -328,7 +330,7 @@
               "why": "Az önce user.model.ts'de mongoose import pattern'ını öğrendik. Aynı pattern'ı burada da kullanıyoruz."
             },
             {
-              "order": "2.7",
+              "order": "2.9",
               "action": "Import'un altına — IConversation interface'ini tanımla",
               "type": "code_add",
               "file": "server/src/models/conversation.model.ts",
@@ -337,7 +339,7 @@
               "why": "type: 'direct' | 'group' ile birebir ve grup sohbetlerini ayırıyoruz. participants ObjectId dizisi — User modeline referans veriyor."
             },
             {
-              "order": "2.8",
+              "order": "2.10",
               "action": "Interface'in altına — conversationSchema'yı tanımla",
               "type": "code_add",
               "file": "server/src/models/conversation.model.ts",
@@ -346,7 +348,7 @@
               "why": "enum ile type sadece 'direct' veya 'group' olabilir. ref: 'User' ile participants alanı User modeline REFERANS verir — populate ile doldurulabilir."
             },
             {
-              "order": "2.9",
+              "order": "2.11",
               "action": "Schema'nın altına — index'leri ve model export'unu ekle",
               "type": "code_add",
               "file": "server/src/models/conversation.model.ts",
@@ -355,32 +357,33 @@
               "why": "Index'leri AYRI adımda ekliyoruz çünkü schema yazıldıktan sonra 'bu alanları nasıl sorgulayacağım?' diye düşünüyoruz. participants index'i kullanıcının konuşmalarını hızlı bulmayı sağlar."
             },
             {
-              "order": "2.10",
+              "order": "2.12",
               "action": "BAŞKA DOSYAYA GEÇ — server/src/models/message.model.ts aç — import yaz",
               "type": "code_write",
               "file": "server/src/models/message.model.ts",
-              "code": "import mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IMessage extends Document {\n  conversationId: mongoose.Types.ObjectId;",
+              "code": "import mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IMessage extends Document {\n  conversationId: mongoose.Types.ObjectId;\n\n}",
               "why": "Artık pattern'ı biliyoruz — User model'deki aynı import yapısını takip ediyoruz."
             },
             {
-              "order": "2.10b",
+              "order": "2.13",
               "action": "Import'un altına — IMessage interface'ini tanımla",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/models/message.model.ts",
               "code": "  sender: mongoose.Types.ObjectId;\n  content: string;\n  type: 'text' | 'image' | 'file' | 'ai_response';\n  readBy: mongoose.Types.ObjectId[];\n  metadata?: Record<string, any>;\n}",
-              "why": "'ai_response' tipi M4'te AI asistan için kullanılacak. readBy dizisi mesaj okundu bilgisi için her okuyan kullanıcının ID'sini tutar."
+              "why": "'ai_response' tipi M4'te AI asistan için kullanılacak. readBy dizisi mesaj okundu bilgisi için her okuyan kullanıcının ID'sini tutar.",
+              "position": "bottom"
             },
             {
-              "order": "2.11",
+              "order": "2.14",
               "action": "Interface'in altına — messageSchema'yı başlat (conversationId, sender, content)",
               "type": "code_add",
               "file": "server/src/models/message.model.ts",
               "position": "after:interface",
-              "code": "\nconst messageSchema = new Schema<IMessage>({\n  conversationId: { type: Schema.Types.ObjectId, ref: 'Conversation', required: true, index: true },\n  sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },\n  content: { type: String, required: true },",
+              "code": "\nconst messageSchema = new Schema<IMessage>({\n  conversationId: { type: Schema.Types.ObjectId, ref: 'Conversation', required: true, index: true },\n  sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },\n  content: { type: String, required: true },\n)\n}",
               "why": "index: true ile conversationId alanında indeks oluşturulur — mesaj sorgulama hızlanır. ref ile ilişki kurulan collection belirtilir."
             },
             {
-              "order": "2.11b",
+              "order": "2.15",
               "action": "Schema'ya type, readBy, metadata ekle ve timestamps ile kapat",
               "type": "code_add",
               "file": "server/src/models/message.model.ts",
@@ -389,7 +392,7 @@
               "why": "Schema.Types.Mixed farklı mesaj tiplerinin metadata'sını esnek şekilde saklar. enum ile sadece izin verilen mesaj tipleri kabul edilir."
             },
             {
-              "order": "2.12",
+              "order": "2.16",
               "action": "Schema'nın altına — compound index ve model export ekle",
               "type": "code_add",
               "file": "server/src/models/message.model.ts",
@@ -398,7 +401,7 @@
               "why": "Compound index { conversationId: 1, createdAt: -1 } bir konuşmanın mesajlarını tarih sırasına göre ÇOK hızlı sorgular. M2'deki cursor-based pagination bu index'e DAYANIR."
             },
             {
-              "order": "2.13",
+              "order": "2.17",
               "action": "Terminale geç — TypeScript derleme kontrolü yap",
               "type": "terminal",
               "command": "cd server && pnpm dlx tsc --noEmit",
@@ -406,7 +409,7 @@
               "why": "Az önce yazdığımız 3 model dosyasının TypeScript hatası olmadığını doğruluyoruz. Bu alışkanlık her dosya yazdıktan sonra yapılmalı."
             },
             {
-              "order": "2.14",
+              "order": "2.18",
               "action": "Model'lerin hatasız derlenmesini doğrula",
               "type": "validate",
               "validation": "tsc --noEmit komutu hata vermemeli. 3 model dosyası oluşturulmuş olmalı: user.model.ts, conversation.model.ts, message.model.ts",
@@ -447,34 +450,37 @@
               "type": "code_write",
               "file": "server/src/utils/config.ts",
               "code": "export const config = {\n  // config değerleri buraya gelecek\n};",
-              "why": "Konfigürasyonu tek dosyada toplamak, değerlerin dağılmasını önler. İskelet ile başlayıp sonra dolduracağız."
+              "why": "Konfigürasyonu tek dosyada toplamak, hardcoded değerlerin koda dağılmasını önler. Environment variable'lar .env dosyasından okunacak — 12-Factor App prensibi."
             },
             {
               "order": "3.2",
               "action": "ÜSTE ÇIK — dotenv import'unu ekle (config'i doldurmadan ÖNCE)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/utils/config.ts",
               "code": "import dotenv from 'dotenv';\ndotenv.config();",
-              "why": "dotenv .env dosyasını okur ve process.env'e yükler. Bu import'u ŞİMDİ ekliyoruz çünkü birazdan environment variable'ları okuyacağız."
+              "why": "dotenv .env dosyasını okur ve process.env'e yükler. Bu import config nesnesinden ÖNCE çalışmalı çünkü config process.env değerlerini okuyacak.",
+              "position": "top"
             },
             {
               "order": "3.3",
               "action": "GERİ DÖN config dosyasına — dotenv import et ve config nesnesini başlat",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/utils/config.ts",
-              "code": "import dotenv from 'dotenv';\ndotenv.config();\n\nexport const config = {",
-              "why": "dotenv.config() .env dosyasını okur ve process.env'e yükler. parseInt() ile port'u string'den number'a çeviriyoruz."
-            },
-            {
-              "order": "3.3b",
-              "action": "Config nesnesine veritabanı, JWT ve API key alanlarını ekle",
-              "type": "code_write",
-              "file": "server/src/utils/config.ts",
-              "code": "  port: parseInt(process.env.PORT || '3001'),\n  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/chatapp',\n  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',\n  jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',\n  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',\n  openaiApiKey: process.env.OPENAI_API_KEY || '',\n};",
-              "why": "Her config değerinin varsayılanı var — .env dosyası olmadan bile çalışır. Default değerler geliştirme ortamı için ayarlanmış."
+              "code": "import dotenv from 'dotenv';\ndotenv.config();\n\nexport const config = {\n  // TODO: implement\n}",
+              "why": "dotenv.config() .env dosyasını okur ve process.env'e yükler. config nesnesini AÇIYORUZ — bir sonraki adımda alanlarını dolduracağız.",
+              "position": "top"
             },
             {
               "order": "3.4",
+              "action": "Config nesnesine veritabanı, JWT ve API key alanlarını ekle",
+              "type": "code_add",
+              "file": "server/src/utils/config.ts",
+              "code": "  port: parseInt(process.env.PORT || '3001'),\n  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/chatapp',\n  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',\n  jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',\n  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',\n  openaiApiKey: process.env.OPENAI_API_KEY || '',\n};",
+              "why": "Her config değerinin varsayılanı var — .env dosyası olmadan bile çalışır. Default değerler geliştirme ortamı için ayarlanmış.",
+              "position": "after:previous"
+            },
+            {
+              "order": "3.5",
               "action": "BAŞKA DOSYAYA GEÇ — server/.env dosyasını oluştur",
               "type": "code_write",
               "file": "server/.env",
@@ -482,48 +488,51 @@
               "why": "3.3'te config.ts'i yazdık, şimdi o dosyanın okuyacağı .env dosyasını oluşturuyoruz. Hassas bilgiler burada saklanır ve git'e commit EDİLMEZ."
             },
             {
-              "order": "3.5",
-              "action": "BAŞKA DOSYAYA GEÇ — server/src/index.ts aç — İSKELET yaz",
-              "type": "code_write",
-              "file": "server/src/index.ts",
-              "code": "const app = {};\nconsole.log('Server placeholder');",
-              "why": "Uygulamanın giriş noktasını İSKELET olarak oluşturuyoruz. İlk önce 'çalışıyor mu?' diye doğrulayacağız, sonra import'ları ekleyeceğiz."
-            },
-            {
               "order": "3.6",
-              "action": "ÜSTE ÇIK — express import'unu ekle ve app oluştur",
+              "action": "server/src/index.ts aç — Express uygulaması ile health check endpoint'i yaz",
               "type": "code_write",
               "file": "server/src/index.ts",
-              "code": "import express from 'express';\n\nconst app = express();",
-              "why": "İlk import — Express framework. İskelet'teki placeholder'ı gerçek Express uygulaması ile değiştiriyoruz."
+              "code": "import express from 'express';\nconst app = express();\napp.get('/health', (req, res) => {\n  res.json({ status: 'ok' });\n});\nconsole.log('Server starting...');",
+              "why": "Express uygulamasını gerçek bir health check endpoint ile başlatıyoruz. Bu sayede server'ın çalıştığını HEMEN doğrulayabiliriz."
             },
             {
               "order": "3.7",
-              "action": "ÜSTE ÇIK — http ve Socket.io import'larını ekle",
-              "type": "code_write",
+              "action": "ÜSTE ÇIK — express import'unu ekle ve app oluştur",
+              "type": "code_add",
               "file": "server/src/index.ts",
-              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';",
-              "why": "Socket.io, Express'in HTTP server'ı üzerinden WebSocket upgrade yapar — bu yüzden createServer gerekli. Server Socket.io'nun ana sınıfı."
+              "code": "import express from 'express';\n\nconst app = express();",
+              "why": "İlk import — Express framework. İskelet'teki placeholder'ı gerçek Express uygulaması ile değiştiriyoruz.",
+              "position": "top"
             },
             {
               "order": "3.8",
-              "action": "Import'ların altına httpServer ve io oluştur",
-              "type": "code_write",
+              "action": "ÜSTE ÇIK — http ve Socket.io import'larını ekle",
+              "type": "code_add",
               "file": "server/src/index.ts",
-              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\n\nconst app = express();\nconst httpServer = createServer(app);",
-              "why": "createServer(app) ile Express uygulaması HTTP server'a sarılıyor. Socket.io bu HTTP server üzerinden WebSocket bağlantısı kuracak."
+              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';",
+              "why": "Socket.io, Express'in HTTP server'ı üzerinden WebSocket upgrade yapar — bu yüzden createServer gerekli. Server Socket.io'nun ana sınıfı.",
+              "position": "top"
             },
             {
               "order": "3.9",
+              "action": "Import'ların altına httpServer ve io oluştur",
+              "type": "code_add",
+              "file": "server/src/index.ts",
+              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\n\nconst app = express();\nconst httpServer = createServer(app);",
+              "why": "createServer(app) ile Express uygulaması HTTP server'a sarılıyor. Socket.io bu HTTP server üzerinden WebSocket bağlantısı kuracak.",
+              "position": "bottom"
+            },
+            {
+              "order": "3.10",
               "action": "httpServer'ın altına config import'unu ekle ve Socket.io server'ını başlat",
               "type": "code_add",
               "file": "server/src/index.ts",
               "position": "after:httpServer",
-              "code": "\nimport { config } from './utils/config';\n\nconst io = new Server(httpServer, {",
+              "code": "\nimport { config } from './utils/config';\n\nconst io = new Server(httpServer, {\n  // TODO: implement)\n}",
               "why": "3.3'te yazdığımız config'i import edip clientUrl'i CORS ayarına veriyoruz."
             },
             {
-              "order": "3.9b",
+              "order": "3.11",
               "action": "Socket.io CORS ayarlarını tamamla ve io değişkenini kapat",
               "type": "code_add",
               "file": "server/src/index.ts",
@@ -532,7 +541,7 @@
               "why": "credentials: true ile cookie/auth header gönderimi sağlanır. methods dizisi sadece GET ve POST'a izin verir."
             },
             {
-              "order": "3.10",
+              "order": "3.12",
               "action": "io'nun altına Express middleware'lerini ekle",
               "type": "code_add",
               "file": "server/src/index.ts",
@@ -541,25 +550,25 @@
               "why": "cors middleware'i frontend'den gelen isteklere izin verir. express.json() request body'yi parse eder. Bunları io'dan SONRA yazıyoruz çünkü sıralı ekliyoruz."
             },
             {
-              "order": "3.11",
+              "order": "3.13",
               "action": "Middleware'lerin altına — Socket.io auth middleware'ini başlat ve token'ı al",
               "type": "code_add",
               "file": "server/src/index.ts",
               "position": "after:middleware",
-              "code": "\nio.use(async (socket, next) => {\n  try {\n    const token = socket.handshake.auth.token;\n    if (!token) return next(new Error('Authentication required'));",
+              "code": "\nio.use(async (socket, next) => {\n  try {\n    const token = socket.handshake.auth.token;\n    if (!token) return next(new Error('Authentication required'));\n);\n  }\n}",
               "why": "io.use() middleware HER yeni socket bağlantısından önce çalışır. Client bağlanırken auth: { token } gönderir — token yoksa bağlantı reddedilir."
             },
             {
-              "order": "3.11b",
+              "order": "3.14",
               "action": "JWT doğrulamasını yap ve userId'yi socket'e ata",
               "type": "code_add",
               "file": "server/src/index.ts",
               "position": "after:middleware",
-              "code": "    const jwt = require('jsonwebtoken');\n    const payload = jwt.verify(token, config.jwtSecret);\n    socket.data.userId = payload.userId;\n    next();\n  } catch (error) {\n    next(new Error('Invalid token'));\n  }\n});",
+              "code": "    const jwt = require('jsonwebtoken');\n    const payload = jwt.verify(token, config.jwtSecret);\n    socket.data.userId = payload.userId;\n    next();\n  } catch (error) {\n    next(new Error('Invalid token'));",
               "why": "jwt.verify token'ı doğrular ve payload'ı çıkarır. socket.data.userId ile kullanıcı kimliği tüm event handler'larda erişilebilir olur."
             },
             {
-              "order": "3.12",
+              "order": "3.15",
               "action": "Auth middleware'inin altına connection event handler'ını ekle",
               "type": "code_add",
               "file": "server/src/index.ts",
@@ -568,7 +577,7 @@
               "why": "Placeholder connection handler — gerçek event handler'ları M1 Adım 4'te AYRI dosyada yazacağız. Şimdilik bağlantının ÇALIŞTIĞINI doğruluyoruz."
             },
             {
-              "order": "3.13",
+              "order": "3.16",
               "action": "ÜSTE ÇIK — mongoose import'unu ekle",
               "type": "code_add",
               "file": "server/src/index.ts",
@@ -577,7 +586,7 @@
               "why": "MongoDB bağlantısı için mongoose'u import ediyoruz. 1.5'te Docker ile başlattığımız MongoDB'ye bağlanacağız."
             },
             {
-              "order": "3.14",
+              "order": "3.17",
               "action": "Dosyanın ALTINA MongoDB bağlantısını ekle",
               "type": "code_add",
               "file": "server/src/index.ts",
@@ -586,7 +595,7 @@
               "why": "MongoDB bağlantısını 1.5'te Docker ile başlattığımız veritabanına kuruyoruz. catch ile bağlantı hatası loglanır."
             },
             {
-              "order": "3.14b",
+              "order": "3.18",
               "action": "MongoDB'nin altına server başlatma ve io export'unu ekle",
               "type": "code_add",
               "file": "server/src/index.ts",
@@ -595,7 +604,7 @@
               "why": "httpServer.listen ile HTTP ve WebSocket server'ı AYNI port'ta başlar. io'yu export ediyoruz çünkü başka dosyalardan erişeceğiz."
             },
             {
-              "order": "3.15",
+              "order": "3.19",
               "action": "Server'ı başlatıp MongoDB bağlantısını doğrula",
               "type": "validate",
               "validation": "cd server && pnpm run dev çalıştırıldığında 'Server running on port 3001' ve 'MongoDB connected' mesajları görülmeli.",
@@ -680,7 +689,7 @@
               "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
               "position": "after:broadcast",
-              "code": "    // Mesaj gönderme\n    socket.on('message:send', async (data, callback) => {\n      try {\n        const { conversationId, content, type = 'text' } = data;",
+              "code": "    // Mesaj gönderme\n    socket.on('message:send', async (data, callback) => {\n      try {\n        const { conversationId, content, type = 'text' } = data;\n)\n  }\n}",
               "why": "Mesaj gönderme event handler'ını AÇIYORUZ. data'dan conversationId, content ve type'ı destructure ediyoruz. callback ile gönderene onay döneceğiz."
             },
             {
@@ -707,7 +716,7 @@
               "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
               "position": "after:emit",
-              "code": "      } catch (error) {\n        callback({ status: 'error', message: 'Mesaj gönderilemedi' });\n      }\n    });",
+              "code": "      } catch (error) {\n        callback({ status: 'error', message: 'Mesaj gönderilemedi' });",
               "why": "Hata durumunda callback ile client'a bilgi dönüyoruz. try/catch ile veritabanı hatası veya network sorunu yakalanır."
             },
             {
@@ -734,20 +743,20 @@
               "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
               "position": "after:typing-stop",
-              "code": "    // Mesaj okundu\n    socket.on('message:read', async (data) => {\n      await Message.updateMany(\n        {\n          conversationId: data.conversationId,\n          sender: { $ne: userId },\n          readBy: { $nin: [userId] },\n        },",
+              "code": "// Mesaj okundu\n    socket.on('message:read', async (data) => {\n      await Message.updateMany(\n        {\n          conversationId: data.conversationId,\n          sender: { $ne: userId },\n          readBy: { $nin: [userId] },)) } }",
               "why": "$ne kendi mesajlarını hariç tutar. $nin zaten okunmuş mesajları hariç tutar. $addToSet duplicate eklemeden readBy'a kullanıcı ekler."
             },
             {
-              "order": "4.12b",
+              "order": "4.13",
               "action": "Okundu bilgisini socket ile karşı tarafa bildir",
               "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
               "position": "after:typing-stop",
-              "code": "        { $addToSet: { readBy: userId } }\n      );\n      socket.to(data.conversationId).emit('message:read:update', {\n        conversationId: data.conversationId,\n        userId,\n      });\n    });",
+              "code": "        { $addToSet: { readBy: userId } }\n      socket.to(data.conversationId).emit('message:read:update', {\n        conversationId: data.conversationId,\n        userId,",
               "why": "socket.to() ile SADECE o konuşmadaki diğer kullanıcılara okundu güncellemesi gönderilir. 2.8'de tanımladığımız readBy alanı burada KULLANILIYOR."
             },
             {
-              "order": "4.13",
+              "order": "4.14",
               "action": "Okundu event'inin altına — disconnect handler'ını ekle",
               "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
@@ -756,7 +765,7 @@
               "why": "Disconnect'te 4.3'teki online yapma işleminin TAM TERSİNİ yapıyoruz: isOnline false, lastSeen güncelle, herkese 'offline oldum' de. WhatsApp'taki 'son görülme' özelliği."
             },
             {
-              "order": "4.14",
+              "order": "4.15",
               "action": "index.ts dosyasına GERİ DÖN — socket handler'ı import et ve kullan",
               "type": "code_modify",
               "file": "server/src/index.ts",
@@ -765,7 +774,7 @@
               "why": "3.12'de yazdığımız placeholder io.on('connection') bloğunu kaldırıp, az önce yazdığımız socket handler modülünü bağlıyoruz. Ana dosya temiz kalır."
             },
             {
-              "order": "4.15",
+              "order": "4.16",
               "action": "Server'ı yeniden başlat ve bağlantıyı test et",
               "type": "validate",
               "validation": "Server loglarında 'User connected' mesajları görülmeli. Bir client mesaj gönderdiğinde diğer client'ta 'message:received' event'i tetiklenmeli.",
@@ -819,37 +828,41 @@
             {
               "order": "5.3",
               "action": "Import'ların altına — Redis bağlantılarını oluştur",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/utils/redis.ts",
               "code": "import Redis from 'ioredis';\nimport { config } from './config';\n\nexport const redis = new Redis(config.redisUrl);\nexport const pubClient = new Redis(config.redisUrl);\nexport const subClient = pubClient.duplicate();",
-              "why": "3 ayrı Redis bağlantısı: genel kullanım, pub ve sub. pubClient.duplicate() aynı ayarlarla yeni bağlantı oluşturur — Socket.io adapter için gerekli."
-            },
-            {
-              "order": "5.3b",
-              "action": "Redis bağlantılarının altına — setUserOnline ve setUserOffline fonksiyonlarını yaz",
-              "type": "code_write",
-              "file": "server/src/utils/redis.ts",
-              "code": "\nexport async function setUserOnline(userId: string, socketId: string) {\n  await redis.hset('online_users', userId, socketId);\n}\n\nexport async function setUserOffline(userId: string) {\n  await redis.hdel('online_users', userId);\n}",
-              "why": "hset/hdel Hash yapısı ile online kullanıcılar saklanır. Hash'te her kullanıcı bir field — socketId value olarak tutulur."
-            },
-            {
-              "order": "5.3c",
-              "action": "Online fonksiyonların altına — getOnlineUsers fonksiyonunu ekle",
-              "type": "code_write",
-              "file": "server/src/utils/redis.ts",
-              "code": "\nexport async function getOnlineUsers(): Promise<string[]> {\n  const users = await redis.hkeys('online_users');\n  return users;\n}",
-              "why": "hkeys tüm online kullanıcı ID'lerini döndürür. Promise<string[]> ile tip güvenli dönüş sağlanır."
-            },
-            {
-              "order": "5.3d",
-              "action": "getOnlineUsers'ın altına — setTyping yardımcısını ekle",
-              "type": "code_write",
-              "file": "server/src/utils/redis.ts",
-              "code": "\nexport async function setTyping(userId: string, conversationId: string) {\n  const key = `typing:${conversationId}:${userId}`;\n  await redis.set(key, '1', 'EX', 3);\n}",
-              "why": "TTL 3 saniye ile typing bilgisi OTOMATİK temizlenir — kullanıcı yazmayı bıraksa bile. Redis key pattern'ı konuşma ve kullanıcı bazında benzersizdir."
+              "why": "3 ayrı Redis bağlantısı: genel kullanım, pub ve sub. pubClient.duplicate() aynı ayarlarla yeni bağlantı oluşturur — Socket.io adapter için gerekli.",
+              "position": "bottom"
             },
             {
               "order": "5.4",
+              "action": "Redis bağlantılarının altına — setUserOnline ve setUserOffline fonksiyonlarını yaz",
+              "type": "code_add",
+              "file": "server/src/utils/redis.ts",
+              "code": "\nexport async function setUserOnline(userId: string, socketId: string) {\n  await redis.hset('online_users', userId, socketId);\n}\n\nexport async function setUserOffline(userId: string) {\n  await redis.hdel('online_users', userId);\n}",
+              "why": "hset/hdel Hash yapısı ile online kullanıcılar saklanır. Hash'te her kullanıcı bir field — socketId value olarak tutulur.",
+              "position": "bottom"
+            },
+            {
+              "order": "5.5",
+              "action": "Online fonksiyonların altına — getOnlineUsers fonksiyonunu ekle",
+              "type": "code_add",
+              "file": "server/src/utils/redis.ts",
+              "code": "\nexport async function getOnlineUsers(): Promise<string[]> {\n  const users = await redis.hkeys('online_users');\n  return users;\n}",
+              "why": "hkeys tüm online kullanıcı ID'lerini döndürür. Promise<string[]> ile tip güvenli dönüş sağlanır.",
+              "position": "bottom"
+            },
+            {
+              "order": "5.6",
+              "action": "getOnlineUsers'ın altına — setTyping yardımcısını ekle",
+              "type": "code_add",
+              "file": "server/src/utils/redis.ts",
+              "code": "\nexport async function setTyping(userId: string, conversationId: string) {\n  const key = `typing:${conversationId}:${userId}`;\n  await redis.set(key, '1', 'EX', 3);\n}",
+              "why": "TTL 3 saniye ile typing bilgisi OTOMATİK temizlenir — kullanıcı yazmayı bıraksa bile. Redis key pattern'ı konuşma ve kullanıcı bazında benzersizdir.",
+              "position": "bottom"
+            },
+            {
+              "order": "5.7",
               "action": "index.ts dosyasına GERİ DÖN — ÜSTE ÇIK, Redis adapter import'unu ekle",
               "type": "code_modify",
               "file": "server/src/index.ts",
@@ -858,7 +871,7 @@
               "why": "5.3'te yazdığımız Redis client'larını import edip Socket.io adapter olarak bağlıyoruz. Bu sayede birden fazla Socket.io server instance'ı aynı room'lara mesaj gönderebilir — horizontal scaling'in TEMELİ."
             },
             {
-              "order": "5.5",
+              "order": "5.8",
               "action": "Server'ı yeniden başlat — Redis bağlantısını doğrula",
               "type": "validate",
               "validation": "Server başlatıldığında Redis bağlantı hatası olmamalı. docker-compose ps ile Redis container'ının çalıştığını doğrula.",
@@ -920,72 +933,77 @@
             {
               "order": "1.2",
               "action": "ÜSTE ÇIK — Mongoose model import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/services/conversation.service.ts",
               "code": "import { Conversation } from '../models/conversation.model';\nimport { User } from '../models/user.model';\nimport mongoose from 'mongoose';",
-              "why": "M1 Adım 2'de yazdığımız modelleri import ediyoruz. Conversation ve User'a ihtiyacımız var çünkü birazdan getOrCreateDirect metodunda HER İKİSİNİ de sorgulayacağız."
+              "why": "M1 Adım 2'de yazdığımız modelleri import ediyoruz. Conversation ve User'a ihtiyacımız var çünkü birazdan getOrCreateDirect metodunda HER İKİSİNİ de sorgulayacağız.",
+              "position": "top"
             },
             {
               "order": "1.3",
               "action": "GERİ DÖN class içine — import'ları ve class tanımını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/services/conversation.service.ts",
-              "code": "import { Conversation } from '../models/conversation.model';\nimport { User } from '../models/user.model';\nimport mongoose from 'mongoose';\n\nexport class ConversationService {",
-              "why": "ConversationService class'ı tüm konuşma işlemlerini kapsüller. mongoose import'u ObjectId karşılaştırmaları için gerekli."
-            },
-            {
-              "order": "1.3b",
-              "action": "Class içine getOrCreateDirect metodunu başlat — mevcut konuşmayı ara",
-              "type": "code_write",
-              "file": "server/src/services/conversation.service.ts",
-              "code": "  async getOrCreateDirect(userId: string, targetUserId: string) {\n    let conversation = await Conversation.findOne({\n      type: 'direct',\n      participants: { $all: [userId, targetUserId], $size: 2 },\n    }).populate('participants', 'name avatar isOnline lastSeen')\n      .populate('lastMessage');",
-              "why": "$all + $size: 2 ile aynı iki kullanıcı arasında duplicate konuşma OLUŞMAZ. populate MongoDB'de JOIN benzeri işlem yapar."
-            },
-            {
-              "order": "1.3c",
-              "action": "Konuşma bulunamazsa yeni oluştur",
-              "type": "code_write",
-              "file": "server/src/services/conversation.service.ts",
-              "code": "\n    if (!conversation) {\n      conversation = await Conversation.create({\n        type: 'direct',\n        participants: [userId, targetUserId],\n      });\n      conversation = await conversation.populate('participants', 'name avatar isOnline lastSeen');",
-              "why": "Yoksa OLUŞTUR pattern'ı 'upsert' mantığıdır. Yeni konuşma oluşturulduktan sonra populate ile katılımcı bilgileri doldurulur."
-            },
-            {
-              "order": "1.3d",
-              "action": "Konuşmayı döndür ve metodu kapat",
-              "type": "code_write",
-              "file": "server/src/services/conversation.service.ts",
-              "code": "    }\n\n    return conversation;\n  }\n}",
-              "why": "return ile bulunan veya oluşturulan konuşma döndürülür. Class kapanış parantezi ile servis tamamlanır."
+              "code": "import { Conversation } from '../models/conversation.model';\nimport { User } from '../models/user.model';\nimport mongoose from 'mongoose';\n\nexport class ConversationService {\n  // TODO: implement\n}",
+              "why": "ConversationService class'ı tüm konuşma işlemlerini kapsüller. mongoose import'u ObjectId karşılaştırmaları için gerekli.",
+              "position": "top"
             },
             {
               "order": "1.4",
+              "action": "Class içine getOrCreateDirect metodunu başlat — mevcut konuşmayı ara",
+              "type": "code_add",
+              "file": "server/src/services/conversation.service.ts",
+              "code": "  async getOrCreateDirect(userId: string, targetUserId: string) {\n    let conversation = await Conversation.findOne({\n      type: 'direct',\n      participants: { $all: [userId, targetUserId], $size: 2 },\n    }).populate('participants', 'name avatar isOnline lastSeen')\n      .populate('lastMessage');\n\n}",
+              "why": "$all + $size: 2 ile aynı iki kullanıcı arasında duplicate konuşma OLUŞMAZ. populate MongoDB'de JOIN benzeri işlem yapar.",
+              "position": "bottom"
+            },
+            {
+              "order": "1.5",
+              "action": "Konuşma bulunamazsa yeni oluştur",
+              "type": "code_add",
+              "file": "server/src/services/conversation.service.ts",
+              "code": "\n    if (!conversation) {\n      conversation = await Conversation.create({\n        type: 'direct',\n        participants: [userId, targetUserId],\n      });\n      conversation = await conversation.populate('participants', 'name avatar isOnline lastSeen');\n\n}",
+              "why": "Yoksa OLUŞTUR pattern'ı 'upsert' mantığıdır. Yeni konuşma oluşturulduktan sonra populate ile katılımcı bilgileri doldurulur.",
+              "position": "bottom"
+            },
+            {
+              "order": "1.6",
+              "action": "Konuşmayı döndür ve metodu kapat",
+              "type": "code_add",
+              "file": "server/src/services/conversation.service.ts",
+              "code": "\n    return conversation;",
+              "why": "return ile bulunan veya oluşturulan konuşma döndürülür. Class kapanış parantezi ile servis tamamlanır.",
+              "position": "bottom"
+            },
+            {
+              "order": "1.7",
               "action": "getOrCreateDirect'in altına — createGroup metodunu başlat",
               "type": "code_add",
               "file": "server/src/services/conversation.service.ts",
-              "code": "\n  async createGroup(userId: string, name: string, participantIds: string[]) {\n    const allParticipants = [...new Set([userId, ...participantIds])];\n    const conversation = await Conversation.create({\n      type: 'group',",
+              "code": "\n  async createGroup(userId: string, name: string, participantIds: string[]) {\n    const allParticipants = [...new Set([userId, ...participantIds])];\n    const conversation = await Conversation.create({\n      type: 'group',\n);\n  }\n}",
               "position": "bottom",
               "why": "Set ile duplicate katılımcıları önlüyoruz — oluşturan kişi zaten listede olabilir."
             },
             {
-              "order": "1.4b",
+              "order": "1.8",
               "action": "Grup konuşmasını veritabanında oluştur ve döndür",
               "type": "code_add",
               "file": "server/src/services/conversation.service.ts",
-              "code": "      name,\n      participants: allParticipants,\n    });\n    return conversation.populate('participants', 'name avatar isOnline lastSeen');\n  }",
+              "code": "      name,\n      participants: allParticipants,\n    return conversation.populate('participants', 'name avatar isOnline lastSeen');",
               "position": "bottom",
               "why": "type: 'group' ile M1 2.6'da tanımladığımız enum ayrımını kullanıyoruz. populate ile katılımcı detayları yüklenir."
             },
             {
-              "order": "1.5",
+              "order": "1.9",
               "action": "createGroup'un altına — getUserConversations metodunu başlat",
               "type": "code_add",
               "file": "server/src/services/conversation.service.ts",
-              "code": "\n  async getUserConversations(userId: string) {\n    return Conversation.find({ participants: userId })\n      .populate('participants', 'name avatar isOnline lastSeen')\n      .populate('lastMessage')",
+              "code": "\n  async getUserConversations(userId: string) {\n    return Conversation.find({ participants: userId })\n      .populate('participants', 'name avatar isOnline lastSeen')\n      .populate('lastMessage')\n\n}",
               "position": "bottom",
               "why": "Kullanıcının tüm konuşmalarını bulur ve katılımcı bilgilerini populate eder."
             },
             {
-              "order": "1.5b",
+              "order": "1.10",
               "action": "Sonuçları lastActivity'ye göre sırala ve lean() ile döndür",
               "type": "code_add",
               "file": "server/src/services/conversation.service.ts",
@@ -994,7 +1012,7 @@
               "why": "lean() Mongoose document yerine plain JS object döndürür — 5-10x DAHA HIZLI okuma sağlar. M1 2.7'de eklediğimiz lastActivity index'i burada işe yarıyor."
             },
             {
-              "order": "1.6",
+              "order": "1.11",
               "action": "Terminale geç — derleme kontrolü yap",
               "type": "terminal",
               "command": "cd server && pnpm dlx tsc --noEmit",
@@ -1002,7 +1020,7 @@
               "why": "Service katmanının tip hatalarını erken yakalamak, runtime hatalarını önler. Her yeni dosyadan sonra bu kontrolü yapıyoruz."
             },
             {
-              "order": "1.7",
+              "order": "1.12",
               "action": "Service'in derlenmesini doğrula",
               "type": "validate",
               "validation": "cd server && pnpm dlx tsc --noEmit — hata olmamalı.",
@@ -1048,70 +1066,77 @@
             {
               "order": "2.2",
               "action": "ÜSTE ÇIK — Message model'ini import et",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/services/message.service.ts",
               "code": "import { Message } from '../models/message.model';\nimport mongoose from 'mongoose';",
-              "why": "M1 2.8'de yazdığımız Message modelini import ediyoruz. mongoose'u da import ediyoruz çünkü ObjectId dönüşümleri için lazım olabilir."
+              "why": "M1 2.8'de yazdığımız Message modelini import ediyoruz. mongoose'u da import ediyoruz çünkü ObjectId dönüşümleri için lazım olabilir.",
+              "position": "top"
             },
             {
               "order": "2.3",
               "action": "GERİ DÖN class içine — import'ları ve MessageService class tanımını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/services/message.service.ts",
-              "code": "import { Message } from '../models/message.model';\nimport mongoose from 'mongoose';\n\nexport class MessageService {",
-              "why": "MessageService tüm mesaj işlemlerini kapsüller. mongoose import'u ObjectId ve Date karşılaştırmaları için gerekli."
-            },
-            {
-              "order": "2.3b",
-              "action": "getMessages metodunu başlat — parametre listesi ve başlangıç sorgusunu yaz",
-              "type": "code_write",
-              "file": "server/src/services/message.service.ts",
-              "code": "  async getMessages(\n    conversationId: string,\n    cursor?: string,\n    limit: number = 50\n  ) {\n    const query: any = { conversationId };",
-              "why": "cursor opsiyonel — ilk yüklemede gönderilmez. conversationId ile hangi konuşmanın mesajları istendiği belirlenir."
-            },
-            {
-              "order": "2.3c",
-              "action": "Cursor varsa tarih filtresini sorguya ekle",
-              "type": "code_write",
-              "file": "server/src/services/message.service.ts",
-              "code": "\n    if (cursor) {\n      query.createdAt = { $lt: new Date(cursor) };\n    }",
-              "why": "Cursor varsa o tarihten ESKİ mesajları filtreler. Bu, offset-based pagination'dan daha performanslıdır çünkü skip kullanılmaz."
-            },
-            {
-              "order": "2.3d",
-              "action": "Sorguyu çalıştır — sort, limit ve populate ile mesajları getir",
-              "type": "code_write",
-              "file": "server/src/services/message.service.ts",
-              "code": "\n    const messages = await Message.find(query)\n      .sort({ createdAt: -1 })\n      .limit(limit + 1)\n      .populate('sender', 'name avatar')\n      .lean();",
-              "why": "limit + 1 pattern'ı: 51 kayıt isteyip 50 döndürüyoruz — 51 gelirse daha fazla veri VAR demek. M1 2.8'deki compound index bu sorguyu HIZLI yapar."
-            },
-            {
-              "order": "2.3e",
-              "action": "hasMore kontrolü yap — fazla kaydı çıkar",
-              "type": "code_write",
-              "file": "server/src/services/message.service.ts",
-              "code": "\n    const hasMore = messages.length > limit;\n    if (hasMore) messages.pop();",
-              "why": "51. kayıt geldiyse hasMore true olur. pop() ile fazla kaydı diziden çıkarıyoruz — client'a 50 mesaj döner."
-            },
-            {
-              "order": "2.3f",
-              "action": "Sonuç objesini oluştur ve döndür",
-              "type": "code_write",
-              "file": "server/src/services/message.service.ts",
-              "code": "\n    return {\n      messages: messages.reverse(),\n      hasMore,\n      nextCursor: hasMore ? messages[0]?.createdAt?.toISOString() : null,\n    };\n  }",
-              "why": "reverse() ile mesajlar kronolojik sıraya çevrilir. nextCursor olarak en eski mesajın tarihi gönderilir — sonraki sayfa isteğinde bu değer kullanılır."
+              "code": "import { Message } from '../models/message.model';\nimport mongoose from 'mongoose';\n\nexport class MessageService {\n  // TODO: implement\n}",
+              "why": "MessageService tüm mesaj işlemlerini kapsüller. mongoose import'u ObjectId ve Date karşılaştırmaları için gerekli.",
+              "position": "top"
             },
             {
               "order": "2.4",
+              "action": "getMessages metodunu başlat — parametre listesi ve başlangıç sorgusunu yaz",
+              "type": "code_add",
+              "file": "server/src/services/message.service.ts",
+              "code": "  async getMessages(\n    conversationId: string,\n    cursor?: string,\n    limit: number = 50\n  ) {\n    const query: any = { conversationId };\n\n}",
+              "why": "cursor opsiyonel — ilk yüklemede gönderilmez. conversationId ile hangi konuşmanın mesajları istendiği belirlenir.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.5",
+              "action": "Cursor varsa tarih filtresini sorguya ekle",
+              "type": "code_add",
+              "file": "server/src/services/message.service.ts",
+              "code": "\n    if (cursor) {\n      query.createdAt = { $lt: new Date(cursor) };\n    }",
+              "why": "Cursor varsa o tarihten ESKİ mesajları filtreler. Bu, offset-based pagination'dan daha performanslıdır çünkü skip kullanılmaz.",
+              "position": "after:previous"
+            },
+            {
+              "order": "2.6",
+              "action": "Sorguyu çalıştır — sort, limit ve populate ile mesajları getir",
+              "type": "code_add",
+              "file": "server/src/services/message.service.ts",
+              "code": "\n    const messages = await Message.find(query)\n      .sort({ createdAt: -1 })\n      .limit(limit + 1)\n      .populate('sender', 'name avatar')\n      .lean();",
+              "why": "limit + 1 pattern'ı: 51 kayıt isteyip 50 döndürüyoruz — 51 gelirse daha fazla veri VAR demek. M1 2.8'deki compound index bu sorguyu HIZLI yapar.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.7",
+              "action": "hasMore kontrolü yap — fazla kaydı çıkar",
+              "type": "code_add",
+              "file": "server/src/services/message.service.ts",
+              "code": "\n    const hasMore = messages.length > limit;\n    if (hasMore) messages.pop();",
+              "why": "51. kayıt geldiyse hasMore true olur. pop() ile fazla kaydı diziden çıkarıyoruz — client'a 50 mesaj döner.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.8",
+              "action": "Sonuç objesini oluştur ve döndür",
+              "type": "code_add",
+              "file": "server/src/services/message.service.ts",
+              "code": "\n    return {\n      messages: messages.reverse(),\n      hasMore,\n      nextCursor: hasMore ? messages[0]?.createdAt?.toISOString() : null,\n    };\n  }",
+              "why": "reverse() ile mesajlar kronolojik sıraya çevrilir. nextCursor olarak en eski mesajın tarihi gönderilir — sonraki sayfa isteğinde bu değer kullanılır.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.9",
               "action": "getMessages'ın altına — searchMessages metodunu başlat ve sorguyu yaz",
               "type": "code_add",
               "file": "server/src/services/message.service.ts",
-              "code": "\n  async searchMessages(conversationId: string, query: string) {\n    return Message.find({\n      conversationId,\n      content: { $regex: query, $options: 'i' },\n    })",
+              "code": "\n  async searchMessages(conversationId: string, query: string) {\n    return Message.find({\n      conversationId,\n      content: { $regex: query, $options: 'i' },\n    })\n\n}",
               "position": "bottom",
               "why": "$regex ile case-insensitive metin araması yapılır. Production'da MongoDB Atlas Search daha performanslıdır ama MVP için regex YETERLİ."
             },
             {
-              "order": "2.4b",
+              "order": "2.10",
               "action": "Arama sonuçlarını sırala, limitle ve döndür",
               "type": "code_add",
               "file": "server/src/services/message.service.ts",
@@ -1120,7 +1145,7 @@
               "why": "Son 20 mesajla sınırlıyoruz çünkü arama sonuçları genelde son mesajlarda aranır. lean() ile performans artırılır."
             },
             {
-              "order": "2.5",
+              "order": "2.11",
               "action": "Pagination'ın çalıştığını doğrula",
               "type": "validate",
               "validation": "Bir konuşmaya 60+ mesaj ekleyip getMessages çağrıldığında ilk sayfa 50 mesaj ve hasMore: true dönmeli. Cursor ile sonraki sayfa kalan mesajları getirmeli.",
@@ -1160,12 +1185,12 @@
               "action": "message.service.ts dosyasına GERİ DÖN — markAsRead metodunu başlat ve sorguyu yaz",
               "type": "code_add",
               "file": "server/src/services/message.service.ts",
-              "code": "\n  async markAsRead(conversationId: string, userId: string) {\n    const result = await Message.updateMany(\n      {\n        conversationId,\n        sender: { $ne: userId },\n        readBy: { $nin: [userId] },\n      },",
+              "code": "async markAsRead(conversationId: string, userId: string) {\n    const result = await Message.updateMany(\n      {\n        conversationId,\n        sender: { $ne: userId },\n        readBy: { $nin: [userId] },\n      },) }",
               "position": "bottom",
               "why": "$ne kendi mesajlarını hariç tutar, $nin zaten okunmuş mesajları hariç tutar. M1 4.6'daki aynı mantığı service katmanına taşıyoruz."
             },
             {
-              "order": "3.1b",
+              "order": "3.2",
               "action": "readBy'a kullanıcıyı ekle ve değişen kayıt sayısını döndür",
               "type": "code_add",
               "file": "server/src/services/message.service.ts",
@@ -1174,7 +1199,7 @@
               "why": "$addToSet duplicate eklemeden readBy dizisine kullanıcı ekler. modifiedCount kaç mesajın okundu olarak işaretlendiğini bildirir."
             },
             {
-              "order": "3.2",
+              "order": "3.3",
               "action": "markAsRead'in altına — getUnreadCount metodunu ekle",
               "type": "code_add",
               "file": "server/src/services/message.service.ts",
@@ -1183,16 +1208,16 @@
               "why": "Tek bir konuşmadaki okunmamış mesaj sayısını döndürür. countDocuments tüm dokümanları çekmekten ÇOK daha verimlidir."
             },
             {
-              "order": "3.2b",
+              "order": "3.4",
               "action": "getUnreadCounts metodunu başlat — tüm konuşmaları bul",
               "type": "code_add",
               "file": "server/src/services/message.service.ts",
-              "code": "\n  async getUnreadCounts(userId: string): Promise<Record<string, number>> {\n    const { Conversation } = require('../models/conversation.model');\n    const conversations = await Conversation.find({ participants: userId }).lean();\n    const counts: Record<string, number> = {};",
+              "code": "\n  async getUnreadCounts(userId: string): Promise<Record<string, number>> {\n    const { Conversation } = require('../models/conversation.model');\n    const conversations = await Conversation.find({ participants: userId }).lean();\n    const counts: Record<string, number> = {};\n\n}",
               "position": "bottom",
               "why": "Her konuşmanın okunmamış sayısını tek seferde hesaplar. Bu veri konuşma listesinde '3 okunmamış' badge göstermek için kullanılacak."
             },
             {
-              "order": "3.2c",
+              "order": "3.5",
               "action": "Her konuşma için unread count hesapla ve döndür",
               "type": "code_add",
               "file": "server/src/services/message.service.ts",
@@ -1201,7 +1226,7 @@
               "why": "for döngüsü ile her konuşma için getUnreadCount çağrılır. Sonuç objesinde key konuşma ID'si, value okunmamış sayısıdır."
             },
             {
-              "order": "3.3",
+              "order": "3.6",
               "action": "Read receipts'in doğru çalıştığını doğrula",
               "type": "validate",
               "validation": "Kullanıcı A mesaj gönderip kullanıcı B konuşmayı açtığında, mesajların readBy dizisinde B'nin ID'si olmalı. modifiedCount > 0 dönmeli.",
@@ -1260,10 +1285,11 @@
             {
               "order": "4.4",
               "action": "GERİ DÖN fonksiyon içine — token'ı header'dan çıkar",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/middleware/auth.ts",
-              "code": "export function authenticate(req: Request, res: Response, next: NextFunction) {\n  const token = req.headers.authorization?.split(' ')[1];\n  if (!token) {\n    return res.status(401).json({ status: 'error', message: 'Token gerekli' });\n  }",
-              "why": "Bearer token'ı Authorization header'dan çıkarıyoruz. split(' ')[1] 'Bearer TOKEN' formatından token kısmını alır. Token yoksa 401 dönüyoruz."
+              "code": "export function authenticate(req: Request, res: Response, next: NextFunction) {\n  const token = req.headers.authorization?.split(' ')[1];\n  if (!token) {\n    return res.status(401).json({ status: 'error', message: 'Token gerekli' });\n  }\n\n}",
+              "why": "Bearer token'ı Authorization header'dan çıkarıyoruz. split(' ')[1] 'Bearer TOKEN' formatından token kısmını alır. Token yoksa 401 dönüyoruz.",
+              "position": "after:previous"
             },
             {
               "order": "4.5",
@@ -1306,56 +1332,56 @@
               "type": "code_add",
               "file": "server/src/routes/conversation.routes.ts",
               "position": "after:auth",
-              "code": "router.get('/', async (req, res, next) => {\n  try {\n    const conversations = await conversationService.getUserConversations(req.userId!);\n    const unreadCounts = await messageService.getUnreadCounts(req.userId!);\n    const enriched = conversations.map((conv: any) => ({\n      ...conv,",
+              "code": "router.get('/', async (req, res, next) => {\n  try {\n    const conversations = await conversationService.getUserConversations(req.userId!);\n    const unreadCounts = await messageService.getUnreadCounts(req.userId!);\n    const enriched = conversations.map((conv: any) => ({\n      ...conv,))) } } }",
               "why": "Konuşma listesine unread count ekleniyor — 3.2'de yazdığımız getUnreadCounts burada KULLANILIYOR."
             },
             {
-              "order": "4.9b",
+              "order": "4.10",
               "action": "Konuşmalara unread count ekle ve response'u döndür",
               "type": "code_add",
               "file": "server/src/routes/conversation.routes.ts",
               "position": "after:auth",
-              "code": "      unreadCount: unreadCounts[conv._id.toString()] || 0,\n    }));\n    res.json({ status: 'success', data: enriched });\n  } catch (error) {\n    next(error);\n  }\n});",
+              "code": "      unreadCount: unreadCounts[conv._id.toString()] || 0,\n    res.json({ status: 'success', data: enriched });\n  } catch (error) {\n    next(error);",
               "why": "Enrichment pattern ile API response'u kullanılabilir hale getiriyoruz. Her konuşmaya okunmamış mesaj sayısı eklenir."
             },
             {
-              "order": "4.10",
+              "order": "4.11",
               "action": "GET / endpoint'inin altına — mesaj geçmişi endpoint'ini başlat",
               "type": "code_add",
               "file": "server/src/routes/conversation.routes.ts",
               "position": "after:get-conversations",
-              "code": "router.get('/:id/messages', async (req, res, next) => {\n  try {\n    const { cursor, limit } = req.query;\n    const result = await messageService.getMessages(\n      req.params.id,\n      cursor as string,",
+              "code": "router.get('/:id/messages', async (req, res, next) => {\n  try {\n    const { cursor, limit } = req.query;\n    const result = await messageService.getMessages(\n      req.params.id,\n      cursor as string,)) } }",
               "why": "2.3'teki cursor-based pagination'ı KULLANIYOR. cursor query parameter'ı opsiyonel — ilk yüklemede gönderilmez."
             },
             {
-              "order": "4.10b",
+              "order": "4.12",
               "action": "Mesaj servisini çağır ve sonuçları döndür",
               "type": "code_add",
               "file": "server/src/routes/conversation.routes.ts",
               "position": "after:get-conversations",
-              "code": "      parseInt(limit as string) || 50\n    );\n    res.json({ status: 'success', data: result });\n  } catch (error) {\n    next(error);\n  }\n});",
+              "code": "      parseInt(limit as string) || 50\n    res.json({ status: 'success', data: result });\n  } catch (error) {\n    next(error);",
               "why": "parseInt ile limit'i number'a çeviriyoruz, varsayılan 50. Aynı try/catch + next(error) pattern'ı her endpoint'te tutarlı."
             },
             {
-              "order": "4.11",
+              "order": "4.13",
               "action": "Mesaj endpoint'inin altına — arama endpoint'ini başlat",
               "type": "code_add",
               "file": "server/src/routes/conversation.routes.ts",
               "position": "after:get-messages",
-              "code": "router.get('/:id/search', async (req, res, next) => {\n  try {\n    const messages = await messageService.searchMessages(\n      req.params.id,\n      req.query.q as string",
+              "code": "router.get('/:id/search', async (req, res, next) => {\n  try {\n    const messages = await messageService.searchMessages(\n      req.params.id,\n      req.query.q as string\n));\n  }\n}",
               "why": "2.4'teki searchMessages'ı KULLANIYOR. q query parameter'ı ile arama terimi alınır."
             },
             {
-              "order": "4.11b",
+              "order": "4.14",
               "action": "Arama sonuçlarını döndür ve endpoint'i kapat",
               "type": "code_add",
               "file": "server/src/routes/conversation.routes.ts",
               "position": "after:get-messages",
-              "code": "    );\n    res.json({ status: 'success', data: messages });\n  } catch (error) {\n    next(error);\n  }\n});",
+              "code": "    res.json({ status: 'success', data: messages });\n  } catch (error) {\n    next(error);",
               "why": "HER endpoint aynı pattern: try/catch + next(error). Bu tutarlılık kodun okunurluğunu artırır ve hata yönetimini merkezileştirir."
             },
             {
-              "order": "4.12",
+              "order": "4.15",
               "action": "index.ts dosyasına GERİ DÖN — route'u import et ve kaydet",
               "type": "code_modify",
               "file": "server/src/index.ts",
@@ -1364,7 +1390,7 @@
               "why": "Az önce yazdığımız route dosyasını ana server'a bağlıyoruz. /api/conversations prefix'i altındaki TÜM istekler conversation router'a yönlendirilir."
             },
             {
-              "order": "4.13",
+              "order": "4.16",
               "action": "API endpoint'lerini test et",
               "type": "validate",
               "validation": "curl veya Postman ile GET /api/conversations isteği yapıldığında konuşma listesi dönmeli. Authorization header'sız isteklerde 401 hatası alınmalı.",
@@ -1426,19 +1452,20 @@
             },
             {
               "order": "1.2",
-              "action": "client/src/stores/socket-store.ts dosyasını aç — İSKELET interface yaz",
+              "action": "client/src/stores/socket-store.ts dosyasını aç — Zustand store iskeletini yaz",
               "type": "code_write",
               "file": "client/src/stores/socket-store.ts",
-              "code": "export {};  // placeholder",
-              "why": "Frontend tarafına geçtik. İlk önce dosyayı oluşturuyoruz, sonra Zustand store'unu adım adım inşa edeceğiz."
+              "code": "import { create } from 'zustand';\ninterface SocketState {\n  isConnected: boolean;\n}\nexport const useSocketStore = create<SocketState>(() => ({\n  isConnected: false,\n}));",
+              "why": "Zustand store ile socket bağlantı durumunu merkezi bir yerde yöneteceğiz. isConnected alanı UI'da bağlantı durumu göstermek için kullanılacak."
             },
             {
               "order": "1.3",
               "action": "ÜSTE ÇIK — zustand ve socket.io-client import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/stores/socket-store.ts",
               "code": "import { create } from 'zustand';\nimport { io, Socket } from 'socket.io-client';",
-              "why": "M1 1.4'te kurduğumuz zustand ve socket.io-client'ı import ediyoruz. create ile Zustand store oluşturacağız, io ile Socket.io bağlantısı kuracağız."
+              "why": "M1 1.4'te kurduğumuz zustand ve socket.io-client'ı import ediyoruz. create ile Zustand store oluşturacağız, io ile Socket.io bağlantısı kuracağız.",
+              "position": "top"
             },
             {
               "order": "1.4",
@@ -1455,7 +1482,7 @@
               "type": "code_add",
               "file": "client/src/stores/socket-store.ts",
               "position": "after:interface",
-              "code": "\nexport const useSocketStore = create<SocketStore>((set, get) => ({\n  socket: null,\n  isConnected: false,",
+              "code": "\nexport const useSocketStore = create<SocketStore>((set, get) => ({\n  socket: null,\n  isConnected: false,\n))\n}",
               "why": "Zustand store'unun STATE kısmını yazıyoruz. Başlangıçta socket null ve bağlantı yok. set ile state güncelleyeceğiz, get ile okuyacağız."
             },
             {
@@ -1464,7 +1491,7 @@
               "type": "code_add",
               "file": "client/src/stores/socket-store.ts",
               "position": "after:state",
-              "code": "\n  connect: (token: string) => {\n    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {\n      auth: { token },\n      reconnection: true,\n      reconnectionAttempts: 10,\n      reconnectionDelay: 1000,\n    });",
+              "code": "connect: (token: string) => {\n    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {\n      auth: { token },\n      reconnection: true,\n      reconnectionAttempts: 10,\n      reconnectionDelay: 1000,\n    }); }",
               "why": "auth: { token } ile M1 3.11'de yazdığımız Socket.io auth middleware'ine JWT gönderiyoruz. reconnection: true ile bağlantı koptuğunda OTOMATİK yeniden bağlanır."
             },
             {
@@ -1477,7 +1504,7 @@
               "why": "Bağlantı durumu değiştiğinde Zustand state'i güncelleniyor — UI bağlantı göstergesini otomatik yansıtır."
             },
             {
-              "order": "1.7b",
+              "order": "1.8",
               "action": "Bağlantı hatası listener'ını ekle",
               "type": "code_add",
               "file": "client/src/stores/socket-store.ts",
@@ -1486,7 +1513,7 @@
               "why": "connect_error ile hata loglanır — debug için önemli. Ağ sorunlarında veya geçersiz token'da bu event tetiklenir."
             },
             {
-              "order": "1.8",
+              "order": "1.9",
               "action": "Event listener'ların altına — socket'i state'e kaydet ve connect fonksiyonunu kapat",
               "type": "code_add",
               "file": "client/src/stores/socket-store.ts",
@@ -1495,16 +1522,16 @@
               "why": "Oluşturduğumuz socket'i Zustand state'ine kaydediyoruz. Artık useSocketStore().socket ile her component'ten erişilebilir."
             },
             {
-              "order": "1.9",
+              "order": "1.10",
               "action": "Connect'in altına — disconnect fonksiyonunu yaz ve store'u kapat",
               "type": "code_add",
               "file": "client/src/stores/socket-store.ts",
               "position": "after:connect",
-              "code": "\n  disconnect: () => {\n    get().socket?.disconnect();\n    set({ socket: null, isConnected: false });\n  },\n}));",
+              "code": "\n  disconnect: () => {\n    get().socket?.disconnect();\n    set({ socket: null, isConnected: false });",
               "why": "get() ile mevcut socket'e erişip disconnect() çağırıyoruz. State'i sıfırlıyoruz — socket null, bağlantı yok."
             },
             {
-              "order": "1.10",
+              "order": "1.11",
               "action": "BAŞKA DOSYAYA GEÇ — client/src/stores/chat-store.ts aç — İSKELET interface yaz",
               "type": "code_write",
               "file": "client/src/stores/chat-store.ts",
@@ -1512,16 +1539,16 @@
               "why": "İkinci store dosyasına geçiyoruz. Zustand pattern'ını 1.3-1.9'da öğrendik — aynı pattern'ı tekrarlayacağız."
             },
             {
-              "order": "1.11",
+              "order": "1.12",
               "action": "Import'un altına — ChatStore interface'ini başlat (state alanları)",
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
               "position": "after:import",
-              "code": "\ninterface ChatStore {\n  conversations: any[];\n  activeConversation: string | null;\n  messages: Record<string, any[]>;\n  typingUsers: Record<string, string[]>;",
+              "code": "\ninterface ChatStore {\n  conversations: any[];\n  activeConversation: string | null;\n  messages: Record<string, any[]>;\n  typingUsers: Record<string, string[]>;\n\n}",
               "why": "Record<string, any[]> ile her konuşmanın mesajları AYRI AYRI saklanır. typingUsers hangi konuşmada kimin yazdığını tutar."
             },
             {
-              "order": "1.11b",
+              "order": "1.13",
               "action": "Interface'e setter fonksiyon tiplerini ekle ve kapat",
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
@@ -1530,16 +1557,16 @@
               "why": "Her state alanı için bir setter tanımlanır. addMessage ve setTyping özel mantık gerektirdiği için ayrı fonksiyonlar."
             },
             {
-              "order": "1.12",
+              "order": "1.14",
               "action": "Interface'in altına — store'u oluştur ve başlangıç state'ini tanımla",
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
               "position": "after:interface",
-              "code": "\nexport const useChatStore = create<ChatStore>((set, get) => ({\n  conversations: [],\n  activeConversation: null,\n  messages: {},",
+              "code": "\nexport const useChatStore = create<ChatStore>((set, get) => ({\n  conversations: [],\n  activeConversation: null,\n  messages: {},\n))\n}",
               "why": "create<ChatStore> ile TypeScript type-safe store oluşturulur. Başlangıçta tüm diziler boş, aktif konuşma null."
             },
             {
-              "order": "1.12b",
+              "order": "1.15",
               "action": "Basit setter fonksiyonlarını ekle",
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
@@ -1548,25 +1575,25 @@
               "why": "setConversations tüm listeyi değiştirir, setActiveConversation seçili konuşmayı belirler. Zustand'da set ile state immutable güncellenir."
             },
             {
-              "order": "1.13",
+              "order": "1.16",
               "action": "Setter'ların altına — addMessage fonksiyonunu başlat",
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
               "position": "after:setters",
-              "code": "\n  addMessage: (conversationId, message) => {\n    set((state) => ({\n      messages: {\n        ...state.messages,",
+              "code": "\n  addMessage: (conversationId, message) => {\n    set((state) => ({\n      messages: {\n        ...state.messages,\n))\n    }\n  }\n}",
               "why": "Yeni mesaj ilgili konuşmanın dizisinin SONUNA eklenir. conversationId bazında ayrı diziler kullanmak karışmayı ÖNLER."
             },
             {
-              "order": "1.13b",
+              "order": "1.17",
               "action": "Mesajı spread ile mevcut diziye ekle ve state'i güncelle",
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
               "position": "after:setters",
-              "code": "        [conversationId]: [\n          ...(state.messages[conversationId] || []),\n          message,\n        ],\n      },\n    }));\n  },",
+              "code": "        [conversationId]: [\n          ...(state.messages[conversationId] || []),\n          message,",
               "why": "spread ile mevcut mesajlar korunur ve yeni mesaj sona eklenir. Boş dizi fallback'i ile ilk mesajda hata oluşmaz."
             },
             {
-              "order": "1.14",
+              "order": "1.18",
               "action": "addMessage'ın altına — setMessages fonksiyonunu ekle",
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
@@ -1575,25 +1602,25 @@
               "why": "Tüm mesaj listesini değiştirir — ilk yüklemede veya pagination'da kullanılır. addMessage tek mesaj ekler, setMessages TÜM listeyi set eder."
             },
             {
-              "order": "1.15",
+              "order": "1.19",
               "action": "setMessages'ın altına — setTyping fonksiyonunu başlat",
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
               "position": "after:setMessages",
-              "code": "\n  setTyping: (conversationId, userId, isTyping) => {\n    set((state) => {\n      const current = state.typingUsers[conversationId] || [];\n      const updated = isTyping\n        ? [...new Set([...current, userId])]",
+              "code": "\n  setTyping: (conversationId, userId, isTyping) => {\n    set((state) => {\n      const current = state.typingUsers[conversationId] || [];\n      const updated = isTyping\n        ? [...new Set([...current, userId])]\n)\n  }\n}",
               "why": "Set ile typing users'da duplicate ÖNLENIR. isTyping true ise kullanıcıyı ekle, false ise çıkar."
             },
             {
-              "order": "1.15b",
+              "order": "1.20",
               "action": "Typing state'ini güncelle ve store'u kapat",
               "type": "code_add",
               "file": "client/src/stores/chat-store.ts",
               "position": "after:setMessages",
-              "code": "        : current.filter((id) => id !== userId);\n      return {\n        typingUsers: { ...state.typingUsers, [conversationId]: updated },\n      };\n    });\n  },\n}));",
+              "code": "        : current.filter((id) => id !== userId);\n      return {\n        typingUsers: { ...state.typingUsers, [conversationId]: updated },",
               "why": "filter ile kullanıcı listeden çıkarılır. M1 4.10-4.11'deki typing event'leri bu fonksiyonu TETİKLEYECEK."
             },
             {
-              "order": "1.16",
+              "order": "1.21",
               "action": "Store'ların import edilip kullanılabildiğini doğrula",
               "type": "validate",
               "validation": "Client dev server çalışıyorken browser console'da hata olmamalı. useSocketStore ve useChatStore import edilebilmeli.",
@@ -1650,19 +1677,20 @@
               "action": "BAŞKA DOSYAYA GEÇ — client/src/pages/chat.tsx aç — İSKELET layout'u başlat",
               "type": "code_write",
               "file": "client/src/pages/chat.tsx",
-              "code": "export function ChatPage() {\n  return (\n    <div className=\"flex h-screen\">\n      <div className=\"w-80 border-r border-gray-800\">\n        <p className=\"p-4 text-gray-400\">Konuşmalar</p>\n      </div>",
+              "code": "export function ChatPage() {\n  return (\n    <div className=\"flex h-screen\">\n      <div className=\"w-80 border-r border-gray-800\">\n        <p className=\"p-4 text-gray-400\">Konuşmalar</p>\n      </div>\n)\n}",
               "why": "İskelet layout ile başlıyoruz — master-detail pattern. Sol panel sabit genişlik (w-80 = 320px) ile konuşma listesi gösterecek."
             },
             {
-              "order": "2.3b",
+              "order": "2.4",
               "action": "Sağ paneli ekle ve component'i kapat",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/pages/chat.tsx",
               "code": "      <div className=\"flex-1 flex items-center justify-center text-gray-400\">\n        Bir konuşma seçin\n      </div>\n    </div>\n  );\n}",
-              "why": "Sağ panel kalan alanı kaplar (flex-1). Konuşma seçilmeden placeholder metin gösterilir."
+              "why": "Sağ panel kalan alanı kaplar (flex-1). Konuşma seçilmeden placeholder metin gösterilir.",
+              "position": "after:previous"
             },
             {
-              "order": "2.4",
+              "order": "2.5",
               "action": "ÜSTE ÇIK — useEffect import'unu ekle",
               "type": "code_add",
               "file": "client/src/pages/chat.tsx",
@@ -1671,7 +1699,7 @@
               "why": "useEffect ile konuşma listesini yükleyip socket event'lerini dinleyeceğiz."
             },
             {
-              "order": "2.5",
+              "order": "2.6",
               "action": "ÜSTE ÇIK — store ve api import'larını ekle",
               "type": "code_add",
               "file": "client/src/pages/chat.tsx",
@@ -1680,7 +1708,7 @@
               "why": "1.5-1.9'da yazdığımız socket store, 1.12-1.15'teki chat store ve 2.1'deki api helper'ı import ediyoruz."
             },
             {
-              "order": "2.6",
+              "order": "2.7",
               "action": "GERİ DÖN component içine — store bağlantılarını ekle",
               "type": "code_add",
               "file": "client/src/pages/chat.tsx",
@@ -1689,7 +1717,7 @@
               "why": "Store'lardan socket bağlantısını ve chat state fonksiyonlarını çekiyoruz. Bunları birazdan useEffect'lerde KULLANACAĞIZ."
             },
             {
-              "order": "2.7",
+              "order": "2.8",
               "action": "Store bağlantılarının altına — konuşma listesini yükleyen useEffect ekle",
               "type": "code_add",
               "file": "client/src/pages/chat.tsx",
@@ -1698,34 +1726,34 @@
               "why": "M2 4.9'da yazdığımız GET /api/conversations endpoint'inden konuşma listesini çekiyor. Boş dependency array ile SADECE ilk render'da çalışır."
             },
             {
-              "order": "2.8",
+              "order": "2.9",
               "action": "Yükleme useEffect'inin altına — socket event listener useEffect başlat",
               "type": "code_add",
               "file": "client/src/pages/chat.tsx",
               "position": "after:load-effect",
-              "code": "  useEffect(() => {\n    if (!socket) return;\n    socket.on('message:received', (message) => {\n      addMessage(message.conversationId, message);\n    });\n    socket.on('typing:update', ({ userId, conversationId, isTyping }) => {",
+              "code": "useEffect(() => {\n    if (!socket) return;\n    socket.on('message:received', (message) => {\n      addMessage(message.conversationId, message);\n    });\n    socket.on('typing:update', ({ userId, conversationId, isTyping }) => {)) } }",
               "why": "M1 4.8'de emit ettiğimiz message:received event'ini DİNLİYORUZ. Yeni mesaj geldiğinde store'a ekleniyor."
             },
             {
-              "order": "2.8b",
+              "order": "2.10",
               "action": "Typing event'ini dinle ve cleanup fonksiyonunu yaz",
               "type": "code_add",
               "file": "client/src/pages/chat.tsx",
               "position": "after:load-effect",
-              "code": "      setTyping(conversationId, userId, isTyping);\n    });\n    return () => {\n      socket.off('message:received');\n      socket.off('typing:update');\n    };\n  }, [socket]);",
+              "code": "      setTyping(conversationId, userId, isTyping);\n    return () => {\n      socket.off('message:received');\n      socket.off('typing:update');\n  }, [socket]);",
               "why": "4.10-4.11'deki typing:update event'i burada yakalanır. return'daki cleanup memory leak ÖNLER — component unmount olunca listener'lar TEMİZLENİR."
             },
             {
-              "order": "2.9",
+              "order": "2.11",
               "action": "JSX'e GERİ DÖN — activeConversation kontrolünü başlat",
               "type": "code_modify",
               "file": "client/src/pages/chat.tsx",
-              "code": "      <div className=\"flex-1\">\n        {activeConversation ? (\n          <p className=\"p-4\">Chat Window - {activeConversation}</p>\n        ) : (",
+              "code": "      <div className=\"flex-1\">\n        {activeConversation ? (\n          <p className=\"p-4\">Chat Window - {activeConversation}</p>\n        ) : (\n)\n}",
               "position": "inside:right-panel",
               "why": "Konuşma seçildiyse içerik göster. ChatWindow component'ini M3 Adım 3'te yazacağız."
             },
             {
-              "order": "2.9b",
+              "order": "2.12",
               "action": "Konuşma seçilmediğinde placeholder göster",
               "type": "code_modify",
               "file": "client/src/pages/chat.tsx",
@@ -1734,7 +1762,7 @@
               "why": "Boş durum için kullanıcıya yönlendirme mesajı gösterilir. flex ile dikey ve yatay ortalama sağlanır."
             },
             {
-              "order": "2.10",
+              "order": "2.13",
               "action": "Chat sayfasının render edildiğini doğrula",
               "type": "validate",
               "validation": "Browser'da chat sayfası açıldığında sol panel ve sağ panel görünmeli. Console'da Socket bağlantı logları görülmeli.",
@@ -1774,27 +1802,29 @@
               "action": "client/src/components/chat-window.tsx dosyasını aç — header ve ana yapıyı kur",
               "type": "code_write",
               "file": "client/src/components/chat-window.tsx",
-              "code": "export function ChatWindow({ conversationId }: { conversationId: string }) {\n  return (\n    <div className=\"flex h-full flex-col\">\n      <div className=\"border-b px-4 py-3\">\n        <h2 className=\"font-semibold\">Konuşma</h2>\n      </div>",
+              "code": "export function ChatWindow({ conversationId }: { conversationId: string }) {\n  return (\n    <div className=\"flex h-full flex-col\">\n      <div className=\"border-b px-4 py-3\">\n        <h2 className=\"font-semibold\">Konuşma</h2>\n      </div>\n)\n}",
               "why": "İskelet ile LAYOUT'u kuruyoruz: üstte header, ortada mesaj alanı (flex-1 ile genişler), altta input."
             },
             {
-              "order": "3.1b",
+              "order": "3.2",
               "action": "Mesaj alanı placeholder'ını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
               "code": "      <div className=\"flex-1 p-4\">\n        <p className=\"text-gray-400\">Mesajlar yüklenecek...</p>\n      </div>",
-              "why": "flex-1 p-4 ile mesaj alanı kalan boşluğu kaplar. Placeholder metin sonraki adımlarda gerçek mesajlarla DEĞİŞTİRİLECEK."
+              "why": "flex-1 p-4 ile mesaj alanı kalan boşluğu kaplar. Placeholder metin sonraki adımlarda gerçek mesajlarla DEĞİŞTİRİLECEK.",
+              "position": "after:previous"
             },
             {
-              "order": "3.1c",
+              "order": "3.3",
               "action": "Input alanı placeholder'ını ekle ve component'i kapat",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
               "code": "      <div className=\"border-t p-4\">\n        <p className=\"text-gray-400\">Input alanı gelecek...</p>\n      </div>\n    </div>\n  );\n}",
-              "why": "border-t ile mesaj alanı ve input görsel olarak AYRILIR. İlk önce yapıyı görüp DOĞRULUYORUZ."
+              "why": "border-t ile mesaj alanı ve input görsel olarak AYRILIR. İlk önce yapıyı görüp DOĞRULUYORUZ.",
+              "position": "after:previous"
             },
             {
-              "order": "3.2",
+              "order": "3.4",
               "action": "ÜSTE ÇIK — React hook'ları import et",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1803,7 +1833,7 @@
               "why": "useState input değeri için, useEffect veri çekme için, useRef scroll target için, useCallback fonksiyon memoization için gerekli."
             },
             {
-              "order": "3.3",
+              "order": "3.5",
               "action": "ÜSTE ÇIK — store ve api import'larını ekle",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1812,7 +1842,7 @@
               "why": "1.5-1.9'da yazdığımız socket store, 1.12-1.15'teki chat store ve 2.1'deki api helper'ı import ediyoruz."
             },
             {
-              "order": "3.4",
+              "order": "3.6",
               "action": "GERİ DÖN component içine — state tanımlarını ve store bağlantılarını ekle",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1821,7 +1851,7 @@
               "why": "input: kullanıcının yazdığı metin. isLoading: mesaj yüklenirken spinner. messagesEndRef: otomatik scroll için div referansı. Store'lardan socket ve mesaj state'i çekiliyor."
             },
             {
-              "order": "3.5",
+              "order": "3.7",
               "action": "State'lerin altına — mesaj ve typing verilerini conversationId'ye göre filtrele",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1830,7 +1860,7 @@
               "why": "1.13-1.15'te tanımladığımız Record<string, any[]> yapısından aktif konuşmanın verilerini çekiyoruz. || [] ile undefined durumunda boş dizi."
             },
             {
-              "order": "3.6",
+              "order": "3.8",
               "action": "Filtrelemenin altına — mesaj geçmişini yükleyen useEffect ekle",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1839,7 +1869,7 @@
               "why": "M2 4.10'da yazdığımız /messages endpoint'inden mesaj geçmişini çekiyor. conversationId DEĞİŞTİĞİNDE yeniden yüklenir. message:read ile mesajları okundu işaretliyoruz."
             },
             {
-              "order": "3.7",
+              "order": "3.9",
               "action": "Yükleme useEffect'inin altına — otomatik scroll useEffect ekle",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1848,25 +1878,25 @@
               "why": "Yeni mesaj geldiğinde en alta scroll yapılır. behavior: 'smooth' ile yumuşak kaydırma. conversationMessages.length DEĞİŞTİĞİNDE tetiklenir."
             },
             {
-              "order": "3.8",
+              "order": "3.10",
               "action": "Scroll useEffect'inin altına — sendMessage fonksiyonunu başlat ve emit et",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
               "position": "after:scroll-effect",
-              "code": "  const sendMessage = useCallback(() => {\n    if (!input.trim() || !socket) return;\n    socket.emit('message:send', {\n      conversationId,\n      content: input.trim(),\n      type: 'text',",
+              "code": "const sendMessage = useCallback(() => {\n    if (!input.trim() || !socket) return;\n    socket.emit('message:send', {\n      conversationId,\n      content: input.trim(),\n      type: 'text',)) } }",
               "why": "M1 4.6-4.9'da yazdığımız message:send event'ini tetikliyor. Boş mesaj kontrolü ile gereksiz emit önlenir."
             },
             {
-              "order": "3.8b",
+              "order": "3.11",
               "action": "Gönderim callback'ini yaz, input'u temizle ve typing'i durdur",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
               "position": "after:scroll-effect",
-              "code": "    }, (response: any) => {\n      if (response.status !== 'ok') console.error('Mesaj gönderilemedi');\n    });\n    setInput('');\n    socket.emit('typing:stop', { conversationId });\n  }, [input, socket, conversationId]);",
+              "code": "    }, (response: any) => {\n      if (response.status !== 'ok') console.error('Mesaj gönderilemedi');\n    setInput('');\n    socket.emit('typing:stop', { conversationId });\n  }, [input, socket, conversationId]);",
               "why": "callback ile gönderim onayı alınır. Mesaj gönderildikten sonra input TEMİZLENİR ve typing durdurulur."
             },
             {
-              "order": "3.9",
+              "order": "3.12",
               "action": "sendMessage'ın altına — handleTyping fonksiyonunu yaz",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1875,23 +1905,25 @@
               "why": "M1 4.10'daki typing:start event'ini tetikliyor. Her tuş basımında çağrılır — production'da throttle/debounce eklenmeli."
             },
             {
-              "order": "3.10",
+              "order": "3.13",
               "action": "Fonksiyonların altına — return JSX'ini başlat (header ve mesaj alanı)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
-              "code": "  return (\n    <div className=\"flex h-full flex-col\">\n      <div className=\"border-b px-4 py-3\">\n        <h2 className=\"font-semibold\">Konuşma</h2>\n      </div>\n      <div className=\"flex-1 overflow-y-auto p-4 space-y-3\">\n        {isLoading ? (",
-              "why": "3.1'deki iskelet layout'u DOLDURUYORUZ. overflow-y-auto ile mesajlar ekrandan taşınca scroll yapılır."
+              "code": "return (\n    <div className=\"flex h-full flex-col\">\n      <div className=\"border-b px-4 py-3\">\n        <h2 className=\"font-semibold\">Konuşma</h2>\n      </div>\n      <div className=\"flex-1 overflow-y-auto p-4 space-y-3\">\n        {isLoading ? ()) }",
+              "why": "3.1'deki iskelet layout'u DOLDURUYORUZ. overflow-y-auto ile mesajlar ekrandan taşınca scroll yapılır.",
+              "position": "bottom"
             },
             {
-              "order": "3.10b",
+              "order": "3.14",
               "action": "Yükleme durumu ve mesaj listesi render'ını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
               "code": "          <div className=\"text-center text-gray-400\">Yükleniyor...</div>\n        ) : (\n          conversationMessages.map((msg: any) => (\n            <div key={msg._id} className=\"p-2 bg-gray-800 rounded\">\n              <p className=\"text-sm text-gray-300\">{msg.content}</p>\n            </div>\n          ))\n        )}",
-              "why": "isLoading sırasında spinner, değilse mesaj listesi gösterilir. Her mesaj bg-gray-800 arka planıyla görsel olarak ayrılır."
+              "why": "isLoading sırasında spinner, değilse mesaj listesi gösterilir. Her mesaj bg-gray-800 arka planıyla görsel olarak ayrılır.",
+              "position": "after:previous"
             },
             {
-              "order": "3.11",
+              "order": "3.15",
               "action": "Mesaj listesinin altına — typing indicator ve scroll div ekle",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1900,7 +1932,7 @@
               "why": "1.15'te tanımladığımız setTyping ile güncellenen typing state'i burada GÖSTERİLİYOR. messagesEndRef ile 3.7'deki scrollIntoView ÇALIŞIR."
             },
             {
-              "order": "3.12",
+              "order": "3.16",
               "action": "Scroll div'in altına — input alanının dış yapısını ve textarea'yı başlat",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1909,7 +1941,7 @@
               "why": "Enter ile gönderme, Shift+Enter ile yeni satır standart chat UX'i. onChange ile hem input güncellenir hem typing tetiklenir."
             },
             {
-              "order": "3.12b",
+              "order": "3.17",
               "action": "Textarea'ya onKeyDown handler ekle — Enter ile gönder",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1918,7 +1950,7 @@
               "why": "e.preventDefault() ile Enter'da yeni satır OLUŞMAZ. shiftKey kontrolü ile Shift+Enter yeni satır eklemeye devam eder."
             },
             {
-              "order": "3.12c",
+              "order": "3.18",
               "action": "Textarea'nın placeholder ve stil ayarlarını tamamla",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1927,7 +1959,7 @@
               "why": "Placeholder @ai komutu hakkında bilgi verir. border-gray-700 ve bg-gray-800 dark tema ile uyumlu."
             },
             {
-              "order": "3.12d",
+              "order": "3.19",
               "action": "Gönder butonunu ekle ve flex container'ı kapat",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1936,7 +1968,7 @@
               "why": "disabled={!input.trim()} boş mesaj göndermeyi engeller. 3.8'deki sendMessage burada onClick ile BAĞLANIYOR."
             },
             {
-              "order": "3.12e",
+              "order": "3.20",
               "action": "Tüm wrapper div'lerini kapat ve component'i sonlandır",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
@@ -1945,7 +1977,7 @@
               "why": "Her açılan JSX etiketi kapatılmalı. React component'i return statement'ı ile tamamlanır."
             },
             {
-              "order": "3.13",
+              "order": "3.21",
               "action": "chat.tsx dosyasına GERİ DÖN — ChatWindow'u import et ve placeholder'ı değiştir",
               "type": "code_modify",
               "file": "client/src/pages/chat.tsx",
@@ -1954,7 +1986,7 @@
               "why": "2.4'te yazdığımız placeholder'ı az önce oluşturduğumuz ChatWindow component'i ile DEĞİŞTİRİYORUZ."
             },
             {
-              "order": "3.14",
+              "order": "3.22",
               "action": "Mesaj gönderme ve alma işlevini doğrula",
               "type": "validate",
               "validation": "Mesaj yazıp Enter'a basıldığında mesaj gönderilmeli ve ekranda görünmeli. Typing indicator yazarken görünmeli.",
@@ -2009,10 +2041,11 @@
             {
               "order": "4.3",
               "action": "Return JSX'ini güncelle — flex yönünü isOwn'a göre ayarla",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/message-bubble.tsx",
               "code": "  return (\n    <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>\n      <div className=\"flex max-w-[70%] gap-2\">\n      </div>\n    </div>\n  );",
-              "why": "Kendi mesajlarımız SAĞDA (justify-end), karşıdakiler SOLDA (justify-start). max-w-[70%] ile balon ekranın %70'inden fazla genişlemez."
+              "why": "Kendi mesajlarımız SAĞDA (justify-end), karşıdakiler SOLDA (justify-start). max-w-[70%] ile balon ekranın %70'inden fazla genişlemez.",
+              "position": "bottom"
             },
             {
               "order": "4.4",
@@ -2033,16 +2066,16 @@
               "why": "Kendi mesajlarında ad gösterilmez. AI mesajlarında 'AI Asistan', diğerlerinde gönderici adı gösterilir."
             },
             {
-              "order": "4.5b",
+              "order": "4.6",
               "action": "Mesaj balonunun renklerini belirle (mavi/mor/gri)",
               "type": "code_add",
               "file": "client/src/components/message-bubble.tsx",
               "position": "after:avatar",
-              "code": "          <div\n            className={`rounded-2xl px-4 py-2 ${\n              isOwn\n                ? 'bg-blue-600 text-white'\n                : isAI",
+              "code": "          <div\n            className={`rounded-2xl px-4 py-2 ${\n              isOwn\n                ? 'bg-blue-600 text-white'\n                : isAI\n\n  }\n}",
               "why": "Kendi mesajlar MAVİ, AI mesajları MOR, karşıdakiler GRİ. Üç farklı renk şeması ile mesaj tiplerini GÖRSEL olarak ayırıyoruz."
             },
             {
-              "order": "4.5c",
+              "order": "4.7",
               "action": "Mesaj içeriğini göster ve balon div'ini kapat",
               "type": "code_add",
               "file": "client/src/components/message-bubble.tsx",
@@ -2051,7 +2084,7 @@
               "why": "whitespace-pre-wrap ile satır sonları korunur — çok satırlı mesajlar doğru görüntülenir."
             },
             {
-              "order": "4.6",
+              "order": "4.8",
               "action": "Balon div'inin altına — zaman damgası göster",
               "type": "code_add",
               "file": "client/src/components/message-bubble.tsx",
@@ -2060,7 +2093,7 @@
               "why": "Saat formatı Türkçe locale ile 24 saat formatında gösterilir. Kendi mesajlarda sağa, diğerlerinde sola hizalanır."
             },
             {
-              "order": "4.6b",
+              "order": "4.9",
               "action": "Kendi mesajlarına okundu tiklerini ekle ve div'leri kapat",
               "type": "code_add",
               "file": "client/src/components/message-bubble.tsx",
@@ -2069,7 +2102,7 @@
               "why": "readBy.length > 1 ise çift tik — karşı taraf okumuş demek. M1 2.8'de tanımladığımız readBy alanı burada KULLANILIYOR."
             },
             {
-              "order": "4.7",
+              "order": "4.10",
               "action": "chat-window.tsx dosyasına GERİ DÖN — MessageBubble'ı import et ve placeholder'ı değiştir",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
@@ -2078,7 +2111,7 @@
               "why": "3.10'da yazdığımız placeholder mesaj div'ini az önce oluşturduğumuz stilize MessageBubble component'i ile DEĞİŞTİRİYORUZ."
             },
             {
-              "order": "4.8",
+              "order": "4.11",
               "action": "Mesaj bubble stillerini doğrula",
               "type": "validate",
               "validation": "Mesajlar baloncuk şeklinde görünmeli. Zaman damgası doğru formatta olmalı. Farklı mesaj tipleri farklı renklerde olmalı.",
@@ -2124,10 +2157,11 @@
             {
               "order": "5.2",
               "action": "ÜSTE ÇIK — React hook'ları ve api import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/hooks/use-infinite-messages.ts",
               "code": "import { useState, useCallback, useRef, useEffect } from 'react';\nimport { api } from '../lib/api';\nimport { useChatStore } from '../stores/chat-store';",
-              "why": "2.1'de yazdığımız api helper'ı ve 1.12'deki chat store'u import ediyoruz. useRef ile cursor değerini re-render'lar arasında KORUYACAĞIZ."
+              "why": "2.1'de yazdığımız api helper'ı ve 1.12'deki chat store'u import ediyoruz. useRef ile cursor değerini re-render'lar arasında KORUYACAĞIZ.",
+              "position": "top"
             },
             {
               "order": "5.3",
@@ -2144,11 +2178,11 @@
               "type": "code_add",
               "file": "client/src/hooks/use-infinite-messages.ts",
               "position": "after:state",
-              "code": "  const loadMore = useCallback(async () => {\n    if (isLoadingMore || !hasMore) return;\n    setIsLoadingMore(true);\n    try {\n      const params = cursorRef.current",
+              "code": "  const loadMore = useCallback(async () => {\n    if (isLoadingMore || !hasMore) return;\n    setIsLoadingMore(true);\n    try {\n      const params = cursorRef.current\n)\n  }\n}",
               "why": "İlk kontrol: zaten yüklüyorsak veya daha fazla mesaj yoksa ÇIK. Cursor varsa query string'e eklenir."
             },
             {
-              "order": "5.4b",
+              "order": "5.5",
               "action": "API çağrısını yaz ve endpoint'e istek gönder",
               "type": "code_add",
               "file": "client/src/hooks/use-infinite-messages.ts",
@@ -2157,7 +2191,7 @@
               "why": "M2 4.10'da yazdığımız /messages endpoint'ini cursor parametresiyle çağırıyoruz. limit=50 ile sayfalama yapılır."
             },
             {
-              "order": "5.5",
+              "order": "5.6",
               "action": "API çağrısının altına — mesajları state'e ekle",
               "type": "code_add",
               "file": "client/src/hooks/use-infinite-messages.ts",
@@ -2166,34 +2200,34 @@
               "why": "Yeni mesajlar mevcut mesajların BAŞINA eklenir çünkü eski mesajlar üstte gösterilir."
             },
             {
-              "order": "5.5b",
+              "order": "5.7",
               "action": "Cursor'ı güncelle ve hata yakalama bloğunu yaz",
               "type": "code_add",
               "file": "client/src/hooks/use-infinite-messages.ts",
               "position": "after:api-call",
-              "code": "    } catch (error) {\n      console.error('Mesaj yükleme hatası:', error);\n    } finally {\n      setIsLoadingMore(false);\n    }\n  }, [conversationId, isLoadingMore, hasMore]);",
+              "code": "    } catch (error) {\n      console.error('Mesaj yükleme hatası:', error);\n    } finally {\n      setIsLoadingMore(false);\n  }, [conversationId, isLoadingMore, hasMore]);",
               "why": "M2 2.3'teki cursor-based pagination'ın döndürdüğü nextCursor ve hasMore burada KULLANILIYOR. finally ile loading state her durumda sıfırlanır."
             },
             {
-              "order": "5.6",
+              "order": "5.8",
               "action": "loadMore'un altına — IntersectionObserver useEffect başlat",
               "type": "code_add",
               "file": "client/src/hooks/use-infinite-messages.ts",
               "position": "after:loadMore",
-              "code": "  useEffect(() => {\n    const observer = new IntersectionObserver(\n      (entries) => {\n        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {\n          loadMore();\n        }\n      },\n      { threshold: 0.1 }",
+              "code": "useEffect(() => {\n    const observer = new IntersectionObserver(\n      (entries) => {\n        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {\n          loadMore();\n        }\n      },)) }",
               "why": "IntersectionObserver scroll event listener'dan DAHA performanslıdır. threshold: 0.1 ile element %10 görünür olduğunda tetiklenir."
             },
             {
-              "order": "5.6b",
+              "order": "5.9",
               "action": "Observer'ı elemente bağla ve cleanup fonksiyonunu yaz",
               "type": "code_add",
               "file": "client/src/hooks/use-infinite-messages.ts",
               "position": "after:loadMore",
-              "code": "    );\n    if (observerRef.current) {\n      observer.observe(observerRef.current);\n    }\n    return () => observer.disconnect();\n  }, [loadMore, hasMore, isLoadingMore]);",
+              "code": "    if (observerRef.current) {\n      observer.observe(observerRef.current);\n    return () => observer.disconnect();\n  }, [loadMore, hasMore, isLoadingMore]);",
               "why": "observerRef.current ile hedef element DOM'da varsa GÖZLEMEYE başlar. return'da observer TEMİZLENİR — memory leak önlenir."
             },
             {
-              "order": "5.7",
+              "order": "5.10",
               "action": "useEffect'in altına — return statement yaz",
               "type": "code_add",
               "file": "client/src/hooks/use-infinite-messages.ts",
@@ -2202,7 +2236,7 @@
               "why": "Hook'un dışarıya sunduğu değerler: yükleme durumu, daha fazla var mı, observer referansı ve manuel yükleme fonksiyonu."
             },
             {
-              "order": "5.8",
+              "order": "5.11",
               "action": "chat-window.tsx dosyasına GERİ DÖN — hook'u import et ve entegre et",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
@@ -2211,7 +2245,7 @@
               "why": "observerRef mesaj listesinin EN ÜSTÜNE yerleştirilir — kullanıcı yukarı scroll yapıp bu element'i GÖRDÜĞÜNDE otomatik olarak eski mesajlar yüklenir."
             },
             {
-              "order": "5.9",
+              "order": "5.12",
               "action": "Infinite scroll'un çalıştığını doğrula",
               "type": "validate",
               "validation": "60+ mesajı olan bir konuşmada yukarı scroll yapıldığında eski mesajlar otomatik yüklenmeli. Tüm mesajlar yüklendiğinde loadMore çağrılmamalı.",
@@ -2295,47 +2329,47 @@
               "type": "code_add",
               "file": "server/src/services/ai.service.ts",
               "position": "inside:class",
-              "code": "  private buildMessages(userMessage: string, conversationHistory: any[] = []) {\n    return [\n      { role: 'system' as const, content: SYSTEM_PROMPT },\n      ...conversationHistory.slice(-10).map((msg) => ({",
+              "code": "  private buildMessages(userMessage: string, conversationHistory: any[] = []) {\n    return [\n      { role: 'system' as const, content: SYSTEM_PROMPT },\n      ...conversationHistory.slice(-10).map((msg) => ({\n  // TODO: implement))\n  }\n}",
               "why": "Private helper metot ile DRY — generateResponse ve streaming ikisi de bunu kullanır. System prompt her istekte gönderilir."
             },
             {
-              "order": "1.4b",
+              "order": "1.5",
               "action": "Konuşma geçmişini ve kullanıcı mesajını diziye ekle",
               "type": "code_add",
               "file": "server/src/services/ai.service.ts",
               "position": "inside:class",
-              "code": "        role: msg.type === 'ai_response' ? 'assistant' as const : 'user' as const,\n        content: msg.content,\n      })),\n      { role: 'user' as const, content: userMessage },\n    ];\n  }",
+              "code": "        role: msg.type === 'ai_response' ? 'assistant' as const : 'user' as const,\n        content: msg.content,\n      { role: 'user' as const, content: userMessage },",
               "why": "Son 10 mesaj context olarak gönderilir — token limitini aşmamak için SINIRLANDIRILIR. 'ai_response' tipi role belirleme için KULLANILIYOR."
             },
             {
-              "order": "1.5",
+              "order": "1.6",
               "action": "buildMessages'ın altına — generateResponse metodunu başlat",
               "type": "code_add",
               "file": "server/src/services/ai.service.ts",
               "position": "after:buildMessages",
-              "code": "  async generateResponse(userMessage: string, conversationHistory: any[] = []) {\n    const completion = await openai.chat.completions.create({\n      model: 'gpt-4o-mini',\n      messages: this.buildMessages(userMessage, conversationHistory),\n      max_tokens: 1000,",
+              "code": "  async generateResponse(userMessage: string, conversationHistory: any[] = []) {\n    const completion = await openai.chat.completions.create({\n      model: 'gpt-4o-mini',\n      messages: this.buildMessages(userMessage, conversationHistory),\n      max_tokens: 1000,\n);\n  }\n}",
               "why": "gpt-4o-mini hız ve maliyet açısından chat uygulamaları için ideal. 1.4'te yazdığımız buildMessages'ı KULLANIYORUZ."
             },
             {
-              "order": "1.5b",
+              "order": "1.7",
               "action": "API çağrısını tamamla ve yanıtı döndür",
               "type": "code_add",
               "file": "server/src/services/ai.service.ts",
               "position": "after:buildMessages",
-              "code": "      temperature: 0.7,\n    });\n    return completion.choices[0].message.content || 'Yanıt oluşturulamadı.';\n  }",
+              "code": "      temperature: 0.7,\n    return completion.choices[0].message.content || 'Yanıt oluşturulamadı.';",
               "why": "temperature: 0.7 yaratıcılık ve tutarlılık arasında denge sağlar. Yanıt boşsa fallback mesaj döndürülür."
             },
             {
-              "order": "1.6",
+              "order": "1.8",
               "action": "generateResponse'un altına — streaming response metodunun İSKELETİNİ yaz",
               "type": "code_add",
               "file": "server/src/services/ai.service.ts",
               "position": "after:generateResponse",
-              "code": "  async generateStreamingResponse(\n    userMessage: string,\n    conversationHistory: any[] = [],\n    onToken: (token: string) => void\n  ) {",
+              "code": "  async generateStreamingResponse(\n    userMessage: string,\n    conversationHistory: any[] = [],\n    onToken: (token: string) => void\n  ) {\n  // TODO: implement\n}",
               "why": "Streaming versiyonu onToken callback alır — her token geldiğinde Socket.io ile client'a emit edecek. Bu BAĞLANTIYI M4 Adım 2'de kuracağız."
             },
             {
-              "order": "1.7",
+              "order": "1.9",
               "action": "Streaming fonksiyonunun içine — OpenAI stream çağrısını yaz",
               "type": "code_add",
               "file": "server/src/services/ai.service.ts",
@@ -2344,25 +2378,25 @@
               "why": "stream: true ile OpenAI token token yanıt döndürür. 1.5'teki ile AYNI parametreler, tek fark stream: true."
             },
             {
-              "order": "1.8",
+              "order": "1.10",
               "action": "Stream'in altına — token'ları async iterator ile oku",
               "type": "code_add",
               "file": "server/src/services/ai.service.ts",
               "position": "after:stream-create",
-              "code": "    let fullResponse = '';\n    for await (const chunk of stream) {\n      const token = chunk.choices[0]?.delta?.content || '';\n      if (token) {\n        fullResponse += token;",
+              "code": "    let fullResponse = '';\n    for await (const chunk of stream) {\n      const token = chunk.choices[0]?.delta?.content || '';\n      if (token) {\n        fullResponse += token;\n\n  }\n}",
               "why": "for await...of ile async iterator olarak okunur. Her token geldiğinde onToken callback'i tetiklenir VE fullResponse'a eklenir."
             },
             {
-              "order": "1.8b",
+              "order": "1.11",
               "action": "Token'ı birikimli response'a ekle ve tam yanıtı döndür",
               "type": "code_add",
               "file": "server/src/services/ai.service.ts",
               "position": "after:stream-create",
-              "code": "        onToken(token);\n      }\n    }\n    return fullResponse;\n  }",
+              "code": "        onToken(token);\n    return fullResponse;",
               "why": "Tam yanıt döndürülür — veritabanına kaydedilmek için. Boş token'lar filtrelenir."
             },
             {
-              "order": "1.9",
+              "order": "1.12",
               "action": "AI service'in çalıştığını doğrula",
               "type": "validate",
               "validation": "OPENAI_API_KEY .env'de tanımlı olmalı. Test amaçlı generateResponse çağrıldığında yanıt dönmeli.",
@@ -2429,7 +2463,7 @@
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
               "position": "inside:function",
-              "code": "  socket.on('ai:ask', async (data, callback) => {\n    const { conversationId, question } = data;\n    const userId = socket.data.userId;\n\n    try {",
+              "code": "  socket.on('ai:ask', async (data, callback) => {\n    const { conversationId, question } = data;\n    const userId = socket.data.userId;\n\n    try {\n  // TODO: implement)\n  }\n}",
               "why": "Event handler'ı AÇIYORUZ. data'dan conversationId ve question'ı destructure ediyoruz. userId'yi M1 3.11'deki auth middleware'den alıyoruz."
             },
             {
@@ -2438,11 +2472,11 @@
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
               "position": "inside:try",
-              "code": "      // Kullanıcı mesajını kaydet\n      const userMessage = await Message.create({\n        conversationId,\n        sender: userId,\n        content: question,\n        type: 'text',",
+              "code": "      // Kullanıcı mesajını kaydet\n      const userMessage = await Message.create({\n        conversationId,\n        sender: userId,\n        content: question,\n        type: 'text',\n);\n}",
               "why": "Önce kullanıcının sorusunu normal mesaj olarak kaydediyoruz. M1 4.7-4.8'deki mesaj kaydetme pattern'ının AYNISI."
             },
             {
-              "order": "2.5b",
+              "order": "2.6",
               "action": "Kaydedilen mesajı odadaki herkese emit et",
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
@@ -2451,7 +2485,7 @@
               "why": "populate ile sender bilgisi dolduruluyor. io.to ile konuşmadaki TÜM kullanıcılar yeni mesajı alır."
             },
             {
-              "order": "2.6",
+              "order": "2.7",
               "action": "Kullanıcı mesajının altına — konuşma geçmişini context olarak al",
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
@@ -2460,7 +2494,7 @@
               "why": "AI'ın konuşmanın bağlamını ANLAMası için son 10 mesajı çekiyoruz. 1.4'te tanımladığımız generateStreamingResponse bu history'yi kullanacak."
             },
             {
-              "order": "2.7",
+              "order": "2.8",
               "action": "History'nin altına — placeholder AI mesajı oluştur",
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
@@ -2469,7 +2503,7 @@
               "why": "BOŞ bir AI mesajı oluşturuyoruz — streaming sırasında token'lar gelecek, sonunda tam içerik ile GÜNCELLENECEK. M1 2.8'de tanımladığımız 'ai_response' tipi burada KULLANILIYOR."
             },
             {
-              "order": "2.8",
+              "order": "2.9",
               "action": "Placeholder'ın altına — streaming başladı bildirimi gönder",
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
@@ -2478,16 +2512,16 @@
               "why": "Client'a 'streaming başlıyor' sinyali gönderiyoruz. Frontend bu event'i alınca cursor animasyonu gösterecek."
             },
             {
-              "order": "2.9",
+              "order": "2.10",
               "action": "Bildirimin altına — streaming yanıtı başlat ve callback'i tanımla",
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
               "position": "after:stream-start",
-              "code": "      // Streaming yanıt\n      const fullResponse = await aiService.generateStreamingResponse(\n        question,\n        history.reverse(),\n        (token) => {",
+              "code": "      // Streaming yanıt\n      const fullResponse = await aiService.generateStreamingResponse(\n        question,\n        history.reverse(),\n        (token) => {\n  // TODO: implement)\n}",
               "why": "1.5'te yazdığımız generateStreamingResponse'u çağırıyoruz. onToken callback'i HER token geldiğinde çalışır."
             },
             {
-              "order": "2.9b",
+              "order": "2.11",
               "action": "Her token'ı Socket.io ile emit et ve stream'i kapat",
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
@@ -2496,7 +2530,7 @@
               "why": "io.to ile token konuşmadaki herkese gönderilir — ChatGPT'nin yazıyor efektini replike eder."
             },
             {
-              "order": "2.10",
+              "order": "2.12",
               "action": "Streaming'in altına — final mesajı güncelle ve tamamlandı bildirimi gönder",
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
@@ -2505,7 +2539,7 @@
               "why": "2.7'de oluşturduğumuz BOŞ placeholder mesajı tam yanıtla güncelliyoruz. ai:stream:end ile client'a 'streaming bitti' sinyali gönderiyoruz."
             },
             {
-              "order": "2.11",
+              "order": "2.13",
               "action": "Stream end'in altına — konuşmanın lastMessage ve lastActivity'sini güncelle",
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
@@ -2514,16 +2548,16 @@
               "why": "lastMessage ile konuşma listesinde son mesaj önizlemesi gösterilir. lastActivity sıralama için güncellenir."
             },
             {
-              "order": "2.11b",
+              "order": "2.14",
               "action": "Callback ile client'a onay gönder ve catch bloğunu yaz",
               "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
               "position": "after:stream-end",
-              "code": "      callback({ status: 'ok' });\n    } catch (error) {\n      console.error('AI error:', error);\n      callback({ status: 'error', message: 'AI yanıt veremedi' });\n    }\n  });\n}",
+              "code": "      callback({ status: 'ok' });\n    } catch (error) {\n      console.error('AI error:', error);\n      callback({ status: 'error', message: 'AI yanıt veremedi' });",
               "why": "catch bloğunda hata durumu yakalanıp client'a bildirilir. Loglama ile production'da hata takibi yapılır."
             },
             {
-              "order": "2.12",
+              "order": "2.15",
               "action": "socket-handler.ts dosyasına GERİ DÖN — AI handler'ı import et ve bağla",
               "type": "code_modify",
               "file": "server/src/events/socket-handler.ts",
@@ -2532,7 +2566,7 @@
               "why": "M1 4.1'de yazdığımız socket-handler'a AI handler'ı BAĞLIYORUZ. Her socket bağlantısında AI handler da kurulur."
             },
             {
-              "order": "2.13",
+              "order": "2.16",
               "action": "AI streaming'in çalıştığını doğrula",
               "type": "validate",
               "validation": "Client'tan ai:ask event'i gönderildiğinde ai:stream:start, ardından ai:stream:token event'leri ve son olarak ai:stream:end event'i gelmeli.",
@@ -2599,7 +2633,7 @@
               "type": "code_add",
               "file": "client/src/hooks/use-ai-stream.ts",
               "position": "after:state",
-              "code": "  useEffect(() => {\n    if (!socket) return;\n\n    socket.on('ai:stream:start', ({ messageId }) => {\n      setStreamingMessages((prev) => ({ ...prev, [messageId]: '' }));\n    });",
+              "code": "  useEffect(() => {\n    if (!socket) return;\n\n    socket.on('ai:stream:start', ({ messageId }) => {\n      setStreamingMessages((prev) => ({ ...prev, [messageId]: '' }));\n    });\n)\n}",
               "why": "M4 2.8'de backend'de emit ettiğimiz ai:stream:start event'ini DİNLİYORUZ. Yeni streaming mesaj için BOŞ string ile başlatıyoruz."
             },
             {
@@ -2643,19 +2677,20 @@
               "action": "BAŞKA DOSYAYA GEÇ — client/src/components/streaming-message.tsx aç ve component'i başlat",
               "type": "code_write",
               "file": "client/src/components/streaming-message.tsx",
-              "code": "export function StreamingMessage({ content }: { content: string }) {\n  return (\n    <div className=\"rounded-2xl border border-purple-800 bg-purple-900/20 px-4 py-2\">\n      <p className=\"mb-1 text-xs text-purple-400\">AI Asistan</p>\n      <p className=\"whitespace-pre-wrap text-sm text-gray-200\">",
+              "code": "export function StreamingMessage({ content }: { content: string }) {\n  return (\n    <div className=\"rounded-2xl border border-purple-800 bg-purple-900/20 px-4 py-2\">\n      <p className=\"mb-1 text-xs text-purple-400\">AI Asistan</p>\n      <p className=\"whitespace-pre-wrap text-sm text-gray-200\">\n)\n}",
               "why": "M3 4.5'te mesaj bubble'da kullandığımız mor tema AYNI — tutarlı tasarım. border ile AI mesajları normal mesajlardan AYRILIR."
             },
             {
-              "order": "3.9b",
+              "order": "3.10",
               "action": "Mesaj içeriğini ve blinking cursor efektini ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/streaming-message.tsx",
               "code": "        {content}\n        <span className=\"inline-block h-4 w-1 animate-pulse bg-purple-500\" />\n      </p>\n    </div>\n  );\n}",
-              "why": "animate-pulse ile blinking cursor efekti AI'ın HALA yazdığını gösterir. whitespace-pre-wrap ile satır sonları korunur."
+              "why": "animate-pulse ile blinking cursor efekti AI'ın HALA yazdığını gösterir. whitespace-pre-wrap ile satır sonları korunur.",
+              "position": "after:previous"
             },
             {
-              "order": "3.10",
+              "order": "3.11",
               "action": "chat-window.tsx dosyasına GERİ DÖN — streaming import'larını ekle",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
@@ -2664,7 +2699,7 @@
               "why": "Hook ve component'i ChatWindow'a BAĞLIYORUZ."
             },
             {
-              "order": "3.10b",
+              "order": "3.12",
               "action": "Streaming mesajları mesaj listesinin sonuna render et",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
@@ -2673,7 +2708,7 @@
               "why": "Streaming mesajlar normal mesaj listesinin SONUNDA gösterilir. Object.entries ile her aktif stream ayrı render edilir."
             },
             {
-              "order": "3.11",
+              "order": "3.13",
               "action": "AI streaming UI'ın çalıştığını doğrula",
               "type": "validate",
               "validation": "AI'a soru sorulduğunda yanıt karakter karakter ekranda görünmeli. Streaming sırasında blinking cursor olmalı. Streaming bitince normal mesaj olarak kalmalı.",
@@ -2719,29 +2754,32 @@
             {
               "order": "4.2",
               "action": "ÜSTE ÇIK — Redis import'unu ekle (şimdi kullanacağız)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/middleware/ai-rate-limit.ts",
               "code": "import { redis } from '../utils/redis';",
-              "why": "M1 5.3'te yazdığımız Redis utility'yi import ediyoruz. INCR + EXPIRE ile sliding window rate limiting yapacağız."
+              "why": "M1 5.3'te yazdığımız Redis utility'yi import ediyoruz. INCR + EXPIRE ile sliding window rate limiting yapacağız.",
+              "position": "top"
             },
             {
               "order": "4.3",
               "action": "GERİ DÖN fonksiyon içine — Redis rate limit import'unu ve sabitleri tanımla",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/middleware/ai-rate-limit.ts",
-              "code": "import { redis } from '../utils/redis';\n\nconst AI_RATE_LIMIT = 10;\nconst AI_RATE_WINDOW = 60;\n\nexport async function checkAIRateLimit(userId: string): Promise<boolean> {",
-              "why": "Dakikada 10 istek sınırı AI API maliyetini kontrol eder. 60 saniyelik pencere ile sliding window rate limiting uygulanır."
-            },
-            {
-              "order": "4.3b",
-              "action": "Redis INCR + EXPIRE ile rate limit kontrolünü yaz",
-              "type": "code_write",
-              "file": "server/src/middleware/ai-rate-limit.ts",
-              "code": "  const key = `ai_rate:${userId}`;\n  const current = await redis.incr(key);\n  if (current === 1) {\n    await redis.expire(key, AI_RATE_WINDOW);\n  }\n  return current <= AI_RATE_LIMIT;\n}",
-              "why": "İlk istekte sayaç 1 olur ve TTL ayarlanır, sonraki isteklerde SADECE artırılır. TTL sona erince sayaç OTOMATİK SIFIRLANIR."
+              "code": "import { redis } from '../utils/redis';\n\nconst AI_RATE_LIMIT = 10;\nconst AI_RATE_WINDOW = 60;\n\nexport async function checkAIRateLimit(userId: string): Promise<boolean> {\n  // TODO: implement\n}",
+              "why": "Dakikada 10 istek sınırı AI API maliyetini kontrol eder. 60 saniyelik pencere ile sliding window rate limiting uygulanır.",
+              "position": "top"
             },
             {
               "order": "4.4",
+              "action": "Redis INCR + EXPIRE ile rate limit kontrolünü yaz",
+              "type": "code_add",
+              "file": "server/src/middleware/ai-rate-limit.ts",
+              "code": "  const key = `ai_rate:${userId}`;\n  const current = await redis.incr(key);\n  if (current === 1) {\n    await redis.expire(key, AI_RATE_WINDOW);\n  }\n  return current <= AI_RATE_LIMIT;\n}",
+              "why": "İlk istekte sayaç 1 olur ve TTL ayarlanır, sonraki isteklerde SADECE artırılır. TTL sona erince sayaç OTOMATİK SIFIRLANIR.",
+              "position": "bottom"
+            },
+            {
+              "order": "4.5",
               "action": "BAŞKA DOSYAYA GEÇ — server/src/utils/prompt-guard.ts aç — engellenen kalıpları tanımla",
               "type": "code_write",
               "file": "server/src/utils/prompt-guard.ts",
@@ -2749,23 +2787,25 @@
               "why": "Prompt injection, kullanıcının system prompt'u override etmeye ÇALIŞMASIDIR. Yaygın kalıplar regex ile engellenir."
             },
             {
-              "order": "4.4b",
+              "order": "4.6",
               "action": "sanitizeUserInput fonksiyonunu başlat ve kalıp kontrolü yap",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/utils/prompt-guard.ts",
-              "code": "\nexport function sanitizeUserInput(input: string): string {\n  for (const pattern of BLOCKED_PATTERNS) {\n    if (pattern.test(input)) {\n      return '[Güvenlik: Bu tür komutlar engellenmiştir]';\n    }",
-              "why": "Her regex kalıbı case-insensitive test edilir. Eşleşme bulunursa orijinal mesaj yerine güvenlik uyarısı döndürülür."
+              "code": "\nexport function sanitizeUserInput(input: string): string {\n  for (const pattern of BLOCKED_PATTERNS) {\n    if (pattern.test(input)) {\n      return '[Güvenlik: Bu tür komutlar engellenmiştir]';\n    }\n\n  }\n}",
+              "why": "Her regex kalıbı case-insensitive test edilir. Eşleşme bulunursa orijinal mesaj yerine güvenlik uyarısı döndürülür.",
+              "position": "bottom"
             },
             {
-              "order": "4.4c",
+              "order": "4.7",
               "action": "Uzunluk sınırı kontrolü ekle ve fonksiyonu kapat",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/utils/prompt-guard.ts",
               "code": "  }\n  if (input.length > 2000) {\n    return input.slice(0, 2000) + '... [kısaltıldı]';\n  }\n  return input;\n}",
-              "why": "Girdi uzunluğu 2000 karakter ile sınırlanır — token maliyetini kontrol eder. Sınırı geçen kısım kısaltılır."
+              "why": "Girdi uzunluğu 2000 karakter ile sınırlanır — token maliyetini kontrol eder. Sınırı geçen kısım kısaltılır.",
+              "position": "after:previous"
             },
             {
-              "order": "4.5",
+              "order": "4.8",
               "action": "ai-handler.ts dosyasına GERİ DÖN — rate limit ve prompt guard import'larını ekle",
               "type": "code_modify",
               "file": "server/src/events/ai-handler.ts",
@@ -2774,7 +2814,7 @@
               "why": "4.3'te yazdığımız rate limit ve 4.4'teki sanitize fonksiyonlarını import ediyoruz."
             },
             {
-              "order": "4.5b",
+              "order": "4.9",
               "action": "Handler'ın başına rate limit kontrolü ve girdi sanitize'ını ekle",
               "type": "code_modify",
               "file": "server/src/events/ai-handler.ts",
@@ -2783,7 +2823,7 @@
               "why": "Rate limit kontrolü AI çağrısından ÖNCE yapılır — gereksiz API çağrısı önlenir. Zararlı kalıplar FİLTRELENİR."
             },
             {
-              "order": "4.6",
+              "order": "4.10",
               "action": "Rate limiting ve güvenlik önlemlerini doğrula",
               "type": "validate",
               "validation": "11. AI isteğinde rate limit hatası alınmalı. 'ignore previous instructions' gibi girdiler engellenmeli. 2000+ karakter uzunluğundaki girdiler kısaltılmalı.",
@@ -2847,86 +2887,94 @@
             },
             {
               "order": "1.3",
-              "action": "server/src/middleware/upload.ts dosyasını aç — İSKELET export yaz",
+              "action": "server/src/middleware/upload.ts dosyasını aç — Multer upload iskeletini yaz",
               "type": "code_write",
               "file": "server/src/middleware/upload.ts",
-              "code": "export {};  // placeholder",
-              "why": "Dosya yükleme middleware'ini iskelet olarak oluşturuyoruz. multer'ı import edip konfigüre edeceğiz."
+              "code": "import multer from 'multer';\n\nconst storage = multer.diskStorage({\n  // ayarlar eklenecek\n});\n\nexport const upload = multer({ storage });",
+              "why": "Multer, Express'te dosya yükleme için standart middleware'dir. diskStorage ile dosyaların nereye ve nasıl kaydedileceğini kontrol edebiliyoruz."
             },
             {
               "order": "1.4",
               "action": "ÜSTE ÇIK — multer ve path import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/middleware/upload.ts",
               "code": "import multer from 'multer';\nimport path from 'path';",
-              "why": "1.1'de kurduğumuz multer'ı import ediyoruz. path modülü dosya uzantısını almak için gerekli — Node.js built-in modülü."
+              "why": "1.1'de kurduğumuz multer'ı import ediyoruz. path modülü dosya uzantısını almak için gerekli — Node.js built-in modülü.",
+              "position": "top"
             },
             {
               "order": "1.5",
               "action": "GERİ DÖN — multer import'unu yaz ve izin verilen dosya tiplerini tanımla",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/middleware/upload.ts",
               "code": "import multer from 'multer';\nimport path from 'path';\n\nconst ALLOWED_TYPES = [\n  'image/jpeg', 'image/png', 'image/gif', 'image/webp',\n  'application/pdf',\n  'text/plain', 'text/csv',\n];",
-              "why": "MIME type kontrolü zararlı dosya yüklemeyi ENGELLEr. Sadece resim, PDF ve metin dosyalarına izin veriyoruz."
-            },
-            {
-              "order": "1.5b",
-              "action": "Dosya boyutu limitini tanımla",
-              "type": "code_write",
-              "file": "server/src/middleware/upload.ts",
-              "code": "\nconst MAX_SIZE = 10 * 1024 * 1024;\n",
-              "why": "10MB sınırı sunucu kaynaklarını korur. Byte cinsinden hesaplanır: 10 * 1024 * 1024."
-            },
-            {
-              "order": "1.5c",
-              "action": "Storage konfigürasyonunu yaz — dosya adı ve hedef klasör",
-              "type": "code_write",
-              "file": "server/src/middleware/upload.ts",
-              "code": "const storage = multer.diskStorage({\n  destination: './uploads',\n  filename: (req, file, cb) => {\n    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);\n    cb(null, uniqueSuffix + path.extname(file.originalname));\n  },\n});",
-              "why": "Dosya ismi olarak timestamp + random sayı kullanılır — orijinal isim GÜVENLIK riski oluşturabilir (path traversal). extname ile uzantı korunur."
-            },
-            {
-              "order": "1.5d",
-              "action": "multer instance'ını oluştur ve storage/limit ayarlarını ver",
-              "type": "code_write",
-              "file": "server/src/middleware/upload.ts",
-              "code": "\nexport const upload = multer({\n  storage,\n  limits: { fileSize: MAX_SIZE },\n  fileFilter: (req, file, cb) => {",
-              "why": "multer() middleware'i Express route'larında upload.single('file') olarak kullanılacak."
-            },
-            {
-              "order": "1.5e",
-              "action": "fileFilter fonksiyonunu yaz — tip kontrolü ile filtreleme",
-              "type": "code_write",
-              "file": "server/src/middleware/upload.ts",
-              "code": "    if (ALLOWED_TYPES.includes(file.mimetype)) {\n      cb(null, true);\n    } else {\n      cb(new Error('Desteklenmeyen dosya tipi') as any);\n    }\n  },\n});",
-              "why": "İzin verilmeyen dosya tiplerinde hata fırlatılır. Bu katman, kötü niyetli dosya yüklemelerini sunucu tarafında ENGELLER."
+              "why": "MIME type kontrolü zararlı dosya yüklemeyi ENGELLEr. Sadece resim, PDF ve metin dosyalarına izin veriyoruz.",
+              "position": "top"
             },
             {
               "order": "1.6",
-              "action": "BAŞKA DOSYAYA GEÇ — server/src/routes/upload.routes.ts aç — import'ları ve POST route'u başlat",
-              "type": "code_write",
-              "file": "server/src/routes/upload.routes.ts",
-              "code": "import { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { upload } from '../middleware/upload';\n\nconst router = Router();\n\nrouter.post('/', authenticate, upload.single('file'), async (req, res) => {\n  if (!req.file) {",
-              "why": "M2 4.3'te yazdığımız authenticate middleware ile SADECE giriş yapmış kullanıcılar dosya yükleyebilir."
-            },
-            {
-              "order": "1.6b",
-              "action": "Dosya yoksa hata döndür, varsa URL ve metadata'yı hazırla",
-              "type": "code_write",
-              "file": "server/src/routes/upload.routes.ts",
-              "code": "    return res.status(400).json({ status: 'error', message: 'Dosya gerekli' });\n  }\n  const fileUrl = `/uploads/${req.file.filename}`;\n  res.json({\n    status: 'success',\n    data: {\n      url: fileUrl,",
-              "why": "upload.single('file') tek dosya yüklemeyi sağlar. Dosya bilgileri response'ta client'a döndürülür."
-            },
-            {
-              "order": "1.6c",
-              "action": "Response'u gönder ve router'ı export et",
-              "type": "code_write",
-              "file": "server/src/routes/upload.routes.ts",
-              "code": "      originalName: req.file.originalname,\n      size: req.file.size,\n      mimetype: req.file.mimetype,\n    },\n  });\n});\n\nexport default router;",
-              "why": "originalName, size ve mimetype client'ın dosyayı doğru göstermesi için gerekli. fileUrl server'daki dosya yolunu döndürür."
+              "action": "Dosya boyutu limitini tanımla",
+              "type": "code_add",
+              "file": "server/src/middleware/upload.ts",
+              "code": "\nconst MAX_SIZE = 10 * 1024 * 1024;\n",
+              "why": "10MB sınırı sunucu kaynaklarını korur. Byte cinsinden hesaplanır: 10 * 1024 * 1024.",
+              "position": "bottom"
             },
             {
               "order": "1.7",
+              "action": "Storage konfigürasyonunu yaz — dosya adı ve hedef klasör",
+              "type": "code_add",
+              "file": "server/src/middleware/upload.ts",
+              "code": "const storage = multer.diskStorage({\n  destination: './uploads',\n  filename: (req, file, cb) => {\n    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);\n    cb(null, uniqueSuffix + path.extname(file.originalname));\n  },\n});",
+              "why": "Dosya ismi olarak timestamp + random sayı kullanılır — orijinal isim GÜVENLIK riski oluşturabilir (path traversal). extname ile uzantı korunur.",
+              "position": "bottom"
+            },
+            {
+              "order": "1.8",
+              "action": "multer instance'ını oluştur ve storage/limit ayarlarını ver",
+              "type": "code_add",
+              "file": "server/src/middleware/upload.ts",
+              "code": "\nexport const upload = multer({\n  storage,\n  limits: { fileSize: MAX_SIZE },\n  fileFilter: (req, file, cb) => {\n  // TODO: implement)\n  }\n}",
+              "why": "multer() middleware'i Express route'larında upload.single('file') olarak kullanılacak.",
+              "position": "bottom"
+            },
+            {
+              "order": "1.9",
+              "action": "fileFilter fonksiyonunu yaz — tip kontrolü ile filtreleme",
+              "type": "code_add",
+              "file": "server/src/middleware/upload.ts",
+              "code": "    if (ALLOWED_TYPES.includes(file.mimetype)) {\n      cb(null, true);\n    } else {\n      cb(new Error('Desteklenmeyen dosya tipi') as any);",
+              "why": "İzin verilmeyen dosya tiplerinde hata fırlatılır. Bu katman, kötü niyetli dosya yüklemelerini sunucu tarafında ENGELLER.",
+              "position": "bottom"
+            },
+            {
+              "order": "1.10",
+              "action": "BAŞKA DOSYAYA GEÇ — server/src/routes/upload.routes.ts aç — import'ları ve POST route'u başlat",
+              "type": "code_write",
+              "file": "server/src/routes/upload.routes.ts",
+              "code": "import { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { upload } from '../middleware/upload';\n\nconst router = Router();\n\nrouter.post('/', authenticate, upload.single('file'), async (req, res) => {) }",
+              "why": "M2 4.3'te yazdığımız authenticate middleware ile SADECE giriş yapmış kullanıcılar dosya yükleyebilir."
+            },
+            {
+              "order": "1.11",
+              "action": "Dosya yoksa hata döndür, varsa URL ve metadata'yı hazırla",
+              "type": "code_add",
+              "file": "server/src/routes/upload.routes.ts",
+              "code": "return res.status(400).json({ status: 'error', message: 'Dosya gerekli' });\n  }\n  const fileUrl = `/uploads/${req.file.filename}`;\n  res.json({\n    status: 'success',\n    data: {\n      url: fileUrl,) }",
+              "why": "upload.single('file') tek dosya yüklemeyi sağlar. Dosya bilgileri response'ta client'a döndürülür.",
+              "position": "bottom"
+            },
+            {
+              "order": "1.12",
+              "action": "Response'u gönder ve router'ı export et",
+              "type": "code_add",
+              "file": "server/src/routes/upload.routes.ts",
+              "code": "      originalName: req.file.originalname,\n      size: req.file.size,\n      mimetype: req.file.mimetype,\n\nexport default router;",
+              "why": "originalName, size ve mimetype client'ın dosyayı doğru göstermesi için gerekli. fileUrl server'daki dosya yolunu döndürür.",
+              "position": "bottom"
+            },
+            {
+              "order": "1.13",
               "action": "index.ts dosyasına GERİ DÖN — upload route'unu ve static serve'ı ekle",
               "type": "code_modify",
               "file": "server/src/index.ts",
@@ -2935,7 +2983,7 @@
               "why": "express.static ile uploads klasöründeki dosyalar HTTP üzerinden SERVE edilir. Bu sayede client yüklenen dosyalara URL ile erişebilir."
             },
             {
-              "order": "1.8",
+              "order": "1.14",
               "action": "Dosya yükleme endpoint'ini test et",
               "type": "validate",
               "validation": "curl veya Postman ile POST /api/upload'a dosya gönderildiğinde başarılı yanıt dönmeli. 10MB'dan büyük dosyalar reddedilmeli.",
@@ -3002,7 +3050,7 @@
               "type": "code_add",
               "file": "client/src/components/file-upload-button.tsx",
               "position": "after:refs",
-              "code": "  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {\n    const file = e.target.files?.[0];\n    if (!file) return;\n\n    const formData = new FormData();\n    formData.append('file', file);",
+              "code": "  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {\n    const file = e.target.files?.[0];\n    if (!file) return;\n\n    const formData = new FormData();\n    formData.append('file', file);\n\n}",
               "why": "FormData ile multipart/form-data formatında dosya gönderilecek — JSON'da binary veri taşınamaz."
             },
             {
@@ -3011,53 +3059,56 @@
               "type": "code_add",
               "file": "client/src/components/file-upload-button.tsx",
               "position": "after:formdata",
-              "code": "    try {\n      const { data } = await api.post('/upload', formData, {\n        headers: { 'Content-Type': 'multipart/form-data' },\n      });\n      socket?.emit('message:send', {\n        conversationId,",
+              "code": "try {\n      const { data } = await api.post('/upload', formData, {\n        headers: { 'Content-Type': 'multipart/form-data' },\n      });\n      socket?.emit('message:send', {\n        conversationId,) } }",
               "why": "1.6'da yazdığımız /api/upload endpoint'ine dosyayı yüklüyoruz. multipart/form-data header'ı dosya gönderimi için ZORUNLU."
             },
             {
-              "order": "2.5b",
+              "order": "2.6",
               "action": "Yükleme başarılı olunca socket ile mesaj gönder",
               "type": "code_add",
               "file": "client/src/components/file-upload-button.tsx",
               "position": "after:formdata",
-              "code": "        content: data.data.url,\n        type: file.type.startsWith('image/') ? 'image' : 'file',\n        metadata: {\n          originalName: data.data.originalName,\n          size: data.data.size,\n          mimetype: data.data.mimetype,",
+              "code": "        content: data.data.url,\n        type: file.type.startsWith('image/') ? 'image' : 'file',\n        metadata: {\n          originalName: data.data.originalName,\n          size: data.data.size,\n          mimetype: data.data.mimetype,\n\n}",
               "why": "M1 4.6'daki message:send event'ini tetikliyoruz — dosya URL'i mesaj content'i olarak gönderiliyor."
             },
             {
-              "order": "2.5c",
+              "order": "2.7",
               "action": "Metadata'yı ekle ve hata yakalama bloğunu yaz",
               "type": "code_add",
               "file": "client/src/components/file-upload-button.tsx",
               "position": "after:formdata",
-              "code": "        },\n      });\n    } catch (error) {\n      console.error('Dosya yükleme hatası:', error);\n    }\n  };",
+              "code": "    } catch (error) {\n      console.error('Dosya yükleme hatası:', error);",
               "why": "metadata objesi dosyanın orijinal adı, boyutu ve tipini taşır — mesaj görüntülemede kullanılacak."
             },
             {
-              "order": "2.6",
+              "order": "2.8",
               "action": "Return JSX'ini güncelle — dosya ekleme butonunu ve SVG ikonu yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/file-upload-button.tsx",
-              "code": "  return (\n    <>\n      <button\n        onClick={() => fileInputRef.current?.click()}\n        className=\"rounded-lg p-2 text-gray-500 hover:bg-gray-700\"\n        title=\"Dosya ekle\"\n      >\n        <svg className=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">",
-              "why": "Hidden file input + button pattern'ı ile özel stilize edilmiş dosya seçici oluşturulur."
+              "code": "return (\n    <>\n      <button\n        onClick={() => fileInputRef.current?.click()}\n        className=\"rounded-lg p-2 text-gray-500 hover:bg-gray-700\"\n        title=\"Dosya ekle\"\n      >)",
+              "why": "Hidden file input + button pattern'ı ile özel stilize edilmiş dosya seçici oluşturulur.",
+              "position": "after:previous"
             },
             {
-              "order": "2.6b",
+              "order": "2.9",
               "action": "SVG path'ini tamamla ve butonu kapat",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/file-upload-button.tsx",
               "code": "          <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13\" />\n        </svg>\n      </button>\n      <input\n        ref={fileInputRef}\n        type=\"file\"",
-              "why": "Ataç ikonu dosya ekleme işlemini temsil eder. title attribute'u hover'da tooltip gösterir."
+              "why": "Ataç ikonu dosya ekleme işlemini temsil eder. title attribute'u hover'da tooltip gösterir.",
+              "position": "after:previous"
             },
             {
-              "order": "2.6c",
+              "order": "2.10",
               "action": "Hidden file input'u ve accept filtresi ekle, fragment'ı kapat",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/file-upload-button.tsx",
               "code": "        onChange={handleFileSelect}\n        accept=\"image/*,.pdf,.txt,.csv\"\n        className=\"hidden\"\n      />\n    </>\n  );",
-              "why": "accept attribute'u dosya seçim dialogunda gösterilen tipleri filtreler. className='hidden' ile input görünmez yapılır."
+              "why": "accept attribute'u dosya seçim dialogunda gösterilen tipleri filtreler. className='hidden' ile input görünmez yapılır.",
+              "position": "after:previous"
             },
             {
-              "order": "2.7",
+              "order": "2.11",
               "action": "chat-window.tsx dosyasına GERİ DÖN — FileUploadButton'ı import et",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
@@ -3066,7 +3117,7 @@
               "why": "Az önce yazdığımız dosya yükleme butonunu ChatWindow'un input alanına BAĞLIYORUZ — WhatsApp'taki ataç ikonu gibi."
             },
             {
-              "order": "2.8",
+              "order": "2.12",
               "action": "Dosya gönderiminin çalıştığını doğrula",
               "type": "validate",
               "validation": "Ataç ikonuna tıklayıp dosya seçildiğinde dosya yüklenmeli ve mesaj olarak gönderilmeli.",
@@ -3116,30 +3167,32 @@
             {
               "order": "3.3",
               "action": "Return JSX'ini güncelle — resim tipiyse img elementi başlat",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/file-message.tsx",
-              "code": "  if (isImage) {\n    return (\n      <div className=\"max-w-sm\">\n        <img\n          src={`${baseUrl}${message.content}`}\n          alt=\"Paylaşılan resim\"",
-              "why": "loading='lazy' ile resimler viewport'a girene kadar YÜKLENMEZ — performans optimizasyonu."
-            },
-            {
-              "order": "3.3b",
-              "action": "Resme tıklama ve stil ayarlarını ekle, div'i kapat",
-              "type": "code_write",
-              "file": "client/src/components/file-message.tsx",
-              "code": "          className=\"rounded-lg cursor-pointer hover:opacity-90 transition-opacity\"\n          loading=\"lazy\"\n          onClick={() => window.open(`${baseUrl}${message.content}`, '_blank')}\n        />\n      </div>\n    );\n  }",
-              "why": "Tıklayınca yeni sekmede tam boyut açılır. hover:opacity-90 ile etkileşim ipucu verilir."
+              "code": "  if (isImage) {\n    return (\n      <div className=\"max-w-sm\">\n        <img\n          src={`${baseUrl}${message.content}`}\n          alt=\"Paylaşılan resim\"\n)\n}",
+              "why": "loading='lazy' ile resimler viewport'a girene kadar YÜKLENMEZ — performans optimizasyonu.",
+              "position": "bottom"
             },
             {
               "order": "3.4",
+              "action": "Resme tıklama ve stil ayarlarını ekle, div'i kapat",
+              "type": "code_add",
+              "file": "client/src/components/file-message.tsx",
+              "code": "          className=\"rounded-lg cursor-pointer hover:opacity-90 transition-opacity\"\n          loading=\"lazy\"\n          onClick={() => window.open(`${baseUrl}${message.content}`, '_blank')}\n        />\n      </div>\n    );\n  }",
+              "why": "Tıklayınca yeni sekmede tam boyut açılır. hover:opacity-90 ile etkileşim ipucu verilir.",
+              "position": "after:previous"
+            },
+            {
+              "order": "3.5",
               "action": "Resim kontrolünün altına — dosya indirme linkini ve ikon container'ını yaz",
               "type": "code_add",
               "file": "client/src/components/file-message.tsx",
               "position": "after:image-check",
-              "code": "  return (\n    <a\n      href={`${baseUrl}${message.content}`}\n      download={metadata.originalName}\n      className=\"flex items-center gap-3 rounded-lg border p-3 transition-colors border-gray-600 hover:bg-gray-700\"\n    >\n      <div className=\"flex h-10 w-10 items-center justify-center rounded-lg bg-blue-900 text-blue-300\">\n        <svg className=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">",
+              "code": "return (\n    <a\n      href={`${baseUrl}${message.content}`}\n      download={metadata.originalName}\n      className=\"flex items-center gap-3 rounded-lg border p-3 transition-colors border-gray-600 hover:bg-gray-700\"\n    >\n      <div className=\"flex h-10 w-10 items-center justify-center rounded-lg bg-blue-900 text-blue-300\">)",
               "why": "download attribute'u dosya indirmeyi TETİKLER. Dosya ikonu mavi renk şemasıyla görsel olarak ayrılır."
             },
             {
-              "order": "3.4b",
+              "order": "3.6",
               "action": "Dosya ikonu SVG'sini ve bilgi alanını ekle",
               "type": "code_add",
               "file": "client/src/components/file-message.tsx",
@@ -3148,7 +3201,7 @@
               "why": "SVG path ile dosya ikonu çizilir. 1.6'da yazdığımız upload endpoint'in döndürdüğü metadata burada GÖSTERİLİYOR."
             },
             {
-              "order": "3.4c",
+              "order": "3.7",
               "action": "Dosya boyutunu formatla ve tüm div'leri kapat",
               "type": "code_add",
               "file": "client/src/components/file-message.tsx",
@@ -3157,7 +3210,7 @@
               "why": "Dosya boyutu KB cinsinden gösterilir. toFixed(1) ile bir ondalık basamak gösterilir."
             },
             {
-              "order": "3.5",
+              "order": "3.8",
               "action": "message-bubble.tsx dosyasına GERİ DÖN — FileMessage'ı import et ve tip kontrolü ekle",
               "type": "code_modify",
               "file": "client/src/components/message-bubble.tsx",
@@ -3166,7 +3219,7 @@
               "why": "M3 4.5'te yazdığımız MessageBubble'da mesaj tipine göre FARKLI component render ediliyor."
             },
             {
-              "order": "3.6",
+              "order": "3.9",
               "action": "Resim ve dosya gösterimini doğrula",
               "type": "validate",
               "validation": "Resim mesajları inline önizleme göstermeli. PDF/dosya mesajlarında indirme linki çalışmalı.",
@@ -3207,10 +3260,11 @@
             {
               "order": "4.2",
               "action": "ÜSTE ÇIK — React hook'larını import et",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/hooks/use-drag-drop.ts",
               "code": "import { useState, useCallback, DragEvent } from 'react';",
-              "why": "useState isDragging state'i için, useCallback event handler memoization için, DragEvent TypeScript tip güvenliği için gerekli."
+              "why": "useState isDragging state'i için, useCallback event handler memoization için, DragEvent TypeScript tip güvenliği için gerekli.",
+              "position": "top"
             },
             {
               "order": "4.3",
@@ -3231,7 +3285,7 @@
               "why": "preventDefault() HER drag event'inde çağrılmalı — yoksa tarayıcı varsayılan davranışı uygular. stopPropagation() ile event üst element'lere YAYILMAZ."
             },
             {
-              "order": "4.4b",
+              "order": "4.5",
               "action": "dragLeave handler'ını yaz",
               "type": "code_add",
               "file": "client/src/hooks/use-drag-drop.ts",
@@ -3240,7 +3294,7 @@
               "why": "Dosya sürükleme alanından çıkınca isDragging false olur. Aynı preventDefault + stopPropagation pattern'ı uygulanır."
             },
             {
-              "order": "4.5",
+              "order": "4.6",
               "action": "DragLeave'in altına — dragOver handler'ını yaz",
               "type": "code_add",
               "file": "client/src/hooks/use-drag-drop.ts",
@@ -3249,7 +3303,7 @@
               "why": "dragOver'da preventDefault() OLMADAN drop event'i tetiklenmez. Bu en sık yapılan hatadır."
             },
             {
-              "order": "4.6",
+              "order": "4.7",
               "action": "DragOver'ın altına — drop handler'ını yaz",
               "type": "code_add",
               "file": "client/src/hooks/use-drag-drop.ts",
@@ -3258,16 +3312,16 @@
               "why": "Dosya bırakıldığında isDragging false yapılır ve onFileDrop callback'i çağrılır. dataTransfer.files ile sürüklenen dosyalara erişilir."
             },
             {
-              "order": "4.7",
+              "order": "4.8",
               "action": "Drop handler'ın altına — return objesini başlat",
               "type": "code_add",
               "file": "client/src/hooks/use-drag-drop.ts",
               "position": "after:drop",
-              "code": "  return {\n    isDragging,\n    dragHandlers: {\n      onDragEnter: handleDragEnter,",
+              "code": "  return {\n    isDragging,\n    dragHandlers: {\n      onDragEnter: handleDragEnter,\n\n  }\n}",
               "why": "isDragging state'i ile koşullu stil uygulanır — sürükleme sırasında drop alanı görsel olarak vurgulanır."
             },
             {
-              "order": "4.7b",
+              "order": "4.9",
               "action": "dragHandlers objesini oluştur ve return'ü kapat",
               "type": "code_add",
               "file": "client/src/hooks/use-drag-drop.ts",
@@ -3276,7 +3330,7 @@
               "why": "dragHandlers objesi JSX'e spread edilebilir: {...dragHandlers}. Her handler karşılık gelen DOM event'ine bağlanır."
             },
             {
-              "order": "4.8",
+              "order": "4.10",
               "action": "chat-window.tsx dosyasına GERİ DÖN — hook'u import et ve entegre et",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
@@ -3285,7 +3339,7 @@
               "why": "Az önce yazdığımız hook'u ChatWindow'a BAĞLIYORUZ. 2.5'teki dosya yükleme mantığını TEKRAR kullanıyoruz."
             },
             {
-              "order": "4.9",
+              "order": "4.11",
               "action": "Ana div'e dragHandlers'ı ve isDragging stilini ekle",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
@@ -3294,7 +3348,7 @@
               "why": "isDragging true olduğunda mavi border gösterilir — kullanıcı dosyayı NEREYE bırakacağını anlar."
             },
             {
-              "order": "4.10",
+              "order": "4.12",
               "action": "Drag & drop'un çalıştığını doğrula",
               "type": "validate",
               "validation": "Dosya sürüklendiğinde chat penceresi mavi çerçeve ile highlight olmalı. Dosya bırakıldığında yüklenip mesaj olarak gönderilmeli.",
@@ -3349,15 +3403,16 @@
               "why": "Multi-stage build'in ilk aşaması: TypeScript DERLENIR. pnpm --frozen-lockfile ile lock dosyasındaki exact versiyonlar yüklenir."
             },
             {
-              "order": "1.1b",
+              "order": "1.2",
               "action": "Production stage'i yaz — sadece derlenmiş kodu kopyala",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/Dockerfile",
               "code": "\nFROM node:20-alpine\nWORKDIR /app\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules ./node_modules\nCOPY package.json ./\nEXPOSE 3001\nCMD [\"node\", \"dist/index.js\"]",
-              "why": "İkinci stage'de SADECE derlenmiş JavaScript ve bağımlılıklar kopyalanır. Bu, image boyutunu ÖNEMLİ ölçüde küçültür."
+              "why": "İkinci stage'de SADECE derlenmiş JavaScript ve bağımlılıklar kopyalanır. Bu, image boyutunu ÖNEMLİ ölçüde küçültür.",
+              "position": "bottom"
             },
             {
-              "order": "1.2",
+              "order": "1.3",
               "action": "BAŞKA DOSYAYA GEÇ — client/Dockerfile aç — builder stage'i yaz",
               "type": "code_write",
               "file": "client/Dockerfile",
@@ -3365,15 +3420,16 @@
               "why": "1.1'deki aynı multi-stage pattern burada da uygulanır. Vite ile production build alınır."
             },
             {
-              "order": "1.2b",
+              "order": "1.4",
               "action": "Nginx stage'i yaz — static dosyaları serve et",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/Dockerfile",
               "code": "\nFROM nginx:alpine\nCOPY --from=builder /app/dist /usr/share/nginx/html\nCOPY nginx.conf /etc/nginx/conf.d/default.conf\nEXPOSE 80\nCMD [\"nginx\", \"-g\", \"daemon off;\"]",
-              "why": "Nginx, static dosya serve etmek için EN VERİMLİ web server'dır. Production'da Vite dev server YERİNE Nginx kullanılır."
+              "why": "Nginx, static dosya serve etmek için EN VERİMLİ web server'dır. Production'da Vite dev server YERİNE Nginx kullanılır.",
+              "position": "bottom"
             },
             {
-              "order": "1.3",
+              "order": "1.5",
               "action": "BAŞKA DOSYAYA GEÇ — docker-compose.prod.yml aç — server servisini tanımla",
               "type": "code_write",
               "file": "docker-compose.prod.yml",
@@ -3381,47 +3437,52 @@
               "why": "M1 1.5'te yazdığımız docker-compose.yml'in PRODUCTION versiyonu. Environment variable'lar .env dosyasından inject edilir."
             },
             {
-              "order": "1.3b",
+              "order": "1.6",
               "action": "Server'ın kalan environment, depends_on ve restart ayarlarını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.prod.yml",
               "code": "      - REDIS_URL=redis://redis:6379\n      - JWT_SECRET=${JWT_SECRET}\n      - OPENAI_API_KEY=${OPENAI_API_KEY}\n    depends_on:\n      - mongo\n      - redis\n    restart: unless-stopped",
-              "why": "depends_on ile server, mongo ve redis hazır olmadan BAŞLAMAZ. restart: unless-stopped ile container crash olursa OTOMATİK yeniden başlar."
+              "why": "depends_on ile server, mongo ve redis hazır olmadan BAŞLAMAZ. restart: unless-stopped ile container crash olursa OTOMATİK yeniden başlar.",
+              "position": "bottom"
             },
             {
-              "order": "1.3c",
+              "order": "1.7",
               "action": "Mongo servisini tanımla",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.prod.yml",
               "code": "\n  mongo:\n    image: mongo:7",
-              "why": "MongoDB 7 resmi imajı kullanılır. Servisler Docker network üzerinden haberleşir."
+              "why": "MongoDB 7 resmi imajı kullanılır. Servisler Docker network üzerinden haberleşir.",
+              "position": "bottom"
             },
             {
-              "order": "1.3b",
+              "order": "1.8",
               "action": "Mongo volume'u ve Redis servisini tanımla",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.prod.yml",
               "code": "    volumes:\n      - mongodata:/data/db\n    restart: unless-stopped\n\n  redis:\n    image: redis:7-alpine\n    restart: unless-stopped",
-              "why": "Volume ile MongoDB verisi container silinse bile korunur. Redis alpine imajı minimal kaynak tüketir."
+              "why": "Volume ile MongoDB verisi container silinse bile korunur. Redis alpine imajı minimal kaynak tüketir.",
+              "position": "bottom"
             },
             {
-              "order": "1.3bb",
+              "order": "1.9",
               "action": "Client servisini tanımla",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.prod.yml",
               "code": "\n  client:\n    build: ./client\n    ports:\n      - '80:80'\n    depends_on:\n      - server\n    restart: unless-stopped",
-              "why": "Client port 80'de serve edilir — Nginx production standartı. depends_on ile server hazır olmadan başlamaz."
+              "why": "Client port 80'de serve edilir — Nginx production standartı. depends_on ile server hazır olmadan başlamaz.",
+              "position": "bottom"
             },
             {
-              "order": "1.3bc",
+              "order": "1.10",
               "action": "Volumes tanımını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "docker-compose.prod.yml",
               "code": "\nvolumes:\n  mongodata:",
-              "why": "Named volume'lar Docker tarafından yönetilir. mongodata volume'u tüm servisler tarafından ERİŞİLEBİLİR."
+              "why": "Named volume'lar Docker tarafından yönetilir. mongodata volume'u tüm servisler tarafından ERİŞİLEBİLİR.",
+              "position": "after:previous"
             },
             {
-              "order": "1.4",
+              "order": "1.11",
               "action": "Docker Compose build'i doğrula",
               "type": "validate",
               "validation": "docker-compose -f docker-compose.prod.yml build başarıyla tamamlanmalı. docker-compose -f docker-compose.prod.yml up -d ile tüm servisler başlamalı.",
@@ -3483,77 +3544,86 @@
             {
               "order": "2.4",
               "action": "ÜSTE ÇIK — Socket.io test import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/tests/socket.test.ts",
               "code": "import { describe, it, expect, beforeAll, afterAll } from 'vitest';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\nimport { io as Client } from 'socket.io-client';\n",
-              "why": "vitest'ten describe, it, expect test fonksiyonları import edilir. socket.io-client ile test client'ı oluşturulur."
-            },
-            {
-              "order": "2.4b",
-              "action": "describe bloğunu başlat ve değişkenleri tanımla",
-              "type": "code_write",
-              "file": "server/tests/socket.test.ts",
-              "code": "describe('Socket.io Events', () => {\n  let io: Server;\n  let clientSocket: any;\n  let httpServer: any;",
-              "why": "io, clientSocket ve httpServer test boyunca kullanılacak. let ile tanımlanır çünkü beforeAll'da atanacak."
-            },
-            {
-              "order": "2.4c",
-              "action": "beforeAll hook'unda test server'ını oluştur ve dinlemeye başlat",
-              "type": "code_write",
-              "file": "server/tests/socket.test.ts",
-              "code": "\n  beforeAll((done) => {\n    httpServer = createServer();\n    io = new Server(httpServer);\n    httpServer.listen(() => {",
-              "why": "Test server'ı RANDOM port'ta çalışır — port çakışması önlenir. listen callback'inde port numarası alınır."
-            },
-            {
-              "order": "2.4d",
-              "action": "Client socket bağlantısını kur ve connect event'inde done çağır",
-              "type": "code_write",
-              "file": "server/tests/socket.test.ts",
-              "code": "      const port = (httpServer.address() as any).port;\n      clientSocket = Client(`http://localhost:${port}`, {\n        auth: { token: 'test-token' },\n      });\n      clientSocket.on('connect', done);\n    });",
-              "why": "Client, oluşturulan random port'a bağlanır. done callback ile beforeAll tamamlandığını bildirir."
-            },
-            {
-              "order": "2.4e",
-              "action": "afterAll cleanup hook'unu yaz — server ve client'ı kapat",
-              "type": "code_write",
-              "file": "server/tests/socket.test.ts",
-              "code": "  });\n\n  afterAll(() => {\n    io.close();\n    clientSocket.close();\n  });",
-              "why": "io.close() server socket'lerini kapatır. clientSocket.close() client bağlantısını temizler — kaynak sızıntısı önlenir."
-            },
-            {
-              "order": "2.4b",
-              "action": "Test case'ini başlat — server tarafında connection handler'ı yaz",
-              "type": "code_write",
-              "file": "server/tests/socket.test.ts",
-              "code": "\n  it('should receive message after sending', (done) => {\n    io.on('connection', (socket) => {\n      socket.on('message:send', (data, callback) => {\n        socket.emit('message:received', {\n          ...data,",
-              "why": "io.on('connection') ile test client bağlandığında handler kaydedilir. Gelen mesaja ID ve sender eklenerek geri emit edilir."
-            },
-            {
-              "order": "2.4bb",
-              "action": "Server handler'da mesajı emit et ve callback çağır",
-              "type": "code_write",
-              "file": "server/tests/socket.test.ts",
-              "code": "          id: 'test-id',\n          sender: { name: 'Test User' },\n          createdAt: new Date(),\n        });\n        callback({ status: 'ok' });\n      });\n    });",
-              "why": "socket.emit ile zenginleştirilmiş mesaj tüm dinleyicilere gönderilir. callback ile client'a onay verilir."
-            },
-            {
-              "order": "2.4bc",
-              "action": "Client tarafında mesaj alımını dinle ve assertion yaz",
-              "type": "code_write",
-              "file": "server/tests/socket.test.ts",
-              "code": "\n    clientSocket.on('message:received', (message: any) => {\n      expect(message.content).toBe('Hello!');\n      done();\n    });",
-              "why": "clientSocket.on ile geri dönen mesaj yakalanır. expect ile mesaj içeriğinin doğruluğu kontrol edilir. done() testi bitirir."
-            },
-            {
-              "order": "2.4bd",
-              "action": "Client'tan test mesajı gönder ve tüm blokları kapat",
-              "type": "code_write",
-              "file": "server/tests/socket.test.ts",
-              "code": "\n    clientSocket.emit('message:send', {\n      conversationId: 'conv-1',\n      content: 'Hello!',\n      type: 'text',\n    }, () => {});\n  });\n});",
-              "why": "emit ile test mesajı gönderilir. Boş callback ile acknowledgment alınır. Tüm test yapısı kapatılır."
+              "why": "vitest'ten describe, it, expect test fonksiyonları import edilir. socket.io-client ile test client'ı oluşturulur.",
+              "position": "top"
             },
             {
               "order": "2.5",
+              "action": "describe bloğunu başlat ve değişkenleri tanımla",
+              "type": "code_add",
+              "file": "server/tests/socket.test.ts",
+              "code": "describe('Socket.io Events', () => {\n  let io: Server;\n  let clientSocket: any;\n  let httpServer: any;\n)\n}",
+              "why": "io, clientSocket ve httpServer test boyunca kullanılacak. let ile tanımlanır çünkü beforeAll'da atanacak.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.6",
+              "action": "beforeAll hook'unda test server'ını oluştur ve dinlemeye başlat",
+              "type": "code_add",
+              "file": "server/tests/socket.test.ts",
+              "code": "\n  beforeAll((done) => {\n    httpServer = createServer();\n    io = new Server(httpServer);\n    httpServer.listen(() => {\n  // TODO: implement))\n  }\n}",
+              "why": "Test server'ı RANDOM port'ta çalışır — port çakışması önlenir. listen callback'inde port numarası alınır.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.7",
+              "action": "Client socket bağlantısını kur ve connect event'inde done çağır",
+              "type": "code_add",
+              "file": "server/tests/socket.test.ts",
+              "code": "      const port = (httpServer.address() as any).port;\n      clientSocket = Client(`http://localhost:${port}`, {\n        auth: { token: 'test-token' },\n      });\n      clientSocket.on('connect', done);\n    });",
+              "why": "Client, oluşturulan random port'a bağlanır. done callback ile beforeAll tamamlandığını bildirir.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.8",
+              "action": "afterAll cleanup hook'unu yaz — server ve client'ı kapat",
+              "type": "code_add",
+              "file": "server/tests/socket.test.ts",
+              "code": "  });\n\n  afterAll(() => {\n    io.close();\n    clientSocket.close();\n  });",
+              "why": "io.close() server socket'lerini kapatır. clientSocket.close() client bağlantısını temizler — kaynak sızıntısı önlenir.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.9",
+              "action": "Test case'ini başlat — server tarafında connection handler'ı yaz",
+              "type": "code_add",
+              "file": "server/tests/socket.test.ts",
+              "code": "it('should receive message after sending', (done) => {\n    io.on('connection', (socket) => {\n      socket.on('message:send', (data, callback) => {\n        socket.emit('message:received', {\n          ...data,)))) } } } }",
+              "why": "io.on('connection') ile test client bağlandığında handler kaydedilir. Gelen mesaja ID ve sender eklenerek geri emit edilir.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.10",
+              "action": "Server handler'da mesajı emit et ve callback çağır",
+              "type": "code_add",
+              "file": "server/tests/socket.test.ts",
+              "code": "          id: 'test-id',\n          sender: { name: 'Test User' },\n          createdAt: new Date(),\n        callback({ status: 'ok' });",
+              "why": "socket.emit ile zenginleştirilmiş mesaj tüm dinleyicilere gönderilir. callback ile client'a onay verilir.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.11",
+              "action": "Client tarafında mesaj alımını dinle ve assertion yaz",
+              "type": "code_add",
+              "file": "server/tests/socket.test.ts",
+              "code": "\n    clientSocket.on('message:received', (message: any) => {\n      expect(message.content).toBe('Hello!');\n      done();\n    });",
+              "why": "clientSocket.on ile geri dönen mesaj yakalanır. expect ile mesaj içeriğinin doğruluğu kontrol edilir. done() testi bitirir.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.12",
+              "action": "Client'tan test mesajı gönder ve tüm blokları kapat",
+              "type": "code_add",
+              "file": "server/tests/socket.test.ts",
+              "code": "\n    clientSocket.emit('message:send', {\n      conversationId: 'conv-1',\n      content: 'Hello!',\n      type: 'text',\n    }, () => {});",
+              "why": "emit ile test mesajı gönderilir. Boş callback ile acknowledgment alınır. Tüm test yapısı kapatılır.",
+              "position": "bottom"
+            },
+            {
+              "order": "2.13",
               "action": "Testleri çalıştır ve doğrula",
               "type": "terminal",
               "command": "cd server && pnpm vitest run",
@@ -3600,21 +3670,23 @@
             {
               "order": "3.2",
               "action": "GERİ DÖN fonksiyon içine — Socket.io import'unu yaz ve periyodik log başlat",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/utils/monitoring.ts",
-              "code": "import { Server } from 'socket.io';\n\nexport function setupMonitoring(io: Server) {\n  setInterval(() => {\n    const connectedSockets = io.sockets.sockets.size;\n    console.log(`[Monitor] Connected clients: ${connectedSockets}`);\n  }, 30000);\n",
-              "why": "30 saniyede bir bağlantı sayısı LOGLANIR. io.sockets.sockets.size aktif bağlantı sayısını verir."
-            },
-            {
-              "order": "3.2b",
-              "action": "getStats fonksiyonunu yaz ve return et",
-              "type": "code_write",
-              "file": "server/src/utils/monitoring.ts",
-              "code": "  return {\n    getStats: () => ({\n      connectedClients: io.sockets.sockets.size,\n      uptime: process.uptime(),\n      memoryUsage: process.memoryUsage(),\n    }),\n  };\n}",
-              "why": "process.memoryUsage() ile heap kullanımı izlenir — memory leak tespiti için KRİTİK. Bu fonksiyon health check endpoint'i için kullanılacak."
+              "code": "import { Server } from 'socket.io';\n\nexport function setupMonitoring(io: Server) {\n  setInterval(() => {\n    const connectedSockets = io.sockets.sockets.size;\n    console.log(`[Monitor] Connected clients: ${connectedSockets}`);\n  }, 30000); }",
+              "why": "30 saniyede bir bağlantı sayısı LOGLANIR. io.sockets.sockets.size aktif bağlantı sayısını verir.",
+              "position": "top"
             },
             {
               "order": "3.3",
+              "action": "getStats fonksiyonunu yaz ve return et",
+              "type": "code_add",
+              "file": "server/src/utils/monitoring.ts",
+              "code": "  return {\n    getStats: () => ({\n      connectedClients: io.sockets.sockets.size,\n      uptime: process.uptime(),\n      memoryUsage: process.memoryUsage(),\n    }),\n  };\n}",
+              "why": "process.memoryUsage() ile heap kullanımı izlenir — memory leak tespiti için KRİTİK. Bu fonksiyon health check endpoint'i için kullanılacak.",
+              "position": "bottom"
+            },
+            {
+              "order": "3.4",
               "action": "index.ts dosyasına GERİ DÖN — monitoring'i import et ve health check endpoint ekle",
               "type": "code_modify",
               "file": "server/src/index.ts",
@@ -3623,7 +3695,7 @@
               "why": "Health check endpoint'i, deployment platformlarının (Railway, AWS) uygulamanın CANLI olduğunu doğrulaması için kullanılır. M1'den beri inşa ettiğimiz io instance'ını monitoring'e GEÇİYORUZ."
             },
             {
-              "order": "3.4",
+              "order": "3.5",
               "action": "Health check endpoint'ini doğrula",
               "type": "validate",
               "validation": "GET /api/health endpoint'i 200 döndürmeli ve connectedClients, uptime, memoryUsage bilgilerini içermeli.",
@@ -3662,53 +3734,58 @@
               "why": "README projenin İLK İZLENİMİNİ belirler. Özellikler listesi projenin kapsamını hızlıca gösterir."
             },
             {
-              "order": "4.1b",
+              "order": "4.2",
               "action": "Özellikler listesinin devamını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "- Streaming AI yanıtları\n- Dosya paylaşımı (drag & drop)\n- Typing indicator ve online durum\n- Mesaj okundu bilgisi\n- Cursor-based pagination",
-              "why": "Tüm özellikler listelenerek projenin teknik kapsamı gösterilir. Recruiter'lar GENELLIKLE sadece README'ye bakar."
+              "why": "Tüm özellikler listelenerek projenin teknik kapsamı gösterilir. Recruiter'lar GENELLIKLE sadece README'ye bakar.",
+              "position": "bottom"
             },
             {
-              "order": "4.1c",
+              "order": "4.3",
               "action": "Teknoloji Stack'i tablo başlığını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "\n## Teknoloji Stack'i\n\n| Katman | Teknoloji |\n|--------|----------|",
-              "why": "Markdown tablo formatı ile Tech Stack düzenli gösterilir. Katman ve teknoloji sütunları net bir genel bakış sunar."
+              "why": "Markdown tablo formatı ile Tech Stack düzenli gösterilir. Katman ve teknoloji sütunları net bir genel bakış sunar.",
+              "position": "after:previous"
             },
             {
-              "order": "4.1b",
+              "order": "4.4",
               "action": "Teknoloji tablosunun satırlarını yaz",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "| Frontend | React, TypeScript, Tailwind CSS, Zustand |\n| Backend | Node.js, Express, Socket.io |\n| Veritabanı | MongoDB, Redis |\n| AI | OpenAI API (GPT-4o-mini) |\n| DevOps | Docker, Docker Compose |\n",
-              "why": "Her katman ve kullanılan teknoloji ayrı satırda gösterilir — hızlı tarama için ideal."
+              "why": "Her katman ve kullanılan teknoloji ayrı satırda gösterilir — hızlı tarama için ideal.",
+              "position": "bottom"
             },
             {
-              "order": "4.1bb",
+              "order": "4.5",
               "action": "Hızlı Başlangıç bölümünü ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "## Hızlı Başlangıç\n\n```bash\ngit clone <repo-url>\ndocker-compose up -d\ncd server && pnpm install && pnpm run dev",
-              "why": "Clone ve çalıştırma komutları ile projeyi deneyen kişi HIZLA başlayabilir."
+              "why": "Clone ve çalıştırma komutları ile projeyi deneyen kişi HIZLA başlayabilir.",
+              "position": "after:previous"
             },
             {
-              "order": "4.1bc",
+              "order": "4.6",
               "action": "Başlangıç komutlarını tamamla ve lisans ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "README.md",
               "code": "cd client && pnpm install && pnpm run dev\n```\n\n## Lisans\n\nMIT",
-              "why": "Adım adım kurulum talimatları. MIT lisansı açık kaynak projelerde standart tercih."
+              "why": "Adım adım kurulum talimatları. MIT lisansı açık kaynak projelerde standart tercih.",
+              "position": "after:previous"
             },
             {
-              "order": "4.2",
+              "order": "4.7",
               "action": "Demo materyali için not: OBS veya LICEcap ile ekran kaydı al",
               "type": "explain",
               "why": "Real-time uygulamaların demo'su, statik screenshot'tan ÇOK daha etkilidir. İki tarayıcı penceresi yan yana açılıp mesajlaşma ve AI streaming gösterilmeli."
             },
             {
-              "order": "4.3",
+              "order": "4.8",
               "action": "Tüm uygulamayı uçtan uca test et",
               "type": "validate",
               "validation": "1) Kayıt ve giriş çalışmalı. 2) Konuşma oluşturma ve mesajlaşma çalışmalı. 3) AI asistan yanıt vermeli. 4) Dosya paylaşımı çalışmalı. 5) Online durum ve typing indicator görünmeli.",
