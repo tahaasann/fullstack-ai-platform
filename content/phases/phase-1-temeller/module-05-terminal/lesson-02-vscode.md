@@ -729,9 +729,9 @@ explanation: "Step Over (F10), fonksiyon çağrısını tek adımda geçer. Step
 :::interview
 ## Mulakat Sorulari
 
-**Soru 1: Gunluk gelistirme workflow'unuzda hangi IDE/editor araclarini kullaniyorsunuz?**
+**Soru 1: Gunluk geliştirme workflow'unuzda hangi IDE/editor araclarini kullaniyorsunuz?**
 - **Junior cevabi:** VS Code kullaniyorum, extension'lar yukluyorum.
-- **Senior cevabi:** VS Code'da verimlilik icin: multi-cursor editing (Alt+Click), Emmet ile hizli HTML, GitLens ile blame/history, ESLint + Prettier entegrasyonu (format on save), debugger ile breakpoint debugging (console.log yerine), integrated terminal ile context switch'i azaltma, workspace settings ile proje bazli konfigurasyonlar. Remote Development extension'i ile SSH uzerinden sunucuda calisma, Dev Containers ile tutarli gelistirme ortami. Sonuc olarak editor ustaligi gunluk uretkenlige direkt etkilidir.
+- **Senior cevabi:** VS Code'da verimlilik icin: multi-cursor editing (Alt+Click), Emmet ile hizli HTML, GitLens ile blame/history, ESLint + Prettier entegrasyonu (format on save), debugger ile breakpoint debugging (console.log yerine), integrated terminal ile context switch'i azaltma, workspace settings ile proje bazli konfigurasyonlar. Remote Development extension'i ile SSH üzerinden sunucuda calisma, Dev Containers ile tutarli geliştirme ortamı. Sonuc olarak editor ustaligi gunluk uretkenlige direkt etkilidir.
 
 **Soru 2: Debugging icin console.log yerine ne kullanilmali?**
 - **Junior cevabi:** Debugger kullanilabilir ama console.log da ise yarar.

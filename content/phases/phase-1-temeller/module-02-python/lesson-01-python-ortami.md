@@ -584,7 +584,7 @@ python hello.py
 
 ### Alistirma 2: Virtual Environment ve Paket Yonetimi (Orta)
 
-uv ve venv kullanarak izole bir proje ortami olustur, paketleri yukle ve requirements.txt ile paylasimli hale getir.
+uv ve venv kullanarak izole bir proje ortamı olustur, paketleri yukle ve requirements.txt ile paylasimli hale getir.
 
 ```bash
 # 1. Proje klasoru olustur
@@ -756,7 +756,7 @@ explanation: "pyproject.toml (PEP 518/621), sadece bağımlılıkları değil, p
 *Neden:* Virtual environment'in sadece nasil kullanildigini degil, neden var oldugunu anlamak kalici ogrenme saglar
 
 **2. Pratik Uygulama:**
-> "Sifirdan bir Python projesi kuruyorum. uv ile proje olusturma, bagimliliklari ekleme, pyproject.toml yapilandirma, .gitignore ve .env.example olusturma adimlarini sirala. Her adimda neden o komutu kullandigimi acikla."
+> "Sifirdan bir Python projesi kuruyorum. uv ile proje olusturma, bagimliliklari ekleme, pyproject.toml yapılandırma, .gitignore ve .env.example olusturma adimlarini sirala. Her adimda neden o komutu kullandigimi acikla."
 
 *Follow-up:* "Bu projeye pre-commit hooks (ruff + mypy) eklemek istesem adimlar ne olur? Makefile'a hangi target'lari eklemeliyim?"
 
@@ -1498,7 +1498,7 @@ repos:
 - Proje yapısı: `src/paket_adi/`, `tests/`, `.venv/`, `pyproject.toml`, `.gitignore`, `.env.example`
 - Debug araclari: `print()` (basit), `breakpoint()` (pdb), `logging` (production)
 - pdb komutlari: n=next, s=step, c=continue, p=print, l=list, q=quit
-- Python REPL'de: `dir(obj)` ozellikleri gor, `help(func)` dokumantasyon oku, `type(obj)` tipini gor
+- Python REPL'de: `dir(obj)` özellikleri gor, `help(func)` dokumantasyon oku, `type(obj)` tipini gor
 :::
 
 :::senior-learns

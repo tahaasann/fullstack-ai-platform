@@ -18,7 +18,7 @@ GitHub her gün 1000'den fazla deployment yapıyor. Spotify dakikada bir product
 :::concept[CI - Continuous Integration (İng: Continuous Integration)]
 CI, geliştiricilerin kodlarını sık sık (günde birden fazla kez) ana branch'e entegre etmesi ve her entegrasyonun otomatik build ve test ile doğrulanması sürecidir.
 
-**Turkce karsiligi:** Sürekli Entegrasyon
+**Türkçe karsiligi:** Sürekli Entegrasyon
 **Ne ise yarar:** Kod hatalarını erken yakalar, "works on my machine" problemini ortadan kaldırır
 **Gercek hayat benzetmesi:** Fabrikada her parça üretildiğinde kalite kontrolden geçirmek - hatalı parçalar montaj hattına ulaşmaz
 :::
@@ -26,13 +26,13 @@ CI, geliştiricilerin kodlarını sık sık (günde birden fazla kez) ana branch
 :::concept[CD - Continuous Delivery/Deployment (İng: Continuous Delivery)]
 CD, CI'dan geçen kodun otomatik olarak staging/production ortamına deploy edilmesi sürecidir. Delivery = manuel onay ile, Deployment = tamamen otomatik.
 
-**Turkce karsiligi:** Sürekli Teslimat / Sürekli Dağıtım
+**Türkçe karsiligi:** Sürekli Teslimat / Sürekli Dağıtım
 **Ne ise yarar:** Yeni özellikleri ve düzeltmeleri hızlı, güvenli şekilde kullanıcılara ulaştırır
 **Gercek hayat benzetmesi:** Otomatik paketleme ve kargo sistemi - ürün kalite kontrolü geçince otomatik olarak müşteriye gönderilir
 :::
 
 :::comparison
-| Ozellik | Continuous Integration | Continuous Delivery | Continuous Deployment |
+| Özellik | Continuous Integration | Continuous Delivery | Continuous Deployment |
 |---------|----------------------|--------------------|-----------------------|
 | Tetikleyici | Her commit/PR | CI başarılı olunca | CI başarılı olunca |
 | Build | Otomatik | Otomatik | Otomatik |
@@ -53,7 +53,7 @@ Senior developer'lar CI/CD'yi sadece "deploy otomasyonu" olarak görmez. Pipelin
 :::concept[GitHub Actions (İng: GitHub Actions)]
 GitHub Actions, GitHub repository'lerinde CI/CD workflow'ları oluşturmak için kullanılan bir otomasyon platformudur. YAML dosyaları ile tanımlanan workflow'lar event'lere (push, PR, schedule) göre tetiklenir.
 
-**Turkce karsiligi:** GitHub Aksiyonları / İş Akışları
+**Türkçe karsiligi:** GitHub Aksiyonları / İş Akışları
 **Ne ise yarar:** Kod push edilince otomatik test, build ve deploy yapar
 **Gercek hayat benzetmesi:** Bir fabrikadaki otomatik montaj hattı - hammadde (kod) girince, kalite kontrol, paketleme ve sevkiyat otomatik olur
 :::
@@ -290,7 +290,7 @@ GitHub Actions'da `pnpm install --frozen-lockfile` kullanmak `pnpm install`'dan 
 :::concept[Kubernetes (İng: Kubernetes / K8s)]
 Kubernetes, containerized uygulamaların deployment, scaling ve management'ını otomatize eden bir container orchestration platformudur. Google tarafından geliştirilmiş, şimdi CNCF tarafından yönetilmektedir.
 
-**Turkce karsiligi:** Konteyner Orkestrasyon Platformu
+**Türkçe karsiligi:** Konteyner Orkestrasyon Platformu
 **Ne ise yarar:** Container'ları otomatik olarak yönetir: scaling, load balancing, self-healing, rolling updates
 **Gercek hayat benzetmesi:** Havaalanı kontrol kulesi gibi - yüzlerce uçağın (container'ın) kalkışını, inişini, park yerini ve yakıt ikmalini koordine eder
 :::
@@ -494,7 +494,7 @@ spec:
 :::concept[Cloud Computing (İng: Cloud Computing)]
 Cloud Computing, bilgi işlem kaynaklarının (sunucu, depolama, veritabanı, network) internet üzerinden isteğe bağlı olarak kiralanması modelidir.
 
-**Turkce karsiligi:** Bulut Bilişim
+**Türkçe karsiligi:** Bulut Bilişim
 **Ne ise yarar:** Fiziksel sunucu satın almadan, dakikalar içinde global altyapı kullanmayı sağlar
 **Gercek hayat benzetmesi:** Elektrik şirketi gibi - kendi jeneratörünü kurmak yerine, kullandığın kadar öde modeli
 :::
@@ -568,7 +568,7 @@ aws lambda invoke \
 :::concept[Infrastructure as Code (İng: Infrastructure as Code / IaC)]
 IaC, altyapı kaynaklarını (sunucu, veritabanı, network) kod olarak tanımlama ve versiyonlama pratiğidir. Manuel konsol tıklamaları yerine deklaratif yapılandırma dosyaları kullanılır.
 
-**Turkce karsiligi:** Kod Olarak Altyapı
+**Türkçe karsiligi:** Kod Olarak Altyapı
 **Ne ise yarar:** Altyapıyı tekrarlanabilir, versiyonlanabilir ve otomatize edilebilir hale getirir
 **Gercek hayat benzetmesi:** Bina planı gibi - aynı plandan aynı binayı defalarca inşa edebilirsin, her seferinde aynı sonucu alırsın
 :::
@@ -703,7 +703,7 @@ terraform validate
 :::concept[Observability (İng: Observability)]
 Observability, bir sistemin iç durumunu dışarıdan gözlemleyebilme yeteneğidir. Üç temel bileşeni vardır: Metrics, Logs, Traces.
 
-**Turkce karsiligi:** Gözlemlenebilirlik
+**Türkçe karsiligi:** Gözlemlenebilirlik
 **Ne ise yarar:** Sistemdeki sorunları hızlıca tespit etmeni ve çözmeni sağlar
 **Gercek hayat benzetmesi:** Arabanın gösterge paneli gibi - hız, yakıt, motor sıcaklığı, arıza lambası... Her an sistemin durumunu görürsün
 :::

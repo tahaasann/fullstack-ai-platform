@@ -253,10 +253,10 @@ Tabs.Panel = function TabPanel({ value, children }) {
 <Tabs defaultTab="genel">
   <Tabs.List>
     <Tabs.Tab value="genel">Genel</Tabs.Tab>
-    <Tabs.Tab value="guvenlik">Guvenlik</Tabs.Tab>
+    <Tabs.Tab value="güvenlik">Güvenlik</Tabs.Tab>
   </Tabs.List>
   <Tabs.Panel value="genel">Genel ayarlar...</Tabs.Panel>
-  <Tabs.Panel value="guvenlik">Guvenlik ayarlari...</Tabs.Panel>
+  <Tabs.Panel value="güvenlik">Güvenlik ayarlari...</Tabs.Panel>
 </Tabs>
 :::
 

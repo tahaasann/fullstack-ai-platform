@@ -26,7 +26,7 @@ Yazılım geliştirme surecinde kodun sürekli değişir. Version control olmada
 :::concept[Version Control System (VCS)]
 Version Control System, dosyalardaki değişiklikleri zaman içinde kaydeden ve istedigin zaman önceki bir versiyona donmeni sağlayan bir sistemdir.
 
-**Turkce karsiligi:** Sürüm Kontrol Sistemi
+**Türkçe karsiligi:** Sürüm Kontrol Sistemi
 **Ne ise yarar:** Kodun her aninin fotografini ceker, istedigin ana geri donebilirsin
 **Gerçek hayat benzetmesi:** Bir belgedeki "Geri Al" (Ctrl+Z) ozelliginin tüm proje genelinde, tüm ekip için çalışan hali
 :::
@@ -80,7 +80,7 @@ Git'te her dosya 3 alan arasinda hareket eder. Bu 3 alani anlamak Git'i anlamani
 :::concept[Staging Area (İng: Staging Area / Index)]
 Staging Area, commit'e dahil edilecek degisikliklerin hazirlandigi ara bolge dir.
 
-**Turkce karsiligi:** Hazırlama / Sahneleme Alani
+**Türkçe karsiligi:** Hazırlama / Sahneleme Alani
 **Ne ise yarar:** Hangi degisikliklerin bir sonraki commit'e dahil edilecegini secmeni sağlar
 **Gerçek hayat benzetmesi:** Bir kolinin içine koyacagin esyalari oncesinde masanin üzerine ayirmak gibi. Önce secersin, sonra paketi kapatirsin (commit).
 :::
@@ -321,7 +321,7 @@ gitignore.io (toptal.com/developers/gitignore) sitesinden diline, framework'une 
 :::concept[Stash (Ing: Stash)]
 Stash, çalışmakta oldugum değişiklikleri geçici olarak bir kenara koymami ve temiz bir working directory ile başka bir ise gecmemi sağlar.
 
-**Turkce karsiligi:** Zula / Geçici Depo
+**Türkçe karsiligi:** Zula / Geçici Depo
 **Ne ise yarar:** Yarım kalmis isi kaydetmeden bir kenara koyar, sonra geri alirsin
 **Gerçek hayat benzetmesi:** Masa üzerinde çalışmakta oldugun kagitlari bir cekmece'ye koyup masayi temizlemek, sonra tekrar cikarip devam etmek
 :::
@@ -550,7 +550,7 @@ refs/remotes/origin/
 :::concept[HEAD (Ing: HEAD)]
 HEAD, suanda üzerinde çalıştığın commit'i veya branch'i gosteren ozel bir referanstir.
 
-**Turkce karsiligi:** Bas / Aktif Referans
+**Türkçe karsiligi:** Bas / Aktif Referans
 **Ne ise yarar:** Git'e "şu an neredesin" bilgisini verir
 **Gerçek hayat benzetmesi:** Bir kitapta kullandığın yer imi (bookmark). Kitabin neresinde oldugunu gösterir.
 :::

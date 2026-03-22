@@ -726,7 +726,7 @@ Google Colab'da (ucretsiz T4 GPU):
 ### Alistirma 2: Custom NER
 1. Kendi veri setini olustur: 50 cumle, icerisinde URUN, SIRKET, FIYAT entity'leri isaretli
 2. `bert-base-uncased` modelini NER icin fine-tune et
-3. Yeni cumleler uzerinde test et
+3. Yeni cumleler üzerinde test et
 
 **Ipucu:** Hugging Face `datasets` kutuphanesinin `Dataset.from_dict()` ile kendi verini olusturabilirsin.
 :::
@@ -1165,8 +1165,8 @@ for model_name in models:
     # TODO: max_length ve padding/truncation etkisini test et
 ```
 
-**Beklenen Sonuc:** BERT WordPiece, GPT-2 BPE, XLM-RoBERTa SentencePiece kullanir. Turkce metin daha fazla token uretir. Nadir kelimeler subword'lere parcalanir.
-**Ipucu:** Token sayisi = islem maliyeti. Turkce gibi aglutine dillerde token sayisi Ingilizce'nin 1.5-2x'i olabilir.
+**Beklenen Sonuc:** BERT WordPiece, GPT-2 BPE, XLM-RoBERTa SentencePiece kullanir. Türkçe metin daha fazla token uretir. Nadir kelimeler subword'lere parcalanir.
+**Ipucu:** Token sayisi = islem maliyeti. Türkçe gibi aglutine dillerde token sayisi Ingilizce'nin 1.5-2x'i olabilir.
 
 ---
 
@@ -1366,7 +1366,7 @@ class TransformerBlock(nn.Module):
 ```
 
 **Beklenen Sonuc:** Model Shakespeare tarzinda tutarli metin uretebilmeli. Attention pattern'leri gorsellestirildiginde diyagonal ve yakin kelimelere yoğunlasma gorunmeli. 4 katmanli model 100 epoch'ta anlamli cikti uretmeli.
-**Ipucu:** Causal mask ile her token sadece onceki token'lari gorebilir (autoregressive). Pre-norm (LayerNorm once) modern transformer'larda tercih edilir.
+**Ipucu:** Causal mask ile her token sadece önceki token'lari gorebilir (autoregressive). Pre-norm (LayerNorm once) modern transformer'larda tercih edilir.
 :::
 
 :::external-resource

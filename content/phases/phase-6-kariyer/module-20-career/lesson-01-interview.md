@@ -74,7 +74,7 @@ Senior muhendisler mülakat hazirligini **stratejik** yapar:
 :::concept
 ### Interview Pipeline
 
-Tipik bir tech sirketinin mulakat sureci:
+Tipik bir tech sirketinin mulakat süreci:
 
 ```
 1. Resume Screen          → CV/LinkedIn incelemesi
@@ -122,7 +122,7 @@ Tipik bir tech sirketinin mulakat sureci:
 
 Her coding sorusunda bu framework'u kullan:
 
-| Adim | Ingilizce | Turkce | Süre |
+| Adim | Ingilizce | Türkçe | Süre |
 |------|-----------|--------|------|
 | **U** | Understand | Problemi anla | 3-5 dk |
 | **M** | Match | Bilinen pattern'e esle | 1-2 dk |
@@ -959,7 +959,7 @@ Bulman gereken sorunlar:
 5. Error handling yetersiz (err durumunda return yok)
 6. Async/await kullanilmamis (callback hell)
 
-**Beklenen Sonuc:** En az 5 sorunu tespit et. Her sorun icin guvenli versiyonunu yaz. Oncelik sirasi: guvenlik > dogrruluk > performans > okunabilirlik.
+**Beklenen Sonuc:** En az 5 sorunu tespit et. Her sorun icin guvenli versiyonunu yaz. Oncelik sirasi: güvenlik > dogrruluk > performans > okunabilirlik.
 
 ---
 
@@ -970,7 +970,7 @@ Interview sonunda "Sorulariniz var mi?" dendiginde sorulacak stratejik sorular h
 **Takim ve Kultur:**
 1. "Takim su an hangi buyuk teknik zorlukla karsi karsiya?"
 2. "Yeni bir muhendis ilk 30-60-90 gunde neler yapmasi beklenir?"
-3. "Code review sureci nasil isliyor? PR ortalama ne kadar surede merge ediliyor?"
+3. "Code review süreci nasil isliyor? PR ortalama ne kadar surede merge ediliyor?"
 
 **Teknik:**
 4. "Tech stack'te son 1 yilda en buyuk degisiklik ne oldu ve neden?"

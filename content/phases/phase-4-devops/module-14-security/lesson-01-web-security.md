@@ -31,7 +31,7 @@ Senior developer'lar güvenliği "eklenen bir özellik" değil, "mimari kararın
 :::concept[OWASP (İng: Open Web Application Security Project)]
 OWASP, web uygulama güvenliği konusunda farkındalık yaratmayı ve best practice'ler oluşturmayı amaçlayan açık kaynak bir topluluktur. OWASP Top 10, en kritik web güvenlik risklerini sıralayan endüstri standardı bir rehberdir.
 
-**Turkce karsiligi:** Açık Web Uygulama Güvenliği Projesi
+**Türkçe karsiligi:** Açık Web Uygulama Güvenliği Projesi
 **Ne ise yarar:** Web uygulamalarındaki en yaygın güvenlik risklerini ve çözümlerini tanımlar
 **Gercek hayat benzetmesi:** Deprem risk haritası gibi - en tehlikeli bölgeleri gösterir ve nasıl korunacağını söyler
 :::
@@ -57,7 +57,7 @@ OWASP, web uygulama güvenliği konusunda farkındalık yaratmayı ve best pract
 :::concept[SQL Injection (İng: SQL Injection / SQLi)]
 SQL Injection, kullanıcı girdisinin doğrudan SQL sorgusuna eklenmesiyle, saldırganın kendi SQL kodunu çalıştırabilmesi güvenlik açığıdır.
 
-**Turkce karsiligi:** SQL Enjeksiyonu
+**Türkçe karsiligi:** SQL Enjeksiyonu
 **Ne ise yarar:** Saldırgan veritabanındaki tüm verileri okuyabilir, değiştirebilir veya silebilir
 **Gercek hayat benzetmesi:** Bir formda adınızı yazmanız istenirken, yerine kasa anahtarının kodunu yazmak gibi - sistem sizi "ad" olarak kabul etmek yerine "komutu" çalıştırır
 :::
@@ -188,7 +188,7 @@ app.get('/api/ping', (req, res) => {
 :::concept[XSS (İng: Cross-Site Scripting)]
 XSS, saldırganın bir web sayfasına zararlı JavaScript kodu enjekte etmesiyle, diğer kullanıcıların tarayıcılarında bu kodun çalışması güvenlik açığıdır.
 
-**Turkce karsiligi:** Siteler Arası Betik Çalıştırma
+**Türkçe karsiligi:** Siteler Arası Betik Çalıştırma
 **Ne ise yarar:** Saldırgan kullanıcıların cookie'lerini çalabilir, sayfa içeriğini değiştirebilir, keylogger yerleştirebilir
 **Gercek hayat benzetmesi:** Bir restoranda menüye gizlice eklenen sahte yemek gibi - müşteri menüye güvenir ve sipariş verir, ama aslında saldırganın hazırladığı şeyi alır
 :::
@@ -271,7 +271,7 @@ React default olarak JSX'te HTML escape eder: `<div>{userInput}</div>` güvenlid
 :::concept[CSRF (İng: Cross-Site Request Forgery)]
 CSRF, kullanıcının tarayıcısının, kullanıcının haberi olmadan başka bir web sitesine yetkili istekler göndermesi saldırısıdır.
 
-**Turkce karsiligi:** Siteler Arası İstek Sahteciliği
+**Türkçe karsiligi:** Siteler Arası İstek Sahteciliği
 **Ne ise yarar:** Saldırgan, kurbanın oturum açtığı siteye kurbanın adına işlem yaptırabilir (para transferi, şifre değiştirme)
 **Gercek hayat benzetmesi:** Birisi senin imzanı taklit edip bankaya talimat göndermesi gibi - banka imzayı gerçek sanıp işlemi yapar
 :::
@@ -337,7 +337,7 @@ app.use((req, res, next) => {
 :::concept[Input Validation (İng: Input Validation)]
 Input validation, kullanıcıdan gelen verilerin beklenen format, tip ve aralıkta olup olmadığını kontrol etme sürecidir.
 
-**Turkce karsiligi:** Girdi Doğrulama
+**Türkçe karsiligi:** Girdi Doğrulama
 **Ne ise yarar:** Zararlı veya hatalı verilerin uygulamaya girmesini engeller
 **Gercek hayat benzetmesi:** Havaalanı güvenlik kontrolü gibi - yolcu bagajını tarar, tehlikeli maddeleri tespit eder ve geçirmez
 :::
@@ -425,7 +425,7 @@ app.post('/api/auth/register', validate(registerSchema), async (req, res) => {
 :::concept[CSP (İng: Content Security Policy)]
 CSP, tarayıcıya hangi kaynaklardan (script, style, image, font) içerik yüklenebileceğini söyleyen bir HTTP header'ıdır. XSS saldırılarını önlemenin en etkili yollarından biridir.
 
-**Turkce karsiligi:** İçerik Güvenlik Politikası
+**Türkçe karsiligi:** İçerik Güvenlik Politikası
 **Ne ise yarar:** Inline script çalıştırmayı, bilinmeyen kaynaklardan script yüklemeyi engeller
 **Gercek hayat benzetmesi:** Binanın güvenlik kuralları gibi - sadece tanımlı kapılardan giriş yapılabilir, tanımsız kapılar kapalı
 :::
@@ -465,7 +465,7 @@ app.use((req, res, next) => {
 :::concept[CORS (İng: Cross-Origin Resource Sharing)]
 CORS, bir web sayfasının farklı bir origin'den (domain, protocol veya port) kaynak istemesine izin veren bir mekanizmadır. Tarayıcılar Same-Origin Policy ile farklı origin'lere yapılan istekleri varsayılan olarak engeller.
 
-**Turkce karsiligi:** Çapraz Kaynak Paylaşımı
+**Türkçe karsiligi:** Çapraz Kaynak Paylaşımı
 **Ne ise yarar:** API'nin hangi domain'lerden erişilebileceğini kontrol eder
 **Gercek hayat benzetmesi:** Bir ülkenin vize politikası gibi - hangi ülkelerin vatandaşlarının girebileceğini belirler
 :::
@@ -562,16 +562,16 @@ app.use(helmet.dnsPrefetchControl()); // DNS prefetch control
 :::concept[Password Hashing (İng: Password Hashing)]
 Password hashing, kullanıcı şifresini tek yönlü bir fonksiyonla kriptografik olarak dönüştürerek saklamaktır. İyi bir password hash fonksiyonu yavaş olmalıdır (brute force'u zorlaştırır) ve salt kullanmalıdır.
 
-**Turkce karsiligi:** Şifre Hash'leme
+**Türkçe karsiligi:** Şifre Hash'leme
 **Ne ise yarar:** Veritabanı sızıntısında bile şifrelerin güvende kalmasını sağlar
 **Gercek hayat benzetmesi:** Belge parçalayıcı gibi - belgeyi parçalara ayırır ama parçalardan belgeyi geri oluşturamazsın. Üstelik her parçalama farklı sonuç verir (salt).
 :::
 
 :::comparison
-| Ozellik | bcrypt | Argon2 | SHA-256 | MD5 |
+| Özellik | bcrypt | Argon2 | SHA-256 | MD5 |
 |---------|--------|--------|---------|-----|
 | Amac | Şifre hash'leme | Şifre hash'leme | Genel hash | Genel hash |
-| Guvenlik | Yüksek | Çok Yüksek | Orta (şifre için uygun DEĞİL) | Düşük (KRİTİK) |
+| Güvenlik | Yüksek | Çok Yüksek | Orta (şifre için uygun DEĞİL) | Düşük (KRİTİK) |
 | Salt | Otomatik | Otomatik | Manuel eklenmeli | Manuel eklenmeli |
 | GPU direnci | İyi | Çok İyi (memory-hard) | Zayıf | Çok Zayıf |
 | Hiz ayari | Salt rounds ile | Time/memory/parallelism | Sabit | Sabit |
@@ -748,8 +748,8 @@ app.get('/users', async (req, res) => {
 ```
 **Gorev:** Parameterized query kullanarak guvenli hale getirin.
 
-### Alistirma 3: Guvenlik Header'lari
-Bir Express uygulamasina asagidaki guvenlik header'larini ekleyin:
+### Alistirma 3: Güvenlik Header'lari
+Bir Express uygulamasina asagidaki güvenlik header'larini ekleyin:
 - Content-Security-Policy
 - X-Content-Type-Options
 - Strict-Transport-Security
@@ -921,7 +921,7 @@ app.post("/api/auth/refresh", async (req, res) => {
 
 ### Alistirma 8: Dependency Vulnerability Scanning (Orta)
 
-Proje bagimliklarindaki guvenlik aciklarina karsi tarama ve otomatik guncelleme kur.
+Proje bagimliklarindaki güvenlik aciklarina karsi tarama ve otomatik guncelleme kur.
 
 ```bash
 # 1. Manuel tarama
@@ -960,12 +960,12 @@ jobs:
 # TODO: SBOM (Software Bill of Materials) olustur
 ```
 
-**Beklenen Sonuc:** Haftalik otomatik guvenlik taramasi calismali. Kritik aciklarda bildirim gelmeli. Dependabot PR'lari otomatik acilmali.
+**Beklenen Sonuc:** Haftalik otomatik güvenlik taramasi calismali. Kritik aciklarda bildirim gelmeli. Dependabot PR'lari otomatik acilmali.
 **Ipucu:** `pnpm audit --audit-level critical` ile sadece kritik aciklari goster. Snyk free tier acik kaynak projeler icin sinisrsiz.
 
 ---
 
-### Alistirma 9: Content Security Policy Detayli Yapilandirma (Zor)
+### Alistirma 9: Content Security Policy Detayli Yapılandırma (Zor)
 
 Siki bir CSP politikasi yapilandir ve XSS saldirilarini engelle.
 
@@ -1060,17 +1060,17 @@ describe("Guvenlik Testleri", () => {
 ### Prompt Ornekleri
 
 **1. Derinlemesine Anla:**
-> "OWASP Top 10 (2021) listesinideki ilk 5 guvenlik acigini (Broken Access Control, Cryptographic Failures, Injection, Insecure Design, Security Misconfiguration) gercek saldiri senaryolariyla acikla. Her biri icin nasil tespit edilir ve nasil onlenir? Express.js ve React'te hangi middleware/practice'ler kullanilir?"
+> "OWASP Top 10 (2021) listesinideki ilk 5 güvenlik acigini (Broken Access Control, Cryptographic Failures, Injection, Insecure Design, Security Misconfiguration) gercek saldiri senaryolariyla acikla. Her biri icin nasil tespit edilir ve nasil onlenir? Express.js ve React'te hangi middleware/practice'ler kullanilir?"
 
 **2. Pratik Uygulama:**
 > "Bir web uygulamasinda XSS (Stored, Reflected, DOM-based), SQL Injection ve CSRF saldirilarini canli orneklerle goster. Her saldiri icin savunmasiz kodu yaz, sonra guvenli versiyonunu olustur. CSP (Content Security Policy) header'ini, parameterized queries'i ve CSRF token mekanizmasini implemente et."
-> Takip: "Simdi Helmet.js ile HTTP guvenlik header'larini konfigure et ve CORS politikasini production icin ayarla. Her header'in ne korudugunu acikla."
+> Takip: "Simdi Helmet.js ile HTTP güvenlik header'larini konfigure et ve CORS politikasini production icin ayarla. Her header'in ne korudugunu acikla."
 
 **3. Mukemmellik Icin:**
-> "Bir SaaS urununde defense-in-depth guvenlik stratejisi tasarliyorum. Input validation, output encoding, CSP, CORS, rate limiting, dependency scanning (Snyk/pnpm audit), SAST/DAST araclari, penetration testing ve bug bounty programini katmanli bir guvenlik mimarisi olarak planla."
+> "Bir SaaS urununde defense-in-depth güvenlik stratejisi tasarliyorum. Input validation, output encoding, CSP, CORS, rate limiting, dependency scanning (Snyk/pnpm audit), SAST/DAST araclari, penetration testing ve bug bounty programini katmanli bir güvenlik mimarisi olarak planla."
 
 ### Pair Programming Ipucu
-Guvenlik kodu yazarken AI'a kodunu goster ve sor: "Bu endpoint'te guvenlik acigi var mi? OWASP Top 10'a gore denetle. XSS, injection, broken access control veya security misconfiguration riski tasiyor mu? Guvenli versiyonunu yaz."
+Güvenlik kodu yazarken AI'a kodunu goster ve sor: "Bu endpoint'te güvenlik acigi var mi? OWASP Top 10'a gore denetle. XSS, injection, broken access control veya security misconfiguration riski tasiyor mu? Guvenli versiyonunu yaz."
 :::
 
 :::must-note
@@ -1102,18 +1102,18 @@ Senior developer web security öğrenirken:
 
 5. **Incident response planı hazırlar:** Veri sızıntısı durumunda: (1) Tespit, (2) İzolasyon, (3) İnceleme, (4) Müdahale, (5) Bildirim, (6) İyileştirme adımlarını tanımlar. Tabletop exercise'ler yapar.
 
-**Karar Verme Sureci — Guvenlik Yatirimi Onceliklendirme:**
+**Karar Verme Sureci — Güvenlik Yatirimi Onceliklendirme:**
 - **Input validation + parameterized queries**: Maliyet dusuk, etki cok yuksek. SQL Injection ve XSS'in %95'ini engeller. Bunu yapmayan hic bir proje production'a cikmamali.
 - **Authentication/Authorization**: JWT vs session, RBAC vs ABAC karari. Trade-off: JWT stateless ama revoke etmek zor (kisa expiry + refresh token ile coz). Session server-side state gerektirir ama aninda revoke edilir. Senior karar: "Microservice mi? JWT. Monolith mi? Session. Ikisi de mi? BFF pattern ile session frontend'e, JWT service'ler arasinda."
-- **WAF (Web Application Firewall)**: Cloudflare, AWS WAF gibi servisler. Trade-off: False positive'ler legitimate trafigi engelleyebilir, konfigurasyonu uzmanlik gerektirir. Ama bilinen saldiri pattern'lerini otomatik engeller. Production'da olmasi gereken minimum guvenlik katmani.
+- **WAF (Web Application Firewall)**: Cloudflare, AWS WAF gibi servisler. Trade-off: False positive'ler legitimate trafigi engelleyebilir, konfigurasyonu uzmanlik gerektirir. Ama bilinen saldiri pattern'lerini otomatik engeller. Production'da olmasi gereken minimum güvenlik katmani.
 - **Penetration testing**: Yilda en az 1 kez professional pentest. Trade-off: Pahali ($5K-50K) ama bir data breach'in maliyeti $4M+ (IBM 2025 raporuna gore). Bug bounty programi daha ucuz ve surekli test saglar.
 
 **Anti-pattern Farkindaligi:**
-- **"Security through obscurity"**: API endpoint'lerini gizleyerek guvenlik saglamaya calismak. Hacker zaten tum endpoint'leri brute-force ile veya JS bundle'dan bulur. Her endpoint authentication + authorization + input validation olmali.
+- **"Security through obscurity"**: API endpoint'lerini gizleyerek güvenlik saglamaya calismak. Hacker zaten tum endpoint'leri brute-force ile veya JS bundle'dan bulur. Her endpoint authentication + authorization + input validation olmali.
 - **Client-side validation'a guvenmek**: Frontend'de "admin" rolunu kontrol edip butonu gizlemek. Kullanici DevTools'tan butonu gorunur yapar veya direkt API'ye istek atar. Validation MUTLAKA server-side olmali.
 - **Logging'de sensitive data**: `console.log(user)` ile password hash'ini, token'i loga yazmak. Log aggregation servisleri (Datadog, ELK) bu verileri indexler ve arama yapilabilir hale getirir. PII masking ve structured logging kullan.
 
-**Gercek Dunya Deneyimi:** Bir e-ticaret sitesinde XSS acigi vardi — urun yorumlarinda script calisiyordu. Saldirgan diger kullanicilarin session cookie'lerini calip admin paneline eristi, 50K kullanicinin verisini cekti. Maliyet: KVKK cezasi, hukuk masraflari, itibar kaybi. Toplam hasar tahmini: 500K+ TL. CSP header + DOMPurify + HttpOnly cookie ile 2 saatte kapatilabilecek bir acikti. Ders: guvenlik "sonra yapariz" dediginde en pahali "sonra" oluyor.
+**Gercek Dunya Deneyimi:** Bir e-ticaret sitesinde XSS acigi vardi — urun yorumlarinda script calisiyordu. Saldirgan diger kullanicilarin session cookie'lerini calip admin paneline eristi, 50K kullanicinin verisini cekti. Maliyet: KVKK cezasi, hukuk masraflari, itibar kaybi. Toplam hasar tahmini: 500K+ TL. CSP header + DOMPurify + HttpOnly cookie ile 2 saatte kapatilabilecek bir acikti. Ders: güvenlik "sonra yapariz" dediginde en pahali "sonra" oluyor.
 
 **CTO bakış açısı:** "Güvenlik bütçesi yeterli mi?", "Security team vs security champions modeli?", "Vendor security assessment süreci?", "Cyber insurance gerekli mi?", "Regulatory risk nedir?". Güvenliği iş riski perspektifinden değerlendirir.
 :::

@@ -495,7 +495,7 @@ Saygilarimla,
 - **CV'yi tekrarlamak**: Cover letter ≠ CV ozeti → Motivasyonunu anlat
 - **Çok uzun yazmak**: Max 250-300 kelime → Kısa ve oz
 - **"Dear Sir/Madam"**: Mumkunse isim bul → LinkedIn'den hiring manager'i ara
-- **Turkce/Ingilizce karışık**: Tutarli ol → Pozisyon diline gore yaz
+- **Türkçe/Ingilizce karışık**: Tutarli ol → Pozisyon diline gore yaz
 :::
 
 ---
@@ -538,7 +538,7 @@ GunlMk Hedef: 5-10 basvuru/gun + 3-5 networking mesaji/gun
 
 | Platform | Tür | Ipucu |
 |----------|-----|-------|
-| LinkedIn | Her tür | Turkce + Ingilizce profil |
+| LinkedIn | Her tür | Türkçe + Ingilizce profil |
 | Kariyer.net | Büyük şirketler | ATS-friendly CV yükle |
 | Kommunity | Startup'lar | Turkiye startup ekosistemi |
 | TopTal Turkiye | Freelance | Test-based giriş |
@@ -731,7 +731,7 @@ Ornek: github.com/[proje]/issues?q=label:"good+first+issue"
 **Başlangıç için uygun projeler:**
 - first-contributions (pratik için)
 - freeCodeCamp
-- Developer Roadmap (Turkce çeviri)
+- Developer Roadmap (Türkçe çeviri)
 - Herhangi bir kullandigin framework/library
 :::
 
@@ -990,7 +990,7 @@ Kurallar:
 4. Anahtar kelimeler job description'dan alinmali
 5. PDF olarak kaydet (Word degil)
 
-Kotu ornek: "Web gelistirme yaptim"
+Kotu ornek: "Web geliştirme yaptim"
 Iyi ornek: "React ve TypeScript ile e-ticaret platformu gelistirdim. Lighthouse performans skorunu 45'ten 92'ye cikardim. 3 ayda 15K kullanici edindik."
 
 **Beklenen Sonuc:** CV tek sayfa olmali. En az 3 proje bullet point'lerle anlatilmali. Her bullet'ta rakamsal impact olmali. Yazim hatasi sifir olmali.

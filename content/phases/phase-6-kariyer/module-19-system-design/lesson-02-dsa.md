@@ -2312,7 +2312,7 @@ assert daily_temperatures([73,74,75,71,69,72,76,73]) == [1,1,4,2,1,1,0,0]
 
 ### Alistirma 8: Tree/BST — DFS ve BFS Traversal (Orta)
 
-Binary tree uzerinde traversal ve ortak ata bulma problemlerini coz.
+Binary tree üzerinde traversal ve ortak ata bulma problemlerini coz.
 
 ```python
 class TreeNode:
@@ -2480,7 +2480,7 @@ print(trie.search("python"))     # True
 # TODO: Turkce karakter destegi ekle (ğ, ü, ş, ı, ö, ç)
 ```
 
-**Beklenen Sonuc:** Insert ve search O(m) time (m = kelime uzunlugu). Autocomplete frequency'ye gore sirali sonuc donmeli. Turkce karakterler dogru islenmeli.
+**Beklenen Sonuc:** Insert ve search O(m) time (m = kelime uzunlugu). Autocomplete frequency'ye gore sirali sonuc donmeli. Türkçe karakterler dogru islenmeli.
 **Ipucu:** Trie autocomplete, spell checker ve IP routing'de kullanilir. Memory-efficient varyant: compressed trie (radix tree).
 :::
 

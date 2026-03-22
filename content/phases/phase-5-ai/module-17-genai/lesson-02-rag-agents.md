@@ -67,7 +67,7 @@ Senior developer RAG öğrenirken:
 
 **Anti-pattern Farkindaligi:**
 - **"Chunk and pray" yaklasimi**: Dokumanları rastgele bolerek vector DB'ye atip "is gorecektir" demek. Evaluation olmadan production'a cikmak. RAGAS metrikleri (faithfulness, answer relevancy, context recall) ile sistematik olcum sart.
-- **Embedding model secimini gozardi etmek**: Default OpenAI text-embedding-3-small her dilde iyi calismiyor. Turkce icerik icin multilingual model sec (multilingual-e5-large gibi). Yanlis embedding = yanlis retrieval = yanlis cevap.
+- **Embedding model secimini gozardi etmek**: Default OpenAI text-embedding-3-small her dilde iyi calismiyor. Türkçe icerik icin multilingual model sec (multilingual-e5-large gibi). Yanlis embedding = yanlis retrieval = yanlis cevap.
 - **Tek buyuk prompt'a her seyi tikmak**: 50 sayfalik dokumani prompt'a koyup "ozetle" demek. Context window yetse bile "lost in the middle" problemi var. RAG ile sadece ilgili chunk'lari getir.
 
 **Gercek Dunya Deneyimi:** Bir hukuk firmasinin 50K+ sozlesme arsivinde arama sistemi kurduk. Ilk versiyonda fixed-size chunking + OpenAI embedding kullandik. Avukatlar "yanlis maddeleri getiriyor" dedi. Analiz: chunk'lar madde ortasindan bolunuyordu. Heading-based chunking + multilingual-e5-large embedding + hybrid search (BM25 + semantic) gecisinden sonra retrieval accuracy %62'den %91'e cikti. Ders: chunking stratejisi, model seciminden bile daha kritik olabilir.
@@ -1472,7 +1472,7 @@ for model_name, model in models.items():
 # TODO: Retrieval latency'yi olc (milisaniye bazinda)
 ```
 
-**Beklenen Sonuc:** Multilingual model Turkce sorgularda daha iyi sonuc vermeli. OpenAI embedding'leri genel olarak en yuksek kaliteyi saglamali ama daha pahali.
+**Beklenen Sonuc:** Multilingual model Türkçe sorgularda daha iyi sonuc vermeli. OpenAI embedding'leri genel olarak en yuksek kaliteyi saglamali ama daha pahali.
 **Ipucu:** all-MiniLM-L6-v2 hizli ve ucretiz. Production'da OpenAI embedding'leri daha iyi retrieval kalitesi verir.
 
 ---

@@ -18,7 +18,7 @@ Her gün milyarlarca HTTPS isteği yapılıyor ve her biri TLS handshake ile ba�
 :::concept[OSI Model (İng: Open Systems Interconnection Model)]
 OSI Model, network iletişimini 7 soyut katmana ayıran bir referans modelidir. Her katman belirli bir sorumluluğa sahiptir ve bir üst katmana hizmet sunar.
 
-**Turkce karsiligi:** Açık Sistemler Arabaglanti Modeli
+**Türkçe karsiligi:** Açık Sistemler Arabaglanti Modeli
 **Ne ise yarar:** Network iletişiminin nasıl çalıştığını anlamak ve sorunları doğru katmanda çözmek için kullanılır
 **Gercek hayat benzetmesi:** Posta sistemi gibi - mektup yazarsın (Application), zarfa koyarsın (Presentation), posta kodunu yazarsın (Session), posta kutusuna bırakırsın (Transport), postacı alır (Network), kamyona yükler (Data Link), yolda gider (Physical)
 :::
@@ -58,7 +58,7 @@ Full-stack developer olarak hangi katmanları bilmen gerekiyor? Layer 7 (HTTP/HT
 :::concept[TCP (İng: Transmission Control Protocol)]
 TCP, güvenilir, sıralı ve hata kontrollü veri iletimi sağlayan connection-oriented bir transport protokolüdür.
 
-**Turkce karsiligi:** İletim Kontrol Protokolü
+**Türkçe karsiligi:** İletim Kontrol Protokolü
 **Ne ise yarar:** Verinin eksiksiz ve doğru sırada ulaşmasını garanti eder
 **Gercek hayat benzetmesi:** Taahhütlü posta gibi - gönderdiğin her mektubun ulaştığından emin olursun, kaybolursa tekrar gönderilir
 :::
@@ -66,13 +66,13 @@ TCP, güvenilir, sıralı ve hata kontrollü veri iletimi sağlayan connection-o
 :::concept[UDP (İng: User Datagram Protocol)]
 UDP, bağlantısız (connectionless) ve hızlı bir transport protokolüdür. Veri iletimini garanti etmez ama çok düşük gecikme sağlar.
 
-**Turkce karsiligi:** Kullanıcı Datagram Protokolü
+**Türkçe karsiligi:** Kullanıcı Datagram Protokolü
 **Ne ise yarar:** Düşük gecikme gerektiren uygulamalarda (video, oyun) hızlı veri iletimi sağlar
 **Gercek hayat benzetmesi:** Normal posta gibi - mektup gönderirsin ama ulaşıp ulaşmadığını bilmezsin. Hızlıdır ama garanti yoktur
 :::
 
 :::comparison
-| Ozellik | TCP | UDP |
+| Özellik | TCP | UDP |
 |---------|-----|-----|
 | Baglanti | Connection-oriented (3-way handshake) | Connectionless |
 | Guvenilirlik | Guaranteed delivery (ACK/retransmit) | Best effort (kayıp olabilir) |
@@ -119,7 +119,7 @@ Client                              Server
 :::concept[Firewall (İng: Firewall)]
 Firewall, ağ trafiğini kurallara göre filtreleyen bir güvenlik sistemidir. İzin verilen trafiğe geçiş sağlar, izinsiz trafiği engeller.
 
-**Turkce karsiligi:** Güvenlik Duvarı
+**Türkçe karsiligi:** Güvenlik Duvarı
 **Ne ise yarar:** Ağa yetkisiz erişimi engeller, sadece izin verilen trafiğe izin verir
 **Gercek hayat benzetmesi:** Bina güvenliği gibi - kimliği kontrol eder, yetkili olanı içeri alır, yetkisizi geri çevirir
 :::
@@ -202,7 +202,7 @@ SSH port'unu (22) tüm dünyaya açma (`0.0.0.0/0`)! Brute force saldırıların
 :::concept[VPN (İng: Virtual Private Network)]
 VPN, internet üzerinden güvenli, şifreli bir tünel oluşturarak özel ağlara erişim sağlayan bir teknolojidir.
 
-**Turkce karsiligi:** Sanal Özel Ağ
+**Türkçe karsiligi:** Sanal Özel Ağ
 **Ne ise yarar:** İnternet trafiğini şifreler, uzaktan özel ağlara güvenli erişim sağlar
 **Gercek hayat benzetmesi:** İki bina arasında yeraltı tüneli gibi - dışarıdan kimse tünelin içinde ne geçtiğini göremez
 :::
@@ -222,7 +222,7 @@ VPN, internet üzerinden güvenli, şifreli bir tünel oluşturarak özel ağlar
 :::concept[SSH (İng: Secure Shell)]
 SSH, güvenli olmayan ağ üzerinden güvenli uzak erişim sağlayan bir kriptografik ağ protokolüdür. Telnet'in güvenli alternatifidir.
 
-**Turkce karsiligi:** Güvenli Kabuk
+**Türkçe karsiligi:** Güvenli Kabuk
 **Ne ise yarar:** Sunuculara güvenli uzaktan erişim, dosya transferi ve port forwarding sağlar
 **Gercek hayat benzetmesi:** Şifreli telefon hattı gibi - konuşmanı kimse dinleyemez ve karşı tarafın gerçekten o kişi olduğundan emin olursun
 :::
@@ -313,7 +313,7 @@ SSH key'leri mutlaka passphrase ile koru! Passphrase olmadan private key'in çal
 :::concept[TLS (İng: Transport Layer Security)]
 TLS, internet üzerindeki iletişimi şifreleyen bir kriptografik protokoldür. HTTPS, TLS üzerinde çalışan HTTP'dir. SSL, TLS'in eski ve güvensiz versiyonudur.
 
-**Turkce karsiligi:** Taşıma Katmanı Güvenliği
+**Türkçe karsiligi:** Taşıma Katmanı Güvenliği
 **Ne ise yarar:** Client-server arasındaki tüm trafiği şifreler, verinin dinlenmesini ve değiştirilmesini engeller
 **Gercek hayat benzetmesi:** Diplomatik kurye çantası gibi - içeriği sadece gönderen ve alıcı görebilir, yolda kimse açamaz ve değiştiremez
 :::
@@ -360,14 +360,14 @@ Client                                  Server
 :::
 
 :::comparison
-| Ozellik | TLS 1.2 | TLS 1.3 |
+| Özellik | TLS 1.2 | TLS 1.3 |
 |---------|---------|---------|
 | Handshake | 2-RTT | 1-RTT (0-RTT resumption) |
 | Cipher suites | Çok fazla (bazıları zayıf) | Sadece güvenli olanlar |
 | Forward secrecy | Opsiyonel | Zorunlu (ECDHE) |
 | RSA key exchange | Destekler | Kaldırıldı (güvensiz) |
 | Performance | Yavaş handshake | Hızlı handshake |
-| Guvenlik | İyi | Çok İyi |
+| Güvenlik | İyi | Çok İyi |
 
 **Kural:** Yeni projelerde TLS 1.3 kullan. TLS 1.2'yi destekle (eski client'lar için). TLS 1.0 ve 1.1 ASLA kullanma (güvensiz). SSL ASLA kullanma (broken).
 :::
@@ -377,7 +377,7 @@ Client                                  Server
 :::concept[TLS Certificate (İng: TLS/SSL Certificate)]
 TLS sertifikası, bir web sitesinin kimliğini doğrulayan ve public key'ini içeren dijital bir belgedir. Certificate Authority (CA) tarafından imzalanır.
 
-**Turkce karsiligi:** Dijital Sertifika
+**Türkçe karsiligi:** Dijital Sertifika
 **Ne ise yarar:** Web sitesinin gerçekten iddia ettiği site olduğunu kanıtlar ve güvenli iletişim için public key sağlar
 **Gercek hayat benzetmesi:** Noterden onaylı kimlik belgesi gibi - noter (CA) kişinin (sitenin) kimliğini doğrulayıp belgeyi imzalar, herkes noterin imzasına güvenir
 :::
@@ -493,7 +493,7 @@ server {
 :::concept[mTLS (İng: Mutual TLS / Two-Way TLS)]
 mTLS, hem server'ın hem de client'ın birbirinin kimliğini sertifika ile doğruladığı TLS yapılandırmasıdır. Normal TLS'te sadece server'ın kimliği doğrulanır.
 
-**Turkce karsiligi:** Karşılıklı TLS / İki Yönlü TLS
+**Türkçe karsiligi:** Karşılıklı TLS / İki Yönlü TLS
 **Ne ise yarar:** Mikroservisler arası iletişimde her iki tarafın da yetkili olduğunu garanti eder
 **Gercek hayat benzetmesi:** Diplomatik görüşme gibi - sadece ziyaretçi kimliğini göstermez, ev sahibi de kendi kimliğini gösterir. İki taraflı doğrulama.
 :::
@@ -566,13 +566,13 @@ mTLS en çok mikroservis mimarilerinde kullanılır. Kubernetes'te Istio veya Li
 :::concept[Zero Trust (İng: Zero Trust Architecture)]
 Zero Trust, "ağın içindeki hiçbir şeye güvenme, her şeyi doğrula" prensibiyle çalışan bir güvenlik modelidir. Geleneksel "kale ve hendek" modelinin yerini alır.
 
-**Turkce karsiligi:** Sıfır Güven Mimarisi
+**Türkçe karsiligi:** Sıfır Güven Mimarisi
 **Ne ise yarar:** İç ve dış tehditlere karşı koruma sağlar. Bir hacker ağa sızsa bile lateral movement yapamaz
 **Gercek hayat benzetmesi:** Geleneksel güvenlik: binaya girdiysen her yere gidebilirsin. Zero Trust: her odaya girmek için ayrı ayrı kimlik kartı göstermen gerekir
 :::
 
 :::comparison
-| Ozellik | Geleneksel Model | Zero Trust |
+| Özellik | Geleneksel Model | Zero Trust |
 |---------|-----------------|------------|
 | Felsefe | "İçerideysen güvenilirsin" | "Hiçbir şeye güvenme" |
 | Ağ segmentasyonu | Düz ağ | Mikro segmentasyon |
@@ -696,7 +696,7 @@ mtr myapp.com
 ### Prompt Ornekleri
 
 **1. Derinlemesine Anla:**
-> "OSI 7 katman modelini ve TCP/IP 4 katman modelini karsilastirarak acikla. TLS 1.3 handshake surecini adim adim goster - Client Hello'dan sifreli iletisim baslayana kadar ne oluyor? TLS 1.2 ile 1.3 arasindaki performans ve guvenlik farklari neler? Certificate chain of trust nasil calisir?"
+> "OSI 7 katman modelini ve TCP/IP 4 katman modelini karsilastirarak acikla. TLS 1.3 handshake surecini adim adim goster - Client Hello'dan sifreli iletisim baslayana kadar ne oluyor? TLS 1.2 ile 1.3 arasindaki performans ve güvenlik farklari neler? Certificate chain of trust nasil calisir?"
 
 **2. Pratik Uygulama:**
 > "SSH key pair olustur (ed25519), bir sunucuya password'suz baglan, SSH config dosyasi yaz ve SSH tunneling ile uzak veritabanina guvenli eris. Let's Encrypt ile ucretsiz TLS sertifikasi al ve Nginx'te HTTPS konfigurasyonu yap. HSTS header'ini aktiflestir."
@@ -731,8 +731,8 @@ traceroute example.com  # Paket hangi hop'lardan geciyor?
 
 **Beklenen sonuc:** curl -v ciktisindaki DNS lookup, TCP handshake, TLS handshake ve HTTP header'lari satir satir aciklayabilmeli.
 
-### Alistirma 2: HTTP Header Guvenlik Analizi
-Populer web sitelerinin guvenlik header'larini kontrol edin:
+### Alistirma 2: HTTP Header Güvenlik Analizi
+Populer web sitelerinin güvenlik header'larini kontrol edin:
 
 ```bash
 # TODO: Asagidaki sitelerin response header'larini inceleyin
@@ -748,10 +748,10 @@ curl -I https://google.com
 # TODO: Her header'in ne ise yaradigini ve eksik olursa ne olacagini yazin
 ```
 
-**Beklenen sonuc:** En az 5 guvenlik header'ini aciklayabilmeli, eksik header'larin olusturdugu riskleri belirtebilmeli.
+**Beklenen sonuc:** En az 5 güvenlik header'ini aciklayabilmeli, eksik header'larin olusturdugu riskleri belirtebilmeli.
 
 ### Alistirma 3: Basit Load Balancer Simulasyonu
-Docker Compose ile basit bir load balancer ortami kurun:
+Docker Compose ile basit bir load balancer ortamı kurun:
 
 ```yaml
 # docker-compose.yml
@@ -797,7 +797,7 @@ done
 
 ### Alistirma 5: TLS Sertifika Analizi (Kolay)
 
-Bir web sitesinin TLS sertifikasini ve guvenlik yapilandirmasini incele.
+Bir web sitesinin TLS sertifikasini ve güvenlik yapilandirmasini incele.
 
 ```bash
 # 1. Sertifika bilgilerini gor
@@ -990,14 +990,14 @@ echo | openssl s_client -connect localhost:443 2>/dev/null | grep "Protocol\|Cip
 # TODO: Sonuclari JSON formatinda kaydet
 ```
 
-**Beklenen Sonuc:** Raporda acik portlar, firewall durumu, TLS versiyonu ve potansiyel guvenlik riskleri listelenmeli.
+**Beklenen Sonuc:** Raporda acik portlar, firewall durumu, TLS versiyonu ve potansiyel güvenlik riskleri listelenmeli.
 **Ipucu:** Production sunucularda sadece gerekli portlar acik olmali (22, 80, 443). `nmap -sV localhost` ile servis versiyonlarini tespit et.
 
 ---
 
 ### Alistirma 10: WebSocket Guvenli Iletisim (Zor)
 
-WebSocket uzerinden guvenli real-time iletisim kur.
+WebSocket üzerinden guvenli real-time iletisim kur.
 
 ```javascript
 // server.js

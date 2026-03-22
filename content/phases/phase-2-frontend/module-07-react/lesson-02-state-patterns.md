@@ -819,7 +819,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 // - Zustand selector ile sadece gerekli state'i kullan (gereksiz re-render onle)
 ```
 
-**Beklenen Sonuc:** Form validation hatalari aninda gosterilmeli. Profil guncellemesi store'a kaydedilmeli. Undo ile onceki profil geri yuklenebilmeli. Selector kullanarak CartIcon gibi bagimsiz component'ler gereksiz re-render olmamali.
+**Beklenen Sonuc:** Form validation hatalari aninda gosterilmeli. Profil guncellemesi store'a kaydedilmeli. Undo ile önceki profil geri yuklenebilmeli. Selector kullanarak CartIcon gibi bagimsiz component'ler gereksiz re-render olmamali.
 **Ipucu:** Zustand'da `persist` middleware ile localStorage'a kaydetmeyi dene.
 :::
 

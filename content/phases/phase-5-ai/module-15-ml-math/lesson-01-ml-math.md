@@ -1530,7 +1530,7 @@ class Adam:
 # TODO: Learning rate scheduler ekle (decay)
 ```
 
-**Beklenen Sonuc:** Adam en hizli converge etmeli. SGD en yavas, Momentum ortada olmali. Contour plot uzerinde izlenen yollar farkli olmali.
+**Beklenen Sonuc:** Adam en hizli converge etmeli. SGD en yavas, Momentum ortada olmali. Contour plot üzerinde izlenen yollar farkli olmali.
 **Ipucu:** Adam = Momentum + RMSprop. Bias correction (m_hat, v_hat) ilk adimilardaki sapmayı duzeltir. AdamW = Adam + weight decay (modern standart).
 :::
 

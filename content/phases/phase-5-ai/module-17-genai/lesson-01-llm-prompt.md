@@ -1185,7 +1185,7 @@ for name, prompt in [("Zero-shot", zero_shot_prompt), ("Few-shot", few_shot_prom
 
 ### Alistirma 2: Structured Output ve Guardrails (Orta)
 
-Pydantic modelleri ile tip-guvenli LLM cikti ayrıstirmasi ve guvenlik katmanlari implement et.
+Pydantic modelleri ile tip-guvenli LLM cikti ayrıstirmasi ve güvenlik katmanlari implement et.
 
 ```python
 from openai import OpenAI

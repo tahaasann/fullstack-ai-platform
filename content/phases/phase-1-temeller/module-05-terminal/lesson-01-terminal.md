@@ -786,8 +786,8 @@ prompts:
   - prompt: "Su pipe zincirinin her adimini acikla: find . -name '*.js' -not -path '*/node_modules/*' | xargs wc -l | sort -rn | head -20. Her komutun ne yaptigini, veri akisini ve ciktiyi adim adim goster."
     why: "Pipe zincirlerini okuyup yazmak terminal ustaliginin temelidir. Her komutu ayri ayri anlamak, karmasik zincirleri kendin kurmani saglar."
     follow_up: "Bir proje icin otomasyon scripti yaz: Node.js kurulu mu kontrol et, bagimliliklaEri yukle, .env dosyasi yoksa ornekten kopyala, dev server'i baslat. Renkli cikti ve hata yonetimi ekle."
-  - prompt: "chmod 755, 644 ve 600 izinlerinin farkini acikla. Hangi dosya turunde hangi izni kullanmaliyim? Bir web sunucusunda dosya izinlerinin yanlis ayarlanmasi hangi guvenlik risklerine yol acar?"
-    why: "Dosya izinleri server yonetiminde kritik oneme sahiptir. Yanlis izinler guvenlik aciklarinin en yaygin nedenlerinden biridir."
+  - prompt: "chmod 755, 644 ve 600 izinlerinin farkini acikla. Hangi dosya turunde hangi izni kullanmaliyim? Bir web sunucusunda dosya izinlerinin yanlis ayarlanmasi hangi güvenlik risklerine yol acar?"
+    why: "Dosya izinleri server yonetiminde kritik oneme sahiptir. Yanlis izinler güvenlik aciklarinin en yaygin nedenlerinden biridir."
 pair_programming_tip: "Terminal'de karmasik bir islem yapmak istediginde AI'a amacini anlat: 'Projede tum console.log satirlarini bul, hangi dosyada kac tane oldugunu goster ve en cok olandan en aza sirala.' AI sana dogru komut zincirini olusturur."
 :::
 

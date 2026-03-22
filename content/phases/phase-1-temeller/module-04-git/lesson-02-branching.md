@@ -18,7 +18,7 @@ Profesyonel yazılım gelistirmede hicbir ciddi ekip tek bir branch üzerinde ç
 :::concept[Branch (Ing: Branch)]
 Branch, mevcut kodun bağımsız bir kopyasi üzerinde calismanizi sağlayan isaretcidir (pointer). Aslinda dosyalari kopyalamaz, sadece commit gecmisinde yeni bir yol oluşturur.
 
-**Turkce karsiligi:** Dal / Dallanma
+**Türkçe karsiligi:** Dal / Dallanma
 **Ne ise yarar:** Ana kodu bozmadan yeni özellik geliştirme, hata duzeltme veya deney yapma imkani verir
 **Gerçek hayat benzetmesi:** Bir kitabin fotokopisini alip üzerinde değişiklik yapmak gibi. Begenmezsen fotokopisi atarsin, begenirsen orijinaline işlenir.
 :::
@@ -89,7 +89,7 @@ bugfix/GH-567-null-pointer
 :::
 
 :::tip
-Branch isimlerinde Turkce karakter (i, s, c, g, u, o) kullanma. Küçük harf, tire (-) veya slash (/) ayirici kullan. Kısa ve aciklayici isimler seç.
+Branch isimlerinde Türkçe karakter (i, s, c, g, u, o) kullanma. Küçük harf, tire (-) veya slash (/) ayirici kullan. Kısa ve aciklayici isimler seç.
 :::
 
 ## Merge: Branch'leri Birleştirme
@@ -99,7 +99,7 @@ Branch isimlerinde Turkce karakter (i, s, c, g, u, o) kullanma. Küçük harf, t
 :::concept[Fast-Forward Merge (Ing: Fast-Forward Merge)]
 Hedef branch'te, kaynak branch'ten ayrildigindan beri hicbir yeni commit yoksa, Git sadece isaretciyi (pointer) ileri tasir. Yeni bir merge commit oluşturmaz.
 
-**Turkce karsiligi:** Hızlı Ileri Sarma
+**Türkçe karsiligi:** Hızlı Ileri Sarma
 **Ne ise yarar:** Temiz, duz bir commit geçmişi oluşturur
 **Gerçek hayat benzetmesi:** Bir kitabin sonuna yeni sayfalar eklemek gibi - arada değişen bir sey yoksa sadece ekleme yapılır
 :::
@@ -125,7 +125,7 @@ git merge feature/login
 :::concept[3-Way Merge (Ing: Three-Way Merge)]
 Her iki branch'te de ayrilma noktasindan sonra yeni commit'ler varsa, Git üç noktayi kullanır: ortak ata (common ancestor), her iki branch'in son hali. Sonucta yeni bir merge commit oluşturur.
 
-**Turkce karsiligi:** Üç Yonlu Birleştirme
+**Türkçe karsiligi:** Üç Yonlu Birleştirme
 **Ne ise yarar:** Paralel calismalarim birlestirilmesini sağlar
 **Gerçek hayat benzetmesi:** Iki kisinin ayni dokumani ayrı ayrı duzenleyip sonra değişiklikleri birde birlestirmesi gibi
 :::
@@ -209,7 +209,7 @@ Yaygin hata: Conflict isaretlerini (<<<, ===, >>>) dosyada birakarak commit etme
 :::concept[Rebase (Ing: Rebase)]
 Rebase, bir branch'in commit'lerini başka bir branch'in ucuna tasir. Commit'lerin base'ini (temelini) değiştirir, bu yuzden "re-base" adi verilmistir.
 
-**Turkce karsiligi:** Yeniden Temellendirme
+**Türkçe karsiligi:** Yeniden Temellendirme
 **Ne ise yarar:** Duz (linear) ve temiz bir commit geçmişi oluşturur
 **Gerçek hayat benzetmesi:** Bir kitabin 5. bolumunu yazmissin ama yazarin 4. bolume ekleme yaptığını farkettin. Senin bolumu sifirdan, yeni 4. bolumun üzerine yeniden yazman gibi.
 :::
@@ -339,7 +339,7 @@ Interactive rebase'i push etmeden önce kullan. "WIP", "fixup", "typo fix" gibi 
 :::concept[Cherry-Pick (Ing: Cherry-Pick)]
 Cherry-pick, başka bir branch'teki belirli bir commit'i secip mevcut branch'ine uygular. Tüm branch'i merge etmek yerine sadece ihtiyacin olan commit'i alirsin.
 
-**Turkce karsiligi:** Secici Alma
+**Türkçe karsiligi:** Secici Alma
 **Ne ise yarar:** Belirli bir değişikliği izole olarak başka bir branch'e tasir
 **Gerçek hayat benzetmesi:** Bir agactan sadece olgun meyveleri toplamak gibi - tüm agaci sokmuyorsun, sadece ihtiyacin olani aliyorsun
 :::
@@ -376,7 +376,7 @@ Yaygin hata: Cherry-pick'i sürekli kullanmak. Cherry-pick ayni değişikliği i
 :::concept[Git Bisect (Ing: Git Bisect)]
 Git bisect, binary search algoritmasi kullanarak bir bug'in hangi commit'te ortaya ciktigini bulur. Yuzlerce commit arasinda hata tespiti için muhtesem bir aractir.
 
-**Turkce karsiligi:** Ikili Arama ile Hata Bulma
+**Türkçe karsiligi:** Ikili Arama ile Hata Bulma
 **Ne ise yarar:** Hangi commit'in hataya neden oldugunu hizlica bulur
 **Gerçek hayat benzetmesi:** 1000 sayfali bir kitapta belirli bir cumleyi bulmak için ortadan acip, cumlenin önce mi sonra mi olduguna bakarak aramak gibi
 :::
@@ -642,7 +642,7 @@ git merge feature/turkish
 # e) git log --oneline --graph ile merge commit'i dogrula
 ```
 
-**Beklenen Sonuc:** Conflict basariyla cozulmeli. Son fonksiyon hem Turkce hem emoji icermeli. Conflict marker'lari dosyada kalmamali.
+**Beklenen Sonuc:** Conflict basariyla cozulmeli. Son fonksiyon hem Türkçe hem emoji icermeli. Conflict marker'lari dosyada kalmamali.
 **Ipucu:** VS Code "Accept Both Changes" secenegi sunar. Manuel cozmek icin `<<<<<<<`, `=======`, `>>>>>>>` isaretlerini sil ve son halini yaz.
 
 ---
@@ -1425,7 +1425,7 @@ git branch
 - Trunk-Based: Herkes main'e commit, feature flag, kısa branch (en hızlı, CI/CD zorunlu)
 - Conflict onleme: Sik merge, küçük commit, iletişim, `rerere.enabled true`
 - `git merge -X ours/theirs`: Conflict'te otomatik taraf secimi
-- Branch isimlendirme: feature/, bugfix/, hotfix/ on ekleri, tire ayirici, Turkce karakter yok
+- Branch isimlendirme: feature/, bugfix/, hotfix/ on ekleri, tire ayirici, Türkçe karakter yok
 :::
 
 :::senior-learns

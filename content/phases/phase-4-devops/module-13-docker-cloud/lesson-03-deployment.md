@@ -1471,8 +1471,8 @@ Bu soruya "Vercel'e push ederim" demek junior cevabı. Tüm pipeline'ı anlatan 
 
 **Basari kriterleri:**
 - Her PR'da unique preview URL olusturulmali
-- Feature flag ile ozellik acilip kapatilabilmeli
-- Production'da flag pasifken ozellik gorunmemeli
+- Feature flag ile özellik acilip kapatilabilmeli
+- Production'da flag pasifken özellik gorunmemeli
 :::
 
 :::exercise[Egzersiz 9: Database Migration ve Seed]

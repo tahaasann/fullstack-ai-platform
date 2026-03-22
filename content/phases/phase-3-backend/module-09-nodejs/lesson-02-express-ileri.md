@@ -625,7 +625,7 @@ class UserService {
 ```
 
 **Beklenen Sonuc:** Her katman tek sorumluluga sahip olmali. Service katmani HTTP'den bagimsiz test edilebilmeli. Yeni bir endpoint eklemek icin sadece ilgili katmanlara kod eklenmeli.
-**Ipucu:** Controller asla dogrudan veritabanina erismemeli — her zaman service uzerinden gitmeli.
+**Ipucu:** Controller asla dogrudan veritabanina erismemeli — her zaman service üzerinden gitmeli.
 
 ---
 

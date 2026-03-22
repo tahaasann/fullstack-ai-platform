@@ -19,7 +19,7 @@ Klasik ML algoritmaları (Random Forest, SVM) iyi çalışır ama **complex patt
 ### Prompt Ornekleri
 
 **1. Derinlemesine Anla:**
-> "Backpropagation algoritmasini bir neural network ornegi uzerinde adim adim acikla. Forward pass'te her layer'da ne hesaplaniyor? Loss hesaplandiktan sonra chain rule ile gradient'ler nasil geriye yayiliyor? Vanishing gradient problemi nedir ve ReLU activation neden bunu azaltiyor?"
+> "Backpropagation algoritmasini bir neural network ornegi üzerinde adim adim acikla. Forward pass'te her layer'da ne hesaplaniyor? Loss hesaplandiktan sonra chain rule ile gradient'ler nasil geriye yayiliyor? Vanishing gradient problemi nedir ve ReLU activation neden bunu azaltiyor?"
 
 **2. Pratik Uygulama:**
 > "PyTorch ile sifirdan bir CNN (Convolutional Neural Network) olustur ve MNIST dataset'inde el yazisi rakam tanima yap. Conv2d, MaxPool2d, ReLU, Fully Connected layer'lari kullan. Training loop, validation, early stopping ve model kaydetme islemlerini goster. Her layer'in ne ogrendigini gorsellestir."
@@ -41,7 +41,7 @@ Model egitirken AI'a training log ciktisini goster ve sor: "Loss azalmiyor, mode
 
 **Soru 2: CNN ve RNN arasindaki temel farklar nelerdir? Hangi problemlerde hangisi kullanilir?**
 - **Junior cevabi:** CNN goruntu isleme, RNN metin ve zaman serisi icindir.
-- **Senior cevabi:** CNN: convolutional layer'lar spatial hierarchy ogrenilir (edge -> texture -> object part -> object). Weight sharing ve local connectivity sayesinde parametre sayisi azdir. Kullanim: goruntu siniflandirma, object detection, segmentation, hatta 1D convolution ile metin siniflandirma. RNN: sequential data'da temporal dependency ogrenilir, hidden state onceki adimlarin bilgisini tasir. Ancak long-term dependency'de vanishing gradient sorunu yasanir. LSTM (gate mekanizmasiyla hangi bilgiyi unutacagina karar verir) ve GRU (simplified LSTM) bu sorunu cozer. Modern yaklasim: Transformer mimarisi (self-attention) hem CNN hem RNN'in yerini almasiyla NLP'de devrim yapti, Vision Transformer (ViT) ile goruntu islemede de kullanilmaya baslandi.
+- **Senior cevabi:** CNN: convolutional layer'lar spatial hierarchy ogrenilir (edge -> texture -> object part -> object). Weight sharing ve local connectivity sayesinde parametre sayisi azdir. Kullanim: goruntu siniflandirma, object detection, segmentation, hatta 1D convolution ile metin siniflandirma. RNN: sequential data'da temporal dependency ogrenilir, hidden state önceki adimlarin bilgisini tasir. Ancak long-term dependency'de vanishing gradient sorunu yasanir. LSTM (gate mekanizmasiyla hangi bilgiyi unutacagina karar verir) ve GRU (simplified LSTM) bu sorunu cozer. Modern yaklasim: Transformer mimarisi (self-attention) hem CNN hem RNN'in yerini almasiyla NLP'de devrim yapti, Vision Transformer (ViT) ile goruntu islemede de kullanilmaya baslandi.
 :::
 
 :::code
@@ -1432,7 +1432,7 @@ net = SimpleNet(2, 4, 1)
 
 ### Alistirma 5: CNN ile Goruntu Siniflandirma (Kolay)
 
-CIFAR-10 uzerinde basit bir CNN modeli egit.
+CIFAR-10 üzerinde basit bir CNN modeli egit.
 
 ```python
 import torch

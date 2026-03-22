@@ -332,7 +332,7 @@ Generics, tipleri parametre olarak gecirmenizi sağlar. Kod tekrarini onler ve t
 :::concept[Generic (Ing: Generic)]
 Generic, bir fonksiyon, class veya interface'in çalışmak isteyecegi tipi parametre olarak almasi demektir.
 
-**Turkce karsiligi:** Jenerik Tip / Tip Parametresi
+**Türkçe karsiligi:** Jenerik Tip / Tip Parametresi
 **Ne ise yarar:** Ayni kodu farklı tiplerle tekrar kullanmani sağlar, tip güvenliğinden odun vermeden
 **Gerçek hayat benzetmesi:** Bir kutu düşün. Kutu her seyi tasiyabilir ama içine ne koyduysan, cikardiginda da o tipi alirsin. "String kutusu"ndan string çıkar, "number kutusu"ndan number çıkar.
 :::

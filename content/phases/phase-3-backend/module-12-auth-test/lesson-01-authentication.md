@@ -636,7 +636,7 @@ app.delete("/api/posts/:id", authenticate, authorize("admin", "moderator"), (req
 
 ---
 
-### Alistirma 3: Guvenlik En Iyi Uygulamalari (Zor)
+### Alistirma 3: Güvenlik En Iyi Uygulamalari (Zor)
 
 Helmet, rate limiting, input sanitization ve guvenli cookie ayarlari ile API'yi guclendir.
 
@@ -693,7 +693,7 @@ async function loginWithLockout(email, password) {
 }
 ```
 
-**Beklenen Sonuc:** Helmet guvenlik header'larini eklemeli. 5 basarisiz login'den sonra hesap 15 dakika kilitlenmeli. NoSQL injection saldirisi engellenebilmeli. Cookie'ler httpOnly ve secure olmali.
+**Beklenen Sonuc:** Helmet güvenlik header'larini eklemeli. 5 basarisiz login'den sonra hesap 15 dakika kilitlenmeli. NoSQL injection saldirisi engellenebilmeli. Cookie'ler httpOnly ve secure olmali.
 **Ipucu:** Helmet otomatik olarak X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security gibi header'lari ekler.
 :::
 
@@ -729,10 +729,10 @@ explanation: "401 Unauthorized: Kullanıcının kimliği doğrulanmamış (token
 ### Prompt Ornekleri
 
 **1. Derinlemesine Anla:**
-> "JWT token'in Header.Payload.Signature yapisini adim adim acikla. Payload neden sifrelenmemis (sadece Base64)? HMAC-SHA256 ile RSA-SHA256 arasindaki fark nedir? Access token bellekte, refresh token httpOnly cookie'de saklamanin guvenlik gerekceleri neler? XSS ve CSRF saldirilarinda her yaklasimin riski ne?"
+> "JWT token'in Header.Payload.Signature yapisini adim adim acikla. Payload neden sifrelenmemis (sadece Base64)? HMAC-SHA256 ile RSA-SHA256 arasindaki fark nedir? Access token bellekte, refresh token httpOnly cookie'de saklamanin güvenlik gerekceleri neler? XSS ve CSRF saldirilarinda her yaklasimin riski ne?"
 
 **2. Pratik Uygulama:**
-> "Express.js ile tam bir authentication sistemi kur: bcrypt ile kayit, JWT access + refresh token ile giris, refresh token rotation, RBAC (admin/moderator/user) middleware, Google OAuth 2.0 (Passport.js). Rate limiting ile brute force korumasini ekle. Her adimdaki guvenlik kararlarini acikla."
+> "Express.js ile tam bir authentication sistemi kur: bcrypt ile kayit, JWT access + refresh token ile giris, refresh token rotation, RBAC (admin/moderator/user) middleware, Google OAuth 2.0 (Passport.js). Rate limiting ile brute force korumasini ekle. Her adimdaki güvenlik kararlarini acikla."
 > Takip: "Simdi bu sisteme 'kullanici kendi profilini gorebilir ama baskasininki icin admin olmali' seklinde resource ownership kontrolu ekle."
 
 **3. Mukemmellik Icin:**

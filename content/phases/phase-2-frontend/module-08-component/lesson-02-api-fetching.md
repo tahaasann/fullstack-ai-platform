@@ -542,7 +542,7 @@ function PaginatedTable() {
     queryFn: () => api.get("/products", {
       params: { page, limit: pageSize },
     }).then(r => r.data),
-    placeholderData: keepPreviousData, // Sayfa degisirken onceki veriyi goster
+    placeholderData: keepPreviousData, // Sayfa degisirken önceki veriyi goster
   });
 
   return (

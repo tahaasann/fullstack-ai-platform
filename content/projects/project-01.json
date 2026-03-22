@@ -16,11 +16,11 @@
     "Frontend Developer"
   ],
   "architecture": {
-    "overview": "Next.js 16App Router mimarisi kullanılacak. Static Site Generation (SSG) ile blog sayfaları build time'da oluşturulacak, böylece maksimum performans elde edilecek. MDX dosyaları content layer olarak kullanılacak, Tailwind CSS ile utility-first styling yapılacak. Vercel üzerinde edge network'te serve edilecek.",
-    "diagram": "┌─────────────────────────────────────────────┐\n│                   Vercel CDN                │\n│              (Edge Network)                 │\n├─────────────────────────────────────────────┤\n│              Next.js 16App                 │\n│  ┌─────────┐  ┌──────────┐  ┌───────────┐  │\n│  │  Pages   │  │   Blog   │  │   API     │  │\n│  │  (SSG)   │  │  (MDX)   │  │  Routes   │  │\n│  └────┬─────┘  └────┬─────┘  └─────┬─────┘  │\n│       │             │              │        │\n│  ┌────┴─────────────┴──────────────┴─────┐  │\n│  │         Shared Components             │  │\n│  │  (Header, Footer, SEO, ThemeToggle)   │  │\n│  └────────────────┬──────────────────────┘  │\n│                   │                         │\n│  ┌────────────────┴──────────────────────┐  │\n│  │         Tailwind CSS + Fonts          │  │\n│  └───────────────────────────────────────┘  │\n└─────────────────────────────────────────────┘",
+    "overview": "Next.js 16 App Router mimarisi kullanılacak. Static Site Generation (SSG) ile blog sayfaları build time'da oluşturulacak, böylece maksimum performans elde edilecek. MDX dosyaları content layer olarak kullanılacak, Tailwind CSS ile utility-first styling yapılacak. Vercel üzerinde edge network'te serve edilecek.",
+    "diagram": "┌─────────────────────────────────────────────┐\n│                   Vercel CDN                │\n│              (Edge Network)                 │\n├─────────────────────────────────────────────┤\n│              Next.js 16 App                 │\n│  ┌─────────┐  ┌──────────┐  ┌───────────┐  │\n│  │  Pages   │  │   Blog   │  │   API     │  │\n│  │  (SSG)   │  │  (MDX)   │  │  Routes   │  │\n│  └────┬─────┘  └────┬─────┘  └─────┬─────┘  │\n│       │             │              │        │\n│  ┌────┴─────────────┴──────────────┴─────┐  │\n│  │         Shared Components             │  │\n│  │  (Header, Footer, SEO, ThemeToggle)   │  │\n│  └────────────────┬──────────────────────┘  │\n│                   │                         │\n│  ┌────────────────┴──────────────────────┐  │\n│  │         Tailwind CSS + Fonts          │  │\n│  └───────────────────────────────────────┘  │\n└─────────────────────────────────────────────┘",
     "decisions": [
       {
-        "decision": "Neden Next.js 16App Router?",
+        "decision": "Neden Next.js 16 App Router?",
         "reasoning": "App Router, React Server Components desteği ile daha iyi performans sunar. Static export ile tam statik site oluşturulabilir. File-based routing sayesinde sayfa yapısı dosya sistemiyle birebir eşleşir ve proje yapısı sezgiseldir.",
         "alternatives": "Gatsby, Astro, plain React + Vite",
         "when_to_choose_alternative": "Gatsby: GraphQL data layer'a ihtiyaç varsa. Astro: Blog-ağırlıklı, minimal JS isteniyorsa. Vite + React: Tam SPA isteniyorsa ve SEO önemli değilse."
@@ -47,7 +47,7 @@
   },
   "what_you_learn": {
     "technical": [
-      "Next.js 16App Router ve Server Components",
+      "Next.js 16 App Router ve Server Components",
       "TypeScript ile tip güvenli React geliştirme",
       "Tailwind CSS ile responsive tasarım",
       "MDX ile content management",
@@ -147,7 +147,7 @@
           "why": "create-next-app, Next.js'in resmi scaffolding aracıdır. TypeScript, Tailwind, ESLint ve App Router seçenekleriyle projeyi en iyi pratiklere uygun şekilde oluşturur. Manuel kurulum yerine bu araç kullanılır çünkü tüm konfigürasyonlar birbiriyle uyumlu şekilde yapılır.",
           "instructions": "Terminal'de proje klasörüne git ve aşağıdaki komutu çalıştır. Tüm sorulara 'Yes' de (TypeScript, ESLint, Tailwind CSS, src/ directory, App Router, import alias).",
           "code_snippet": "pnpm dlx create-next-app@latest portfolio-blog --tailwind --eslint --src-dir --import-alias \"@/*\"\ncd portfolio-blog\n\n# Proje yapısını kontrol et\nls -la src/app/",
-          "deep_dive": "Next.js 16App Router, React Server Components (RSC) üzerine inşa edilmiştir. Bu, component'lerin varsayılan olarak server'da render edildiği anlamına gelir. Client-side interaktivite gereken yerlerde 'use client' directive'i kullanılır. Bu mimari, JavaScript bundle size'ı dramatik şekilde azaltır çünkü server component'lerin JS'i client'a gönderilmez.",
+          "deep_dive": "Next.js 16 App Router, React Server Components (RSC) üzerine inşa edilmiştir. Bu, component'lerin varsayılan olarak server'da render edildiği anlamına gelir. Client-side interaktivite gereken yerlerde 'use client' directive'i kullanılır. Bu mimari, JavaScript bundle size'ı dramatik şekilde azaltır çünkü server component'lerin JS'i client'a gönderilmez.",
           "checkpoint": "pnpm run dev komutu ile http://localhost:3000 açıldığında Next.js varsayılan sayfası görünmeli. Terminal'de hata olmamalı.",
           "substeps": [
             {
@@ -1844,7 +1844,7 @@
           "title": "Örnek Blog Yazıları Oluşturma",
           "why": "Boş bir blog, kötü bir izlenim bırakır. En az 2 kaliteli teknik blog yazısı, hem yazma becerilini gösterir hem de içerik üretme alışkanlığının başladığını kanıtlar. Teknik blog yazmak, mülakatlardan networking'e kadar kariyerine büyük katkı sağlar.",
           "instructions": "content/blog/ klasöründe 2 örnek MDX blog yazısı oluştur.",
-          "code_snippet": "---\ntitle: 'Next.js 16App Router ile Portfolio Sitesi Oluşturma'\ndate: '2026-01-15'\nsummary: 'Next.js 16App Router, Server Components ve MDX kullanarak modern bir portfolio sitesi nasıl oluşturulur?'\ntags: ['Next.js', 'React', 'TypeScript']\n---\n\n# Next.js 16App Router ile Portfolio Sitesi Oluşturma\n\nBu yazıda, Next.js 16'ün yeni App Router yapısıyla nasıl bir portfolio\nsitesi oluşturabileceğini adım adım anlatacağım.\n\n## Neden Next.js?\n\nNext.js, React tabanlı framework'ler arasında en popüleridir.\nServer Components desteği ile performans avantajı sağlar...\n\n## Kurulum\n\n```bash\npnpm dlx create-next-app@latest my-portfolio --tailwind\n```\n\n## Server Components vs Client Components\n\nApp Router'da tüm component'ler varsayılan olarak Server Component'tir...\n\n## Sonuç\n\nNext.js 16, modern web geliştirme için güçlü araçlar sunar...",
+          "code_snippet": "---\ntitle: 'Next.js 16 App Router ile Portfolio Sitesi Oluşturma'\ndate: '2026-01-15'\nsummary: 'Next.js 16 App Router, Server Components ve MDX kullanarak modern bir portfolio sitesi nasıl oluşturulur?'\ntags: ['Next.js', 'React', 'TypeScript']\n---\n\n# Next.js 16 App Router ile Portfolio Sitesi Oluşturma\n\nBu yazıda, Next.js 16'ün yeni App Router yapısıyla nasıl bir portfolio\nsitesi oluşturabileceğini adım adım anlatacağım.\n\n## Neden Next.js?\n\nNext.js, React tabanlı framework'ler arasında en popüleridir.\nServer Components desteği ile performans avantajı sağlar...\n\n## Kurulum\n\n```bash\npnpm dlx create-next-app@latest my-portfolio --tailwind\n```\n\n## Server Components vs Client Components\n\nApp Router'da tüm component'ler varsayılan olarak Server Component'tir...\n\n## Sonuç\n\nNext.js 16, modern web geliştirme için güçlü araçlar sunar...",
           "deep_dive": "Frontmatter (--- arasındaki YAML), blog yazısının metadata'sıdır. gray-matter kütüphanesi bu kısmı parse eder. İyi bir blog yazısı: 1) Problemi tanımlar, 2) Çözümü açıklar, 3) Kod örnekleri verir, 4) Sonuç ve next steps belirtir. Teknik blog yazarken 'öğretirken öğrenme' (Feynman Technique) yöntemini uygularsın.",
           "checkpoint": "content/blog/ klasöründe en az 2 .mdx dosyası olmalı. /blog sayfasında liste görünmeli, detay sayfasında syntax highlighting çalışmalı.",
           "substeps": [
@@ -4571,7 +4571,7 @@
       "vercel",
       "react"
     ],
-    "when_to_create": "Projeye başladığın ilk gün repo'yu oluştur. İlk commit: Next.js 16App Router boilerplate + TypeScript + Tailwind CSS konfigürasyonu. README.md ile proje açıklamasını hemen ekle.",
+    "when_to_create": "Projeye başladığın ilk gün repo'yu oluştur. İlk commit: Next.js 16 App Router boilerplate + TypeScript + Tailwind CSS konfigürasyonu. README.md ile proje açıklamasını hemen ekle.",
     "pin_on_profile": true,
     "pin_priority": 6,
     "readme_sections": [
@@ -4631,12 +4631,12 @@
   "ai_workflow": {
     "planning": {
       "model": "Claude Opus 4.6",
-      "prompt_template": "I'm building a personal portfolio and blog site using Next.js 16App Router, TypeScript, Tailwind CSS, and MDX. Help me design the component architecture considering SSG for blog pages, SEO optimization with metadata API, Core Web Vitals performance targets (Lighthouse 95+), accessibility (WCAG 2.1), responsive design breakpoints, and dark mode theming. Also consider the MDX content pipeline and Vercel deployment strategy.",
+      "prompt_template": "I'm building a personal portfolio and blog site using Next.js 16 App Router, TypeScript, Tailwind CSS, and MDX. Help me design the component architecture considering SSG for blog pages, SEO optimization with metadata API, Core Web Vitals performance targets (Lighthouse 95+), accessibility (WCAG 2.1), responsive design breakpoints, and dark mode theming. Also consider the MDX content pipeline and Vercel deployment strategy.",
       "when_to_use": "Her milestone'un basinda kullan — sayfa yapisi, component hierarchy ve SEO stratejisi planlamak icin"
     },
     "code_review": {
       "model": "Claude Sonnet 4.5",
-      "prompt_template": "Review this Next.js 16App Router code for: proper use of Server Components vs Client Components, metadata API usage for SEO, Tailwind CSS class organization, TypeScript type safety, accessibility attributes (aria labels, semantic HTML), image optimization with next/image, and Core Web Vitals impact. Also check MDX content rendering and responsive design patterns.",
+      "prompt_template": "Review this Next.js 16 App Router code for: proper use of Server Components vs Client Components, metadata API usage for SEO, Tailwind CSS class organization, TypeScript type safety, accessibility attributes (aria labels, semantic HTML), image optimization with next/image, and Core Web Vitals impact. Also check MDX content rendering and responsive design patterns.",
       "when_to_use": "Her step tamamlandiktan sonra kullan — ozellikle component yapisi ve SEO meta tag'leri icin"
     },
     "debugging": {

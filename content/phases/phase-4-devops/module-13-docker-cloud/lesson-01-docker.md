@@ -33,7 +33,7 @@ Senior developer'lar sadece "Docker kullanmayı" bilmez, container orchestration
 :::concept[Container (İng: Container)]
 Container, bir uygulamayı ve tüm dependency'lerini (kütüphaneler, runtime, system tools) izole bir ortamda paketleyen lightweight bir sanallaştırma teknolojisidir.
 
-**Turkce karsiligi:** Konteyner / Kapsayıcı
+**Türkçe karsiligi:** Konteyner / Kapsayıcı
 **Ne ise yarar:** Uygulamayı her ortamda aynı şekilde çalıştırır
 **Gercek hayat benzetmesi:** Nakliye konteyneri gibi - içinde ne olursa olsun her gemiye, trene, kamyona sığar ve içindekiler korunur
 :::
@@ -41,24 +41,24 @@ Container, bir uygulamayı ve tüm dependency'lerini (kütüphaneler, runtime, s
 :::concept[Virtual Machine (İng: Virtual Machine / VM)]
 Virtual Machine, fiziksel bir bilgisayar üzerinde yazılımsal olarak oluşturulmuş tam bir bilgisayar simülasyonudur. Kendi işletim sistemi, kernel'i ve kaynaklara sahiptir.
 
-**Turkce karsiligi:** Sanal Makine
+**Türkçe karsiligi:** Sanal Makine
 **Ne ise yarar:** Bir fiziksel sunucuda birden fazla izole işletim sistemi çalıştırır
 **Gercek hayat benzetmesi:** Bir bina içinde tamamen bağımsız daireler gibi - her dairenin kendi mutfağı, banyosu, elektriği var
 :::
 
 :::comparison
-| Ozellik | Container | Virtual Machine |
+| Özellik | Container | Virtual Machine |
 |---------|-----------|----------------|
-| Baslatma suresi | Saniyeler | Dakikalar |
+| Başlatma suresi | Saniyeler | Dakikalar |
 | Boyut | MB'lar (10-500MB) | GB'lar (1-20GB) |
 | OS | Host OS kernel'ini paylaşır | Kendi OS kernel'i |
 | İzolasyon | Process-level | Hardware-level |
 | Performance | Native'e yakın | Overhead var |
 | Kaynak tuketimi | Düşük | Yüksek |
 | Tasinabilirlik | Çok yüksek | Orta |
-| Guvenlik izolasyonu | Orta (namespace/cgroup) | Yüksek (hypervisor) |
+| Güvenlik izolasyonu | Orta (namespace/cgroup) | Yüksek (hypervisor) |
 
-**Ozet:** Container = lightweight, hızlı, paylaşımlı kernel. VM = ağır ama tam izolasyon. Modern uygulamalarda container tercih edilir, compliance gerektiren durumlarda VM kullanılır.
+**Özet:** Container = lightweight, hızlı, paylaşımlı kernel. VM = ağır ama tam izolasyon. Modern uygulamalarda container tercih edilir, compliance gerektiren durumlarda VM kullanılır.
 :::
 
 :::english
@@ -166,7 +166,7 @@ Port mapping sırasını karıştırma: `-p HOST:CONTAINER`. Host tarafındaki p
 :::concept[Dockerfile (İng: Dockerfile)]
 Dockerfile, bir Docker image'ı oluşturmak için gereken adımları tanımlayan bir text dosyasıdır. Her satır bir "layer" oluşturur ve Docker bu layer'ları cache'ler.
 
-**Turkce karsiligi:** Docker yapılandırma dosyası
+**Türkçe karsiligi:** Docker yapılandırma dosyası
 **Ne ise yarar:** Image'ın nasıl oluşturulacağını adım adım tanımlar
 **Gercek hayat benzetmesi:** Yemek tarifi gibi - malzemeleri ve adımları sırayla yazar, her seferinde aynı sonucu alırsın
 :::
@@ -344,7 +344,7 @@ CMD ["node", "server.js"]
 :::concept[Layer Caching (İng: Layer Caching)]
 Docker, Dockerfile'daki her komutu bir layer olarak saklar ve cache'ler. Build sırasında değişmeyen layer'lar cache'ten alınır, sadece değişen layer'lar yeniden oluşturulur.
 
-**Turkce karsiligi:** Katman Önbellekleme
+**Türkçe karsiligi:** Katman Önbellekleme
 **Ne ise yarar:** Build süresini dramatik şekilde kısaltır
 **Gercek hayat benzetmesi:** Bir bina inşa ederken temeli tekrar atmazsın - sadece değişen katı yeniden yaparsın
 :::
@@ -404,7 +404,7 @@ CMD ["node", "dist/server.js"]
 :::
 
 :::comparison
-| Ozellik | Single-Stage Build | Multi-Stage Build |
+| Özellik | Single-Stage Build | Multi-Stage Build |
 |---------|-------------------|-------------------|
 | Image boyutu | 800MB - 1.5GB | 100MB - 200MB |
 | Dev dependencies | Image'da kalır | Çıkarılır |
@@ -451,7 +451,7 @@ React/Vue/Angular gibi SPA'lar için multi-stage build ZORUNLUDUR. Build stage'd
 :::concept[Docker Compose (İng: Docker Compose)]
 Docker Compose, çoklu container uygulamalarını tanımlamak ve çalıştırmak için kullanılan bir araçtır. YAML dosyasında service'leri, network'leri ve volume'ları tanımlarsın.
 
-**Turkce karsiligi:** Docker Kompozisyon / Çoklu Konteyner Yönetimi
+**Türkçe karsiligi:** Docker Kompozisyon / Çoklu Konteyner Yönetimi
 **Ne ise yarar:** Birden fazla container'ı tek komutla ayağa kaldırır (app + database + cache + ...)
 **Gercek hayat benzetmesi:** Orkestra şefi gibi - tüm müzisyenlerin (container'ların) ne zaman, nasıl çalacağını koordine eder
 :::
@@ -603,7 +603,7 @@ Docker container'lar arasında iletişim sağlamak için network sistemi kullan�
 :::concept[Docker Network (İng: Docker Network)]
 Docker Network, container'lar arasında izole iletişim kanalları oluşturan bir sanal ağ yapısıdır.
 
-**Turkce karsiligi:** Docker Ağı
+**Türkçe karsiligi:** Docker Ağı
 **Ne ise yarar:** Container'ların birbirleriyle güvenli ve izole şekilde iletişim kurmasını sağlar
 **Gercek hayat benzetmesi:** Şirket içi telefon sistemi gibi - dışarıdan aranamaz ama dahili numaralarla herkes birbirini arayabilir
 :::
@@ -655,7 +655,7 @@ docker network create --driver overlay my-overlay
 :::concept[Docker Volume (İng: Docker Volume)]
 Docker Volume, container verilerini kalıcı hale getiren bir mekanizmadır. Container silinse bile veriler korunur.
 
-**Turkce karsiligi:** Docker Birim / Kalıcı Depolama
+**Türkçe karsiligi:** Docker Birim / Kalıcı Depolama
 **Ne ise yarar:** Veritabanı dosyaları, upload'lar, log'lar gibi verilerin container yaşam döngüsünden bağımsız olmasını sağlar
 **Gercek hayat benzetmesi:** Kira kontratı bitince evden çıkarsın ama eşyaların depoda kalır
 :::
@@ -836,7 +836,7 @@ CMD ["node", "dist/server.js"]
 ## Development vs Production Docker Setup
 
 :::comparison
-| Ozellik | Development | Production |
+| Özellik | Development | Production |
 |---------|------------|------------|
 | Base image | `node:20-alpine` | `node:20-alpine` + multi-stage |
 | Volumes | Bind mount (live reload) | Named volume (data only) |
@@ -1046,7 +1046,7 @@ docker network inspect my-app_default
 
 ---
 
-### Alistirma 4: .dockerignore ve Guvenlik Taramasi (Kolay)
+### Alistirma 4: .dockerignore ve Güvenlik Taramasi (Kolay)
 
 Docker image'inda gereksiz ve hassas dosyalarin bulunmadigini dogrula.
 
@@ -1074,7 +1074,7 @@ docker run --rm my-app:secure ls -la /app/
 # TODO: Trivy ile alternatif tarama: trivy image my-app:secure
 ```
 
-**Beklenen Sonuc:** .env, .git, node_modules gibi dosyalar image'da bulunmamali. Guvenlik taramasinda kritik CVE olmamali.
+**Beklenen Sonuc:** .env, .git, node_modules gibi dosyalar image'da bulunmamali. Güvenlik taramasinda kritik CVE olmamali.
 **Ipucu:** `docker history my-app:secure` ile her layer'in ne yaptigini gor. Secret'lari build-time'da ARG olarak gecme, runtime'da environment variable kullan.
 
 ---
@@ -1161,7 +1161,7 @@ docker images | grep app
 
 ### Alistirma 7: Docker Network ve Container Iletisimi (Orta)
 
-Birden fazla container'in ozel bir network uzerinden iletisim kurmasini sagla.
+Birden fazla container'in ozel bir network üzerinden iletisim kurmasini sagla.
 
 ```bash
 # 1. Custom bridge network olustur
@@ -1228,7 +1228,7 @@ docker run -d \
 
 ### Alistirma 9: Docker Compose ile Development Ortami (Zor)
 
-Production benzeri bir development ortami kur: hot reload, debug, seeding.
+Production benzeri bir development ortamı kur: hot reload, debug, seeding.
 
 ```yaml
 # docker-compose.dev.yml
@@ -1453,7 +1453,7 @@ Her biri ayrı bir container'da çalışır, Docker Compose (development) veya K
 > "Docker'da container, image ve layer kavramlarini acikla. Union file system nasil calisir? Dockerfile'daki her instruction neden ayri bir layer olusturur? Layer caching mekanizmasi build suresini nasil etkiler? Multi-stage build ile final image boyutunu nasil minimize ederim?"
 
 **2. Pratik Uygulama:**
-> "Bir Node.js + PostgreSQL + Redis uygulamasi icin Docker ortami kur: Multi-stage Dockerfile (builder + runner), docker-compose.yml (3 servis, network, volume), .dockerignore, environment variables ve health check. Production-ready Dockerfile best practice'lerini uygula (non-root user, minimal base image, layer ordering)."
+> "Bir Node.js + PostgreSQL + Redis uygulamasi icin Docker ortamı kur: Multi-stage Dockerfile (builder + runner), docker-compose.yml (3 servis, network, volume), .dockerignore, environment variables ve health check. Production-ready Dockerfile best practice'lerini uygula (non-root user, minimal base image, layer ordering)."
 > Takip: "Simdi bu Docker setup'ina hot-reload ekle (development mode) ve production build ile development build arasindaki farklari docker-compose.override.yml ile yonet."
 
 **3. Mukemmellik Icin:**

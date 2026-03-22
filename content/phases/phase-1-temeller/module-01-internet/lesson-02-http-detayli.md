@@ -32,7 +32,7 @@ Deha seviyesi developer'lar, bir API tasarlarken sadece "çalışıyor mu?" değ
 :::concept[HTTP (HyperText Transfer Protocol)]
 HTTP, web üzerinde istemci (client) ve sunucu (server) arasında veri alışverişini sağlayan uygulama katmanı protokolüdür. Stateless (durumsuz) bir protokoldür - her istek bağımsızdır.
 
-**Turkce karsiligi:** Hiper Metin Transfer Protokolu
+**Türkçe karsiligi:** Hiper Metin Transfer Protokolu
 **Ne ise yarar:** Tarayici ile sunucu arasinda web sayfalarini, resimleri, API verilerini ve diger kaynaklari tasir
 **Gerçek hayat benzetmesi:** Bir restoranda garson (HTTP) senin siparisini (request) mutfaga (server) goturur ve yemegi (response) sana getirir. Garson bir önceki siparisini hatirlamaz (stateless).
 :::
@@ -100,7 +100,7 @@ X-Request-Id: req-789
 :::concept[HTTP Method (İng: HTTP Method / Verb)]
 HTTP method, bir kaynak üzerinde yapilmak istenen işlemi belirtir. REST API tasariminin temelini oluşturur.
 
-**Turkce karsiligi:** HTTP Yontemi / Fiili
+**Türkçe karsiligi:** HTTP Yontemi / Fiili
 **Ne ise yarar:** Sunucuya "bu kaynakla ne yapmak istiyorum" bilgisini iletir
 **Gerçek hayat benzetmesi:** Bir kutuphanede kitap için yapabileceklerin: bak (GET), yeni kitap ekle (POST), kitabi değiştir (PUT), sayfasini duzelt (PATCH), kitabi sil (DELETE)
 :::
@@ -166,7 +166,7 @@ Yaygin hata: Her sey için POST kullanmak. "POST /getUsers", "POST /deleteUser/4
 :::concept[Status Code (İng: Status Code)]
 Status code, sunucunun istege verdigi yanitin durumunu belirten 3 haneli sayisal koddur. Bes kategoriye ayrilir.
 
-**Turkce karsiligi:** Durum Kodu
+**Türkçe karsiligi:** Durum Kodu
 **Ne ise yarar:** Client'a istegin başarılı mi, hatali mi, yönlendirme mi gerektigini bildirir
 **Gerçek hayat benzetmesi:** Restoranda garsonun cevaplari: "Hazirliyoruz" (1xx), "Buyurun yemeginiz" (2xx), "O yemek başka subemizde" (3xx), "Yanlis sipariş verdiniz" (4xx), "Mutfakta yangin çıktı" (5xx)
 :::
@@ -300,7 +300,7 @@ Statik dosyalar (CSS, JS, resim) için uzun max-age kullan ve dosya adina hash e
 :::concept[CORS (Cross-Origin Resource Sharing)]
 CORS, bir web sayfasinin farklı bir domain'deki API'ye istek gonderebilmesi için kullanılan güvenlik mekanizmasidir.
 
-**Turkce karsiligi:** Crapraz Kaynak Paylasimi
+**Türkçe karsiligi:** Crapraz Kaynak Paylasimi
 **Ne ise yarar:** frontend.com'dan api.backend.com'a istek gonderebilmeni sağlar
 **Gerçek hayat benzetmesi:** Bir ulkenin sınır kapisi gibi - pasaportuna (Origin header) bakar, izin listesinde varsan girersin
 :::
@@ -400,7 +400,7 @@ Avantajlari:
 :::concept[HTTPS (HTTP Secure)]
 HTTPS, HTTP iletisiminin TLS (Transport Layer Security) ile sifrelenmis halidir. Verilerin üçüncü kisiler tarafindan okunamasini ve degistirilememesini sağlar.
 
-**Turkce karsiligi:** Güvenli HTTP
+**Türkçe karsiligi:** Güvenli HTTP
 **Ne ise yarar:** Client ile server arasindaki tüm trafigi sifreler
 **Gerçek hayat benzetmesi:** Normal mektup (HTTP) vs muhurlu ve sifreli mektup (HTTPS) - postaci icerigini okuyamaz
 :::
@@ -452,7 +452,7 @@ HTTP/1.1'de Connection: keep-alive default'tür. Bu sayede her istek için yeni 
 :::concept[Cookie (İng: Cookie)]
 Cookie, sunucunun client tarafinda (tarayicida) sakladigi küçük veri parcalaridir. Her istekte otomatik olarak sunucuya gönderilir. Stateless olan HTTP'ye "hafiza" kazandirir.
 
-**Turkce karsiligi:** Cerez
+**Türkçe karsiligi:** Cerez
 **Ne ise yarar:** Oturum yönetimi, kullanıcı tercihleri, takip (tracking)
 **Gerçek hayat benzetmesi:** Bir kafede sana verilen musteri karti - her gelisinde karti gosterirsin ve kafeciyi seni tanir
 :::

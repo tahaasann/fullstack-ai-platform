@@ -695,7 +695,7 @@ console.log("D");
 
 ### Alistirma 2: Array Metodlari ile Veri Isleme (Orta)
 
-Bir ogrenci listesi uzerinde filter, map, reduce ve sort metodlarini zincirleyerek veri analizi yap.
+Bir ogrenci listesi üzerinde filter, map, reduce ve sort metodlarini zincirleyerek veri analizi yap.
 
 ```javascript
 const students = [

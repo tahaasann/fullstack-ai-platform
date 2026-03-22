@@ -1415,14 +1415,14 @@ vLLM Avantajlari:
 :::exercise
 ## Alıştırma 1: Hugging Face ile Sentiment Fine-tuning
 
-**Görev:** DistilBERT modelini Turkce sentiment analizi için fine-tune et.
+**Görev:** DistilBERT modelini Türkçe sentiment analizi için fine-tune et.
 
 **Adimlar:**
-1. `tyqiangz/multilingual-sentiments` datasetini yükle (Turkce subset)
+1. `tyqiangz/multilingual-sentiments` datasetini yükle (Türkçe subset)
 2. Tokenize et (max_length=256)
 3. TrainingArguments ile egit (3 epoch, lr=2e-5)
 4. Eval accuracy ve F1'i raporla
-5. 5 Turkce cumle ile test et
+5. 5 Türkçe cumle ile test et
 
 **Başlangıç kodu:**
 ```python
@@ -1473,12 +1473,12 @@ test_sentences = [
 :::exercise
 ## Alıştırma 2: LoRA ile Text Generation
 
-**Görev:** Bir LLM'i LoRA ile Turkce soru-cevap formati için fine-tune et.
+**Görev:** Bir LLM'i LoRA ile Türkçe soru-cevap formati için fine-tune et.
 
 **Adimlar:**
 1. Küçük bir model seç (örneğin `microsoft/phi-2` veya `TinyLlama/TinyLlama-1.1B-Chat-v1.0`)
 2. LoRA config oluştur (r=16, alpha=32, target_modules için modele uygun seçim yap)
-3. 100+ Turkce soru-cevap cifti hazırla (veya mevcut dataset kullan)
+3. 100+ Türkçe soru-cevap cifti hazırla (veya mevcut dataset kullan)
 4. SFTTrainer ile 1-2 epoch egit
 5. Base model vs fine-tuned model ciktisini karşılaştır
 
@@ -2004,7 +2004,7 @@ print(f"En iyi parametreler: {study.best_params}")
 
 ## Özet
 
-Bu derste fine-tuning'in temellerinden production deployment'a kadar tüm sureci kapsadik:
+Bu derste fine-tuning'in temellerinden production deployment'a kadar tüm süreci kapsadik:
 
 ```
 Fine-tuning Yol Haritasi:
