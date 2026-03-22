@@ -447,13 +447,16 @@
               "why": "@custom-variant dark ile class-based dark mode aktifleştirilir. Media query yerine class yaklaşımı tercih ediyoruz çünkü kullanıcıya toggle kontrolü verecek — sistem temasına bağımlı kalmayacak."
             },
             {
-              "order": "3.6",
-              "action": "Şimdi renk paletine ihtiyacımız var — @theme bloğunu başlat",
-              "type": "code_add",
-              "file": "src/app/globals.css",
-              "position": "bottom",
-              "code": "\n@theme {\n  --color-primary-50: #eff6ff;\n  --color-primary-100: #dbeafe;\n  --color-primary-200: #bfdbfe;\n  --color-primary-300: #93c5fd;\n  --color-primary-400: #60a5fa;\n  --color-primary-500: #3b82f6;\n  --color-primary-600: #2563eb;\n  --color-primary-700: #1d4ed8;\n  --color-primary-800: #1e40af;\n  --color-primary-900: #1e3a8a;\n}",
-              "why": "Renk paletini @theme içinde tanımlamak, tüm projede tutarlı renk kullanımını sağlar. primary-600 ana vurgu rengi olacak. Bu 'design token' yaklaşımı, renk değişikliğini tek yerden yapmayı mümkün kılar."
+              "title": "",
+              "why": "Renk paletini @theme içinde tanımlamak, tüm projede tutarlı renk kullanımını sağlar. primary-600 ana vurgu rengi olacak. Bu 'design token' yaklaşımı, renk değişikliğini tek yerden yapmayı mümkün kılar.",
+              "code": "@theme {\n  --color-primary-50: #eff6ff;\n  --color-primary-100: #dbeafe;\n  --color-primary-200: #bfdbfe;\n  --color-primary-300: #93c5fd;\n  --color-primary-400: #60a5fa;",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "  --color-primary-500: #3b82f6;\n  --color-primary-600: #2563eb;\n  --color-primary-700: #1d4ed8;\n  --color-primary-800: #1e40af;\n  --color-primary-900: #1e3a8a;\n}",
+              "filename": ""
             },
             {
               "order": "3.7",
@@ -541,12 +544,16 @@
               "why": "layout.tsx, Next.js App Router'da tüm sayfaları saran root layout dosyasıdır. Fontlar, global stiller ve metadata burada tanımlanır — uygulamanın 'iskeleti'dir."
             },
             {
-              "order": "4.2",
-              "action": "Mevcut içeriği sil ve RootLayout iskeletini yaz",
-              "type": "code_write",
-              "file": "src/app/layout.tsx",
-              "code": "import './globals.css';\n\nexport default function RootLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <html lang=\"tr\">\n      <body>{children}</body>\n    </html>\n  );\n}",
-              "why": "Senior developer önce çalışan en basit iskeleti yazar. lang='tr' Türkçe içerik için SEO ve screen reader açısından önemli. Şimdi adım adım üzerine ekleyeceğiz."
+              "title": "",
+              "why": "Senior developer önce çalışan en basit iskeleti yazar. lang='tr' Türkçe içerik için SEO ve screen reader açısından önemli. Şimdi adım adım üzerine ekleyeceğiz.",
+              "code": "import './globals.css';\n\nexport default function RootLayout({\n  children,\n}: {\n  children: React.ReactNode;",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
+              "code": "}) {\n  return (\n    <html lang=\"tr\">\n      <body>{children}</body>\n    </html>\n  );\n}",
+              "filename": ""
             },
             {
               "order": "4.3",
@@ -719,29 +726,52 @@
               "why": "Navigation verilerini dizi olarak tanımlamak DRY prensibine uyar — link eklemek için sadece bu diziyi değiştirirsin."
             },
             {
-              "order": "5.6",
-              "action": "Header component iskeletini oluştur — boş nav ile",
-              "type": "code_add",
-              "file": "src/components/header.tsx",
-              "position": "bottom",
-              "code": "\nexport function Header() {\n  const pathname = usePathname();\n\n  return (\n    <header className=\"sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-dark-bg/80\">\n      <nav className=\"mx-auto flex max-w-5xl items-center justify-between px-4 py-4\">\n      </nav>\n    </header>\n  );\n}",
-              "why": "Önce boş iskeleti oluşturuyoruz. sticky top-0 header'ı üste sabitler, backdrop-blur-md glassmorphism efekti verir. 5.4'te import ettiğimiz usePathname'i burada kullanıyoruz."
+              "title": "",
+              "why": "Önce boş iskeleti oluşturuyoruz. sticky top-0 header'ı üste sabitler, backdrop-blur-md glassmorphism efekti verir. 5.4'te import ettiğimiz usePathname'i burada kullanıyoruz.",
+              "code": "export function Header() {\n  const pathname = usePathname();\n",
+              "filename": ""
             },
             {
-              "order": "5.7",
-              "action": "nav içine logo ve linkleri ekle — fonksiyonun İÇİNE geri dön",
-              "type": "code_modify",
-              "file": "src/components/header.tsx",
-              "code": "<nav className=\"mx-auto flex max-w-5xl items-center justify-between px-4 py-4\">\n  <Link href=\"/\" className=\"text-xl font-bold text-primary-600 dark:text-primary-400\">{'<AD />'}</Link>\n  <div className=\"flex items-center gap-6\">\n    {navigation.map((item) => (\n      <Link key={item.href} href={item.href}\n        className={`text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${\n          pathname === item.href\n            ? 'font-semibold text-primary-600 dark:text-primary-400'\n            : 'text-gray-600 dark:text-gray-400'\n        }`}>{item.name}</Link>\n    ))}\n  </div>\n</nav>",
-              "why": "5.5'te tanımladığımız navigation dizisini map ile dönerek linkleri render ediyoruz. 5.4'te import ettiğimiz usePathname ile aktif sayfa vurgulanır."
+              "title": "",
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
+              "code": "  return (\n    <header className=\"sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-dark-bg/80\">\n      <nav className=\"mx-auto flex max-w-5xl items-center justify-between px-4 py-4\">\n      </nav>\n    </header>\n  );\n}",
+              "filename": ""
             },
             {
-              "order": "5.8",
-              "action": "Şimdi BAŞKA DOSYAYA geç — footer.tsx oluştur",
-              "type": "code_write",
-              "file": "src/components/footer.tsx",
-              "code": "export function Footer() {\n  return (\n    <footer className=\"border-t border-gray-200 dark:border-gray-800\">\n      <div className=\"mx-auto max-w-5xl px-4 py-8\">\n        <div className=\"flex flex-col items-center justify-between gap-4 sm:flex-row\">\n          <p className=\"text-sm text-gray-500 dark:text-gray-400\">\n            &copy; {new Date().getFullYear()} Adın Soyadın. Tüm hakları saklıdır.\n          </p>\n          <div className=\"flex gap-4\">\n            <a href=\"https://github.com/username\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-gray-500 transition-colors hover:text-primary-600\">GitHub</a>\n            <a href=\"https://linkedin.com/in/username\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-gray-500 transition-colors hover:text-primary-600\">LinkedIn</a>\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}",
-              "why": "Footer'ı tek seferde yazıyoruz çünkü basit bir component — hook kullanmıyor, Server Component olarak çalışır. noopener noreferrer güvenlik için zorunlu."
+              "title": "",
+              "why": "5.5'te tanımladığımız navigation dizisini map ile dönerek linkleri render ediyoruz. 5.4'te import ettiğimiz usePathname ile aktif sayfa vurgulanır.",
+              "code": "<nav className=\"mx-auto flex max-w-5xl items-center justify-between px-4 py-4\">\n  <Link href=\"/\" className=\"text-xl font-bold text-primary-600 dark:text-primary-400\">{'<AD />'}</Link>\n  <div className=\"flex items-center gap-6\">\n    {navigation.map((item) => (\n      <Link key={item.href} href={item.href}\n        className={`text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Bir önceki adımda başlanan yapının tamamlanması.",
+              "code": "          pathname === item.href\n            ? 'font-semibold text-primary-600 dark:text-primary-400'\n            : 'text-gray-600 dark:text-gray-400'\n        }`}>{item.name}</Link>\n    ))}\n  </div>\n</nav>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Footer iskeletini oluşturuyoruz. border-t üst kenarlık ile header'dan ayrımı sağlar. flex-col + sm:flex-row mobilde dikey, desktop'ta yatay düzen.",
+              "code": "export function Footer() {\n  return (\n    <footer className=\"border-t border-gray-200 dark:border-gray-800\">\n      <div className=\"mx-auto max-w-5xl px-4 py-8\">\n        <div className=\"flex flex-col items-center\n          justify-between gap-4 sm:flex-row\">",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Copyright metni — new Date().getFullYear() ile yıl her yıl otomatik güncellenir. text-sm ve gray-500 ile geri planda kalır.",
+              "code": "          <p className=\"text-sm text-gray-500\n            dark:text-gray-400\">\n            &copy; {new Date().getFullYear()} Adın Soyadın.\n            Tüm hakları saklıdır.\n          </p>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Sosyal medya linkleri. noopener noreferrer güvenlik için zorunlu — target='_blank' açılan sekmede referrer bilgisi sızdırabilir. hover efekti etkileşim gösterir.",
+              "code": "          <div className=\"flex gap-4\">\n            <a href=\"https://github.com/username\"\n              target=\"_blank\" rel=\"noopener noreferrer\"\n              className=\"text-gray-500 transition-colors\n                hover:text-primary-600\">GitHub</a>\n            <a href=\"https://linkedin.com/in/username\"\n              target=\"_blank\" rel=\"noopener noreferrer\"\n              className=\"text-gray-500 transition-colors hover:text-primary-600\">LinkedIn</a>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Footer'ın kapanış etiketleri. Tüm div'leri kapatıyoruz — JSX'te her açılan etiket kapatılmalı, eksik kapanış build hatası verir.",
+              "code": "          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}",
+              "filename": ""
             },
             {
               "order": "5.9",
@@ -863,12 +893,22 @@
               "why": "async anahtar kelimesini ekliyoruz çünkü ileride (M2 Step 6) getRecentPosts çağıracağız. Server Component olduğu için async/await doğrudan kullanılabilir — bu React hook'larından farklıdır."
             },
             {
-              "order": "1.4",
-              "action": "main içine Hero Section'ı ekle — fonksiyonun İÇİNE geri dön",
-              "type": "code_modify",
-              "file": "src/app/page.tsx",
-              "code": "<main>\n  {/* Hero Section */}\n  <section className=\"mx-auto max-w-5xl px-4 py-20\">\n    <div className=\"space-y-6\">\n      <p className=\"text-lg text-primary-600 dark:text-primary-400\">Merhaba, ben</p>\n      <h1 className=\"text-5xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl\">Adın Soyadın</h1>\n      <h2 className=\"text-2xl text-gray-600 dark:text-gray-400 sm:text-3xl\">Full Stack Developer</h2>\n      <p className=\"max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400\">\n        React, Node.js ve AI teknolojileriyle modern web uygulamaları geliştiriyorum.\n      </p>\n    </div>\n  </section>\n</main>",
-              "why": "tracking-tight büyük başlıklarda harf aralığını azaltır. sm:text-6xl ile mobilde küçük, desktop'ta büyük font — responsive typography. max-w-2xl paragrafın 65-75 karakter genişliğinde kalmasını sağlar."
+              "title": "",
+              "why": "tracking-tight büyük başlıklarda harf aralığını azaltır. sm:text-6xl ile mobilde küçük, desktop'ta büyük font — responsive typography. max-w-2xl paragrafın 65-75 karakter genişliğinde kalmasını sağlar.",
+              "code": "<main>\n  {/* Hero Section */}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
+              "code": "<section className=\"mx-auto max-w-5xl px-4 py-20\">\n    <div className=\"space-y-6\">\n      <p className=\"text-lg text-primary-600 dark:text-primary-400\">Merhaba, ben</p>\n      <h1 className=\"text-5xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl\">Adın Soyadın</h1>\n      <h2 className=\"text-2xl text-gray-600 dark:text-gray-400 sm:text-3xl\">Full Stack Developer</h2>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
+              "code": "      <p className=\"max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400\">\n        React, Node.js ve AI teknolojileriyle modern web uygulamaları geliştiriyorum.\n      </p>\n    </div>\n  </section>\n</main>",
+              "filename": ""
             },
             {
               "order": "1.5",
@@ -1029,13 +1069,16 @@
               "why": "2.1'de kurduğumuz reading-time, içeriğin kelime sayısına göre tahmini okuma süresi hesaplar (ortalama 200 kelime/dakika). Blog listesinde göstereceğiz."
             },
             {
-              "order": "2.10",
-              "action": "TypeScript tip güvenliği için Post interface ekle — POSTS_PATH'in ALTINA",
-              "type": "code_add",
-              "file": "src/lib/mdx.ts",
-              "position": "after_posts_path",
-              "code": "\nexport interface Post {\n  slug: string;\n  title: string;\n  date: string;\n  summary: string;\n  tags: string[];\n  readingTime: string;\n  content: string;\n}",
-              "why": "Interface tanımlayarak bu fonksiyonu kullanan her yerde otomatik tamamlama ve hata kontrolü sağlıyoruz. Yanlış alan adı kullanımı derleme zamanında yakalanır."
+              "title": "",
+              "why": "Interface tanımlayarak bu fonksiyonu kullanan her yerde otomatik tamamlama ve hata kontrolü sağlıyoruz. Yanlış alan adı kullanımı derleme zamanında yakalanır.",
+              "code": "export interface Post {\n  slug: string;\n  title: string;\n  date: string;",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "  summary: string;\n  tags: string[];\n  readingTime: string;\n  content: string;\n}",
+              "filename": ""
             },
             {
               "order": "2.11",
@@ -1070,13 +1113,22 @@
               "why": "En yeni yazı en üstte görünmeli. Date objesini getTime() ile milisaniyeye çevirip karşılaştırıyoruz. b - a sıralaması descending (yeniden eskiye) sonuç verir."
             },
             {
-              "order": "2.12",
-              "action": "getPostBySlug fonksiyonunu ekle — getAllPosts'un ALTINA",
-              "type": "code_add",
-              "file": "src/lib/mdx.ts",
-              "position": "bottom",
-              "code": "\nexport async function getPostBySlug(slug: string): Promise<Post | null> {\n  const filePath = path.join(POSTS_PATH, `${slug}.mdx`);\n  if (!fs.existsSync(filePath)) return null;\n\n  const source = fs.readFileSync(filePath, 'utf-8');\n  const { data, content } = matter(source);\n  const stats = readingTime(content);\n\n  return {\n    slug,\n    title: data.title,\n    date: data.date,\n    summary: data.summary,\n    tags: data.tags || [],\n    readingTime: stats.text,\n    content,\n  };\n}",
-              "why": "Blog detay sayfası için tek bir yazıyı slug ile bulan fonksiyon. null dönüşü, yazı bulunamadığında 404 göstermeyi mümkün kılar. 2.7'deki POSTS_PATH sabitini yeniden kullanıyoruz."
+              "title": "",
+              "why": "Slug'dan dosya yolunu oluşturup dosyanın var olup olmadığını kontrol ediyoruz. Yoksa null döndürerek 404 handle'ı mümkün kılıyoruz. gray-matter ile frontmatter parse edilir.",
+              "code": "\nexport async function getPostBySlug(slug: string): Promise<Post | null> {\n  const filePath = path.join(POSTS_PATH, `${slug}.mdx`);\n  if (!fs.existsSync(filePath)) return null;\n\n  const source = fs.readFileSync(filePath, 'utf-8');\n  const { data, content } = matter(source);\n  const stats = readingTime(content);",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Post objesini döndürüyoruz. tags varsayılan boş dizi (|| []) ile opsiyonel. readingTime.text '3 min read' formatında string döner.",
+              "code": "return {\n    slug,\n    title: data.title,\n    date: data.date,",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "    summary: data.summary,\n    tags: data.tags || [],\n    readingTime: stats.text, content,\n  };\n}",
+              "filename": ""
             },
             {
               "order": "2.13",
@@ -1128,12 +1180,22 @@
               "why": "App Router'da src/app/blog/page.tsx dosyası /blog route'unu oluşturur. Dosya yapısı = URL yapısı."
             },
             {
-              "order": "3.2",
-              "action": "Blog listesi sayfası dosyasını oluştur ve iskeletini yaz",
-              "type": "code_write",
-              "file": "src/app/blog/page.tsx",
-              "code": "export default async function BlogPage() {\n  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">Blog</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Yazılım geliştirme deneyimlerimi ve öğrendiklerimi paylaştığım teknik blog.\n      </p>\n    </main>\n  );\n}",
-              "why": "Önce çalışan boş bir component oluşturuyoruz. async function çünkü Server Component'te doğrudan await kullanacağız."
+              "title": "",
+              "why": "Önce çalışan boş bir component oluşturuyoruz. async function çünkü Server Component'te doğrudan await kullanacağız.",
+              "code": "export default async function BlogPage() {",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
+              "code": "  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">Blog</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Yazılım geliştirme deneyimlerimi ve öğrendiklerimi paylaştığım teknik blog.\n      </p>\n    </main>\n  );",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "}",
+              "filename": ""
             },
             {
               "order": "3.3",
@@ -1220,12 +1282,16 @@
               "why": "[slug] klasör adı Next.js'te dynamic route'u temsil eder. /blog/nextjs-rehberi URL'i için slug='nextjs-rehberi' olur."
             },
             {
-              "order": "3.9",
-              "action": "Blog detay sayfası iskeletini oluştur",
-              "type": "code_write",
-              "file": "src/app/blog/[slug]/page.tsx",
-              "code": "interface Props {\n  params: Promise<{ slug: string }>;\n}\n\nexport default async function BlogPostPage({ params }: Props) {\n  const { slug } = await params;\n\n  return (\n    <article className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1>{slug}</h1>\n    </article>\n  );\n}",
-              "why": "Önce en basit iskeleti yazıyoruz — slug'ı gösteriyor, bu kadar. Şimdi adım adım dolduracağız."
+              "title": "",
+              "why": "Önce en basit iskeleti yazıyoruz — slug'ı gösteriyor, bu kadar. Şimdi adım adım dolduracağız.",
+              "code": "interface Props {\n  params: Promise<{ slug: string }>;\n}\n\nexport default async function BlogPostPage({ params }: Props) {\n  const { slug } = await params;",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
+              "code": "\n  return (\n    <article className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1>{slug}</h1>\n    </article>\n  );\n}",
+              "filename": ""
             },
             {
               "order": "3.10",
@@ -1273,12 +1339,40 @@
               "why": "3.10'da import ettiğimiz getPostBySlug ile her yazı için dinamik SEO metadata oluşturuyoruz. Google arama sonuçlarında yazı başlığı ve özeti görünecek."
             },
             {
-              "order": "3.15",
-              "action": "BlogPostPage fonksiyonunu doldur — tüm import'ları kullan",
-              "type": "code_modify",
-              "file": "src/app/blog/[slug]/page.tsx",
-              "code": "export default async function BlogPostPage({ params }: Props) {\n  const { slug } = await params;\n  const post = await getPostBySlug(slug);\n  if (!post) notFound();\n\n  return (\n    <article className=\"mx-auto max-w-3xl px-4 py-16\">\n      <header className=\"mb-8\">\n        <div className=\"flex items-center gap-3 text-sm text-gray-500\">\n          <time>{post.date}</time>\n          <span>·</span>\n          <span>{post.readingTime}</span>\n        </div>\n        <h1 className=\"mt-4 text-4xl font-bold tracking-tight text-gray-900 dark:text-white\">{post.title}</h1>\n      </header>\n      <div className=\"prose prose-lg dark:prose-invert max-w-none\">\n        <MDXRemote\n          source={post.content}\n          options={{ mdxOptions: { rehypePlugins: [rehypeHighlight, rehypeSlug] } }}\n        />\n      </div>\n    </article>\n  );\n}",
-              "why": "3.10'daki getPostBySlug ile veriyi çekip, 3.11'deki notFound ile 404 handle edip, 3.12'deki MDXRemote ile MDX'i render ediyoruz. prose class'ı typography eklentisinden geliyor."
+              "title": "",
+              "why": "Params'tan slug çekip getPostBySlug ile veriyi alıyoruz. Post yoksa notFound() ile Next.js 404 sayfasını gösteriyoruz.",
+              "code": "export default async function BlogPostPage({ params }: Props) {\n  const { slug } = await params;\n  const post = await getPostBySlug(slug);\n  if (!post) notFound();",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Article header: tarih, okuma süresi ve başlık. time elementi semantik HTML — SEO ve ekran okuyucular için önemli. tracking-tight başlıkta harfler arası boşluğu azaltır.",
+              "code": "return (\n    <article className=\"mx-auto max-w-3xl px-4 py-16\">\n      <header className=\"mb-8\">\n        <div className=\"flex items-center gap-3 text-sm text-gray-500\">\n          <time>{post.date}</time>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
+              "code": "          <span>·</span>\n          <span>{post.readingTime}</span>\n        </div>\n        <h1 className=\"mt-4 text-4xl font-bold tracking-tight\n          text-gray-900 dark:text-white\">{post.title}</h1>\n      </header>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "tracking-tight başlıkta harfler arası boşluğu azaltır — büyük fontlarda daha güzel görünür.",
+              "code": "        <h1 className=\"mt-4 text-4xl font-bold\n          tracking-tight text-gray-900\n          dark:text-white\">{post.title}</h1>\n      </header>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "MDXRemote ile MDX render. prose class'ı tipografi, rehypeHighlight kod renklendirme, rehypeSlug başlıklara anchor ekler.",
+              "code": "<div className=\"prose prose-lg\n        dark:prose-invert max-w-none\">\n        <MDXRemote source={post.content}\n          options={{ mdxOptions: {",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kapanış etiketleri — tüm JSX elementlerini kapatıyoruz. Eksik kapanış build hatası verir.",
+              "code": "            rehypePlugins: [\n              rehypeHighlight, rehypeSlug]\n          } }} />\n      </div>\n    </article>);\n}",
+              "filename": ""
             },
             {
               "order": "3.16",
@@ -1325,21 +1419,28 @@
               "why": "Veriyi ayrı tutmak Single Responsibility prensibine uyar. Üç klasörü birden oluşturuyoruz — hepsine ihtiyacımız olacak."
             },
             {
-              "order": "4.2",
-              "action": "src/data/projects.ts dosyasını oluştur ve Project interface iskeletini yaz",
-              "type": "code_write",
-              "file": "src/data/projects.ts",
-              "code": "export interface Project {\n  title: string;\n  description: string;\n  tech: string[];\n  github: string;\n  demo?: string;\n  image?: string;\n  featured: boolean;\n}",
-              "why": "Önce tip tanımını yazıyoruz. demo ve image opsiyonel (?) çünkü her projenin demo'su olmayabilir. featured flag'i ana sayfada hangilerinin öne çıkacağını belirler."
+              "title": "",
+              "why": "Önce tip tanımını yazıyoruz. demo ve image opsiyonel (?) çünkü her projenin demo'su olmayabilir. featured flag'i ana sayfada hangilerinin öne çıkacağını belirler.",
+              "code": "export interface Project {\n  title: string;\n  description: string;\n  tech: string[];",
+              "filename": ""
             },
             {
-              "order": "4.3",
-              "action": "Interface'in ALTINA örnek proje verilerini ekle",
-              "type": "code_add",
-              "file": "src/data/projects.ts",
-              "position": "bottom",
-              "code": "\nexport const projects: Project[] = [\n  {\n    title: 'Portfolio & Blog',\n    description: 'Next.js 16 ile oluşturulmuş kişisel portfolio ve MDX blog sitesi.',\n    tech: ['Next.js', 'TypeScript', 'Tailwind CSS', 'MDX'],\n    github: 'https://github.com/username/portfolio',\n    demo: 'https://portfolio.vercel.app',\n    featured: true,\n  },\n];",
-              "why": "4.2'de tanımladığımız Project interface'ine uygun veri oluşturuyoruz. Bu projeyi (şu an yaptığımız) ilk proje olarak eklemek mantıklı."
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "  github: string;\n  demo?: string;\n  image?: string;\n  featured: boolean;\n}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "4.2'de tanımladığımız Project interface'ine uygun veri oluşturuyoruz. Bu projeyi (şu an yaptığımız) ilk proje olarak eklemek mantıklı.",
+              "code": "export const projects: Project[] = [\n  {\n    title: 'Portfolio & Blog',\n    description: 'Next.js 16 ile oluşturulmuş kişisel portfolio ve MDX blog sitesi.',\n    tech: ['Next.js', 'TypeScript', 'Tailwind CSS', 'MDX'],",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Bir önceki adımda başlanan yapının tamamlanması.",
+              "code": "    github: 'https://github.com/username/portfolio',\n    demo: 'https://portfolio.vercel.app',\n    featured: true,\n  },\n];",
+              "filename": ""
             },
             {
               "order": "4.3b",
@@ -1350,12 +1451,22 @@
               "why": "4.2-4.3'te yazdığımız interface ve verilerin uyumlu olduğunu TypeScript derleyicisi ile doğruluyoruz."
             },
             {
-              "order": "4.4",
-              "action": "Projeler sayfası iskeletini oluştur",
-              "type": "code_write",
-              "file": "src/app/projects/page.tsx",
-              "code": "export default function ProjectsPage() {\n  return (\n    <main className=\"mx-auto max-w-5xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">Projeler</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Üzerinde çalıştığım bazı projeler. Tamamı açık kaynaklıdır.\n      </p>\n    </main>\n  );\n}",
-              "why": "Önce çalışan boş sayfa. Adım adım proje kartlarını ekleyeceğiz."
+              "title": "",
+              "why": "Önce çalışan boş sayfa. Adım adım proje kartlarını ekleyeceğiz.",
+              "code": "export default function ProjectsPage() {",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
+              "code": "  return (\n    <main className=\"mx-auto max-w-5xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">Projeler</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Üzerinde çalıştığım bazı projeler. Tamamı açık kaynaklıdır.\n      </p>\n    </main>\n  );",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "}",
+              "filename": ""
             },
             {
               "order": "4.5",
@@ -1383,12 +1494,46 @@
               "why": "4.7'de eklediğimiz transition-all class'ının çalıştığını doğruluyoruz."
             },
             {
-              "order": "4.7",
-              "action": "main içine proje kartları grid'ini ekle — 4.5'te import ettiğimiz veriyi kullan",
-              "type": "code_modify",
-              "file": "src/app/projects/page.tsx",
-              "code": "export default function ProjectsPage() {\n  return (\n    <main className=\"mx-auto max-w-5xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">Projeler</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">Üzerinde çalıştığım bazı projeler. Tamamı açık kaynaklıdır.</p>\n      <div className=\"grid gap-6 md:grid-cols-2\">\n        {projects.map((project) => (\n          <div key={project.title} className=\"group rounded-xl border border-gray-200 p-6 transition-all hover:border-primary-300 hover:shadow-lg dark:border-gray-800 dark:hover:border-primary-700\">\n            <h2 className=\"text-xl font-semibold text-gray-900 dark:text-white\">{project.title}</h2>\n            <p className=\"mt-2 text-gray-600 dark:text-gray-400\">{project.description}</p>\n            <div className=\"mt-4 flex flex-wrap gap-2\">\n              {project.tech.map((t) => (\n                <span key={t} className=\"rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-700 dark:bg-gray-800 dark:text-gray-300\">{t}</span>\n              ))}\n            </div>\n            <div className=\"mt-4 flex gap-4\">\n              <a href={project.github} target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400\">GitHub →</a>\n              {project.demo && <a href={project.demo} target=\"_blank\" rel=\"noopener noreferrer\" className=\"text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400\">Demo →</a>}\n            </div>\n          </div>\n        ))}\n      </div>\n    </main>\n  );\n}",
-              "why": "4.5'te import ettiğimiz projects dizisini map ile dönerek kart grid'i oluşturuyoruz. md:grid-cols-2 ile mobilde tek sütun, desktop'ta iki sütun."
+              "title": "",
+              "why": "Sayfa başlığı ve açıklama ile başlıyoruz. max-w-5xl ile okunabilir genişlik sınırı. mb-12 ile açıklama ve grid arası yeterli boşluk.",
+              "code": "export default function ProjectsPage() {\n  return (\n    <main className=\"mx-auto max-w-5xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold\n        text-gray-900 dark:text-white\">Projeler</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Üzerinde çalıştığım bazı projeler.\n        Tamamı açık kaynaklıdır.</p>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Grid layout: mobilde tek sütun, md'de iki sütun. map ile her proje kartı oluşturulur. group class'ı hover efekti için parent referansı sağlar.",
+              "code": "      <div className=\"grid gap-6 md:grid-cols-2\">\n        {projects.map((project) => (\n          <div key={project.title}\n            className=\"group rounded-xl border\n              border-gray-200 p-6 transition-all\n              hover:border-primary-300 hover:shadow-lg\n              dark:border-gray-800\n              dark:hover:border-primary-700\">",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Proje başlığı ve açıklaması. Kart içinde h2 ile proje adını, p ile kısa açıklamayı gösteriyoruz.",
+              "code": "            <h2 className=\"text-xl font-semibold\n              text-gray-900 dark:text-white\">\n              {project.title}</h2>\n            <p className=\"mt-2 text-gray-600\n              dark:text-gray-400\">\n              {project.description}</p>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Tech stack badge'leri. flex-wrap ile etiketler satıra sığmazsa alt satıra geçer. rounded-md bg-gray-100 ile ince etiket görünümü.",
+              "code": "            <div className=\"mt-4 flex flex-wrap gap-2\">\n              {project.tech.map((t) => (\n                <span key={t}\n                  className=\"rounded-md bg-gray-100 px-2 py-1\n                    text-xs text-gray-700 dark:bg-gray-800\n                    dark:text-gray-300\">{t}</span>\n              ))}\n            </div>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "GitHub ve demo linkleri. Koşullu render: project.demo varsa demo linki göster. noopener noreferrer güvenlik standardı.",
+              "code": "            <div className=\"mt-4 flex gap-4\">\n              <a href={project.github} target=\"_blank\"\n                rel=\"noopener noreferrer\"\n                className=\"text-sm font-medium text-primary-600\n                  hover:text-primary-700\">GitHub →</a>\n              {project.demo && (\n                <a href={project.demo} target=\"_blank\"\n                  rel=\"noopener noreferrer\"",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Demo linki class'ları ve kartın kapanış etiketleri. Sayfanın tüm JSX'ini kapatıyoruz.",
+              "code": "className=\"text-sm font-medium\n                    text-primary-600\n                    hover:text-primary-700\">\n                  Demo →</a>)}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "            </div>\n          </div>\n        ))}\n      </div>\n    </main>);\n}",
+              "filename": ""
             },
             {
               "order": "4.8b",
@@ -1398,12 +1543,34 @@
               "why": "4.8'de eklediğimiz prose class'ının çalıştığını doğruluyoruz. M1'deki @plugin tanımına bağımlı."
             },
             {
-              "order": "4.8",
-              "action": "BAŞKA DOSYAYA geç — Hakkımda sayfasını oluştur",
-              "type": "code_write",
-              "file": "src/app/about/page.tsx",
-              "code": "import type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Hakkımda',\n  description: 'Full Stack Developer olarak becerilerim, deneyimim ve hikayem',\n};\n\nexport default function AboutPage() {\n  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">Hakkımda</h1>\n      <div className=\"prose prose-lg dark:prose-invert\">\n        <p>Merhaba! Ben bir Full Stack Developer'ım. React, Next.js, Node.js ve TypeScript ile modern web uygulamaları geliştiriyorum.</p>\n        <p>Temiz kod, iyi mimari ve kullanıcı deneyimine önem veriyorum. Sürekli öğrenmeye devam ediyorum.</p>\n      </div>\n    </main>\n  );\n}",
-              "why": "Hakkımda sayfası basit — prose class'ı ile otomatik güzel tipografi. Milestone 3'te SkillsSection ve Timeline component'leri eklenecek."
+              "title": "",
+              "why": "Metadata ile sayfa başlığı ve açıklamasını SEO için tanımlıyoruz. Next.js bu objeyi otomatik olarak <head> etiketlerine çevirir.",
+              "code": "import type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Hakkımda',\n  description: 'Full Stack Developer olarak becerilerim,\n    deneyimim ve hikayem',\n};",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Metadata ile sayfa başlığı ve açıklamasını SEO için tanımlıyoruz. Next.js bu objeyi otomatik <head> etiketlerine çevirir.",
+              "code": "import type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Hakkımda',\n  description: 'Full Stack Developer olarak\n    becerilerim, deneyimim ve hikayem',\n};",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Sayfa iskeleti: prose class'ı @tailwindcss/typography'den gelir — paragraflar otomatik güzel görünür. dark:prose-invert dark modda renkleri çevirir.",
+              "code": "export default function AboutPage() {\n  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold\n        text-gray-900 dark:text-white\">Hakkımda</h1>\n      <div className=\"prose prose-lg dark:prose-invert\">",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Tanıtım paragrafları. İleride Milestone 3'te SkillsSection ve Timeline component'leri bu sayfaya eklenecek.",
+              "code": "<p>Merhaba! Ben bir Full Stack Developer'ım.\n          React, Next.js, Node.js ve TypeScript ile\n          modern web uygulamaları geliştiriyorum.</p>\n        <p>Temiz kod, iyi mimari ve kullanıcı deneyimine",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "          önem veriyorum.</p>\n      </div>\n    </main>\n  );\n}",
+              "filename": ""
             },
             {
               "order": "4.9",
@@ -1487,13 +1654,16 @@
               "why": "5.3'te import ettiğimiz useState ile iki state oluşturuyoruz. Union type ile status sadece dört geçerli değer alabilir — geçersiz state imkansız."
             },
             {
-              "order": "5.6",
-              "action": "handleSubmit fonksiyonunu yaz — state'lerden sonra, return'den önce",
-              "type": "code_add",
-              "file": "src/app/contact/page.tsx",
-              "position": "before_return",
-              "code": "  const handleSubmit = async (e: FormEvent) => {\n    e.preventDefault();\n    setStatus('loading');\n    try {\n      const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {\n        method: 'POST',\n        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify(form),\n      });\n      if (res.ok) { setStatus('success'); setForm({ name: '', email: '', message: '' }); }\n      else { setStatus('error'); }\n    } catch { setStatus('error'); }\n  };",
-              "why": "5.5'te tanımladığımız form ve status state'lerini kullanarak form gönderimini handle ediyoruz. 5.3'teki FormEvent tipini parametre olarak kullanıyoruz."
+              "title": "",
+              "why": "5.5'te tanımladığımız form ve status state'lerini kullanarak form gönderimini handle ediyoruz. 5.3'teki FormEvent tipini parametre olarak kullanıyoruz.",
+              "code": "const handleSubmit = async (e: FormEvent) => {\n    e.preventDefault();\n    setStatus('loading');\n    try {\n      const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {\n        method: 'POST',",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Koşullu mantık — farklı durumlar için farklı davranış tanımlanıyor.",
+              "code": "        headers: { 'Content-Type': 'application/json' },\n        body: JSON.stringify(form),\n      });\n      if (res.ok) { setStatus('success'); setForm({ name: '', email: '', message: '' }); }\n      else { setStatus('error'); }\n    } catch { setStatus('error'); }\n  };",
+              "filename": ""
             },
             {
               "order": "5.6b",
@@ -1510,12 +1680,46 @@
               "why": "5.7'de eklediğimiz required attribute'ünün browser-native validation'ı tetiklediğini doğruluyoruz."
             },
             {
-              "order": "5.7",
-              "action": "return null'u sayfa JSX'i ile değiştir — başlık, açıklama ve form",
-              "type": "code_modify",
-              "file": "src/app/contact/page.tsx",
-              "code": "  return (\n    <main className=\"mx-auto max-w-2xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">İletişim</h1>\n      <p className=\"mb-8 text-gray-600 dark:text-gray-400\">\n        Benimle iletişime geçmek için aşağıdaki formu doldurabilirsin.\n      </p>\n      <form onSubmit={handleSubmit} className=\"space-y-6\">\n        <div>\n          <label htmlFor=\"name\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">İsim</label>\n          <input id=\"name\" type=\"text\" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-dark-card dark:text-white\" />\n        </div>\n        <div>\n          <label htmlFor=\"email\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">E-posta</label>\n          <input id=\"email\" type=\"email\" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-dark-card dark:text-white\" />\n        </div>\n        <div>\n          <label htmlFor=\"message\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">Mesaj</label>\n          <textarea id=\"message\" required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-dark-card dark:text-white\" />\n        </div>\n        <button type=\"submit\" disabled={status === 'loading'}\n          className=\"w-full rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-50\">\n          {status === 'loading' ? 'Gönderiliyor...' : 'Gönder'}\n        </button>\n        {status === 'success' && <p className=\"text-center text-green-600\">Mesajın gönderildi!</p>}\n        {status === 'error' && <p className=\"text-center text-red-600\">Bir hata oluştu, tekrar dene.</p>}\n      </form>\n    </main>\n  );",
-              "why": "5.5'teki form state'ini input'lara bağlıyoruz (controlled component). 5.6'daki handleSubmit'i form'un onSubmit'ine veriyoruz. htmlFor-id eşleşmesi accessibility için zorunlu."
+              "title": "",
+              "why": "Form'un ana yapısını (main, başlık, açıklama, form etiketi) oluşturuyoruz. handleSubmit'i form'a bağlamak, Enter tuşuyla da gönderim sağlar.",
+              "code": "  return (\n    <main className=\"mx-auto max-w-2xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">İletişim</h1>\n      <p className=\"mb-8 text-gray-600 dark:text-gray-400\">\n        Benimle iletişime geçmek için aşağıdaki formu doldurabilirsin.\n      </p>\n      <form onSubmit={handleSubmit} className=\"space-y-6\">\n        {/* Input alanları buraya gelecek */}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Her input'u label ile eşleştiriyoruz (htmlFor-id). Controlled component pattern: value={form.name} ile React state'i input'a bağlıyoruz. onChange ile her tuş vuruşunda state güncellenir.",
+              "code": "        <div>\n          <label htmlFor=\"name\" className=\"mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300\">İsim</label>\n          <input id=\"name\" type=\"text\" required value={form.name}\n            onChange={(e) => setForm({ ...form, name: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2\n              focus:border-primary-500 focus:outline-none focus:ring-2\n              focus:ring-primary-500/20 dark:border-gray-700\n              dark:bg-dark-card dark:text-white\" />",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "E-posta (type='email' ile tarayıcı doğrulaması), mesaj (textarea rows={5}) ve gönder butonu ekliyoruz. disabled={status === 'loading'} çift gönderimi önler. Status mesajları kullanıcıya geri bildirim verir.",
+              "code": "        <div>\n          <label htmlFor=\"email\"\n            className=\"mb-2 block text-sm font-medium\n              text-gray-700 dark:text-gray-300\">E-posta</label>\n          <input id=\"email\" type=\"email\" required\n            value={form.email}\n            onChange={(e) => setForm({ ...form, email: e.target.value })}\n            className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-dark-card dark:text-white\" />",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Mesaj textarea'sı ile çok satırlı girdi alıyoruz. rows={5} ile varsayılan yüksekliği ayarlıyoruz. Aynı Tailwind class'ları tutarlılık sağlıyor.",
+              "code": "        </div>\n        <div>\n          <label htmlFor=\"message\"\n            className=\"mb-2 block text-sm font-medium\n              text-gray-700 dark:text-gray-300\">Mesaj</label>\n          <textarea id=\"message\" required rows={5}\n            value={form.message}\n            onChange={(e) => setForm({ ...form, message: e.target.value })} className=\"w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-dark-card dark:text-white\" />",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Submit butonu: loading state'inde devre dışı kalır (disabled:opacity-50). Ternary ile buton metni değişir — kullanıcı gönderim durumunu görür.",
+              "code": "        </div>\n        <button type=\"submit\"\n          disabled={status === 'loading'}\n          className=\"w-full rounded-lg bg-primary-600 px-6 py-3\n            font-medium text-white transition-colors\n            hover:bg-primary-700 disabled:opacity-50\">\n          {status === 'loading' ? 'Gönderiliyor...' : 'Gönder'}\n        </button>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Başarı/hata mesajları ve form kapanışı. Koşullu render ile sadece ilgili status'ta görünürler — yeşil başarı, kırmızı hata.",
+              "code": "{status === 'success' && (\n          <p className=\"text-center text-green-600\">\n            Mesajın gönderildi!</p>)}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
+              "code": "        {status === 'error' && (\n          <p className=\"text-center text-red-600\">\n            Bir hata oluştu, tekrar dene.</p>)}\n      </form>\n    </main>\n  );",
+              "filename": ""
             },
             {
               "order": "5.8",
@@ -1593,13 +1797,22 @@
               "why": "Frontmatter (--- arasındaki YAML), M2 Step 2'de yazdığımız gray-matter'ın parse edeceği metadata. title, date, summary ve tags alanları zorunlu — getAllPosts bunlara bağımlı."
             },
             {
-              "order": "6.3",
-              "action": "Frontmatter'ın ALTINA içeriği ekle",
-              "type": "code_add",
-              "file": "content/blog/nextjs-portfolio-rehberi.mdx",
-              "position": "bottom",
-              "code": "\n# Next.js 16 App Router ile Portfolio Sitesi Oluşturma\n\nBu yazıda, Next.js 16'ün yeni App Router yapısıyla nasıl bir portfolio sitesi oluşturabileceğini adım adım anlatacağım.\n\n## Neden Next.js?\n\nNext.js, React tabanlı framework'ler arasında en popüleridir. Server Components desteği ile performans avantajı sağlar...\n\n## Kurulum\n\n```bash\npnpm dlx create-next-app@latest my-portfolio --tailwind\n```\n\n## Server Components vs Client Components\n\nApp Router'da tüm component'ler varsayılan olarak Server Component'tir...\n\n## Sonuç\n\nNext.js 16, modern web geliştirme için güçlü araçlar sunar...",
-              "why": "İyi blog yazısı: 1) Problemi tanımlar, 2) Çözümü açıklar, 3) Kod örnekleri verir, 4) Sonuç belirtir. ```bash ile syntax highlighting aktifleşir."
+              "title": "",
+              "why": "Blog yazısının giriş bölümü: başlık ve motivasyon. İyi bir teknik yazı problemi tanımlayarak başlar.",
+              "code": "\n# Next.js 16 App Router ile Portfolio Sitesi Oluşturma\n\nBu yazıda, Next.js 16'ün yeni App Router yapısıyla\nbir portfolio sitesi oluşturmayı anlatacağım.\n\n## Neden Next.js?\n\nNext.js, React tabanlı framework'ler arasında en popüleridir...",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kurulum adımı — ```bash ile terminal komutunu syntax highlighting ile gösteriyoruz. pnpm dlx ile geçici paket çalıştırma, --tailwind flag'i ile Tailwind dahil.",
+              "code": "\n## Kurulum\n\n```bash\npnpm dlx create-next-app@latest my-portfolio --tailwind\n```\n\n## Server Components vs Client Components",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Server vs Client Components açıklaması ve sonuç bölümü. Her blog yazısı bir sonuçla kapanmalı — öğrenilen dersi özetler.",
+              "code": "\nApp Router'da tüm component'ler varsayılan olarak\nServer Component'tir...\n\n## Sonuç\n\nNext.js 16, modern web geliştirme için güçlü araçlar sunar...",
+              "filename": ""
             },
             {
               "order": "6.4",
@@ -1617,13 +1830,28 @@
               "why": "İkinci yazının tarihi ilkinden sonra olmalı — M2 Step 2'deki getAllPosts tarihe göre sıralar, en yeni en üstte görünür."
             },
             {
-              "order": "6.6",
-              "action": "İkinci yazının içeriğini ekle",
-              "type": "code_add",
-              "file": "content/blog/typescript-temelleri.mdx",
-              "position": "bottom",
-              "code": "\n# TypeScript Temelleri: Neden ve Nasıl?\n\nTypeScript, JavaScript'in tip güvenli bir süper kümesidir.\n\n## TypeScript Nedir?\n\nTypeScript, Microsoft tarafından geliştirilen, JavaScript'e statik tip sistemi ekleyen bir programlama dilidir...\n\n## Temel Tipler\n\n```typescript\nlet name: string = 'John';\nlet age: number = 25;\nlet isActive: boolean = true;\n```\n\n## Interface ve Type\n\n```typescript\ninterface User {\n  name: string;\n  email: string;\n  age?: number;\n}\n```\n\n## Sonuç\n\nTypeScript, daha güvenilir ve bakımı kolay kod yazmayı sağlar...",
-              "why": "```typescript ile dil belirtmek M2 Step 2'de kurduğumuz rehype-highlight'ın doğru syntax highlighting uygulaması için şart."
+              "title": "",
+              "why": "Blog yazısının giriş kısmı: başlık ve 'TypeScript nedir?' sorusunu cevaplıyoruz. Okuyucuyu konuya çekecek kısa bir tanıtım.",
+              "code": "\n# TypeScript Temelleri: Neden ve Nasıl?\n\nTypeScript, JavaScript'in tip güvenli bir süper kümesidir.\n\n## TypeScript Nedir?\n\nTypeScript, Microsoft tarafından geliştirilen,\nJavaScript'e statik tip sistemi ekleyen bir programlama dilidir...",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Temel tipler bölümü — ```typescript dil belirteci rehype-highlight'ın doğru renklendirme yapması için zorunlu. let ile değişken tanımları en temel TypeScript kullanımı.",
+              "code": "\n## Temel Tipler\n\n```typescript\nlet name: string = 'John';\nlet age: number = 25;\nlet isActive: boolean = true;\n```",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Interface tanımı TypeScript'in en güçlü özelliği. Opsiyonel alan (age?) gerçek dünya kullanımını gösteriyor. Sonuç bölümü yazıyı bağlıyor.",
+              "code": "## Interface ve Type\n\n```typescript\ninterface User {\n  name: string;\n  email: string;",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod örneği bloğu — syntax highlighting ile gösterilecek.",
+              "code": "  age?: number;\n}\n```\n\n## Sonuç\n\nTypeScript, daha güvenilir ve bakımı kolay kod yazmayı sağlar...",
+              "filename": ""
             },
             {
               "order": "6.7",
@@ -1665,20 +1893,52 @@
               "why": "Server Component olduğu için async/await doğrudan kullanılabilir. 6.10'da import ettiğimiz getRecentPosts ile son 3 yazıyı çekiyoruz."
             },
             {
-              "order": "6.12",
-              "action": "Hero section'dan SONRA son yazılar bölümünü ekle",
-              "type": "code_add",
-              "file": "src/app/page.tsx",
-              "position": "after_hero",
-              "code": "      {/* Son Blog Yazıları */}\n      <section className=\"mx-auto max-w-5xl px-4 py-16\">\n        <h2 className=\"mb-8 text-2xl font-bold text-gray-900 dark:text-white\">Son Yazılar</h2>\n        <div className=\"grid gap-6 md:grid-cols-3\">\n          {recentPosts.map((post) => (\n            <article key={post.slug} className=\"rounded-xl border border-gray-200 p-6 transition-shadow hover:shadow-lg dark:border-gray-800\">\n              <time className=\"text-sm text-gray-500\">{post.date}</time>\n              <h3 className=\"mt-2 text-lg font-semibold text-gray-900 dark:text-white\">\n                <Link href={`/blog/${post.slug}`}>{post.title}</Link>\n              </h3>\n              <p className=\"mt-2 text-sm text-gray-600 dark:text-gray-400\">{post.summary}</p>\n            </article>\n          ))}\n        </div>\n      </section>",
-              "why": "6.10-6.11'de hazırladığımız recentPosts verisini ve daha önce import ettiğimiz Link component'ini kullanarak blog kartlarını render ediyoruz."
+              "title": "",
+              "why": "Blog kartı: article elementi semantik. Tarih ve başlık gösteriliyor. Link ile tıklanabilir başlık — slug bazlı yönlendirme.",
+              "code": "          {recentPosts.map((post) => (\n            <article key={post.slug}\n              className=\"rounded-xl border border-gray-200\n                p-6 transition-shadow hover:shadow-lg\n                dark:border-gray-800\">\n              <time className=\"text-sm text-gray-500\">\n                {post.date}</time>",
+              "filename": ""
             },
             {
-              "order": "6.13",
-              "action": "Ana sayfada son yazıların göründüğünü doğrula ve commit yap",
-              "type": "validate",
-              "validation": "Ana sayfada Hero section'dan sonra 'Son Yazılar' bölümü görünmeli. Blog kartları tıklanabilir olmalı.",
-              "why": "6.1-6.12'de yaptığımız tüm çalışmayı doğruluyoruz. Milestone 2 tamamlandı."
+              "title": "",
+              "why": "Başlık linki ve özet. summary ile kısa açıklama — kartın altında okuyucu konuyu anlar. Section kapanışları.",
+              "code": "<h3 className=\"mt-2 text-lg font-semibold\n                text-gray-900 dark:text-white\">\n                <Link href={`/blog/${post.slug}`}>\n                  {post.title}</Link>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
+              "code": "              </h3>\n              <p className=\"mt-2 text-sm text-gray-600\n                dark:text-gray-400\">{post.summary}</p>\n            </article>\n          ))}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Bir önceki adımda başlanan yapının tamamlanması.",
+              "code": "        </div>\n      </section>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Blog bölümü başlığı ve grid yapısı. md:grid-cols-3 ile desktop'ta 3 sütunlu kart dizilimi oluşturuyoruz.",
+              "code": "      {/* Son Blog Yazıları */}\n      <section className=\"mx-auto max-w-5xl px-4 py-16\">\n        <h2 className=\"mb-8 text-2xl font-bold text-gray-900\n          dark:text-white\">Son Yazılar</h2>\n        <div className=\"grid gap-6 md:grid-cols-3\">",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Blog kartı: article elementi semantik. Tarih gösteriliyor. hover:shadow-lg ile etkileşim hissi.",
+              "code": "          {recentPosts.map((post) => (\n            <article key={post.slug}\n              className=\"rounded-xl border\n                border-gray-200 p-6 transition-shadow\n                hover:shadow-lg dark:border-gray-800\">\n              <time className=\"text-sm text-gray-500\">\n                {post.date}</time>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Başlık Link ile tıklanabilir — slug bazlı yönlendirme. summary ile kısa açıklama. Section kapanışları.",
+              "code": "<h3 className=\"mt-2 text-lg font-semibold\n                text-gray-900 dark:text-white\">\n                <Link href={`/blog/${post.slug}`}>\n                  {post.title}</Link></h3>\n              <p className=\"mt-2 text-sm text-gray-600\n                dark:text-gray-400\">{post.summary}</p>\n            </article>))}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Bir önceki adımda başlanan yapının tamamlanması.",
+              "code": "        </div>\n      </section>",
+              "filename": ""
             }
           ],
           "folder_structure_after": "portfolio-blog/\n├── content/\n│   └── blog/\n│       ├── nextjs-portfolio-rehberi.mdx   ← YENİ\n│       └── typescript-temelleri.mdx        ← YENİ\n├── src/\n│   ├── app/\n│   │   ├── about/\n│   │   ├── blog/\n│   │   │   ├── [slug]/\n│   │   │   └── page.tsx\n│   │   ├── contact/\n│   │   ├── projects/\n│   │   ├── globals.css\n│   │   ├── layout.tsx\n│   │   └── page.tsx\n│   ├── components/\n│   ├── data/\n│   └── lib/\n│       └── mdx.ts\n├── next.config.mjs\n├── package.json\n└── tsconfig.json",
@@ -1787,13 +2047,34 @@
               "why": "Server'da localStorage olmadığından tema bilgisi ancak client mount olduktan sonra güvenle okunabilir. useState ve useEffect ile mounted state kontrolü yapacağız."
             },
             {
-              "order": "1.8",
-              "action": "ThemeToggle fonksiyonunu yaz — mounted guard ve toggle butonu",
-              "type": "code_add",
-              "file": "src/components/theme-toggle.tsx",
-              "position": "bottom",
-              "code": "\nexport function ThemeToggle() {\n  const { theme, setTheme } = useTheme();\n  const [mounted, setMounted] = useState(false);\n\n  useEffect(() => setMounted(true), []);\n\n  if (!mounted) return <div className=\"h-9 w-9\" />;\n\n  return (\n    <button\n      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}\n      className=\"rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800\"\n      aria-label=\"Tema değiştir\"\n    >\n      {theme === 'dark' ? (\n        <svg className=\"h-5 w-5 text-yellow-500\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path fillRule=\"evenodd\" d=\"M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z\" clipRule=\"evenodd\" />\n        </svg>\n      ) : (\n        <svg className=\"h-5 w-5 text-gray-700\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path d=\"M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z\" />\n        </svg>\n      )}\n    </button>\n  );\n}",
-              "why": "1.6'daki useTheme ile tema bilgisini okuyup, 1.7'deki useState/useEffect ile hydration mismatch'i önlüyoruz. mounted=false iken aynı boyutta placeholder gösteriyoruz — layout shift olmaz."
+              "title": "",
+              "why": "useTheme ile tema bilgisini çekiyoruz. useState(false) + useEffect ile component'in client'ta mount olduğunu takip ediyoruz — hydration mismatch önlenir.",
+              "code": "\nexport function ThemeToggle() {\n  const { theme, setTheme } = useTheme();\n  const [mounted, setMounted] = useState(false);\n\n  useEffect(() => setMounted(true), []);\n\n  if (!mounted) return <div className=\"h-9 w-9\" />;",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Toggle butonu: tıklayınca dark↔light geçişi. aria-label ekran okuyucular için şart. rounded-lg p-2 ile ikon boyutunda tıklanabilir alan.",
+              "code": "\n  return (\n    <button\n      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}\n      className=\"rounded-lg p-2 transition-colors\n        hover:bg-gray-100 dark:hover:bg-gray-800\"\n      aria-label=\"Tema değiştir\"\n    >",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Dark modda güneş ikonu (sarı), light modda ay ikonu (gri) gösteriyoruz. SVG inline olarak kullanılır — ek paket gerektirmez. fill='currentColor' ile renk text-color'dan gelir.",
+              "code": "{theme === 'dark' ? (\n        <svg className=\"h-5 w-5 text-yellow-500\"\n          fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path fillRule=\"evenodd\" d=\"M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z\" clipRule=\"evenodd\" />",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin Tailwind CSS ile stillendirmesi. Dark/light mod desteği dahil.",
+              "code": "        </svg>\n      ) : (\n        <svg className=\"h-5 w-5 text-gray-700\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n          <path d=\"M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z\" />\n        </svg>)}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "    </button>);\n}",
+              "filename": ""
             },
             {
               "order": "1.9",
@@ -1900,31 +2181,40 @@
               "why": "DRY prensibine uygun — aynı veri yapısı Header'da da var. İleride ortak bir dosyaya taşınabilir."
             },
             {
-              "order": "2.5",
-              "action": "MobileNav iskeletini yaz — md:hidden ile sadece mobilde görünecek",
-              "type": "code_add",
-              "file": "src/components/mobile-nav.tsx",
-              "position": "bottom",
-              "code": "\nexport function MobileNav() {\n  const [isOpen, setIsOpen] = useState(false);\n  const pathname = usePathname();\n\n  return (\n    <div className=\"md:hidden\">\n    </div>\n  );\n}",
-              "why": "md:hidden ile bu component sadece 768px altında görünür. 2.2'deki useState ile menü durumunu, 2.3'teki usePathname ile aktif sayfayı yönetiyoruz."
+              "title": "",
+              "why": "md:hidden ile bu component sadece 768px altında görünür. 2.2'deki useState ile menü durumunu, 2.3'teki usePathname ile aktif sayfayı yönetiyoruz.",
+              "code": "export function MobileNav() {\n  const [isOpen, setIsOpen] = useState(false);\n  const pathname = usePathname();\n",
+              "filename": ""
             },
             {
-              "order": "2.6",
-              "action": "Hamburger butonunu div içine ekle",
-              "type": "code_add",
-              "file": "src/components/mobile-nav.tsx",
-              "position": "inside_div",
-              "code": "      <button onClick={() => setIsOpen(!isOpen)} className=\"rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800\" aria-label=\"Menüyü aç\" aria-expanded={isOpen}>\n        <svg className=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          {isOpen ? (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M6 18L18 6M6 6l12 12\" />\n          ) : (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M4 6h16M4 12h16M4 18h16\" />\n          )}\n        </svg>\n      </button>",
-              "why": "aria-label screen reader'lara butonun amacını söyler. aria-expanded={isOpen} menünün açık mı kapalı mı olduğunu bildirir — WCAG zorunluluğu. 2.5'teki isOpen state'ine göre ikon değişir."
+              "title": "",
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
+              "code": "  return (\n    <div className=\"md:hidden\">\n    </div>\n  );\n}",
+              "filename": ""
             },
             {
-              "order": "2.7",
-              "action": "Menü dropdown panelini ekle — butonun ALTINA",
-              "type": "code_add",
-              "file": "src/components/mobile-nav.tsx",
-              "position": "after_button",
-              "code": "\n      {isOpen && (\n        <div className=\"absolute left-0 right-0 top-full border-b border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-dark-bg\">\n          <nav className=\"flex flex-col space-y-3\">\n            {navigation.map((item) => (\n              <Link key={item.href} href={item.href} onClick={() => setIsOpen(false)}\n                className={`rounded-lg px-4 py-2 text-sm transition-colors ${\n                  pathname === item.href\n                    ? 'bg-primary-50 font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'\n                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'\n                }`}>{item.name}</Link>\n            ))}\n          </nav>\n        </div>\n      )}",
-              "why": "2.4'teki navigation dizisini map ile dönerek linkleri render ediyoruz. onClick={() => setIsOpen(false)} linke tıklanınca menüyü kapatır. 2.3'teki pathname ile aktif sayfa vurgulanır."
+              "title": "",
+              "why": "aria-label screen reader'lara butonun amacını söyler. aria-expanded={isOpen} menünün açık mı kapalı mı olduğunu bildirir — WCAG zorunluluğu. 2.5'teki isOpen state'ine göre ikon değişir.",
+              "code": "<button onClick={() => setIsOpen(!isOpen)} className=\"rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800\" aria-label=\"Menüyü aç\" aria-expanded={isOpen}>\n        <svg className=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          {isOpen ? (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M6 18L18 6M6 6l12 12\" />\n          ) : (\n            <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M4 6h16M4 12h16M4 18h16\" />\n          )}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Bir önceki adımda başlanan yapının tamamlanması.",
+              "code": "        </svg>\n      </button>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "2.4'teki navigation dizisini map ile dönerek linkleri render ediyoruz. onClick={() => setIsOpen(false)} linke tıklanınca menüyü kapatır. 2.3'teki pathname ile aktif sayfa vurgulanır.",
+              "code": "{isOpen && (\n        <div className=\"absolute left-0 right-0 top-full border-b border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-dark-bg\">\n          <nav className=\"flex flex-col space-y-3\">\n            {navigation.map((item) => (\n              <Link key={item.href} href={item.href} onClick={() => setIsOpen(false)}\n                className={`rounded-lg px-4 py-2 text-sm transition-colors ${",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "                  pathname === item.href\n                    ? 'bg-primary-50 font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'\n                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'\n                }`}>{item.name}</Link>\n            ))}\n          </nav>\n        </div>\n      )}",
+              "filename": ""
             },
             {
               "order": "2.7b",
@@ -2030,13 +2320,16 @@
               "why": "Önce boş iskelet. Semantic HTML kullanarak section ve h2 ile bölümü tanımlıyoruz."
             },
             {
-              "order": "3.4",
-              "action": "h2'den sonra grid ve kategori kartlarını ekle — 3.2'deki veriyi kullan",
-              "type": "code_add",
-              "file": "src/components/skills-section.tsx",
-              "position": "after_h2",
-              "code": "      <div className=\"grid gap-6 sm:grid-cols-2\">\n        {skillCategories.map((category) => (\n          <div key={category.title} className=\"rounded-xl border border-gray-200 p-6 dark:border-gray-800\">\n            <h3 className=\"mb-4 font-semibold text-gray-900 dark:text-white\">{category.title}</h3>\n            <div className=\"flex flex-wrap gap-2\">\n              {category.skills.map((skill) => (\n                <span key={skill} className=\"rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-primary-900/30 dark:text-primary-300\">{skill}</span>\n              ))}\n            </div>\n          </div>\n        ))}\n      </div>",
-              "why": "3.2'de tanımladığımız skillCategories dizisini map ile dönerek kartları oluşturuyoruz. sm:grid-cols-2 ile mobile-first responsive grid."
+              "title": "",
+              "why": "3.2'de tanımladığımız skillCategories dizisini map ile dönerek kartları oluşturuyoruz. sm:grid-cols-2 ile mobile-first responsive grid.",
+              "code": "<div className=\"grid gap-6 sm:grid-cols-2\">\n        {skillCategories.map((category) => (\n          <div key={category.title} className=\"rounded-xl border border-gray-200 p-6 dark:border-gray-800\">\n            <h3 className=\"mb-4 font-semibold text-gray-900 dark:text-white\">{category.title}</h3>\n            <div className=\"flex flex-wrap gap-2\">\n              {category.skills.map((skill) => (\n                <span key={skill} className=\"rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-primary-900/30 dark:text-primary-300\">{skill}</span>\n              ))}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Bir önceki adımda başlanan yapının tamamlanması.",
+              "code": "            </div>\n          </div>\n        ))}\n      </div>",
+              "filename": ""
             },
             {
               "order": "3.5",
@@ -2063,13 +2356,16 @@
               "why": "Boş iskelet. 3.3'teki SkillsSection ile aynı stil kurallarını kullanarak tutarlılık sağlıyoruz."
             },
             {
-              "order": "3.8",
-              "action": "Timeline çizgisi ve kartları ekle — 3.6'daki veriyi kullan",
-              "type": "code_add",
-              "file": "src/components/timeline.tsx",
-              "position": "after_h2",
-              "code": "      <div className=\"space-y-8\">\n        {experiences.map((exp, i) => (\n          <div key={i} className=\"relative border-l-2 border-primary-200 pl-6 dark:border-primary-800\">\n            <div className=\"absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 border-primary-500 bg-white dark:bg-dark-bg\" />\n            <p className=\"text-sm text-gray-500 dark:text-gray-400\">{exp.period}</p>\n            <h3 className=\"mt-1 font-semibold text-gray-900 dark:text-white\">{exp.title}</h3>\n            <p className=\"text-sm text-primary-600 dark:text-primary-400\">{exp.company}</p>\n            <p className=\"mt-2 text-gray-600 dark:text-gray-400\">{exp.description}</p>\n          </div>\n        ))}\n      </div>",
-              "why": "3.6'daki experiences dizisini render ediyoruz. border-l-2 ile sol çizgi, absolute ile daire konumlandırması — CSS-only timeline, library dependency yok."
+              "title": "",
+              "why": "3.6'daki experiences dizisini render ediyoruz. border-l-2 ile sol çizgi, absolute ile daire konumlandırması — CSS-only timeline, library dependency yok.",
+              "code": "<div className=\"space-y-8\">\n        {experiences.map((exp, i) => (\n          <div key={i} className=\"relative border-l-2 border-primary-200 pl-6 dark:border-primary-800\">\n            <div className=\"absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 border-primary-500 bg-white dark:bg-dark-bg\" />\n            <p className=\"text-sm text-gray-500 dark:text-gray-400\">{exp.period}</p>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin stil ve kapanış kısımları. Tailwind class'ları ile görünüm ayarlanıyor.",
+              "code": "            <h3 className=\"mt-1 font-semibold text-gray-900 dark:text-white\">{exp.title}</h3>\n            <p className=\"text-sm text-primary-600 dark:text-primary-400\">{exp.company}</p>\n            <p className=\"mt-2 text-gray-600 dark:text-gray-400\">{exp.description}</p>\n          </div>\n        ))}\n      </div>",
+              "filename": ""
             },
             {
               "order": "3.9",
@@ -2310,13 +2606,16 @@
               "why": "description Google arama sonuçlarında görünür — 155 karakter sınırı. keywords modern SEO'da eskisi kadar etkili olmasa da bazı motorlar referans olarak kullanır."
             },
             {
-              "order": "1.4",
-              "action": "Open Graph meta tag'lerini ekle",
-              "type": "code_add",
-              "file": "src/app/layout.tsx",
-              "position": "inside_metadata",
-              "code": "  openGraph: {\n    type: 'website',\n    locale: 'tr_TR',\n    url: 'https://your-domain.com',\n    siteName: 'Adın Soyadın',\n    title: 'Adın Soyadın | Full Stack Developer',\n    description: 'Full Stack Developer portfolio ve teknik blog.',\n    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Adın Soyadın Portfolio' }],\n  },",
-              "why": "LinkedIn veya Facebook'ta paylaşıldığında büyük görsel kartı oluşturur. 1200x630px tüm platformlarda optimal çalışan standart."
+              "title": "",
+              "why": "LinkedIn veya Facebook'ta paylaşıldığında büyük görsel kartı oluşturur. 1200x630px tüm platformlarda optimal çalışan standart.",
+              "code": "openGraph: {\n    type: 'website',\n    locale: 'tr_TR',\n    url: 'https://your-domain.com',",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
+              "code": "    siteName: 'Adın Soyadın',\n    title: 'Adın Soyadın | Full Stack Developer',\n    description: 'Full Stack Developer portfolio ve teknik blog.',\n    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Adın Soyadın Portfolio' }],\n  },",
+              "filename": ""
             },
             {
               "order": "1.5",
@@ -2328,13 +2627,16 @@
               "why": "Twitter (X) kendi meta tag formatını kullanır. summary_large_image büyük görsel kartı ile CTR artırır. 1.4'teki og-image.png'yi yeniden kullanıyoruz."
             },
             {
-              "order": "1.6",
-              "action": "robots konfigürasyonunu ekle",
-              "type": "code_add",
-              "file": "src/app/layout.tsx",
-              "position": "after_twitter",
-              "code": "  robots: {\n    index: true,\n    follow: true,\n    googleBot: {\n      index: true,\n      follow: true,\n      'max-video-preview': -1,\n      'max-image-preview': 'large',\n      'max-snippet': -1,\n    },\n  },",
-              "why": "Google bot'una sayfayı indexlemesi ve linkleri takip etmesi gerektiğini söylüyoruz. max-image-preview: 'large' arama sonuçlarında büyük görsel önizleme gösterilmesine izin verir."
+              "title": "",
+              "why": "Google bot'una sayfayı indexlemesi ve linkleri takip etmesi gerektiğini söylüyoruz. max-image-preview: 'large' arama sonuçlarında büyük görsel önizleme gösterilmesine izin verir.",
+              "code": "robots: {\n    index: true,\n    follow: true,\n    googleBot: {\n      index: true,",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Bir önceki adımda başlanan yapının tamamlanması.",
+              "code": "      follow: true,\n      'max-video-preview': -1,\n      'max-image-preview': 'large',\n      'max-snippet': -1,\n    },\n  },",
+              "filename": ""
             },
             {
               "order": "1.7",
@@ -2451,12 +2753,34 @@
               "why": "M2 Step 2'de yazdığımız getAllPosts ile blog yazılarını dinamik olarak sitemap'e ekleyeceğiz."
             },
             {
-              "order": "2.5",
-              "action": "Fonksiyonun return tipini belirle ve blog yazılarını ekle — geri DÖN",
-              "type": "code_modify",
-              "file": "src/app/sitemap.ts",
-              "code": "export default async function sitemap(): Promise<MetadataRoute.Sitemap> {\n  const posts = await getAllPosts();\n  const baseUrl = 'https://your-domain.com';\n\n  const blogPosts = posts.map((post) => ({\n    url: `${baseUrl}/blog/${post.slug}`,\n    lastModified: new Date(post.date),\n    changeFrequency: 'monthly' as const,\n    priority: 0.7,\n  }));\n\n  const staticPages = [\n    { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 1.0 },\n    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },\n    { url: `${baseUrl}/projects`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.8 },\n    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },\n    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.5 },\n  ];\n\n  return [...staticPages, ...blogPosts];\n}",
-              "why": "2.3'teki MetadataRoute.Sitemap tipini, 2.4'teki getAllPosts'u kullanarak tam fonksiyonu yazıyoruz. Ana sayfa priority 1.0, iletişim 0.5."
+              "title": "",
+              "why": "Blog yazılarını sitemap'e ekliyoruz. Her post'un URL'si, son güncelleme tarihi ve priority'si var. changeFrequency arama motorlarına ne sıklıkla tarayacağını söyler.",
+              "code": "export default async function sitemap()\n    : Promise<MetadataRoute.Sitemap> {\n  const posts = await getAllPosts();\n  const baseUrl = 'https://your-domain.com';",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
+              "code": "  const blogPosts = posts.map((post) => ({\n    url: `${baseUrl}/blog/${post.slug}`,\n    lastModified: new Date(post.date),\n    changeFrequency: 'monthly' as const, priority: 0.7,\n  }));",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Statik sayfalar elle tanımlanır. Ana sayfa priority 1.0 (en önemli). changeFrequency ile tarama sıklığı belirtilir.",
+              "code": "  const staticPages = [\n    { url: baseUrl, lastModified: new Date(),\n      changeFrequency: 'weekly' as const,\n      priority: 1.0 },\n    { url: `${baseUrl}/about`,\n      lastModified: new Date(),\n      changeFrequency: 'monthly' as const,\n      priority: 0.8 },",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Projeler ve blog sık güncellenir (weekly), iletişim nadiren (yearly, priority 0.5). Spread ile iki diziyi birleştirip döndürüyoruz.",
+              "code": "{ url: `${baseUrl}/projects`,\n      lastModified: new Date(),\n      changeFrequency: 'weekly' as const,\n      priority: 0.8 },\n    { url: `${baseUrl}/blog`,\n      lastModified: new Date(),\n      changeFrequency: 'weekly' as const,",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Sonuç sözlüğü/listesi döndürülüyor — çağıran kod bu yapıyı kullanacak.",
+              "code": "      priority: 0.9 },\n    { url: `${baseUrl}/contact`,\n      lastModified: new Date(),\n      changeFrequency: 'yearly' as const,\n      priority: 0.5 }];\n  return [...staticPages, ...blogPosts];\n}",
+              "filename": ""
             },
             {
               "order": "2.5b",
@@ -2574,13 +2898,16 @@
               "why": "TypeScript interface ile prop tiplerini tanımlamak, component'in nasıl kullanılacağını belgeliyor. alt zorunlu çünkü erişilebilirlik için her görselin açıklaması olmalı (WCAG zorunluluğu). priority opsiyonel çünkü sadece above-the-fold görsellerde kullanılacak."
             },
             {
-              "order": "3.4",
-              "action": "OptimizedImage component fonksiyonunu ve destructuring'i yaz",
-              "type": "code_add",
-              "file": "src/components/optimized-image.tsx",
-              "position": "bottom",
-              "code": "\nexport function OptimizedImage({\n  src,\n  alt,\n  width,\n  height,\n  priority = false,\n  className,\n}: OptimizedImageProps) {\n}",
-              "why": "priority = false varsayılan değeri, çoğu görselin lazy load olmasını sağlar — sadece above-the-fold görseller priority={true} alır. Destructuring ile prop'ları tek tek çıkarmak, JSX'te doğrudan kullanımı temizler."
+              "title": "",
+              "why": "priority = false varsayılan değeri, çoğu görselin lazy load olmasını sağlar — sadece above-the-fold görseller priority={true} alır. Destructuring ile prop'ları tek tek çıkarmak, JSX'te doğrudan kullanımı temizler.",
+              "code": "export function OptimizedImage({\n  src,\n  alt,\n  width,",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "  height,\n  priority = false,\n  className,\n}: OptimizedImageProps) {\n}",
+              "filename": ""
             },
             {
               "order": "3.4b",
@@ -2589,13 +2916,16 @@
               "why": "priority={true} SADECE above-the-fold (ilk ekran) görseller için kullanılır — preload hint ekler ve lazy loading'i devre dışı bırakır. Tüm görsellere priority vermek, hiçbirine vermemekle aynı etkiyi yapar — önceliklendirmenin anlamını kaybettirir."
             },
             {
-              "order": "3.5",
-              "action": "Image component'ini return JSX'ine ekle ve sizes prop'unu tanımla",
-              "type": "code_add",
-              "file": "src/components/optimized-image.tsx",
-              "position": "inside_function",
-              "code": "  return (\n    <Image\n      src={src}\n      alt={alt}\n      width={width}\n      height={height}\n      priority={priority}\n      className={className}\n      sizes=\"(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw\"\n    />\n  );",
-              "why": "sizes prop'u tarayıcıya hangi viewport genişliğinde hangi boyutta görsel yüklemesi gerektiğini söyler. Mobilde (768px altı) tam genişlik, tablette yarım, masaüstünde üçte bir. Bu olmadan tarayıcı en büyük boyutu yükler ve bant genişliğini israf eder."
+              "title": "",
+              "why": "sizes prop'u tarayıcıya hangi viewport genişliğinde hangi boyutta görsel yüklemesi gerektiğini söyler. Mobilde (768px altı) tam genişlik, tablette yarım, masaüstünde üçte bir. Bu olmadan tarayıcı en büyük boyutu yükler ve bant genişliğini israf eder.",
+              "code": "return (\n    <Image\n      src={src}\n      alt={alt}\n      width={width}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin Tailwind CSS ile stillendirmesi. Dark/light mod desteği dahil.",
+              "code": "      height={height}\n      priority={priority}\n      className={className}\n      sizes=\"(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw\"\n    />\n  );",
+              "filename": ""
             },
             {
               "order": "3.6",
@@ -2620,12 +2950,16 @@
               "why": "AVIF, WebP'den %20-30 daha küçük dosya boyutu üretir ama her tarayıcı desteklemez. Next.js, tarayıcının Accept header'ına bakarak desteklenen en iyi formatı otomatik seçer — AVIF destekleniyorsa AVIF, yoksa WebP, o da yoksa orijinal format gönderilir."
             },
             {
-              "order": "3.9",
-              "action": "Hero section'da OptimizedImage kullanımını uygula",
-              "type": "code_modify",
-              "file": "src/app/page.tsx",
-              "code": "import { OptimizedImage } from '@/components/optimized-image';\n\n<OptimizedImage\n  src=\"/images/profile.jpg\"\n  alt=\"Profil fotoğrafı\"\n  width={400}\n  height={400}\n  priority={true}\n  className=\"rounded-full\"\n/>",
-              "why": "Hero'daki profil fotoğrafı sayfa yüklendiğinde hemen görünmesi gereken (above-the-fold) bir görseldir, bu yüzden priority={true} ile preload hint eklenir. Lazy loading devre dışı kalır çünkü kullanıcı bu görseli beklemek zorunda kalmamalı."
+              "title": "",
+              "why": "Hero'daki profil fotoğrafı sayfa yüklendiğinde hemen görünmesi gereken (above-the-fold) bir görseldir, bu yüzden priority={true} ile preload hint eklenir. Lazy loading devre dışı kalır çünkü kullanıcı bu görseli beklemek zorunda kalmamalı.",
+              "code": "import { OptimizedImage } from '@/components/optimized-image';\n\n<OptimizedImage\n  src=\"/images/profile.jpg\"\n  alt=\"Profil fotoğrafı\"\n  width={400}",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin Tailwind CSS ile stillendirmesi. Dark/light mod desteği dahil.",
+              "code": "  height={400}\n  priority={true}\n  className=\"rounded-full\"\n/>",
+              "filename": ""
             },
             {
               "order": "3.10",
@@ -2689,12 +3023,22 @@
               "why": "Skip navigation link'i, WCAG 2.4.1 (Bypass Blocks) zorunluluğudur. Klavye kullanıcılarının her sayfa yüklenişinde tüm navigasyon linklerini Tab'lamak zorunda kalmasını önler — doğrudan ana içeriğe atlama imkânı verir."
             },
             {
-              "order": "4.2",
-              "action": "SkipNav component'ini yaz ve export et",
-              "type": "code_write",
-              "file": "src/components/skip-nav.tsx",
-              "code": "export function SkipNav() {\n  return (\n    <a\n      href=\"#main-content\"\n      className=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white\"\n    >\n      İçeriğe atla\n    </a>\n  );\n}",
-              "why": "sr-only class'ı elementi görsel olarak gizler ama screen reader'lar tarafından okunmasını sağlar. focus:not-sr-only ile Tab tuşuna basıldığında link görünür hale gelir. focus:fixed ve focus:z-50 ile sayfanın en üstünde, tüm içeriğin üzerinde gösterilir."
+              "title": "",
+              "why": "sr-only class'ı elementi görsel olarak gizler ama screen reader'lar tarafından okunmasını sağlar. focus:not-sr-only ile Tab tuşuna basıldığında link görünür hale gelir. focus:fixed ve focus:z-50 ile sayfanın en üstünde, tüm içeriğin üzerinde gösterilir.",
+              "code": "export function SkipNav() {",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
+              "code": "  return (\n    <a\n      href=\"#main-content\"\n      className=\"sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white\"\n    >\n      İçeriğe atla\n    </a>\n  );",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "}",
+              "filename": ""
             },
             {
               "order": "4.3",
@@ -2815,12 +3159,16 @@
               "why": "Performans ve güvenlik optimizasyonlarının çoğu Next.js konfigürasyonunda yapılır. Security header'ları, image format desteği ve paket optimizasyonu bu dosyadan kontrol edilir."
             },
             {
-              "order": "5.2",
-              "action": "Security header'ları tanımlamak için headers() fonksiyonunu ekle",
-              "type": "code_modify",
-              "file": "next.config.mjs",
-              "code": "async headers() {\n  return [\n    {\n      source: '/(.*)',\n      headers: [\n        { key: 'X-Content-Type-Options', value: 'nosniff' },\n        { key: 'X-Frame-Options', value: 'DENY' },\n      ],\n    },\n  ];\n},",
-              "why": "X-Content-Type-Options: nosniff, tarayıcının dosya türünü tahmin etmesini (MIME sniffing) önler — bu, kötü niyetli dosyaların script olarak çalıştırılmasını engeller. X-Frame-Options: DENY, sitenin iframe içine yerleştirilmesini engeller ve clickjacking saldırılarını önler."
+              "title": "",
+              "why": "X-Content-Type-Options: nosniff, tarayıcının dosya türünü tahmin etmesini (MIME sniffing) önler — bu, kötü niyetli dosyaların script olarak çalıştırılmasını engeller. X-Frame-Options: DENY, sitenin iframe içine yerleştirilmesini engeller ve clickjacking saldırılarını önler.",
+              "code": "async headers() {\n  return [\n    {\n      source: '/(.*)',\n      headers: [\n        { key: 'X-Content-Type-Options', value: 'nosniff' },",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Veri yapısının devamı — alanlar/değerler tanımlanıyor.",
+              "code": "        { key: 'X-Frame-Options', value: 'DENY' },\n      ],\n    },\n  ];\n},",
+              "filename": ""
             },
             {
               "order": "5.3",
@@ -3254,12 +3602,28 @@
               "why": "M4'te eklediğimiz SEO meta tag'lerinin production'da da doğru çalıştığını kontrol ediyoruz."
             },
             {
-              "order": "3.5",
-              "action": "404 sayfası oluştur (not-found.tsx)",
-              "type": "code_write",
-              "file": "src/app/not-found.tsx",
-              "code": "import Link from 'next/link';\n\nexport default function NotFound() {\n  return (\n    <main className=\"mx-auto flex max-w-3xl flex-col items-center justify-center px-4 py-32 text-center\">\n      <h1 className=\"text-6xl font-bold text-gray-900 dark:text-white\">404</h1>\n      <p className=\"mt-4 text-xl text-gray-600 dark:text-gray-400\">Sayfa bulunamadı</p>\n      <Link href=\"/\" className=\"mt-8 rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700\">\n        Ana Sayfaya Dön\n      </Link>\n    </main>\n  );\n}",
-              "why": "Custom 404 sayfası, kullanıcı deneyimini iyileştirir. Varsayılan Next.js 404 sayfası profesyonel görünmez ve ziyaretçiyi kaybettirir."
+              "title": "",
+              "why": "Custom 404 sayfası, kullanıcı deneyimini iyileştirir. Varsayılan Next.js 404 sayfası profesyonel görünmez ve ziyaretçiyi kaybettirir.",
+              "code": "import Link from 'next/link';\n\nexport default function NotFound() {",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Component'in JSX return bloğu — render edilecek UI yapısını tanımlıyoruz.",
+              "code": "return (\n    <main className=\"mx-auto flex max-w-3xl flex-col items-center justify-center px-4 py-32 text-center\">\n      <h1 className=\"text-6xl font-bold text-gray-900 dark:text-white\">404</h1>\n      <p className=\"mt-4 text-xl text-gray-600 dark:text-gray-400\">Sayfa bulunamadı</p>",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "UI elementlerinin Tailwind CSS ile stillendirmesi. Dark/light mod desteği dahil.",
+              "code": "      <Link href=\"/\" className=\"mt-8 rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-700\">\n        Ana Sayfaya Dön\n      </Link>\n    </main>\n  );",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Kod bloğunun kapanışı — yapı tamamlanıyor.",
+              "code": "}",
+              "filename": ""
             },
             {
               "order": "3.6",
@@ -3368,12 +3732,16 @@
               "why": "Badge'ler teknoloji stack'ini bir bakışta gösterir. shields.io üzerinden oluşturulan badge'ler, README'ye profesyonel bir görünüm katar."
             },
             {
-              "order": "4.4",
-              "action": "Özellikler listesi bölümünü yaz",
-              "type": "code_modify",
-              "file": "README.md",
-              "code": "## Özellikler\n\n- Next.js 16 App Router ile SSG\n- MDX blog sistemi\n- Dark/Light mode\n- Responsive tasarım (mobile-first)\n- SEO optimizasyonu (Open Graph, sitemap, robots.txt)\n- Lighthouse 95+ skor\n- WCAG 2.1 AA uyumu\n- Vercel Edge Network deployment",
-              "why": "Özellikler listesi, projenin kapsamını ve teknik derinliğini gösterir. Recruiter'lar bu listeye bakarak projenin seviyesini değerlendirir."
+              "title": "",
+              "why": "Özellikler listesi, projenin kapsamını ve teknik derinliğini gösterir. Recruiter'lar bu listeye bakarak projenin seviyesini değerlendirir.",
+              "code": "## Özellikler\n\n- Next.js 16 App Router ile SSG\n- MDX blog sistemi\n- Dark/Light mode\n- Responsive tasarım (mobile-first)",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Bir önceki adımda başlanan yapının tamamlanması.",
+              "code": "- SEO optimizasyonu (Open Graph, sitemap, robots.txt)\n- Lighthouse 95+ skor\n- WCAG 2.1 AA uyumu\n- Vercel Edge Network deployment",
+              "filename": ""
             },
             {
               "order": "4.5",
@@ -3384,20 +3752,28 @@
               "why": "Kurulum adımları, projeyi sıfırdan klonlayıp çalıştırabilmeyi garanti eder. Copy-paste edilebilir komutlar kullanıcı deneyimini artırır."
             },
             {
-              "order": "4.6",
-              "action": "Proje yapısı bölümünü ekle",
-              "type": "code_modify",
-              "file": "README.md",
-              "code": "## Proje Yapısı\n\n```\nsrc/\n├── app/          # Next.js App Router sayfaları\n├── components/   # Yeniden kullanılabilir UI bileşenleri\n├── lib/          # Yardımcı fonksiyonlar (MDX parser vb.)\n└── data/         # Statik veri dosyaları\ncontent/\n└── blog/         # MDX blog yazıları\n```",
-              "why": "Proje yapısı, code reviewer'ların kodu hızla anlamasını sağlar. Hangi klasörün ne işe yaradığını göstermek, büyük projelerde navigasyonu kolaylaştırır."
+              "title": "",
+              "why": "Proje yapısı, code reviewer'ların kodu hızla anlamasını sağlar. Hangi klasörün ne işe yaradığını göstermek, büyük projelerde navigasyonu kolaylaştırır.",
+              "code": "## Proje Yapısı\n\n```\nsrc/\n├── app/          # Next.js App Router sayfaları\n├── components/   # Yeniden kullanılabilir UI bileşenleri\n├── lib/          # Yardımcı fonksiyonlar (MDX parser vb.)",
+              "filename": ""
             },
             {
-              "order": "4.7",
-              "action": "Lighthouse skor bilgisini ve canlı demo linkini ekle",
-              "type": "code_modify",
-              "file": "README.md",
-              "code": "## Performans\n\n- Performance: 95+\n- Accessibility: 95+\n- Best Practices: 95+\n- SEO: 95+\n\n## Canlı Demo\n\n[portfolio-site.vercel.app](https://portfolio-site.vercel.app)",
-              "why": "Lighthouse skorları projenin teknik kalitesini kanıtlar. Canlı demo linki, recruiter'ın projeyi hemen görmesini sağlar — statik screenshot'tan çok daha etkilidir."
+              "title": "",
+              "why": "Kod örneği bloğu — syntax highlighting ile gösterilecek.",
+              "code": "└── data/         # Statik veri dosyaları\ncontent/\n└── blog/         # MDX blog yazıları\n```",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Lighthouse skorları projenin teknik kalitesini kanıtlar. Canlı demo linki, recruiter'ın projeyi hemen görmesini sağlar — statik screenshot'tan çok daha etkilidir.",
+              "code": "## Performans\n\n- Performance: 95+\n- Accessibility: 95+\n- Best Practices: 95+\n- SEO: 95+\n",
+              "filename": ""
+            },
+            {
+              "title": "",
+              "why": "Döküman bölümünün devamı — içerik yapısı tamamlanıyor.",
+              "code": "## Canlı Demo\n\n[portfolio-site.vercel.app](https://portfolio-site.vercel.app)",
+              "filename": ""
             },
             {
               "order": "4.6b",

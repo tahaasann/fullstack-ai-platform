@@ -224,16 +224,49 @@
               "action": "Docker Compose iskeletini yaz — önce sadece db servisi",
               "type": "code_write",
               "file": "docker-compose.yml",
-              "code": "services:\n  db:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_USER: ecomuser\n      POSTGRES_PASSWORD: ecompass\n      POSTGRES_DB: ecommerce\n    ports:\n      - '5432:5432'",
+              "code": "services:\n  db:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_USER: ecomuser\n      POSTGRES_PASSWORD: ecompass\n      POSTGRES_DB: ecommerce\n    ports:",
               "why": "Senior developer önce en basit çalışan yapıyı yazar. Tek servis, temel ayarlar. Çalıştığını görünce üzerine ekleyeceğiz."
+            },
+            {
+              "order": "1.8b",
+              "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
+              "type": "code_add",
+              "why": "Altyapi yapilandirmasinin siradaki bolumunu ekliyoruz.",
+              "code": "- '5432:5432'",
+              "file": "docker-compose.yml",
+              "position": "bottom"
             },
             {
               "order": "1.9",
               "action": "GERİ DÖN: docker-compose.yml — db servisine volume ve healthcheck ekle, Redis servisini ekle",
               "type": "code_modify",
               "file": "docker-compose.yml",
-              "code": "services:\n  db:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_USER: ecomuser\n      POSTGRES_PASSWORD: ecompass\n      POSTGRES_DB: ecommerce\n    ports:\n      - '5432:5432'\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U ecomuser -d ecommerce']\n      interval: 5s\n      timeout: 5s\n      retries: 5\n\n  redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'\n\n  fraud-service:\n    build: ./fraud-detection\n    ports:\n      - '5000:5000'\n    depends_on:\n      - db\n\nvolumes:\n  pgdata:",
+              "code": "services:\n  db:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_USER: ecomuser\n      POSTGRES_PASSWORD: ecompass\n      POSTGRES_DB: ecommerce\n    ports:",
               "why": "1.8'de iskelet çalıştı, şimdi production-grade özellikler ekliyoruz. healthcheck ile DB hazır olana kadar diğer servisler bekler. Volume ile veri kalıcılığı sağlanır. Redis ve fraud-service ayrı konteyner olarak eklendi."
+            },
+            {
+              "order": "1.9b",
+              "action": "ALTTA DEVAM ET: volume ve healthcheck ekle",
+              "type": "code_modify",
+              "why": "Veri kaliciligini ve servis saglik kontrolunu yapilandiriyoruz.",
+              "code": "- '5432:5432'\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    healthcheck:\n      test: ['CMD-SHELL', 'pg_isready -U ecomuser -d ecommerce']\n      interval: 5s\n      timeout: 5s\n      retries: 5",
+              "file": "docker-compose.yml"
+            },
+            {
+              "order": "1.9c",
+              "action": "ALTTA DEVAM ET: Docker servisini tanimla",
+              "type": "code_modify",
+              "why": "Container servisinin image, port ve ortam degiskenlerini yapilandiriyoruz.",
+              "code": "redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'",
+              "file": "docker-compose.yml"
+            },
+            {
+              "order": "1.9d",
+              "action": "ALTTA DEVAM ET: volume ve healthcheck ekle",
+              "type": "code_modify",
+              "why": "Veri kaliciligini ve servis saglik kontrolunu yapilandiriyoruz.",
+              "code": "fraud-service:\n    build: ./fraud-detection\n    ports:\n      - '5000:5000'\n    depends_on:\n      - db\n\nvolumes:\n  pgdata:",
+              "file": "docker-compose.yml"
             },
             {
               "order": "1.10",
@@ -308,8 +341,26 @@
               "type": "code_add",
               "file": "prisma/schema.prisma",
               "position": "bottom",
-              "code": "\nenum Role {\n  CUSTOMER\n  ADMIN\n}\n\nenum OrderStatus {\n  PENDING\n  PAID\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n  REFUNDED\n}",
+              "code": "enum Role {\n  CUSTOMER\n  ADMIN\n}",
               "why": "Enum'lar veritabanında sadece belirlenmiş değerlerin kullanılmasını garanti eder. Önce enum'ları tanımlıyoruz çünkü model'ler bunlara referans verecek."
+            },
+            {
+              "order": "2.3b",
+              "action": "ALTTA DEVAM ET: enum degerlerini tanimla",
+              "type": "code_add",
+              "why": "Enum ile sadece gecerli degerlerin kullanilmasini garanti ediyoruz.",
+              "code": "enum OrderStatus {\n  PENDING\n  PAID\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n  REFUNDED",
+              "file": "prisma/schema.prisma",
+              "position": "bottom"
+            },
+            {
+              "order": "2.3c",
+              "action": "ALTTA DEVAM ET: model tanimini kapat",
+              "type": "code_add",
+              "why": "Model blogu kapatilarak Prisma'nin semayi dogru parse etmesi saglaniyor.",
+              "code": "}",
+              "file": "prisma/schema.prisma",
+              "position": "bottom"
             },
             {
               "order": "2.4",
@@ -317,8 +368,17 @@
               "type": "code_add",
               "file": "prisma/schema.prisma",
               "position": "bottom",
-              "code": "\nmodel User {\n  id        String   @id @default(cuid())\n  email     String   @unique\n  name      String\n  password  String\n  role      Role     @default(CUSTOMER)\n  address   String?\n  phone     String?\n  orders    Order[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"users\")\n}",
+              "code": "model User {\n  id        String   @id @default(cuid())\n  email     String   @unique\n  name      String\n  password  String\n  role      Role     @default(CUSTOMER)\n  address   String?\n  phone     String?",
               "why": "2.3'te tanımladığımız Role enum'unu burada kullanıyoruz. cuid() benzersiz ID üretir, @unique e-posta tekrarını önler. orders Order[] ilişkisi henüz Order modeli yok ama Prisma bunu sonra çözecek."
+            },
+            {
+              "order": "2.4b",
+              "action": "ALTTA DEVAM ET: index ve mapping tanimlarini ekle",
+              "type": "code_add",
+              "why": "Veritabani index'leri sorgu performansini artirirken, @@map ile tablo isimlerini belirliyoruz.",
+              "code": "orders    Order[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"users\")\n}",
+              "file": "prisma/schema.prisma",
+              "position": "bottom"
             },
             {
               "order": "2.5",
@@ -335,8 +395,26 @@
               "type": "code_add",
               "file": "prisma/schema.prisma",
               "position": "bottom",
-              "code": "\nmodel Product {\n  id           String      @id @default(cuid())\n  name         String\n  slug         String      @unique\n  description  String\n  price        Decimal     @db.Decimal(10, 2)\n  comparePrice Decimal?    @db.Decimal(10, 2)\n  stock        Int         @default(0)\n  images       String[]    @default([])\n  categoryId   String\n  category     Category    @relation(fields: [categoryId], references: [id])\n  isActive     Boolean     @default(true)\n  orderItems   OrderItem[]\n  createdAt    DateTime    @default(now())\n  updatedAt    DateTime    @updatedAt\n\n  @@index([categoryId])\n  @@index([price])\n  @@index([isActive, createdAt(sort: Desc)])\n  @@map(\"products\")\n}",
+              "code": "model Product {\n  id           String      @id @default(cuid())\n  name         String\n  slug         String      @unique\n  description  String\n  price        Decimal     @db.Decimal(10, 2)\n  comparePrice Decimal?    @db.Decimal(10, 2)\n  stock        Int         @default(0)",
               "why": "Decimal(10,2) ile para değerleri hassas saklanır — Float kullanırsan yuvarlama hataları oluşur. 2.5'te tanımladığımız Category ile @relation kuruyoruz. Index'ler sorgu performansını artırır."
+            },
+            {
+              "order": "2.6b",
+              "action": "ALTTA DEVAM ET: model alanlarini ve iliskileri tanimla",
+              "type": "code_add",
+              "why": "Modelin kalan alanlarini ve diger tablolarla iliskilerini tanimlayarak sema butunlugunu sagliyoruz.",
+              "code": "images       String[]    @default([])\n  categoryId   String\n  category     Category    @relation(fields: [categoryId], references: [id])\n  isActive     Boolean     @default(true)\n  orderItems   OrderItem[]\n  createdAt    DateTime    @default(now())\n  updatedAt    DateTime    @updatedAt",
+              "file": "prisma/schema.prisma",
+              "position": "bottom"
+            },
+            {
+              "order": "2.6c",
+              "action": "ALTTA DEVAM ET: index ve mapping tanimlarini ekle",
+              "type": "code_add",
+              "why": "Veritabani index'leri sorgu performansini artirirken, @@map ile tablo isimlerini belirliyoruz.",
+              "code": "@@index([categoryId])\n  @@index([price])\n  @@index([isActive, createdAt(sort: Desc)])\n  @@map(\"products\")\n}",
+              "file": "prisma/schema.prisma",
+              "position": "bottom"
             },
             {
               "order": "2.7",
@@ -344,8 +422,26 @@
               "type": "code_add",
               "file": "prisma/schema.prisma",
               "position": "bottom",
-              "code": "\nmodel Order {\n  id              String      @id @default(cuid())\n  userId          String\n  user            User        @relation(fields: [userId], references: [id])\n  status          OrderStatus @default(PENDING)\n  totalAmount     Decimal     @db.Decimal(10, 2)\n  shippingAddress String\n  stripeSessionId String?     @unique\n  stripePaymentId String?     @unique\n  fraudScore      Float?      @default(0)\n  items           OrderItem[]\n  createdAt       DateTime    @default(now())\n  updatedAt       DateTime    @updatedAt\n\n  @@index([userId])\n  @@index([status])\n  @@index([createdAt(sort: Desc)])\n  @@map(\"orders\")\n}",
+              "code": "model Order {\n  id              String      @id @default(cuid())\n  userId          String\n  user            User        @relation(fields: [userId], references: [id])\n  status          OrderStatus @default(PENDING)\n  totalAmount     Decimal     @db.Decimal(10, 2)\n  shippingAddress String\n  stripeSessionId String?     @unique",
               "why": "2.3'teki OrderStatus enum'unu burada kullanıyoruz. 2.4'teki User ile @relation kuruldu. stripeSessionId Stripe ödeme entegrasyonu için, fraudScore ML modeli için ileride kullanılacak."
+            },
+            {
+              "order": "2.7b",
+              "action": "ALTTA DEVAM ET: model alanlarini ekle",
+              "type": "code_add",
+              "why": "Modelin ek alanlarini tanimlayarak veri yapisini tamamliyoruz.",
+              "code": "stripePaymentId String?     @unique\n  fraudScore      Float?      @default(0)\n  items           OrderItem[]\n  createdAt       DateTime    @default(now())\n  updatedAt       DateTime    @updatedAt",
+              "file": "prisma/schema.prisma",
+              "position": "bottom"
+            },
+            {
+              "order": "2.7c",
+              "action": "ALTTA DEVAM ET: index ve mapping tanimlarini ekle",
+              "type": "code_add",
+              "why": "Veritabani index'leri sorgu performansini artirirken, @@map ile tablo isimlerini belirliyoruz.",
+              "code": "@@index([userId])\n  @@index([status])\n  @@index([createdAt(sort: Desc)])\n  @@map(\"orders\")\n}",
+              "file": "prisma/schema.prisma",
+              "position": "bottom"
             },
             {
               "order": "2.8",
@@ -353,8 +449,17 @@
               "type": "code_add",
               "file": "prisma/schema.prisma",
               "position": "bottom",
-              "code": "\nmodel OrderItem {\n  id        String  @id @default(cuid())\n  orderId   String\n  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)\n  productId String\n  product   Product @relation(fields: [productId], references: [id])\n  quantity  Int\n  unitPrice Decimal @db.Decimal(10, 2)\n\n  @@map(\"order_items\")\n}",
+              "code": "model OrderItem {\n  id        String  @id @default(cuid())\n  orderId   String\n  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)\n  productId String\n  product   Product @relation(fields: [productId], references: [id])\n  quantity  Int\n  unitPrice Decimal @db.Decimal(10, 2)",
               "why": "OrderItem, Order ve Product arasındaki many-to-many ilişkiyi modellerken unitPrice'ı da saklar. Ürün fiyatı değişse bile sipariş anındaki fiyat korunmalı. onDelete: Cascade ile sipariş silinirse kalemleri de silinir."
+            },
+            {
+              "order": "2.8b",
+              "action": "ALTTA DEVAM ET: index ve mapping tanimlarini ekle",
+              "type": "code_add",
+              "why": "Veritabani index'leri sorgu performansini artirirken, @@map ile tablo isimlerini belirliyoruz.",
+              "code": "@@map(\"order_items\")\n}",
+              "file": "prisma/schema.prisma",
+              "position": "bottom"
             },
             {
               "order": "2.9",
@@ -420,24 +525,123 @@
               "action": "Önce ProductService iskeletini yaz — boş sınıf",
               "type": "code_write",
               "file": "src/services/product.service.ts",
-              "code": "export class ProductService {\n  async getAll() {\n    // TODO: filtreleme ve pagination\n  }\n\n  async getBySlug(slug: string) {\n    // TODO\n  }\n\n  async create(data: any) {\n    // TODO\n  }\n}",
+              "code": "export class ProductService {\n  async getAll() {\n    // TODO: filtreleme ve pagination\n  }\n\n  async getBySlug(slug: string) {\n    // TODO\n  }",
               "why": "Senior developer önce sınıfın iskeletini yazar — hangi metodlar lazım, ne yapacaklar. Detayları sonra doldurur. Bu, zihinsel haritayı oluşturur."
+            },
+            {
+              "order": "3.2b",
+              "action": "ALTTA DEVAM ET: create fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "create fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "async create(data: any) {\n    // TODO\n  }\n}",
+              "file": "src/services/product.service.ts",
+              "position": "bottom"
             },
             {
               "order": "3.3",
               "action": "ÜSTE ÇIK: Prisma import'unu ekle — getAll'ı doldurmak için gerekli",
               "type": "code_write",
               "file": "src/services/product.service.ts",
-              "code": "import { PrismaClient, Prisma } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\ninterface ProductFilter {\n  categoryId?: string;\n  minPrice?: number;\n  maxPrice?: number;\n  search?: string;\n  isActive?: boolean;\n}\n\ninterface PaginationParams {\n  page: number;\n  limit: number;\n  sortBy: string;\n  sortOrder: 'asc' | 'desc';\n}",
+              "code": "import { PrismaClient, Prisma } from '@prisma/client';\n\nconst prisma = new PrismaClient();",
               "why": "3.2'de iskelet yazdık, şimdi gerçek implementasyon için Prisma'yı import ediyoruz. Interface'leri de burada tanımlıyoruz — TypeScript tip güvenliği sağlar."
+            },
+            {
+              "order": "3.3b",
+              "action": "ALTTA DEVAM ET: ProductFilter arayuzunu tanimla",
+              "type": "code_add",
+              "why": "TypeScript ProductFilter arayuzu ile parametrelerin tipini belirliyoruz — yanlis tip derlemede yakalanir.",
+              "code": "interface ProductFilter {\n  categoryId?: string;\n  minPrice?: number;\n  maxPrice?: number;\n  search?: string;\n  isActive?: boolean;\n}",
+              "file": "src/services/product.service.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.3c",
+              "action": "ALTTA DEVAM ET: PaginationParams arayuzunu tanimla",
+              "type": "code_add",
+              "why": "TypeScript PaginationParams arayuzu ile parametrelerin tipini belirliyoruz — yanlis tip derlemede yakalanir.",
+              "code": "interface PaginationParams {\n  page: number;\n  limit: number;\n  sortBy: string;\n  sortOrder: 'asc' | 'desc';\n}",
+              "file": "src/services/product.service.ts",
+              "position": "bottom"
             },
             {
               "order": "3.4",
               "action": "GERİ DÖN: getAll metodunu gerçek implementasyonla doldur",
               "type": "code_modify",
               "file": "src/services/product.service.ts",
-              "code": "export class ProductService {\n  async getAll(filter: ProductFilter, pagination: PaginationParams) {\n    const where: Prisma.ProductWhereInput = {\n      isActive: filter.isActive ?? true,\n    };\n\n    if (filter.categoryId) where.categoryId = filter.categoryId;\n    if (filter.minPrice || filter.maxPrice) {\n      where.price = {};\n      if (filter.minPrice) where.price.gte = filter.minPrice;\n      if (filter.maxPrice) where.price.lte = filter.maxPrice;\n    }\n    if (filter.search) {\n      where.OR = [\n        { name: { contains: filter.search, mode: 'insensitive' } },\n        { description: { contains: filter.search, mode: 'insensitive' } },\n      ];\n    }\n\n    const [products, total] = await Promise.all([\n      prisma.product.findMany({\n        where,\n        include: { category: { select: { name: true, slug: true } } },\n        orderBy: { [pagination.sortBy]: pagination.sortOrder },\n        skip: (pagination.page - 1) * pagination.limit,\n        take: pagination.limit,\n      }),\n      prisma.product.count({ where }),\n    ]);\n\n    return {\n      products,\n      meta: {\n        page: pagination.page,\n        limit: pagination.limit,\n        total,\n        totalPages: Math.ceil(total / pagination.limit),\n      },\n    };\n  }\n\n  async getBySlug(slug: string) {\n    return prisma.product.findUnique({\n      where: { slug },\n      include: { category: true },\n    });\n  }\n\n  async getById(id: string) {\n    return prisma.product.findUnique({\n      where: { id },\n      include: { category: true },\n    });\n  }\n\n  async create(data: Prisma.ProductCreateInput) {\n    return prisma.product.create({\n      data,\n      include: { category: true },\n    });\n  }\n\n  async updateStock(productId: string, quantity: number) {\n    return prisma.product.update({\n      where: { id: productId },\n      data: { stock: { decrement: quantity } },\n    });\n  }\n}",
+              "code": "export class ProductService {\n  async getAll(filter: ProductFilter, pagination: PaginationParams) {\n    const where: Prisma.ProductWhereInput = {\n      isActive: filter.isActive ?? true,\n    };",
               "why": "3.3'te import'ları ve tipleri tanımladık, şimdi metod gövdelerini dolduruyoruz. Promise.all ile ürün listesi ve toplam sayı paralel sorgulanır — sıralı sorgudan 2x hızlı. decrement ile atomik stok güncellemesi race condition önler."
+            },
+            {
+              "order": "3.4b",
+              "action": "ALTTA DEVAM ET: validasyon kontrolu ekle",
+              "type": "code_modify",
+              "why": "Giris verilerini kontrol ederek hatali durumda erken cikmak veritabanini korur.",
+              "code": "if (filter.categoryId) where.categoryId = filter.categoryId;\n    if (filter.minPrice || filter.maxPrice) {\n      where.price = {};\n      if (filter.minPrice) where.price.gte = filter.minPrice;\n      if (filter.maxPrice) where.price.lte = filter.maxPrice;\n    }",
+              "file": "src/services/product.service.ts"
+            },
+            {
+              "order": "3.4c",
+              "action": "ALTTA DEVAM ET: validasyon kontrolu ekle",
+              "type": "code_modify",
+              "why": "Giris verilerini kontrol ederek hatali durumda erken cikmak veritabanini korur.",
+              "code": "if (filter.search) {\n      where.OR = [\n        { name: { contains: filter.search, mode: 'insensitive' } },\n        { description: { contains: filter.search, mode: 'insensitive' } },\n      ];\n    }",
+              "file": "src/services/product.service.ts"
+            },
+            {
+              "order": "3.4d",
+              "action": "ALTTA DEVAM ET: paralel sorgulari calistir",
+              "type": "code_modify",
+              "why": "Promise.all ile birden fazla sorguyu paralel calistirarak performansi artiriyoruz.",
+              "code": "const [products, total] = await Promise.all([\n      prisma.product.findMany({\n        where,\n        include: { category: { select: { name: true, slug: true } } },\n        orderBy: { [pagination.sortBy]: pagination.sortOrder },\n        skip: (pagination.page - 1) * pagination.limit,\n        take: pagination.limit,\n      }),",
+              "file": "src/services/product.service.ts"
+            },
+            {
+              "order": "3.4e",
+              "action": "ALTTA DEVAM ET: count sorgusu ve Promise.all kapanisi",
+              "type": "code_modify",
+              "why": "Toplam kayit sayisini paralel sorguyla alarak pagination meta bilgisi icin hazirliyoruz.",
+              "code": "prisma.product.count({ where }),\n    ]);",
+              "file": "src/services/product.service.ts"
+            },
+            {
+              "order": "3.4f",
+              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "type": "code_modify",
+              "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
+              "code": "return {\n      products,\n      meta: {\n        page: pagination.page,\n        limit: pagination.limit,\n        total,\n        totalPages: Math.ceil(total / pagination.limit),\n      },",
+              "file": "src/services/product.service.ts"
+            },
+            {
+              "order": "3.4g",
+              "action": "ALTTA DEVAM ET: veritabani sorgusunu yaz",
+              "type": "code_modify",
+              "why": "Prisma ile veritabanindan veri cekerek istemciye donecek cevabi hazirliyoruz.",
+              "code": "};\n  }\n\n  async getBySlug(slug: string) {\n    return prisma.product.findUnique({\n      where: { slug },\n      include: { category: true },\n    });\n  }",
+              "file": "src/services/product.service.ts"
+            },
+            {
+              "order": "3.4h",
+              "action": "ALTTA DEVAM ET: getById fonksiyonunu yaz",
+              "type": "code_modify",
+              "why": "getById fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "async getById(id: string) {\n    return prisma.product.findUnique({\n      where: { id },\n      include: { category: true },\n    });\n  }",
+              "file": "src/services/product.service.ts"
+            },
+            {
+              "order": "3.4i",
+              "action": "ALTTA DEVAM ET: create fonksiyonunu yaz",
+              "type": "code_modify",
+              "why": "create fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "async create(data: Prisma.ProductCreateInput) {\n    return prisma.product.create({\n      data,\n      include: { category: true },\n    });\n  }",
+              "file": "src/services/product.service.ts"
+            },
+            {
+              "order": "3.4j",
+              "action": "ALTTA DEVAM ET: updateStock fonksiyonunu yaz",
+              "type": "code_modify",
+              "why": "updateStock fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "async updateStock(productId: string, quantity: number) {\n    return prisma.product.update({\n      where: { id: productId },\n      data: { stock: { decrement: quantity } },\n    });\n  }\n}",
+              "file": "src/services/product.service.ts"
             },
             {
               "order": "3.5",
@@ -451,8 +655,44 @@
               "action": "Controller iskeletini yaz — önce tek bir metod",
               "type": "code_write",
               "file": "src/controllers/product.controller.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport { ProductService } from '../services/product.service';\n\nconst productService = new ProductService();\n\nexport const getProducts = async (\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {\n  try {\n    const { categoryId, minPrice, maxPrice, search } = req.query;\n    const page = parseInt(req.query.page as string) || 1;\n    const limit = parseInt(req.query.limit as string) || 10;\n    const sortBy = (req.query.sortBy as string) || 'createdAt';\n    const sortOrder = (req.query.sortOrder as string) === 'asc' ? 'asc' : 'desc';\n\n    const result = await productService.getAll(\n      { categoryId: categoryId as string, minPrice: minPrice ? +minPrice : undefined, maxPrice: maxPrice ? +maxPrice : undefined, search: search as string },\n      { page, limit, sortBy, sortOrder }\n    );\n    res.json(result);\n  } catch (err) {\n    next(err);\n  }\n};",
+              "code": "import { Request, Response, NextFunction } from 'express';\nimport { ProductService } from '../services/product.service';\n\nconst productService = new ProductService();",
               "why": "3.1'de oluşturduğumuz ProductService'i import edip kullanıyoruz. Query parametrelerini parse edip service'e iletiyoruz. try-catch ile hata yönetimi — next(err) Express error handler'a yönlendirir."
+            },
+            {
+              "order": "3.6b",
+              "action": "ALTTA DEVAM ET: async fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "async fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export const getProducts = async (\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {\n  try {\n    const { categoryId, minPrice, maxPrice, search } = req.query;\n    const page = parseInt(req.query.page as string) || 1;",
+              "file": "src/controllers/product.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.6c",
+              "action": "ALTTA DEVAM ET: limit degerini hesapla",
+              "type": "code_add",
+              "why": "limit degerini hesaplayarak sonraki adimlarda kullanilmak uzere hazirliyoruz.",
+              "code": "const limit = parseInt(req.query.limit as string) || 10;\n    const sortBy = (req.query.sortBy as string) || 'createdAt';\n    const sortOrder = (req.query.sortOrder as string) === 'asc' ? 'asc' : 'desc';",
+              "file": "src/controllers/product.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.6d",
+              "action": "ALTTA DEVAM ET: asenkron islemi calistir",
+              "type": "code_add",
+              "why": "Veritabani veya harici servis cagrisinin sonucunu bekliyoruz.",
+              "code": "const result = await productService.getAll(\n      { categoryId: categoryId as string, minPrice: minPrice ? +minPrice : undefined, maxPrice: maxPrice ? +maxPrice : undefined, search: search as string },\n      { page, limit, sortBy, sortOrder }\n    );\n    res.json(result);\n  } catch (err) {\n    next(err);\n  }",
+              "file": "src/controllers/product.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.6e",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "};",
+              "file": "src/controllers/product.controller.ts",
+              "position": "bottom"
             },
             {
               "order": "3.7",
@@ -460,8 +700,26 @@
               "type": "code_add",
               "file": "src/controllers/product.controller.ts",
               "position": "bottom",
-              "code": "\nexport const getProductBySlug = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const product = await productService.getBySlug(req.params.slug);\n    if (!product) return res.status(404).json({ error: 'Ürün bulunamadı' });\n    res.json(product);\n  } catch (err) {\n    next(err);\n  }\n};\n\nexport const createProduct = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const product = await productService.create(req.body);\n    res.status(201).json(product);\n  } catch (err) {\n    next(err);\n  }\n};",
+              "code": "export const getProductBySlug = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const product = await productService.getBySlug(req.params.slug);\n    if (!product) return res.status(404).json({ error: 'Ürün bulunamadı' });\n    res.json(product);\n  } catch (err) {\n    next(err);\n  }",
               "why": "3.6'da tek metod yazdık, şimdi diğerlerini ekliyoruz. 404 kontrolü önemli — olmayan ürün sorgulanırsa anlamlı hata mesajı dönmeli. 201 status code yeni kayıt oluşturulduğunu belirtir."
+            },
+            {
+              "order": "3.7b",
+              "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
+              "type": "code_add",
+              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
+              "code": "};\n\nexport const createProduct = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const product = await productService.create(req.body);\n    res.status(201).json(product);\n  } catch (err) {\n    next(err);\n  }",
+              "file": "src/controllers/product.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.7c",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "};",
+              "file": "src/controllers/product.controller.ts",
+              "position": "bottom"
             },
             {
               "order": "3.8",
@@ -475,8 +733,17 @@
               "action": "Product route tanımlarını yaz",
               "type": "code_write",
               "file": "src/routes/product.routes.ts",
-              "code": "import { Router } from 'express';\nimport {\n  getProducts,\n  getProductBySlug,\n  createProduct,\n} from '../controllers/product.controller';\n\nconst router = Router();\n\nrouter.get('/', getProducts);\nrouter.get('/:slug', getProductBySlug);\nrouter.post('/', createProduct);\n\nexport default router;",
+              "code": "import { Router } from 'express';\nimport {\n  getProducts,\n  getProductBySlug,\n  createProduct,\n} from '../controllers/product.controller';\n\nconst router = Router();\n\nrouter.get('/', getProducts);",
               "why": "3.6-3.7'deki controller fonksiyonlarını import edip HTTP verb'lerine bağlıyoruz. GET / listeleme, GET /:slug detay, POST / oluşturma. RESTful API convention'ı."
+            },
+            {
+              "order": "3.9b",
+              "action": "ALTTA DEVAM ET: route endpoint'lerini tanimla",
+              "type": "code_add",
+              "why": "HTTP verb ve path'leri controller fonksiyonlarina bagliyoruz.",
+              "code": "router.get('/:slug', getProductBySlug);\nrouter.post('/', createProduct);\n\nexport default router;",
+              "file": "src/routes/product.routes.ts",
+              "position": "bottom"
             },
             {
               "order": "3.10",
@@ -490,8 +757,35 @@
               "action": "Seed script iskeletini yaz — önce kategori ve birkaç ürün",
               "type": "code_write",
               "file": "prisma/seed.ts",
-              "code": "import { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\nasync function main() {\n  const elektronik = await prisma.category.create({\n    data: { name: 'Elektronik', slug: 'elektronik' },\n  });\n\n  const giyim = await prisma.category.create({\n    data: { name: 'Giyim', slug: 'giyim' },\n  });\n\n  await prisma.product.createMany({\n    data: [\n      { name: 'iPhone 15', slug: 'iphone-15', description: 'Apple iPhone 15 128GB', price: 49999.99, stock: 50, categoryId: elektronik.id },\n      { name: 'MacBook Air M2', slug: 'macbook-air-m2', description: 'Apple MacBook Air M2 çip', price: 39999.99, stock: 30, categoryId: elektronik.id },\n      { name: 'Oversize Tişört', slug: 'oversize-tisort', description: 'Pamuklu oversize tişört', price: 299.99, stock: 200, categoryId: giyim.id },\n    ],\n  });\n\n  console.log('Seed tamamlandı!');\n}\n\nmain()\n  .catch(console.error)\n  .finally(() => prisma.$disconnect());",
+              "code": "import { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\nasync function main() {\n  const elektronik = await prisma.category.create({\n    data: { name: 'Elektronik', slug: 'elektronik' },\n  });",
               "why": "Gerçekçi test verisi — Türkçe ürün isimleri, mantıklı fiyatlar, kategori ilişkisi. createMany ile toplu ekleme tek sorguda yapılır."
+            },
+            {
+              "order": "3.11b",
+              "action": "ALTTA DEVAM ET: veritabaninda kayit olustur",
+              "type": "code_add",
+              "why": "Prisma ile veritabaninda yeni kayit olusturarak veriyi kalici yapiyoruz.",
+              "code": "const giyim = await prisma.category.create({\n    data: { name: 'Giyim', slug: 'giyim' },\n  });",
+              "file": "prisma/seed.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.11c",
+              "action": "ALTTA DEVAM ET: veritabaninda kayit olustur",
+              "type": "code_add",
+              "why": "Prisma ile veritabaninda yeni kayit olusturarak veriyi kalici yapiyoruz.",
+              "code": "await prisma.product.createMany({\n    data: [\n      { name: 'iPhone 15', slug: 'iphone-15', description: 'Apple iPhone 15 128GB', price: 49999.99, stock: 50, categoryId: elektronik.id },\n      { name: 'MacBook Air M2', slug: 'macbook-air-m2', description: 'Apple MacBook Air M2 çip', price: 39999.99, stock: 30, categoryId: elektronik.id },\n      { name: 'Oversize Tişört', slug: 'oversize-tisort', description: 'Pamuklu oversize tişört', price: 299.99, stock: 200, categoryId: giyim.id },\n    ],\n  });",
+              "file": "prisma/seed.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.11d",
+              "action": "ALTTA DEVAM ET: seed scriptini tamamla",
+              "type": "code_add",
+              "why": "Seed scriptinin calistirma ve hata yonetimi bolumunu ekliyoruz.",
+              "code": "console.log('Seed tamamlandı!');\n}\n\nmain()\n  .catch(console.error)\n  .finally(() => prisma.$disconnect());",
+              "file": "prisma/seed.ts",
+              "position": "bottom"
             },
             {
               "order": "3.12",
@@ -782,8 +1076,26 @@
               "type": "code_add",
               "file": "src/middleware/error-handler.ts",
               "position": "bottom",
-              "code": "\nimport { Request, Response, NextFunction } from 'express';\n\nexport const errorHandler = (\n  err: Error,\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {\n  if (err instanceof AppError) {\n    return res.status(err.statusCode).json({ error: err.message });\n  }\n  console.error(err);\n  res.status(500).json({ error: 'Sunucu hatası' });\n};",
+              "code": "import { Request, Response, NextFunction } from 'express';",
               "why": "5.2'deki AppError instance'ı ise status code'unu kullanır, değilse 500 döner. Express'te 4 parametre alan middleware otomatik olarak error handler olarak tanınır."
+            },
+            {
+              "order": "5.3b",
+              "action": "ALTTA DEVAM ET: export tanimini yaz",
+              "type": "code_add",
+              "why": "Modulu disariya acarak diger dosyalardan erisime izin veriyoruz.",
+              "code": "export const errorHandler = (\n  err: Error,\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {\n  if (err instanceof AppError) {\n    return res.status(err.statusCode).json({ error: err.message });",
+              "file": "src/middleware/error-handler.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.3c",
+              "action": "ALTTA DEVAM ET: error handler kapanisi",
+              "type": "code_add",
+              "why": "Hata yonetimi middleware'inin blok kapanisini tamamliyoruz.",
+              "code": "}\n  console.error(err);\n  res.status(500).json({ error: 'Sunucu hatası' });\n};",
+              "file": "src/middleware/error-handler.ts",
+              "position": "bottom"
             },
             {
               "order": "5.4",
@@ -797,8 +1109,44 @@
               "action": "Auth middleware iskeletini yaz — önce token çıkarma",
               "type": "code_write",
               "file": "src/middleware/auth.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport jwt from 'jsonwebtoken';\nimport { AppError } from './error-handler';\n\nexport const authenticate = (\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {\n  const authHeader = req.headers.authorization;\n  if (!authHeader?.startsWith('Bearer ')) {\n    throw new AppError('Token gerekli', 401);\n  }\n\n  const token = authHeader.split(' ')[1];\n  try {\n    const decoded = jwt.verify(token, process.env.JWT_SECRET!);\n    (req as any).user = decoded;\n    next();\n  } catch {\n    throw new AppError('Geçersiz token', 401);\n  }\n};",
+              "code": "import { Request, Response, NextFunction } from 'express';\nimport jwt from 'jsonwebtoken';\nimport { AppError } from './error-handler';",
               "why": "5.2'deki AppError'ü import edip kullanıyoruz — yetkisiz erişimde 401 fırlatır. Bearer token pattern'ı: Authorization header'dan token çıkarılır, jwt.verify ile doğrulanır, decoded bilgi req.user'a eklenir."
+            },
+            {
+              "order": "5.5b",
+              "action": "ALTTA DEVAM ET: authenticate degerini hesapla",
+              "type": "code_add",
+              "why": "authenticate degerini hesaplayarak sonraki adimlarda kullanilmak uzere hazirliyoruz.",
+              "code": "export const authenticate = (\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {\n  const authHeader = req.headers.authorization;\n  if (!authHeader?.startsWith('Bearer ')) {\n    throw new AppError('Token gerekli', 401);",
+              "file": "src/middleware/auth.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.5c",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "}",
+              "file": "src/middleware/auth.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.5d",
+              "action": "ALTTA DEVAM ET: test senaryosunu tanimla",
+              "type": "code_add",
+              "why": "Her test case izole bir senaryoyu dogrulayarak regresyonu onler.",
+              "code": "const token = authHeader.split(' ')[1];\n  try {\n    const decoded = jwt.verify(token, process.env.JWT_SECRET!);\n    (req as any).user = decoded;\n    next();\n  } catch {\n    throw new AppError('Geçersiz token', 401);\n  }",
+              "file": "src/middleware/auth.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.5e",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "};",
+              "file": "src/middleware/auth.ts",
+              "position": "bottom"
             },
             {
               "order": "5.6",
@@ -812,8 +1160,17 @@
               "action": "Role-based authorization middleware'ini yaz",
               "type": "code_write",
               "file": "src/middleware/authorize.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport { AppError } from './error-handler';\n\nexport const authorize = (...roles: string[]) => {\n  return (req: Request, res: Response, next: NextFunction) => {\n    const userRole = (req as any).user?.role;\n    if (!roles.includes(userRole)) {\n      throw new AppError('Bu işlem için yetkiniz yok', 403);\n    }\n    next();\n  };\n};",
+              "code": "import { Request, Response, NextFunction } from 'express';\nimport { AppError } from './error-handler';\n\nexport const authorize = (...roles: string[]) => {\n  return (req: Request, res: Response, next: NextFunction) => {\n    const userRole = (req as any).user?.role;\n    if (!roles.includes(userRole)) {\n      throw new AppError('Bu işlem için yetkiniz yok', 403);\n    }",
               "why": "Higher-order function pattern — authorize('ADMIN') çağrısı bir middleware döndürür. 5.5'teki authenticate'den sonra çalışır ve req.user.role'ü kontrol eder. 403 Forbidden yetki hatası."
+            },
+            {
+              "order": "5.7b",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "next();\n  };\n};",
+              "file": "src/middleware/authorize.ts",
+              "position": "bottom"
             },
             {
               "order": "5.8",
@@ -827,8 +1184,26 @@
               "action": "AuthService iskeletini yaz — register metodu",
               "type": "code_write",
               "file": "src/services/auth.service.ts",
-              "code": "import { PrismaClient } from '@prisma/client';\nimport bcrypt from 'bcrypt';\nimport jwt from 'jsonwebtoken';\n\nconst prisma = new PrismaClient();\n\nexport class AuthService {\n  async register(email: string, name: string, password: string) {\n    const existing = await prisma.user.findUnique({ where: { email } });\n    if (existing) throw new Error('Bu e-posta zaten kayıtlı');\n\n    const hashedPassword = await bcrypt.hash(password, 10);\n    const user = await prisma.user.create({\n      data: { email, name, password: hashedPassword },\n    });\n\n    const token = jwt.sign(\n      { id: user.id, email: user.email, role: user.role },\n      process.env.JWT_SECRET!,\n      { expiresIn: '7d' }\n    );\n    return { user: { id: user.id, email, name, role: user.role }, token };\n  }\n}",
+              "code": "import { PrismaClient } from '@prisma/client';\nimport bcrypt from 'bcrypt';\nimport jwt from 'jsonwebtoken';\n\nconst prisma = new PrismaClient();\n\nexport class AuthService {\n  async register(email: string, name: string, password: string) {\n    const existing = await prisma.user.findUnique({ where: { email } });\n    if (existing) throw new Error('Bu e-posta zaten kayıtlı');",
               "why": "bcrypt.hash ile şifre güvenli şekilde hashlenir — düz metin saklanmaz. JWT token'a kullanıcı bilgileri gömülür. 5.5'teki middleware bu token'ı doğrulayacak."
+            },
+            {
+              "order": "5.9b",
+              "action": "ALTTA DEVAM ET: veritabaninda kayit olustur",
+              "type": "code_add",
+              "why": "Prisma ile veritabaninda yeni kayit olusturarak veriyi kalici yapiyoruz.",
+              "code": "const hashedPassword = await bcrypt.hash(password, 10);\n    const user = await prisma.user.create({\n      data: { email, name, password: hashedPassword },\n    });",
+              "file": "src/services/auth.service.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.9c",
+              "action": "ALTTA DEVAM ET: token degerini hesapla",
+              "type": "code_add",
+              "why": "token degerini hesaplayarak sonraki adimlarda kullanilmak uzere hazirliyoruz.",
+              "code": "const token = jwt.sign(\n      { id: user.id, email: user.email, role: user.role },\n      process.env.JWT_SECRET!,\n      { expiresIn: '7d' }\n    );\n    return { user: { id: user.id, email, name, role: user.role }, token };\n  }\n}",
+              "file": "src/services/auth.service.ts",
+              "position": "bottom"
             },
             {
               "order": "5.10",
@@ -836,8 +1211,17 @@
               "type": "code_add",
               "file": "src/services/auth.service.ts",
               "position": "bottom",
-              "code": "\n// AuthService sınıfına login metodunu ekle:\n//  async login(email: string, password: string) {\n//    const user = await prisma.user.findUnique({ where: { email } });\n//    if (!user) throw new Error('E-posta veya şifre hatalı');\n//    const isValid = await bcrypt.compare(password, user.password);\n//    if (!isValid) throw new Error('E-posta veya şifre hatalı');\n//    const token = jwt.sign(\n//      { id: user.id, email: user.email, role: user.role },\n//      process.env.JWT_SECRET!,\n//      { expiresIn: '7d' }\n//    );\n//    return { user: { id: user.id, email: user.email, name: user.name, role: user.role }, token };\n//  }",
+              "code": "// AuthService sınıfına login metodunu ekle:\n//  async login(email: string, password: string) {\n//    const user = await prisma.user.findUnique({ where: { email } });\n//    if (!user) throw new Error('E-posta veya şifre hatalı');\n//    const isValid = await bcrypt.compare(password, user.password);\n//    if (!isValid) throw new Error('E-posta veya şifre hatalı');\n//    const token = jwt.sign(\n//      { id: user.id, email: user.email, role: user.role },",
               "why": "Login'de aynı hata mesajı ('E-posta veya şifre hatalı') kullanıyoruz — saldırganın hangi alanın yanlış olduğunu anlamasını engeller. bcrypt.compare ile hash karşılaştırması yapılır."
+            },
+            {
+              "order": "5.10b",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_add",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "//      process.env.JWT_SECRET!,\n//      { expiresIn: '7d' }\n//    );\n//    return { user: { id: user.id, email: user.email, name: user.name, role: user.role }, token };\n//  }",
+              "file": "src/services/auth.service.ts",
+              "position": "bottom"
             },
             {
               "order": "5.11",
@@ -851,16 +1235,79 @@
               "action": "Auth route'larını ve controller'ı yaz",
               "type": "code_write",
               "file": "src/routes/auth.routes.ts",
-              "code": "import { Router, Request, Response, NextFunction } from 'express';\nimport { AuthService } from '../services/auth.service';\n\nconst router = Router();\nconst authService = new AuthService();\n\nrouter.post('/register', async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const { email, name, password } = req.body;\n    const result = await authService.register(email, name, password);\n    res.status(201).json(result);\n  } catch (err) {\n    next(err);\n  }\n});\n\nrouter.post('/login', async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const { email, password } = req.body;\n    const result = await authService.login(email, password);\n    res.json(result);\n  } catch (err) {\n    next(err);\n  }\n});\n\nexport default router;",
+              "code": "import { Router, Request, Response, NextFunction } from 'express';\nimport { AuthService } from '../services/auth.service';\n\nconst router = Router();\nconst authService = new AuthService();",
               "why": "Basit route'larda controller ayrı dosya gerektirmez — inline handler yeterli. POST /register ve POST /login endpoint'leri 5.9-5.10'daki service metodlarını çağırır."
+            },
+            {
+              "order": "5.12b",
+              "action": "ALTTA DEVAM ET: route endpoint'lerini tanimla",
+              "type": "code_add",
+              "why": "HTTP verb ve path'leri controller fonksiyonlarina bagliyoruz.",
+              "code": "router.post('/register', async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const { email, name, password } = req.body;\n    const result = await authService.register(email, name, password);\n    res.status(201).json(result);\n  } catch (err) {\n    next(err);\n  }",
+              "file": "src/routes/auth.routes.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.12c",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "});",
+              "file": "src/routes/auth.routes.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.12d",
+              "action": "ALTTA DEVAM ET: route endpoint'lerini tanimla",
+              "type": "code_add",
+              "why": "HTTP verb ve path'leri controller fonksiyonlarina bagliyoruz.",
+              "code": "router.post('/login', async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const { email, password } = req.body;\n    const result = await authService.login(email, password);\n    res.json(result);\n  } catch (err) {\n    next(err);\n  }",
+              "file": "src/routes/auth.routes.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.12e",
+              "action": "ALTTA DEVAM ET: route handler kapanisi",
+              "type": "code_add",
+              "why": "Route handler'in try-catch ve yanit islemini tamamliyoruz.",
+              "code": "});\n\nexport default router;",
+              "file": "src/routes/auth.routes.ts",
+              "position": "bottom"
             },
             {
               "order": "5.13",
               "action": "BAŞKA DOSYAYA GEÇ: src/app.ts — tüm route'ları birleştir",
               "type": "code_write",
               "file": "src/app.ts",
-              "code": "import express from 'express';\nimport cors from 'cors';\nimport helmet from 'helmet';\nimport morgan from 'morgan';\nimport { errorHandler } from './middleware/error-handler';\nimport { authenticate } from './middleware/auth';\nimport productRoutes from './routes/product.routes';\nimport cartRoutes from './routes/cart.routes';\nimport authRoutes from './routes/auth.routes';\n\nconst app = express();\n\napp.use(cors());\napp.use(helmet());\napp.use(morgan('dev'));\napp.use(express.json());\n\n// Public routes\napp.use('/api/auth', authRoutes);\napp.use('/api/products', productRoutes);\n\n// Protected routes\napp.use('/api/cart', authenticate, cartRoutes);\n\napp.use(errorHandler);\n\nconst PORT = process.env.PORT || 3001;\napp.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));\n\nexport default app;",
+              "code": "import express from 'express';\nimport cors from 'cors';\nimport helmet from 'helmet';\nimport morgan from 'morgan';\nimport { errorHandler } from './middleware/error-handler';\nimport { authenticate } from './middleware/auth';\nimport productRoutes from './routes/product.routes';\nimport cartRoutes from './routes/cart.routes';",
               "why": "Tüm parçaları birleştiriyoruz: 3.9'daki product route'ları, 4.10'daki cart route'ları, 5.12'deki auth route'ları. Cart route'ları authenticate middleware ile korunuyor (5.5). errorHandler en sonda (5.3)."
+            },
+            {
+              "order": "5.13b",
+              "action": "ALTTA DEVAM ET: import ve sabitleri tanimla",
+              "type": "code_add",
+              "why": "Dosyanin basinda gerekli modulleri import ediyoruz. Her modul belirli bir islev saglar.",
+              "code": "import authRoutes from './routes/auth.routes';\n\nconst app = express();\n\napp.use(cors());\napp.use(helmet());\napp.use(morgan('dev'));\napp.use(express.json());",
+              "file": "src/app.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.13c",
+              "action": "ALTTA DEVAM ET: Express uygulamasini yapilandir",
+              "type": "code_add",
+              "why": "Middleware ve route'lari Express uygulamasina bagleyerek sunucuyu hazirliyoruz.",
+              "code": "// Public routes\napp.use('/api/auth', authRoutes);\napp.use('/api/products', productRoutes);\n\n// Protected routes\napp.use('/api/cart', authenticate, cartRoutes);\n\napp.use(errorHandler);\n\nconst PORT = process.env.PORT || 3001;\napp.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));",
+              "file": "src/app.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.13d",
+              "action": "ALTTA DEVAM ET: export tanimini yaz",
+              "type": "code_add",
+              "why": "Modulu disariya acarak diger dosyalardan erisime izin veriyoruz.",
+              "code": "export default app;",
+              "file": "src/app.ts",
+              "position": "bottom"
             },
             {
               "order": "5.14",
@@ -957,8 +1404,32 @@
               "action": "GERİ DÖN: createCheckoutSession metodunu doldur",
               "type": "code_modify",
               "file": "src/services/payment.service.ts",
-              "code": "export class PaymentService {\n  async createCheckoutSession(\n    orderId: string,\n    items: { name: string; price: number; quantity: number }[],\n    customerEmail: string\n  ) {\n    const lineItems = items.map((item) => ({\n      price_data: {\n        currency: 'try',\n        product_data: { name: item.name },\n        unit_amount: Math.round(item.price * 100),\n      },\n      quantity: item.quantity,\n    }));\n\n    const session = await stripe.checkout.sessions.create({\n      mode: 'payment',\n      customer_email: customerEmail,\n      line_items: lineItems,\n      success_url: `${CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,\n      cancel_url: `${CLIENT_URL}/cancel`,\n      metadata: { orderId },\n    });\n\n    return { sessionId: session.id, url: session.url };\n  }\n}",
+              "code": "export class PaymentService {\n  async createCheckoutSession(\n    orderId: string,\n    items: { name: string; price: number; quantity: number }[],\n    customerEmail: string\n  ) {\n    const lineItems = items.map((item) => ({\n      price_data: {",
               "why": "1.5'te Stripe client'ını başlattık, şimdi Checkout Session oluşturuyoruz. unit_amount kuruş cinsinden — 49999.99 TL = 4999999 kuruş. metadata.orderId ile ödeme tamamlanınca hangi siparişe ait olduğunu bulacağız."
+            },
+            {
+              "order": "1.6b",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_modify",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "currency: 'try',\n        product_data: { name: item.name },\n        unit_amount: Math.round(item.price * 100),\n      },\n      quantity: item.quantity,\n    }));",
+              "file": "src/services/payment.service.ts"
+            },
+            {
+              "order": "1.6c",
+              "action": "ALTTA DEVAM ET: asenkron islemi calistir",
+              "type": "code_modify",
+              "why": "Veritabani veya harici servis cagrisinin sonucunu bekliyoruz.",
+              "code": "const session = await stripe.checkout.sessions.create({\n      mode: 'payment',\n      customer_email: customerEmail,\n      line_items: lineItems,\n      success_url: `${CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,\n      cancel_url: `${CLIENT_URL}/cancel`,\n      metadata: { orderId },\n    });",
+              "file": "src/services/payment.service.ts"
+            },
+            {
+              "order": "1.6d",
+              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "type": "code_modify",
+              "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
+              "code": "return { sessionId: session.id, url: session.url };\n  }\n}",
+              "file": "src/services/payment.service.ts"
             },
             {
               "order": "1.7",
@@ -972,8 +1443,35 @@
               "action": "Payment controller'ı yaz",
               "type": "code_write",
               "file": "src/controllers/payment.controller.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport { PaymentService } from '../services/payment.service';\n\nconst paymentService = new PaymentService();\n\nexport const createCheckout = async (\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {\n  try {\n    const { orderId, items, email } = req.body;\n    const session = await paymentService.createCheckoutSession(\n      orderId,\n      items,\n      email\n    );\n    res.json(session);\n  } catch (err) {\n    next(err);\n  }\n};",
+              "code": "import { Request, Response, NextFunction } from 'express';\nimport { PaymentService } from '../services/payment.service';\n\nconst paymentService = new PaymentService();",
               "why": "1.6'daki PaymentService'i import edip kullanıyoruz. Request body'den orderId, items ve email alınır. Stripe session URL'i frontend'e döndürülür — kullanıcı bu URL'ye yönlendirilir."
+            },
+            {
+              "order": "1.8b",
+              "action": "ALTTA DEVAM ET: async fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "async fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export const createCheckout = async (\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {\n  try {\n    const { orderId, items, email } = req.body;\n    const session = await paymentService.createCheckoutSession(",
+              "file": "src/controllers/payment.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "1.8c",
+              "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
+              "type": "code_add",
+              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
+              "code": "orderId,\n      items,\n      email\n    );\n    res.json(session);\n  } catch (err) {\n    next(err);\n  }",
+              "file": "src/controllers/payment.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "1.8d",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "};",
+              "file": "src/controllers/payment.controller.ts",
+              "position": "bottom"
             },
             {
               "order": "1.9",
@@ -1055,16 +1553,82 @@
               "action": "Webhook handler iskeletini yaz — önce signature doğrulama",
               "type": "code_write",
               "file": "src/controllers/webhook.controller.ts",
-              "code": "import { Request, Response } from 'express';\nimport Stripe from 'stripe';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {\n  apiVersion: '2024-04-10',\n});\n\nexport const handleWebhook = async (req: Request, res: Response) => {\n  const sig = req.headers['stripe-signature'] as string;\n  let event: Stripe.Event;\n\n  try {\n    event = stripe.webhooks.constructEvent(\n      req.body,\n      sig,\n      process.env.STRIPE_WEBHOOK_SECRET!\n    );\n  } catch (err: any) {\n    console.error('Webhook signature doğrulama hatası:', err.message);\n    return res.status(400).send(`Webhook Error: ${err.message}`);\n  }\n\n  res.json({ received: true });\n};",
+              "code": "import { Request, Response } from 'express';\nimport Stripe from 'stripe';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {\n  apiVersion: '2024-04-10',\n});\n\nexport const handleWebhook = async (req: Request, res: Response) => {\n  const sig = req.headers['stripe-signature'] as string;\n  let event: Stripe.Event;",
               "why": "Webhook güvenliği kritik — signature doğrulama olmadan herkes sahte webhook gönderebilir. constructEvent, Stripe'ın imzasını doğrular. req.body raw olmalı (JSON parse edilmemiş), bunu app.ts'te ayarlayacağız."
+            },
+            {
+              "order": "2.2b",
+              "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
+              "type": "code_add",
+              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
+              "code": "try {\n    event = stripe.webhooks.constructEvent(\n      req.body,\n      sig,\n      process.env.STRIPE_WEBHOOK_SECRET!\n    );\n  } catch (err: any) {\n    console.error('Webhook signature doğrulama hatası:', err.message);",
+              "file": "src/controllers/webhook.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "2.2c",
+              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "type": "code_add",
+              "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
+              "code": "return res.status(400).send(`Webhook Error: ${err.message}`);\n  }\n\n  res.json({ received: true });\n};",
+              "file": "src/controllers/webhook.controller.ts",
+              "position": "bottom"
             },
             {
               "order": "2.3",
               "action": "GERİ DÖN: Event tipine göre işleme ekle — switch bloğu",
               "type": "code_modify",
               "file": "src/controllers/webhook.controller.ts",
-              "code": "import { Request, Response } from 'express';\nimport Stripe from 'stripe';\nimport { PrismaClient } from '@prisma/client';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {\n  apiVersion: '2024-04-10',\n});\nconst prisma = new PrismaClient();\n\nexport const handleWebhook = async (req: Request, res: Response) => {\n  const sig = req.headers['stripe-signature'] as string;\n  let event: Stripe.Event;\n\n  try {\n    event = stripe.webhooks.constructEvent(\n      req.body,\n      sig,\n      process.env.STRIPE_WEBHOOK_SECRET!\n    );\n  } catch (err: any) {\n    console.error('Webhook signature hatası:', err.message);\n    return res.status(400).send(`Webhook Error: ${err.message}`);\n  }\n\n  switch (event.type) {\n    case 'checkout.session.completed': {\n      const session = event.data.object as Stripe.Checkout.Session;\n      const orderId = session.metadata?.orderId;\n      if (orderId) {\n        await prisma.order.update({\n          where: { id: orderId },\n          data: {\n            status: 'PAID',\n            stripeSessionId: session.id,\n            stripePaymentId: session.payment_intent as string,\n          },\n        });\n        console.log(`Sipariş ${orderId} ödendi!`);\n      }\n      break;\n    }\n    case 'payment_intent.payment_failed': {\n      const intent = event.data.object as Stripe.PaymentIntent;\n      console.error('Ödeme başarısız:', intent.id);\n      break;\n    }\n  }\n\n  res.json({ received: true });\n};",
+              "code": "import { Request, Response } from 'express';\nimport Stripe from 'stripe';\nimport { PrismaClient } from '@prisma/client';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {\n  apiVersion: '2024-04-10',\n});\nconst prisma = new PrismaClient();",
               "why": "2.2'de signature doğruladık, şimdi event tipine göre işleme ekliyoruz. checkout.session.completed geldiğinde Milestone 0'da tanımladığımız Order tablosunun status'ünü PAID yapıyoruz. metadata.orderId ile doğru siparişi buluyoruz."
+            },
+            {
+              "order": "2.3b",
+              "action": "ALTTA DEVAM ET: async fonksiyonunu yaz",
+              "type": "code_modify",
+              "why": "async fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export const handleWebhook = async (req: Request, res: Response) => {\n  const sig = req.headers['stripe-signature'] as string;\n  let event: Stripe.Event;",
+              "file": "src/controllers/webhook.controller.ts"
+            },
+            {
+              "order": "2.3c",
+              "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
+              "type": "code_modify",
+              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
+              "code": "try {\n    event = stripe.webhooks.constructEvent(\n      req.body,\n      sig,\n      process.env.STRIPE_WEBHOOK_SECRET!\n    );\n  } catch (err: any) {\n    console.error('Webhook signature hatası:', err.message);",
+              "file": "src/controllers/webhook.controller.ts"
+            },
+            {
+              "order": "2.3d",
+              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "type": "code_modify",
+              "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
+              "code": "return res.status(400).send(`Webhook Error: ${err.message}`);\n  }\n\n  switch (event.type) {",
+              "file": "src/controllers/webhook.controller.ts"
+            },
+            {
+              "order": "2.3e",
+              "action": "ALTTA DEVAM ET: event handler case'lerini yaz",
+              "type": "code_modify",
+              "why": "Her event tipi icin ayri islem mantigi tanimlayarak dogru akisi sagliyoruz.",
+              "code": "case 'checkout.session.completed': {\n      const session = event.data.object as Stripe.Checkout.Session;\n      const orderId = session.metadata?.orderId;\n      if (orderId) {\n        await prisma.order.update({\n          where: { id: orderId },\n          data: {\n            status: 'PAID',",
+              "file": "src/controllers/webhook.controller.ts"
+            },
+            {
+              "order": "2.3f",
+              "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
+              "type": "code_modify",
+              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
+              "code": "stripeSessionId: session.id,\n            stripePaymentId: session.payment_intent as string,\n          },\n        });\n        console.log(`Sipariş ${orderId} ödendi!`);\n      }\n      break;\n    }",
+              "file": "src/controllers/webhook.controller.ts"
+            },
+            {
+              "order": "2.3g",
+              "action": "ALTTA DEVAM ET: event handler case'lerini yaz",
+              "type": "code_modify",
+              "why": "Her event tipi icin ayri islem mantigi tanimlayarak dogru akisi sagliyoruz.",
+              "code": "case 'payment_intent.payment_failed': {\n      const intent = event.data.object as Stripe.PaymentIntent;\n      console.error('Ödeme başarısız:', intent.id);\n      break;\n    }\n  }\n\n  res.json({ received: true });\n};",
+              "file": "src/controllers/webhook.controller.ts"
             },
             {
               "order": "2.4",
@@ -1178,8 +1742,26 @@
               "action": "OrderService iskeletini yaz — state machine mantığı",
               "type": "code_write",
               "file": "src/services/order.service.ts",
-              "code": "import { PrismaClient, OrderStatus } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\n// Geçerli durum geçişleri\nconst VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {\n  PENDING: ['PAID', 'CANCELLED'],\n  PAID: ['PROCESSING', 'REFUNDED'],\n  PROCESSING: ['SHIPPED'],\n  SHIPPED: ['DELIVERED'],\n  DELIVERED: [],\n  CANCELLED: [],\n  REFUNDED: [],\n};",
+              "code": "import { PrismaClient, OrderStatus } from '@prisma/client';\n\nconst prisma = new PrismaClient();",
               "why": "State machine pattern'ı — her durumdan hangi durumlara geçilebileceği tanımlanır. PENDING -> DELIVERED direkt geçiş yapılamaz, sırayla gitmeli. Bu, sipariş akışını güvence altına alır."
+            },
+            {
+              "order": "3.2b",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_add",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "// Geçerli durum geçişleri\nconst VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {\n  PENDING: ['PAID', 'CANCELLED'],\n  PAID: ['PROCESSING', 'REFUNDED'],\n  PROCESSING: ['SHIPPED'],\n  SHIPPED: ['DELIVERED'],\n  DELIVERED: [],\n  CANCELLED: [],",
+              "file": "src/services/order.service.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.2c",
+              "action": "ALTTA DEVAM ET: service metodunu kapat",
+              "type": "code_add",
+              "why": "Metodun blok kapanisini yazarak fonksiyonu tamamliyoruz.",
+              "code": "REFUNDED: [],\n};",
+              "file": "src/services/order.service.ts",
+              "position": "bottom"
             },
             {
               "order": "3.3",
@@ -1187,8 +1769,53 @@
               "type": "code_add",
               "file": "src/services/order.service.ts",
               "position": "bottom",
-              "code": "\nexport class OrderService {\n  async getUserOrders(userId: string) {\n    return prisma.order.findMany({\n      where: { userId },\n      include: { items: { include: { product: true } } },\n      orderBy: { createdAt: 'desc' },\n    });\n  }\n\n  async getOrderById(orderId: string, userId: string) {\n    const order = await prisma.order.findUnique({\n      where: { id: orderId },\n      include: { items: { include: { product: true } } },\n    });\n    if (!order || order.userId !== userId) return null;\n    return order;\n  }\n\n  async updateStatus(orderId: string, newStatus: OrderStatus) {\n    const order = await prisma.order.findUnique({ where: { id: orderId } });\n    if (!order) throw new Error('Sipariş bulunamadı');\n\n    const allowed = VALID_TRANSITIONS[order.status];\n    if (!allowed.includes(newStatus)) {\n      throw new Error(`${order.status} -> ${newStatus} geçişi geçersiz`);\n    }\n\n    return prisma.order.update({\n      where: { id: orderId },\n      data: { status: newStatus },\n    });\n  }\n\n  async getAllOrders(status?: OrderStatus) {\n    const where = status ? { status } : {};\n    return prisma.order.findMany({\n      where,\n      include: { user: { select: { email: true, name: true } }, items: true },\n      orderBy: { createdAt: 'desc' },\n    });\n  }\n}",
+              "code": "export class OrderService {\n  async getUserOrders(userId: string) {\n    return prisma.order.findMany({\n      where: { userId },\n      include: { items: { include: { product: true } } },\n      orderBy: { createdAt: 'desc' },\n    });\n  }",
               "why": "getOrderById'da IDOR koruması var — order.userId !== userId kontrolü, kullanıcının başkasının siparişini görmesini engeller. updateStatus'ta 3.2'deki state machine kullanılıyor — geçersiz geçiş engelleniyor."
+            },
+            {
+              "order": "3.3b",
+              "action": "ALTTA DEVAM ET: getOrderById fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "getOrderById fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "async getOrderById(orderId: string, userId: string) {\n    const order = await prisma.order.findUnique({\n      where: { id: orderId },\n      include: { items: { include: { product: true } } },\n    });\n    if (!order || order.userId !== userId) return null;\n    return order;\n  }",
+              "file": "src/services/order.service.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.3c",
+              "action": "ALTTA DEVAM ET: updateStatus fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "updateStatus fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "async updateStatus(orderId: string, newStatus: OrderStatus) {\n    const order = await prisma.order.findUnique({ where: { id: orderId } });\n    if (!order) throw new Error('Sipariş bulunamadı');\n\n    const allowed = VALID_TRANSITIONS[order.status];\n    if (!allowed.includes(newStatus)) {\n      throw new Error(`${order.status} -> ${newStatus} geçişi geçersiz`);\n    }",
+              "file": "src/services/order.service.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.3d",
+              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "type": "code_add",
+              "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
+              "code": "return prisma.order.update({\n      where: { id: orderId },\n      data: { status: newStatus },\n    });\n  }",
+              "file": "src/services/order.service.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.3e",
+              "action": "ALTTA DEVAM ET: getAllOrders fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "getAllOrders fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "async getAllOrders(status?: OrderStatus) {\n    const where = status ? { status } : {};\n    return prisma.order.findMany({\n      where,\n      include: { user: { select: { email: true, name: true } }, items: true },\n      orderBy: { createdAt: 'desc' },\n    });\n  }",
+              "file": "src/services/order.service.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.3f",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "}",
+              "file": "src/services/order.service.ts",
+              "position": "bottom"
             },
             {
               "order": "3.4",
@@ -1202,8 +1829,44 @@
               "action": "Order controller'ı yaz",
               "type": "code_write",
               "file": "src/controllers/order.controller.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport { OrderService } from '../services/order.service';\n\nconst orderService = new OrderService();\n\nexport const getMyOrders = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const orders = await orderService.getUserOrders((req as any).user.id);\n    res.json(orders);\n  } catch (err) { next(err); }\n};\n\nexport const getOrderDetail = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const order = await orderService.getOrderById(req.params.id, (req as any).user.id);\n    if (!order) return res.status(404).json({ error: 'Sipariş bulunamadı' });\n    res.json(order);\n  } catch (err) { next(err); }\n};\n\nexport const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const order = await orderService.updateStatus(req.params.id, req.body.status);\n    res.json(order);\n  } catch (err) { next(err); }\n};\n\nexport const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const orders = await orderService.getAllOrders(req.query.status as any);\n    res.json(orders);\n  } catch (err) { next(err); }\n};",
+              "code": "import { Request, Response, NextFunction } from 'express';\nimport { OrderService } from '../services/order.service';\n\nconst orderService = new OrderService();",
               "why": "3.3'teki service metodlarını HTTP katmanına taşıyoruz. getOrderDetail'da IDOR koruması service'te yapılıyor — controller sadece null kontrolü yapıp 404 döndürüyor."
+            },
+            {
+              "order": "3.5b",
+              "action": "ALTTA DEVAM ET: async fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "async fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export const getMyOrders = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const orders = await orderService.getUserOrders((req as any).user.id);\n    res.json(orders);\n  } catch (err) { next(err); }\n};",
+              "file": "src/controllers/order.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.5c",
+              "action": "ALTTA DEVAM ET: async fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "async fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export const getOrderDetail = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const order = await orderService.getOrderById(req.params.id, (req as any).user.id);\n    if (!order) return res.status(404).json({ error: 'Sipariş bulunamadı' });\n    res.json(order);\n  } catch (err) { next(err); }\n};",
+              "file": "src/controllers/order.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.5d",
+              "action": "ALTTA DEVAM ET: async fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "async fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const order = await orderService.updateStatus(req.params.id, req.body.status);\n    res.json(order);\n  } catch (err) { next(err); }\n};",
+              "file": "src/controllers/order.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.5e",
+              "action": "ALTTA DEVAM ET: async fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "async fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const orders = await orderService.getAllOrders(req.query.status as any);\n    res.json(orders);\n  } catch (err) { next(err); }\n};",
+              "file": "src/controllers/order.controller.ts",
+              "position": "bottom"
             },
             {
               "order": "3.6",
@@ -1217,8 +1880,26 @@
               "action": "Order route tanımlarını yaz — müşteri ve admin ayrımı",
               "type": "code_write",
               "file": "src/routes/order.routes.ts",
-              "code": "import { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { authorize } from '../middleware/authorize';\nimport {\n  getMyOrders,\n  getOrderDetail,\n  updateOrderStatus,\n  getAllOrders,\n} from '../controllers/order.controller';\n\nconst router = Router();\n\n// Müşteri route'ları\nrouter.get('/my-orders', authenticate, getMyOrders);\nrouter.get('/:id', authenticate, getOrderDetail);\n\n// Admin route'ları\nrouter.get('/', authenticate, authorize('ADMIN'), getAllOrders);\nrouter.patch('/:id/status', authenticate, authorize('ADMIN'), updateOrderStatus);\n\nexport default router;",
+              "code": "import { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { authorize } from '../middleware/authorize';\nimport {\n  getMyOrders,\n  getOrderDetail,\n  updateOrderStatus,\n  getAllOrders,",
               "why": "Milestone 0 Step 5'teki authenticate ve authorize middleware'lerini kullanıyoruz. Müşteri kendi siparişlerini görür, admin tüm siparişleri yönetir. PATCH /:id/status ile sipariş durumu güncellenir."
+            },
+            {
+              "order": "3.7b",
+              "action": "ALTTA DEVAM ET: route endpoint'lerini tanimla",
+              "type": "code_add",
+              "why": "HTTP verb ve path'leri controller fonksiyonlarina bagliyoruz.",
+              "code": "} from '../controllers/order.controller';\n\nconst router = Router();\n\n// Müşteri route'ları\nrouter.get('/my-orders', authenticate, getMyOrders);\nrouter.get('/:id', authenticate, getOrderDetail);\n\n// Admin route'ları\nrouter.get('/', authenticate, authorize('ADMIN'), getAllOrders);\nrouter.patch('/:id/status', authenticate, authorize('ADMIN'), updateOrderStatus);",
+              "file": "src/routes/order.routes.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.7c",
+              "action": "ALTTA DEVAM ET: export tanimini yaz",
+              "type": "code_add",
+              "why": "Modulu disariya acarak diger dosyalardan erisime izin veriyoruz.",
+              "code": "export default router;",
+              "file": "src/routes/order.routes.ts",
+              "position": "bottom"
             },
             {
               "order": "3.8",
@@ -1416,8 +2097,26 @@
               "type": "code_add",
               "file": "src/controllers/payment.controller.ts",
               "position": "bottom",
-              "code": "\nexport const createRefund = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const { orderId } = req.params;\n    // Siparişi bul, stripePaymentId'yi al\n    const { PrismaClient } = require('@prisma/client');\n    const prisma = new PrismaClient();\n    const order = await prisma.order.findUnique({ where: { id: orderId } });\n    if (!order?.stripePaymentId) {\n      return res.status(400).json({ error: 'Bu sipariş için ödeme bulunamadı' });\n    }\n    const refund = await paymentService.createRefund(order.stripePaymentId);\n    await prisma.order.update({ where: { id: orderId }, data: { status: 'REFUNDED' } });\n    res.json({ refund, message: 'İade başarılı' });\n  } catch (err) {\n    next(err);\n  }\n};",
+              "code": "export const createRefund = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const { orderId } = req.params;\n    // Siparişi bul, stripePaymentId'yi al\n    const { PrismaClient } = require('@prisma/client');\n    const prisma = new PrismaClient();\n    const order = await prisma.order.findUnique({ where: { id: orderId } });\n    if (!order?.stripePaymentId) {",
               "why": "Step 1'deki webhook handler (2.3) ödeme sonrası stripePaymentId'yi kaydetmişti. Şimdi o ID ile iade yapıyoruz. Sipariş durumunu da REFUNDED'a güncelliyoruz."
+            },
+            {
+              "order": "5.5b",
+              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "type": "code_add",
+              "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
+              "code": "return res.status(400).json({ error: 'Bu sipariş için ödeme bulunamadı' });\n    }\n    const refund = await paymentService.createRefund(order.stripePaymentId);\n    await prisma.order.update({ where: { id: orderId }, data: { status: 'REFUNDED' } });\n    res.json({ refund, message: 'İade başarılı' });\n  } catch (err) {\n    next(err);\n  }",
+              "file": "src/controllers/payment.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.5c",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "};",
+              "file": "src/controllers/payment.controller.ts",
+              "position": "bottom"
             },
             {
               "order": "5.6",
@@ -1532,8 +2231,56 @@
               "action": "GERİ DÖN: createOrder'ı transaction ile doldur",
               "type": "code_modify",
               "file": "src/services/order.service.ts",
-              "code": "  async createOrder(userId: string, shippingAddress: string) {\n    const cartService = new CartService();\n    const cartItems = await cartService.getCart(userId);\n    if (cartItems.length === 0) throw new Error('Sepet boş');\n\n    return prisma.$transaction(async (tx) => {\n      // 1. Stok kontrolü ve güncelleme\n      for (const item of cartItems) {\n        const product = await tx.product.findUnique({\n          where: { id: item.product.id },\n        });\n        if (!product || product.stock < item.quantity) {\n          throw new Error(`${item.product.name} için yetersiz stok`);\n        }\n        await tx.product.update({\n          where: { id: item.product.id },\n          data: { stock: { decrement: item.quantity } },\n        });\n      }\n\n      // 2. Toplam tutarı hesapla\n      const totalAmount = cartItems.reduce(\n        (sum, item) => sum + Number(item.product.price) * item.quantity,\n        0\n      );\n\n      // 3. Siparişi oluştur\n      const order = await tx.order.create({\n        data: {\n          userId,\n          shippingAddress,\n          totalAmount,\n          items: {\n            create: cartItems.map((item) => ({\n              productId: item.product.id,\n              quantity: item.quantity,\n              unitPrice: item.product.price,\n            })),\n          },\n        },\n        include: { items: { include: { product: true } } },\n      });\n\n      // 4. Sepeti temizle\n      await cartService.clearCart(userId);\n\n      return order;\n    });\n  }",
+              "code": "async createOrder(userId: string, shippingAddress: string) {\n    const cartService = new CartService();\n    const cartItems = await cartService.getCart(userId);\n    if (cartItems.length === 0) throw new Error('Sepet boş');",
               "why": "prisma.$transaction ile tüm işlemler atomik — stok düşürme, sipariş oluşturma, sepet temizleme hepsi ya birlikte başarılı olur ya birlikte geri alınır. Stok yetersizse throw ile transaction iptal edilir ve hiçbir şey değişmez."
+            },
+            {
+              "order": "1.4b",
+              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "type": "code_modify",
+              "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
+              "code": "return prisma.$transaction(async (tx) => {\n      // 1. Stok kontrolü ve güncelleme\n      for (const item of cartItems) {\n        const product = await tx.product.findUnique({\n          where: { id: item.product.id },\n        });\n        if (!product || product.stock < item.quantity) {\n          throw new Error(`${item.product.name} için yetersiz stok`);",
+              "file": "src/services/order.service.ts"
+            },
+            {
+              "order": "1.4c",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_modify",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "}\n        await tx.product.update({\n          where: { id: item.product.id },\n          data: { stock: { decrement: item.quantity } },\n        });\n      }",
+              "file": "src/services/order.service.ts"
+            },
+            {
+              "order": "1.4d",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_modify",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "// 2. Toplam tutarı hesapla\n      const totalAmount = cartItems.reduce(\n        (sum, item) => sum + Number(item.product.price) * item.quantity,\n        0\n      );",
+              "file": "src/services/order.service.ts"
+            },
+            {
+              "order": "1.4e",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_modify",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "// 3. Siparişi oluştur\n      const order = await tx.order.create({\n        data: {\n          userId,\n          shippingAddress,\n          totalAmount,\n          items: {\n            create: cartItems.map((item) => ({",
+              "file": "src/services/order.service.ts"
+            },
+            {
+              "order": "1.4f",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_modify",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "productId: item.product.id,\n              quantity: item.quantity,\n              unitPrice: item.product.price,\n            })),\n          },\n        },\n        include: { items: { include: { product: true } } },\n      });",
+              "file": "src/services/order.service.ts"
+            },
+            {
+              "order": "1.4g",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_modify",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "// 4. Sepeti temizle\n      await cartService.clearCart(userId);\n\n      return order;\n    });\n  }",
+              "file": "src/services/order.service.ts"
             },
             {
               "order": "1.5",
@@ -1541,8 +2288,17 @@
               "type": "code_add",
               "file": "src/controllers/order.controller.ts",
               "position": "bottom",
-              "code": "\nexport const createOrder = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const { shippingAddress } = req.body;\n    const order = await orderService.createOrder(userId, shippingAddress);\n    res.status(201).json(order);\n  } catch (err) {\n    next(err);\n  }\n};",
+              "code": "export const createOrder = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const { shippingAddress } = req.body;\n    const order = await orderService.createOrder(userId, shippingAddress);\n    res.status(201).json(order);\n  } catch (err) {\n    next(err);",
               "why": "1.4'te yazdığımız service metodunu HTTP endpoint'ine bağlıyoruz. req.user.id Milestone 0 Step 5'teki authenticate middleware'den geliyor."
+            },
+            {
+              "order": "1.5b",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "}\n};",
+              "file": "src/controllers/order.controller.ts",
+              "position": "bottom"
             },
             {
               "order": "1.6",
@@ -1807,8 +2563,32 @@
               "action": "GERİ DÖN: Metodları doldur",
               "type": "code_modify",
               "file": "src/services/stock.service.ts",
-              "code": "export class StockService {\n  async getLowStockProducts(threshold = DEFAULT_LOW_STOCK_THRESHOLD) {\n    return prisma.product.findMany({\n      where: {\n        stock: { lte: threshold },\n        isActive: true,\n      },\n      include: { category: { select: { name: true } } },\n      orderBy: { stock: 'asc' },\n    });\n  }\n\n  async getStockReport() {\n    const [totalProducts, outOfStock, lowStock] = await Promise.all([\n      prisma.product.count({ where: { isActive: true } }),\n      prisma.product.count({ where: { stock: 0, isActive: true } }),\n      prisma.product.count({\n        where: { stock: { lte: DEFAULT_LOW_STOCK_THRESHOLD, gt: 0 }, isActive: true },\n      }),\n    ]);\n\n    return {\n      totalProducts,\n      outOfStock,\n      lowStock,\n      healthyStock: totalProducts - outOfStock - lowStock,\n    };\n  }\n}",
+              "code": "export class StockService {\n  async getLowStockProducts(threshold = DEFAULT_LOW_STOCK_THRESHOLD) {\n    return prisma.product.findMany({\n      where: {\n        stock: { lte: threshold },\n        isActive: true,\n      },\n      include: { category: { select: { name: true } } },",
               "why": "3.3'te tanımladığımız threshold'u kullanıyoruz. Promise.all ile 3 paralel sorgu — toplam, stoksuz ve düşük stoklu ürün sayıları. Bu rapor admin dashboard için çok değerli."
+            },
+            {
+              "order": "3.4b",
+              "action": "ALTTA DEVAM ET: service metodunu kapat",
+              "type": "code_modify",
+              "why": "Metodun blok kapanisini yazarak fonksiyonu tamamliyoruz.",
+              "code": "orderBy: { stock: 'asc' },\n    });\n  }",
+              "file": "src/services/stock.service.ts"
+            },
+            {
+              "order": "3.4c",
+              "action": "ALTTA DEVAM ET: getStockReport fonksiyonunu yaz",
+              "type": "code_modify",
+              "why": "getStockReport fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "async getStockReport() {\n    const [totalProducts, outOfStock, lowStock] = await Promise.all([\n      prisma.product.count({ where: { isActive: true } }),\n      prisma.product.count({ where: { stock: 0, isActive: true } }),\n      prisma.product.count({\n        where: { stock: { lte: DEFAULT_LOW_STOCK_THRESHOLD, gt: 0 }, isActive: true },\n      }),\n    ]);",
+              "file": "src/services/stock.service.ts"
+            },
+            {
+              "order": "3.4d",
+              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "type": "code_modify",
+              "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
+              "code": "return {\n      totalProducts,\n      outOfStock,\n      lowStock,\n      healthyStock: totalProducts - outOfStock - lowStock,\n    };\n  }\n}",
+              "file": "src/services/stock.service.ts"
             },
             {
               "order": "3.5",
@@ -1822,8 +2602,26 @@
               "action": "Stock controller'ı yaz",
               "type": "code_write",
               "file": "src/controllers/stock.controller.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport { StockService } from '../services/stock.service';\n\nconst stockService = new StockService();\n\nexport const getLowStock = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const threshold = parseInt(req.query.threshold as string) || undefined;\n    const products = await stockService.getLowStockProducts(threshold);\n    res.json(products);\n  } catch (err) { next(err); }\n};\n\nexport const getStockReport = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const report = await stockService.getStockReport();\n    res.json(report);\n  } catch (err) { next(err); }\n};",
+              "code": "import { Request, Response, NextFunction } from 'express';\nimport { StockService } from '../services/stock.service';\n\nconst stockService = new StockService();",
               "why": "3.4'teki service metodlarını HTTP'ye bağlıyoruz. threshold query parametresi opsiyonel — belirtilmezse 3.3'teki varsayılan (10) kullanılır."
+            },
+            {
+              "order": "3.6b",
+              "action": "ALTTA DEVAM ET: async fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "async fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export const getLowStock = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const threshold = parseInt(req.query.threshold as string) || undefined;\n    const products = await stockService.getLowStockProducts(threshold);\n    res.json(products);\n  } catch (err) { next(err); }\n};",
+              "file": "src/controllers/stock.controller.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.6c",
+              "action": "ALTTA DEVAM ET: async fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "async fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export const getStockReport = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const report = await stockService.getStockReport();\n    res.json(report);\n  } catch (err) { next(err); }\n};",
+              "file": "src/controllers/stock.controller.ts",
+              "position": "bottom"
             },
             {
               "order": "3.7",
@@ -1965,8 +2763,44 @@
               "type": "code_add",
               "file": "fraud-detection/generate_data.py",
               "position": "bottom",
-              "code": "\ndef generate_dataset():\n    n_fraud = int(N_SAMPLES * FRAUD_RATIO)\n    n_normal = N_SAMPLES - n_fraud\n\n    # Normal işlemler\n    normal = pd.DataFrame({\n        'amount': np.random.lognormal(5, 1, n_normal).clip(10, 50000),\n        'num_items': np.random.randint(1, 5, n_normal),\n        'hour_of_day': np.random.choice(range(8, 23), n_normal),\n        'days_since_registration': np.random.randint(30, 365, n_normal),\n        'previous_orders': np.random.randint(1, 20, n_normal),\n        'different_shipping': np.random.choice([0, 1], n_normal, p=[0.9, 0.1]),\n        'is_fraud': 0,\n    })\n\n    # Sahte işlemler — yüksek tutar, gece saatleri, yeni hesap\n    fraud = pd.DataFrame({\n        'amount': np.random.lognormal(8, 1.5, n_fraud).clip(1000, 100000),\n        'num_items': np.random.randint(5, 20, n_fraud),\n        'hour_of_day': np.random.choice([0, 1, 2, 3, 4, 5], n_fraud),\n        'days_since_registration': np.random.randint(0, 7, n_fraud),\n        'previous_orders': np.random.randint(0, 2, n_fraud),\n        'different_shipping': np.random.choice([0, 1], n_fraud, p=[0.3, 0.7]),\n        'is_fraud': 1,\n    })\n\n    df = pd.concat([normal, fraud]).sample(frac=1).reset_index(drop=True)\n    df.to_csv('data/fraud_dataset.csv', index=False)\n    print(f'Veri seti oluşturuldu: {len(df)} kayıt ({n_fraud} fraud, {n_normal} normal)')\n    return df",
+              "code": "def generate_dataset():\n    n_fraud = int(N_SAMPLES * FRAUD_RATIO)\n    n_normal = N_SAMPLES - n_fraud",
               "why": "1.7'deki sabitleri kullanıyoruz. Fraud işlemlerin özellikleri gerçekçi: yüksek tutar, gece saatleri, yeni hesap, çok ürün, farklı teslimat adresi. Bu feature'lar ML modeline öğretilecek."
+            },
+            {
+              "order": "1.8b",
+              "action": "ALTTA DEVAM ET: veri seti olusturma mantigini yaz",
+              "type": "code_add",
+              "why": "Sentetik veri uretme fonksiyonuyla ML modeli icin egitim verisi hazirliyoruz.",
+              "code": "# Normal işlemler\n    normal = pd.DataFrame({\n        'amount': np.random.lognormal(5, 1, n_normal).clip(10, 50000),\n        'num_items': np.random.randint(1, 5, n_normal),\n        'hour_of_day': np.random.choice(range(8, 23), n_normal),\n        'days_since_registration': np.random.randint(30, 365, n_normal),\n        'previous_orders': np.random.randint(1, 20, n_normal),\n        'different_shipping': np.random.choice([0, 1], n_normal, p=[0.9, 0.1]),",
+              "file": "fraud-detection/generate_data.py",
+              "position": "bottom"
+            },
+            {
+              "order": "1.8c",
+              "action": "ALTTA DEVAM ET: Python kod blogunu ekle",
+              "type": "code_add",
+              "why": "ML pipeline'in siradaki bilesenini implement ediyoruz.",
+              "code": "'is_fraud': 0,\n    })",
+              "file": "fraud-detection/generate_data.py",
+              "position": "bottom"
+            },
+            {
+              "order": "1.8d",
+              "action": "ALTTA DEVAM ET: veri seti olusturma mantigini yaz",
+              "type": "code_add",
+              "why": "Sentetik veri uretme fonksiyonuyla ML modeli icin egitim verisi hazirliyoruz.",
+              "code": "# Sahte işlemler — yüksek tutar, gece saatleri, yeni hesap\n    fraud = pd.DataFrame({\n        'amount': np.random.lognormal(8, 1.5, n_fraud).clip(1000, 100000),\n        'num_items': np.random.randint(5, 20, n_fraud),\n        'hour_of_day': np.random.choice([0, 1, 2, 3, 4, 5], n_fraud),\n        'days_since_registration': np.random.randint(0, 7, n_fraud),\n        'previous_orders': np.random.randint(0, 2, n_fraud),\n        'different_shipping': np.random.choice([0, 1], n_fraud, p=[0.3, 0.7]),",
+              "file": "fraud-detection/generate_data.py",
+              "position": "bottom"
+            },
+            {
+              "order": "1.8e",
+              "action": "ALTTA DEVAM ET: Python kod blogunu ekle",
+              "type": "code_add",
+              "why": "ML pipeline'in siradaki bilesenini implement ediyoruz.",
+              "code": "'is_fraud': 1,\n    })\n\n    df = pd.concat([normal, fraud]).sample(frac=1).reset_index(drop=True)\n    df.to_csv('data/fraud_dataset.csv', index=False)\n    print(f'Veri seti oluşturuldu: {len(df)} kayıt ({n_fraud} fraud, {n_normal} normal)')\n    return df",
+              "file": "fraud-detection/generate_data.py",
+              "position": "bottom"
             },
             {
               "order": "1.9",
@@ -2050,8 +2884,17 @@
               "type": "code_add",
               "file": "fraud-detection/train_model.py",
               "position": "bottom",
-              "code": "\n# Veri yükle\ndf = pd.read_csv('data/fraud_dataset.csv')\nprint(f'Veri seti: {len(df)} kayıt')\nprint(f'Fraud oranı: {df[\"is_fraud\"].mean():.2%}')\n\n# Feature ve target ayır\nX = df.drop('is_fraud', axis=1)\ny = df['is_fraud']\n\n# Train/test böl\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.2, random_state=42, stratify=y\n)",
+              "code": "# Veri yükle\ndf = pd.read_csv('data/fraud_dataset.csv')\nprint(f'Veri seti: {len(df)} kayıt')\nprint(f'Fraud oranı: {df[\"is_fraud\"].mean():.2%}')\n\n# Feature ve target ayır\nX = df.drop('is_fraud', axis=1)\ny = df['is_fraud']",
               "why": "Step 0'da (1.10) oluşturduğumuz CSV'yi yüklüyoruz. stratify=y ile fraud oranı train ve test setlerinde eşit tutulur — %5'lik nadir sınıfı korumak için kritik."
+            },
+            {
+              "order": "2.3b",
+              "action": "ALTTA DEVAM ET: Python kod blogunu ekle",
+              "type": "code_add",
+              "why": "ML pipeline'in siradaki bilesenini implement ediyoruz.",
+              "code": "# Train/test böl\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.2, random_state=42, stratify=y\n)",
+              "file": "fraud-detection/train_model.py",
+              "position": "bottom"
             },
             {
               "order": "2.4",
@@ -2077,8 +2920,17 @@
               "type": "code_add",
               "file": "fraud-detection/train_model.py",
               "position": "bottom",
-              "code": "\n# Değerlendir\ny_pred = model.predict(X_test_scaled)\nprint('\\nClassification Report:')\nprint(classification_report(y_test, y_pred))\nprint('Confusion Matrix:')\nprint(confusion_matrix(y_test, y_pred))\n\n# Feature importance\nimportances = pd.Series(model.feature_importances_, index=X.columns)\nprint('\\nFeature Importance:')\nprint(importances.sort_values(ascending=False))",
+              "code": "# Değerlendir\ny_pred = model.predict(X_test_scaled)\nprint('\\nClassification Report:')\nprint(classification_report(y_test, y_pred))\nprint('Confusion Matrix:')\nprint(confusion_matrix(y_test, y_pred))",
               "why": "classification_report ile precision, recall, f1-score metrikleri. Fraud detection'da recall önemli — kaç fraud'un yakalandığı. Feature importance hangi özelliklerin en ayırt edici olduğunu gösterir."
+            },
+            {
+              "order": "2.6b",
+              "action": "ALTTA DEVAM ET: Python kod blogunu ekle",
+              "type": "code_add",
+              "why": "ML pipeline'in siradaki bilesenini implement ediyoruz.",
+              "code": "# Feature importance\nimportances = pd.Series(model.feature_importances_, index=X.columns)\nprint('\\nFeature Importance:')\nprint(importances.sort_values(ascending=False))",
+              "file": "fraud-detection/train_model.py",
+              "position": "bottom"
             },
             {
               "order": "2.7",
@@ -2165,24 +3017,50 @@
               "action": "Flask app iskeletini yaz — boş route'lar",
               "type": "code_write",
               "file": "fraud-detection/app.py",
-              "code": "from flask import Flask, jsonify\n\napp = Flask(__name__)\n\n@app.route('/health')\ndef health():\n    return jsonify({'status': 'ok'})\n\n@app.route('/predict', methods=['POST'])\ndef predict():\n    # TODO: ML tahmin\n    pass\n\nif __name__ == '__main__':\n    app.run(port=5000, debug=True)",
+              "code": "from flask import Flask, jsonify\n\napp = Flask(__name__)\n\n@app.route('/health')\ndef health():\n    return jsonify({'status': 'ok'})\n\n@app.route('/predict', methods=['POST'])",
               "why": "Önce çalışan bir iskelet — health endpoint ile API'nin ayakta olduğunu kontrol edebiliriz. predict endpoint'i sonra dolduracağız."
+            },
+            {
+              "order": "3.2b",
+              "action": "ALTTA DEVAM ET: predict fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "predict fonksiyonunun is mantigini implement ediyoruz.",
+              "code": "def predict():\n    # TODO: ML tahmin\n    pass\n\nif __name__ == '__main__':\n    app.run(port=5000, debug=True)",
+              "file": "fraud-detection/app.py",
+              "position": "bottom"
             },
             {
               "order": "3.3",
               "action": "ÜSTE ÇIK: Model yükleme import'larını ekle",
               "type": "code_write",
               "file": "fraud-detection/app.py",
-              "code": "from flask import Flask, jsonify, request\nfrom flask_cors import CORS\nimport joblib\nimport numpy as np\nimport os\n\napp = Flask(__name__)\nCORS(app)\n\n# Model yükle\nmodel = joblib.load('models/fraud_model.pkl')\nscaler = joblib.load('models/scaler.pkl')\nfeature_names = joblib.load('models/feature_names.pkl')",
+              "code": "from flask import Flask, jsonify, request\nfrom flask_cors import CORS\nimport joblib\nimport numpy as np\nimport os\n\napp = Flask(__name__)\nCORS(app)",
               "why": "3.2'de iskelet yazdık, şimdi import'ları ve model yüklemeyi ekliyoruz. Step 1'de (2.7) kaydettiğimiz model, scaler ve feature_names dosyalarını yüklüyoruz. Uygulama başlarken bir kez yüklenir — her istekte yeniden yüklemek yavaş olur."
+            },
+            {
+              "order": "3.3b",
+              "action": "ALTTA DEVAM ET: model dosyalarini kaydet/yukle",
+              "type": "code_add",
+              "why": "Egitilmis modeli diske kaydederek Flask API'den yuklenebilir hale getiriyoruz.",
+              "code": "# Model yükle\nmodel = joblib.load('models/fraud_model.pkl')\nscaler = joblib.load('models/scaler.pkl')\nfeature_names = joblib.load('models/feature_names.pkl')",
+              "file": "fraud-detection/app.py",
+              "position": "bottom"
             },
             {
               "order": "3.4",
               "action": "GERİ DÖN: predict endpoint'ini doldur",
               "type": "code_modify",
               "file": "fraud-detection/app.py",
-              "code": "@app.route('/predict', methods=['POST'])\ndef predict():\n    try:\n        data = request.get_json()\n        features = [data.get(f, 0) for f in feature_names]\n        features_scaled = scaler.transform([features])\n        prediction = model.predict(features_scaled)[0]\n        probability = model.predict_proba(features_scaled)[0]\n\n        return jsonify({\n            'is_fraud': bool(prediction),\n            'fraud_probability': float(probability[1]),\n            'risk_level': 'HIGH' if probability[1] > 0.7 else 'MEDIUM' if probability[1] > 0.3 else 'LOW',\n        })\n    except Exception as e:\n        return jsonify({'error': str(e)}), 400",
+              "code": "@app.route('/predict', methods=['POST'])\ndef predict():\n    try:\n        data = request.get_json()\n        features = [data.get(f, 0) for f in feature_names]\n        features_scaled = scaler.transform([features])\n        prediction = model.predict(features_scaled)[0]\n        probability = model.predict_proba(features_scaled)[0]",
               "why": "3.3'te yüklediğimiz model ve scaler ile tahmin yapıyoruz. feature_names sıralamasına göre veri çıkarılır — sıra önemli. predict_proba ile olasılık skoru, risk_level ile anlaşılır sınıflandırma döndürüyoruz."
+            },
+            {
+              "order": "3.4b",
+              "action": "ALTTA DEVAM ET: donus degerini olustur",
+              "type": "code_modify",
+              "why": "Hesaplanan sonuclari dondurerek cagiran fonksiyona veri aktariyoruz.",
+              "code": "return jsonify({\n            'is_fraud': bool(prediction),\n            'fraud_probability': float(probability[1]),\n            'risk_level': 'HIGH' if probability[1] > 0.7 else 'MEDIUM' if probability[1] > 0.3 else 'LOW',\n        })\n    except Exception as e:\n        return jsonify({'error': str(e)}), 400",
+              "file": "fraud-detection/app.py"
             },
             {
               "order": "3.5",
@@ -2319,8 +3197,32 @@
               "action": "GERİ DÖN: checkOrder metodunu doldur",
               "type": "code_modify",
               "file": "src/services/fraud.service.ts",
-              "code": "export class FraudService {\n  async checkOrder(orderData: {\n    amount: number;\n    numItems: number;\n    hourOfDay: number;\n    daysSinceRegistration: number;\n    previousOrders: number;\n    differentShipping: boolean;\n  }) {\n    try {\n      const response = await axios.post(`${FRAUD_SERVICE_URL}/predict`, {\n        amount: orderData.amount,\n        num_items: orderData.numItems,\n        hour_of_day: orderData.hourOfDay,\n        days_since_registration: orderData.daysSinceRegistration,\n        previous_orders: orderData.previousOrders,\n        different_shipping: orderData.differentShipping ? 1 : 0,\n      });\n      return response.data;\n    } catch (error) {\n      console.error('Fraud servis hatası:', error);\n      return { is_fraud: false, fraud_probability: 0, risk_level: 'UNKNOWN' };\n    }\n  }\n}",
+              "code": "export class FraudService {\n  async checkOrder(orderData: {\n    amount: number;\n    numItems: number;\n    hourOfDay: number;\n    daysSinceRegistration: number;\n    previousOrders: number;\n    differentShipping: boolean;",
               "why": "4.4'teki URL'ye Step 2'deki predict endpoint'ine istek gönderiyoruz. Feature isimleri Step 0'daki (1.8) generate_data.py ile eşleşmeli (snake_case). Servis çökerse UNKNOWN döndürüyoruz — ödemeyi engellemiyoruz ama logluyoruz."
+            },
+            {
+              "order": "4.5b",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_modify",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "}) {\n    try {\n      const response = await axios.post(`${FRAUD_SERVICE_URL}/predict`, {\n        amount: orderData.amount,\n        num_items: orderData.numItems,\n        hour_of_day: orderData.hourOfDay,\n        days_since_registration: orderData.daysSinceRegistration,\n        previous_orders: orderData.previousOrders,",
+              "file": "src/services/fraud.service.ts"
+            },
+            {
+              "order": "4.5c",
+              "action": "ALTTA DEVAM ET: service islem mantigi",
+              "type": "code_modify",
+              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "code": "different_shipping: orderData.differentShipping ? 1 : 0,\n      });\n      return response.data;\n    } catch (error) {\n      console.error('Fraud servis hatası:', error);\n      return { is_fraud: false, fraud_probability: 0, risk_level: 'UNKNOWN' };\n    }\n  }",
+              "file": "src/services/fraud.service.ts"
+            },
+            {
+              "order": "4.5d",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_modify",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "}",
+              "file": "src/services/fraud.service.ts"
             },
             {
               "order": "4.6",
@@ -2344,8 +3246,17 @@
               "type": "code_add",
               "file": "src/services/order.service.ts",
               "position": "bottom",
-              "code": "\n  // createOrder metodu içinde, siparişi oluşturduktan sonra ekle:\n  // const fraudService = new FraudService();\n  // const fraudResult = await fraudService.checkOrder({\n  //   amount: Number(totalAmount),\n  //   numItems: cartItems.reduce((s, i) => s + i.quantity, 0),\n  //   hourOfDay: new Date().getHours(),\n  //   daysSinceRegistration: ..., // user.createdAt'tan hesapla\n  //   previousOrders: await prisma.order.count({ where: { userId } }),\n  //   differentShipping: shippingAddress !== user.address,\n  // });\n  // await prisma.order.update({\n  //   where: { id: order.id },\n  //   data: { fraudScore: fraudResult.fraud_probability },\n  // });",
+              "code": "// createOrder metodu içinde, siparişi oluşturduktan sonra ekle:\n  // const fraudService = new FraudService();\n  // const fraudResult = await fraudService.checkOrder({\n  //   amount: Number(totalAmount),\n  //   numItems: cartItems.reduce((s, i) => s + i.quantity, 0),\n  //   hourOfDay: new Date().getHours(),\n  //   daysSinceRegistration: ..., // user.createdAt'tan hesapla\n  //   previousOrders: await prisma.order.count({ where: { userId } }),",
               "why": "Sipariş oluşturulduktan sonra fraud skoru hesaplanır ve kaydedilir. HIGH risk siparişler admin tarafından manuel incelenebilir. Step 0'daki (1.8) feature'larla eşleşen verileri OrderService'ten topluyoruz."
+            },
+            {
+              "order": "4.8b",
+              "action": "ALTTA DEVAM ET: veritabani kaydini guncelle",
+              "type": "code_add",
+              "why": "Mevcut kaydi guncel verilerle degistirerek tutarliligi koruyoruz.",
+              "code": "//   differentShipping: shippingAddress !== user.address,\n  // });\n  // await prisma.order.update({\n  //   where: { id: order.id },\n  //   data: { fraudScore: fraudResult.fraud_probability },\n  // });",
+              "file": "src/services/order.service.ts",
+              "position": "bottom"
             },
             {
               "order": "4.9",
@@ -2428,8 +3339,17 @@
               "action": "Jest konfigürasyonunu yaz",
               "type": "code_write",
               "file": "jest.config.ts",
-              "code": "export default {\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  roots: ['<rootDir>/tests'],\n  testMatch: ['**/*.test.ts'],\n  setupFilesAfterSetup: ['<rootDir>/tests/setup.ts'],\n  coverageDirectory: 'coverage',\n  collectCoverageFrom: ['src/**/*.ts', '!src/types/**'],\n};",
+              "code": "export default {\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  roots: ['<rootDir>/tests'],\n  testMatch: ['**/*.test.ts'],\n  setupFilesAfterSetup: ['<rootDir>/tests/setup.ts'],\n  coverageDirectory: 'coverage',\n  collectCoverageFrom: ['src/**/*.ts', '!src/types/**'],",
               "why": "ts-jest preset TypeScript dosyalarını dönüştürür. tests/ klasöründeki .test.ts dosyaları otomatik bulunur. Coverage src/ altındaki tüm dosyalardan toplanır."
+            },
+            {
+              "order": "1.2b",
+              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "type": "code_add",
+              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "code": "};",
+              "file": "jest.config.ts",
+              "position": "bottom"
             },
             {
               "order": "1.3",
@@ -2443,8 +3363,17 @@
               "action": "Test setup dosyasını yaz",
               "type": "code_write",
               "file": "tests/setup.ts",
-              "code": "import { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\nbeforeAll(async () => {\n  // Test veritabanına bağlan\n});\n\nafterAll(async () => {\n  await prisma.$disconnect();\n});\n\nbeforeEach(async () => {\n  // Her test öncesi verileri temizle\n  await prisma.orderItem.deleteMany();\n  await prisma.order.deleteMany();\n  await prisma.product.deleteMany();\n  await prisma.category.deleteMany();\n  await prisma.user.deleteMany();\n});",
+              "code": "import { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\nbeforeAll(async () => {\n  // Test veritabanına bağlan\n});\n\nafterAll(async () => {\n  await prisma.$disconnect();\n});",
               "why": "Her test izole olmalı — önceki testin verileri sonrakini etkilememeli. Silme sırası foreign key constraint'lerine göre: önce bağımlı tablolar (OrderItem), sonra ana tablolar (User)."
+            },
+            {
+              "order": "1.4b",
+              "action": "ALTTA DEVAM ET: test yasamdongusu hook'larini ekle",
+              "type": "code_add",
+              "why": "Her test oncesi veri temizlenerek testlerin birbirini etkilemesi onlenir.",
+              "code": "beforeEach(async () => {\n  // Her test öncesi verileri temizle\n  await prisma.orderItem.deleteMany();\n  await prisma.order.deleteMany();\n  await prisma.product.deleteMany();\n  await prisma.category.deleteMany();\n  await prisma.user.deleteMany();\n});",
+              "file": "tests/setup.ts",
+              "position": "bottom"
             },
             {
               "order": "1.5",
@@ -2458,16 +3387,73 @@
               "action": "Test dosyası iskeletini yaz — describe bloğu",
               "type": "code_write",
               "file": "tests/integration/product.test.ts",
-              "code": "import request from 'supertest';\nimport app from '../../src/app';\n\ndescribe('Product API', () => {\n  it('should list products', async () => {\n    // TODO\n  });\n\n  it('should filter by category', async () => {\n    // TODO\n  });\n});",
+              "code": "import request from 'supertest';\nimport app from '../../src/app';\n\ndescribe('Product API', () => {\n  it('should list products', async () => {\n    // TODO\n  });",
               "why": "Önce test iskeletini yazıyoruz — hangi senaryolar test edilecek. supertest ile Express app'e HTTP istekleri gönderilir."
+            },
+            {
+              "order": "1.6b",
+              "action": "ALTTA DEVAM ET: test senaryosunu tanimla",
+              "type": "code_add",
+              "why": "Her test case izole bir senaryoyu dogrulayarak regresyonu onler.",
+              "code": "it('should filter by category', async () => {\n    // TODO\n  });\n});",
+              "file": "tests/integration/product.test.ts",
+              "position": "bottom"
             },
             {
               "order": "1.7",
               "action": "GERİ DÖN: Test case'leri doldur",
               "type": "code_modify",
               "file": "tests/integration/product.test.ts",
-              "code": "import request from 'supertest';\nimport app from '../../src/app';\nimport { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\ndescribe('Product API', () => {\n  let categoryId: string;\n\n  beforeEach(async () => {\n    const category = await prisma.category.create({\n      data: { name: 'Test', slug: 'test' },\n    });\n    categoryId = category.id;\n    await prisma.product.create({\n      data: {\n        name: 'Test Ürün',\n        slug: 'test-urun',\n        description: 'Test açıklama',\n        price: 99.99,\n        stock: 10,\n        categoryId,\n      },\n    });\n  });\n\n  it('should list products with pagination', async () => {\n    const res = await request(app).get('/api/products');\n    expect(res.status).toBe(200);\n    expect(res.body.products).toHaveLength(1);\n    expect(res.body.meta.total).toBe(1);\n  });\n\n  it('should get product by slug', async () => {\n    const res = await request(app).get('/api/products/test-urun');\n    expect(res.status).toBe(200);\n    expect(res.body.name).toBe('Test Ürün');\n  });\n\n  it('should return 404 for non-existent product', async () => {\n    const res = await request(app).get('/api/products/yok-urun');\n    expect(res.status).toBe(404);\n  });\n\n  it('should search products', async () => {\n    const res = await request(app).get('/api/products?search=Test');\n    expect(res.status).toBe(200);\n    expect(res.body.products).toHaveLength(1);\n  });\n});",
+              "code": "import request from 'supertest';\nimport app from '../../src/app';\nimport { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\ndescribe('Product API', () => {\n  let categoryId: string;",
               "why": "1.6'daki iskeletin gövdelerini dolduruyoruz. beforeEach ile her test için temiz veri oluşturulur (1.4'teki deleteMany'den sonra). Milestone 0 Step 2'deki product endpoint'lerini test ediyoruz."
+            },
+            {
+              "order": "1.7b",
+              "action": "ALTTA DEVAM ET: test yasamdongusu hook'larini ekle",
+              "type": "code_modify",
+              "why": "Her test oncesi veri temizlenerek testlerin birbirini etkilemesi onlenir.",
+              "code": "beforeEach(async () => {\n    const category = await prisma.category.create({\n      data: { name: 'Test', slug: 'test' },\n    });\n    categoryId = category.id;\n    await prisma.product.create({\n      data: {\n        name: 'Test Ürün',",
+              "file": "tests/integration/product.test.ts"
+            },
+            {
+              "order": "1.7c",
+              "action": "ALTTA DEVAM ET: test kodunu tamamla",
+              "type": "code_modify",
+              "why": "Test kapsamini genisleterek daha fazla senaryoyu dogruluyoruz.",
+              "code": "slug: 'test-urun',\n        description: 'Test açıklama',\n        price: 99.99,\n        stock: 10,\n        categoryId,\n      },\n    });\n  });",
+              "file": "tests/integration/product.test.ts"
+            },
+            {
+              "order": "1.7d",
+              "action": "ALTTA DEVAM ET: test dogrulamalarini yaz",
+              "type": "code_modify",
+              "why": "Her assertion bir gereksininimi dogrular — basarisiz assertion sorunu erkenden yakalar.",
+              "code": "it('should list products with pagination', async () => {\n    const res = await request(app).get('/api/products');\n    expect(res.status).toBe(200);\n    expect(res.body.products).toHaveLength(1);\n    expect(res.body.meta.total).toBe(1);\n  });",
+              "file": "tests/integration/product.test.ts"
+            },
+            {
+              "order": "1.7e",
+              "action": "ALTTA DEVAM ET: test dogrulamalarini yaz",
+              "type": "code_modify",
+              "why": "Her assertion bir gereksininimi dogrular — basarisiz assertion sorunu erkenden yakalar.",
+              "code": "it('should get product by slug', async () => {\n    const res = await request(app).get('/api/products/test-urun');\n    expect(res.status).toBe(200);\n    expect(res.body.name).toBe('Test Ürün');\n  });",
+              "file": "tests/integration/product.test.ts"
+            },
+            {
+              "order": "1.7f",
+              "action": "ALTTA DEVAM ET: test dogrulamalarini yaz",
+              "type": "code_modify",
+              "why": "Her assertion bir gereksininimi dogrular — basarisiz assertion sorunu erkenden yakalar.",
+              "code": "it('should return 404 for non-existent product', async () => {\n    const res = await request(app).get('/api/products/yok-urun');\n    expect(res.status).toBe(404);\n  });",
+              "file": "tests/integration/product.test.ts"
+            },
+            {
+              "order": "1.7g",
+              "action": "ALTTA DEVAM ET: test dogrulamalarini yaz",
+              "type": "code_modify",
+              "why": "Her assertion bir gereksininimi dogrular — basarisiz assertion sorunu erkenden yakalar.",
+              "code": "it('should search products', async () => {\n    const res = await request(app).get('/api/products?search=Test');\n    expect(res.status).toBe(200);\n    expect(res.body.products).toHaveLength(1);\n  });\n});",
+              "file": "tests/integration/product.test.ts"
             },
             {
               "order": "1.8",
@@ -2555,16 +3541,82 @@
               "action": "CI workflow iskeletini yaz — sadece trigger ve setup",
               "type": "code_write",
               "file": ".github/workflows/ci.yml",
-              "code": "name: CI Pipeline\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '20'\n      - run: echo 'TODO: test adımları'",
+              "code": "name: CI Pipeline\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]",
               "why": "Önce en basit çalışan workflow — trigger ve runner tanımı. Detayları sonra ekleyeceğiz."
+            },
+            {
+              "order": "2.3b",
+              "action": "ALTTA DEVAM ET: CI pipeline adimlarini ekle",
+              "type": "code_add",
+              "why": "GitHub Actions pipeline'ina test ve build adimlarini ekliyoruz.",
+              "code": "jobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '20'",
+              "file": ".github/workflows/ci.yml",
+              "position": "bottom"
+            },
+            {
+              "order": "2.3c",
+              "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
+              "type": "code_add",
+              "why": "Altyapi yapilandirmasinin siradaki bolumunu ekliyoruz.",
+              "code": "- run: echo 'TODO: test adımları'",
+              "file": ".github/workflows/ci.yml",
+              "position": "bottom"
             },
             {
               "order": "2.4",
               "action": "GERİ DÖN: CI workflow'a servisler ve test adımları ekle",
               "type": "code_modify",
               "file": ".github/workflows/ci.yml",
-              "code": "name: CI Pipeline\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n\n    services:\n      postgres:\n        image: postgres:16-alpine\n        env:\n          POSTGRES_USER: ecomuser\n          POSTGRES_PASSWORD: ecompass\n          POSTGRES_DB: ecommerce_test\n        ports:\n          - 5432:5432\n        options: >-\n          --health-cmd pg_isready\n          --health-interval 10s\n          --health-timeout 5s\n          --health-retries 5\n      redis:\n        image: redis:7-alpine\n        ports:\n          - 6379:6379\n\n    env:\n      DATABASE_URL: postgresql://ecomuser:ecompass@localhost:5432/ecommerce_test\n      REDIS_URL: redis://localhost:6379\n      JWT_SECRET: test-secret\n      STRIPE_SECRET_KEY: sk_test_mock\n\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '20'\n      - uses: pnpm/action-setup@v2\n        with:\n          version: 9\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm dlx prisma migrate deploy\n      - run: pnpm test\n      - run: pnpm tsc --noEmit",
+              "code": "name: CI Pipeline\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]",
               "why": "2.3'teki iskeletin detaylarını ekliyoruz. services ile GitHub Actions'ın kendi PostgreSQL ve Redis container'larını başlatır. Milestone 0'daki Docker Compose ile aynı konfigürasyon. migrate deploy (dev değil) production migration'ı uygular."
+            },
+            {
+              "order": "2.4b",
+              "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
+              "type": "code_modify",
+              "why": "Altyapi yapilandirmasinin siradaki bolumunu ekliyoruz.",
+              "code": "jobs:\n  test:\n    runs-on: ubuntu-latest",
+              "file": ".github/workflows/ci.yml"
+            },
+            {
+              "order": "2.4c",
+              "action": "ALTTA DEVAM ET: Docker servisini tanimla",
+              "type": "code_modify",
+              "why": "Container servisinin image, port ve ortam degiskenlerini yapilandiriyoruz.",
+              "code": "services:\n      postgres:\n        image: postgres:16-alpine\n        env:\n          POSTGRES_USER: ecomuser\n          POSTGRES_PASSWORD: ecompass\n          POSTGRES_DB: ecommerce_test\n        ports:",
+              "file": ".github/workflows/ci.yml"
+            },
+            {
+              "order": "2.4d",
+              "action": "ALTTA DEVAM ET: Docker servisini tanimla",
+              "type": "code_modify",
+              "why": "Container servisinin image, port ve ortam degiskenlerini yapilandiriyoruz.",
+              "code": "- 5432:5432\n        options: >-\n          --health-cmd pg_isready\n          --health-interval 10s\n          --health-timeout 5s\n          --health-retries 5\n      redis:\n        image: redis:7-alpine",
+              "file": ".github/workflows/ci.yml"
+            },
+            {
+              "order": "2.4e",
+              "action": "ALTTA DEVAM ET: CI pipeline adimlarini ekle",
+              "type": "code_modify",
+              "why": "GitHub Actions pipeline'ina test ve build adimlarini ekliyoruz.",
+              "code": "ports:\n          - 6379:6379\n\n    env:\n      DATABASE_URL: postgresql://ecomuser:ecompass@localhost:5432/ecommerce_test\n      REDIS_URL: redis://localhost:6379\n      JWT_SECRET: test-secret\n      STRIPE_SECRET_KEY: sk_test_mock\n\n    steps:",
+              "file": ".github/workflows/ci.yml"
+            },
+            {
+              "order": "2.4f",
+              "action": "ALTTA DEVAM ET: CI pipeline adimlarini ekle",
+              "type": "code_modify",
+              "why": "GitHub Actions pipeline'ina test ve build adimlarini ekliyoruz.",
+              "code": "- uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '20'\n      - uses: pnpm/action-setup@v2\n        with:\n          version: 9\n      - run: pnpm install --frozen-lockfile",
+              "file": ".github/workflows/ci.yml"
+            },
+            {
+              "order": "2.4g",
+              "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
+              "type": "code_modify",
+              "why": "Altyapi yapilandirmasinin siradaki bolumunu ekliyoruz.",
+              "code": "- run: pnpm dlx prisma migrate deploy\n      - run: pnpm test\n      - run: pnpm tsc --noEmit",
+              "file": ".github/workflows/ci.yml"
             },
             {
               "order": "2.5",
@@ -2658,8 +3710,26 @@
               "action": "Swagger konfigürasyonu iskeletini yaz",
               "type": "code_write",
               "file": "src/utils/swagger.ts",
-              "code": "import swaggerJSDoc from 'swagger-jsdoc';\n\nconst options: swaggerJSDoc.Options = {\n  definition: {\n    openapi: '3.0.0',\n    info: {\n      title: 'E-Ticaret API',\n      version: '1.0.0',\n      description: 'E-ticaret backend API + Fraud Detection',\n    },\n    servers: [\n      { url: 'http://localhost:3001', description: 'Development' },\n    ],\n  },\n  apis: ['./src/routes/*.ts'],\n};\n\nexport const swaggerSpec = swaggerJSDoc(options);",
+              "code": "import swaggerJSDoc from 'swagger-jsdoc';",
               "why": "OpenAPI 3.0 standardında API dokümantasyonu. apis alanı route dosyalarındaki JSDoc comment'larını tarar. Milestone 0'daki tüm route dosyaları otomatik dahil edilir."
+            },
+            {
+              "order": "3.3b",
+              "action": "ALTTA DEVAM ET: options degerini hesapla",
+              "type": "code_add",
+              "why": "options degerini hesaplayarak sonraki adimlarda kullanilmak uzere hazirliyoruz.",
+              "code": "const options: swaggerJSDoc.Options = {\n  definition: {\n    openapi: '3.0.0',\n    info: {\n      title: 'E-Ticaret API',\n      version: '1.0.0',\n      description: 'E-ticaret backend API + Fraud Detection',\n    },",
+              "file": "src/utils/swagger.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.3c",
+              "action": "ALTTA DEVAM ET: islem mantigi devam",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan mantigi tamamlayarak fonksiyonu calisir hale getiriyoruz.",
+              "code": "servers: [\n      { url: 'http://localhost:3001', description: 'Development' },\n    ],\n  },\n  apis: ['./src/routes/*.ts'],\n};\n\nexport const swaggerSpec = swaggerJSDoc(options);",
+              "file": "src/utils/swagger.ts",
+              "position": "bottom"
             },
             {
               "order": "3.4",
@@ -2667,8 +3737,26 @@
               "type": "code_add",
               "file": "src/routes/product.routes.ts",
               "position": "top",
-              "code": "/**\n * @swagger\n * /api/products:\n *   get:\n *     summary: Ürünleri listele\n *     tags: [Products]\n *     parameters:\n *       - in: query\n *         name: page\n *         schema: { type: integer, default: 1 }\n *       - in: query\n *         name: search\n *         schema: { type: string }\n *     responses:\n *       200:\n *         description: Ürün listesi\n */",
+              "code": "/**\n * @swagger\n * /api/products:\n *   get:\n *     summary: Ürünleri listele\n *     tags: [Products]\n *     parameters:\n *       - in: query",
               "why": "Milestone 0 Step 2'deki product route'una Swagger dokümantasyonu ekliyoruz. JSDoc comment'ları swagger-jsdoc tarafından parse edilir."
+            },
+            {
+              "order": "3.4b",
+              "action": "ALTTA DEVAM ET: route handler kapanisi",
+              "type": "code_add",
+              "why": "Route handler'in try-catch ve yanit islemini tamamliyoruz.",
+              "code": "*         name: page\n *         schema: { type: integer, default: 1 }\n *       - in: query\n *         name: search\n *         schema: { type: string }\n *     responses:\n *       200:\n *         description: Ürün listesi",
+              "file": "src/routes/product.routes.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.4c",
+              "action": "ALTTA DEVAM ET: route handler kapanisi",
+              "type": "code_add",
+              "why": "Route handler'in try-catch ve yanit islemini tamamliyoruz.",
+              "code": "*/",
+              "file": "src/routes/product.routes.ts",
+              "position": "bottom"
             },
             {
               "order": "3.5",
@@ -2699,8 +3787,17 @@
               "type": "code_add",
               "file": "src/utils/swagger.ts",
               "position": "bottom",
-              "code": "\n// definition objesine ekle:\n// components: {\n//   securitySchemes: {\n//     bearerAuth: {\n//       type: 'http',\n//       scheme: 'bearer',\n//       bearerFormat: 'JWT',\n//     },\n//   },\n// },",
+              "code": "// definition objesine ekle:\n// components: {\n//   securitySchemes: {\n//     bearerAuth: {\n//       type: 'http',\n//       scheme: 'bearer',\n//       bearerFormat: 'JWT',\n//     },",
               "why": "Korumalı endpoint'leri Swagger UI'dan test edebilmek için JWT token girişi gerekli. bearerAuth tanımı, Authorize butonu ekler."
+            },
+            {
+              "order": "3.8b",
+              "action": "ALTTA DEVAM ET: islem mantigi devam",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan mantigi tamamlayarak fonksiyonu calisir hale getiriyoruz.",
+              "code": "//   },\n// },",
+              "file": "src/utils/swagger.ts",
+              "position": "bottom"
             },
             {
               "order": "3.9",
@@ -2788,8 +3885,24 @@
               "action": "GERİ DÖN: getCached implementasyonunu yaz",
               "type": "code_modify",
               "file": "src/utils/cache.ts",
-              "code": "import { redis } from './redis';\n\nexport async function getCached<T>(\n  key: string,\n  ttl: number,\n  fetcher: () => Promise<T>\n): Promise<T> {\n  const cached = await redis.get(key);\n  if (cached) {\n    return JSON.parse(cached);\n  }\n\n  const fresh = await fetcher();\n  await redis.setex(key, ttl, JSON.stringify(fresh));\n  return fresh;\n}",
+              "code": "import { redis } from './redis';",
               "why": "1.2'deki iskeletin gövdesini dolduruyoruz. setex ile key-value çifti TTL ile kaydedilir — süresi dolunca otomatik silinir. Generic tip <T> ile her veri tipi için kullanılabilir."
+            },
+            {
+              "order": "1.3b",
+              "action": "ALTTA DEVAM ET: export tanimini yaz",
+              "type": "code_modify",
+              "why": "Modulu disariya acarak diger dosyalardan erisime izin veriyoruz.",
+              "code": "export async function getCached<T>(\n  key: string,\n  ttl: number,\n  fetcher: () => Promise<T>\n): Promise<T> {\n  const cached = await redis.get(key);\n  if (cached) {\n    return JSON.parse(cached);",
+              "file": "src/utils/cache.ts"
+            },
+            {
+              "order": "1.3c",
+              "action": "ALTTA DEVAM ET: islem mantigi devam",
+              "type": "code_modify",
+              "why": "Onceki adimda baslanan mantigi tamamlayarak fonksiyonu calisir hale getiriyoruz.",
+              "code": "}\n\n  const fresh = await fetcher();\n  await redis.setex(key, ttl, JSON.stringify(fresh));\n  return fresh;\n}",
+              "file": "src/utils/cache.ts"
             },
             {
               "order": "1.4",
@@ -2797,8 +3910,17 @@
               "type": "code_add",
               "file": "src/utils/cache.ts",
               "position": "bottom",
-              "code": "\nexport async function invalidateCache(pattern: string): Promise<void> {\n  const keys = await redis.keys(pattern);\n  if (keys.length > 0) {\n    await redis.del(...keys);\n  }\n}\n\nexport async function invalidateKey(key: string): Promise<void> {\n  await redis.del(key);\n}",
+              "code": "export async function invalidateCache(pattern: string): Promise<void> {\n  const keys = await redis.keys(pattern);\n  if (keys.length > 0) {\n    await redis.del(...keys);\n  }\n}",
               "why": "Veri güncellendiğinde eski cache'i temizlemek gerekir. Pattern ile 'products:*' gibi tüm ürün cache'lerini tek seferde silebilirsin. invalidateKey tek bir key için."
+            },
+            {
+              "order": "1.4b",
+              "action": "ALTTA DEVAM ET: invalidateKey fonksiyonunu yaz",
+              "type": "code_add",
+              "why": "invalidateKey fonksiyonunun is mantigini burada implement ediyoruz.",
+              "code": "export async function invalidateKey(key: string): Promise<void> {\n  await redis.del(key);\n}",
+              "file": "src/utils/cache.ts",
+              "position": "bottom"
             },
             {
               "order": "1.5",
@@ -2905,8 +4027,17 @@
               "type": "code_add",
               "file": "Dockerfile",
               "position": "bottom",
-              "code": "\n# Production aşaması\nFROM node:20-alpine\n\nWORKDIR /app\n\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules ./node_modules\nCOPY --from=builder /app/prisma ./prisma\nCOPY --from=builder /app/package.json ./\n\nEXPOSE 3001\n\nCMD [\"node\", \"dist/app.js\"]",
+              "code": "# Production aşaması\nFROM node:20-alpine\n\nWORKDIR /app\n\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules ./node_modules\nCOPY --from=builder /app/prisma ./prisma\nCOPY --from=builder /app/package.json ./\n\nEXPOSE 3001",
               "why": "2.2'deki builder'dan sadece gerekli dosyaları kopyalıyoruz — TypeScript kaynak kodu, devDependencies hariç. Image boyutu ~200MB'den ~100MB'ye düşer."
+            },
+            {
+              "order": "2.3b",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "CMD [\"node\", \"dist/app.js\"]",
+              "file": "Dockerfile",
+              "position": "bottom"
             },
             {
               "order": "2.4",
@@ -2920,8 +4051,17 @@
               "action": ".dockerignore içeriğini yaz",
               "type": "code_write",
               "file": ".dockerignore",
-              "code": "node_modules\ndist\n.env\n.env.*\ncoverage\ntests\n*.md\n.git\nfraud-detection/venv\nfraud-detection/data\nfraud-detection/__pycache__",
+              "code": "node_modules\ndist\n.env\n.env.*\ncoverage\ntests\n*.md\n.git",
               "why": "node_modules Docker içinde pnpm install ile yeniden kurulur. .env production'da farklı olacak. coverage ve test dosyaları production image'da gereksiz."
+            },
+            {
+              "order": "2.5b",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "fraud-detection/venv\nfraud-detection/data\nfraud-detection/__pycache__",
+              "file": ".dockerignore",
+              "position": "bottom"
             },
             {
               "order": "2.6",
@@ -3212,8 +4352,17 @@
               "action": "README başlık ve açıklama bölümünü yaz",
               "type": "code_write",
               "file": "README.md",
-              "code": "# E-Ticaret Backend API + Fraud Detection\n\nProduction-ready e-ticaret backend API'si. Stripe ödeme entegrasyonu, Redis sepet yönetimi ve ML tabanlı fraud detection sistemi.\n\n## Tech Stack\n\n- **Backend:** Node.js, Express, TypeScript\n- **Database:** PostgreSQL (Prisma ORM)\n- **Cache:** Redis\n- **Payment:** Stripe\n- **ML:** Python, scikit-learn, Flask\n- **DevOps:** Docker, GitHub Actions",
+              "code": "# E-Ticaret Backend API + Fraud Detection\n\nProduction-ready e-ticaret backend API'si. Stripe ödeme entegrasyonu, Redis sepet yönetimi ve ML tabanlı fraud detection sistemi.\n\n## Tech Stack",
               "why": "İlk 3 satır projenin ne yaptığını anlatmalı. Tech stack badge'leri veya listesi, recruiter'ın hızlıca teknolojileri görmesini sağlar."
+            },
+            {
+              "order": "3.2b",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "- **Backend:** Node.js, Express, TypeScript\n- **Database:** PostgreSQL (Prisma ORM)\n- **Cache:** Redis\n- **Payment:** Stripe\n- **ML:** Python, scikit-learn, Flask\n- **DevOps:** Docker, GitHub Actions",
+              "file": "README.md",
+              "position": "bottom"
             },
             {
               "order": "3.3",
@@ -3221,8 +4370,26 @@
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "\n## Özellikler\n\n- RESTful API tasarımı (ürün, sepet, sipariş, ödeme)\n- Stripe Checkout Session + Webhook entegrasyonu\n- Redis ile sepet yönetimi (TTL ile otomatik temizleme)\n- Transaction-safe sipariş oluşturma (atomik stok kontrolü)\n- JWT authentication + Role-based authorization\n- ML tabanlı fraud detection (scikit-learn RandomForest)\n- Redis caching stratejisi (response time %90 iyileştirme)\n- Docker Compose multi-service orchestration\n- GitHub Actions CI/CD pipeline\n- Swagger API dokümantasyonu",
+              "code": "## Özellikler",
               "why": "3.2'de tech stack'i yazdık, şimdi projenin özelliklerini listeliyoruz. Her madde bir interview konuşma başlangıcı — 'Stripe webhook entegrasyonunuzu anlatır mısınız?' gibi."
+            },
+            {
+              "order": "3.3b",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "- RESTful API tasarımı (ürün, sepet, sipariş, ödeme)\n- Stripe Checkout Session + Webhook entegrasyonu\n- Redis ile sepet yönetimi (TTL ile otomatik temizleme)\n- Transaction-safe sipariş oluşturma (atomik stok kontrolü)\n- JWT authentication + Role-based authorization\n- ML tabanlı fraud detection (scikit-learn RandomForest)\n- Redis caching stratejisi (response time %90 iyileştirme)\n- Docker Compose multi-service orchestration",
+              "file": "README.md",
+              "position": "bottom"
+            },
+            {
+              "order": "3.3c",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "- GitHub Actions CI/CD pipeline\n- Swagger API dokümantasyonu",
+              "file": "README.md",
+              "position": "bottom"
             },
             {
               "order": "3.4",
@@ -3230,8 +4397,17 @@
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "\n## Kurulum\n\n```bash\n# Repo'yu klonla\ngit clone https://github.com/USERNAME/ecommerce-api.git\ncd ecommerce-api\n\n# Bağımlılıkları kur\npnpm install\n\n# Docker servislerini başlat\ndocker-compose up -d db redis\n\n# Migration uygula\npnpm dlx prisma migrate dev\n\n# Sunucuyu başlat\npnpm dev\n```",
+              "code": "## Kurulum\n\n```bash\n# Repo'yu klonla\ngit clone https://github.com/USERNAME/ecommerce-api.git\ncd ecommerce-api\n\n# Bağımlılıkları kur\npnpm install",
               "why": "Klonlayan kişi 5 komutla projeyi çalıştırabilmeli. Milestone 0'daki adımların özeti."
+            },
+            {
+              "order": "3.4b",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "# Docker servislerini başlat\ndocker-compose up -d db redis\n\n# Migration uygula\npnpm dlx prisma migrate dev\n\n# Sunucuyu başlat\npnpm dev\n```",
+              "file": "README.md",
+              "position": "bottom"
             },
             {
               "order": "3.5",
@@ -3239,8 +4415,26 @@
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "\n## API Endpoints\n\n| Method | Endpoint | Auth | Açıklama |\n|--------|----------|------|----------|\n| POST | /api/auth/register | - | Kayıt |\n| POST | /api/auth/login | - | Giriş |\n| GET | /api/products | - | Ürün listele |\n| GET | /api/products/:slug | - | Ürün detay |\n| POST | /api/cart/items | JWT | Sepete ekle |\n| GET | /api/cart | JWT | Sepeti gör |\n| POST | /api/orders | JWT | Sipariş oluştur |\n| POST | /api/payments/create-checkout | JWT | Ödeme başlat |\n| GET | /api/stock/report | Admin | Stok raporu |",
+              "code": "## API Endpoints",
               "why": "Endpoint tablosu API'nin kapsamını tek bakışta gösterir. Auth sütunu hangi endpoint'lerin korumalı olduğunu belirtir."
+            },
+            {
+              "order": "3.5b",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "| Method | Endpoint | Auth | Açıklama |\n|--------|----------|------|----------|\n| POST | /api/auth/register | - | Kayıt |\n| POST | /api/auth/login | - | Giriş |\n| GET | /api/products | - | Ürün listele |\n| GET | /api/products/:slug | - | Ürün detay |\n| POST | /api/cart/items | JWT | Sepete ekle |\n| GET | /api/cart | JWT | Sepeti gör |",
+              "file": "README.md",
+              "position": "bottom"
+            },
+            {
+              "order": "3.5c",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "| POST | /api/orders | JWT | Sipariş oluştur |\n| POST | /api/payments/create-checkout | JWT | Ödeme başlat |\n| GET | /api/stock/report | Admin | Stok raporu |",
+              "file": "README.md",
+              "position": "bottom"
             },
             {
               "order": "3.6",
@@ -3248,8 +4442,26 @@
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "\n## Mimari\n\n```\nClient → Express API → PostgreSQL (Prisma)\n              ↓\n          Redis Cache\n              ↓\n        Stripe Payment\n              ↓\n     Fraud Detection (Flask/ML)\n```",
+              "code": "## Mimari",
               "why": "Basit ASCII diyagramı sistem mimarisini anlatır. Interview'da 'mimarinizi anlatır mısınız?' sorusuna görsel cevap."
+            },
+            {
+              "order": "3.6b",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "```\nClient → Express API → PostgreSQL (Prisma)\n              ↓\n          Redis Cache\n              ↓\n        Stripe Payment\n              ↓\n     Fraud Detection (Flask/ML)",
+              "file": "README.md",
+              "position": "bottom"
+            },
+            {
+              "order": "3.6c",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "```",
+              "file": "README.md",
+              "position": "bottom"
             },
             {
               "order": "3.7",
@@ -3257,8 +4469,17 @@
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "\n## Fraud Detection\n\nML modeli sipariş verilerini analiz ederek şüpheli işlemleri tespit eder.\n\n**Feature'lar:** Sipariş tutarı, ürün sayısı, saat, hesap yaşı, önceki sipariş sayısı, farklı teslimat adresi\n\n**Model:** RandomForest Classifier (scikit-learn)\n**Performans:** Recall > 0.85, Precision > 0.80\n\n**Risk Seviyeleri:**\n- LOW: fraud_probability < 0.3\n- MEDIUM: 0.3 - 0.7\n- HIGH: > 0.7",
+              "code": "## Fraud Detection\n\nML modeli sipariş verilerini analiz ederek şüpheli işlemleri tespit eder.\n\n**Feature'lar:** Sipariş tutarı, ürün sayısı, saat, hesap yaşı, önceki sipariş sayısı, farklı teslimat adresi\n\n**Model:** RandomForest Classifier (scikit-learn)\n**Performans:** Recall > 0.85, Precision > 0.80",
               "why": "ML bileşeni projeyi diğerlerinden ayırır. Feature'ları, modeli ve performans metriklerini açıkça belirtmek, AI/ML bilgini gösterir."
+            },
+            {
+              "order": "3.7b",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "**Risk Seviyeleri:**\n- LOW: fraud_probability < 0.3\n- MEDIUM: 0.3 - 0.7\n- HIGH: > 0.7",
+              "file": "README.md",
+              "position": "bottom"
             },
             {
               "order": "3.8",
@@ -3266,8 +4487,17 @@
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "\n## Environment Variables\n\n`.env.example` dosyasını `.env` olarak kopyala ve değerleri doldur.\n\n## Testler\n\n```bash\npnpm test           # Testleri çalıştır\npnpm test:coverage  # Coverage raporu\n```\n\n## Lisans\n\nMIT",
+              "code": "## Environment Variables\n\n`.env.example` dosyasını `.env` olarak kopyala ve değerleri doldur.\n\n## Testler\n\n```bash\npnpm test           # Testleri çalıştır\npnpm test:coverage  # Coverage raporu\n```\n\n## Lisans",
               "why": "Son bölümler: environment setup referansı, test komutları ve lisans. MIT lisansı open source projeler için standart."
+            },
+            {
+              "order": "3.8b",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle",
+              "type": "code_add",
+              "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
+              "code": "MIT",
+              "file": "README.md",
+              "position": "bottom"
             },
             {
               "order": "3.9",

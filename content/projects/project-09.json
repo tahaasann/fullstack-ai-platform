@@ -173,12 +173,12 @@
               "why": "Bağımlılıkları sabit versiyonla kaydetmek farklı ortamlarda aynı sonucu garanti eder. ML projeleri kütüphane uyumsuzluğuna çok hassastır."
             },
             {
-              "order": "1.3b",
+              "order": "1.3a",
               "action": "requirements.txt'nin devamı — ML ve yardımcı paketler",
               "type": "code_write",
               "file": "requirements.txt",
               "code": "scikit-learn==1.3.2\npandas==2.1.4\npydantic==2.5.3\npython-multipart==0.0.6\nalembic==1.13.1\njoblib==1.3.2\nscipy==1.11.4",
-              "why": "1.3'ün devamı. scikit-learn model eğitimi, pandas veri işleme, scipy istatistiksel testler (drift detection) için kullanılacak."
+              "why": "scikit-learn model eğitimi, pandas veri işleme, scipy istatistiksel testler (drift detection) için kullanılacak."
             },
             {
               "order": "1.4",
@@ -196,12 +196,12 @@
               "why": "Önce en basit çalışan API'yi yazıyoruz. Health endpoint ile servisin ayakta olduğunu kanıtlıyoruz. CORS ve router'ları sonra ekleyeceğiz — adım adım."
             },
             {
-              "order": "1.5b",
+              "order": "1.5a",
               "action": "İskelet olarak başla — sadece FastAPI app oluştur ve health endpoint yaz (devamı)",
               "type": "code_add",
               "file": "api/main.py",
               "code": "@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"healthy\"}",
-              "why": "Önce en basit çalışan API'yi yazıyoruz — bu adımın devamı.",
+              "why": "health_check endpoint'i servisin ayakta olduğunu kanıtlar. Tarayıcıda /health açıp {status: healthy} görmelisin — bu basit test deployment'ta da kullanılır.",
               "position": "bottom"
             },
             {
@@ -221,7 +221,7 @@
               "why": "Frontend'den gelen isteklerin kabul edilmesi için CORS gerekli. ÜSTE ÇIK çünkü import'lar her zaman dosyanın en üstünde olmalı."
             },
             {
-              "order": "1.7b",
+              "order": "1.7a",
               "action": "app tanımının ALTINA CORS middleware'i ekle",
               "type": "code_add",
               "file": "api/main.py",
@@ -238,16 +238,16 @@
               "why": "Docker Compose ile tüm servisleri tek komutla ayağa kaldıracağız. PostgreSQL ile başlıyoruz çünkü metadata storage tüm bileşenlerin bağımlılığı."
             },
             {
-              "order": "1.8b",
+              "order": "1.8a",
               "action": "docker-compose.yml dosyasını oluştur — servis iskeleti (devamı)",
               "type": "code_add",
               "file": "docker-compose.yml",
               "code": "      - POSTGRES_DB=mlpipeline\n    ports:\n      - \"5432:5432\"\n    volumes:\n      - pgdata:/var/lib/postgresql/data",
-              "why": "Docker Compose ile tüm servisleri tek komutla ayağa kaldıracağız — bu adımın devamı.",
+              "why": "POSTGRES_DB veritabanı adını, ports dışarıya açılan portu, volumes ise container silinse bile verinin kalmasını sağlar. Volume olmadan her restart'ta veri kaybolur.",
               "position": "bottom"
             },
             {
-              "order": "1.8c",
+              "order": "1.8b",
               "action": "docker-compose.yml'e Redis ve MLflow servislerini ekle",
               "type": "code_add",
               "file": "docker-compose.yml",
@@ -256,13 +256,13 @@
               "why": "1.8'deki PostgreSQL'e ek olarak Redis (Celery job queue) ve MLflow (experiment tracking) servislerini ekliyoruz. depends_on ile başlatma sırasını kontrol ediyoruz."
             },
             {
-              "order": "1.8d",
+              "order": "1.8c",
               "action": "docker-compose.yml'e Redis ve MLflow servislerini ekle (devamı)",
               "type": "code_add",
               "file": "docker-compose.yml",
               "position": "bottom",
               "code": "      - \"5000:5000\"\n    command: mlflow server --host 0.0.0.0 --port 5000\n    depends_on:\n      - db\n\nvolumes:\n  pgdata:",
-              "why": "Docker Compose ile tüm servisleri tek komutla ayağa kaldıracağız — bu adımın devamı."
+              "why": "MLflow server'ın 5000 portunda çalışması için command ve depends_on ayarlanıyor. volumes bloğu Docker Compose'un named volume'larını tanımlar."
             },
             {
               "order": "1.9",
@@ -322,7 +322,7 @@
               "why": "Önce import'ları ve Base'i yazıyoruz. declarative_base() tüm modellerin miras alacağı temel sınıf — SQLAlchemy ORM'in bel kemiği."
             },
             {
-              "order": "2.2b",
+              "order": "2.2a",
               "action": "Base'in ALTINA Dataset sınıfını ekle",
               "type": "code_add",
               "file": "api/models.py",
@@ -331,13 +331,13 @@
               "why": "2.2'de yazdığımız Base'den miras alan Dataset sınıfı. Her sütun bir Column — primary_key otomatik artış sağlar, index=True sorguları hızlandırır."
             },
             {
-              "order": "2.2c",
+              "order": "2.2b",
               "action": "Dataset sınıfının devamı — JSON ve tarih alanları",
               "type": "code_add",
               "file": "api/models.py",
               "position": "bottom",
               "code": "    columns_info = Column(JSON)\n    quality_score = Column(Float)\n    profile = Column(JSON)\n    created_at = Column(DateTime, default=datetime.utcnow)\n    description = Column(Text)",
-              "why": "2.2b'nin devamı. JSON tipi esnek metadata saklama sağlar — sütun bilgileri ve profil verisi değişken yapıda olabilir."
+              "why": "JSON tipi esnek metadata saklama sağlar — sütun bilgileri ve profil verisi değişken yapıda olabilir."
             },
             {
               "order": "2.3",
@@ -348,16 +348,16 @@
               "why": "Veritabanı bağlantısını merkezi modülde tutmak tüm endpoint'lerin aynı havuzu kullanmasını sağlar. os.getenv ile Docker ve lokal ortamda farklı URL kullanabilirsin."
             },
             {
-              "order": "2.3b",
-              "action": "BAŞKA DOSYAYA GEÇ — api/database.py veritabanı bağlantısı (devamı)",
+              "order": "2.3a",
+              "action": "AYNI DOSYADA DEVAM ET — api/database.py veritabanı bağlantısı (devamı)",
               "type": "code_add",
               "file": "api/database.py",
               "code": "engine = create_engine(DATABASE_URL)",
-              "why": "Veritabanı bağlantısını merkezi modülde tutmak tüm endpoint'lerin aynı havuzu kullanmasını sağlar — bu adımın devamı.",
+              "why": "create_engine veritabanı bağlantı havuzunu oluşturur. URL'yi parse edip connection pooling yapar — her istek yeni bağlantı açmak yerine havuzdan alır.",
               "position": "bottom"
             },
             {
-              "order": "2.3c",
+              "order": "2.3b",
               "action": "database.py'nin devamı — session factory ve dependency",
               "type": "code_add",
               "file": "api/database.py",
@@ -366,13 +366,13 @@
               "why": "2.3'teki engine üzerine session factory kuruyoruz. get_db generator'ı FastAPI dependency injection ile çalışır — her istek kendi session'ını alır, sonra otomatik kapanır."
             },
             {
-              "order": "2.3d",
+              "order": "2.3c",
               "action": "database.py'nin devamı — session factory ve dependency (devamı)",
               "type": "code_add",
               "file": "api/database.py",
               "position": "bottom",
               "code": "    finally:\n        db.close()",
-              "why": "Veritabanı bağlantısını merkezi modülde tutmak tüm endpoint'lerin aynı havuzu kullanmasını sağlar — bu adımın devamı."
+              "why": "finally bloğu hata olsa bile session'ı kapatır. Kapatılmayan session'lar connection pool'u tüketir ve veritabanını kilitler."
             },
             {
               "order": "2.4",
@@ -383,16 +383,16 @@
               "why": "Her yüklenen dataset'in kalitesini otomatik değerlendiren servis. Missing value oranı, veri tipleri ve dağılım istatistikleri model eğitimi öncesi kritik bilgilerdir."
             },
             {
-              "order": "2.4b",
-              "action": "BAŞKA DOSYAYA GEÇ — api/services/data_profiler.py veri profilleme (devamı)",
+              "order": "2.4a",
+              "action": "AYNI DOSYADA DEVAM ET — api/services/data_profiler.py veri profilleme (devamı)",
               "type": "code_add",
               "file": "api/services/data_profiler.py",
               "code": "        \"columns\": []\n    }",
-              "why": "Her yüklenen dataset'in kalitesini otomatik değerlendiren servis — bu adımın devamı.",
+              "why": "profile dict'inin columns listesini başlatıyoruz. Her sütunun istatistikleri bu listeye eklenecek — döngü bir sonraki adımda.",
               "position": "bottom"
             },
             {
-              "order": "2.4c",
+              "order": "2.4b",
               "action": "profile_dataset fonksiyonunun devamı — sütun analizi",
               "type": "code_add",
               "file": "api/services/data_profiler.py",
@@ -401,31 +401,31 @@
               "why": "2.4'teki profile dict'ine her sütunun istatistiklerini ekliyoruz. missing_pct modelin eğitim kalitesini doğrudan etkiler."
             },
             {
-              "order": "2.4d",
+              "order": "2.4c",
               "action": "profile_dataset fonksiyonunun devamı — sütun analizi (devamı)",
               "type": "code_add",
               "file": "api/services/data_profiler.py",
               "position": "bottom",
               "code": "            \"unique_count\": int(df[col].nunique()),\n        }",
-              "why": "Her yüklenen dataset'in kalitesini otomatik değerlendiren servis — bu adımın devamı."
+              "why": "unique_count bir sütundaki benzersiz değer sayısını verir. Çok az unique = kategorik, çok fazla = ID sütunu olabilir — model için anlamsız."
             },
             {
-              "order": "2.4e",
+              "order": "2.4d",
               "action": "Sayısal sütunlar için ek istatistikler ve quality score",
               "type": "code_add",
               "file": "api/services/data_profiler.py",
               "position": "bottom",
               "code": "if pd.api.types.is_numeric_dtype(df[col]):\n            col_info.update({\n                \"mean\": round(float(df[col].mean()), 4),\n                \"std\": round(float(df[col].std()), 4),\n            })\n        profile[\"columns\"].append(col_info)\n    total = df.shape[0] * df.shape[1]\n    missing = df.isnull().sum().sum()",
-              "why": "2.4b'nin devamı. Sayısal sütunlarda mean/std ekleniyor. quality_score tüm hücrelerdeki eksik veri oranını gösterir — %95+ iyi, %80 altı sorunlu."
+              "why": "Sayısal sütunlarda mean/std ekleniyor. quality_score tüm hücrelerdeki eksik veri oranını gösterir — %95+ iyi, %80 altı sorunlu."
             },
             {
-              "order": "2.4f",
+              "order": "2.4e",
               "action": "Sayısal sütunlar için ek istatistikler ve quality score (devamı)",
               "type": "code_add",
               "file": "api/services/data_profiler.py",
               "position": "bottom",
               "code": "    profile[\"quality_score\"] = round(\n        (1 - missing / total) * 100, 2\n    ) if total > 0 else 0\n    return profile",
-              "why": "Her yüklenen dataset'in kalitesini otomatik değerlendiren servis — bu adımın devamı."
+              "why": "quality_score formülü: (1 - eksik_hücre / toplam_hücre) * 100. %95+ iyi kalite, %80 altı uyarı gerektirir — model eğitimi öncesi kontrol noktası."
             },
             {
               "order": "2.5",
@@ -436,25 +436,25 @@
               "why": "2.2'de model, 2.3'te database, 2.4'te profiler yazdık — şimdi hepsini birleştiren endpoint'i yazıyoruz. Import'ları ÜSTE yazıyoruz."
             },
             {
-              "order": "2.5b",
+              "order": "2.5a",
               "action": "Router tanımı ve upload endpoint iskeleti",
               "type": "code_add",
               "file": "api/routers/datasets.py",
               "position": "bottom",
-              "code": "router = APIRouter(\n    prefix=\"/api/datasets\", tags=[\"datasets\"]\n)\nUPLOAD_DIR = \"data/uploads\"\nos.makedirs(UPLOAD_DIR, exist_ok=True)\n\n@router.post(\"/upload\")\nasync def upload_dataset(",
+              "code": "router = APIRouter(\n    prefix=\"/api/datasets\", tags=[\"datasets\"]\n)\nUPLOAD_DIR = \"data/uploads\"\nos.makedirs(UPLOAD_DIR, exist_ok=True)",
               "why": "2.5'teki import'ları kullanarak router oluşturuyoruz. APIRouter prefix ile tüm endpoint'ler /api/datasets altında gruplanır."
             },
             {
-              "order": "2.5c",
+              "order": "2.5b",
               "action": "Router tanımı ve upload endpoint iskeleti (devamı)",
               "type": "code_add",
               "file": "api/routers/datasets.py",
               "position": "bottom",
-              "code": "    file: UploadFile = File(...),\n    db: Session = Depends(get_db)\n):",
-              "why": "2 — bu adımın devamı."
+              "code": "@router.post(\"/upload\")\nasync def upload_dataset(\n    file: UploadFile = File(...),\n    db: Session = Depends(get_db)\n):",
+              "why": "file parametresi multipart upload, db parametresi dependency injection ile session alır. FastAPI Depends() her istekte yeni session oluşturup sonra kapatır."
             },
             {
-              "order": "2.5d",
+              "order": "2.5c",
               "action": "Upload endpoint'in gövdesi — dosya kaydetme ve profilleme",
               "type": "code_add",
               "file": "api/routers/datasets.py",
@@ -463,7 +463,7 @@
               "why": "2.5b'deki endpoint'in gövdesi. Dosya tipini kontrol et, diske kaydet, pandas ile oku ve 2.4'te yazdığımız profiler ile analiz et."
             },
             {
-              "order": "2.5e",
+              "order": "2.5d",
               "action": "Upload endpoint'in devamı — veritabanına kaydet ve list endpoint",
               "type": "code_add",
               "file": "api/routers/datasets.py",
@@ -472,13 +472,13 @@
               "why": "2.2'de tanımladığımız Dataset modeline kaydediyoruz. db.refresh() otomatik oluşturulan id'yi alır. List endpoint tüm dataset'leri döner."
             },
             {
-              "order": "2.5f",
+              "order": "2.5e",
               "action": "Upload endpoint'in devamı — veritabanına kaydet ve list endpoint (devamı)",
               "type": "code_add",
               "file": "api/routers/datasets.py",
               "position": "bottom",
               "code": "    db.add(dataset)\n    db.commit()\n    db.refresh(dataset)\n    return {\"id\": dataset.id, \"name\": dataset.name, \"profile\": profile}\n\n@router.get(\"/\")\nasync def list_datasets(db: Session = Depends(get_db)):\n    return db.query(Dataset).all()",
-              "why": "2 — bu adımın devamı."
+              "why": "db.commit() değişiklikleri kalıcı yapar, db.refresh() otomatik oluşturulan id'yi Python nesnesine yükler. List endpoint tüm dataset'leri sorgulayıp döner."
             },
             {
               "order": "2.6",
@@ -536,16 +536,16 @@
               "action": "api/services/data_cleaner.py dosyasını oluştur — DataCleaner iskeleti",
               "type": "code_write",
               "file": "api/services/data_cleaner.py",
-              "code": "import pandas as pd\nimport numpy as np\nfrom typing import Dict, Any\n\nclass DataCleaner:\n    def __init__(self, df: pd.DataFrame):\n        self.df = df.copy()\n        self.report = {",
+              "code": "import pandas as pd\nimport numpy as np\nfrom typing import Dict, Any\n\nclass DataCleaner:\n    def __init__(self, df: pd.DataFrame):\n        self.df = df.copy()",
               "why": "Veri temizleme modülü builder pattern kullanacak — zincirleme çağrılarla temizleme adımlarını birleştirebilirsin. df.copy() orijinal veriyi korur."
             },
             {
-              "order": "3.1b",
+              "order": "3.1a",
               "action": "api/services/data_cleaner.py dosyasını oluştur — DataCleaner iskeleti (devamı)",
               "type": "code_add",
               "file": "api/services/data_cleaner.py",
-              "code": "            \"steps\": [],\n            \"original_shape\": df.shape\n        }",
-              "why": "Veri temizleme modülü builder pattern kullanacak — zincirleme çağrılarla temizleme adımlarını birleştirebilirsin — bu adımın devamı.",
+              "code": "        self.report = {\n            \"steps\": [],\n            \"original_shape\": df.shape\n        }",
+              "why": "report dict'i temizleme adımlarını ve orijinal boyutu kaydeder. İleride kullanıcıya 'kaç eksik değer dolduruldu, kaç outlier tespit edildi' göstermek için.",
               "position": "bottom"
             },
             {
@@ -558,31 +558,31 @@
               "why": "3.1'deki sınıfa missing value temizleme metodu ekliyoruz. select_dtypes ile sadece sayısal sütunları seçiyoruz — kategorik sütunlarda mean anlamsız."
             },
             {
-              "order": "3.2b",
+              "order": "3.2a",
               "action": "DataCleaner'a missing value handler ekle (devamı)",
               "type": "code_add",
               "file": "api/services/data_cleaner.py",
               "position": "bottom",
               "code": "                self.df[col].fillna(fill, inplace=True)\n                self.report[\"steps\"].append(\n                    f\"{col}: {missing} eksik → {strategy}\"\n                )",
-              "why": "3 — bu adımın devamı."
+              "why": "fillna(fill) eksik değerleri hesaplanan ortalama/medyan ile doldurur. report'a hangi sütunda kaç eksik değerin hangi stratejiyle doldurulduğu kaydedilir."
             },
             {
-              "order": "3.2c",
+              "order": "3.2b",
               "action": "Kategorik sütunlar için mode ile doldurma",
               "type": "code_add",
               "file": "api/services/data_cleaner.py",
               "position": "bottom",
-              "code": "for col in self.df.select_dtypes(\n            include=[\"object\"]\n        ).columns:\n            missing = self.df[col].isnull().sum()\n            if missing > 0:\n                mode_val = self.df[col].mode()\n                if not mode_val.empty:\n                    self.df[col].fillna(",
-              "why": "3.2'nin devamı. Kategorik sütunlarda mode (en sık değer) kullanılır. return self ile method chaining mümkün — cleaner.handle_missing().detect_outliers() yazılabilir."
+              "code": "for col in self.df.select_dtypes(\n            include=[\"object\"]\n        ).columns:\n            missing = self.df[col].isnull().sum()\n            if missing > 0:\n                mode_val = self.df[col].mode()\n                if not mode_val.empty:\n                    self.df[col].fillna(mode_val[0], inplace=True)",
+              "why": "Kategorik sütunlarda mode (en sık değer) kullanılır. return self ile method chaining mümkün — cleaner.handle_missing().detect_outliers() yazılabilir."
             },
             {
-              "order": "3.2d",
+              "order": "3.2c",
               "action": "Kategorik sütunlar için mode ile doldurma (devamı)",
               "type": "code_add",
               "file": "api/services/data_cleaner.py",
               "position": "bottom",
-              "code": "                        mode_val[0], inplace=True\n                    )\n        return self",
-              "why": "3 — bu adımın devamı."
+              "code": "        return self",
+              "why": "mode_val[0] en sık görülen değeri alır. return self builder pattern'i tamamlar — zincirleme çağrılar için gerekli."
             },
             {
               "order": "3.3",
@@ -594,13 +594,13 @@
               "why": "3.2'deki missing value'dan sonra outlier tespiti yapıyoruz. IQR yöntemi — Q1-1.5*IQR ile Q3+1.5*IQR arasında olmayan değerler aykırı sayılır."
             },
             {
-              "order": "3.3b",
+              "order": "3.3a",
               "action": "Outlier detection metodu ekle (devamı)",
               "type": "code_add",
               "file": "api/services/data_cleaner.py",
               "position": "bottom",
               "code": "                IQR = Q3 - Q1\n                mask = (self.df[col] < Q1 - 1.5 * IQR) | \\\n                       (self.df[col] > Q3 + 1.5 * IQR)\n                outliers[col] = int(mask.sum())\n        self.report[\"outliers\"] = outliers\n        return self",
-              "why": "3 — bu adımın devamı."
+              "why": "IQR hesaplaması: Q3-Q1 aralığının 1.5 katı dışındaki değerler aykırı sayılır. Outlier sayısı report'a eklenir, return self chaining için."
             },
             {
               "order": "3.4",
@@ -621,16 +621,16 @@
               "why": "3.1-3.4'te yazdığımız DataCleaner'ı API endpoint olarak sunuyoruz. ÜSTE ÇIK — import'u dosyanın başına ekliyoruz."
             },
             {
-              "order": "3.5b",
+              "order": "3.5a",
               "action": "GERİ DÖN — api/routers/datasets.py'ye temizleme endpoint'i ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/datasets.py",
               "position": "bottom",
               "code": "    dataset = db.query(Dataset).filter(\n        Dataset.id == dataset_id\n    ).first()",
-              "why": "3 — bu adımın devamı."
+              "why": "Veritabanından dataset kaydını sorguluyor. filter() SQL WHERE, first() tek sonuç döner. Bulunamazsa 404 hatası fırlatılır."
             },
             {
-              "order": "3.5c",
+              "order": "3.5b",
               "action": "Temizleme endpoint'inin devamı — cleaner çağır ve kaydet",
               "type": "code_add",
               "file": "api/routers/datasets.py",
@@ -639,13 +639,13 @@
               "why": "3.5'teki endpoint'in gövdesi. Builder pattern ile chaining: handle_missing → detect_outliers → clean. Temizlenmiş veri ayrı dosyaya kaydedilir — orijinal korunur."
             },
             {
-              "order": "3.5d",
+              "order": "3.5c",
               "action": "Temizleme endpoint'inin devamı — cleaner çağır ve kaydet (devamı)",
               "type": "code_add",
               "file": "api/routers/datasets.py",
               "position": "bottom",
               "code": "    cleaned_path = dataset.file_path.replace(\n        \".csv\", \"_cleaned.csv\"\n    )\n    cleaned_df.to_csv(cleaned_path, index=False)\n    return {\"report\": report, \"cleaned_path\": cleaned_path}",
-              "why": "3 — bu adımın devamı."
+              "why": "Temizlenmiş veri _cleaned.csv son ekiyle ayrı dosyaya kaydedilir — orijinal veri korunur. Report ile birlikte döndürülür."
             },
             {
               "order": "3.6",
@@ -699,39 +699,48 @@
               "why": "Hangi modelin hangi veri ile eğitildiğini bilmek reproducibility için kritik. Mevcut models.py'ye yeni tablo ekliyoruz — aynı dosya, yeni sınıf."
             },
             {
-              "order": "4.1b",
+              "order": "4.1a",
               "action": "DatasetVersion modelinin devamı",
               "type": "code_add",
               "file": "api/models.py",
               "position": "bottom",
               "code": "    column_count = Column(Integer)\n    quality_score = Column(Float)\n    profile = Column(JSON)\n    changes_summary = Column(JSON)\n    created_at = Column(DateTime, default=datetime.utcnow)",
-              "why": "4.1'in devamı. changes_summary iki versiyon arasındaki farkları JSON olarak saklar — sütun ekleme/çıkarma, istatistik değişimleri."
+              "why": "changes_summary iki versiyon arasındaki farkları JSON olarak saklar — sütun ekleme/çıkarma, istatistik değişimleri."
             },
             {
               "order": "4.2",
               "action": "BAŞKA DOSYAYA GEÇ — api/services/dataset_versioner.py karşılaştırma servisi",
               "type": "code_write",
               "file": "api/services/dataset_versioner.py",
-              "code": "import pandas as pd\nfrom typing import Dict, Any\n\ndef compare_datasets(\n    df1: pd.DataFrame, df2: pd.DataFrame\n) -> Dict[str, Any]:\n    comparison = {\n        \"shape_change\": {",
+              "code": "import pandas as pd\nfrom typing import Dict, Any\n\ndef compare_datasets(\n    df1: pd.DataFrame, df2: pd.DataFrame\n) -> Dict[str, Any]:",
               "why": "İki dataset versiyonunu karşılaştıran fonksiyon. Satır/sütun sayısı değişimleri data drift'in erken belirtileridir."
             },
             {
-              "order": "4.2b",
-              "action": "BAŞKA DOSYAYA GEÇ — api/services/dataset_versioner.py karşılaştırma servisi (devamı)",
+              "order": "4.2a",
+              "action": "AYNI DOSYADA DEVAM ET — api/services/dataset_versioner.py karşılaştırma servisi (devamı)",
               "type": "code_add",
               "file": "api/services/dataset_versioner.py",
-              "code": "            \"rows\": {\"before\": len(df1), \"after\": len(df2)},\n            \"cols\": {\"before\": len(df1.columns),\n                     \"after\": len(df2.columns)}\n        },",
-              "why": "İki dataset versiyonunu karşılaştıran fonksiyon — bu adımın devamı.",
+              "code": "    comparison = {\n        \"shape_change\": {\n            \"rows\": {\"before\": len(df1), \"after\": len(df2)},\n            \"cols\": {\"before\": len(df1.columns),\n                     \"after\": len(df2.columns)}\n        },",
+              "why": "shape_change satır ve sütun sayısı değişimlerini kaydeder. Rows artışı yeni veri, cols değişimi şema değişikliği anlamına gelir.",
               "position": "bottom"
             },
             {
-              "order": "4.2c",
+              "order": "4.2b",
               "action": "Karşılaştırma fonksiyonunun devamı — sütun diff ve istatistik",
               "type": "code_add",
               "file": "api/services/dataset_versioner.py",
               "position": "bottom",
               "code": "\"added_columns\": list(\n            set(df2.columns) - set(df1.columns)\n        ),\n        \"removed_columns\": list(\n            set(df1.columns) - set(df2.columns)\n        ),\n        \"stats_changes\": {}\n    }",
-              "why": "4.2'nin devamı. Eklenen/çıkarılan sütunlar ve ortak sütunlardaki ortalama kayması hesaplanıyor. Ortalama kayması data drift göstergesi."
+              "why": "Eklenen/çıkarılan sütunlar ve ortak sütunlardaki ortalama kayması hesaplanıyor. Ortalama kayması data drift göstergesi."
+            },
+            {
+              "order": "4.2c",
+              "action": "Karşılaştırma fonksiyonunun devamı — sütun diff ve istatistik (devamı)",
+              "type": "code_add",
+              "file": "api/services/dataset_versioner.py",
+              "position": "bottom",
+              "code": "    common = set(df1.columns) & set(df2.columns)\n    for col in common:\n        if pd.api.types.is_numeric_dtype(df1[col]):\n            comparison[\"stats_changes\"][col] = {\n                \"mean_change\": round(\n                    float(df2[col].mean() - df1[col].mean()), 4\n                )\n            }",
+              "why": "Ortak sütunlarda ortalama farkı hesaplanır. mean_change büyükse veri dağılımı değişmiş demektir — drift detection'ın temel mantığı."
             },
             {
               "order": "4.2d",
@@ -739,17 +748,8 @@
               "type": "code_add",
               "file": "api/services/dataset_versioner.py",
               "position": "bottom",
-              "code": "    common = set(df1.columns) & set(df2.columns)\n    for col in common:\n        if pd.api.types.is_numeric_dtype(df1[col]):\n            comparison[\"stats_changes\"][col] = {\n                \"mean_change\": round(\n                    float(df2[col].mean() - df1[col].mean()), 4\n                )\n            }",
-              "why": "İki dataset versiyonunu karşılaştıran fonksiyon — bu adımın devamı."
-            },
-            {
-              "order": "4.2e",
-              "action": "Karşılaştırma fonksiyonunun devamı — sütun diff ve istatistik (devamı)",
-              "type": "code_add",
-              "file": "api/services/dataset_versioner.py",
-              "position": "bottom",
               "code": "    return comparison",
-              "why": "İki dataset versiyonunu karşılaştıran fonksiyon — bu adımın devamı."
+              "why": "Karşılaştırma sonuçlarını dictionary olarak döndürür. Bu sonuç DatasetVersion tablosunun changes_summary alanına JSON olarak kaydedilecek."
             },
             {
               "order": "4.3",
@@ -761,7 +761,7 @@
               "why": "4.1'de model, 4.2'de karşılaştırma servisi yazdık — şimdi bunları API endpoint olarak birleştiriyoruz."
             },
             {
-              "order": "4.3z",
+              "order": "4.3a",
               "action": "GERİ DÖN — api/routers/datasets.py'ye versiyon endpoint'lerini ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/datasets.py",
@@ -785,7 +785,7 @@
               "file": "api/routers/datasets.py",
               "position": "bottom",
               "code": "    new_ver = (latest.version + 1) if latest else 2",
-              "why": "4 — bu adımın devamı."
+              "why": "İlk versiyon yoksa 2'den başlar (orijinal dataset v1 sayılır). Ternary expression ile son versiyon numarasını belirler."
             },
             {
               "order": "4.3d",
@@ -803,7 +803,7 @@
               "file": "api/routers/datasets.py",
               "position": "bottom",
               "code": "    version = DatasetVersion(\n        dataset_id=dataset_id, version=new_ver,\n        file_path=path, row_count=profile[\"row_count\"],\n        column_count=profile[\"column_count\"],\n        quality_score=profile[\"quality_score\"],\n        changes_summary=changes\n    )\n    db.add(version)",
-              "why": "4 — bu adımın devamı."
+              "why": "DatasetVersion kaydını oluşturup veritabanına ekliyoruz. profile bilgileri 2.4'teki profiler'dan, changes bilgileri 4.2'deki compare'dan gelir."
             },
             {
               "order": "4.3f",
@@ -812,7 +812,7 @@
               "file": "api/routers/datasets.py",
               "position": "bottom",
               "code": "    db.commit()\n    return {\"version\": new_ver, \"changes\": changes}",
-              "why": "4 — bu adımın devamı."
+              "why": "db.commit() ile kayıt kalıcı hale gelir. Versiyon numarası ve değişiklik özeti JSON olarak döndürülür — frontend'de gösterilecek."
             },
             {
               "order": "4.4",
@@ -895,13 +895,13 @@
               "why": "Builder pattern ile pipeline oluşturacağız. detect_column_types otomatik olarak sayısal ve kategorik sütunları ayırır — 20'den az unique değer kategorik sayılır."
             },
             {
-              "order": "1.2b",
+              "order": "1.2a",
               "action": "FeaturePipelineBuilder sınıf iskeleti — __init__ ve detect_column_types (devamı)",
               "type": "code_add",
               "file": "features/transformers.py",
               "position": "bottom",
               "code": "            if pd.api.types.is_numeric_dtype(df[col]):\n                self.numeric_cols.append(col)\n            elif df[col].nunique() < 20:\n                self.categorical_cols.append(col)\n        return self",
-              "why": "Builder pattern ile pipeline oluşturacağız — bu adımın devamı."
+              "why": "is_numeric_dtype sayısal sütunları, nunique < 20 ise kategorik sütunları ayırır. return self method chaining sağlar: builder.detect().build()."
             },
             {
               "order": "1.3",
@@ -909,8 +909,17 @@
               "type": "code_add",
               "file": "features/transformers.py",
               "position": "bottom",
-              "code": "def build(self) -> ColumnTransformer:\n        transformers = []\n        if self.numeric_cols:\n            transformers.append(\n                ('num', StandardScaler(), self.numeric_cols)\n            )\n        if self.categorical_cols:\n            transformers.append(",
+              "code": "def build(self) -> ColumnTransformer:\n        transformers = []\n        if self.numeric_cols:\n            transformers.append(\n                ('num', StandardScaler(),\n                 self.numeric_cols)\n            )",
               "why": "1.2'de tespit edilen sütun tiplerine göre transformer atıyoruz. Sayısal → StandardScaler, kategorik → OneHotEncoder. sparse_output=False dense array döndürür."
+            },
+            {
+              "order": "1.3a",
+              "action": "build() metodu — ColumnTransformer oluştur (devamı)",
+              "type": "code_add",
+              "file": "features/transformers.py",
+              "position": "bottom",
+              "code": "        if self.categorical_cols:\n            transformers.append(\n                ('cat', OneHotEncoder(\n                    handle_unknown='ignore',\n                    sparse_output=False\n                ), self.categorical_cols)\n            )",
+              "why": "OneHotEncoder kategorik değerleri binary sütunlara çevirir. handle_unknown='ignore' inference'da yeni kategoriler hata vermez. ColumnTransformer hepsini birleştirir."
             },
             {
               "order": "1.3b",
@@ -918,17 +927,8 @@
               "type": "code_add",
               "file": "features/transformers.py",
               "position": "bottom",
-              "code": "                ('cat', OneHotEncoder(\n                    handle_unknown='ignore',\n                    sparse_output=False\n                ), self.categorical_cols)\n            )\n        self.pipeline = ColumnTransformer(\n            transformers=transformers, remainder='drop'\n        )",
-              "why": "1 — bu adımın devamı."
-            },
-            {
-              "order": "1.3c",
-              "action": "build() metodu — ColumnTransformer oluştur (devamı)",
-              "type": "code_add",
-              "file": "features/transformers.py",
-              "position": "bottom",
-              "code": "        return self.pipeline",
-              "why": "1 — bu adımın devamı."
+              "code": "        self.pipeline = ColumnTransformer(\n            transformers=transformers,\n            remainder='drop'\n        )\n        return self.pipeline",
+              "why": "build() metodu oluşturduğu ColumnTransformer'ı döndürür. Bu nesne fit_transform() ile veriyi dönüştürmek için kullanılacak."
             },
             {
               "order": "1.4",
@@ -999,13 +999,13 @@
               "why": "Feature store tanımlar tablosu — hangi feature, hangi sütundan, hangi transform ile oluşturulacak. unique=True aynı isimde iki feature olmasını engeller."
             },
             {
-              "order": "2.1b",
+              "order": "2.1a",
               "action": "api/models.py'ye GERİ DÖN — FeatureDefinition modeli ekle (devamı)",
               "type": "code_add",
               "file": "api/models.py",
               "position": "bottom",
               "code": "    created_at = Column(DateTime, default=datetime.utcnow)",
-              "why": "Feature store tanımlar tablosu — hangi feature, hangi sütundan, hangi transform ile oluşturulacak — bu adımın devamı."
+              "why": "created_at alanı feature'ın ne zaman tanımlandığını kaydeder. Feature lineage (hangi raw data'dan geldi) için önemli metadata."
             },
             {
               "order": "2.2",
@@ -1016,12 +1016,12 @@
               "why": "Feature store feature hesaplama mantığını merkezi yerde tutar. register → compute → get akışı ile feature'lar tekrarlanabilir ve paylaşılabilir olur."
             },
             {
-              "order": "2.2b",
+              "order": "2.2a",
               "action": "features/feature_store.py dosyasını oluştur — FeatureStore iskeleti (devamı)",
               "type": "code_add",
               "file": "features/feature_store.py",
               "code": "\nclass FeatureStore:\n    def __init__(self):\n        self._registry: Dict[str, Dict] = {}",
-              "why": "Feature store feature hesaplama mantığını merkezi yerde tutar — bu adımın devamı.",
+              "why": "_registry dict'i feature tanımlarını bellekte tutar. register → compute → get akışı ile feature'lar tekrarlanabilir hale gelir.",
               "position": "bottom"
             },
             {
@@ -1034,22 +1034,31 @@
               "why": "2.2'deki sınıfa feature kayıt ve hesaplama ekliyoruz. register ile tanım saklanır, compute ile gerçek veri üzerinde hesaplanır."
             },
             {
-              "order": "2.3b",
+              "order": "2.3a",
               "action": "register_feature ve compute_feature metodları (devamı)",
               "type": "code_add",
               "file": "features/feature_store.py",
               "position": "bottom",
               "code": "        return self._registry[name]\n\n    def compute_feature(self, name, df: pd.DataFrame):\n        if name not in self._registry:\n            raise ValueError(f\"Feature '{name}' kayıtlı değil\")\n        feat = self._registry[name]\n        col = feat[\"source_column\"]\n        t = feat[\"transform_type\"]",
-              "why": "2 — bu adımın devamı."
+              "why": "register sonucu döndürülür ve compute_feature başlatılır. Kayıtlı olmayan feature'ı hesaplamak ValueError fırlatır — güvenlik kontrolü."
             },
             {
-              "order": "2.3c",
+              "order": "2.3b",
               "action": "compute_feature devamı — transform mantığı",
               "type": "code_add",
               "file": "features/feature_store.py",
               "position": "bottom",
               "code": "if t == \"standard_scale\":\n            result = (df[col] - df[col].mean()) / df[col].std()\n        elif t == \"min_max_scale\":\n            result = (df[col] - df[col].min()) / \\\n                     (df[col].max() - df[col].min())\n        elif t == \"log_transform\":\n            result = np.log1p(df[col])\n        elif t == \"passthrough\":",
-              "why": "2.3'ün devamı. Her transform tipi farklı hesaplama yapar. Sonuç parquet formatında kaydedilir — parquet columnar storage, büyük veri setlerinde hızlı okuma sağlar."
+              "why": "Her transform tipi farklı hesaplama yapar. Sonuç parquet formatında kaydedilir — parquet columnar storage, büyük veri setlerinde hızlı okuma sağlar."
+            },
+            {
+              "order": "2.3c",
+              "action": "compute_feature devamı — transform mantığı (devamı)",
+              "type": "code_add",
+              "file": "features/feature_store.py",
+              "position": "bottom",
+              "code": "            result = df[col]\n        else:\n            raise ValueError(f\"Bilinmeyen transform: {t}\")\n        path = os.path.join(FEATURE_STORE_DIR,\n            f\"{name}_v{feat['version']}.parquet\")\n        result.to_frame().to_parquet(path)\n        return result\n",
+              "why": "Bilinmeyen transform tipi ValueError fırlatır. Sonuç parquet formatında kaydedilir — parquet columnar storage büyük veri setlerinde hızlı okuma sağlar."
             },
             {
               "order": "2.3d",
@@ -1057,17 +1066,8 @@
               "type": "code_add",
               "file": "features/feature_store.py",
               "position": "bottom",
-              "code": "            result = df[col]\n        else:\n            raise ValueError(f\"Bilinmeyen transform: {t}\")\n        path = os.path.join(FEATURE_STORE_DIR,\n            f\"{name}_v{feat['version']}.parquet\")\n        result.to_frame().to_parquet(path)\n        return result\n",
-              "why": "2 — bu adımın devamı."
-            },
-            {
-              "order": "2.3e",
-              "action": "compute_feature devamı — transform mantığı (devamı)",
-              "type": "code_add",
-              "file": "features/feature_store.py",
-              "position": "bottom",
               "code": "    def list_features(self):\n        return list(self._registry.values())",
-              "why": "2 — bu adımın devamı."
+              "why": "list_features tüm kayıtlı feature tanımlarını döndürür. Dashboard'da hangi feature'ların mevcut olduğunu göstermek için kullanılır."
             },
             {
               "order": "2.4",
@@ -1078,16 +1078,16 @@
               "why": "2.2-2.3'te yazdığımız FeatureStore'u REST API olarak sunuyoruz. Singleton store nesnesi tüm endpoint'ler arasında paylaşılır."
             },
             {
-              "order": "2.4b",
-              "action": "BAŞKA DOSYAYA GEÇ — api/routers/features.py endpoint'leri oluştur (devamı)",
+              "order": "2.4a",
+              "action": "AYNI DOSYADA DEVAM ET — api/routers/features.py endpoint'leri oluştur (devamı)",
               "type": "code_add",
               "file": "api/routers/features.py",
               "code": "router = APIRouter(\n    prefix=\"/api/features\", tags=[\"features\"]\n)\nstore = FeatureStore()",
-              "why": "2 — bu adımın devamı.",
+              "why": "Router tanımı /api/features prefix'i ile tüm endpoint'leri gruplar. store singleton tüm istekler arasında paylaşılan FeatureStore instance'ı.",
               "position": "bottom"
             },
             {
-              "order": "2.4c",
+              "order": "2.4b",
               "action": "Register ve compute endpoint'leri",
               "type": "code_add",
               "file": "api/routers/features.py",
@@ -1096,13 +1096,22 @@
               "why": "2.4'teki import'ları kullanarak register/compute/list endpoint'leri oluşturuyoruz. compute endpoint'i 2.3'teki fonksiyonu çağırır."
             },
             {
-              "order": "2.4d",
+              "order": "2.4c",
               "action": "Register ve compute endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/features.py",
               "position": "bottom",
               "code": "    return store.register_feature(\n        req.name, req.source_column,\n        req.transform_type, req.description\n    )\n\n@router.post(\"/compute/{feature_name}\")\nasync def compute_feature(\n    feature_name: str, dataset_id: int,",
-              "why": "2 — bu adımın devamı."
+              "why": "register fonksiyonu FeatureStore'a yeni feature kaydeder. compute endpoint'i ise kayıtlı feature'ı belirtilen dataset üzerinde hesaplar."
+            },
+            {
+              "order": "2.4d",
+              "action": "Register ve compute endpoint'leri (devamı)",
+              "type": "code_add",
+              "file": "api/routers/features.py",
+              "position": "bottom",
+              "code": "    db: Session = Depends(get_db)\n):\n    from api.models import Dataset\n    ds = db.query(Dataset).filter(\n        Dataset.id == dataset_id\n    ).first()\n    if not ds:\n        raise HTTPException(404, \"Dataset bulunamadı\")",
+              "why": "Dataset bulunamazsa 404, feature kayıtlı değilse FeatureStore ValueError fırlatır. Defensive programming — her adımda hata kontrolü."
             },
             {
               "order": "2.4e",
@@ -1110,8 +1119,8 @@
               "type": "code_add",
               "file": "api/routers/features.py",
               "position": "bottom",
-              "code": "    db: Session = Depends(get_db)\n):\n    from api.models import Dataset\n    ds = db.query(Dataset).filter(\n        Dataset.id == dataset_id\n    ).first()\n    if not ds:\n        raise HTTPException(404, \"Dataset bulunamadı\")",
-              "why": "2 — bu adımın devamı."
+              "code": "    df = pd.read_csv(ds.file_path)\n    result = store.compute_feature(feature_name, df)\n    return {\"feature\": feature_name,\n            \"rows\": len(result),\n            \"sample\": result.head().tolist()}\n\n@router.get(\"/\")\nasync def list_features():",
+              "why": "Hesaplanan feature'ın ilk 5 değerini sample olarak döndürür. list_features endpoint'i tüm kayıtlı feature'ları listeler."
             },
             {
               "order": "2.4f",
@@ -1119,17 +1128,8 @@
               "type": "code_add",
               "file": "api/routers/features.py",
               "position": "bottom",
-              "code": "    df = pd.read_csv(ds.file_path)\n    result = store.compute_feature(feature_name, df)\n    return {\"feature\": feature_name,\n            \"rows\": len(result),\n            \"sample\": result.head().tolist()}\n\n@router.get(\"/\")\nasync def list_features():",
-              "why": "2 — bu adımın devamı."
-            },
-            {
-              "order": "2.4g",
-              "action": "Register ve compute endpoint'leri (devamı)",
-              "type": "code_add",
-              "file": "api/routers/features.py",
-              "position": "bottom",
               "code": "    return store.list_features()",
-              "why": "2 — bu adımın devamı."
+              "why": "store.list_features() tüm kayıtlı feature tanımlarını döndürür — dashboard'da feature kataloğu olarak gösterilir."
             },
             {
               "order": "2.5",
@@ -1191,21 +1191,21 @@
               "why": "Feature importance üç yöntemle analiz edilecek: korelasyon, tree-based ve RFE. Birden fazla yöntem kullanmak tek yöntemin yanıltıcı olma riskini azaltır."
             },
             {
-              "order": "3.1b",
+              "order": "3.1a",
               "action": "features/importance.py dosyasını oluştur — FeatureAnalyzer iskeleti (devamı)",
               "type": "code_add",
               "file": "features/importance.py",
               "code": "    def __init__(self, df: pd.DataFrame, target_col: str):\n        self.target_col = target_col\n        self.feature_cols = [\n            c for c in df.select_dtypes(\n                include=[np.number]\n            ).columns if c != target_col\n        ]\n        self.X = df[self.feature_cols].fillna(0)",
-              "why": "Feature importance üç yöntemle analiz edilecek: korelasyon, tree-based ve RFE — bu adımın devamı.",
+              "why": "__init__ hedef sütunu ayırır ve sadece sayısal feature'ları seçer. fillna(0) eksik değerleri sıfırlar — model NaN kabul etmez.",
               "position": "bottom"
             },
             {
-              "order": "3.1c",
+              "order": "3.1b",
               "action": "features/importance.py dosyasını oluştur — FeatureAnalyzer iskeleti (devamı)",
               "type": "code_add",
               "file": "features/importance.py",
               "code": "        self.y = df[target_col]",
-              "why": "Feature importance üç yöntemle analiz edilecek: korelasyon, tree-based ve RFE — bu adımın devamı.",
+              "why": "self.y hedef değişkeni tutar. X ve y ayrımı supervised learning'in temel yapısı — X özellikler, y tahmin edilecek değer.",
               "position": "bottom"
             },
             {
@@ -1218,13 +1218,22 @@
               "why": "3.1'deki sınıfa iki analiz yöntemi ekliyoruz. Korelasyon basit ama doğrusal ilişki dışını yakalamaz. Tree importance non-linear ilişkileri de bulur."
             },
             {
+              "order": "3.2a",
+              "action": "Korelasyon ve tree importance metodları (devamı)",
+              "type": "code_add",
+              "file": "features/importance.py",
+              "position": "bottom",
+              "code": "        return {\n            \"target_correlations\": {\n                k: round(v, 4)\n                for k, v in target_corr.items()\n            }\n        }",
+              "why": "Korelasyon sonuçları dict olarak döndürülür. tree_importance metodu RandomForest ile non-linear ilişkileri de yakalayan önem skoru hesaplar."
+            },
+            {
               "order": "3.2b",
               "action": "Korelasyon ve tree importance metodları (devamı)",
               "type": "code_add",
               "file": "features/importance.py",
               "position": "bottom",
-              "code": "        return {\n            \"target_correlations\": {\n                k: round(v, 4) for k, v in target_corr.items()\n            }\n        }\n\n    def tree_importance(self, task=\"classification\"):\n        model = RandomForestClassifier(",
-              "why": "3 — bu adımın devamı."
+              "code": "    def tree_importance(self, task=\"classification\"):\n        model = RandomForestClassifier(\n            n_estimators=100, random_state=42\n        ) if task == \"classification\" else \\\n            RandomForestRegressor(\n                n_estimators=100, random_state=42\n            )\n        model.fit(self.X, self.y)",
+              "why": "RandomForest 100 ağaçla eğitilir, random_state tekrarlanabilirlik sağlar. feature_importances_ her feature'ın karar ağaçlarındaki katkısını ölçer."
             },
             {
               "order": "3.2c",
@@ -1232,17 +1241,8 @@
               "type": "code_add",
               "file": "features/importance.py",
               "position": "bottom",
-              "code": "            n_estimators=100, random_state=42\n        ) if task == \"classification\" else \\\n            RandomForestRegressor(\n                n_estimators=100, random_state=42\n            )\n        model.fit(self.X, self.y)\n        imp = dict(zip(self.feature_cols,\n                       model.feature_importances_))",
-              "why": "3 — bu adımın devamı."
-            },
-            {
-              "order": "3.2d",
-              "action": "Korelasyon ve tree importance metodları (devamı)",
-              "type": "code_add",
-              "file": "features/importance.py",
-              "position": "bottom",
               "code": "        return {k: round(v, 4) for k, v in\n                sorted(imp.items(), key=lambda x: x[1],\n                       reverse=True)}",
-              "why": "3 — bu adımın devamı."
+              "why": "Sonuçlar önem sırasına göre sıralanır (büyükten küçüğe). En önemli feature en üstte — model seçimi ve feature pruning için kullanılır."
             },
             {
               "order": "3.3",
@@ -1250,8 +1250,17 @@
               "type": "code_add",
               "file": "features/importance.py",
               "position": "bottom",
-              "code": "def rfe_ranking(self, n_features=5, task=\"classification\"):\n        est = RandomForestClassifier(\n            n_estimators=50, random_state=42\n        ) if task == \"classification\" else \\\n            RandomForestRegressor(\n                n_estimators=50, random_state=42\n            )\n        rfe = RFE(est, n_features_to_select=min(",
+              "code": "def rfe_ranking(self, n_features=5,\n                    task=\"classification\"):\n        est = RandomForestClassifier(\n            n_estimators=50, random_state=42\n        ) if task == \"classification\" else \\\n            RandomForestRegressor(\n                n_estimators=50, random_state=42\n            )",
               "why": "3.2'deki yöntemlere RFE (Recursive Feature Elimination) ekliyoruz. full_analysis üç yöntemi tek çağrıda çalıştırır — dashboard'da göstermek için ideal."
+            },
+            {
+              "order": "3.3a",
+              "action": "RFE ranking ve full_analysis metodu (devamı)",
+              "type": "code_add",
+              "file": "features/importance.py",
+              "position": "bottom",
+              "code": "        n_sel = min(n_features, len(self.feature_cols))\n        rfe = RFE(est, n_features_to_select=n_sel)\n        rfe.fit(self.X, self.y)\n        return [{\"feature\": col, \"rank\": int(r),\n                 \"selected\": bool(s)}\n                for col, r, s in zip(\n                    self.feature_cols,\n                    rfe.ranking_, rfe.support_)]",
+              "why": "RFE iteratif olarak en az önemli feature'ı çıkarır. ranking_ her feature'ın sıralaması, support_ seçilen feature'ları boolean olarak gösterir."
             },
             {
               "order": "3.3b",
@@ -1259,17 +1268,8 @@
               "type": "code_add",
               "file": "features/importance.py",
               "position": "bottom",
-              "code": "            n_features, len(self.feature_cols)\n        ))\n        rfe.fit(self.X, self.y)\n        return [{\"feature\": col, \"rank\": int(r),\n                 \"selected\": bool(s)}\n                for col, r, s in zip(\n                    self.feature_cols, rfe.ranking_,\n                    rfe.support_)]",
-              "why": "3 — bu adımın devamı."
-            },
-            {
-              "order": "3.3c",
-              "action": "RFE ranking ve full_analysis metodu (devamı)",
-              "type": "code_add",
-              "file": "features/importance.py",
-              "position": "bottom",
               "code": "\n    def full_analysis(self, task=\"classification\"):\n        return {\n            \"correlation\": self.correlation_matrix(),\n            \"tree_importance\": self.tree_importance(task),\n            \"rfe_ranking\": self.rfe_ranking(task=task)\n        }",
-              "why": "3 — bu adımın devamı."
+              "why": "full_analysis üç yöntemi tek çağrıda birleştirir. Dashboard'da korelasyon, tree importance ve RFE sonuçları yan yana gösterilir."
             },
             {
               "order": "3.4",
@@ -1281,22 +1281,22 @@
               "why": "3.1-3.3'te yazdığımız FeatureAnalyzer'ı API endpoint olarak sunuyoruz. target_column hangi sütunun hedef olduğunu belirtir."
             },
             {
-              "order": "3.4b",
+              "order": "3.4a",
               "action": "GERİ DÖN — api/routers/features.py'ye importance endpoint'i ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/features.py",
               "position": "bottom",
               "code": "    from api.models import Dataset\n    ds = db.query(Dataset).filter(\n        Dataset.id == dataset_id\n    ).first()\n    if not ds:\n        raise HTTPException(404, \"Dataset bulunamadı\")\n    df = pd.read_csv(ds.file_path)\n    analyzer = FeatureAnalyzer(df, target_column)",
-              "why": "3 — bu adımın devamı."
+              "why": "Dataset'i veritabanından bulup pandas ile okur. FeatureAnalyzer target_column ile hedefi ayırır — özellik önem analizi bağımlı değişkeni bilmelidir."
             },
             {
-              "order": "3.4c",
+              "order": "3.4b",
               "action": "GERİ DÖN — api/routers/features.py'ye importance endpoint'i ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/features.py",
               "position": "bottom",
               "code": "    return analyzer.full_analysis(task)",
-              "why": "3 — bu adımın devamı."
+              "why": "full_analysis çağrısı üç yöntemin sonuçlarını birleştirip JSON olarak döndürür. Frontend bu veriyi grafiklere çevirecek."
             },
             {
               "order": "3.5",
@@ -1363,35 +1363,35 @@
               "action": "workers/celery_app.py dosyasını oluştur — Celery konfigürasyonu",
               "type": "code_write",
               "file": "workers/celery_app.py",
-              "code": "import os\nfrom celery import Celery\n\nREDIS_URL = os.getenv(\n    \"REDIS_URL\", \"redis://localhost:6379/0\"\n)\n\ncelery_app = Celery(",
+              "code": "import os\nfrom celery import Celery\n\nREDIS_URL = os.getenv(\n    \"REDIS_URL\", \"redis://localhost:6379/0\"\n)",
               "why": "Celery konfigürasyonu broker (Redis) ve result backend'i tanımlar. include ile task modüllerini bildirir — worker başladığında bunları yükler."
             },
             {
-              "order": "1.1b",
+              "order": "1.1a",
               "action": "workers/celery_app.py dosyasını oluştur — Celery konfigürasyonu (devamı)",
               "type": "code_add",
               "file": "workers/celery_app.py",
-              "code": "    \"ml_pipeline\",\n    broker=REDIS_URL,\n    backend=REDIS_URL,\n    include=[\"workers.training_tasks\"]\n)",
-              "why": "Celery konfigürasyonu broker (Redis) ve result backend'i tanımlar — bu adımın devamı.",
+              "code": "celery_app = Celery(\n    \"ml_pipeline\",\n    broker=REDIS_URL,\n    backend=REDIS_URL,\n    include=[\"workers.training_tasks\"]\n)",
+              "why": "Celery app'e isim, broker (Redis) ve backend (Redis) veriliyor. include listesi worker başlangıcında yüklenecek task modüllerini belirtir.",
               "position": "bottom"
             },
             {
-              "order": "1.1c",
+              "order": "1.1b",
               "action": "Celery ayarlarının devamı — serializer ve task tracking",
               "type": "code_add",
               "file": "workers/celery_app.py",
               "position": "bottom",
               "code": "celery_app.conf.update(\n    task_serializer=\"json\",\n    accept_content=[\"json\"],\n    result_serializer=\"json\",\n    timezone=\"UTC\",\n    enable_utc=True,\n    task_track_started=True,\n    task_acks_late=True,",
-              "why": "1.1'in devamı. task_track_started progress takibi için, task_acks_late worker çökerse görevin kaybolmaması için. prefetch_multiplier=1 fair scheduling sağlar."
+              "why": "task_track_started progress takibi için, task_acks_late worker çökerse görevin kaybolmaması için. prefetch_multiplier=1 fair scheduling sağlar."
             },
             {
-              "order": "1.1d",
+              "order": "1.1c",
               "action": "Celery ayarlarının devamı — serializer ve task tracking (devamı)",
               "type": "code_add",
               "file": "workers/celery_app.py",
               "position": "bottom",
               "code": "    worker_prefetch_multiplier=1,\n)",
-              "why": "Celery konfigürasyonu broker (Redis) ve result backend'i tanımlar — bu adımın devamı."
+              "why": "prefetch_multiplier=1 fair scheduling sağlar — bir worker tüm görevleri kapamaz. Her worker bir seferde bir görev alır."
             },
             {
               "order": "1.2",
@@ -1402,16 +1402,16 @@
               "why": "Training task dosyasının import'ları. Üç model tipi desteklenecek: RandomForest, GradientBoosting, LogisticRegression. MLflow experiment tracking için mlflow import ediyoruz."
             },
             {
-              "order": "1.2b",
+              "order": "1.2a",
               "action": "workers/training_tasks.py dosyasını oluştur — import'lar (devamı)",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "code": "from sklearn.metrics import accuracy_score, f1_score\nimport joblib\nfrom workers.celery_app import celery_app\nfrom features.transformers import FeaturePipelineBuilder",
-              "why": "Training task dosyasının import'ları — bu adımın devamı.",
+              "why": "accuracy_score ve f1_score model değerlendirmesi, joblib pipeline kaydetme, celery_app task dekoratörü için gerekli import'lar.",
               "position": "bottom"
             },
             {
-              "order": "1.2c",
+              "order": "1.2b",
               "action": "MLflow URI ve model map tanımları",
               "type": "code_add",
               "file": "workers/training_tasks.py",
@@ -1420,13 +1420,13 @@
               "why": "1.2'deki import'ları kullanarak sabitler tanımlıyoruz. MODEL_MAP string'den sınıfa çevirir — API'den gelen model_type parametresini sınıfa dönüştürür."
             },
             {
-              "order": "1.2d",
+              "order": "1.2c",
               "action": "MLflow URI ve model map tanımları (devamı)",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "    \"logistic_regression\": LogisticRegression\n}",
-              "why": "Training task dosyasının import'ları — bu adımın devamı."
+              "why": "MODEL_MAP dict'ini tamamlıyoruz. API'den gelen string (logistic_regression) doğrudan sınıfa çevrilir — factory pattern."
             },
             {
               "order": "1.3",
@@ -1438,22 +1438,31 @@
               "why": "1.1'de tanımladığımız celery_app üzerinde task oluşturuyoruz. bind=True ile self.update_state progress güncellemesi yapabilir. İlk adım veri yükleme."
             },
             {
-              "order": "1.3b",
+              "order": "1.3a",
               "action": "train_model task'ını yaz — veri yükleme ve feature engineering (devamı)",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "        X = df.drop(columns=[target_col])\n        y = df[target_col]",
-              "why": "1 — bu adımın devamı."
+              "why": "drop(columns=[target_col]) hedef sütunu X'ten çıkarır. X özellikler, y hedef — supervised learning'in standart ayrımı."
             },
             {
-              "order": "1.3c",
+              "order": "1.3b",
               "action": "Feature engineering ve model eğitimi",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "self.update_state(\n            state=\"FEATURE_ENG\", meta={\"progress\": 25}\n        )\n        builder = FeaturePipelineBuilder()\n        builder.detect_column_types(X)\n        preprocessor = builder.build()\n        X_transformed = preprocessor.fit_transform(X)\n",
-              "why": "1.3'ün devamı. Step 1.0'da yazdığımız FeaturePipelineBuilder ile otomatik transform uyguluyoruz. MODEL_MAP'ten sınıfı alıp parametrelerle oluşturuyoruz."
+              "why": "Step 1.0'da yazdığımız FeaturePipelineBuilder ile otomatik transform uyguluyoruz. MODEL_MAP'ten sınıfı alıp parametrelerle oluşturuyoruz."
+            },
+            {
+              "order": "1.3c",
+              "action": "Feature engineering ve model eğitimi (devamı)",
+              "type": "code_add",
+              "file": "workers/training_tasks.py",
+              "position": "bottom",
+              "code": "        self.update_state(\n            state=\"TRAINING\", meta={\"progress\": 50}\n        )\n        model_type = config.get(\"model_type\", \"random_forest\")\n        params = config.get(\"params\", {})\n        ModelClass = MODEL_MAP.get(\n            model_type, RandomForestClassifier\n        )",
+              "why": "1."
             },
             {
               "order": "1.3d",
@@ -1461,44 +1470,44 @@
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
-              "code": "        self.update_state(\n            state=\"TRAINING\", meta={\"progress\": 50}\n        )\n        model_type = config.get(\"model_type\", \"random_forest\")\n        params = config.get(\"params\", {})\n        ModelClass = MODEL_MAP.get(\n            model_type, RandomForestClassifier\n        )",
-              "why": "1 — bu adımın devamı."
+              "code": "        model = ModelClass(**params)",
+              "why": "ModelClass(**params) ile model sınıfı dinamik parametrelerle oluşturulur. Factory pattern — config'den gelen model tipi otomatik seçilir."
             },
             {
               "order": "1.3e",
-              "action": "Feature engineering ve model eğitimi (devamı)",
-              "type": "code_add",
-              "file": "workers/training_tasks.py",
-              "position": "bottom",
-              "code": "        model = ModelClass(**params)",
-              "why": "1 — bu adımın devamı."
-            },
-            {
-              "order": "1.3f",
               "action": "MLflow loglama ve cross-validation",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "exp_name = config.get(\"experiment_name\", \"default\")\n        mlflow.set_experiment(exp_name)\n        with mlflow.start_run(\n            run_name=config.get(\"run_name\",\n                               f\"{model_type}_run\")\n        ):\n            mlflow.log_params(params)\n            mlflow.log_param(\"model_type\", model_type)",
-              "why": "1.3b'nin devamı. MLflow'da experiment oluşturup parametreleri logluyoruz. 5-fold cross-validation modelin genelleme yeteneğini ölçer."
+              "why": "MLflow'da experiment oluşturup parametreleri logluyoruz. 5-fold cross-validation modelin genelleme yeteneğini ölçer."
             },
             {
-              "order": "1.3g",
+              "order": "1.3f",
               "action": "MLflow loglama ve cross-validation (devamı)",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "            cv_scores = cross_val_score(\n                model, X_transformed, y, cv=5\n            )\n            model.fit(X_transformed, y)\n            preds = model.predict(X_transformed)",
-              "why": "1 — bu adımın devamı."
+              "why": "5-fold cross-validation modelin genelleme yeteneğini ölçer. fit() tam veri üzerinde eğitir, predict() training accuracy hesaplar."
             },
             {
-              "order": "1.3h",
+              "order": "1.3g",
               "action": "Metrikleri logla, modeli kaydet ve sonuç dön",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "metrics = {\n                \"accuracy\": round(accuracy_score(y, preds), 4),\n                \"f1_score\": round(f1_score(\n                    y, preds, average=\"weighted\"), 4),\n                \"cv_mean\": round(float(cv_scores.mean()), 4),\n                \"cv_std\": round(float(cv_scores.std()), 4)\n            }\n            mlflow.log_metrics(metrics)",
-              "why": "1.3c'nin devamı. Metrikler MLflow'a loglanır, model artifact olarak kaydedilir. Pipeline da kaydedilir — serving'de aynı transform uygulanması için kritik."
+              "why": "Metrikler MLflow'a loglanır, model artifact olarak kaydedilir. Pipeline da kaydedilir — serving'de aynı transform uygulanması için kritik."
+            },
+            {
+              "order": "1.3h",
+              "action": "Metrikleri logla, modeli kaydet ve sonuç dön (devamı)",
+              "type": "code_add",
+              "file": "workers/training_tasks.py",
+              "position": "bottom",
+              "code": "            mlflow.sklearn.log_model(model, \"model\")\n            os.makedirs(\"artifacts\", exist_ok=True)\n            joblib.dump(preprocessor,\n                f\"artifacts/pipeline_{model_type}.joblib\")\n            run_id = mlflow.active_run().info.run_id\n        self.update_state(\n            state=\"COMPLETED\", meta={\"progress\": 100}\n        )",
+              "why": "mlflow.sklearn.log_model modeli artifact olarak kaydeder. Pipeline da ayrıca kaydedilir — serving'de aynı transform uygulanması için kritik."
             },
             {
               "order": "1.3i",
@@ -1506,37 +1515,28 @@
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
-              "code": "            mlflow.sklearn.log_model(model, \"model\")\n            os.makedirs(\"artifacts\", exist_ok=True)\n            joblib.dump(preprocessor,\n                f\"artifacts/pipeline_{model_type}.joblib\")\n            run_id = mlflow.active_run().info.run_id\n        self.update_state(\n            state=\"COMPLETED\", meta={\"progress\": 100}\n        )",
-              "why": "1 — bu adımın devamı."
-            },
-            {
-              "order": "1.3j",
-              "action": "Metrikleri logla, modeli kaydet ve sonuç dön (devamı)",
-              "type": "code_add",
-              "file": "workers/training_tasks.py",
-              "position": "bottom",
               "code": "        return {\"run_id\": run_id, \"metrics\": metrics}\n    except Exception as e:\n        self.update_state(\n            state=\"FAILED\", meta={\"error\": str(e)}\n        )\n        raise",
-              "why": "1 — bu adımın devamı."
+              "why": "run_id ve metrikler sonuç olarak döner. except bloğu hata durumunda task state'ini FAILED yapar ve hatayı tekrar fırlatır."
             },
             {
               "order": "1.4",
               "action": "BAŞKA DOSYAYA GEÇ — api/routers/training.py endpoint'leri oluştur",
               "type": "code_write",
               "file": "api/routers/training.py",
-              "code": "from fastapi import APIRouter, HTTPException\nfrom pydantic import BaseModel\nfrom typing import Optional, Dict, Any\nfrom workers.training_tasks import train_model\nfrom celery.result import AsyncResult\nfrom workers.celery_app import celery_app\n\nrouter = APIRouter(",
+              "code": "from fastapi import APIRouter, HTTPException\nfrom pydantic import BaseModel\nfrom typing import Optional, Dict, Any\nfrom workers.training_tasks import train_model\nfrom celery.result import AsyncResult\nfrom workers.celery_app import celery_app",
               "why": "1.3'te yazdığımız Celery task'ını API endpoint olarak sunuyoruz. AsyncResult ile task durumunu sorgulayabiliriz."
             },
             {
-              "order": "1.4b",
-              "action": "BAŞKA DOSYAYA GEÇ — api/routers/training.py endpoint'leri oluştur (devamı)",
+              "order": "1.4a",
+              "action": "AYNI DOSYADA DEVAM ET — api/routers/training.py endpoint'leri oluştur (devamı)",
               "type": "code_add",
               "file": "api/routers/training.py",
-              "code": "    prefix=\"/api/training\", tags=[\"training\"]\n)",
-              "why": "1 — bu adımın devamı.",
+              "code": "router = APIRouter(\n    prefix=\"/api/training\", tags=[\"training\"]\n)",
+              "why": "prefix ve tags ile endpoint'ler gruplandı. Router'ı main.py'ye bağlayınca /api/training/* yolları aktif olur.",
               "position": "bottom"
             },
             {
-              "order": "1.4c",
+              "order": "1.4b",
               "action": "Training start, status ve cancel endpoint'leri",
               "type": "code_add",
               "file": "api/routers/training.py",
@@ -1545,13 +1545,22 @@
               "why": "1.4'teki import'ları kullanarak üç endpoint: start (training başlat), status (durumu sorgula), cancel (iptal et). delay() ile task asenkron çalışır."
             },
             {
-              "order": "1.4d",
+              "order": "1.4c",
               "action": "Training start, status ve cancel endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/training.py",
               "position": "bottom",
               "code": "@router.post(\"/start\")\nasync def start_training(req: TrainingRequest):\n    task = train_model.delay(req.model_dump())\n    return {\"task_id\": task.id, \"status\": \"started\"}\n\n@router.get(\"/status/{task_id}\")\nasync def get_status(task_id: str):\n    result = AsyncResult(task_id, app=celery_app)",
-              "why": "1 — bu adımın devamı."
+              "why": "delay() task'ı Celery kuyruğuna ekler, hemen task_id döner. AsyncResult ile task durumu (progress, state) sorgulanabilir."
+            },
+            {
+              "order": "1.4d",
+              "action": "Training start, status ve cancel endpoint'leri (devamı)",
+              "type": "code_add",
+              "file": "api/routers/training.py",
+              "position": "bottom",
+              "code": "    resp = {\"task_id\": task_id, \"status\": result.state}\n    if result.state == \"SUCCESS\":\n        resp[\"result\"] = result.result\n    elif result.info:\n        resp[\"progress\"] = result.info.get(\"progress\", 0)\n    return resp\n\n@router.post(\"/cancel/{task_id}\")",
+              "why": "SUCCESS durumunda sonuçlar, diğer durumlarda progress yüzdesi döner. cancel endpoint'i revoke ile çalışan task'ı sonlandırır."
             },
             {
               "order": "1.4e",
@@ -1559,17 +1568,8 @@
               "type": "code_add",
               "file": "api/routers/training.py",
               "position": "bottom",
-              "code": "    resp = {\"task_id\": task_id, \"status\": result.state}\n    if result.state == \"SUCCESS\":\n        resp[\"result\"] = result.result\n    elif result.info:\n        resp[\"progress\"] = result.info.get(\"progress\", 0)\n    return resp\n\n@router.post(\"/cancel/{task_id}\")",
-              "why": "1 — bu adımın devamı."
-            },
-            {
-              "order": "1.4f",
-              "action": "Training start, status ve cancel endpoint'leri (devamı)",
-              "type": "code_add",
-              "file": "api/routers/training.py",
-              "position": "bottom",
               "code": "async def cancel(task_id: str):\n    celery_app.control.revoke(task_id, terminate=True)\n    return {\"status\": \"cancelled\"}",
-              "why": "1 — bu adımın devamı."
+              "why": "revoke(terminate=True) çalışan task'ı zorla durdurur. Uzun süren training'i iptal etmek için kullanıcıya kontrol verir."
             },
             {
               "order": "1.5",
@@ -1639,12 +1639,12 @@
               "why": "MLflow'un Python API'sini FastAPI endpoint'leriyle sararak frontend'in experiment verilerine erişmesini sağlıyoruz."
             },
             {
-              "order": "2.1b",
+              "order": "2.1a",
               "action": "api/routers/experiments.py dosyasını oluştur — MLflow sarmalayıcı (devamı)",
               "type": "code_add",
               "file": "api/routers/experiments.py",
               "code": "\nrouter = APIRouter(\n    prefix=\"/api/experiments\", tags=[\"experiments\"]\n)",
-              "why": "MLflow'un Python API'sini FastAPI endpoint'leriyle sararak frontend'in experiment verilerine erişmesini sağlıyoruz — bu adımın devamı.",
+              "why": "Router prefix'i /api/experiments altında tüm experiment endpoint'lerini gruplar. MLflow'un kendi UI'ı var ama frontend'den de erişim gerekli.",
               "position": "bottom"
             },
             {
@@ -1657,13 +1657,13 @@
               "why": "2.1'deki router'a iki endpoint ekliyoruz. list_experiments tüm deneyleri, list_runs belirli bir deneyin run'larını accuracy'ye göre sıralı döner."
             },
             {
-              "order": "2.2b",
+              "order": "2.2a",
               "action": "Experiment listeleme ve run sorgulama endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/experiments.py",
               "position": "bottom",
               "code": "    runs = mlflow.search_runs(\n        experiment_ids=[experiment_id],\n        max_results=50,\n        order_by=[\"metrics.accuracy DESC\"]\n    )\n    if runs.empty:\n        return []\n    return runs.to_dict(orient=\"records\")",
-              "why": "2 — bu adımın devamı."
+              "why": "search_runs accuracy'ye göre sıralı döner. to_dict(orient='records') DataFrame'i JSON-serializable dict listesine çevirir."
             },
             {
               "order": "2.3",
@@ -1675,22 +1675,22 @@
               "why": "2.2'deki list'e ek olarak detay ve karşılaştırma ekliyoruz. compare endpoint'i birden fazla run'ı yan yana gösterir — model seçimi için kritik."
             },
             {
-              "order": "2.3b",
+              "order": "2.3a",
               "action": "Run detayı ve karşılaştırma endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/experiments.py",
               "position": "bottom",
               "code": "    }\n\n@router.get(\"/compare\")\nasync def compare_runs(run_ids: str):\n    ids = run_ids.split(\",\")\n    return [{\n        \"run_id\": rid.strip(),\n        \"params\": mlflow.get_run(rid.strip()).data.params,",
-              "why": "2 — bu adımın devamı."
+              "why": "Run detayı kapatılıp compare endpoint'i başlıyor. Compare birden fazla run_id'yi virgülle alıp paralel karşılaştırma yapar."
             },
             {
-              "order": "2.3c",
+              "order": "2.3b",
               "action": "Run detayı ve karşılaştırma endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/experiments.py",
               "position": "bottom",
               "code": "        \"metrics\": mlflow.get_run(rid.strip()).data.metrics\n    } for rid in ids]",
-              "why": "2 — bu adımın devamı."
+              "why": "Her run'ın parametreleri ve metrikleri liste olarak döndürülür. Frontend bu veriyi tablo ve grafik olarak gösterir."
             },
             {
               "order": "2.4",
@@ -1752,12 +1752,12 @@
               "why": "Hyperparameter search grid ve random yöntemlerini destekleyecek. Her deneme MLflow'a loglanır — sonra karşılaştırabilirsin."
             },
             {
-              "order": "3.1b",
+              "order": "3.1a",
               "action": "ml/hyperparameter_search.py dosyasını oluştur — import ve sınıf iskeleti (devamı)",
               "type": "code_add",
               "file": "ml/hyperparameter_search.py",
               "code": "    def __init__(self, model_class, param_space: Dict,\n                 experiment_name: str):\n        self.model_class = model_class\n        self.param_space = param_space\n        self.experiment_name = experiment_name\n        self.results: List[Dict] = []",
-              "why": "Hyperparameter search grid ve random yöntemlerini destekleyecek — bu adımın devamı.",
+              "why": "Hyperparameter search grid ve random yöntemlerini destekleyecek.",
               "position": "bottom"
             },
             {
@@ -1766,8 +1766,17 @@
               "type": "code_add",
               "file": "ml/hyperparameter_search.py",
               "position": "bottom",
-              "code": "def grid_search(self, X, y, cv=5):\n        best_score = -1\n        best_params = {}\n        mlflow.set_experiment(self.experiment_name)\n        for combo in itertools.product(\n            *self.param_space.values()\n        ):\n            params = dict(zip(",
+              "code": "def grid_search(self, X, y, cv=5):\n        best_score = -1\n        best_params = {}\n        mlflow.set_experiment(self.experiment_name)\n        for combo in itertools.product(\n            *self.param_space.values()\n        ):",
               "why": "3.1'deki sınıfa grid search ekliyoruz. itertools.product tüm kombinasyonları üretir. Her deneme MLflow'a loglanır."
+            },
+            {
+              "order": "3.2a",
+              "action": "grid_search metodu — tüm kombinasyonları dene (devamı)",
+              "type": "code_add",
+              "file": "ml/hyperparameter_search.py",
+              "position": "bottom",
+              "code": "            params = dict(zip(\n                self.param_space.keys(), combo))\n            with mlflow.start_run():\n                mlflow.log_params(params)\n                model = self.model_class(**params)\n                scores = cross_val_score(\n                    model, X, y, cv=cv\n                )",
+              "why": "Her parametre kombinasyonu MLflow run'ı olarak loglanır. cross_val_score 5-fold CV ile genelleme performansını ölçer."
             },
             {
               "order": "3.2b",
@@ -1775,17 +1784,8 @@
               "type": "code_add",
               "file": "ml/hyperparameter_search.py",
               "position": "bottom",
-              "code": "                self.param_space.keys(), combo\n            ))\n            with mlflow.start_run():\n                mlflow.log_params(params)\n                model = self.model_class(**params)\n                scores = cross_val_score(\n                    model, X, y, cv=cv\n                )",
-              "why": "3 — bu adımın devamı."
-            },
-            {
-              "order": "3.2c",
-              "action": "grid_search metodu — tüm kombinasyonları dene (devamı)",
-              "type": "code_add",
-              "file": "ml/hyperparameter_search.py",
-              "position": "bottom",
               "code": "                mean = float(scores.mean())\n                mlflow.log_metric(\"cv_accuracy\", mean)\n                if mean > best_score:\n                    best_score = mean\n                    best_params = params\n        return {\"best_params\": best_params,\n                \"best_score\": round(best_score, 4)}",
-              "why": "3 — bu adımın devamı."
+              "why": "En yüksek CV skoru ve parametreleri kaydedilir. Tüm kombinasyonlar denendikten sonra best_params ve best_score döndürülür."
             },
             {
               "order": "3.3",
@@ -1793,8 +1793,17 @@
               "type": "code_add",
               "file": "ml/hyperparameter_search.py",
               "position": "bottom",
-              "code": "def random_search(self, X, y, n_iter=10, cv=5):\n        best_score = -1\n        best_params = {}\n        mlflow.set_experiment(self.experiment_name)\n        for i in range(n_iter):\n            params = {k: random.choice(v)\n                      for k, v in self.param_space.items()}\n            with mlflow.start_run(",
+              "code": "def random_search(self, X, y, n_iter=10, cv=5):\n        best_score = -1\n        best_params = {}\n        mlflow.set_experiment(self.experiment_name)\n        for i in range(n_iter):\n            params = {k: random.choice(v)\n                      for k, v in self.param_space.items()}",
               "why": "3.2'deki grid'e alternatif. Çok parametre varsa grid patlayabilir (4x4x3=48 deneme) — random search budget-friendly."
+            },
+            {
+              "order": "3.3a",
+              "action": "random_search metodu — rastgele örnekle (devamı)",
+              "type": "code_add",
+              "file": "ml/hyperparameter_search.py",
+              "position": "bottom",
+              "code": "            with mlflow.start_run(\n                run_name=f\"random_{i}\"\n            ):\n                mlflow.log_params(params)\n                model = self.model_class(**params)\n                scores = cross_val_score(\n                    model, X, y, cv=cv\n                )",
+              "why": "Her random deneme ayrı MLflow run'ı olarak loglanır. run_name ile MLflow UI'da hangi deneme olduğu kolayca anlaşılır."
             },
             {
               "order": "3.3b",
@@ -1802,17 +1811,8 @@
               "type": "code_add",
               "file": "ml/hyperparameter_search.py",
               "position": "bottom",
-              "code": "                run_name=f\"random_{i}\"\n            ):\n                mlflow.log_params(params)\n                model = self.model_class(**params)\n                scores = cross_val_score(\n                    model, X, y, cv=cv\n                )\n                mean = float(scores.mean())",
-              "why": "3 — bu adımın devamı."
-            },
-            {
-              "order": "3.3c",
-              "action": "random_search metodu — rastgele örnekle (devamı)",
-              "type": "code_add",
-              "file": "ml/hyperparameter_search.py",
-              "position": "bottom",
               "code": "                mlflow.log_metric(\"cv_accuracy\", mean)\n                if mean > best_score:\n                    best_score = mean\n                    best_params = params\n        return {\"best_params\": best_params,\n                \"best_score\": round(best_score, 4),\n                \"total_trials\": n_iter}",
-              "why": "3 — bu adımın devamı."
+              "why": "En iyi skor ve parametreler döndürülür. total_trials kaç deneme yapıldığını belirtir — budget takibi için önemli."
             },
             {
               "order": "3.4",
@@ -1824,31 +1824,31 @@
               "why": "3.1-3.3'te yazdığımız HyperparameterSearch'ü Celery task olarak sarıyoruz — uzun süren search'ü asenkron çalıştırır."
             },
             {
-              "order": "3.4b",
+              "order": "3.4a",
               "action": "GERİ DÖN — workers/training_tasks.py'ye HP search task'ı ekle (devamı)",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "    builder.detect_column_types(X)\n    X_t = builder.build().fit_transform(X)",
-              "why": "3 — bu adımın devamı."
+              "why": "Feature pipeline ile veriyi transform ediyoruz — model ham veriyle değil, dönüştürülmüş veriyle eğitilecek."
             },
             {
-              "order": "3.4c",
+              "order": "3.4b",
               "action": "HP search task'ının devamı — search çalıştır ve sonuç dön",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "ModelClass = MODEL_MAP.get(\n        config[\"model_type\"], RandomForestClassifier\n    )\n    search = HyperparameterSearch(\n        ModelClass, config[\"param_space\"],\n        config.get(\"experiment_name\", \"hp_search\")\n    )\n    method = config.get(\"search_method\", \"random\")",
-              "why": "3.4'ün devamı. Grid veya random search seçimi config'den gelir. Sonuç best_params ve best_score olarak döner."
+              "why": "Grid veya random search seçimi config'den gelir. Sonuç best_params ve best_score olarak döner."
             },
             {
-              "order": "3.4d",
+              "order": "3.4c",
               "action": "HP search task'ının devamı — search çalıştır ve sonuç dön (devamı)",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "    if method == \"grid\":\n        result = search.grid_search(X_t, y)\n    else:\n        result = search.random_search(\n            X_t, y, n_iter=config.get(\"n_iter\", 10)\n        )\n    return result",
-              "why": "3 — bu adımın devamı."
+              "why": "Grid search tüm kombinasyonları dener, random search budget-friendly. n_iter ile random search deneme sayısı sınırlanır."
             },
             {
               "order": "3.5",
@@ -1860,13 +1860,13 @@
               "why": "3.4'te yazdığımız Celery task'ını API endpoint olarak sunuyoruz. param_space her parametre için denenecek değerleri içerir."
             },
             {
-              "order": "3.5b",
+              "order": "3.5a",
               "action": "GERİ DÖN — api/routers/training.py'ye HP search endpoint'i ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/training.py",
               "position": "bottom",
               "code": "    n_iter: int = 10\n    experiment_name: str = \"hp_search\"\n\n@router.post(\"/hp-search\")\nasync def start_hp_search(req: HPSearchRequest):\n    task = hyperparameter_search.delay(req.model_dump())\n    return {\"task_id\": task.id, \"status\": \"started\"}",
-              "why": "3 — bu adımın devamı."
+              "why": "n_iter ve experiment_name request body'den gelir. delay() ile Celery'de asenkron çalışır — uzun search API'yi bloklamaz."
             },
             {
               "order": "3.6",
@@ -1907,16 +1907,16 @@
               "action": "api/routers/model_registry.py dosyasını oluştur — import ve setup",
               "type": "code_write",
               "file": "api/routers/model_registry.py",
-              "code": "import os\nimport mlflow\nfrom mlflow.tracking import MlflowClient\nfrom fastapi import APIRouter, HTTPException\nfrom pydantic import BaseModel\nfrom typing import Optional\n\nMLFLOW_URI = os.getenv(",
+              "code": "import os\nimport mlflow\nfrom mlflow.tracking import MlflowClient\nfrom fastapi import APIRouter, HTTPException\nfrom pydantic import BaseModel\nfrom typing import Optional",
               "why": "MLflow Model Registry modellerin yaşam döngüsünü yönetir. MlflowClient düşük seviyeli API çağrıları için kullanılır."
             },
             {
-              "order": "4.1b",
+              "order": "4.1a",
               "action": "api/routers/model_registry.py dosyasını oluştur — import ve setup (devamı)",
               "type": "code_add",
               "file": "api/routers/model_registry.py",
-              "code": "    \"MLFLOW_TRACKING_URI\", \"http://localhost:5000\"\n)\nmlflow.set_tracking_uri(MLFLOW_URI)\nclient = MlflowClient()\n\nrouter = APIRouter(\n    prefix=\"/api/models\", tags=[\"model-registry\"]\n)",
-              "why": "MLflow Model Registry modellerin yaşam döngüsünü yönetir — bu adımın devamı.",
+              "code": "MLFLOW_URI = os.getenv(\n    \"MLFLOW_TRACKING_URI\",\n    \"http://localhost:5000\"\n)\nmlflow.set_tracking_uri(MLFLOW_URI)\nclient = MlflowClient()\nrouter = APIRouter(\n    prefix=\"/api/models\", tags=[\"model-registry\"])",
+              "why": "MLFLOW_TRACKING_URI MLflow sunucu adresini, MlflowClient düşük seviyeli API çağrılarını sağlar. Router prefix /api/models altında endpoint'ler gruplandı.",
               "position": "bottom"
             },
             {
@@ -1929,31 +1929,22 @@
               "why": "4.1'deki router'a register (modeli kaydet) ve transition (stage değiştir) ekliyoruz. Stage'ler: Staging → Production → Archived."
             },
             {
-              "order": "4.2b",
+              "order": "4.2a",
               "action": "Register ve transition endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/model_registry.py",
               "position": "bottom",
               "code": "    stage: str\n\n@router.post(\"/register\")\nasync def register_model(req: RegisterModelRequest):\n    uri = f\"runs:/{req.run_id}/model\"\n    result = mlflow.register_model(uri, req.model_name)\n    return {\"name\": result.name,\n            \"version\": result.version}",
-              "why": "4 — bu adımın devamı."
+              "why": "TransitionRequest stage'i değiştirir. register_model MLflow run'ındaki modeli isimle kaydeder, otomatik versiyon numarası atar."
             },
             {
-              "order": "4.2c",
+              "order": "4.2b",
               "action": "Register ve transition endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/model_registry.py",
               "position": "bottom",
-              "code": "\n@router.post(\"/transition\")\nasync def transition(req: TransitionRequest):\n    if req.stage not in [\"Staging\", \"Production\", \"Archived\"]:\n        raise HTTPException(400, \"Geçersiz stage\")\n    client.transition_model_version_stage(\n        req.model_name, req.version, req.stage\n    )",
-              "why": "4 — bu adımın devamı."
-            },
-            {
-              "order": "4.2d",
-              "action": "Register ve transition endpoint'leri (devamı)",
-              "type": "code_add",
-              "file": "api/routers/model_registry.py",
-              "position": "bottom",
-              "code": "    return {\"version\": req.version, \"stage\": req.stage}",
-              "why": "4 — bu adımın devamı."
+              "code": "\n@router.post(\"/transition\")\nasync def transition(req: TransitionRequest):\n    if req.stage not in [\"Staging\", \"Production\", \"Archived\"]:\n        raise HTTPException(400, \"Geçersiz stage\")\n    client.transition_model_version_stage(\n        req.model_name, req.version, req.stage\n    )\n    return {\"version\": req.version, \"stage\": req.stage}",
+              "why": "transition_model_version_stage modelin yaşam döngüsünü yönetir. Staging → Production geçişi test sonrası, Production → Archived rollback için kullanılır."
             },
             {
               "order": "4.3",
@@ -1965,22 +1956,22 @@
               "why": "4.2'deki register/transition'a ek olarak listeleme ve production model sorgulama. Production modeli serving API'de kullanılacak."
             },
             {
-              "order": "4.3b",
+              "order": "4.3a",
               "action": "Listeleme ve production model endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/model_registry.py",
               "position": "bottom",
               "code": "@router.get(\"/{model_name}/production\")\nasync def get_production(model_name: str):\n    versions = client.get_latest_versions(\n        model_name, stages=[\"Production\"]\n    )\n    if not versions:\n        raise HTTPException(404, \"Production model yok\")\n    v = versions[0]",
-              "why": "4 — bu adımın devamı."
+              "why": "get_latest_versions Production stage'indeki en son modeli getirir. Yoksa 404 — serving API bu endpoint'i kullanarak aktif modeli belirler."
             },
             {
-              "order": "4.3c",
+              "order": "4.3b",
               "action": "Listeleme ve production model endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/model_registry.py",
               "position": "bottom",
               "code": "    run = mlflow.get_run(v.run_id)\n    return {\"version\": v.version,\n            \"metrics\": run.data.metrics}",
-              "why": "4 — bu adımın devamı."
+              "why": "Production modelin run bilgileri MLflow'dan çekilir. Metrikler ve versiyon numarası birlikte döndürülür — dashboard'da gösterilir."
             },
             {
               "order": "4.4",
@@ -2046,12 +2037,12 @@
               "why": "ModelServer sınıfı modeli bellekte tutar ve predict çağrılarını işler. Singleton pattern ile tüm istekler aynı model instance'ını kullanır."
             },
             {
-              "order": "1.1b",
+              "order": "1.1a",
               "action": "ml/model_server.py dosyasını oluştur — ModelServer iskeleti (devamı)",
               "type": "code_add",
               "file": "ml/model_server.py",
               "code": "mlflow.set_tracking_uri(MLFLOW_URI)\n\nclass ModelServer:\n    def __init__(self):\n        self._model = None\n        self._model_version = None\n        self._model_name = None",
-              "why": "ModelServer sınıfı modeli bellekte tutar ve predict çağrılarını işler — bu adımın devamı.",
+              "why": "mlflow tracking URI ayarlanır. ModelServer sınıfı singleton pattern ile çalışır — _model, _model_version ve _model_name private alanları modeli tutar.",
               "position": "bottom"
             },
             {
@@ -2064,13 +2055,13 @@
               "why": "1.1'deki sınıfa model yükleme ekliyoruz. MLflow'dan Production stage'indeki modeli alır. Hata durumunda False döner — API 503 dönecek."
             },
             {
-              "order": "1.2b",
+              "order": "1.2a",
               "action": "load_production_model metodu (devamı)",
               "type": "code_add",
               "file": "ml/model_server.py",
               "position": "bottom",
               "code": "            if versions:\n                self._model_version = versions[0].version\n            self._model_name = model_name\n            return True\n        except Exception as e:\n            print(f\"Model yükleme hatası: {e}\")\n            return False",
-              "why": "1 — bu adımın devamı."
+              "why": "Model versiyonu alınır ve model_name kaydedilir. Hata durumunda False döner — API 503 Service Unavailable yanıtı verecek."
             },
             {
               "order": "1.3",
@@ -2082,22 +2073,22 @@
               "why": "1.2'deki yükleme sonrası predict ile tahmin yapıyoruz. predict_proba varsa confidence score da eklenir. Singleton instance dosyanın sonunda oluşturuluyor."
             },
             {
-              "order": "1.3b",
+              "order": "1.3a",
               "action": "predict metodu ve is_loaded property (devamı)",
               "type": "code_add",
               "file": "ml/model_server.py",
               "position": "bottom",
               "code": "            result[\"confidence\"] = float(\n                np.max(proba, axis=1)[0]\n            )\n        return result\n\n    @property\n    def is_loaded(self):\n        return self._model is not None",
-              "why": "1 — bu adımın devamı."
+              "why": "predict_proba varsa confidence score (en yüksek olasılık) eklenir. Confidence düşükse modelin emin olmadığı anlamına gelir — monitoring için kritik."
             },
             {
-              "order": "1.3c",
+              "order": "1.3b",
               "action": "predict metodu ve is_loaded property (devamı)",
               "type": "code_add",
               "file": "ml/model_server.py",
               "position": "bottom",
               "code": "\nmodel_server = ModelServer()",
-              "why": "1 — bu adımın devamı."
+              "why": "Singleton model_server instance'ı modül yüklendiğinde oluşturulur. Tüm endpoint'ler aynı instance'ı kullanır — bellek tasarrufu."
             },
             {
               "order": "1.4",
@@ -2108,16 +2099,16 @@
               "why": "1.1-1.3'te yazdığımız ModelServer'ı API endpoint olarak sunuyoruz. Import'ları ÜSTE yazıyoruz."
             },
             {
-              "order": "1.4b",
-              "action": "BAŞKA DOSYAYA GEÇ — api/routers/inference.py endpoint oluştur (devamı)",
+              "order": "1.4a",
+              "action": "AYNI DOSYADA DEVAM ET — api/routers/inference.py endpoint oluştur (devamı)",
               "type": "code_add",
               "file": "api/routers/inference.py",
               "code": "\nrouter = APIRouter(\n    prefix=\"/api/predict\", tags=[\"inference\"]\n)",
-              "why": "1 — bu adımın devamı.",
+              "why": "Router prefix'i /api/predict ile inference endpoint'lerini gruplar. İlk istekte model lazy-load edilir.",
               "position": "bottom"
             },
             {
-              "order": "1.4c",
+              "order": "1.4b",
               "action": "Predict endpoint — request/response modeli ve ana fonksiyon",
               "type": "code_add",
               "file": "api/routers/inference.py",
@@ -2126,22 +2117,22 @@
               "why": "1.4'teki router'a predict endpoint ekliyoruz. Lazy-load: model ilk istekte yüklenir. Latency her response'a eklenir — monitoring için kritik."
             },
             {
-              "order": "1.4d",
+              "order": "1.4c",
               "action": "Predict endpoint — request/response modeli ve ana fonksiyon (devamı)",
               "type": "code_add",
               "file": "api/routers/inference.py",
               "position": "bottom",
               "code": "        loaded = model_server.load_production_model(\n            request.model_name\n        )\n        if not loaded:\n            raise HTTPException(503, \"Model yüklenemedi\")\n    input_df = pd.DataFrame([request.features])\n    builder = FeaturePipelineBuilder()\n    builder.detect_column_types(input_df)",
-              "why": "1 — bu adımın devamı."
+              "why": "Model yüklü değilse ilk istekte yüklenir (lazy loading). DataFrame oluşturup feature pipeline uygulayarak tahmin yapıyor."
             },
             {
-              "order": "1.4e",
+              "order": "1.4d",
               "action": "Predict endpoint — request/response modeli ve ana fonksiyon (devamı)",
               "type": "code_add",
               "file": "api/routers/inference.py",
               "position": "bottom",
               "code": "    transformed = builder.build().fit_transform(input_df)\n    result = model_server.predict(transformed)\n    latency = (time.time() - start) * 1000\n    return {\"prediction\": result[\"prediction\"][0],\n            \"confidence\": result.get(\"confidence\", 0),\n            \"latency_ms\": round(latency, 2)}",
-              "why": "1 — bu adımın devamı."
+              "why": "Tahmin sonucu, confidence ve latency birlikte döndürülür. Latency milisaniye cinsinden — SLA kontrolü için izlenir."
             },
             {
               "order": "1.5",
@@ -2205,40 +2196,40 @@
               "why": "Model cache thread-safe olmalı (Lock) çünkü FastAPI async istekleri farklı thread'lerde çalıştırabilir. TTL ile eski cache otomatik temizlenir."
             },
             {
-              "order": "2.1b",
+              "order": "2.1a",
               "action": "ml/model_server.py'ye GERİ DÖN — ÜSTE ÇIK, ModelCache sınıfı ekle (devamı)",
               "type": "code_add",
               "file": "ml/model_server.py",
               "position": "after:mlflow.set_tracking_uri(MLFLOW_URI)",
               "code": "        self._lock = Lock()\n\n    def get(self, key: str):\n        with self._lock:\n            if key in self._cache:\n                if time.time() - self._timestamps[key] < self._ttl:\n                    return self._cache[key]\n                del self._cache[key]",
-              "why": "Model cache thread-safe olmalı (Lock) çünkü FastAPI async istekleri farklı thread'lerde çalıştırabilir — bu adımın devamı."
+              "why": "Thread-safe get metodu: lock alır, TTL kontrolü yapar, süresi dolmuşsa cache'den siler. Concurrent isteklerde race condition'ı önler."
             },
             {
-              "order": "2.1c",
+              "order": "2.1b",
               "action": "ml/model_server.py'ye GERİ DÖN — ÜSTE ÇIK, ModelCache sınıfı ekle (devamı)",
               "type": "code_add",
               "file": "ml/model_server.py",
               "position": "after:mlflow.set_tracking_uri(MLFLOW_URI)",
               "code": "        return None",
-              "why": "Model cache thread-safe olmalı (Lock) çünkü FastAPI async istekleri farklı thread'lerde çalıştırabilir — bu adımın devamı."
+              "why": "TTL süresi dolmuşsa None döner — bir sonraki istek modeli diskten yeniden yükler. Cache miss durumunu işaret eder."
             },
             {
-              "order": "2.1d",
+              "order": "2.1c",
               "action": "ModelCache'e set ve invalidate metodları",
               "type": "code_add",
               "file": "ml/model_server.py",
               "position": "after:return None",
               "code": "def set(self, key: str, value: Any):\n        with self._lock:\n            self._cache[key] = value\n            self._timestamps[key] = time.time()\n\n    def invalidate(self, key=None):\n        with self._lock:\n            if key:",
-              "why": "2.1'in devamı. set() cache'e yazar, invalidate() temizler. Parametre verilmezse tüm cache temizlenir."
+              "why": "set() cache'e yazar, invalidate() temizler. Parametre verilmezse tüm cache temizlenir."
             },
             {
-              "order": "2.1e",
+              "order": "2.1d",
               "action": "ModelCache'e set ve invalidate metodları (devamı)",
               "type": "code_add",
               "file": "ml/model_server.py",
               "position": "after:return None",
               "code": "                self._cache.pop(key, None)\n            else:\n                self._cache.clear()\n                self._timestamps.clear()\n\nmodel_cache = ModelCache()",
-              "why": "Model cache thread-safe olmalı (Lock) çünkü FastAPI async istekleri farklı thread'lerde çalıştırabilir — bu adımın devamı."
+              "why": "invalidate(key) tek modeli, invalidate() tüm cache'i temizler. model_cache singleton instance modül seviyesinde oluşturulur."
             },
             {
               "order": "2.2",
@@ -2249,30 +2240,30 @@
               "why": "1.2'de yazdığımız load metodunu cache ile güncelliyoruz. Önce cache'e bak, varsa hemen dön — diskten yükleme yok."
             },
             {
-              "order": "2.2b",
+              "order": "2.2a",
               "action": "ModelServer.load_production_model'a cache entegrasyonu (devamı)",
               "type": "code_modify",
               "file": "ml/model_server.py",
               "code": "            uri = f\"models:/{model_name}/Production\"\n            self._model = mlflow.sklearn.load_model(uri)",
-              "why": "1 — bu adımın devamı."
+              "why": "Mevcut load mantığı cache-aware hale gelir. Cache hit varsa diskten yükleme atlanır — latency 100ms'den 5ms'ye düşer."
             },
             {
-              "order": "2.2c",
+              "order": "2.2b",
               "action": "load_production_model devamı — cache'e kaydet",
               "type": "code_add",
               "file": "ml/model_server.py",
               "position": "after:self._model = mlflow.sklearn.load_model(uri)",
               "code": "client = mlflow.tracking.MlflowClient()\n            versions = client.get_latest_versions(\n                model_name, stages=[\"Production\"]\n            )\n            if versions:\n                self._model_version = versions[0].version\n            model_cache.set(f\"model_{model_name}\", {\n                \"model\": self._model,",
-              "why": "2.2'nin devamı. Model başarıyla yüklendikten sonra cache'e kaydediyoruz. Sonraki isteklerde diskten yükleme olmayacak."
+              "why": "Model başarıyla yüklendikten sonra cache'e kaydediyoruz. Sonraki isteklerde diskten yükleme olmayacak."
             },
             {
-              "order": "2.2d",
+              "order": "2.2c",
               "action": "load_production_model devamı — cache'e kaydet (devamı)",
               "type": "code_add",
               "file": "ml/model_server.py",
               "position": "after:self._model = mlflow.sklearn.load_model(uri)",
               "code": "                \"version\": self._model_version\n            })\n            self._model_name = model_name\n            return True\n        except Exception as e:\n            print(f\"Model yükleme hatası: {e}\")\n            return False",
-              "why": "1 — bu adımın devamı."
+              "why": "Model başarıyla yüklendikten sonra cache'e kaydedilir. Sonraki isteklerde cache'den alınır — disk I/O sıfıra iner."
             },
             {
               "order": "2.3",
@@ -2284,13 +2275,13 @@
               "why": "Model güncellendiğinde cache temizlenmeli. Aksi halde eski model ile prediction yapmaya devam edersin."
             },
             {
-              "order": "2.3b",
+              "order": "2.3a",
               "action": "GERİ DÖN — api/routers/inference.py'ye cache invalidation endpoint'i ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/inference.py",
               "position": "bottom",
               "code": "    return {\"status\": \"cache invalidated\"}",
-              "why": "Model güncellendiğinde cache temizlenmeli — bu adımın devamı."
+              "why": "Model güncellendiğinde cache temizlenmeli."
             },
             {
               "order": "2.4",
@@ -2339,31 +2330,31 @@
               "why": "Büyük veri setleri için tek tek API çağrısı yerine toplu işlem. Celery'de çalıştırarak API bloklanmaz."
             },
             {
-              "order": "3.1b",
+              "order": "3.1a",
               "action": "workers/training_tasks.py'ye GERİ DÖN — batch_predict task'ı ekle (devamı)",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "    model = mlflow.sklearn.load_model(uri)",
-              "why": "Büyük veri setleri için tek tek API çağrısı yerine toplu işlem — bu adımın devamı."
+              "why": "MLflow'dan Production modeli yüklenir. URI formatı models:/{model_name}/Production — MLflow'un model registry şemasını takip eder."
             },
             {
-              "order": "3.1c",
+              "order": "3.1b",
               "action": "batch_predict devamı — transform, predict ve kaydet",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "target = config.get(\"target_column\")\n    X = df.drop(columns=[target]) if target and \\\n        target in df.columns else df\n    builder = FeaturePipelineBuilder()\n    builder.detect_column_types(X)\n    X_t = builder.build().fit_transform(X)\n    df[\"prediction\"] = model.predict(X_t)\n    if hasattr(model, 'predict_proba'):",
-              "why": "3.1'in devamı. Tüm satırları toplu predict edip sonuçları CSV'ye kaydediyor. Confidence score da ekleniyor."
+              "why": "Tüm satırları toplu predict edip sonuçları CSV'ye kaydediyor. Confidence score da ekleniyor."
             },
             {
-              "order": "3.1d",
+              "order": "3.1c",
               "action": "batch_predict devamı — transform, predict ve kaydet (devamı)",
               "type": "code_add",
               "file": "workers/training_tasks.py",
               "position": "bottom",
               "code": "        proba = model.predict_proba(X_t)\n        df[\"confidence\"] = np.max(proba, axis=1)\n    out = config[\"input_path\"].replace(\n        \".csv\", \"_predictions.csv\"\n    )\n    df.to_csv(out, index=False)\n    return {\"total_rows\": len(df), \"output_path\": out}",
-              "why": "Büyük veri setleri için tek tek API çağrısı yerine toplu işlem — bu adımın devamı."
+              "why": "Büyük veri setleri için tek tek API çağrısı yerine toplu işlem."
             },
             {
               "order": "3.2",
@@ -2375,22 +2366,22 @@
               "why": "3.1'de yazdığımız Celery task'ını batch endpoint olarak sunuyoruz. CSV yükle → asenkron predict → sonuçları indir."
             },
             {
-              "order": "3.2b",
+              "order": "3.2a",
               "action": "GERİ DÖN — api/routers/inference.py'ye batch endpoint'i ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/inference.py",
               "position": "bottom",
               "code": "    import os\n    path = f\"data/uploads/batch_{file.filename}\"\n    content = await file.read()\n    with open(path, \"wb\") as f:\n        f.write(content)\n    task = batch_predict.delay(\n        {\"input_path\": path, \"model_name\": model_name}\n    )",
-              "why": "3 — bu adımın devamı."
+              "why": "CSV diske kaydedilip Celery task'ına path olarak gönderilir. delay() ile asenkron çalışır — büyük dosyalar API'yi bloklamaz."
             },
             {
-              "order": "3.2c",
+              "order": "3.2b",
               "action": "GERİ DÖN — api/routers/inference.py'ye batch endpoint'i ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/inference.py",
               "position": "bottom",
               "code": "    return {\"task_id\": task.id, \"status\": \"started\"}",
-              "why": "3 — bu adımın devamı."
+              "why": "task_id döndürülür. Frontend bu ID ile /batch/status endpoint'ini polling yaparak ilerlemeyi takip eder."
             },
             {
               "order": "3.3",
@@ -2402,13 +2393,13 @@
               "why": "3.2'deki batch endpoint'inin durumunu sorgulamak için status endpoint'i. Tamamlandığında output_path döner."
             },
             {
-              "order": "3.3b",
+              "order": "3.3a",
               "action": "Batch status endpoint'i ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/inference.py",
               "position": "bottom",
               "code": "                \"result\": result.result}\n    return {\"status\": result.state,\n            \"progress\": result.info.get(\"progress\", 0)\n            if result.info else 0}",
-              "why": "3 — bu adımın devamı."
+              "why": "SUCCESS durumunda sonuçlar (output dosya yolu, satır sayısı), diğer durumlarda progress yüzdesi döndürülür."
             },
             {
               "order": "3.4",
@@ -2448,12 +2439,12 @@
               "why": "A/B testing framework trafik bölme, sonuç loglama ve istatistiksel karşılaştırma yapacak. defaultdict otomatik boş liste oluşturur."
             },
             {
-              "order": "4.1b",
+              "order": "4.1a",
               "action": "ml/ab_testing.py dosyasını oluştur — ABTestManager iskeleti (devamı)",
               "type": "code_add",
               "file": "ml/ab_testing.py",
               "code": "    def __init__(self):\n        self.tests: Dict[str, Dict] = {}\n        self.results: Dict[str, List] = defaultdict(list)",
-              "why": "A/B testing framework trafik bölme, sonuç loglama ve istatistiksel karşılaştırma yapacak — bu adımın devamı.",
+              "why": "tests dict aktif testleri, results defaultdict(list) her testin sonuçlarını tutar. In-memory — uygulama restart'ında sıfırlanır.",
               "position": "bottom"
             },
             {
@@ -2466,13 +2457,13 @@
               "why": "4.1'deki sınıfa test oluşturma ve trafik yönlendirme ekliyoruz. traffic_split=0.8 → %80 mevcut model, %20 yeni model."
             },
             {
-              "order": "4.2b",
+              "order": "4.2a",
               "action": "create_test ve route_request metodları (devamı)",
               "type": "code_add",
               "file": "ml/ab_testing.py",
               "position": "bottom",
               "code": "        }\n        return self.tests[test_name]\n\n    def route_request(self, test_name: str):\n        test = self.tests[test_name]\n        if random.random() < test[\"traffic_split\"]:\n            return test[\"model_a\"]\n        return test[\"model_b\"]",
-              "why": "4 — bu adımın devamı."
+              "why": "random.random() < traffic_split ile trafik bölünür. %80 model_a (mevcut), %20 model_b (yeni) — güvenli test oranı."
             },
             {
               "order": "4.3",
@@ -2484,40 +2475,40 @@
               "why": "4.2'deki route sonuçlarını loglama ve istatistik hesaplama. Her model'in kaç istek aldığını ve ortalama latency'sini ölçüyoruz."
             },
             {
-              "order": "4.3b",
+              "order": "4.3a",
               "action": "log_result ve get_statistics metodları (devamı)",
               "type": "code_add",
               "file": "ml/ab_testing.py",
               "position": "bottom",
               "code": "\n    def get_statistics(self, test_name):\n        results = self.results[test_name]\n        test = self.tests[test_name]\n        a = [r for r in results\n             if r[\"model\"] == test[\"model_a\"]]\n        b = [r for r in results\n             if r[\"model\"] == test[\"model_b\"]]",
-              "why": "4 — bu adımın devamı."
+              "why": "İstatistik hesaplaması başlıyor. Model A ve B'nin sonuçları ayrılarak latency karşılaştırması yapılacak."
             },
             {
-              "order": "4.3c",
+              "order": "4.3b",
               "action": "log_result ve get_statistics metodları (devamı)",
               "type": "code_add",
               "file": "ml/ab_testing.py",
               "position": "bottom",
               "code": "        stat = {\"total\": len(results),\n                \"model_a_count\": len(a),\n                \"model_b_count\": len(b)}",
-              "why": "4 — bu adımın devamı."
+              "why": "Her model'in toplam istek sayısı hesaplanır. Latency listesi t-test için hazırlanır."
             },
             {
-              "order": "4.3d",
+              "order": "4.3c",
               "action": "İstatistiksel anlamlılık testi — t-test",
               "type": "code_add",
               "file": "ml/ab_testing.py",
               "position": "bottom",
               "code": "if a and b:\n            a_lat = [r[\"latency_ms\"] for r in a]\n            b_lat = [r[\"latency_ms\"] for r in b]\n            t, p = stats.ttest_ind(a_lat, b_lat)\n            stat[\"significance\"] = {\n                \"t_statistic\": round(float(t), 4),\n                \"p_value\": round(float(p), 4),\n                \"significant\": p < 0.05",
-              "why": "4.3'ün devamı. t-test ile latency farkının istatistiksel olarak anlamlı olup olmadığını ölçüyoruz. p < 0.05 ise fark gerçek."
+              "why": "t-test ile latency farkının istatistiksel olarak anlamlı olup olmadığını ölçüyoruz. p < 0.05 ise fark gerçek."
             },
             {
-              "order": "4.3e",
+              "order": "4.3d",
               "action": "İstatistiksel anlamlılık testi — t-test (devamı)",
               "type": "code_add",
               "file": "ml/ab_testing.py",
               "position": "bottom",
               "code": "            }\n        return stat\n\nab_manager = ABTestManager()",
-              "why": "4 — bu adımın devamı."
+              "why": "t-test sonucu ve singleton instance. p < 0.05 ise latency farkı istatistiksel olarak anlamlı — model seçiminde güvenilir kanıt."
             },
             {
               "order": "4.4",
@@ -2529,22 +2520,22 @@
               "why": "4.1-4.3'te yazdığımız ABTestManager'ı API endpoint olarak sunuyoruz."
             },
             {
-              "order": "4.4b",
+              "order": "4.4a",
               "action": "GERİ DÖN — api/routers/inference.py'ye A/B test endpoint'leri ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/inference.py",
               "position": "bottom",
               "code": "@router.post(\"/ab-test/create\")\nasync def create_ab_test(req: ABTestRequest):\n    return ab_manager.create_test(\n        req.test_name, req.model_a,\n        req.model_b, req.traffic_split\n    )\n\n@router.get(\"/ab-test/{test_name}/stats\")",
-              "why": "4 — bu adımın devamı."
+              "why": "create endpoint yeni A/B test oluşturur. stats endpoint test istatistiklerini (istek sayıları, t-test sonuçları) döndürür."
             },
             {
-              "order": "4.4c",
+              "order": "4.4b",
               "action": "GERİ DÖN — api/routers/inference.py'ye A/B test endpoint'leri ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/inference.py",
               "position": "bottom",
               "code": "async def ab_stats(test_name: str):\n    return ab_manager.get_statistics(test_name)",
-              "why": "4 — bu adımın devamı."
+              "why": "get_statistics test sonuçlarını hesaplayıp döndürür. Frontend bu veriyi A/B test dashboard kartında gösterir."
             },
             {
               "order": "4.5",
@@ -2601,21 +2592,21 @@
               "why": "Her tahmin sonucunu kaydeden logger. deque(maxlen) ile bellek sınırlı tutulur — en eski loglar otomatik silinir."
             },
             {
-              "order": "1.1b",
+              "order": "1.1a",
               "action": "monitoring/prediction_logger.py dosyasını oluştur — PredictionLogger iskeleti (devamı)",
               "type": "code_add",
               "file": "monitoring/prediction_logger.py",
               "code": "\n    def log_prediction(self, input_features,\n                       prediction, confidence,\n                       model_version, latency_ms):\n        self.logs.append({\n            \"timestamp\": datetime.utcnow().isoformat(),\n            \"prediction\": prediction,\n            \"confidence\": confidence,",
-              "why": "Her tahmin sonucunu kaydeden logger — bu adımın devamı.",
+              "why": "log_prediction her tahmin sonrasını kaydeder: prediction, confidence, model versiyonu ve latency. Push-based monitoring yaklaşımı.",
               "position": "bottom"
             },
             {
-              "order": "1.1c",
+              "order": "1.1b",
               "action": "monitoring/prediction_logger.py dosyasını oluştur — PredictionLogger iskeleti (devamı)",
               "type": "code_add",
               "file": "monitoring/prediction_logger.py",
               "code": "            \"model_version\": model_version,\n            \"latency_ms\": latency_ms\n        })",
-              "why": "Her tahmin sonucunu kaydeden logger — bu adımın devamı.",
+              "why": "model_version ve latency_ms kaydedilir. deque maxlen ile en eski loglar otomatik silinir — bellek taşması önlenir.",
               "position": "bottom"
             },
             {
@@ -2628,22 +2619,22 @@
               "why": "1.1'deki loglara dayanarak son N dakikanın istatistiklerini hesaplıyoruz. Latency percentiles ve low confidence count monitoring dashboard'da gösterilecek."
             },
             {
-              "order": "1.2b",
+              "order": "1.2a",
               "action": "get_stats metodu — istatistik hesaplama (devamı)",
               "type": "code_add",
               "file": "monitoring/prediction_logger.py",
               "position": "bottom",
               "code": "        lats = [l[\"latency_ms\"] for l in recent]\n        confs = [l[\"confidence\"] for l in recent]\n        return {\n            \"total_predictions\": len(recent),\n            \"latency\": {\n                \"avg\": round(np.mean(lats), 2),\n                \"p95\": round(np.percentile(lats, 95), 2)\n            },",
-              "why": "1 — bu adımın devamı."
+              "why": "Latency avg ve p95 percentile hesaplanır. p95: isteklerin %95'i bu sürenin altında — SLA metriği. low_count düşük güvenli tahmin sayısı."
             },
             {
-              "order": "1.2c",
+              "order": "1.2b",
               "action": "get_stats metodu — istatistik hesaplama (devamı)",
               "type": "code_add",
               "file": "monitoring/prediction_logger.py",
               "position": "bottom",
               "code": "            \"confidence\": {\n                \"avg\": round(np.mean(confs), 4),\n                \"low_count\": sum(1 for c in confs if c < 0.5)\n            }\n        }\n\nprediction_logger = PredictionLogger()",
-              "why": "1 — bu adımın devamı."
+              "why": "Confidence avg ve low_count (<0.5) hesaplanır. Singleton prediction_logger modül seviyesinde oluşturulur."
             },
             {
               "order": "1.3",
@@ -2663,12 +2654,12 @@
               "why": "Step 1.4b'deki predict endpoint'ini güncelliyoruz — her prediction sonrası otomatik loglama. Push-based monitoring yaklaşımı."
             },
             {
-              "order": "1.4b",
+              "order": "1.4a",
               "action": "Predict endpoint'ine logging entegre et (devamı)",
               "type": "code_modify",
               "file": "api/routers/inference.py",
               "code": "        latency_ms=latency\n    )\n    return {\"prediction\": result[\"prediction\"][0],\n            \"confidence\": result.get(\"confidence\", 0),\n            \"latency_ms\": round(latency, 2)}",
-              "why": "Step 1 — bu adımın devamı."
+              "why": "Loglama sonrası prediction, confidence ve latency JSON olarak döndürülür. Her tahmin otomatik loglanır — push-based monitoring."
             },
             {
               "order": "1.5",
@@ -2717,12 +2708,12 @@
               "why": "Data drift tespiti training verisinin dağılımını (baseline) ile production verisini karşılaştırır. KS test istatistiksel farkı ölçer."
             },
             {
-              "order": "2.1b",
+              "order": "2.1a",
               "action": "monitoring/drift_detector.py dosyasını oluştur — DriftDetector iskeleti (devamı)",
               "type": "code_add",
               "file": "monitoring/drift_detector.py",
               "code": "\n    def set_baseline(self, df: pd.DataFrame,\n                     feature_columns: List[str]):\n        for col in feature_columns:\n            if pd.api.types.is_numeric_dtype(df[col]):\n                self.baseline_stats[col] = {\n                    \"values\": df[col].dropna().values,\n                    \"mean\": float(df[col].mean())\n}",
-              "why": "Data drift tespiti training verisinin dağılımını (baseline) ile production verisini karşılaştırır — bu adımın devamı.",
+              "why": "set_baseline her sayısal sütunun değerlerini ve ortalamasını kaydeder. Bu baseline production verisinin karşılaştırma referansı olacak.",
               "position": "bottom"
             },
             {
@@ -2735,40 +2726,31 @@
               "why": "2.1'deki baseline ile mevcut veriyi KS testi ile karşılaştırıyoruz. p < threshold ise o feature'da anlamlı dağılım değişimi var."
             },
             {
-              "order": "2.2b",
+              "order": "2.2a",
               "action": "KS test ile drift detection metodu (devamı)",
               "type": "code_add",
               "file": "monitoring/drift_detector.py",
               "position": "bottom",
               "code": "            current = current_df[col].dropna().values\n            if len(current) == 0:\n                continue\n            stat, p = ks_2samp(\n                baseline[\"values\"], current\n            )\n            drifted = p < threshold",
-              "why": "2 — bu adımın devamı."
+              "why": "ks_2samp iki dağılımın aynı olup olmadığını test eder. p < threshold ise dağılımlar farklı — o feature'da drift var."
             },
             {
-              "order": "2.2c",
+              "order": "2.2b",
               "action": "Drift detection sonuçlarını topla",
               "type": "code_add",
               "file": "monitoring/drift_detector.py",
               "position": "bottom",
               "code": "results[\"feature_results\"][col] = {\n                \"ks_statistic\": round(float(stat), 4),\n                \"p_value\": round(float(p), 6),\n                \"drifted\": drifted,\n                \"mean_shift\": round(\n                    float(current_df[col].mean()) -\n                    baseline[\"mean\"], 4\n                )",
-              "why": "2.2'nin devamı. Her feature için drift sonucu, mean kayması ve istatistiksel değerler raporlanıyor. Singleton instance oluşturuluyor."
+              "why": "Her feature için drift sonucu, mean kayması ve istatistiksel değerler raporlanıyor. Singleton instance oluşturuluyor."
             },
             {
-              "order": "2.2d",
+              "order": "2.2c",
               "action": "Drift detection sonuçlarını topla (devamı)",
               "type": "code_add",
               "file": "monitoring/drift_detector.py",
               "position": "bottom",
-              "code": "            }\n            if drifted:\n                results[\"drifted_features\"].append(col)\n        results[\"overall_drift\"] = len(\n            results[\"drifted_features\"]\n        ) > 0\n        return results\n",
-              "why": "2 — bu adımın devamı."
-            },
-            {
-              "order": "2.2e",
-              "action": "Drift detection sonuçlarını topla (devamı)",
-              "type": "code_add",
-              "file": "monitoring/drift_detector.py",
-              "position": "bottom",
-              "code": "drift_detector = DriftDetector()",
-              "why": "2 — bu adımın devamı."
+              "code": "            }\n            if drifted:\n                results[\"drifted_features\"].append(col)\n        results[\"overall_drift\"] = len(\n            results[\"drifted_features\"]\n        ) > 0\n        return results\ndrift_detector = DriftDetector()",
+              "why": "Drift tespit edilen feature'lar listeye eklenir. overall_drift en az bir feature'da drift varsa True olur — alert tetikler."
             },
             {
               "order": "2.3",
@@ -2779,16 +2761,16 @@
               "why": "2.1-2.2'de yazdığımız DriftDetector'ı REST API olarak sunuyoruz."
             },
             {
-              "order": "2.3b",
-              "action": "BAŞKA DOSYAYA GEÇ — api/routers/monitoring.py drift endpoint'leri (devamı)",
+              "order": "2.3a",
+              "action": "AYNI DOSYADA DEVAM ET — api/routers/monitoring.py drift endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/monitoring.py",
               "code": "router = APIRouter(\n    prefix=\"/api/monitoring\", tags=[\"monitoring\"]\n)",
-              "why": "2 — bu adımın devamı.",
+              "why": "Router prefix /api/monitoring altında drift ve performance endpoint'lerini gruplar.",
               "position": "bottom"
             },
             {
-              "order": "2.3c",
+              "order": "2.3b",
               "action": "Baseline ve detect endpoint'leri",
               "type": "code_add",
               "file": "api/routers/monitoring.py",
@@ -2797,13 +2779,22 @@
               "why": "2.3'teki router'a baseline ayarlama ve drift tespit endpoint'leri ekliyoruz."
             },
             {
-              "order": "2.3d",
+              "order": "2.3c",
               "action": "Baseline ve detect endpoint'leri (devamı)",
               "type": "code_add",
               "file": "api/routers/monitoring.py",
               "position": "bottom",
               "code": "    ds = db.query(Dataset).filter(\n        Dataset.id == req.dataset_id\n    ).first()\n    if not ds:\n        raise HTTPException(404, \"Dataset bulunamadı\")\n    df = pd.read_csv(ds.file_path)\n    drift_detector.set_baseline(df, req.feature_columns)\n    return {\"status\": \"baseline set\"}",
-              "why": "2 — bu adımın devamı."
+              "why": "Dataset'i okuyup drift_detector'a baseline olarak set eder. Bu baseline ileride detect çağrılarında referans olarak kullanılacak."
+            },
+            {
+              "order": "2.3d",
+              "action": "Baseline ve detect endpoint'leri (devamı)",
+              "type": "code_add",
+              "file": "api/routers/monitoring.py",
+              "position": "bottom",
+              "code": "\n@router.post(\"/drift/detect\")\nasync def detect_drift(dataset_id: int,\n                       db: Session = Depends(get_db)):\n    from api.models import Dataset\n    ds = db.query(Dataset).filter(\n        Dataset.id == dataset_id\n    ).first()",
+              "why": "detect endpoint yeni veri ile baseline'ı KS testi ile karşılaştırır. Hangi feature'larda drift olduğu JSON olarak döner."
             },
             {
               "order": "2.3e",
@@ -2811,17 +2802,8 @@
               "type": "code_add",
               "file": "api/routers/monitoring.py",
               "position": "bottom",
-              "code": "\n@router.post(\"/drift/detect\")\nasync def detect_drift(dataset_id: int,\n                       db: Session = Depends(get_db)):\n    from api.models import Dataset\n    ds = db.query(Dataset).filter(\n        Dataset.id == dataset_id\n    ).first()",
-              "why": "2 — bu adımın devamı."
-            },
-            {
-              "order": "2.3f",
-              "action": "Baseline ve detect endpoint'leri (devamı)",
-              "type": "code_add",
-              "file": "api/routers/monitoring.py",
-              "position": "bottom",
               "code": "    if not ds:\n        raise HTTPException(404, \"Dataset bulunamadı\")\n    df = pd.read_csv(ds.file_path)\n    return drift_detector.detect_drift_ks(df)",
-              "why": "2 — bu adımın devamı."
+              "why": "Dataset bulunamazsa 404, veri okunur ve detect_drift_ks çağrılır. Sonuç her feature için p_value ve drifted bilgisi içerir."
             },
             {
               "order": "2.4",
@@ -2883,12 +2865,12 @@
               "why": "Model accuracy zamanla düşebilir (concept drift). Ground truth geldikçe performansı baseline ile karşılaştırıyoruz."
             },
             {
-              "order": "3.1b",
+              "order": "3.1a",
               "action": "monitoring/performance_monitor.py dosyasını oluştur (devamı)",
               "type": "code_add",
               "file": "monitoring/performance_monitor.py",
               "code": "                 alert_threshold=0.05):\n        self.baseline_accuracy = baseline_accuracy\n        self.alert_threshold = alert_threshold\n        self.ground_truth_log: deque = deque(maxlen=10000)\n        self.alerts: List[Dict] = []",
-              "why": "Model accuracy zamanla düşebilir (concept drift) — bu adımın devamı.",
+              "why": "baseline_accuracy referans doğruluk, alert_threshold kabul edilebilir düşüş miktarı. deque ve alerts listesi sonuçları saklar.",
               "position": "bottom"
             },
             {
@@ -2901,22 +2883,31 @@
               "why": "3.1'deki sınıfa baseline ayarlama ve ground truth loglama ekliyoruz. Ground truth gerçek sonuçlar — tahminle karşılaştırarak accuracy hesaplanır."
             },
             {
-              "order": "3.2b",
+              "order": "3.2a",
               "action": "set_baseline, log_ground_truth ve calculate_performance (devamı)",
               "type": "code_add",
               "file": "monitoring/performance_monitor.py",
               "position": "bottom",
               "code": "            \"model_version\": model_version,\n            \"timestamp\": datetime.utcnow().isoformat()\n        })",
-              "why": "3 — bu adımın devamı."
+              "why": "Ground truth kaydı: tahmin, gerçek sonuç, model versiyonu ve zaman damgası. Bu verilerle periyodik accuracy hesaplanır."
             },
             {
-              "order": "3.2c",
+              "order": "3.2b",
               "action": "Performans hesaplama ve alert oluşturma",
               "type": "code_add",
               "file": "monitoring/performance_monitor.py",
               "position": "bottom",
               "code": "def calculate_performance(self, window_hours=24):\n        cutoff = datetime.utcnow() - timedelta(\n            hours=window_hours\n        )\n        recent = [l for l in self.ground_truth_log\n            if datetime.fromisoformat(\n                l[\"timestamp\"]) > cutoff]\n        if len(recent) < 10:",
-              "why": "3.2'nin devamı. Accuracy baseline'dan threshold kadar düşerse alert oluşturulur. Bu concept drift tespitinin temel mekanizması."
+              "why": "Accuracy baseline'dan threshold kadar düşerse alert oluşturulur. Bu concept drift tespitinin temel mekanizması."
+            },
+            {
+              "order": "3.2c",
+              "action": "Performans hesaplama ve alert oluşturma (devamı)",
+              "type": "code_add",
+              "file": "monitoring/performance_monitor.py",
+              "position": "bottom",
+              "code": "            return {\"status\": \"insufficient_data\"}\n        preds = [l[\"prediction\"] for l in recent]\n        actuals = [l[\"actual\"] for l in recent]\n        acc = accuracy_score(actuals, preds)\n        drop = self.baseline_accuracy - acc\n        degraded = drop > self.alert_threshold",
+              "why": "accuracy_score ile mevcut doğruluk hesaplanır. Baseline'dan threshold kadar düşüşe alert oluşturulur — concept drift tespiti."
             },
             {
               "order": "3.2d",
@@ -2924,8 +2915,8 @@
               "type": "code_add",
               "file": "monitoring/performance_monitor.py",
               "position": "bottom",
-              "code": "            return {\"status\": \"insufficient_data\"}\n        preds = [l[\"prediction\"] for l in recent]\n        actuals = [l[\"actual\"] for l in recent]\n        acc = accuracy_score(actuals, preds)\n        drop = self.baseline_accuracy - acc\n        degraded = drop > self.alert_threshold\n        if degraded:\n            self.alerts.append({",
-              "why": "3 — bu adımın devamı."
+              "code": "        if degraded:\n            self.alerts.append({\n                \"type\": \"model_degradation\",\n                \"message\": f\"Accuracy {drop:.2%} düştü\",\n                \"severity\": \"high\"\n                    if drop > 0.1 else \"medium\"\n            })",
+              "why": "Alert severity: %10+ düşüş high, %5-10 medium. Degraded bilgisi auto-retraining tetiklemesi için kullanılır."
             },
             {
               "order": "3.2e",
@@ -2933,17 +2924,8 @@
               "type": "code_add",
               "file": "monitoring/performance_monitor.py",
               "position": "bottom",
-              "code": "                \"type\": \"model_degradation\",\n                \"message\": f\"Accuracy {drop:.2%} düştü\",\n                \"severity\": \"high\" if drop > 0.1 else \"medium\"\n            })\n        return {\"current_accuracy\": round(acc, 4),\n                \"accuracy_drop\": round(drop, 4),\n                \"degraded\": degraded}\n",
-              "why": "3 — bu adımın devamı."
-            },
-            {
-              "order": "3.2f",
-              "action": "Performans hesaplama ve alert oluşturma (devamı)",
-              "type": "code_add",
-              "file": "monitoring/performance_monitor.py",
-              "position": "bottom",
               "code": "    def get_alerts(self, limit=20):\n        return list(self.alerts)[-limit:]\n\nperformance_monitor = PerformanceMonitor()",
-              "why": "3 — bu adımın devamı."
+              "why": "get_alerts son N alert'i döndürür. Singleton performance_monitor modül seviyesinde oluşturulur."
             },
             {
               "order": "3.3",
@@ -2955,13 +2937,22 @@
               "why": "3.1-3.2'de yazdığımız performance monitor'u API endpoint olarak sunuyoruz."
             },
             {
-              "order": "3.3b",
+              "order": "3.3a",
               "action": "GERİ DÖN — api/routers/monitoring.py'ye performance endpoint'leri ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/monitoring.py",
               "position": "bottom",
               "code": "async def set_baseline(accuracy: float):\n    performance_monitor.set_baseline(accuracy)\n    return {\"baseline_accuracy\": accuracy}\n\n@router.post(\"/performance/ground-truth\")\nasync def log_ground_truth(req: GroundTruthRequest):\n    performance_monitor.log_ground_truth(\n        req.prediction, req.actual, req.model_version",
-              "why": "3 — bu adımın devamı."
+              "why": "Baseline accuracy ayarlanır. ground-truth endpoint her tahmin-gerçek çiftini loglar. performance/stats mevcut durumu hesaplar."
+            },
+            {
+              "order": "3.3b",
+              "action": "GERİ DÖN — api/routers/monitoring.py'ye performance endpoint'leri ekle (devamı)",
+              "type": "code_add",
+              "file": "api/routers/monitoring.py",
+              "position": "bottom",
+              "code": "    )\n    return {\"status\": \"logged\"}\n\n@router.get(\"/performance/stats\")\nasync def perf_stats(window_hours: int = 24):\n    return performance_monitor.calculate_performance(\n        window_hours\n    )",
+              "why": "log_ground_truth kaydeder, stats endpoint window_hours parametresi ile zaman penceresini belirler."
             },
             {
               "order": "3.3c",
@@ -2969,17 +2960,8 @@
               "type": "code_add",
               "file": "api/routers/monitoring.py",
               "position": "bottom",
-              "code": "    )\n    return {\"status\": \"logged\"}\n\n@router.get(\"/performance/stats\")\nasync def perf_stats(window_hours: int = 24):\n    return performance_monitor.calculate_performance(\n        window_hours\n    )",
-              "why": "3 — bu adımın devamı."
-            },
-            {
-              "order": "3.3d",
-              "action": "GERİ DÖN — api/routers/monitoring.py'ye performance endpoint'leri ekle (devamı)",
-              "type": "code_add",
-              "file": "api/routers/monitoring.py",
-              "position": "bottom",
               "code": "\n@router.get(\"/alerts\")\nasync def get_alerts(limit: int = 20):\n    return performance_monitor.get_alerts(limit)",
-              "why": "3 — bu adımın devamı."
+              "why": "alerts endpoint son alert'leri listeler. Dashboard'da kırmızı banner olarak gösterilir — operasyon ekibini uyarır."
             },
             {
               "order": "3.4",
@@ -3019,12 +3001,12 @@
               "why": "Auto-retrain manager drift ve performance degradation'ı birleştirerek retraining kararı verir. Varsayılan enabled=False — açıkça aktifleştirmek gerekir."
             },
             {
-              "order": "4.1b",
+              "order": "4.1a",
               "action": "monitoring/auto_retrain.py dosyasını oluştur — AutoRetrainManager (devamı)",
               "type": "code_add",
               "file": "monitoring/auto_retrain.py",
               "code": "            \"performance_drop_threshold\": 0.05,\n            \"auto_promote\": False,\n            \"validation_accuracy_min\": 0.80\n        }\n        self.retrain_history: list = []",
-              "why": "Auto-retrain manager drift ve performance degradation'ı birleştirerek retraining kararı verir — bu adımın devamı.",
+              "why": "performance_drop_threshold accuracy düşüş limiti, auto_promote otomatik production'a alma, validation_accuracy_min minimum kabul edilebilir accuracy.",
               "position": "bottom"
             },
             {
@@ -3037,13 +3019,22 @@
               "why": "4.1'deki sınıfa konfigürasyon ve retrain kararı ekliyoruz. Drift VEYA performance drop varsa retrain önerilir — ama enabled=True olmalı."
             },
             {
+              "order": "4.2a",
+              "action": "configure ve should_retrain metodları (devamı)",
+              "type": "code_add",
+              "file": "monitoring/auto_retrain.py",
+              "position": "bottom",
+              "code": "            drifted = drift_result.get(\n                \"drifted_features\", [])\n            reasons.append(\n                f\"Data drift: {', '.join(drifted)}\"\n            )\n        if performance_result.get(\"degraded\", False):\n            drop = performance_result.get(\n                \"accuracy_drop\", 0)",
+              "why": "Drift tespit edilen feature'lar reasons listesine eklenir. Performance drop da ayrı bir neden olarak kaydedilir."
+            },
+            {
               "order": "4.2b",
               "action": "configure ve should_retrain metodları (devamı)",
               "type": "code_add",
               "file": "monitoring/auto_retrain.py",
               "position": "bottom",
-              "code": "            drifted = drift_result.get(\n                \"drifted_features\", []\n            )\n            reasons.append(\n                f\"Data drift: {', '.join(drifted)}\"\n            )\n        if performance_result.get(\"degraded\", False):\n            drop = performance_result.get(",
-              "why": "4 — bu adımın devamı."
+              "code": "            reasons.append(\n                f\"Accuracy {drop:.2%} düştü\"\n            )\n        return {\n            \"should_retrain\": len(reasons) > 0\n                and self.config[\"enabled\"],\n            \"reasons\": reasons\n        }",
+              "why": "Accuracy düşüşü yüzde olarak raporlanır. should_retrain: nedenler var VE enabled=True ise retrain önerilir."
             },
             {
               "order": "4.2c",
@@ -3051,17 +3042,8 @@
               "type": "code_add",
               "file": "monitoring/auto_retrain.py",
               "position": "bottom",
-              "code": "                \"accuracy_drop\", 0\n            )\n            reasons.append(\n                f\"Accuracy {drop:.2%} düştü\"\n            )\n        return {\n            \"should_retrain\": len(reasons) > 0\n                and self.config[\"enabled\"],",
-              "why": "4 — bu adımın devamı."
-            },
-            {
-              "order": "4.2d",
-              "action": "configure ve should_retrain metodları (devamı)",
-              "type": "code_add",
-              "file": "monitoring/auto_retrain.py",
-              "position": "bottom",
               "code": "            \"reasons\": reasons\n        }",
-              "why": "4 — bu adımın devamı."
+              "why": "Retrain kararı reasons listesi ile birlikte döndürülür. Frontend'de 'neden retrain gerekiyor?' sorusuna yanıt verir."
             },
             {
               "order": "4.3",
@@ -3073,22 +3055,22 @@
               "why": "4.2'deki retrain kararından sonra yeni modelin eskisinden iyi olduğunu doğrulayan guardrail. Minimum accuracy threshold'u geçmeli VE eski modelden iyi olmalı."
             },
             {
-              "order": "4.3b",
+              "order": "4.3a",
               "action": "validate_new_model metodu — güvenlik guardrail (devamı)",
               "type": "code_add",
               "file": "monitoring/auto_retrain.py",
               "position": "bottom",
               "code": "            \"improvement\": round(\n                new_accuracy - old_accuracy, 4\n            ),\n            \"auto_promote\": approved and \\\n                self.config[\"auto_promote\"]\n        }\n        self.retrain_history.append({\n            **result,",
-              "why": "4 — bu adımın devamı."
+              "why": "improvement yeni-eski accuracy farkı. auto_promote: onaylandı VE config'de auto=True ise model otomatik production'a alınır."
             },
             {
-              "order": "4.3c",
+              "order": "4.3b",
               "action": "validate_new_model metodu — güvenlik guardrail (devamı)",
               "type": "code_add",
               "file": "monitoring/auto_retrain.py",
               "position": "bottom",
               "code": "            \"timestamp\": datetime.utcnow().isoformat()\n        })\n        return result\n\nauto_retrain_manager = AutoRetrainManager()",
-              "why": "4 — bu adımın devamı."
+              "why": "Her validation sonucu retrain_history'ye kaydedilir. Singleton auto_retrain_manager modül seviyesinde oluşturulur."
             },
             {
               "order": "4.4",
@@ -3100,13 +3082,22 @@
               "why": "4.1-4.3'te yazdığımız auto-retrain manager'ı API endpoint olarak sunuyoruz. check endpoint drift + performance'ı birlikte değerlendirir."
             },
             {
-              "order": "4.4b",
+              "order": "4.4a",
               "action": "GERİ DÖN — api/routers/monitoring.py'ye retrain endpoint'leri ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/monitoring.py",
               "position": "bottom",
               "code": "    return auto_retrain_manager.configure(\n        **cfg.model_dump()\n    )\n\n@router.post(\"/retrain/check\")\nasync def check_retrain(dataset_id: int,\n                        db: Session = Depends(get_db)):\n    from api.models import Dataset",
-              "why": "4 — bu adımın devamı."
+              "why": "configure retrain ayarlarını günceller. check endpoint drift + performance'ı birlikte değerlendirip retrain kararı verir."
+            },
+            {
+              "order": "4.4b",
+              "action": "GERİ DÖN — api/routers/monitoring.py'ye retrain endpoint'leri ekle (devamı)",
+              "type": "code_add",
+              "file": "api/routers/monitoring.py",
+              "position": "bottom",
+              "code": "    ds = db.query(Dataset).filter(\n        Dataset.id == dataset_id\n    ).first()\n    if not ds:\n        raise HTTPException(404, \"Dataset bulunamadı\")\n    df = pd.read_csv(ds.file_path)\n    drift = drift_detector.detect_drift_ks(df)\n    perf = performance_monitor.calculate_performance()",
+              "why": "Dataset'i okuyup drift tespiti yapar, performance hesaplar. İki sonucu birleştirip should_retrain kararı döndürür."
             },
             {
               "order": "4.4c",
@@ -3114,8 +3105,8 @@
               "type": "code_add",
               "file": "api/routers/monitoring.py",
               "position": "bottom",
-              "code": "    ds = db.query(Dataset).filter(\n        Dataset.id == dataset_id\n    ).first()\n    if not ds:\n        raise HTTPException(404, \"Dataset bulunamadı\")\n    df = pd.read_csv(ds.file_path)\n    drift = drift_detector.detect_drift_ks(df)\n    perf = performance_monitor.calculate_performance()",
-              "why": "4 — bu adımın devamı."
+              "code": "    decision = auto_retrain_manager.should_retrain(\n        drift, perf\n    )\n    return {\"drift\": drift, \"performance\": perf,\n            \"retrain_decision\": decision}\n\n@router.get(\"/retrain/history\")\nasync def retrain_history():",
+              "why": "Drift, performance ve retrain kararı tek yanıtta döner. Frontend'de monitoring dashboard'unda özet kart olarak gösterilir."
             },
             {
               "order": "4.4d",
@@ -3123,17 +3114,8 @@
               "type": "code_add",
               "file": "api/routers/monitoring.py",
               "position": "bottom",
-              "code": "    decision = auto_retrain_manager.should_retrain(\n        drift, perf\n    )\n    return {\"drift\": drift, \"performance\": perf,\n            \"retrain_decision\": decision}\n\n@router.get(\"/retrain/history\")\nasync def retrain_history():",
-              "why": "4 — bu adımın devamı."
-            },
-            {
-              "order": "4.4e",
-              "action": "GERİ DÖN — api/routers/monitoring.py'ye retrain endpoint'leri ekle (devamı)",
-              "type": "code_add",
-              "file": "api/routers/monitoring.py",
-              "position": "bottom",
               "code": "    return auto_retrain_manager.retrain_history",
-              "why": "4 — bu adımın devamı."
+              "why": "retrain_history endpoint geçmiş retrain kararlarını listeler. Audit trail — hangi modelin neden retrain edildiğini gösterir."
             },
             {
               "order": "4.5",
@@ -3202,7 +3184,7 @@
               "why": "Merkezi API client ile tüm backend çağrıları tek yerden yönetilir. URL değiştiğinde sadece burayı güncellersen yeter."
             },
             {
-              "order": "1.2z",
+              "order": "1.2a",
               "action": "frontend/src/api/client.ts dosyasını oluştur — API client (devamı)",
               "type": "code_write",
               "file": "frontend/src/api/client.ts",
@@ -3226,7 +3208,7 @@
               "file": "frontend/src/api/client.ts",
               "position": "bottom",
               "code": "export const getTrainingStatus = (id: string) =>\n  api.get(`/api/training/status/${id}`)\nexport const fetchPredictionStats = (min: number) =>\n  api.get(`/api/predict/monitoring/stats?minutes=${min}`)\nexport const fetchAlerts = () =>\n  api.get('/api/monitoring/alerts')",
-              "why": "Merkezi API client ile tüm backend çağrıları tek yerden yönetilir — bu adımın devamı."
+              "why": "Training status polling ve monitoring stats endpoint'leri. Merkezi client ile URL değişikliği tek yerden yönetilir."
             },
             {
               "order": "1.3",
@@ -3237,16 +3219,16 @@
               "why": "Training dashboard experiment'leri listeler, training başlatır ve progress gösterir. Dark tema proje stiline uygun."
             },
             {
-              "order": "1.3b",
+              "order": "1.3a",
               "action": "frontend/src/pages/TrainingDashboard.tsx dosyasını oluştur — iskelet (devamı)",
               "type": "code_add",
               "file": "frontend/src/pages/TrainingDashboard.tsx",
               "code": "  const [progress, setProgress] = useState(0)",
-              "why": "Training dashboard experiment'leri listeler, training başlatır ve progress gösterir — bu adımın devamı.",
+              "why": "progress state'i training ilerleme yüzdesini tutar. useState hook'u ile React component güncellemeleri tetiklenir.",
               "position": "bottom"
             },
             {
-              "order": "1.3c",
+              "order": "1.3b",
               "action": "Dashboard useEffect'leri ve handler'ları",
               "type": "code_add",
               "file": "frontend/src/pages/TrainingDashboard.tsx",
@@ -3255,25 +3237,25 @@
               "why": "1.3'teki state'leri kullanan useEffect'ler. İlkinde experiment listesi yüklenir. İkincisinde aktif task'ın durumu 2 saniyede bir sorgulanır."
             },
             {
-              "order": "1.3d",
+              "order": "1.3c",
               "action": "Dashboard useEffect'leri ve handler'ları (devamı)",
               "type": "code_add",
               "file": "frontend/src/pages/TrainingDashboard.tsx",
               "position": "bottom",
               "code": "      setProgress(data.progress || 0)\n      if (data.status === 'SUCCESS' ||\n          data.status === 'FAILED') {\n        clearInterval(iv)\n        setActiveTask(null)\n        fetchExperiments().then(\n          r => setExperiments(r.data)\n        )",
-              "why": "Training dashboard experiment'leri listeler, training başlatır ve progress gösterir — bu adımın devamı."
+              "why": "Task SUCCESS veya FAILED olduğunda polling durur, experiment listesi yenilenir. clearInterval memory leak'i önler."
             },
             {
-              "order": "1.3e",
+              "order": "1.3d",
               "action": "Dashboard useEffect'leri ve handler'ları (devamı)",
               "type": "code_add",
               "file": "frontend/src/pages/TrainingDashboard.tsx",
               "position": "bottom",
               "code": "      }\n    }, 2000)\n    return () => clearInterval(iv)\n  }, [activeTask])",
-              "why": "Training dashboard experiment'leri listeler, training başlatır ve progress gösterir — bu adımın devamı."
+              "why": "useEffect cleanup fonksiyonu component unmount olduğunda interval'ı temizler. Memory leak prevention — React best practice."
             },
             {
-              "order": "1.3f",
+              "order": "1.3e",
               "action": "Dashboard JSX — UI render",
               "type": "code_add",
               "file": "frontend/src/pages/TrainingDashboard.tsx",
@@ -3282,13 +3264,22 @@
               "why": "1.3-1.3b'deki state ve effect'leri görsel olarak sunan JSX. Dark tema (gray-900), emerald vurgular. Progress bar training ilerlemesini gösterir."
             },
             {
+              "order": "1.3f",
+              "action": "Dashboard JSX — UI render (devamı)",
+              "type": "code_add",
+              "file": "frontend/src/pages/TrainingDashboard.tsx",
+              "position": "bottom",
+              "code": "          <div className=\"w-full bg-gray-700 rounded-full h-2\">\n            <div className=\"bg-emerald-500 h-2 rounded-full\"\n              style={{width: `${progress}%`}} />\n          </div>\n        </div>\n      )}",
+              "why": "Progress bar genişliği CSS width ile dinamik ayarlanır. Experiment kartları grid layout ile responsive görünür."
+            },
+            {
               "order": "1.3g",
               "action": "Dashboard JSX — UI render (devamı)",
               "type": "code_add",
               "file": "frontend/src/pages/TrainingDashboard.tsx",
               "position": "bottom",
-              "code": "          <div className=\"w-full bg-gray-700 rounded-full h-2\">\n            <div className=\"bg-emerald-500 h-2 rounded-full\"\n              style={{width: `${progress}%`}} />\n          </div>\n        </div>\n      )}\n      <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">\n        {experiments.map((exp: any) => (",
-              "why": "Training dashboard experiment'leri listeler, training başlatır ve progress gösterir — bu adımın devamı."
+              "code": "      <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">\n        {experiments.map((exp: any) => (\n          <div key={exp.id}\n            className=\"bg-gray-800 p-4 rounded-lg border border-gray-700\">\n            <h3 className=\"text-lg text-emerald-400\">\n              {exp.name}\n            </h3>\n          </div>",
+              "why": "Her experiment kartı emerald renkli başlık ile dark tema'ya uygun. Grid layout mobile'da tek sütun, desktop'ta iki sütun gösterir."
             },
             {
               "order": "1.3h",
@@ -3296,17 +3287,8 @@
               "type": "code_add",
               "file": "frontend/src/pages/TrainingDashboard.tsx",
               "position": "bottom",
-              "code": "          <div key={exp.id}\n            className=\"bg-gray-800 p-4 rounded-lg border border-gray-700\">\n            <h3 className=\"text-lg text-emerald-400\">{exp.name}</h3>\n          </div>\n        ))}\n      </div>\n    </div>\n  )",
-              "why": "Training dashboard experiment'leri listeler, training başlatır ve progress gösterir — bu adımın devamı."
-            },
-            {
-              "order": "1.3i",
-              "action": "Dashboard JSX — UI render (devamı)",
-              "type": "code_add",
-              "file": "frontend/src/pages/TrainingDashboard.tsx",
-              "position": "bottom",
               "code": "}\n\nexport default TrainingDashboard",
-              "why": "Training dashboard experiment'leri listeler, training başlatır ve progress gösterir — bu adımın devamı."
+              "why": "Component export edilir. default export ile App.tsx'te import edilip router'a bağlanacak."
             },
             {
               "order": "1.4",
@@ -3317,21 +3299,21 @@
               "why": "1.3'te yazdığımız TrainingDashboard'u router ile bağlıyoruz. Dark tema navigation bar ile tutarlı görünüm."
             },
             {
-              "order": "1.4b",
+              "order": "1.4a",
               "action": "frontend/src/App.tsx dosyasını oluştur — router yapısı (devamı)",
               "type": "code_add",
               "file": "frontend/src/App.tsx",
               "code": "        <div className=\"flex space-x-6\">\n          <Link to=\"/\" className=\"text-emerald-400 font-bold\">ML Pipeline</Link>\n          <Link to=\"/training\" className=\"text-gray-300 hover:text-emerald-400\">Training</Link>\n          <Link to=\"/monitoring\" className=\"text-gray-300 hover:text-emerald-400\">Monitoring</Link>\n        </div>\n      </nav>\n      <Routes>\n        <Route path=\"/\" element={<TrainingDashboard />} />",
-              "why": "1 — bu adımın devamı.",
+              "why": "Navigation linkleri emerald hover efekti ile dark temaya uyumlu. Routes ile sayfa yönlendirmesi yapılır — SPA mimarisi.",
               "position": "bottom"
             },
             {
-              "order": "1.4c",
+              "order": "1.4b",
               "action": "frontend/src/App.tsx dosyasını oluştur — router yapısı (devamı)",
               "type": "code_add",
               "file": "frontend/src/App.tsx",
               "code": "        <Route path=\"/training\" element={<TrainingDashboard />} />\n      </Routes>\n    </div>\n  </BrowserRouter>\n)\n\nexport default App",
-              "why": "1 — bu adımın devamı.",
+              "why": "/training route'u TrainingDashboard'a yönlendir. İleride /monitoring route'u da eklenecek.",
               "position": "bottom"
             },
             {
@@ -3377,25 +3359,25 @@
               "why": "Monitoring dashboard prediction istatistiklerini ve alert'leri gösterecek. 30 saniyede bir otomatik güncellenir."
             },
             {
-              "order": "2.1b",
+              "order": "2.1a",
               "action": "frontend/src/pages/MonitoringDashboard.tsx oluştur — iskelet ve state (devamı)",
               "type": "code_add",
               "file": "frontend/src/pages/MonitoringDashboard.tsx",
               "code": "  useEffect(() => {\n    const load = async () => {\n      const [s, a] = await Promise.all([\n        fetchPredictionStats(60),\n        fetchAlerts()\n      ])\n      setStats(s.data)\n      setAlerts(a.data)",
-              "why": "Monitoring dashboard prediction istatistiklerini ve alert'leri gösterecek — bu adımın devamı.",
+              "why": "Promise.all ile stats ve alerts paralel yüklenir — iki API çağrısını beklemek yerine aynı anda yapar, toplam süre yarıya iner.",
               "position": "bottom"
             },
             {
-              "order": "2.1c",
+              "order": "2.1b",
               "action": "frontend/src/pages/MonitoringDashboard.tsx oluştur — iskelet ve state (devamı)",
               "type": "code_add",
               "file": "frontend/src/pages/MonitoringDashboard.tsx",
               "code": "    }\n    load()\n    const iv = setInterval(load, 30000)\n    return () => clearInterval(iv)\n  }, [])",
-              "why": "Monitoring dashboard prediction istatistiklerini ve alert'leri gösterecek — bu adımın devamı.",
+              "why": "30 saniyede bir otomatik güncelleme. cleanup fonksiyonu interval'ı temizler — component unmount'ta memory leak önlenir.",
               "position": "bottom"
             },
             {
-              "order": "2.1d",
+              "order": "2.1c",
               "action": "Monitoring Dashboard JSX — kartlar ve alert banner",
               "type": "code_add",
               "file": "frontend/src/pages/MonitoringDashboard.tsx",
@@ -3404,13 +3386,22 @@
               "why": "2.1'deki state'i görsel olarak sunan JSX. Metric kartları ve alert banner. Optional chaining (?.) ile null güvenliği sağlanıyor."
             },
             {
-              "order": "2.1e",
+              "order": "2.1d",
               "action": "Monitoring Dashboard JSX — kartlar ve alert banner (devamı)",
               "type": "code_add",
               "file": "frontend/src/pages/MonitoringDashboard.tsx",
               "position": "bottom",
               "code": "            <p className=\"text-sm text-gray-400\">Total Predictions</p>\n            <p className=\"text-2xl text-emerald-400\">{stats.total_predictions}</p>\n          </div>\n          <div className=\"bg-gray-800 p-4 rounded-lg\">\n            <p className=\"text-sm text-gray-400\">Avg Latency</p>\n            <p className=\"text-2xl text-blue-400\">{stats.latency?.avg || 0}ms</p>\n          </div>\n          <div className=\"bg-gray-800 p-4 rounded-lg\">",
-              "why": "Monitoring dashboard prediction istatistiklerini ve alert'leri gösterecek — bu adımın devamı."
+              "why": "Optional chaining (?.) ile null güvenliği sağlanır. Stats henüz yüklenmemişken hata vermez — React'te defensif render."
+            },
+            {
+              "order": "2.1e",
+              "action": "Monitoring Dashboard JSX — kartlar ve alert banner (devamı)",
+              "type": "code_add",
+              "file": "frontend/src/pages/MonitoringDashboard.tsx",
+              "position": "bottom",
+              "code": "            <p className=\"text-sm text-gray-400\">Avg Confidence</p>\n            <p className=\"text-2xl text-emerald-400\">\n              {((stats.confidence?.avg || 0) * 100).toFixed(1)}%\n            </p>\n          </div>\n        </div>\n      )}",
+              "why": "Confidence yüzdeye çevrilip gösterilir. Alerts varsa koşullu render — boş alert listesi banner göstermez."
             },
             {
               "order": "2.1f",
@@ -3418,8 +3409,8 @@
               "type": "code_add",
               "file": "frontend/src/pages/MonitoringDashboard.tsx",
               "position": "bottom",
-              "code": "            <p className=\"text-sm text-gray-400\">Avg Confidence</p>\n            <p className=\"text-2xl text-emerald-400\">\n              {((stats.confidence?.avg || 0) * 100).toFixed(1)}%\n            </p>\n          </div>\n        </div>\n      )}\n      {alerts.length > 0 && (",
-              "why": "Monitoring dashboard prediction istatistiklerini ve alert'leri gösterecek — bu adımın devamı."
+              "code": "      {alerts.length > 0 && (\n        <div className=\"bg-red-900/20 border\n          border-red-700 rounded-lg p-4\">\n          <h2 className=\"text-lg text-red-400 mb-2\">\n            Alerts\n          </h2>\n          {alerts.map((a: any, i: number) => (\n            <p key={i} className=\"text-sm\">",
+              "why": "Alert'ler severity'ye göre renkli badge ile gösterilir. Dark tema'da kırmızı arka plan dikkat çeker."
             },
             {
               "order": "2.1g",
@@ -3427,17 +3418,8 @@
               "type": "code_add",
               "file": "frontend/src/pages/MonitoringDashboard.tsx",
               "position": "bottom",
-              "code": "        <div className=\"bg-red-900/20 border border-red-700 rounded-lg p-4\">\n          <h2 className=\"text-lg text-red-400 mb-2\">Alerts</h2>\n          {alerts.map((a: any, i: number) => (\n            <p key={i} className=\"text-sm\">\n              <span className=\"text-red-400\">[{a.severity}]</span> {a.message}\n            </p>\n          ))}\n        </div>",
-              "why": "Monitoring dashboard prediction istatistiklerini ve alert'leri gösterecek — bu adımın devamı."
-            },
-            {
-              "order": "2.1h",
-              "action": "Monitoring Dashboard JSX — kartlar ve alert banner (devamı)",
-              "type": "code_add",
-              "file": "frontend/src/pages/MonitoringDashboard.tsx",
-              "position": "bottom",
               "code": "      )}\n    </div>\n  )\n}\n\nexport default MonitoringDashboard",
-              "why": "Monitoring dashboard prediction istatistiklerini ve alert'leri gösterecek — bu adımın devamı."
+              "why": "Component kapatılıp export edilir. App.tsx'te /monitoring route'una bağlanacak."
             },
             {
               "order": "2.2",
@@ -3485,31 +3467,40 @@
               "why": "Production compose development'tan farklı: health check, restart policy ve environment variable'lar ile kararlı çalışmayı sağlar."
             },
             {
-              "order": "3.1b",
+              "order": "3.1a",
               "action": "docker-compose.prod.yml dosyasını oluştur — production servisleri (devamı)",
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "code": "      - \"8000:8000\"\n    environment:\n      - DATABASE_URL=${DATABASE_URL}\n      - REDIS_URL=${REDIS_URL}\n      - MLFLOW_TRACKING_URI=http://mlflow:5000\n    depends_on:\n      db:\n        condition: service_healthy",
-              "why": "Production compose development'tan farklı: health check, restart policy ve environment variable'lar ile kararlı çalışmayı sağlar — bu adımın devamı.",
+              "why": "Environment variable'lar .env dosyasından çekilir — secret'lar kod'da değil. depends_on service_healthy ile sıralı başlatma sağlanır.",
               "position": "bottom"
             },
             {
-              "order": "3.1c",
+              "order": "3.1b",
               "action": "docker-compose.prod.yml dosyasını oluştur — production servisleri (devamı)",
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "code": "    healthcheck:\n      test: [\"CMD\", \"curl\", \"-f\",\n             \"http://localhost:8000/health\"]\n      interval: 30s\n      timeout: 10s\n      retries: 3\n    restart: unless-stopped",
-              "why": "Production compose development'tan farklı: health check, restart policy ve environment variable'lar ile kararlı çalışmayı sağlar — bu adımın devamı.",
+              "why": "Health check her 30 saniyede /health endpoint'ini kontrol eder. 3 başarısız denemede container unhealthy işaretlenir.",
               "position": "bottom"
             },
             {
-              "order": "3.1d",
+              "order": "3.1c",
               "action": "Production compose devamı — worker, db, redis, mlflow",
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
               "code": "worker:\n    build:\n      context: .\n      dockerfile: Dockerfile.worker\n    environment:\n      - DATABASE_URL=${DATABASE_URL}\n      - REDIS_URL=${REDIS_URL}\n    depends_on:",
-              "why": "3.1'in devamı. Worker'a memory limit (2G), db'ye healthcheck, hepsine restart policy eklendi."
+              "why": "Worker'a memory limit (2G), db'ye healthcheck, hepsine restart policy eklendi."
+            },
+            {
+              "order": "3.1d",
+              "action": "Production compose devamı — worker, db, redis, mlflow (devamı)",
+              "type": "code_add",
+              "file": "docker-compose.prod.yml",
+              "position": "bottom",
+              "code": "      - db\n      - redis\n    restart: unless-stopped\n    deploy:\n      resources:\n        limits:\n          memory: 2G\n",
+              "why": "Worker'a 2GB memory limit koyulur — training sırasında tüm sunucu belleğini tüketmesi engellenir. restart policy crash sonrası otomatik başlatır."
             },
             {
               "order": "3.1e",
@@ -3517,8 +3508,8 @@
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
-              "code": "      - db\n      - redis\n    restart: unless-stopped\n    deploy:\n      resources:\n        limits:\n          memory: 2G\n",
-              "why": "Production compose development'tan farklı: health check, restart policy ve environment variable'lar ile kararlı çalışmayı sağlar — bu adımın devamı."
+              "code": "  db:\n    image: postgres:16-alpine\n    environment:\n      - POSTGRES_USER=${POSTGRES_USER}\n      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}\n      - POSTGRES_DB=${POSTGRES_DB}\n    volumes:\n      - pgdata:/var/lib/postgresql/data",
+              "why": "PostgreSQL credential'ları .env'den çekilir. Volume mount verinin container restart'ında korunmasını sağlar."
             },
             {
               "order": "3.1f",
@@ -3526,8 +3517,8 @@
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
-              "code": "  db:\n    image: postgres:16-alpine\n    environment:\n      - POSTGRES_USER=${POSTGRES_USER}\n      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}\n      - POSTGRES_DB=${POSTGRES_DB}\n    volumes:\n      - pgdata:/var/lib/postgresql/data",
-              "why": "Production compose development'tan farklı: health check, restart policy ve environment variable'lar ile kararlı çalışmayı sağlar — bu adımın devamı."
+              "code": "    healthcheck:\n      test: [\"CMD-SHELL\",\n             \"pg_isready -U ${POSTGRES_USER}\"]\n      interval: 10s\n      retries: 5\n    restart: unless-stopped\n\n  redis:",
+              "why": "pg_isready PostgreSQL'in bağlantı kabul ettiğini doğrular. Bu healthcheck diğer servislerin depends_on koşulunu karşılar."
             },
             {
               "order": "3.1g",
@@ -3535,8 +3526,8 @@
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
-              "code": "    healthcheck:\n      test: [\"CMD-SHELL\",\n             \"pg_isready -U ${POSTGRES_USER}\"]\n      interval: 10s\n      retries: 5\n    restart: unless-stopped\n\n  redis:",
-              "why": "Production compose development'tan farklı: health check, restart policy ve environment variable'lar ile kararlı çalışmayı sağlar — bu adımın devamı."
+              "code": "    image: redis:7-alpine\n    healthcheck:\n      test: [\"CMD\", \"redis-cli\", \"ping\"]\n      interval: 10s\n    restart: unless-stopped\n\n  mlflow:\n    image: ghcr.io/mlflow/mlflow:v2.9.2",
+              "why": "Redis health check ping komutu ile. MLflow server PostgreSQL hazır olduktan sonra başlar — depends_on sıralama sağlar."
             },
             {
               "order": "3.1h",
@@ -3544,8 +3535,8 @@
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
-              "code": "    image: redis:7-alpine\n    healthcheck:\n      test: [\"CMD\", \"redis-cli\", \"ping\"]\n      interval: 10s\n    restart: unless-stopped\n\n  mlflow:\n    image: ghcr.io/mlflow/mlflow:v2.9.2",
-              "why": "Production compose development'tan farklı: health check, restart policy ve environment variable'lar ile kararlı çalışmayı sağlar — bu adımın devamı."
+              "code": "    ports:\n      - \"5000:5000\"\n    command: mlflow server --host 0.0.0.0 --port 5000\n    depends_on:\n      db:\n        condition: service_healthy\n    restart: unless-stopped\n",
+              "why": "MLflow 5000 portunda çalışır. depends_on condition ile PostgreSQL healthy olana kadar bekler — bağlantı hatası önlenir."
             },
             {
               "order": "3.1i",
@@ -3553,17 +3544,8 @@
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
-              "code": "    ports:\n      - \"5000:5000\"\n    command: mlflow server --host 0.0.0.0 --port 5000\n    depends_on:\n      db:\n        condition: service_healthy\n    restart: unless-stopped\n",
-              "why": "Production compose development'tan farklı: health check, restart policy ve environment variable'lar ile kararlı çalışmayı sağlar — bu adımın devamı."
-            },
-            {
-              "order": "3.1j",
-              "action": "Production compose devamı — worker, db, redis, mlflow (devamı)",
-              "type": "code_add",
-              "file": "docker-compose.prod.yml",
-              "position": "bottom",
               "code": "volumes:\n  pgdata:",
-              "why": "Production compose development'tan farklı: health check, restart policy ve environment variable'lar ile kararlı çalışmayı sağlar — bu adımın devamı."
+              "why": "Named volume pgdata PostgreSQL verilerini persist eder. Volume tanımı olmadan container restart'ında tüm veri kaybolur."
             },
             {
               "order": "3.2",
@@ -3620,16 +3602,16 @@
               "action": "ml/model_card.py dosyasını oluştur — ModelCard iskeleti",
               "type": "code_write",
               "file": "ml/model_card.py",
-              "code": "import json\nimport os\nfrom typing import Dict, List\nfrom datetime import datetime\n\nclass ModelCard:\n    def __init__(self, model_name: str):\n        self.card = {",
+              "code": "import json\nimport os\nfrom typing import Dict, List\nfrom datetime import datetime\n\nclass ModelCard:\n    def __init__(self, model_name: str):",
               "why": "Model card modelin amacını, performansını ve limitasyonlarını belgeler. Google Responsible AI standartlarına uygun — regulatory compliance için gerekebilir."
             },
             {
-              "order": "4.1b",
+              "order": "4.1a",
               "action": "ml/model_card.py dosyasını oluştur — ModelCard iskeleti (devamı)",
               "type": "code_add",
               "file": "ml/model_card.py",
-              "code": "            \"model_name\": model_name,\n            \"created_at\": datetime.utcnow().isoformat(),\n            \"model_details\": {},\n            \"performance_metrics\": {},\n            \"limitations\": []\n        }",
-              "why": "Model card modelin amacını, performansını ve limitasyonlarını belgeler — bu adımın devamı.",
+              "code": "        self.card = {\n            \"model_name\": model_name,\n            \"created_at\": datetime.utcnow().isoformat(),\n            \"model_details\": {},\n            \"performance_metrics\": {},\n            \"limitations\": []\n        }",
+              "why": "Card dict'i model adı, tarih, detaylar, metrikler ve limitasyonları tutar. Google Model Cards standardına uygun yapı.",
               "position": "bottom"
             },
             {
@@ -3642,22 +3624,22 @@
               "why": "4.1'deki sınıfa builder metodları ekliyoruz. Method chaining ile card.set_model_details(...).set_metrics(...).add_limitation(...) yazılabilir."
             },
             {
-              "order": "4.2b",
+              "order": "4.2a",
               "action": "Builder metodları — set_model_details, set_metrics, add_limitation (devamı)",
               "type": "code_add",
               "file": "ml/model_card.py",
               "position": "bottom",
               "code": "        return self\n\n    def set_metrics(self, metrics: Dict[str, float]):\n        self.card[\"performance_metrics\"] = metrics\n        return self\n\n    def add_limitation(self, limitation: str):\n        self.card[\"limitations\"].append(limitation)",
-              "why": "4 — bu adımın devamı."
+              "why": "set_metrics performans metriklerini kaydeder. add_limitation model sınırlamalarını belgeler. return self method chaining sağlar."
             },
             {
-              "order": "4.2c",
+              "order": "4.2b",
               "action": "Builder metodları — set_model_details, set_metrics, add_limitation (devamı)",
               "type": "code_add",
               "file": "ml/model_card.py",
               "position": "bottom",
               "code": "        return self",
-              "why": "4 — bu adımın devamı."
+              "why": "return self add_limitation'dan sonra zincirleme çağrı yapabilmek için. card.set_details().set_metrics().add_limitation() yazılabilir."
             },
             {
               "order": "4.3",
@@ -3669,22 +3651,22 @@
               "why": "4.2'deki builder sonrası JSON olarak kaydetme ve Markdown'a çevirme. ensure_ascii=False Türkçe karakterleri korur."
             },
             {
-              "order": "4.3b",
+              "order": "4.3a",
               "action": "save ve to_markdown metodları (devamı)",
               "type": "code_add",
               "file": "ml/model_card.py",
               "position": "bottom",
               "code": "\n    def to_markdown(self):\n        md = f\"# Model Card: {self.card['model_name']}\\n\"\n        md += f\"\\n**Tarih:** {self.card['created_at']}\\n\"\n        md += \"\\n## Metrikler\\n\"\n        for k, v in self.card['performance_metrics'].items():\n            md += f\"- **{k}:** {v}\\n\"\n        md += \"\\n## Limitasyonlar\\n\"",
-              "why": "4 — bu adımın devamı."
+              "why": "to_markdown Markdown formatına çevirir. Model metrikleri ve limitasyonlar okunabilir formatta — README'ye eklenebilir."
             },
             {
-              "order": "4.3c",
+              "order": "4.3b",
               "action": "save ve to_markdown metodları (devamı)",
               "type": "code_add",
               "file": "ml/model_card.py",
               "position": "bottom",
               "code": "        for l in self.card['limitations']:\n            md += f\"- {l}\\n\"\n        return md",
-              "why": "4 — bu adımın devamı."
+              "why": "Limitasyonlar madde işaretli liste olarak eklenir. Markdown çıktısı GitHub/GitLab'da doğrudan render edilir."
             },
             {
               "order": "4.4",
@@ -3696,13 +3678,22 @@
               "why": "4.1-4.3'te yazdığımız ModelCard'ı MLflow'daki bilgilerle otomatik dolduran endpoint. Her modelin belgesi production'da şeffaflık sağlar."
             },
             {
-              "order": "4.4b",
+              "order": "4.4a",
               "action": "GERİ DÖN — api/routers/model_registry.py'ye card endpoint'i ekle (devamı)",
               "type": "code_add",
               "file": "api/routers/model_registry.py",
               "position": "bottom",
               "code": "    if not versions:\n        raise HTTPException(404, \"Production model yok\")\n    v = versions[0]\n    run = mlflow.get_run(v.run_id)\n    card = ModelCard(model_name)\n    card.set_model_details(\n        model_type=run.data.params.get(\n            \"model_type\", \"unknown\"),",
-              "why": "4 — bu adımın devamı."
+              "why": "Production model yoksa 404. MLflow run bilgileri çekilip ModelCard'a otomatik dolduruluyor — metrikler ve model tipi."
+            },
+            {
+              "order": "4.4b",
+              "action": "GERİ DÖN — api/routers/model_registry.py'ye card endpoint'i ekle (devamı)",
+              "type": "code_add",
+              "file": "api/routers/model_registry.py",
+              "position": "bottom",
+              "code": "        framework=\"scikit-learn\",\n        version=str(v.version),\n        description=description\n    ).set_metrics(run.data.metrics)\n    card.add_limitation(\n        \"Sadece eğitim verisine benzer dağılımda geçerli\"\n    )\n    path = card.save()",
+              "why": "framework scikit-learn olarak set edilir. Standart limitasyon eklenir. card.save() JSON dosyası oluşturur."
             },
             {
               "order": "4.4c",
@@ -3710,17 +3701,8 @@
               "type": "code_add",
               "file": "api/routers/model_registry.py",
               "position": "bottom",
-              "code": "        framework=\"scikit-learn\",\n        version=str(v.version),\n        description=description\n    ).set_metrics(run.data.metrics)\n    card.add_limitation(\n        \"Sadece eğitim verisine benzer dağılımda geçerli\"\n    )\n    path = card.save()",
-              "why": "4 — bu adımın devamı."
-            },
-            {
-              "order": "4.4d",
-              "action": "GERİ DÖN — api/routers/model_registry.py'ye card endpoint'i ekle (devamı)",
-              "type": "code_add",
-              "file": "api/routers/model_registry.py",
-              "position": "bottom",
               "code": "    return {\"card\": card.card, \"saved_path\": path}",
-              "why": "4 — bu adımın devamı."
+              "why": "Card JSON'u ve dosya yolu döndürülür. Frontend'de model detay sayfasında card bilgileri gösterilir."
             },
             {
               "order": "4.5",

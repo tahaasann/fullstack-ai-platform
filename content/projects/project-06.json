@@ -221,12 +221,21 @@
             },
             {
               "order": "1.4",
-              "action": "Bağımlılıklar lazım — pyproject.toml'a dependencies bloğunu ekle",
+              "action": "Bağımlılıklar lazım — pyproject.toml'a dependencies bloğunu ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "pyproject.toml",
               "position": "bottom",
-              "code": "\ndependencies = [\n    \"fastapi>=0.115.0\",\n    \"uvicorn>=0.32.0\",\n    \"openai>=1.50.0\",\n    \"anthropic>=0.40.0\",\n    \"google-genai>=1.0.0\",\n    \"pydantic-settings>=2.1.0\",\n    \"redis>=5.0.0\",\n    \"sqlalchemy>=2.0.0\",\n    \"alembic>=1.13.0\",\n    \"httpx>=0.27.0\",\n    \"tiktoken>=0.7.0\",\n    \"asyncpg>=0.30.0\",\n]",
+              "code": "dependencies = [\n    \"fastapi>=0.115.0\",\n    \"uvicorn>=0.32.0\",\n    \"openai>=1.50.0\",\n    \"anthropic>=0.40.0\",\n    \"google-genai>=1.0.0\",\n    \"pydantic-settings>=2.1.0\",",
               "why": "1.3'te yazdığımız iskeletin altına bağımlılıkları ekliyoruz. Her paketin minimum versiyonunu belirtmek uyumluluk sorunlarını önler."
+            },
+            {
+              "order": "1.4b",
+              "action": "DEVAM: Bağımlılıklar lazım — pyproject.toml'a dependencies bloğunu ekle (bölüm 2/2)",
+              "type": "code_add",
+              "file": "pyproject.toml",
+              "position": "bottom",
+              "code": "    \"redis>=5.0.0\",\n    \"sqlalchemy>=2.0.0\",\n    \"alembic>=1.13.0\",\n    \"httpx>=0.27.0\",\n    \"tiktoken>=0.7.0\",\n    \"asyncpg>=0.30.0\",\n]",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "1.5",
@@ -315,11 +324,27 @@
           "substeps": [
             {
               "order": "2.1",
-              "action": ".env dosyasını oluştur — API key'lerini buraya yaz",
+              "action": ".env dosyasını oluştur — API key'lerini buraya yaz (bölüm 1/3)",
               "type": "code_write",
               "file": ".env",
-              "code": "# LLM Provider API Keys\nOPENAI_API_KEY=sk-your-openai-key-here\nANTHROPIC_API_KEY=sk-ant-your-key-here\nGEMINI_API_KEY=your-gemini-key-here\n\n# Database\nDATABASE_URL=postgresql+asyncpg://localhost/ai_content\n\n# Redis\nREDIS_URL=redis://localhost:6379\n\n# App\nDEBUG=true",
+              "code": "# LLM Provider API Keys\nOPENAI_API_KEY=sk-your-openai-key-here\nANTHROPIC_API_KEY=sk-ant-your-key-here\nGEMINI_API_KEY=your-gemini-key-here\n",
               "why": "API key'leri kodda yazmak güvenlik açığıdır. .env dosyası ile hassas bilgiler koddan ayrılır."
+            },
+            {
+              "order": "2.1b",
+              "action": "DEVAM: .env dosyasını oluştur — API key'lerini buraya yaz (bölüm 2/3)",
+              "type": "code_write",
+              "file": ".env",
+              "code": "# Database\nDATABASE_URL=postgresql+asyncpg://localhost/ai_content\n\n# Redis\nREDIS_URL=redis://localhost:6379\n",
+              "why": "Bu kısım yapılandırma ve asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "2.1c",
+              "action": "DEVAM: .env dosyasını oluştur — API key'lerini buraya yaz (bölüm 3/3)",
+              "type": "code_write",
+              "file": ".env",
+              "code": "# App\nDEBUG=true",
+              "why": "Bu kısım yapılandırma içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "2.2",
@@ -356,21 +381,39 @@
             },
             {
               "order": "2.6",
-              "action": "Aynı şekilde Anthropic ve Gemini config'lerini ekle",
+              "action": "Aynı şekilde Anthropic ve Gemini config'lerini ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/config.py",
               "position": "after_openai_config",
-              "code": "\n\nclass AnthropicConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"claude-sonnet-4-5-20250514\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.003\n    output_cost_per_1k: float = 0.015\n    model_config = {\"env_prefix\": \"ANTHROPIC_\"}\n\n\nclass GeminiConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"gemini-2.0-flash\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.0001\n    output_cost_per_1k: float = 0.0004\n    model_config = {\"env_prefix\": \"GEMINI_\"}",
+              "code": "class AnthropicConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"claude-sonnet-4-5-20250514\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.003\n    output_cost_per_1k: float = 0.015\n    model_config = {\"env_prefix\": \"ANTHROPIC_\"}\n",
               "why": "2.5'teki OpenAI pattern'ini tekrarlıyoruz. Her provider'ın farklı fiyatlandırması var — Gemini en ucuz, Anthropic en pahalı."
             },
             {
+              "order": "2.6b",
+              "action": "DEVAM: Aynı şekilde Anthropic ve Gemini config'lerini ekle (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/config.py",
+              "position": "after_openai_config",
+              "code": "\nclass GeminiConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"gemini-2.0-flash\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.0001\n    output_cost_per_1k: float = 0.0004\n    model_config = {\"env_prefix\": \"GEMINI_\"}",
+              "why": "Bu kısım sınıf tanımı ve yapılandırma ayarları içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "2.7",
-              "action": "Ana Settings sınıfını ekle — tüm config'leri birleştir",
+              "action": "Ana Settings sınıfını ekle — tüm config'leri birleştir (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/config.py",
               "position": "bottom",
-              "code": "\n\nclass Settings(BaseSettings):\n    app_name: str = \"AI Content Platform\"\n    debug: bool = False\n    default_provider: LLMProvider = LLMProvider.OPENAI\n    fallback_providers: list[LLMProvider] = [\n        LLMProvider.OPENAI,\n        LLMProvider.ANTHROPIC,\n        LLMProvider.GEMINI\n    ]\n    database_url: str = \"postgresql+asyncpg://localhost/ai_content\"\n    redis_url: str = \"redis://localhost:6379\"\n    cache_ttl: int = 3600\n    model_config = {\"env_file\": \".env\"}",
+              "code": "class Settings(BaseSettings):\n    app_name: str = \"AI Content Platform\"\n    debug: bool = False\n    default_provider: LLMProvider = LLMProvider.OPENAI\n    fallback_providers: list[LLMProvider] = [\n        LLMProvider.OPENAI,\n        LLMProvider.ANTHROPIC,",
               "why": "2.5-2.6'daki provider config'lerini tek bir ana sınıfta topluyoruz. fallback_providers sırası önemli — ilk başarısız olursa sırayla dener."
+            },
+            {
+              "order": "2.7b",
+              "action": "DEVAM: Ana Settings sınıfını ekle — tüm config'leri birleştir (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/config.py",
+              "position": "bottom",
+              "code": "        LLMProvider.GEMINI\n    ]\n    database_url: str = \"postgresql+asyncpg://localhost/ai_content\"\n    redis_url: str = \"redis://localhost:6379\"\n    cache_ttl: int = 3600\n    model_config = {\"env_file\": \".env\"}",
+              "why": "Bu kısım asenkron işlem ve yapılandırma ayarları içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "2.8",
@@ -452,30 +495,57 @@
             },
             {
               "order": "3.3",
-              "action": "LLMMessage'ın ALTINA LLMResponse dataclass'ını ekle",
+              "action": "LLMMessage'ın ALTINA LLMResponse dataclass'ını ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/providers/base.py",
               "position": "after_message",
-              "code": "\n\n@dataclass\nclass LLMResponse:\n    id: str = field(default_factory=lambda: str(uuid.uuid4()))\n    content: str = \"\"\n    provider: str = \"\"\n    model: str = \"\"\n    input_tokens: int = 0\n    output_tokens: int = 0\n    total_tokens: int = 0\n    cost: float = 0.0\n    latency_ms: float = 0.0\n    created_at: datetime = field(\n        default_factory=lambda: datetime.now(timezone.utc)\n    )\n    metadata: dict = field(default_factory=dict)",
+              "code": "@dataclass\nclass LLMResponse:\n    id: str = field(default_factory=lambda: str(uuid.uuid4()))\n    content: str = \"\"\n    provider: str = \"\"\n    model: str = \"\"\n    input_tokens: int = 0\n    output_tokens: int = 0",
               "why": "3.1'deki LLMMessage giriş formatı, bu ise çıkış formatı. Hangi provider'dan geldiğinden bağımsız, her zaman aynı yapıda yanıt alırsın."
             },
             {
+              "order": "3.3b",
+              "action": "DEVAM: LLMMessage'ın ALTINA LLMResponse dataclass'ını ekle (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "after_message",
+              "code": "    total_tokens: int = 0\n    cost: float = 0.0\n    latency_ms: float = 0.0\n    created_at: datetime = field(\n        default_factory=lambda: datetime.now(timezone.utc)\n    )\n    metadata: dict = field(default_factory=dict)",
+              "why": "Python modül yapısı her dosyanın tek bir sorumluluğa sahip olmasını sağlar — import sistemi bağımlılıkları açıkça tanımlar."
+            },
+            {
               "order": "3.4",
-              "action": "Şimdi abstract base class iskeletini yaz — sadece __init__ ve property",
+              "action": "Şimdi abstract base class iskeletini yaz — sadece __init__ ve property (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/providers/base.py",
               "position": "bottom",
-              "code": "\n\nclass BaseLLMProvider(ABC):\n    def __init__(self, config: dict):\n        self.config = config\n        self._request_count = 0\n        self._total_tokens = 0\n        self._total_cost = 0.0\n\n    @property\n    @abstractmethod\n    def provider_name(self) -> str: ...",
+              "code": "class BaseLLMProvider(ABC):\n    def __init__(self, config: dict):\n        self.config = config\n        self._request_count = 0\n        self._total_tokens = 0",
               "why": "Önce iskelet — sınıf yapısı ve tek bir abstract property. Tüm provider'ların uyması gereken kontratı adım adım ekleyeceğiz."
             },
             {
+              "order": "3.4b",
+              "action": "DEVAM: Şimdi abstract base class iskeletini yaz — sadece __init__ ve property (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "bottom",
+              "code": "        self._total_cost = 0.0\n\n    @property\n    @abstractmethod\n    def provider_name(self) -> str: ...",
+              "why": "Sınıf metotları ilgili davranışları bir arada tutar — nesne yönelimli tasarımda cohesion prensibi budur."
+            },
+            {
               "order": "3.5",
-              "action": "Sınıfa GERİ DÖN — abstract metodları ekle: generate ve stream",
+              "action": "Sınıfa GERİ DÖN — abstract metodları ekle: generate ve stream (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/providers/base.py",
               "position": "inside_base_class",
-              "code": "\n    @abstractmethod\n    async def generate(\n        self, messages: list[LLMMessage],\n        temperature: float = 0.7,\n        max_tokens: int = 4096, **kwargs\n    ) -> LLMResponse: ...\n\n    @abstractmethod\n    async def stream(\n        self, messages: list[LLMMessage],\n        temperature: float = 0.7,\n        max_tokens: int = 4096, **kwargs\n    ) -> AsyncIterator[str]: ...",
+              "code": "@abstractmethod\n    async def generate(\n        self, messages: list[LLMMessage],\n        temperature: float = 0.7,\n        max_tokens: int = 4096, **kwargs\n    ) -> LLMResponse: ...\n",
               "why": "3.4'teki iskeletin içine asıl iş yapan metodları ekliyoruz. generate() tek seferlik yanıt, stream() token token yanıt üretir."
+            },
+            {
+              "order": "3.5b",
+              "action": "DEVAM: Sınıfa GERİ DÖN — abstract metodları ekle: generate ve stream (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "inside_base_class",
+              "code": "    @abstractmethod\n    async def stream(\n        self, messages: list[LLMMessage],\n        temperature: float = 0.7,\n        max_tokens: int = 4096, **kwargs\n    ) -> AsyncIterator[str]: ...",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "3.6",
@@ -488,12 +558,39 @@
             },
             {
               "order": "3.7",
-              "action": "Ortak metodları ekle — bunlar abstract DEĞİL, tüm provider'lar paylaşır",
+              "action": "Ortak metodları ekle — bunlar abstract DEĞİL, tüm provider'lar paylaşır (bölüm 1/4)",
               "type": "code_add",
               "file": "ai_content_platform/providers/base.py",
               "position": "inside_base_class",
-              "code": "\n    def calculate_cost(\n        self, input_tokens: int, output_tokens: int\n    ) -> float:\n        input_cost = (input_tokens / 1000) * self.config.get(\n            \"input_cost_per_1k\", 0\n        )\n        output_cost = (output_tokens / 1000) * self.config.get(\n            \"output_cost_per_1k\", 0\n        )\n        return round(input_cost + output_cost, 6)\n\n    def get_stats(self) -> dict:\n        return {\n            \"provider\": self.provider_name,\n            \"request_count\": self._request_count,\n            \"total_tokens\": self._total_tokens,\n            \"total_cost\": self._total_cost\n        }",
+              "code": "def calculate_cost(\n        self, input_tokens: int, output_tokens: int\n    ) -> float:\n        input_cost = (input_tokens / 1000) * self.config.get(\n            \"input_cost_per_1k\", 0\n        )",
               "why": "3.5-3.6'daki metodlar abstract — her provider kendisi yazar. Ama maliyet hesaplama ve istatistikler tüm provider'larda aynı, base class'ta bir kez yazıyoruz."
+            },
+            {
+              "order": "3.7b",
+              "action": "DEVAM: Ortak metodları ekle — bunlar abstract DEĞİL, tüm provider'lar paylaşır (bölüm 2/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "inside_base_class",
+              "code": "        output_cost = (output_tokens / 1000) * self.config.get(\n            \"output_cost_per_1k\", 0\n        )\n        return round(input_cost + output_cost, 6)\n",
+              "why": "Bu kısım yapılandırma ayarları ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "3.7c",
+              "action": "DEVAM: Ortak metodları ekle — bunlar abstract DEĞİL, tüm provider'lar paylaşır (bölüm 3/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "inside_base_class",
+              "code": "    def get_stats(self) -> dict:\n        return {\n            \"provider\": self.provider_name,\n            \"request_count\": self._request_count,\n            \"total_tokens\": self._total_tokens,\n            \"total_cost\": self._total_cost",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "3.7d",
+              "action": "DEVAM: Ortak metodları ekle — bunlar abstract DEĞİL, tüm provider'lar paylaşır (bölüm 4/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/base.py",
+              "position": "inside_base_class",
+              "code": "        }",
+              "why": "Python modül yapısı her dosyanın tek bir sorumluluğa sahip olmasını sağlar — import sistemi bağımlılıkları açıkça tanımlar."
             },
             {
               "order": "3.8",
@@ -545,29 +642,55 @@
           "substeps": [
             {
               "order": "4.1",
-              "action": "factory.py dosyasını oluştur — önce CircuitBreaker iskeletini yaz",
+              "action": "factory.py dosyasını oluştur — önce CircuitBreaker iskeletini yaz (bölüm 1/2)",
               "type": "code_write",
               "file": "ai_content_platform/providers/factory.py",
-              "code": "import time\n\n\nclass CircuitBreaker:\n    def __init__(\n        self, failure_threshold: int = 3,\n        recovery_timeout: int = 60\n    ):\n        self.failure_threshold = failure_threshold\n        self.recovery_timeout = recovery_timeout\n        self.failure_count = 0\n        self.last_failure_time = 0\n        self.state = \"CLOSED\"",
+              "code": "import time\n\n\nclass CircuitBreaker:\n    def __init__(\n        self, failure_threshold: int = 3,\n        recovery_timeout: int = 60",
               "why": "Önce CircuitBreaker iskeleti. CLOSED = normal çalışma, OPEN = provider devre dışı. Sürekli çöken provider'a istek göndermek tüm uygulamayı yavaşlatır."
             },
             {
+              "order": "4.1b",
+              "action": "DEVAM: factory.py dosyasını oluştur — önce CircuitBreaker iskeletini yaz (bölüm 2/2)",
+              "type": "code_write",
+              "file": "ai_content_platform/providers/factory.py",
+              "code": "    ):\n        self.failure_threshold = failure_threshold\n        self.recovery_timeout = recovery_timeout\n        self.failure_count = 0\n        self.last_failure_time = 0\n        self.state = \"CLOSED\"",
+              "why": "Python modül yapısı her dosyanın tek bir sorumluluğa sahip olmasını sağlar — import sistemi bağımlılıkları açıkça tanımlar."
+            },
+            {
               "order": "4.2",
-              "action": "CircuitBreaker'a GERİ DÖN — state yönetim metodlarını ekle",
+              "action": "CircuitBreaker'a GERİ DÖN — state yönetim metodlarını ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/providers/factory.py",
               "position": "inside_circuit_breaker",
-              "code": "\n    def record_failure(self):\n        self.failure_count += 1\n        self.last_failure_time = time.time()\n        if self.failure_count >= self.failure_threshold:\n            self.state = \"OPEN\"\n\n    def record_success(self):\n        self.failure_count = 0\n        self.state = \"CLOSED\"",
+              "code": "def record_failure(self):\n        self.failure_count += 1\n        self.last_failure_time = time.time()\n        if self.failure_count >= self.failure_threshold:\n            self.state = \"OPEN\"",
               "why": "4.1'deki iskeletin içine davranış ekliyoruz. Threshold aşılınca OPEN'a geçer, başarılı olunca CLOSED'a döner."
             },
             {
-              "order": "4.3",
-              "action": "Bir metod daha — can_execute ile provider'ın kullanılıp kullanılamayacağını kontrol et",
+              "order": "4.2b",
+              "action": "DEVAM: CircuitBreaker'a GERİ DÖN — state yönetim metodlarını ekle (bölüm 2/2)",
               "type": "code_add",
               "file": "ai_content_platform/providers/factory.py",
               "position": "inside_circuit_breaker",
-              "code": "\n    def can_execute(self) -> bool:\n        if self.state == \"CLOSED\":\n            return True\n        if self.state == \"OPEN\":\n            if time.time() - self.last_failure_time > self.recovery_timeout:\n                self.state = \"HALF_OPEN\"\n                return True\n            return False\n        return True  # HALF_OPEN — bir deneme izni",
+              "code": "\n    def record_success(self):\n        self.failure_count = 0\n        self.state = \"CLOSED\"",
+              "why": "Sınıf metotları ilgili davranışları bir arada tutar — nesne yönelimli tasarımda cohesion prensibi budur."
+            },
+            {
+              "order": "4.3",
+              "action": "Bir metod daha — can_execute ile provider'ın kullanılıp kullanılamayacağını kontrol et (bölüm 1/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_circuit_breaker",
+              "code": "def can_execute(self) -> bool:\n        if self.state == \"CLOSED\":\n            return True\n        if self.state == \"OPEN\":\n            if time.time() - self.last_failure_time > self.recovery_timeout:",
               "why": "4.2'deki record metodları state'i değiştiriyor, bu metod ise state'e göre karar veriyor. HALF_OPEN, recovery timeout sonrası tek deneme izni verir."
+            },
+            {
+              "order": "4.3b",
+              "action": "DEVAM: Bir metod daha — can_execute ile provider'ın kullanılıp kullanılamayacağını kontrol et (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_circuit_breaker",
+              "code": "                self.state = \"HALF_OPEN\"\n                return True\n            return False\n        return True  # HALF_OPEN — bir deneme izni",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "4.4",
@@ -588,30 +711,75 @@
             },
             {
               "order": "4.6",
-              "action": "Factory'ye GERİ DÖN — register ve get_provider metodlarını ekle",
+              "action": "Factory'ye GERİ DÖN — register ve get_provider metodlarını ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/providers/factory.py",
               "position": "inside_factory",
-              "code": "\n    def register(\n        self, name: str,\n        provider_class: Type[BaseLLMProvider]\n    ):\n        self._registry[name] = provider_class\n        self._circuit_breakers[name] = CircuitBreaker()\n\n    def get_provider(self, name: str) -> BaseLLMProvider:\n        if name not in self._instances:\n            if name not in self._registry:\n                raise ValueError(f\"Bilinmeyen provider: {name}\")\n            config = getattr(self.settings, name, {})\n            self._instances[name] = self._registry[name](config)\n        return self._instances[name]",
+              "code": "def register(\n        self, name: str,\n        provider_class: Type[BaseLLMProvider]\n    ):\n        self._registry[name] = provider_class\n        self._circuit_breakers[name] = CircuitBreaker()\n",
               "why": "4.5'teki iskeletin içine temel operasyonları ekliyoruz. register() yeni provider ekler (Open-Closed Principle), get_provider() lazy singleton döner."
             },
             {
-              "order": "4.7",
-              "action": "Fallback metodunu yaz — önce provider listesini hazırla",
+              "order": "4.6b",
+              "action": "DEVAM: Factory'ye GERİ DÖN — register ve get_provider metodlarını ekle (bölüm 2/2)",
               "type": "code_add",
               "file": "ai_content_platform/providers/factory.py",
               "position": "inside_factory",
-              "code": "\n    async def generate_with_fallback(\n        self, messages: list[LLMMessage],\n        preferred_provider: str | None = None,\n        **kwargs\n    ) -> LLMResponse:\n        providers_to_try = []\n        if preferred_provider:\n            providers_to_try.append(preferred_provider)\n        for p in self.settings.fallback_providers:\n            if p.value not in providers_to_try:\n                providers_to_try.append(p.value)",
+              "code": "    def get_provider(self, name: str) -> BaseLLMProvider:\n        if name not in self._instances:\n            if name not in self._registry:\n                raise ValueError(f\"Bilinmeyen provider: {name}\")\n            config = getattr(self.settings, name, {})\n            self._instances[name] = self._registry[name](config)\n        return self._instances[name]",
+              "why": "Bu kısım kontrol akışı ve hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "4.7",
+              "action": "Fallback metodunu yaz — önce provider listesini hazırla (bölüm 1/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_factory",
+              "code": "async def generate_with_fallback(\n        self, messages: list[LLMMessage],\n        preferred_provider: str | None = None,\n        **kwargs\n    ) -> LLMResponse:\n        providers_to_try = []",
               "why": "Tercih edilen provider varsa ilk sıraya, sonra fallback listesini ekliyoruz. Bu liste sırayla denenecek."
             },
             {
               "order": "4.7b",
-              "action": "Fallback döngüsünü ekle — provider'ları sırayla dene",
+              "action": "DEVAM: Fallback metodunu yaz — önce provider listesini hazırla (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_factory",
+              "code": "        if preferred_provider:\n            providers_to_try.append(preferred_provider)\n        for p in self.settings.fallback_providers:\n            if p.value not in providers_to_try:\n                providers_to_try.append(p.value)",
+              "why": "Bu kısım kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "4.7b",
+              "action": "Fallback döngüsünü ekle — provider'ları sırayla dene (bölüm 1/4)",
               "type": "code_add",
               "file": "ai_content_platform/providers/factory.py",
               "position": "inside_generate_with_fallback",
-              "code": "        last_error = None\n        for provider_name in providers_to_try:\n            cb = self._circuit_breakers.get(provider_name)\n            if cb and not cb.can_execute():\n                continue\n            try:\n                provider = self.get_provider(provider_name)\n                start = time.time()\n                response = await provider.generate(\n                    messages, **kwargs\n                )\n                response.latency_ms = (\n                    time.time() - start\n                ) * 1000\n                if cb:\n                    cb.record_success()\n                return response\n            except Exception as e:\n                last_error = e\n                if cb:\n                    cb.record_failure()\n                continue\n        raise RuntimeError(\n            f\"Tüm provider'lar başarısız. Son hata: {last_error}\"\n        )",
+              "code": "last_error = None\n        for provider_name in providers_to_try:\n            cb = self._circuit_breakers.get(provider_name)\n            if cb and not cb.can_execute():\n                continue\n            try:\n                provider = self.get_provider(provider_name)",
               "why": "4.7'deki listeyi sırayla deniyor. Circuit breaker açıksa provider atlanır, başarılı olursa döner, başarısız olursa sonrakine geçer."
+            },
+            {
+              "order": "4.7bb",
+              "action": "DEVAM: Fallback döngüsünü ekle — provider'ları sırayla dene (bölüm 2/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_generate_with_fallback",
+              "code": "                start = time.time()\n                response = await provider.generate(\n                    messages, **kwargs\n                )\n                response.latency_ms = (\n                    time.time() - start\n                ) * 1000",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "4.7bc",
+              "action": "DEVAM: Fallback döngüsünü ekle — provider'ları sırayla dene (bölüm 3/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_generate_with_fallback",
+              "code": "                if cb:\n                    cb.record_success()\n                return response\n            except Exception as e:\n                last_error = e\n                if cb:\n                    cb.record_failure()",
+              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "4.7bd",
+              "action": "DEVAM: Fallback döngüsünü ekle — provider'ları sırayla dene (bölüm 4/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/factory.py",
+              "position": "inside_generate_with_fallback",
+              "code": "                continue\n        raise RuntimeError(\n            f\"Tüm provider'lar başarısız. Son hata: {last_error}\"\n        )",
+              "why": "Bu kısım hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "4.8",
@@ -667,81 +835,185 @@
           "substeps": [
             {
               "order": "5.1",
-              "action": "database.py dosyasını oluştur — bağlantı iskeletini yaz",
+              "action": "database.py dosyasını oluştur — bağlantı iskeletini yaz (bölüm 1/2)",
               "type": "code_write",
               "file": "ai_content_platform/core/database.py",
-              "code": "from sqlalchemy.ext.asyncio import (\n    create_async_engine,\n    async_sessionmaker,\n    AsyncSession,\n)\nfrom ai_content_platform.core.config import get_settings\n\nsettings = get_settings()\nengine = create_async_engine(\n    settings.database_url, echo=settings.debug\n)",
+              "code": "from sqlalchemy.ext.asyncio import (\n    create_async_engine,\n    async_sessionmaker,\n    AsyncSession,\n)\nfrom ai_content_platform.core.config import get_settings",
               "why": "Önce engine — veritabanına bağlantı noktası. echo=True debug modda tüm SQL sorgularını loglar, production'da kapalı olmalı."
             },
             {
+              "order": "5.1b",
+              "action": "DEVAM: database.py dosyasını oluştur — bağlantı iskeletini yaz (bölüm 2/2)",
+              "type": "code_write",
+              "file": "ai_content_platform/core/database.py",
+              "code": "\nsettings = get_settings()\nengine = create_async_engine(\n    settings.database_url, echo=settings.debug\n)",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "5.2",
-              "action": "database.py'ye GERİ DÖN — session factory ve dependency'yi ekle",
+              "action": "database.py'ye GERİ DÖN — session factory ve dependency'yi ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/database.py",
               "position": "bottom",
-              "code": "\nasync_session = async_sessionmaker(\n    engine, class_=AsyncSession,\n    expire_on_commit=False\n)\n\n\nasync def get_db() -> AsyncSession:\n    async with async_session() as session:\n        yield session",
+              "code": "async_session = async_sessionmaker(\n    engine, class_=AsyncSession,\n    expire_on_commit=False\n)\n",
               "why": "5.1'deki engine'i kullanarak session factory oluşturuyoruz. expire_on_commit=False, session kapandıktan sonra da objelere erişimi mümkün kılar."
             },
             {
+              "order": "5.2b",
+              "action": "DEVAM: database.py'ye GERİ DÖN — session factory ve dependency'yi ekle (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/database.py",
+              "position": "bottom",
+              "code": "\nasync def get_db() -> AsyncSession:\n    async with async_session() as session:\n        yield session",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "5.3",
-              "action": "BAŞKA DOSYAYA GEÇ — models.py oluştur, önce Base ve enum iskeletini yaz",
+              "action": "BAŞKA DOSYAYA GEÇ — models.py oluştur, önce Base ve enum iskeletini yaz (bölüm 1/3)",
               "type": "code_write",
               "file": "ai_content_platform/core/models.py",
-              "code": "from sqlalchemy.orm import DeclarativeBase\nfrom sqlalchemy.ext.asyncio import AsyncAttrs\nimport enum\n\n\nclass Base(AsyncAttrs, DeclarativeBase):\n    pass\n\n\nclass ContentType(str, enum.Enum):\n    BLOG_POST = \"blog_post\"\n    SOCIAL_MEDIA = \"social_media\"\n    EMAIL = \"email\"\n    PRODUCT_DESC = \"product_description\"",
+              "code": "from sqlalchemy.orm import DeclarativeBase\nfrom sqlalchemy.ext.asyncio import AsyncAttrs\nimport enum\n\n",
               "why": "Önce temel yapı taşları — Base class ve ContentType enum. Tüm modeller Base'den türeyecek, ContentType içerik türlerini type-safe tanımlar."
             },
             {
+              "order": "5.3b",
+              "action": "DEVAM: BAŞKA DOSYAYA GEÇ — models.py oluştur, önce Base ve enum iskeletini yaz (bölüm 2/3)",
+              "type": "code_write",
+              "file": "ai_content_platform/core/models.py",
+              "code": "class Base(AsyncAttrs, DeclarativeBase):\n    pass\n\n\nclass ContentType(str, enum.Enum):\n    BLOG_POST = \"blog_post\"\n    SOCIAL_MEDIA = \"social_media\"",
+              "why": "Bu kısım sınıf tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "5.3c",
+              "action": "DEVAM: BAŞKA DOSYAYA GEÇ — models.py oluştur, önce Base ve enum iskeletini yaz (bölüm 3/3)",
+              "type": "code_write",
+              "file": "ai_content_platform/core/models.py",
+              "code": "    EMAIL = \"email\"\n    PRODUCT_DESC = \"product_description\"",
+              "why": "Python modül yapısı her dosyanın tek bir sorumluluğa sahip olmasını sağlar — import sistemi bağımlılıkları açıkça tanımlar."
+            },
+            {
               "order": "5.4",
-              "action": "Import'lar lazım — ÜSTE ÇIK ve SQLAlchemy tiplerini ekle",
+              "action": "Import'lar lazım — ÜSTE ÇIK ve SQLAlchemy tiplerini ekle (bölüm 1/2)",
               "type": "code_modify",
               "file": "ai_content_platform/core/models.py",
-              "code": "from sqlalchemy import (\n    String, Text, Float, Integer,\n    DateTime, ForeignKey, JSON,\n    Enum as SQLEnum\n)\nfrom sqlalchemy.orm import (\n    DeclarativeBase, relationship,\n    Mapped, mapped_column\n)\nfrom sqlalchemy.ext.asyncio import AsyncAttrs\nfrom datetime import datetime, timezone\nimport enum",
+              "code": "from sqlalchemy import (\n    String, Text, Float, Integer,\n    DateTime, ForeignKey, JSON,\n    Enum as SQLEnum\n)\nfrom sqlalchemy.orm import (",
               "why": "5.3'te sadece Base ve enum yazdık. Şimdi tablo tanımları için SQLAlchemy tiplerini import ediyoruz — ihtiyaç duydukça ekleme prensibi."
             },
             {
+              "order": "5.4b",
+              "action": "DEVAM: Import'lar lazım — ÜSTE ÇIK ve SQLAlchemy tiplerini ekle (bölüm 2/2)",
+              "type": "code_modify",
+              "file": "ai_content_platform/core/models.py",
+              "code": "    DeclarativeBase, relationship,\n    Mapped, mapped_column\n)\nfrom sqlalchemy.ext.asyncio import AsyncAttrs\nfrom datetime import datetime, timezone\nimport enum",
+              "why": "Bu kısım asenkron işlem ve modül yapısı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "5.5",
-              "action": "İlk model — Prompt tablosunu ekle",
+              "action": "İlk model — Prompt tablosunu ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/models.py",
               "position": "after_content_type",
-              "code": "\n\nclass Prompt(Base):\n    __tablename__ = \"prompts\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    name: Mapped[str] = mapped_column(String(255), unique=True)\n    description: Mapped[str] = mapped_column(Text, nullable=True)\n    content_type: Mapped[ContentType] = mapped_column(\n        SQLEnum(ContentType)\n    )\n    active_version: Mapped[int] = mapped_column(Integer, default=1)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    versions: Mapped[list[\"PromptVersion\"]] = relationship(\n        back_populates=\"prompt\",\n        cascade=\"all, delete-orphan\"\n    )",
+              "code": "class Prompt(Base):\n    __tablename__ = \"prompts\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    name: Mapped[str] = mapped_column(String(255), unique=True)\n    description: Mapped[str] = mapped_column(Text, nullable=True)\n    content_type: Mapped[ContentType] = mapped_column(\n        SQLEnum(ContentType)\n    )",
               "why": "Her prompt'un birden fazla versiyonu olabilir. active_version production'da kullanılan versiyon. versions ilişkisi ile tüm versiyonlara erişilir."
             },
             {
+              "order": "5.5b",
+              "action": "DEVAM: İlk model — Prompt tablosunu ekle (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_content_type",
+              "code": "    active_version: Mapped[int] = mapped_column(Integer, default=1)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    versions: Mapped[list[\"PromptVersion\"]] = relationship(\n        back_populates=\"prompt\",\n        cascade=\"all, delete-orphan\"\n    )",
+              "why": "Prompt yönetimi LLM çıktı kalitesini doğrudan etkiler — küçük prompt değişiklikleri büyük sonuç farklılıkları yaratabilir."
+            },
+            {
               "order": "5.6",
-              "action": "PromptVersion modelini ekle — prompt ile ilişkili",
+              "action": "PromptVersion modelini ekle — prompt ile ilişkili (bölüm 1/3)",
               "type": "code_add",
               "file": "ai_content_platform/core/models.py",
               "position": "after_prompt",
-              "code": "\n\nclass PromptVersion(Base):\n    __tablename__ = \"prompt_versions\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    prompt_id: Mapped[str] = mapped_column(\n        ForeignKey(\"prompts.id\", ondelete=\"CASCADE\")\n    )\n    version: Mapped[int] = mapped_column(Integer)\n    system_template: Mapped[str] = mapped_column(Text)\n    user_template: Mapped[str] = mapped_column(Text)\n    few_shot_examples: Mapped[list] = mapped_column(JSON, default=list)\n    change_note: Mapped[str] = mapped_column(Text, nullable=True)\n    avg_quality_score: Mapped[float] = mapped_column(Float, nullable=True)\n    usage_count: Mapped[int] = mapped_column(Integer, default=0)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    prompt: Mapped[\"Prompt\"] = relationship(back_populates=\"versions\")",
+              "code": "class PromptVersion(Base):\n    __tablename__ = \"prompt_versions\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    prompt_id: Mapped[str] = mapped_column(\n        ForeignKey(\"prompts.id\", ondelete=\"CASCADE\")\n    )",
               "why": "5.5'teki Prompt ile one-to-many ilişki. Her versiyon system_template ve user_template içerir — prompt değişiklikleri bu şekilde izlenir."
             },
             {
+              "order": "5.6b",
+              "action": "DEVAM: PromptVersion modelini ekle — prompt ile ilişkili (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_prompt",
+              "code": "    version: Mapped[int] = mapped_column(Integer)\n    system_template: Mapped[str] = mapped_column(Text)\n    user_template: Mapped[str] = mapped_column(Text)\n    few_shot_examples: Mapped[list] = mapped_column(JSON, default=list)\n    change_note: Mapped[str] = mapped_column(Text, nullable=True)\n    avg_quality_score: Mapped[float] = mapped_column(Float, nullable=True)",
+              "why": "Evaluation metrikleri model kalitesini ölçülebilir kılar — objektif karşılaştırma için her iterasyonda aynı metrikler kullanılmalıdır."
+            },
+            {
+              "order": "5.6c",
+              "action": "DEVAM: PromptVersion modelini ekle — prompt ile ilişkili (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_prompt",
+              "code": "    usage_count: Mapped[int] = mapped_column(Integer, default=0)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    prompt: Mapped[\"Prompt\"] = relationship(back_populates=\"versions\")",
+              "why": "Prompt yönetimi LLM çıktı kalitesini doğrudan etkiler — küçük prompt değişiklikleri büyük sonuç farklılıkları yaratabilir."
+            },
+            {
               "order": "5.7",
-              "action": "GeneratedContent modelini ekle",
+              "action": "GeneratedContent modelini ekle (bölüm 1/3)",
               "type": "code_add",
               "file": "ai_content_platform/core/models.py",
               "position": "after_prompt_version",
-              "code": "\n\nclass GeneratedContent(Base):\n    __tablename__ = \"generated_contents\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    prompt_version_id: Mapped[str] = mapped_column(\n        ForeignKey(\"prompt_versions.id\")\n    )\n    provider: Mapped[str] = mapped_column(String(50))\n    model: Mapped[str] = mapped_column(String(100))\n    input_variables: Mapped[dict] = mapped_column(JSON)\n    content: Mapped[str] = mapped_column(Text)\n    input_tokens: Mapped[int] = mapped_column(Integer)\n    output_tokens: Mapped[int] = mapped_column(Integer)\n    cost_usd: Mapped[float] = mapped_column(Float)\n    latency_ms: Mapped[float] = mapped_column(Float)\n    user_rating: Mapped[int] = mapped_column(Integer, nullable=True)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    evaluations: Mapped[list[\"Evaluation\"]] = relationship(\n        back_populates=\"content\"\n    )",
+              "code": "class GeneratedContent(Base):\n    __tablename__ = \"generated_contents\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    prompt_version_id: Mapped[str] = mapped_column(\n        ForeignKey(\"prompt_versions.id\")\n    )\n    provider: Mapped[str] = mapped_column(String(50))",
               "why": "Her LLM çağrısının sonucu burada saklanır — provider, model, token kullanımı, maliyet ve kullanıcı puanı. Fine-tuning dataset'i buradan oluşturulur."
             },
             {
               "order": "5.7b",
-              "action": "Evaluation modelini ekle — kalite puanları için",
+              "action": "DEVAM: GeneratedContent modelini ekle (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_prompt_version",
+              "code": "    model: Mapped[str] = mapped_column(String(100))\n    input_variables: Mapped[dict] = mapped_column(JSON)\n    content: Mapped[str] = mapped_column(Text)\n    input_tokens: Mapped[int] = mapped_column(Integer)\n    output_tokens: Mapped[int] = mapped_column(Integer)\n    cost_usd: Mapped[float] = mapped_column(Float)\n    latency_ms: Mapped[float] = mapped_column(Float)",
+              "why": "ML pipeline'ı veriyi işleyip model eğitimi yapar — her adım bağımsız test edilebilir olmalıdır."
+            },
+            {
+              "order": "5.7c",
+              "action": "DEVAM: GeneratedContent modelini ekle (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_prompt_version",
+              "code": "    user_rating: Mapped[int] = mapped_column(Integer, nullable=True)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    evaluations: Mapped[list[\"Evaluation\"]] = relationship(\n        back_populates=\"content\"\n    )",
+              "why": "Evaluation metrikleri model kalitesini ölçülebilir kılar — objektif karşılaştırma için her iterasyonda aynı metrikler kullanılmalıdır."
+            },
+            {
+              "order": "5.7b",
+              "action": "Evaluation modelini ekle — kalite puanları için (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/models.py",
               "position": "after_generated_content",
-              "code": "\n\nclass Evaluation(Base):\n    __tablename__ = \"evaluations\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    content_id: Mapped[str] = mapped_column(\n        ForeignKey(\"generated_contents.id\")\n    )\n    evaluator_type: Mapped[str] = mapped_column(String(50))\n    score: Mapped[float] = mapped_column(Float)\n    feedback: Mapped[str] = mapped_column(Text, nullable=True)\n    metrics: Mapped[dict] = mapped_column(JSON, default=dict)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    content: Mapped[\"GeneratedContent\"] = relationship(\n        back_populates=\"evaluations\"\n    )",
+              "code": "class Evaluation(Base):\n    __tablename__ = \"evaluations\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    content_id: Mapped[str] = mapped_column(\n        ForeignKey(\"generated_contents.id\")\n    )\n    evaluator_type: Mapped[str] = mapped_column(String(50))\n    score: Mapped[float] = mapped_column(Float)",
               "why": "5.7'deki GeneratedContent ile one-to-many ilişki. AI-as-Judge puanları, BLEU/ROUGE metrikleri ve insan feedback'i bu tabloda saklanır."
             },
             {
+              "order": "5.7bb",
+              "action": "DEVAM: Evaluation modelini ekle — kalite puanları için (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "after_generated_content",
+              "code": "    feedback: Mapped[str] = mapped_column(Text, nullable=True)\n    metrics: Mapped[dict] = mapped_column(JSON, default=dict)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )\n    content: Mapped[\"GeneratedContent\"] = relationship(\n        back_populates=\"evaluations\"\n    )",
+              "why": "Evaluation metrikleri model kalitesini ölçülebilir kılar — objektif karşılaştırma için her iterasyonda aynı metrikler kullanılmalıdır."
+            },
+            {
               "order": "5.8",
-              "action": "Son model — UsageLog tablosunu ekle (maliyet takibi için)",
+              "action": "Son model — UsageLog tablosunu ekle (maliyet takibi için) (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/models.py",
               "position": "bottom",
-              "code": "\n\nclass UsageLog(Base):\n    __tablename__ = \"usage_logs\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    provider: Mapped[str] = mapped_column(String(50))\n    model: Mapped[str] = mapped_column(String(100))\n    input_tokens: Mapped[int] = mapped_column(Integer)\n    output_tokens: Mapped[int] = mapped_column(Integer)\n    cost_usd: Mapped[float] = mapped_column(Float)\n    endpoint: Mapped[str] = mapped_column(String(255))\n    status: Mapped[str] = mapped_column(String(20))\n    error_message: Mapped[str] = mapped_column(Text, nullable=True)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )",
+              "code": "class UsageLog(Base):\n    __tablename__ = \"usage_logs\"\n    id: Mapped[str] = mapped_column(String(36), primary_key=True)\n    provider: Mapped[str] = mapped_column(String(50))\n    model: Mapped[str] = mapped_column(String(100))\n    input_tokens: Mapped[int] = mapped_column(Integer)\n    output_tokens: Mapped[int] = mapped_column(Integer)",
               "why": "Her API çağrısının maliyeti burada loglanır. Provider bazında aylık raporlar bu tablodan üretilir — bütçe kontrolü için zorunlu."
+            },
+            {
+              "order": "5.8b",
+              "action": "DEVAM: Son model — UsageLog tablosunu ekle (maliyet takibi için) (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/models.py",
+              "position": "bottom",
+              "code": "    cost_usd: Mapped[float] = mapped_column(Float)\n    endpoint: Mapped[str] = mapped_column(String(255))\n    status: Mapped[str] = mapped_column(String(20))\n    error_message: Mapped[str] = mapped_column(Text, nullable=True)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=lambda: datetime.now(timezone.utc)\n    )",
+              "why": "Bu kısım hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "5.9",
@@ -839,30 +1111,93 @@
             },
             {
               "order": "1.4",
-              "action": "generate() metodunu yaz — mesaj dönüşümü ve API çağrısı",
+              "action": "generate() metodunu yaz — mesaj dönüşümü ve API çağrısı (bölüm 1/4)",
               "type": "code_add",
               "file": "ai_content_platform/providers/openai_provider.py",
               "position": "inside_class",
-              "code": "\n    async def generate(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        openai_messages = [\n            {\"role\": m.role, \"content\": m.content}\n            for m in messages\n        ]\n        retry_count = 0\n        while retry_count <= 3:\n            try:\n                response = await self._client.chat.completions.create(\n                    model=self.config.model,\n                    messages=openai_messages,\n                    temperature=temperature,\n                    max_tokens=max_tokens, **kwargs\n                )\n                break\n            except openai.RateLimitError:\n                retry_count += 1\n                if retry_count > 3: raise\n                await asyncio.sleep(2 ** (retry_count - 1))\n            except openai.APIStatusError as e:\n                if e.status_code >= 500:\n                    retry_count += 1\n                    if retry_count > 3: raise\n                    await asyncio.sleep(1)\n                else: raise",
+              "code": "async def generate(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        openai_messages = [\n            {\"role\": m.role, \"content\": m.content}\n            for m in messages",
               "why": "1.3'te oluşturduğumuz client ile API çağrısı yapıyoruz. Rate limit'te exponential backoff, server hatasında basit retry uygulanır."
             },
             {
               "order": "1.4b",
-              "action": "generate() içine GERİ DÖN — response'u LLMResponse'a dönüştür",
-              "type": "code_add",
-              "file": "ai_content_platform/providers/openai_provider.py",
-              "position": "inside_generate_after_api_call",
-              "code": "        usage = response.usage\n        cost = self.calculate_cost(\n            usage.prompt_tokens,\n            usage.completion_tokens\n        )\n        self._request_count += 1\n        self._total_tokens += usage.total_tokens\n        self._total_cost += cost\n        return LLMResponse(\n            content=response.choices[0].message.content,\n            provider=self.provider_name,\n            model=response.model,\n            input_tokens=usage.prompt_tokens,\n            output_tokens=usage.completion_tokens,\n            total_tokens=usage.total_tokens,\n            cost=cost,\n        )",
-              "why": "1.4'teki API yanıtını M1 Step 3'te tanımladığımız LLMResponse formatına dönüştürüyoruz. Token ve maliyet bilgisi burada hesaplanır."
-            },
-            {
-              "order": "1.5",
-              "action": "stream() metodunu implement et — token token yield",
+              "action": "DEVAM: generate() metodunu yaz — mesaj dönüşümü ve API çağrısı (bölüm 2/4)",
               "type": "code_add",
               "file": "ai_content_platform/providers/openai_provider.py",
               "position": "inside_class",
-              "code": "\n    async def stream(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        openai_messages = [\n            {\"role\": m.role, \"content\": m.content}\n            for m in messages\n        ]\n        stream = await self._client.chat.completions.create(\n            model=self.config.model,\n            messages=openai_messages,\n            temperature=temperature,\n            max_tokens=max_tokens,\n            stream=True, **kwargs\n        )\n        async for chunk in stream:\n            if chunk.choices[0].delta.content:\n                yield chunk.choices[0].delta.content",
+              "code": "        ]\n        retry_count = 0\n        while retry_count <= 3:\n            try:\n                response = await self._client.chat.completions.create(\n                    model=self.config.model,\n                    messages=openai_messages,",
+              "why": "Bu kısım asenkron işlem ve yapılandırma ayarları içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "1.4c",
+              "action": "DEVAM: generate() metodunu yaz — mesaj dönüşümü ve API çağrısı (bölüm 3/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_class",
+              "code": "                    temperature=temperature,\n                    max_tokens=max_tokens, **kwargs\n                )\n                break\n            except openai.RateLimitError:\n                retry_count += 1\n                if retry_count > 3: raise",
+              "why": "Bu kısım hata yönetimi ve kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "1.4d",
+              "action": "DEVAM: generate() metodunu yaz — mesaj dönüşümü ve API çağrısı (bölüm 4/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_class",
+              "code": "                await asyncio.sleep(2 ** (retry_count - 1))\n            except openai.APIStatusError as e:\n                if e.status_code >= 500:\n                    retry_count += 1\n                    if retry_count > 3: raise\n                    await asyncio.sleep(1)\n                else: raise",
+              "why": "Bu kısım asenkron işlem ve hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "1.4b",
+              "action": "generate() içine GERİ DÖN — response'u LLMResponse'a dönüştür (bölüm 1/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "usage = response.usage\n        cost = self.calculate_cost(\n            usage.prompt_tokens,\n            usage.completion_tokens\n        )\n        self._request_count += 1",
+              "why": "1.4'teki API yanıtını M1 Step 3'te tanımladığımız LLMResponse formatına dönüştürüyoruz. Token ve maliyet bilgisi burada hesaplanır."
+            },
+            {
+              "order": "1.4bb",
+              "action": "DEVAM: generate() içine GERİ DÖN — response'u LLMResponse'a dönüştür (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "        self._total_tokens += usage.total_tokens\n        self._total_cost += cost\n        return LLMResponse(\n            content=response.choices[0].message.content,\n            provider=self.provider_name,\n            model=response.model,",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "1.4bc",
+              "action": "DEVAM: generate() içine GERİ DÖN — response'u LLMResponse'a dönüştür (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "            input_tokens=usage.prompt_tokens,\n            output_tokens=usage.completion_tokens,\n            total_tokens=usage.total_tokens,\n            cost=cost,\n        )",
+              "why": "Prompt yönetimi LLM çıktı kalitesini doğrudan etkiler — küçük prompt değişiklikleri büyük sonuç farklılıkları yaratabilir."
+            },
+            {
+              "order": "1.5",
+              "action": "stream() metodunu implement et — token token yield (bölüm 1/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_class",
+              "code": "async def stream(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        openai_messages = [\n            {\"role\": m.role, \"content\": m.content}",
               "why": "1.4'teki generate() tam yanıt bekler, stream() ise token token yield eder. Kullanıcı 30 saniye beklemek yerine anında yanıt görmeye başlar."
+            },
+            {
+              "order": "1.5b",
+              "action": "DEVAM: stream() metodunu implement et — token token yield (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_class",
+              "code": "            for m in messages\n        ]\n        stream = await self._client.chat.completions.create(\n            model=self.config.model,\n            messages=openai_messages,\n            temperature=temperature,",
+              "why": "Bu kısım asenkron işlem ve yapılandırma ayarları içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "1.5c",
+              "action": "DEVAM: stream() metodunu implement et — token token yield (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/openai_provider.py",
+              "position": "inside_class",
+              "code": "            max_tokens=max_tokens,\n            stream=True, **kwargs\n        )\n        async for chunk in stream:\n            if chunk.choices[0].delta.content:\n                yield chunk.choices[0].delta.content",
+              "why": "Bu kısım asenkron işlem ve kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "1.6",
@@ -875,19 +1210,35 @@
             },
             {
               "order": "1.7",
-              "action": "BAŞKA DOSYAYA GEÇ — dependencies.py oluştur ve factory'yi kur",
+              "action": "BAŞKA DOSYAYA GEÇ — dependencies.py oluştur ve factory'yi kur (bölüm 1/2)",
               "type": "code_write",
               "file": "ai_content_platform/core/dependencies.py",
-              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\n\n\n@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    return factory",
+              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\n\n",
               "why": "1.1-1.6'da yazdığımız OpenAI provider'ını factory'ye kaydediyoruz. lru_cache uygulama boyunca tek factory instance'ı kullanılmasını sağlar."
             },
             {
+              "order": "1.7b",
+              "action": "DEVAM: BAŞKA DOSYAYA GEÇ — dependencies.py oluştur ve factory'yi kur (bölüm 2/2)",
+              "type": "code_write",
+              "file": "ai_content_platform/core/dependencies.py",
+              "code": "@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    return factory",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "1.8",
-              "action": "OpenAI ile basit bir test çağrısı yap",
+              "action": "OpenAI ile basit bir test çağrısı yap (bölüm 1/2)",
               "type": "terminal",
-              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()\n    messages = [LLMMessage(role='user', content='2+2 kaç eder?')]\n    response = await factory.generate_with_fallback(messages)\n    print(f'Yanıt: {response.content}')\n    print(f'Token: {response.total_tokens}, Maliyet: ${response.cost}')\nasyncio.run(test())\"",
+              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()",
               "expected_output": "Yanıt: 2+2 = 4 eder.\nToken: ~25, Maliyet: $0.000xxx",
               "why": "1.1-1.7'de yazdığımız tüm kodun uçtan uca çalıştığını doğruluyoruz. İlk gerçek LLM API çağrısı!"
+            },
+            {
+              "order": "1.8b",
+              "action": "DEVAM: OpenAI ile basit bir test çağrısı yap (bölüm 2/2)",
+              "type": "terminal",
+              "command": "    messages = [LLMMessage(role='user', content='2+2 kaç eder?')]\n    response = await factory.generate_with_fallback(messages)\n    print(f'Yanıt: {response.content}')\n    print(f'Token: {response.total_tokens}, Maliyet: ${response.cost}')\nasyncio.run(test())\"",
+              "expected_output": "Yanıt: 2+2 = 4 eder.\nToken: ~25, Maliyet: $0.000xxx",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "1.9",
@@ -951,55 +1302,134 @@
             },
             {
               "order": "2.3",
-              "action": "Sınıfa GERİ DÖN — __init__ ve _prepare_messages'ı yaz",
+              "action": "Sınıfa GERİ DÖN — __init__ ve _prepare_messages'ı yaz (bölüm 1/3)",
               "type": "code_add",
               "file": "ai_content_platform/providers/anthropic_provider.py",
               "position": "inside_class_top",
-              "code": "    def __init__(self, config):\n        super().__init__(config)\n        self._client = anthropic.AsyncAnthropic(\n            api_key=config.api_key.get_secret_value()\n        )\n\n    def _prepare_messages(self, messages):\n        system_prompt = None\n        anthropic_messages = []\n        for msg in messages:\n            if msg.role == \"system\":\n                system_prompt = msg.content\n            else:\n                anthropic_messages.append(\n                    {\"role\": msg.role, \"content\": msg.content}\n                )\n        return system_prompt, anthropic_messages",
+              "code": "def __init__(self, config):\n        super().__init__(config)\n        self._client = anthropic.AsyncAnthropic(\n            api_key=config.api_key.get_secret_value()\n        )\n",
               "why": "Kritik fark: Anthropic'te system prompt messages listesinin DIŞINDA. OpenAI'da {role:'system'} olarak gönderilir. Bu dönüşümü abstraction layer otomatik yapar."
             },
             {
+              "order": "2.3b",
+              "action": "DEVAM: Sınıfa GERİ DÖN — __init__ ve _prepare_messages'ı yaz (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_class_top",
+              "code": "    def _prepare_messages(self, messages):\n        system_prompt = None\n        anthropic_messages = []\n        for msg in messages:\n            if msg.role == \"system\":\n                system_prompt = msg.content",
+              "why": "Bu kısım kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "2.3c",
+              "action": "DEVAM: Sınıfa GERİ DÖN — __init__ ve _prepare_messages'ı yaz (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_class_top",
+              "code": "            else:\n                anthropic_messages.append(\n                    {\"role\": msg.role, \"content\": msg.content}\n                )\n        return system_prompt, anthropic_messages",
+              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "2.4",
-              "action": "generate() metodunu yaz — API çağrısı",
+              "action": "generate() metodunu yaz — API çağrısı (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/providers/anthropic_provider.py",
               "position": "inside_class",
-              "code": "\n    async def generate(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_prompt, msgs = self._prepare_messages(messages)\n        params = {\n            \"model\": self.config.model,\n            \"messages\": msgs,\n            \"max_tokens\": max_tokens,\n            \"temperature\": temperature,\n        }\n        if system_prompt:\n            params[\"system\"] = system_prompt\n        response = await self._client.messages.create(**params)",
+              "code": "async def generate(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_prompt, msgs = self._prepare_messages(messages)\n        params = {\n            \"model\": self.config.model,",
               "why": "2.3'teki _prepare_messages ile system prompt'u ayırıp Anthropic API'ye gönderiyoruz. max_tokens Anthropic'te zorunlu parametre."
             },
             {
               "order": "2.4b",
-              "action": "generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür",
-              "type": "code_add",
-              "file": "ai_content_platform/providers/anthropic_provider.py",
-              "position": "inside_generate_after_api_call",
-              "code": "        content = \"\".join(\n            b.text for b in response.content\n            if b.type == \"text\"\n        )\n        cost = self.calculate_cost(\n            response.usage.input_tokens,\n            response.usage.output_tokens\n        )\n        total = (\n            response.usage.input_tokens +\n            response.usage.output_tokens\n        )\n        self._request_count += 1\n        self._total_tokens += total\n        self._total_cost += cost\n        return LLMResponse(\n            content=content,\n            provider=self.provider_name,\n            model=response.model,\n            input_tokens=response.usage.input_tokens,\n            output_tokens=response.usage.output_tokens,\n            total_tokens=total, cost=cost,\n        )",
-              "why": "2.4'teki API yanıtını standart LLMResponse formatına dönüştürüyoruz. Anthropic'te content bir ContentBlock listesi — text bloklarını birleştiriyoruz."
-            },
-            {
-              "order": "2.5",
-              "action": "stream() ve count_tokens() metodlarını ekle",
+              "action": "DEVAM: generate() metodunu yaz — API çağrısı (bölüm 2/2)",
               "type": "code_add",
               "file": "ai_content_platform/providers/anthropic_provider.py",
               "position": "inside_class",
-              "code": "\n    async def stream(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_prompt, msgs = self._prepare_messages(messages)\n        params = {\n            \"model\": self.config.model,\n            \"messages\": msgs,\n            \"max_tokens\": max_tokens,\n            \"temperature\": temperature,\n        }\n        if system_prompt:\n            params[\"system\"] = system_prompt\n        async with self._client.messages.stream(\n            **params\n        ) as stream:\n            async for text in stream.text_stream:\n                yield text\n\n    def count_tokens(self, text: str) -> int:\n        return int(len(text.split()) * 1.3)",
+              "code": "            \"messages\": msgs,\n            \"max_tokens\": max_tokens,\n            \"temperature\": temperature,\n        }\n        if system_prompt:\n            params[\"system\"] = system_prompt\n        response = await self._client.messages.create(**params)",
+              "why": "Bu kısım kontrol akışı ve asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "2.4b",
+              "action": "generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür (bölüm 1/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "content = \"\".join(\n            b.text for b in response.content\n            if b.type == \"text\"\n        )\n        cost = self.calculate_cost(\n            response.usage.input_tokens,\n            response.usage.output_tokens\n        )",
+              "why": "2.4'teki API yanıtını standart LLMResponse formatına dönüştürüyoruz. Anthropic'te content bir ContentBlock listesi — text bloklarını birleştiriyoruz."
+            },
+            {
+              "order": "2.4bb",
+              "action": "DEVAM: generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "        total = (\n            response.usage.input_tokens +\n            response.usage.output_tokens\n        )\n        self._request_count += 1\n        self._total_tokens += total\n        self._total_cost += cost\n        return LLMResponse(",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "2.4bc",
+              "action": "DEVAM: generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "            content=content,\n            provider=self.provider_name,\n            model=response.model,\n            input_tokens=response.usage.input_tokens,\n            output_tokens=response.usage.output_tokens,\n            total_tokens=total, cost=cost,\n        )",
+              "why": "ML pipeline'ı veriyi işleyip model eğitimi yapar — her adım bağımsız test edilebilir olmalıdır."
+            },
+            {
+              "order": "2.5",
+              "action": "stream() ve count_tokens() metodlarını ekle (bölüm 1/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_class",
+              "code": "async def stream(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_prompt, msgs = self._prepare_messages(messages)\n        params = {\n            \"model\": self.config.model,",
               "why": "2.4'teki generate() ile aynı mesaj hazırlığı ama stream modunda. count_tokens yaklaşık hesaplama — Anthropic'in tokenizer'ı API çağrısı gerektirir, maliyetinden kaçınıyoruz."
             },
             {
+              "order": "2.5b",
+              "action": "DEVAM: stream() ve count_tokens() metodlarını ekle (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_class",
+              "code": "            \"messages\": msgs,\n            \"max_tokens\": max_tokens,\n            \"temperature\": temperature,\n        }\n        if system_prompt:\n            params[\"system\"] = system_prompt\n        async with self._client.messages.stream(",
+              "why": "Bu kısım kontrol akışı ve asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "2.5c",
+              "action": "DEVAM: stream() ve count_tokens() metodlarını ekle (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/anthropic_provider.py",
+              "position": "inside_class",
+              "code": "            **params\n        ) as stream:\n            async for text in stream.text_stream:\n                yield text\n\n    def count_tokens(self, text: str) -> int:\n        return int(len(text.split()) * 1.3)",
+              "why": "Bu kısım asenkron işlem ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "2.6",
-              "action": "BAŞKA DOSYAYA GEÇ — dependencies.py'ye Anthropic'i kaydet",
+              "action": "BAŞKA DOSYAYA GEÇ — dependencies.py'ye Anthropic'i kaydet (bölüm 1/2)",
               "type": "code_modify",
               "file": "ai_content_platform/core/dependencies.py",
-              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.providers.anthropic_provider import AnthropicProvider\n\n\n@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    factory.register(\"anthropic\", AnthropicProvider)\n    return factory",
+              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.providers.anthropic_provider import AnthropicProvider\n\n",
               "why": "M2 Step 1'deki factory'ye yeni provider eklemek sadece iki satır — import ve register(). Open-Closed Principle'ın güzel bir örneği."
             },
             {
+              "order": "2.6b",
+              "action": "DEVAM: BAŞKA DOSYAYA GEÇ — dependencies.py'ye Anthropic'i kaydet (bölüm 2/2)",
+              "type": "code_modify",
+              "file": "ai_content_platform/core/dependencies.py",
+              "code": "@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    factory.register(\"anthropic\", AnthropicProvider)\n    return factory",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "2.7",
-              "action": "Her iki provider'ı aynı mesajla karşılaştırmalı test et",
+              "action": "Her iki provider'ı aynı mesajla karşılaştırmalı test et (bölüm 1/2)",
               "type": "terminal",
-              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()\n    messages = [LLMMessage(role='system', content='Kısa cevap ver.'), LLMMessage(role='user', content='Python nedir?')]\n    for name in ['openai', 'anthropic']:\n        r = await factory.generate_with_fallback(messages, preferred_provider=name)\n        print(f'{r.provider}: {r.content[:80]}... (${r.cost:.4f})')\nasyncio.run(test())\"",
+              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()",
               "expected_output": "openai: Python, genel amaçlı... ($0.00xx)\nanthropic: Python, yüksek seviyeli... ($0.00xx)",
               "why": "Aynı mesaj listesinin her iki provider'da da çalıştığını doğruluyoruz. System prompt'un Anthropic'te otomatik ayrıldığını kontrol ediyoruz."
+            },
+            {
+              "order": "2.7b",
+              "action": "DEVAM: Her iki provider'ı aynı mesajla karşılaştırmalı test et (bölüm 2/2)",
+              "type": "terminal",
+              "command": "    messages = [LLMMessage(role='system', content='Kısa cevap ver.'), LLMMessage(role='user', content='Python nedir?')]\n    for name in ['openai', 'anthropic']:\n        r = await factory.generate_with_fallback(messages, preferred_provider=name)\n        print(f'{r.provider}: {r.content[:80]}... (${r.cost:.4f})')\nasyncio.run(test())\"",
+              "expected_output": "openai: Python, genel amaçlı... ($0.00xx)\nanthropic: Python, yüksek seviyeli... ($0.00xx)",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "2.8",
@@ -1055,39 +1485,111 @@
             },
             {
               "order": "3.3",
-              "action": "Sınıfa GERİ DÖN — __init__ ve _convert_messages'ı yaz",
+              "action": "Sınıfa GERİ DÖN — __init__ ve _convert_messages'ı yaz (bölüm 1/3)",
               "type": "code_add",
               "file": "ai_content_platform/providers/gemini_provider.py",
               "position": "inside_class_top",
-              "code": "    def __init__(self, config):\n        super().__init__(config)\n        genai.configure(\n            api_key=config.api_key.get_secret_value()\n        )\n        self._model = genai.GenerativeModel(\n            model_name=config.model\n        )\n\n    def _convert_messages(self, messages):\n        system_instruction = None\n        contents = []\n        for msg in messages:\n            if msg.role == \"system\":\n                system_instruction = msg.content\n            else:\n                role = \"model\" if msg.role == \"assistant\" else msg.role\n                contents.append({\n                    \"role\": role,\n                    \"parts\": [{\"text\": msg.content}]\n                })\n        return system_instruction, contents",
+              "code": "def __init__(self, config):\n        super().__init__(config)\n        genai.configure(\n            api_key=config.api_key.get_secret_value()\n        )\n        self._model = genai.GenerativeModel(\n            model_name=config.model\n        )",
               "why": "Gemini'de 'assistant' yerine 'model' kullanılıyor ve mesajlar contents/parts formatında. Bu küçük fark, abstraction olmadan bug'a neden olur."
             },
             {
+              "order": "3.3b",
+              "action": "DEVAM: Sınıfa GERİ DÖN — __init__ ve _convert_messages'ı yaz (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class_top",
+              "code": "\n    def _convert_messages(self, messages):\n        system_instruction = None\n        contents = []\n        for msg in messages:\n            if msg.role == \"system\":\n                system_instruction = msg.content\n            else:",
+              "why": "Bu kısım kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "3.3c",
+              "action": "DEVAM: Sınıfa GERİ DÖN — __init__ ve _convert_messages'ı yaz (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class_top",
+              "code": "                role = \"model\" if msg.role == \"assistant\" else msg.role\n                contents.append({\n                    \"role\": role,\n                    \"parts\": [{\"text\": msg.content}]\n                })\n        return system_instruction, contents",
+              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "3.4",
-              "action": "generate() metodunu yaz — model hazırlığı ve API çağrısı",
+              "action": "generate() metodunu yaz — model hazırlığı ve API çağrısı (bölüm 1/3)",
               "type": "code_add",
               "file": "ai_content_platform/providers/gemini_provider.py",
               "position": "inside_class",
-              "code": "\n    async def generate(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_instruction, contents = self._convert_messages(\n            messages\n        )\n        model = self._model\n        if system_instruction:\n            model = genai.GenerativeModel(\n                model_name=self.config.model,\n                system_instruction=system_instruction\n            )\n        response = await model.generate_content_async(\n            contents=contents,\n            generation_config=genai.types.GenerationConfig(\n                temperature=temperature,\n                max_output_tokens=max_tokens,\n            )\n        )",
+              "code": "async def generate(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_instruction, contents = self._convert_messages(\n            messages\n        )",
               "why": "3.3'teki _convert_messages ile formatı dönüştürüp API'ye gönderiyoruz. System instruction varsa model yeniden oluşturuluyor — Gemini'nin API tasarımı böyle."
             },
             {
               "order": "3.4b",
-              "action": "generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür",
-              "type": "code_add",
-              "file": "ai_content_platform/providers/gemini_provider.py",
-              "position": "inside_generate_after_api_call",
-              "code": "        usage = response.usage_metadata\n        cost = self.calculate_cost(\n            usage.prompt_token_count,\n            usage.candidates_token_count\n        )\n        total = (\n            usage.prompt_token_count +\n            usage.candidates_token_count\n        )\n        self._request_count += 1\n        self._total_tokens += total\n        self._total_cost += cost\n        return LLMResponse(\n            content=response.text,\n            provider=self.provider_name,\n            model=self.config.model,\n            input_tokens=usage.prompt_token_count,\n            output_tokens=usage.candidates_token_count,\n            total_tokens=total, cost=cost,\n        )",
-              "why": "3.4'teki API yanıtını LLMResponse'a dönüştürüyoruz. Gemini'de token bilgisi usage_metadata altında, diğer provider'lardan farklı alan isimleri kullanıyor."
-            },
-            {
-              "order": "3.5",
-              "action": "stream() metodunu ekle",
+              "action": "DEVAM: generate() metodunu yaz — model hazırlığı ve API çağrısı (bölüm 2/3)",
               "type": "code_add",
               "file": "ai_content_platform/providers/gemini_provider.py",
               "position": "inside_class",
-              "code": "\n    async def stream(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_instruction, contents = self._convert_messages(\n            messages\n        )\n        model = self._model\n        if system_instruction:\n            model = genai.GenerativeModel(\n                model_name=self.config.model,\n                system_instruction=system_instruction\n            )\n        response = await model.generate_content_async(\n            contents=contents,\n            generation_config=genai.types.GenerationConfig(\n                temperature=temperature,\n                max_output_tokens=max_tokens,\n            ),\n            stream=True\n        )\n        async for chunk in response:\n            if chunk.text:\n                yield chunk.text",
+              "code": "        model = self._model\n        if system_instruction:\n            model = genai.GenerativeModel(\n                model_name=self.config.model,\n                system_instruction=system_instruction\n            )\n        response = await model.generate_content_async(",
+              "why": "Bu kısım kontrol akışı ve yapılandırma ayarları içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "3.4c",
+              "action": "DEVAM: generate() metodunu yaz — model hazırlığı ve API çağrısı (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class",
+              "code": "            contents=contents,\n            generation_config=genai.types.GenerationConfig(\n                temperature=temperature,\n                max_output_tokens=max_tokens,\n            )\n        )",
+              "why": "Bu kısım yapılandırma ayarları içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "3.4b",
+              "action": "generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür (bölüm 1/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "usage = response.usage_metadata\n        cost = self.calculate_cost(\n            usage.prompt_token_count,\n            usage.candidates_token_count\n        )\n        total = (\n            usage.prompt_token_count +",
+              "why": "3.4'teki API yanıtını LLMResponse'a dönüştürüyoruz. Gemini'de token bilgisi usage_metadata altında, diğer provider'lardan farklı alan isimleri kullanıyor."
+            },
+            {
+              "order": "3.4bb",
+              "action": "DEVAM: generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "            usage.candidates_token_count\n        )\n        self._request_count += 1\n        self._total_tokens += total\n        self._total_cost += cost\n        return LLMResponse(\n            content=response.text,",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "3.4bc",
+              "action": "DEVAM: generate() içine GERİ DÖN — yanıtı LLMResponse'a dönüştür (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_generate_after_api_call",
+              "code": "            provider=self.provider_name,\n            model=self.config.model,\n            input_tokens=usage.prompt_token_count,\n            output_tokens=usage.candidates_token_count,\n            total_tokens=total, cost=cost,\n        )",
+              "why": "Bu kısım yapılandırma ayarları içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "3.5",
+              "action": "stream() metodunu ekle (bölüm 1/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class",
+              "code": "async def stream(\n        self, messages, temperature=0.7,\n        max_tokens=4096, **kwargs\n    ):\n        system_instruction, contents = self._convert_messages(\n            messages\n        )\n        model = self._model",
               "why": "3.4'teki generate() pattern'inin stream versiyonu. stream=True parametresi ile API chunk chunk yanıt verir."
+            },
+            {
+              "order": "3.5b",
+              "action": "DEVAM: stream() metodunu ekle (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class",
+              "code": "        if system_instruction:\n            model = genai.GenerativeModel(\n                model_name=self.config.model,\n                system_instruction=system_instruction\n            )\n        response = await model.generate_content_async(\n            contents=contents,\n            generation_config=genai.types.GenerationConfig(",
+              "why": "Bu kısım kontrol akışı ve yapılandırma ayarları içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "3.5c",
+              "action": "DEVAM: stream() metodunu ekle (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/providers/gemini_provider.py",
+              "position": "inside_class",
+              "code": "                temperature=temperature,\n                max_output_tokens=max_tokens,\n            ),\n            stream=True\n        )\n        async for chunk in response:\n            if chunk.text:\n                yield chunk.text",
+              "why": "Bu kısım asenkron işlem ve kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "3.5b",
@@ -1100,19 +1602,35 @@
             },
             {
               "order": "3.6",
-              "action": "BAŞKA DOSYAYA GEÇ — dependencies.py'ye Gemini'yi ekle",
+              "action": "BAŞKA DOSYAYA GEÇ — dependencies.py'ye Gemini'yi ekle (bölüm 1/2)",
               "type": "code_modify",
               "file": "ai_content_platform/core/dependencies.py",
-              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.providers.anthropic_provider import AnthropicProvider\nfrom ai_content_platform.providers.gemini_provider import GeminiProvider\n\n\n@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    factory.register(\"anthropic\", AnthropicProvider)\n    factory.register(\"gemini\", GeminiProvider)\n    return factory",
+              "code": "from functools import lru_cache\nfrom ai_content_platform.core.config import get_settings\nfrom ai_content_platform.providers.factory import ProviderFactory\nfrom ai_content_platform.providers.openai_provider import OpenAIProvider\nfrom ai_content_platform.providers.anthropic_provider import AnthropicProvider\nfrom ai_content_platform.providers.gemini_provider import GeminiProvider\n\n",
               "why": "Üçüncü provider'ı eklemek yine sadece iki satır değişiklik. Mimari doğruysa yeni provider eklemek kolay olmalı — ve öyle."
             },
             {
+              "order": "3.6b",
+              "action": "DEVAM: BAŞKA DOSYAYA GEÇ — dependencies.py'ye Gemini'yi ekle (bölüm 2/2)",
+              "type": "code_modify",
+              "file": "ai_content_platform/core/dependencies.py",
+              "code": "@lru_cache\ndef get_provider_factory() -> ProviderFactory:\n    settings = get_settings()\n    factory = ProviderFactory(settings)\n    factory.register(\"openai\", OpenAIProvider)\n    factory.register(\"anthropic\", AnthropicProvider)\n    factory.register(\"gemini\", GeminiProvider)\n    return factory",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "3.7",
-              "action": "Üç provider'ı karşılaştırmalı test et",
+              "action": "Üç provider'ı karşılaştırmalı test et (bölüm 1/2)",
               "type": "terminal",
-              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()\n    messages = [LLMMessage(role='user', content='AI nedir? Bir cümle ile açıkla.')]\n    for name in ['openai', 'anthropic', 'gemini']:\n        r = await factory.generate_with_fallback(messages, preferred_provider=name)\n        print(f'{r.provider} ({r.model}): {r.content[:80]}... | ${r.cost:.6f}')\nasyncio.run(test())\"",
+              "command": "python -c \"import asyncio\nfrom ai_content_platform.core.dependencies import get_provider_factory\nfrom ai_content_platform.providers.base import LLMMessage\nasync def test():\n    factory = get_provider_factory()",
               "expected_output": "openai (gpt-4o): AI, makinelerin... | $0.000xxx\nanthropic (claude-...): AI, insan... | $0.000xxx\ngemini (gemini-...): AI, bilgisayar... | $0.000xxx",
               "why": "Aynı prompt'un üç farklı provider'da çalıştığını ve her birinin maliyet/token metriklerini doğru raporladığını doğruluyoruz."
+            },
+            {
+              "order": "3.7b",
+              "action": "DEVAM: Üç provider'ı karşılaştırmalı test et (bölüm 2/2)",
+              "type": "terminal",
+              "command": "    messages = [LLMMessage(role='user', content='AI nedir? Bir cümle ile açıkla.')]\n    for name in ['openai', 'anthropic', 'gemini']:\n        r = await factory.generate_with_fallback(messages, preferred_provider=name)\n        print(f'{r.provider} ({r.model}): {r.content[:80]}... | ${r.cost:.6f}')\nasyncio.run(test())\"",
+              "expected_output": "openai (gpt-4o): AI, makinelerin... | $0.000xxx\nanthropic (claude-...): AI, insan... | $0.000xxx\ngemini (gemini-...): AI, bilgisayar... | $0.000xxx",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "3.8",
@@ -1167,11 +1685,19 @@
             },
             {
               "order": "4.2",
-              "action": "content.py dosyasını oluştur — önce router ve request model iskeletini yaz",
+              "action": "content.py dosyasını oluştur — önce router ve request model iskeletini yaz (bölüm 1/2)",
               "type": "code_write",
               "file": "ai_content_platform/api/routes/content.py",
-              "code": "from fastapi import APIRouter\nfrom pydantic import BaseModel\n\nrouter = APIRouter(\n    prefix=\"/api/content\", tags=[\"content\"]\n)\n\n\nclass GenerateRequest(BaseModel):\n    prompt: str\n    content_type: str = \"blog_post\"\n    tone: str = \"professional\"\n    provider: str | None = None\n    stream: bool = True\n    temperature: float = 0.7\n    max_tokens: int = 4096",
+              "code": "from fastapi import APIRouter\nfrom pydantic import BaseModel\n\nrouter = APIRouter(\n    prefix=\"/api/content\", tags=[\"content\"]\n)\n\n",
               "why": "Önce iskelet — router ve giriş modeli. Endpoint'leri henüz yazmadık, önce veri yapısını tanımlıyoruz."
+            },
+            {
+              "order": "4.2b",
+              "action": "DEVAM: content.py dosyasını oluştur — önce router ve request model iskeletini yaz (bölüm 2/2)",
+              "type": "code_write",
+              "file": "ai_content_platform/api/routes/content.py",
+              "code": "class GenerateRequest(BaseModel):\n    prompt: str\n    content_type: str = \"blog_post\"\n    tone: str = \"professional\"\n    provider: str | None = None\n    stream: bool = True\n    temperature: float = 0.7\n    max_tokens: int = 4096",
+              "why": "Bu kısım sınıf tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "4.3",
@@ -1183,38 +1709,100 @@
             },
             {
               "order": "4.4",
-              "action": "SSE generator fonksiyonunu yaz — streaming'in kalbi",
+              "action": "SSE generator fonksiyonunu yaz — streaming'in kalbi (bölüm 1/3)",
               "type": "code_add",
               "file": "ai_content_platform/api/routes/content.py",
               "position": "after_request_model",
-              "code": "\n\nasync def sse_generator(factory, messages, provider_name, **kwargs):\n    total_content = \"\"\n    try:\n        provider = factory.get_provider(\n            provider_name or \"openai\"\n        )\n        async for token in provider.stream(\n            messages, **kwargs\n        ):\n            total_content += token\n            yield f\"data: {json.dumps({'type': 'token', 'content': token})}\\n\\n\"\n        input_text = \" \".join(m.content for m in messages)\n        input_tokens = provider.count_tokens(input_text)\n        output_tokens = provider.count_tokens(total_content)\n        cost = provider.calculate_cost(input_tokens, output_tokens)\n        yield f\"data: {json.dumps({'type': 'done', 'usage': {'input_tokens': input_tokens, 'output_tokens': output_tokens, 'cost_usd': cost, 'provider': provider.provider_name}})}\\n\\n\"\n    except Exception as e:\n        yield f\"data: {json.dumps({'type': 'error', 'message': str(e)})}\\n\\n\"",
+              "code": "async def sse_generator(factory, messages, provider_name, **kwargs):\n    total_content = \"\"\n    try:\n        provider = factory.get_provider(\n            provider_name or \"openai\"\n        )",
               "why": "SSE formatı: 'data: {...}\\n\\n'. Her token ayrı event olarak gönderilir. Stream bittiğinde 'done' event'i maliyet bilgisiyle gelir. Hata olursa 'error' event'i."
             },
             {
+              "order": "4.4b",
+              "action": "DEVAM: SSE generator fonksiyonunu yaz — streaming'in kalbi (bölüm 2/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "after_request_model",
+              "code": "        async for token in provider.stream(\n            messages, **kwargs\n        ):\n            total_content += token\n            yield f\"data: {json.dumps({'type': 'token', 'content': token})}\\n\\n\"\n        input_text = \" \".join(m.content for m in messages)",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "4.4c",
+              "action": "DEVAM: SSE generator fonksiyonunu yaz — streaming'in kalbi (bölüm 3/3)",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "after_request_model",
+              "code": "        input_tokens = provider.count_tokens(input_text)\n        output_tokens = provider.count_tokens(total_content)\n        cost = provider.calculate_cost(input_tokens, output_tokens)\n        yield f\"data: {json.dumps({'type': 'done', 'usage': {'input_tokens': input_tokens, 'output_tokens': output_tokens, 'cost_usd': cost, 'provider': provider.provider_name}})}\\n\\n\"\n    except Exception as e:\n        yield f\"data: {json.dumps({'type': 'error', 'message': str(e)})}\\n\\n\"",
+              "why": "Bu kısım hata yönetimi içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "4.5",
-              "action": "Endpoint'in streaming kısmını yaz",
+              "action": "Endpoint'in streaming kısmını yaz (bölüm 1/4)",
               "type": "code_add",
               "file": "ai_content_platform/api/routes/content.py",
               "position": "bottom",
-              "code": "\n\n@router.post(\"/generate\")\nasync def generate_content(\n    request: GenerateRequest,\n    factory: ProviderFactory = Depends(get_provider_factory)\n):\n    messages = [\n        LLMMessage(\n            role=\"system\",\n            content=(\n                f\"Sen profesyonel bir içerik yazarısın. \"\n                f\"İçerik türü: {request.content_type}. \"\n                f\"Ton: {request.tone}. Türkçe yaz.\"\n            )\n        ),\n        LLMMessage(role=\"user\", content=request.prompt)\n    ]\n    if request.stream:\n        return StreamingResponse(\n            sse_generator(\n                factory, messages, request.provider,\n                temperature=request.temperature,\n                max_tokens=request.max_tokens\n            ),\n            media_type=\"text/event-stream\",\n            headers={\n                \"Cache-Control\": \"no-cache\",\n                \"X-Accel-Buffering\": \"no\"\n            }\n        )",
+              "code": "@router.post(\"/generate\")\nasync def generate_content(\n    request: GenerateRequest,\n    factory: ProviderFactory = Depends(get_provider_factory)\n):\n    messages = [\n        LLMMessage(\n            role=\"system\",",
               "why": "4.2'deki GenerateRequest, 4.3'teki import'lar ve 4.4'teki sse_generator burada birleşiyor. Stream modunda SSE yanıt döner."
             },
             {
               "order": "4.5b",
-              "action": "Endpoint'e GERİ DÖN — non-streaming yanıt kısmını ekle",
+              "action": "DEVAM: Endpoint'in streaming kısmını yaz (bölüm 2/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "bottom",
+              "code": "            content=(\n                f\"Sen profesyonel bir içerik yazarısın. \"\n                f\"İçerik türü: {request.content_type}. \"\n                f\"Ton: {request.tone}. Türkçe yaz.\"\n            )\n        ),\n        LLMMessage(role=\"user\", content=request.prompt)\n    ]",
+              "why": "Prompt yönetimi LLM çıktı kalitesini doğrudan etkiler — küçük prompt değişiklikleri büyük sonuç farklılıkları yaratabilir."
+            },
+            {
+              "order": "4.5c",
+              "action": "DEVAM: Endpoint'in streaming kısmını yaz (bölüm 3/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "bottom",
+              "code": "    if request.stream:\n        return StreamingResponse(\n            sse_generator(\n                factory, messages, request.provider,\n                temperature=request.temperature,\n                max_tokens=request.max_tokens\n            ),\n            media_type=\"text/event-stream\",",
+              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "4.5d",
+              "action": "DEVAM: Endpoint'in streaming kısmını yaz (bölüm 4/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "bottom",
+              "code": "            headers={\n                \"Cache-Control\": \"no-cache\",\n                \"X-Accel-Buffering\": \"no\"\n            }\n        )",
+              "why": "Cache katmanı tekrarlanan sorguları bellekten karşılar — veritabanı yükünü azaltır ve yanıt süresini düşürür."
+            },
+            {
+              "order": "4.5b",
+              "action": "Endpoint'e GERİ DÖN — non-streaming yanıt kısmını ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/api/routes/content.py",
               "position": "inside_generate_content",
-              "code": "    response = await factory.generate_with_fallback(\n        messages,\n        preferred_provider=request.provider,\n        temperature=request.temperature,\n        max_tokens=request.max_tokens\n    )\n    return {\n        \"content\": response.content,\n        \"usage\": {\n            \"input_tokens\": response.input_tokens,\n            \"output_tokens\": response.output_tokens,\n            \"cost_usd\": response.cost,\n            \"provider\": response.provider,\n        }\n    }",
+              "code": "response = await factory.generate_with_fallback(\n        messages,\n        preferred_provider=request.provider,\n        temperature=request.temperature,\n        max_tokens=request.max_tokens\n    )\n    return {\n        \"content\": response.content,",
               "why": "4.5'te stream=true durumunu handle ettik. stream=false ise tam yanıt bekleyip JSON olarak döner — batch işleme senaryoları için."
             },
             {
+              "order": "4.5bb",
+              "action": "DEVAM: Endpoint'e GERİ DÖN — non-streaming yanıt kısmını ekle (bölüm 2/2)",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "position": "inside_generate_content",
+              "code": "        \"usage\": {\n            \"input_tokens\": response.input_tokens,\n            \"output_tokens\": response.output_tokens,\n            \"cost_usd\": response.cost,\n            \"provider\": response.provider,\n        }\n    }",
+              "why": "Provider abstraction farklı servisleri tek bir arayüz arkasında birleştirir — yeni provider eklemek mevcut kodu bozmaz."
+            },
+            {
               "order": "4.6",
-              "action": "BAŞKA DOSYAYA GEÇ — main.py'ye router'ı bağla",
+              "action": "BAŞKA DOSYAYA GEÇ — main.py'ye router'ı bağla (bölüm 1/2)",
               "type": "code_modify",
               "file": "ai_content_platform/main.py",
-              "code": "from fastapi import FastAPI\nfrom ai_content_platform.api.routes.content import router as content_router\n\napp = FastAPI(\n    title=\"AI Content Platform\",\n    version=\"0.1.0\",\n)\napp.include_router(content_router)\n\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"healthy\", \"version\": \"0.1.0\"}",
+              "code": "from fastapi import FastAPI\nfrom ai_content_platform.api.routes.content import router as content_router\n\napp = FastAPI(\n    title=\"AI Content Platform\",\n    version=\"0.1.0\",\n)",
               "why": "M1 Step 1'de oluşturduğumuz main.py'ye ÜSTE ÇIK ve router import'unu ekle. include_router ile modüler yapıyı ana uygulamaya bağlıyoruz."
+            },
+            {
+              "order": "4.6b",
+              "action": "DEVAM: BAŞKA DOSYAYA GEÇ — main.py'ye router'ı bağla (bölüm 2/2)",
+              "type": "code_modify",
+              "file": "ai_content_platform/main.py",
+              "code": "app.include_router(content_router)\n\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"healthy\", \"version\": \"0.1.0\"}",
+              "why": "Bu kısım asenkron işlem ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "4.7",
@@ -1278,11 +1866,27 @@
           "substeps": [
             {
               "order": "5.1",
-              "action": "docker-compose.yml oluştur — Redis ve PostgreSQL servisleri",
+              "action": "docker-compose.yml oluştur — Redis ve PostgreSQL servisleri (bölüm 1/3)",
               "type": "code_write",
               "file": "docker-compose.yml",
-              "code": "version: '3.8'\nservices:\n  postgres:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_DB: ai_content\n      POSTGRES_USER: postgres\n      POSTGRES_PASSWORD: postgres\n    ports:\n      - \"5432:5432\"\n    volumes:\n      - postgres_data:/var/lib/postgresql/data\n  redis:\n    image: redis:7-alpine\n    ports:\n      - \"6379:6379\"\n    volumes:\n      - redis_data:/data\nvolumes:\n  postgres_data:\n  redis_data:",
+              "code": "version: '3.8'\nservices:\n  postgres:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_DB: ai_content\n      POSTGRES_USER: postgres",
               "why": "Tüm bağımlı servisleri tek komutla başlatmak development ortamını standartlaştırır. Her developer aynı veritabanı ve cache versiyonunu kullanır."
+            },
+            {
+              "order": "5.1b",
+              "action": "DEVAM: docker-compose.yml oluştur — Redis ve PostgreSQL servisleri (bölüm 2/3)",
+              "type": "code_write",
+              "file": "docker-compose.yml",
+              "code": "      POSTGRES_PASSWORD: postgres\n    ports:\n      - \"5432:5432\"\n    volumes:\n      - postgres_data:/var/lib/postgresql/data\n  redis:\n    image: redis:7-alpine",
+              "why": "Cache katmanı tekrarlanan sorguları bellekten karşılar — veritabanı yükünü azaltır ve yanıt süresini düşürür."
+            },
+            {
+              "order": "5.1c",
+              "action": "DEVAM: docker-compose.yml oluştur — Redis ve PostgreSQL servisleri (bölüm 3/3)",
+              "type": "code_write",
+              "file": "docker-compose.yml",
+              "code": "    ports:\n      - \"6379:6379\"\n    volumes:\n      - redis_data:/data\nvolumes:\n  postgres_data:\n  redis_data:",
+              "why": "Cache katmanı tekrarlanan sorguları bellekten karşılar — veritabanı yükünü azaltır ve yanıt süresini düşürür."
             },
             {
               "order": "5.2",
@@ -1294,11 +1898,27 @@
             },
             {
               "order": "5.3",
-              "action": "cache.py dosyasını oluştur — önce LLMCache iskeletini yaz",
+              "action": "cache.py dosyasını oluştur — önce LLMCache iskeletini yaz (bölüm 1/3)",
               "type": "code_write",
               "file": "ai_content_platform/core/cache.py",
-              "code": "import redis.asyncio as redis\nimport logging\n\nlogger = logging.getLogger(__name__)\n\n\nclass LLMCache:\n    def __init__(\n        self, redis_url: str,\n        default_ttl: int = 3600\n    ):\n        self._redis = redis.from_url(\n            redis_url, decode_responses=True\n        )\n        self._default_ttl = default_ttl\n        self._hits = 0\n        self._misses = 0",
+              "code": "import redis.asyncio as redis\nimport logging\n\nlogger = logging.getLogger(__name__)\n\n",
               "why": "Önce iskelet — bağlantı ve istatistik değişkenleri. Metodları adım adım ekleyeceğiz."
+            },
+            {
+              "order": "5.3b",
+              "action": "DEVAM: cache.py dosyasını oluştur — önce LLMCache iskeletini yaz (bölüm 2/3)",
+              "type": "code_write",
+              "file": "ai_content_platform/core/cache.py",
+              "code": "class LLMCache:\n    def __init__(\n        self, redis_url: str,\n        default_ttl: int = 3600\n    ):\n        self._redis = redis.from_url(",
+              "why": "Bu kısım sınıf tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "5.3c",
+              "action": "DEVAM: cache.py dosyasını oluştur — önce LLMCache iskeletini yaz (bölüm 3/3)",
+              "type": "code_write",
+              "file": "ai_content_platform/core/cache.py",
+              "code": "            redis_url, decode_responses=True\n        )\n        self._default_ttl = default_ttl\n        self._hits = 0\n        self._misses = 0",
+              "why": "Cache katmanı tekrarlanan sorguları bellekten karşılar — veritabanı yükünü azaltır ve yanıt süresini düşürür."
             },
             {
               "order": "5.4",
@@ -1310,47 +1930,127 @@
             },
             {
               "order": "5.5",
-              "action": "LLMCache'e GERİ DÖN — _make_key ve get metodlarını ekle",
+              "action": "LLMCache'e GERİ DÖN — _make_key ve get metodlarını ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/cache.py",
               "position": "inside_class",
-              "code": "\n    def _make_key(self, messages, model, temperature):\n        key_data = json.dumps(\n            {\"messages\": messages, \"model\": model,\n             \"temperature\": temperature},\n            sort_keys=True\n        )\n        return f\"llm_cache:{hashlib.sha256(key_data.encode()).hexdigest()}\"\n\n    async def get(self, messages, model, temperature):\n        key = self._make_key(messages, model, temperature)\n        cached = await self._redis.get(key)\n        if cached:\n            self._hits += 1\n            return json.loads(cached)\n        self._misses += 1\n        return None",
+              "code": "def _make_key(self, messages, model, temperature):\n        key_data = json.dumps(\n            {\"messages\": messages, \"model\": model,\n             \"temperature\": temperature},\n            sort_keys=True\n        )\n        return f\"llm_cache:{hashlib.sha256(key_data.encode()).hexdigest()}\"\n",
               "why": "SHA256 hash ile cache key oluşturuyoruz — aynı input her zaman aynı key üretir. Cache hit'te pahalı API çağrısı atlanır."
             },
             {
-              "order": "5.6",
-              "action": "set ve get_stats metodlarını ekle",
+              "order": "5.5b",
+              "action": "DEVAM: LLMCache'e GERİ DÖN — _make_key ve get metodlarını ekle (bölüm 2/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/cache.py",
               "position": "inside_class",
-              "code": "\n    async def set(\n        self, messages, model, temperature,\n        response, ttl=None\n    ):\n        key = self._make_key(messages, model, temperature)\n        await self._redis.set(\n            key, json.dumps(response),\n            ex=ttl or self._default_ttl\n        )\n\n    def get_stats(self):\n        total = self._hits + self._misses\n        hit_rate = self._hits / total * 100 if total > 0 else 0\n        return {\n            \"hits\": self._hits,\n            \"misses\": self._misses,\n            \"hit_rate\": f\"{hit_rate:.1f}%\"\n        }",
+              "code": "    async def get(self, messages, model, temperature):\n        key = self._make_key(messages, model, temperature)\n        cached = await self._redis.get(key)\n        if cached:\n            self._hits += 1\n            return json.loads(cached)\n        self._misses += 1\n        return None",
+              "why": "Bu kısım asenkron işlem ve kontrol akışı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "5.6",
+              "action": "set ve get_stats metodlarını ekle (bölüm 1/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cache.py",
+              "position": "inside_class",
+              "code": "async def set(\n        self, messages, model, temperature,\n        response, ttl=None\n    ):\n        key = self._make_key(messages, model, temperature)\n        await self._redis.set(",
               "why": "5.5'teki get ile çift — set cache'e yazar. TTL (Time To Live) ile cache otomatik temizlenir. get_stats ile cache etkinliğini ölçebilirsin."
             },
             {
+              "order": "5.6b",
+              "action": "DEVAM: set ve get_stats metodlarını ekle (bölüm 2/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cache.py",
+              "position": "inside_class",
+              "code": "            key, json.dumps(response),\n            ex=ttl or self._default_ttl\n        )\n",
+              "why": "Python modül yapısı her dosyanın tek bir sorumluluğa sahip olmasını sağlar — import sistemi bağımlılıkları açıkça tanımlar."
+            },
+            {
+              "order": "5.6c",
+              "action": "DEVAM: set ve get_stats metodlarını ekle (bölüm 3/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cache.py",
+              "position": "inside_class",
+              "code": "    def get_stats(self):\n        total = self._hits + self._misses\n        hit_rate = self._hits / total * 100 if total > 0 else 0\n        return {\n            \"hits\": self._hits,\n            \"misses\": self._misses,",
+              "why": "Bu kısım kontrol akışı ve dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "5.6d",
+              "action": "DEVAM: set ve get_stats metodlarını ekle (bölüm 4/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cache.py",
+              "position": "inside_class",
+              "code": "            \"hit_rate\": f\"{hit_rate:.1f}%\"\n        }",
+              "why": "Python modül yapısı her dosyanın tek bir sorumluluğa sahip olmasını sağlar — import sistemi bağımlılıkları açıkça tanımlar."
+            },
+            {
               "order": "5.7",
-              "action": "BAŞKA DOSYAYA GEÇ — cost_tracker.py oluştur, iskeletini yaz",
+              "action": "BAŞKA DOSYAYA GEÇ — cost_tracker.py oluştur, iskeletini yaz (bölüm 1/2)",
               "type": "code_write",
               "file": "ai_content_platform/core/cost_tracker.py",
-              "code": "from datetime import datetime, timezone\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy import select, func\nimport uuid\nfrom ai_content_platform.core.models import UsageLog\n\n\nclass CostTracker:\n    def __init__(\n        self, db: AsyncSession,\n        monthly_budget: float = 100.0\n    ):\n        self.db = db\n        self.monthly_budget = monthly_budget",
+              "code": "from datetime import datetime, timezone\nfrom sqlalchemy.ext.asyncio import AsyncSession\nfrom sqlalchemy import select, func\nimport uuid\nfrom ai_content_platform.core.models import UsageLog\n\n",
               "why": "Önce iskelet — veritabanı bağlantısı ve bütçe limiti. Her API çağrısının maliyetini burada loglayacağız."
             },
             {
+              "order": "5.7b",
+              "action": "DEVAM: BAŞKA DOSYAYA GEÇ — cost_tracker.py oluştur, iskeletini yaz (bölüm 2/2)",
+              "type": "code_write",
+              "file": "ai_content_platform/core/cost_tracker.py",
+              "code": "class CostTracker:\n    def __init__(\n        self, db: AsyncSession,\n        monthly_budget: float = 100.0\n    ):\n        self.db = db\n        self.monthly_budget = monthly_budget",
+              "why": "Bu kısım sınıf tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
               "order": "5.8",
-              "action": "CostTracker'a GERİ DÖN — log_usage metodunu ekle",
+              "action": "CostTracker'a GERİ DÖN — log_usage metodunu ekle (bölüm 1/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/cost_tracker.py",
               "position": "inside_class",
-              "code": "\n    async def log_usage(\n        self, provider, model,\n        input_tokens, output_tokens,\n        cost, status=\"success\"\n    ):\n        log = UsageLog(\n            id=str(uuid.uuid4()),\n            provider=provider, model=model,\n            input_tokens=input_tokens,\n            output_tokens=output_tokens,\n            cost_usd=cost,\n            endpoint=\"/api/content/generate\",\n            status=status\n        )\n        self.db.add(log)\n        await self.db.commit()",
+              "code": "async def log_usage(\n        self, provider, model,\n        input_tokens, output_tokens,\n        cost, status=\"success\"\n    ):\n        log = UsageLog(\n            id=str(uuid.uuid4()),\n            provider=provider, model=model,",
               "why": "5.7'deki iskeletin içine kayıt mantığını ekliyoruz. Her API çağrısının maliyeti burada veritabanına yazılır."
             },
             {
               "order": "5.8b",
-              "action": "Aylık maliyet raporu metodunu ekle",
+              "action": "DEVAM: CostTracker'a GERİ DÖN — log_usage metodunu ekle (bölüm 2/2)",
               "type": "code_add",
               "file": "ai_content_platform/core/cost_tracker.py",
               "position": "inside_class",
-              "code": "\n    async def get_monthly_report(self):\n        start = datetime.now(timezone.utc).replace(\n            day=1, hour=0, minute=0, second=0\n        )\n        result = await self.db.execute(\n            select(\n                UsageLog.provider,\n                func.sum(UsageLog.cost_usd).label(\"total_cost\"),\n                func.count().label(\"request_count\")\n            )\n            .where(UsageLog.created_at >= start)\n            .group_by(UsageLog.provider)\n        )\n        providers = []\n        total_cost = 0.0\n        for row in result:\n            providers.append({\n                \"provider\": row.provider,\n                \"total_cost\": round(row.total_cost, 4),\n                \"request_count\": row.request_count\n            })\n            total_cost += row.total_cost\n        return {\n            \"period\": start.strftime(\"%Y-%m\"),\n            \"total_cost\": round(total_cost, 4),\n            \"budget\": self.monthly_budget,\n            \"providers\": providers\n        }",
+              "code": "            input_tokens=input_tokens,\n            output_tokens=output_tokens,\n            cost_usd=cost,\n            endpoint=\"/api/content/generate\",\n            status=status\n        )\n        self.db.add(log)\n        await self.db.commit()",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "5.8b",
+              "action": "Aylık maliyet raporu metodunu ekle (bölüm 1/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cost_tracker.py",
+              "position": "inside_class",
+              "code": "async def get_monthly_report(self):\n        start = datetime.now(timezone.utc).replace(\n            day=1, hour=0, minute=0, second=0\n        )\n        result = await self.db.execute(\n            select(\n                UsageLog.provider,",
               "why": "5.8'deki log_usage kayıt yapar, bu metod ise o kayıtlardan aylık rapor üretir. Provider bazında harcama gösterir."
+            },
+            {
+              "order": "5.8bb",
+              "action": "DEVAM: Aylık maliyet raporu metodunu ekle (bölüm 2/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cost_tracker.py",
+              "position": "inside_class",
+              "code": "                func.sum(UsageLog.cost_usd).label(\"total_cost\"),\n                func.count().label(\"request_count\")\n            )\n            .where(UsageLog.created_at >= start)\n            .group_by(UsageLog.provider)\n        )\n        providers = []",
+              "why": "Provider abstraction farklı servisleri tek bir arayüz arkasında birleştirir — yeni provider eklemek mevcut kodu bozmaz."
+            },
+            {
+              "order": "5.8bc",
+              "action": "DEVAM: Aylık maliyet raporu metodunu ekle (bölüm 3/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cost_tracker.py",
+              "position": "inside_class",
+              "code": "        total_cost = 0.0\n        for row in result:\n            providers.append({\n                \"provider\": row.provider,\n                \"total_cost\": round(row.total_cost, 4),\n                \"request_count\": row.request_count\n            })",
+              "why": "Provider abstraction farklı servisleri tek bir arayüz arkasında birleştirir — yeni provider eklemek mevcut kodu bozmaz."
+            },
+            {
+              "order": "5.8bd",
+              "action": "DEVAM: Aylık maliyet raporu metodunu ekle (bölüm 4/4)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/cost_tracker.py",
+              "position": "inside_class",
+              "code": "            total_cost += row.total_cost\n        return {\n            \"period\": start.strftime(\"%Y-%m\"),\n            \"total_cost\": round(total_cost, 4),\n            \"budget\": self.monthly_budget,\n            \"providers\": providers\n        }",
+              "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "5.9",
@@ -1363,11 +2063,19 @@
             },
             {
               "order": "5.10",
-              "action": "Redis bağlantısını test et",
+              "action": "Redis bağlantısını test et (bölüm 1/2)",
               "type": "terminal",
-              "command": "python -c \"import asyncio\nimport redis.asyncio as r\nasync def test():\n    client = r.from_url('redis://localhost:6379', decode_responses=True)\n    await client.set('test_key', 'merhaba')\n    val = await client.get('test_key')\n    print(f'Redis çalışıyor: {val}')\n    await client.delete('test_key')\nasyncio.run(test())\"",
+              "command": "python -c \"import asyncio\nimport redis.asyncio as r\nasync def test():\n    client = r.from_url('redis://localhost:6379', decode_responses=True)\n    await client.set('test_key', 'merhaba')",
               "expected_output": "Redis çalışıyor: merhaba",
               "why": "5.2'de başlattığımız Redis'in gerçekten çalıştığını doğruluyoruz. Cache modülünü entegre etmeden önce altyapının hazır olduğunu garantiliyoruz."
+            },
+            {
+              "order": "5.10b",
+              "action": "DEVAM: Redis bağlantısını test et (bölüm 2/2)",
+              "type": "terminal",
+              "command": "    val = await client.get('test_key')\n    print(f'Redis çalışıyor: {val}')\n    await client.delete('test_key')\nasyncio.run(test())\"",
+              "expected_output": "Redis çalışıyor: merhaba",
+              "why": "Bu kısım asenkron işlem içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "5.11",
@@ -1558,21 +2266,48 @@
             },
             {
               "order": "3.2",
-              "action": "README'ye GERİ DÖN — tech stack ve özellik listesini ekle",
+              "action": "README'ye GERİ DÖN — tech stack ve özellik listesini ekle (bölüm 1/3)",
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "\n\n## Tech Stack\n- **Backend:** FastAPI, Python, PostgreSQL, Redis\n- **AI/ML:** OpenAI, Anthropic, Google Gemini\n- **DevOps:** Docker, Docker Compose\n\n## Features\n- Multi-provider LLM integration\n- Automatic provider fallback with circuit breaker\n- Streaming SSE responses\n- Prompt versioning and A/B testing\n- Cost tracking and analytics\n- Redis caching for LLM responses",
+              "code": "## Tech Stack\n- **Backend:** FastAPI, Python, PostgreSQL, Redis\n- **AI/ML:** OpenAI, Anthropic, Google Gemini\n- **DevOps:** Docker, Docker Compose\n",
               "why": "3.1'deki iskeletin altına detay ekliyoruz. Recruiter'lar bu bölüme bakarak projenin kapsamını anlar."
             },
             {
-              "order": "3.3",
-              "action": "Kurulum talimatlarını ekle",
+              "order": "3.2b",
+              "action": "DEVAM: README'ye GERİ DÖN — tech stack ve özellik listesini ekle (bölüm 2/3)",
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "\n\n## Getting Started\n```bash\ngit clone https://github.com/USERNAME/ai-content-platform.git\ncd ai-content-platform\nuv sync\ndocker compose up -d\ncp .env.example .env\nuvicorn ai_content_platform.main:app --reload\n```\n\n## License\nMIT",
+              "code": "## Features\n- Multi-provider LLM integration\n- Automatic provider fallback with circuit breaker\n- Streaming SSE responses\n- Prompt versioning and A/B testing\n- Cost tracking and analytics",
+              "why": "Bu kısım yapılandırma içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
+            },
+            {
+              "order": "3.2c",
+              "action": "DEVAM: README'ye GERİ DÖN — tech stack ve özellik listesini ekle (bölüm 3/3)",
+              "type": "code_add",
+              "file": "README.md",
+              "position": "bottom",
+              "code": "- Redis caching for LLM responses",
+              "why": "Cache katmanı tekrarlanan sorguları bellekten karşılar — veritabanı yükünü azaltır ve yanıt süresini düşürür."
+            },
+            {
+              "order": "3.3",
+              "action": "Kurulum talimatlarını ekle (bölüm 1/2)",
+              "type": "code_add",
+              "file": "README.md",
+              "position": "bottom",
+              "code": "## Getting Started\n```bash\ngit clone https://github.com/USERNAME/ai-content-platform.git\ncd ai-content-platform\nuv sync\ndocker compose up -d",
               "why": "3.2'deki özellik listesinden sonra nasıl çalıştırılacağı lazım. Başka bir developer'ın projeyi 5 dakikada ayağa kaldırabilmesi gerekir."
+            },
+            {
+              "order": "3.3b",
+              "action": "DEVAM: Kurulum talimatlarını ekle (bölüm 2/2)",
+              "type": "code_add",
+              "file": "README.md",
+              "position": "bottom",
+              "code": "cp .env.example .env\nuvicorn ai_content_platform.main:app --reload\n```\n\n## License\nMIT",
+              "why": "Bu kısım yapılandırma içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
               "order": "3.4",

@@ -201,7 +201,7 @@
               "action": "Compose konfigürasyonunu yaz — services bloğu ile başla",
               "type": "code_write",
               "file": "docker-compose.yml",
-              "code": "version: '3.8'\nservices:\n  postgres:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: support\n      POSTGRES_USER: admin\n      POSTGRES_PASSWORD: dev123",
+              "code": "version: '3.8'\nservices:\n  postgres:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: support\n      POSTGRES_USER: admin",
               "why": "Önce veritabanı servisini tanımlıyoruz — diğer servisler buna bağımlı. volumes ile PostgreSQL verisi container silinse bile kalıcı olur."
             },
             {
@@ -209,8 +209,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "docker-compose.yml",
-              "code": "    ports:\n      - '5432:5432'\n    volumes:\n      - pgdata:/var/lib/postgresql/data",
-              "why": "PostgreSQL varsayılan 5432 portunu dışarı açıyoruz. volumes ile veri container silinse bile kalıcı olur — geliştirme sırasında veri kaybı yaşanmaz."
+              "code": "      POSTGRES_PASSWORD: dev123\n    ports:\n      - '5432:5432'\n    volumes:\n      - pgdata:/var/lib/postgresql/data",
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
               "order": "1.7",
@@ -218,26 +218,26 @@
               "type": "code_add",
               "file": "docker-compose.yml",
               "position": "after_postgres",
-              "code": "redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'\n\n  orchestrator:\n    build: ./orchestrator\n    ports:",
+              "code": "redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'\n\n  orchestrator:\n    build: ./orchestrator",
               "why": "depends_on ile başlatma sırası belirlenir: önce DB ve Redis, sonra orchestrator, en son gateway. Environment variable'lar container içi iletişimi sağlar."
             },
             {
               "order": "1.7a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.yml",
               "position": "after_postgres",
-              "code": "      - '8000:8000'\n    environment:\n      - DATABASE_URL=postgresql://admin:dev123@postgres:5432/support\n      - REDIS_URL=redis://redis:6379\n      - OPENAI_API_KEY=${OPENAI_API_KEY}\n    depends_on:\n      - postgres\n      - redis",
-              "why": "Orchestrator'a veritabanı, Redis ve OpenAI bağlantı bilgilerini environment variable olarak geçiyoruz. Container'lar arasi iletişim servis adıyla yapılır (postgres:5432)."
+              "code": "    ports:\n      - '8000:8000'\n    environment:\n      - DATABASE_URL=postgresql://admin:dev123@postgres:5432/support\n      - REDIS_URL=redis://redis:6379\n      - OPENAI_API_KEY=${OPENAI_API_KEY}\n    depends_on:",
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
               "order": "1.7b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.yml",
               "position": "after_postgres",
-              "code": "\n  gateway:\n    build: ./gateway\n    ports:\n      - '3001:3001'\n    environment:\n      - REDIS_URL=redis://redis:6379\n      - ORCHESTRATOR_URL=http://orchestrator:8000",
-              "why": "Gateway servisi WebSocket bağlantılarını yönetecek. Orchestrator'a HTTP üzerinden bağlanır — separation of concerns: WS işlemleri gateway'de, AI işlemleri orchestrator'da."
+              "code": "      - postgres\n      - redis\n\n  gateway:\n    build: ./gateway\n    ports:\n      - '3001:3001'",
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
               "order": "1.7c",
@@ -245,8 +245,8 @@
               "type": "code_add",
               "file": "docker-compose.yml",
               "position": "after_postgres",
-              "code": "    depends_on:\n      - redis\n      - orchestrator\n\nvolumes:\n  pgdata:",
-              "why": "depends_on ile gateway'in orchestrator'dan önce başlamamasını sağlıyoruz. pgdata volume tanımı YAML'in en altında olmalı — Docker Compose volumes formatı."
+              "code": "    environment:\n      - REDIS_URL=redis://redis:6379\n      - ORCHESTRATOR_URL=http://orchestrator:8000\n    depends_on:\n      - redis\n      - orchestrator\nvolumes:\n  pgdata:",
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
               "order": "1.8",
@@ -269,7 +269,7 @@
               "action": "ÜSTE ÇIK — CORS middleware import et, sonra GERİ DÖN app'e ekle",
               "type": "code_modify",
               "file": "orchestrator/main.py",
-              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI(\n    title=\"Multi-Agent Support Orchestrator\"\n)\n\napp.add_middleware(",
+              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI(\n    title=\"Multi-Agent Support Orchestrator\"\n)\n",
               "why": "CORS middleware frontend'den gelen isteklere izin verir. Geliştirme ortamında allow_origins=[\"*\"] hızlı başlamak için yeterli."
             },
             {
@@ -277,8 +277,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/main.py",
-              "code": "    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)",
-              "why": "CORS ayarları frontend'in backend'e istek atabilmesi için zorunlu. allow_origins=['*'] geliştirmede her origin'e izin verir — production'da bunu kısıtlamalısın."
+              "code": "app.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)",
+              "why": "Ana uygulama konfigürasyonunu tamamlıyoruz. Middleware ve router'lar modüler şekilde eklenir."
             },
             {
               "order": "1.11",
@@ -360,7 +360,7 @@
               "action": "GERİ DÖN AgentState'e — metadata alanlarını ekle",
               "type": "code_modify",
               "file": "orchestrator/agents/state.py",
-              "code": "class AgentState(TypedDict):\n    messages: Annotated[list, add_messages]\n    current_agent: str\n    intent: str\n    confidence: float\n    context: dict\n    customer_sentiment: int  # 1-5\n    attempted_solutions: List[str]",
+              "code": "class AgentState(TypedDict):\n    messages: Annotated[list, add_messages]\n    current_agent: str\n    intent: str\n    confidence: float\n    context: dict\n    customer_sentiment: int  # 1-5",
               "why": "Her alan bir sorumluluğa karşılık gelir: current_agent hangi agent aktif, intent nereye yönlendirilecek, confidence ne kadar emin. Bu alanlar ilerideki route_decision fonksiyonunda kullanılacak."
             },
             {
@@ -368,16 +368,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/state.py",
-              "code": "    escalation_reason: Optional[str]",
-              "why": "Agent state'ine ek alanlar ekliyoruz. escalation_reason neden insana aktarıldığını kaydeder — handoff sırasında context kaybını önler."
-            },
-            {
-              "order": "2.5",
-              "action": "BAŞKA DOSYAYA GEÇ — orchestrator/agents/graph.py oluştur, graph iskeletini yaz",
-              "type": "code_write",
-              "file": "orchestrator/agents/graph.py",
-              "code": "from langgraph.graph import StateGraph, END\nfrom .state import AgentState",
-              "why": "Graph dosyası tüm agent'ların ve aralarındaki geçişlerin tanımlandığı ana dosya. Önce import'ları yazıyoruz — 2.3'te tanımladığımız AgentState'i buraya çekiyoruz."
+              "code": "    attempted_solutions: List[str]\n    escalation_reason: Optional[str]\nfrom langgraph.graph import StateGraph, END\nfrom .state import AgentState",
+              "why": "State alanlarını tamamlıyoruz. Her alan agent geçişlerinde ve karar mantığında kullanılacak."
             },
             {
               "order": "2.6",
@@ -385,7 +377,7 @@
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
               "position": "bottom",
-              "code": "async def router_agent(state: AgentState) -> dict:\n    \"\"\"Intent classification — mesajı doğru agent'a yönlendirir\"\"\"\n    return {\"current_agent\": \"router\",\n            \"intent\": \"faq\", \"confidence\": 0.9}\n\n\nasync def faq_agent(state: AgentState) -> dict:\n    \"\"\"FAQ sorularını knowledge base'den cevaplar\"\"\"",
+              "code": "async def router_agent(state: AgentState) -> dict:\n    \"\"\"Intent classification — mesajı doğru agent'a yönlendirir\"\"\"\n    return {\"current_agent\": \"router\",\n            \"intent\": \"faq\", \"confidence\": 0.9}\n\n\nasync def faq_agent(state: AgentState) -> dict:",
               "why": "Her agent şimdilik placeholder — ileride LLM ile dolduracağız. Ama graph yapısını test edebilmemiz için return formatı doğru olmalı: dict döndürmeliler."
             },
             {
@@ -394,8 +386,17 @@
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
               "position": "bottom",
-              "code": "    return {\"messages\": [{\"role\": \"assistant\",\n            \"content\": \"FAQ cevabı\"}]}\n\n\nasync def tech_agent(state: AgentState) -> dict:\n    \"\"\"Teknik sorunları adım adım çözer\"\"\"\n    return {\"messages\": [{\"role\": \"assistant\",\n            \"content\": \"Teknik destek cevabı\"}]}",
-              "why": "Fonksiyonun gövdesini dolduruyoruz. Her fonksiyon tek bir sorumluluğa sahip — Single Responsibility Principle. Bu, test edilebilirliği ve bakım kolaylığını artırır."
+              "code": "    \"\"\"FAQ sorularını knowledge base'den cevaplar\"\"\"\n    return {\"messages\": [{\"role\": \"assistant\",\n            \"content\": \"FAQ cevabı\"}]}\n\n\nasync def tech_agent(state: AgentState) -> dict:\n    \"\"\"Teknik sorunları adım adım çözer\"\"\"",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
+            },
+            {
+              "order": "2.6b",
+              "action": "GERİ DÖN — devamını yaz",
+              "type": "code_add",
+              "file": "orchestrator/agents/graph.py",
+              "position": "bottom",
+              "code": "    return {\"messages\": [{\"role\": \"assistant\",\n            \"content\": \"Teknik destek cevabı\"}]}",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "2.7",
@@ -413,7 +414,7 @@
               "file": "orchestrator/agents/graph.py",
               "position": "bottom",
               "code": "    confidence = state.get(\"confidence\", 0.0)\n    if confidence < 0.7:\n        return \"escalation\"\n    return intent if intent in [\"faq\", \"technical\",\n           \"escalation\"] else \"escalation\"",
-              "why": "JSX ile UI yapısını tanımlıyoruz. Her component tek bir sorumluluğa sahip — küçük, yeniden kullanılabilir parçalar halinde inşa ediyoruz."
+              "why": "Confidence düşükse güvenli tarafta kal ve escalation'a yönlendir. Bilinmeyen intent'leri de escalation'a göndererek fail-safe davranış sağlıyoruz."
             },
             {
               "order": "2.8",
@@ -430,41 +431,32 @@
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
               "position": "bottom",
-              "code": "    graph.add_conditional_edges(\n        \"router\", route_decision,\n        {\"faq\": \"faq\", \"technical\": \"tech\",\n         \"escalation\": \"escalation\"})\n    graph.add_edge(\"faq\", END)\n    graph.add_edge(\"tech\", END)\n    graph.add_edge(\"escalation\", END)\n",
+              "code": "    graph.add_conditional_edges(\n        \"router\", route_decision,\n        {\"faq\": \"faq\", \"technical\": \"tech\",\n         \"escalation\": \"escalation\"})\n    graph.add_edge(\"faq\", END)\n    graph.add_edge(\"tech\", END)\n    graph.add_edge(\"escalation\", END)\n    return graph.compile()",
               "why": "Conditional edge'ler router agent'ın kararına göre hangi agent'a gidileceğini belirler. Her intent (faq, tech, escalation) farklı bir node'a yönlendirir."
-            },
-            {
-              "order": "2.8b",
-              "action": "GERİ DÖN — devamını yaz",
-              "type": "code_add",
-              "file": "orchestrator/agents/graph.py",
-              "position": "bottom",
-              "code": "    return graph.compile()",
-              "why": "compile() çağrısı graph tanımını çalıştırılabilir hale getirir. Bu noktadan sonra graph.ainvoke() ile agent workflow'unu başlatabiliriz."
             },
             {
               "order": "2.9",
               "action": "BAŞKA DOSYAYA GEÇ — test script'i yaz",
               "type": "code_write",
               "file": "orchestrator/test_graph.py",
-              "code": "import asyncio\nfrom agents.graph import build_graph\n\nasync def main():\n    graph = build_graph()\n    result = await graph.ainvoke({\n        \"messages\": [{\"role\": \"user\",\n            \"content\": \"Şifremi nasıl değiştirebilirim?\"}],",
+              "code": "import asyncio\nfrom agents.graph import build_graph\n\nasync def main():\n    graph = build_graph()\n    result = await graph.ainvoke({\n        \"messages\": [{\"role\": \"user\",",
               "why": "Graph'i compile edip basit bir mesajla test etmek, agent geçişlerinin doğru çalıştığını erken aşamada doğrular."
             },
             {
               "order": "2.9a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/test_graph.py",
-              "code": "        \"current_agent\": \"\", \"intent\": \"\",\n        \"confidence\": 0.0, \"context\": {},\n        \"customer_sentiment\": 3,\n        \"attempted_solutions\": [],\n        \"escalation_reason\": None,\n    })\n    print(\"Final state:\", result)\n",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "            \"content\": \"Şifremi nasıl değiştirebilirim?\"}],\n        \"current_agent\": \"\", \"intent\": \"\",\n        \"confidence\": 0.0, \"context\": {},\n        \"customer_sentiment\": 3,\n        \"attempted_solutions\": [],\n        \"escalation_reason\": None,\n    })",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "2.9b",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/test_graph.py",
-              "code": "asyncio.run(main())",
-              "why": "asyncio.run ile async fonksiyonu test script'inden çalıştırıyoruz. Graph'ın doğru agent'a yönlendirip cevap ürettiğini doğruluyoruz."
+              "code": "    print(\"Final state:\", result)\nasyncio.run(main())",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "2.10",
@@ -529,7 +521,7 @@
               "action": "GERİ DÖN — prompt'a kategorileri ve JSON formatını ekle",
               "type": "code_modify",
               "file": "orchestrator/agents/prompts.py",
-              "code": "ROUTER_SYSTEM_PROMPT = \"\"\"\nSen bir müşteri destek router'ısın.\nGelen mesajı analiz et ve doğru kategoriye yönlendir.\n\nKategoriler:\n- faq: Sık sorulan sorular, genel bilgi talepleri\n- technical: Teknik sorun, hata, bug raporu\n- billing: Ödeme, fatura, abonelik sorunları",
+              "code": "ROUTER_SYSTEM_PROMPT = \"\"\"\nSen bir müşteri destek router'ısın.\nGelen mesajı analiz et ve doğru kategoriye yönlendir.\n\nKategoriler:\n- faq: Sık sorulan sorular, genel bilgi talepleri\n- technical: Teknik sorun, hata, bug raporu",
               "why": "JSON çıktı formatı belirtmek yapılandırılmış yanıt almayı garanti eder. Kategoriler net ve ayrışık olmalı — overlap varsa router hata yapar."
             },
             {
@@ -537,8 +529,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/prompts.py",
-              "code": "- escalation: Kızgın müşteri, karmaşık sorun,\n  insan talebi\n\nJSON formatında yanıt ver:\n{\"intent\": \"faq|technical|billing|escalation\",\n \"confidence\": 0.0-1.0, \"reason\": \"kısa açıklama\"}\n\"\"\"",
-              "why": "Router agent'a hangi kategorilerin mevcut olduğunu ve JSON formatında yanıt vermesini söylüyoruz. Structured output ile intent parsing güvenilir hale gelir."
+              "code": "- billing: Ödeme, fatura, abonelik sorunları\n- escalation: Kızgın müşteri, karmaşık sorun,\n  insan talebi\n\nJSON formatında yanıt ver:\n{\"intent\": \"faq|technical|billing|escalation\",\n \"confidence\": 0.0-1.0, \"reason\": \"kısa açıklama\"}\n\"\"\"",
+              "why": "Agent prompt'larını tamamlıyoruz. Yapılandırılmış talimatlar ile LLM daha tutarlı yanıtlar üretir."
             },
             {
               "order": "3.4",
@@ -546,7 +538,7 @@
               "type": "code_add",
               "file": "orchestrator/agents/prompts.py",
               "position": "bottom",
-              "code": "FAQ_SYSTEM_PROMPT = \"\"\"\nSen bir FAQ uzman agent'ısın. Knowledge base'den\ngelen bilgileri kullanarak müşteri sorularını cevapla.\nCevabın yoksa 'Bu konuda yardımcı olamıyorum,\nsizi teknik destek ekibine yönlendiriyorum' de.\n\"\"\"\n\nTECH_SYSTEM_PROMPT = \"\"\"",
+              "code": "FAQ_SYSTEM_PROMPT = \"\"\"\nSen bir FAQ uzman agent'ısın. Knowledge base'den\ngelen bilgileri kullanarak müşteri sorularını cevapla.\nCevabın yoksa 'Bu konuda yardımcı olamıyorum,\nsizi teknik destek ekibine yönlendiriyorum' de.\n\"\"\"\n",
               "why": "Her agent'ın system prompt'u kısa ve odaklı olmalı — 500 token'dan fazla olmamalı. 3.3'teki router prompt'u ile aynı dosyada tutmak yönetimi kolaylaştırır."
             },
             {
@@ -555,31 +547,32 @@
               "type": "code_add",
               "file": "orchestrator/agents/prompts.py",
               "position": "bottom",
-              "code": "Sen bir teknik destek agent'ısın.\nMüşterinin teknik sorununu adım adım çöz.\n1. Önce sorunu anla — gerekirse ek soru sor\n2. Knowledge base'den ilgili çözümü bul\n3. Adım adım çözüm sun\nMaksimum 5 adım dene. Çözemezsen insan\ndesteğine yönlendir.\n\"\"\"",
-              "why": "Tech agent'ın system prompt'u onu adım adım sorun çözmeye yönlendirir. Yapılandırılmış talimat ile LLM daha tutarlı ve kullanışlı yanıtlar üretir."
+              "code": "TECH_SYSTEM_PROMPT = \"\"\"\nSen bir teknik destek agent'ısın.\nMüşterinin teknik sorununu adım adım çöz.\n1. Önce sorunu anla — gerekirse ek soru sor\n2. Knowledge base'den ilgili çözümü bul\n3. Adım adım çözüm sun\nMaksimum 5 adım dene. Çözemezsen insan",
+              "why": "Agent prompt'larını tamamlıyoruz. Yapılandırılmış talimatlar ile LLM daha tutarlı yanıtlar üretir."
+            },
+            {
+              "order": "3.4b",
+              "action": "GERİ DÖN — devamını yaz",
+              "type": "code_add",
+              "file": "orchestrator/agents/prompts.py",
+              "position": "bottom",
+              "code": "desteğine yönlendir.\n\"\"\"",
+              "why": "Agent prompt'larını tamamlıyoruz. Yapılandırılmış talimatlar ile LLM daha tutarlı yanıtlar üretir."
             },
             {
               "order": "3.5",
               "action": "BAŞKA DOSYAYA GEÇ — orchestrator/config.py oluştur, env değişkenlerini yükle",
               "type": "code_write",
               "file": "orchestrator/config.py",
-              "code": "from dotenv import load_dotenv\nimport os\n\nload_dotenv()\n\nOPENAI_API_KEY = os.getenv(\"OPENAI_API_KEY\")\nREDIS_URL = os.getenv(\n    \"REDIS_URL\", \"redis://localhost:6379\")",
+              "code": "from dotenv import load_dotenv\nimport os\n\nload_dotenv()\n\nOPENAI_API_KEY = os.getenv(\"OPENAI_API_KEY\")\nREDIS_URL = os.getenv(",
               "why": "Config modülü ortam değişkenlerini merkezi bir yerden yönetir. Varsayılan değerler geliştirme ortamı için kolaylık sağlar."
-            },
-            {
-              "order": "3.5a",
-              "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
-              "file": "orchestrator/config.py",
-              "code": "DATABASE_URL = os.getenv(\"DATABASE_URL\")",
-              "why": "Konfigürasyon değerlerini environment variable'lardan okuyoruz. Hardcoded değerler yerine env var kullanmak ortam değişikliğini (dev/staging/prod) kolaylaştırır."
             },
             {
               "order": "3.6",
               "action": "BAŞKA DOSYAYA GEÇ — .env dosyasını oluştur",
               "type": "code_write",
               "file": "orchestrator/.env",
-              "code": "OPENAI_API_KEY=sk-your-api-key-here\nREDIS_URL=redis://localhost:6379\nDATABASE_URL=postgresql://admin:dev123@localhost:5432/support",
+              "code": "    \"REDIS_URL\", \"redis://localhost:6379\")\nDATABASE_URL = os.getenv(\"DATABASE_URL\")\nOPENAI_API_KEY=sk-your-api-key-here\nREDIS_URL=redis://localhost:6379\nDATABASE_URL=postgresql://admin:dev123@localhost:5432/support",
               "why": "API key'ler asla koda gömülmemeli — .env dosyasında tutulur. .gitignore'a .env eklemeyi unutma!"
             },
             {
@@ -604,16 +597,16 @@
               "action": "GERİ DÖN — devamını ekle",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "    try:\n        result = json.loads(response.content)\n        return {\"current_agent\": \"router\",\n                \"intent\": result[\"intent\"],\n                \"confidence\": result[\"confidence\"]}\n    except (json.JSONDecodeError, KeyError):\n        return {\"current_agent\": \"router\",\n                \"intent\": \"escalation\",",
+              "code": "try:\n        result = json.loads(response.content)\n        return {\"current_agent\": \"router\",\n                \"intent\": result[\"intent\"],\n                \"confidence\": result[\"confidence\"]}\n    except (json.JSONDecodeError, KeyError):\n        return {\"current_agent\": \"router\",",
               "why": "Hata yönetimi ile beklenmedik durumları yakalıyoruz. LLM çağrıları timeout, rate limit veya API hatası verebilir — graceful degradation sağlıyoruz."
             },
             {
-              "order": "3.8b",
+              "order": "3.8aa",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "                \"confidence\": 0.0}",
-              "why": "Varsayılan confidence değeri 0.0 ile başlıyor. Agent yanıt ürettikçe bu skor güncellenir — düşük skor escalation kararında kullanılır."
+              "code": "                \"intent\": \"escalation\",\n                \"confidence\": 0.0}",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "3.9",
@@ -678,17 +671,17 @@
               "type": "code_add",
               "file": "orchestrator/models.py",
               "position": "bottom",
-              "code": "class MessageResponse(BaseModel):\n    id: str\n    role: str\n    content: str\n    agent: Optional[str] = None\n    timestamp: datetime\n\nclass ConversationCreate(BaseModel):",
+              "code": "class MessageResponse(BaseModel):\n    id: str\n    role: str\n    content: str\n    agent: Optional[str] = None\n    timestamp: datetime\n",
               "why": "4.2'de yazdığımız MessageRequest ile gelen veriyi alırız, buradaki response modelleri ile yapılandırılmış yanıt döneriz. FastAPI bu modelleri Swagger dokümantasyonunda da gösterir."
             },
             {
               "order": "4.3a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/models.py",
               "position": "bottom",
-              "code": "    customer_name: Optional[str] = None\n    metadata: dict = {}\n\nclass ConversationResponse(BaseModel):\n    id: str\n    messages: List[MessageResponse]\n    current_agent: str\n    status: str",
-              "why": "Pydantic model ile request/response şemasını tanımlıyoruz. Tip güvenliği ve otomatik validasyon sağlar — yanlış veri geldiğinde 422 hatası döner."
+              "code": "class ConversationCreate(BaseModel):\n    customer_name: Optional[str] = None\n    metadata: dict = {}\n\nclass ConversationResponse(BaseModel):\n    id: str\n    messages: List[MessageResponse]",
+              "why": "Pydantic modellerini tamamlıyoruz. Tip güvenliği ve otomatik validasyon sağlanır."
             },
             {
               "order": "4.3b",
@@ -696,8 +689,8 @@
               "type": "code_add",
               "file": "orchestrator/models.py",
               "position": "bottom",
-              "code": "    created_at: datetime",
-              "why": "Zaman damgası alanları kayıtların ne zaman oluşturulduğunu takip eder. Konuşma geçmişini kronolojik sıralama ve analytics için kritik."
+              "code": "    current_agent: str\n    status: str\n    created_at: datetime",
+              "why": "Pydantic modellerini tamamlıyoruz. Tip güvenliği ve otomatik validasyon sağlanır."
             },
             {
               "order": "4.4",
@@ -712,23 +705,15 @@
               "action": "BAŞKA DOSYAYA GEÇ — orchestrator/api/conversations.py oluştur, router iskeletini yaz",
               "type": "code_write",
               "file": "orchestrator/api/conversations.py",
-              "code": "from fastapi import APIRouter, HTTPException\nfrom uuid import uuid4\nfrom datetime import datetime\n\nrouter = APIRouter(\n    prefix=\"/api/conversations\",\n    tags=[\"conversations\"])\n",
+              "code": "from fastapi import APIRouter, HTTPException\nfrom uuid import uuid4\nfrom datetime import datetime\n\nrouter = APIRouter(\n    prefix=\"/api/conversations\",\n    tags=[\"conversations\"])\nconversations = {}",
               "why": "Önce boş router iskeletini yazıyoruz. In-memory dict ile başlıyoruz — veritabanı entegrasyonu sonra yapılacak."
-            },
-            {
-              "order": "4.5a",
-              "action": "GERİ DÖN — devamını yaz",
-              "type": "code_write",
-              "file": "orchestrator/api/conversations.py",
-              "code": "conversations = {}",
-              "why": "In-memory dictionary ile hızlı prototip yapıyoruz. Production'da Redis'e taşıyacağız — şimdilik API mantığını doğrulamak için yeterli."
             },
             {
               "order": "4.6",
               "action": "ÜSTE ÇIK — model ve graph import'larını ekle",
               "type": "code_modify",
               "file": "orchestrator/api/conversations.py",
-              "code": "from fastapi import APIRouter, HTTPException\nfrom uuid import uuid4\nfrom datetime import datetime\nfrom ..models import MessageRequest, ConversationCreate\nfrom ..agents.graph import build_graph\n\nrouter = APIRouter(\n    prefix=\"/api/conversations\",",
+              "code": "from fastapi import APIRouter, HTTPException\nfrom uuid import uuid4\nfrom datetime import datetime\nfrom ..models import MessageRequest, ConversationCreate\nfrom ..agents.graph import build_graph\n\nrouter = APIRouter(",
               "why": "4.2-4.3'te yazdığımız Pydantic modellerini ve 2.8'de yazdığımız build_graph'ı import ediyoruz. graph = build_graph() compile edilmiş graph'ı bir kez oluşturur."
             },
             {
@@ -736,8 +721,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/api/conversations.py",
-              "code": "    tags=[\"conversations\"])\n\nconversations = {}\ngraph = build_graph()",
-              "why": "In-memory dictionary ile hızlı prototip yapıyoruz. Production'da Redis'e taşıyacağız — şimdilik API mantığını doğrulamak için yeterli."
+              "code": "    prefix=\"/api/conversations\",\n    tags=[\"conversations\"])\n\nconversations = {}\ngraph = build_graph()",
+              "why": "API endpoint mantığını tamamlıyoruz. Her endpoint tek bir sorumluluğa sahip — temiz ve test edilebilir kod."
             },
             {
               "order": "4.7",
@@ -754,17 +739,8 @@
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
               "position": "bottom",
-              "code": "\n@router.post(\"/{conv_id}/messages\")\nasync def send_message(conv_id: str,\n                       msg: MessageRequest):\n    if conv_id not in conversations:\n        raise HTTPException(404, \"Not found\")\n    conv = conversations[conv_id]\n    conv[\"messages\"].append(",
+              "code": "\n@router.post(\"/{conv_id}/messages\")\nasync def send_message(conv_id: str,\n                       msg: MessageRequest):\n    if conv_id not in conversations:\n        raise HTTPException(404, \"Not found\")\n    conv = conversations[conv_id]\n    conv[\"messages\"].append(\n        {\"role\": msg.role, \"content\": msg.content})",
               "why": "Hata yönetimi ile beklenmedik durumları yakalıyoruz. LLM çağrıları timeout, rate limit veya API hatası verebilir — graceful degradation sağlıyoruz."
-            },
-            {
-              "order": "4.7b",
-              "action": "GERİ DÖN — devamını yaz",
-              "type": "code_add",
-              "file": "orchestrator/api/conversations.py",
-              "position": "bottom",
-              "code": "        {\"role\": msg.role, \"content\": msg.content})",
-              "why": "4.7 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
             },
             {
               "order": "4.8",
@@ -772,7 +748,7 @@
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
               "position": "inside_send_message",
-              "code": "result = await graph.ainvoke({\n        \"messages\": conv[\"messages\"],\n        \"current_agent\": conv[\"current_agent\"],\n        \"intent\": \"\", \"confidence\": 0.0,\n        \"context\": {}, \"customer_sentiment\": 3,\n        \"attempted_solutions\": [],\n        \"escalation_reason\": None})\n    assistant_msg = result[\"messages\"][-1]",
+              "code": "result = await graph.ainvoke({\n        \"messages\": conv[\"messages\"],\n        \"current_agent\": conv[\"current_agent\"],\n        \"intent\": \"\", \"confidence\": 0.0,\n        \"context\": {}, \"customer_sentiment\": 3,\n        \"attempted_solutions\": [],\n        \"escalation_reason\": None})",
               "why": "2.8'de build ettiğimiz graph'ı burada çağırıyoruz. graph.ainvoke tüm agent akışını çalıştırır ve sonucu döndürür."
             },
             {
@@ -781,8 +757,8 @@
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
               "position": "inside_send_message",
-              "code": "    conv[\"messages\"].append(assistant_msg)\n    conv[\"current_agent\"] = result.get(\n        \"current_agent\", \"\")\n    return {\"response\": assistant_msg,\n            \"agent\": result.get(\"intent\", \"\")}",
-              "why": "Agent yanıtını konuşma geçmişine ekliyoruz ve aktif agent'ı güncelliyoruz. Frontend bu bilgiyle hangi agent'ın cevap verdiğini gösterebilir."
+              "code": "    assistant_msg = result[\"messages\"][-1]\n    conv[\"messages\"].append(assistant_msg)\n    conv[\"current_agent\"] = result.get(\n        \"current_agent\", \"\")\n    return {\"response\": assistant_msg,\n            \"agent\": result.get(\"intent\", \"\")}",
+              "why": "API endpoint mantığını tamamlıyoruz. Her endpoint tek bir sorumluluğa sahip — temiz ve test edilebilir kod."
             },
             {
               "order": "4.9",
@@ -790,7 +766,7 @@
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
               "position": "bottom",
-              "code": "@router.get(\"/{conv_id}\")\nasync def get_conversation(conv_id: str):\n    if conv_id not in conversations:\n        raise HTTPException(404, \"Not found\")\n    return conversations[conv_id]\n\n@router.get(\"\")\nasync def list_conversations():",
+              "code": "@router.get(\"/{conv_id}\")\nasync def get_conversation(conv_id: str):\n    if conv_id not in conversations:\n        raise HTTPException(404, \"Not found\")\n    return conversations[conv_id]\n\n@router.get(\"\")",
               "why": "GET endpoint'leri konuşma detayını ve listesini döndürür. Frontend'de konuşma geçmişini göstermek için kullanacağız."
             },
             {
@@ -799,15 +775,15 @@
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
               "position": "bottom",
-              "code": "    return list(conversations.values())",
-              "why": "Tüm aktif konuşmaları liste olarak döndürüyoruz. Dashboard'da konuşma listesi ve agent performans metrikleri için bu endpoint kullanılacak."
+              "code": "async def list_conversations():\n    return list(conversations.values())",
+              "why": "API endpoint mantığını tamamlıyoruz. Her endpoint tek bir sorumluluğa sahip — temiz ve test edilebilir kod."
             },
             {
               "order": "4.10",
               "action": "GERİ DÖN main.py'ye — router'ı include et",
               "type": "code_modify",
               "file": "orchestrator/main.py",
-              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom api.conversations import router as conv_router\n\napp = FastAPI(\n    title=\"Multi-Agent Support Orchestrator\")\napp.add_middleware(\n    CORSMiddleware, allow_origins=[\"*\"],",
+              "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom api.conversations import router as conv_router\n\napp = FastAPI(\n    title=\"Multi-Agent Support Orchestrator\")\napp.add_middleware(",
               "why": "1.9-1.11'de yazdığımız main.py'ye şimdi API router'ını ekliyoruz. include_router modüler API yapısı sağlar."
             },
             {
@@ -815,8 +791,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/main.py",
-              "code": "    allow_credentials=True,\n    allow_methods=[\"*\"], allow_headers=[\"*\"])\napp.include_router(conv_router)",
-              "why": "Router'ı ana app'e bağlıyoruz. include_router ile endpoint'ler modüler tutulur — her API grubu ayrı dosyada tanımlanır, main.py temiz kalır."
+              "code": "    CORSMiddleware, allow_origins=[\"*\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"], allow_headers=[\"*\"])\napp.include_router(conv_router)",
+              "why": "Ana uygulama konfigürasyonunu tamamlıyoruz. Middleware ve router'lar modüler şekilde eklenir."
             },
             {
               "order": "4.11",
@@ -922,7 +898,7 @@
               "action": "orchestrator/services/faq_service.py oluştur — servis iskeletini yaz",
               "type": "code_write",
               "file": "orchestrator/services/faq_service.py",
-              "code": "import json\nfrom pathlib import Path\nfrom dataclasses import dataclass\nfrom typing import List\n\n@dataclass\nclass FAQResult:\n    id: str",
+              "code": "import json\nfrom pathlib import Path\nfrom dataclasses import dataclass\nfrom typing import List\n\n@dataclass\nclass FAQResult:",
               "why": "Önce veri yapısını (dataclass) tanımlıyoruz. FAQResult arama sonuçlarını temsil eder — score alanı sonuçları sıralamak için kullanılacak."
             },
             {
@@ -930,8 +906,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/services/faq_service.py",
-              "code": "    question: str\n    answer: str\n    score: float",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "    id: str\n    question: str\n    answer: str\n    score: float",
+              "why": "FAQ arama fonksiyonunu tamamlıyoruz. Sonuçlar skora göre sıralanıp en alakalı FAQ'lar döndürülür."
             },
             {
               "order": "1.6",
@@ -939,17 +915,17 @@
               "type": "code_add",
               "file": "orchestrator/services/faq_service.py",
               "position": "bottom",
-              "code": "def load_faqs() -> list:\n    faq_path = Path(__file__).parent.parent / \"data\" / \"faqs.json\"\n    with open(faq_path, \"r\", encoding=\"utf-8\") as f:\n        return json.load(f)\n\nasync def search_faqs(query: str,\n                      top_k: int = 3) -> List[FAQResult]:\n    faqs = load_faqs()",
+              "code": "def load_faqs() -> list:\n    faq_path = Path(__file__).parent.parent / \"data\" / \"faqs.json\"\n    with open(faq_path, \"r\", encoding=\"utf-8\") as f:\n        return json.load(f)\n\nasync def search_faqs(query: str,\n                      top_k: int = 3) -> List[FAQResult]:",
               "why": "1.2-1.3'te oluşturduğumuz faqs.json'ı yüklüyor. İlk aşamada basit keyword matching — hızlı sonuç verir. İleride M3'te embedding-based semantic search ekleyeceğiz."
             },
             {
               "order": "1.6a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/faq_service.py",
               "position": "bottom",
-              "code": "    results = []\n    query_lower = query.lower()\n    for faq in faqs:\n        score = 0.0\n        for kw in faq.get(\"keywords\", []):\n            if kw.lower() in query_lower:\n                score += 0.3\n        if score > 0:",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "    faqs = load_faqs()\n    results = []\n    query_lower = query.lower()\n    for faq in faqs:\n        score = 0.0\n        for kw in faq.get(\"keywords\", []):\n            if kw.lower() in query_lower:",
+              "why": "FAQ arama fonksiyonunu tamamlıyoruz. Sonuçlar skora göre sıralanıp en alakalı FAQ'lar döndürülür."
             },
             {
               "order": "1.6b",
@@ -957,8 +933,8 @@
               "type": "code_add",
               "file": "orchestrator/services/faq_service.py",
               "position": "bottom",
-              "code": "            results.append(FAQResult(\n                id=faq[\"id\"], question=faq[\"question\"],\n                answer=faq[\"answer\"],\n                score=min(score, 1.0)))\n    results.sort(key=lambda x: x.score, reverse=True)\n    return results[:top_k]",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "                score += 0.3\n        if score > 0:\n            results.append(FAQResult(\n                id=faq[\"id\"], question=faq[\"question\"],\n                answer=faq[\"answer\"],\n                score=min(score, 1.0)))\n    results.sort(key=lambda x: x.score, reverse=True)\n    return results[:top_k]",
+              "why": "FAQ arama fonksiyonunu tamamlıyoruz. Sonuçlar skora göre sıralanıp en alakalı FAQ'lar döndürülür."
             },
             {
               "order": "1.7",
@@ -974,24 +950,24 @@
               "action": "GERİ DÖN faq_agent fonksiyonuna — placeholder'ı gerçek implementasyonla değiştir",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "async def faq_agent(state: AgentState) -> dict:\n    query = state[\"messages\"][-1][\"content\"]\n    relevant_faqs = await search_faqs(query, top_k=3)\n    if not relevant_faqs or relevant_faqs[0].score < 0.3:\n        return {\n            \"current_agent\": \"faq\",\n            \"intent\": \"needs_escalation\",\n            \"messages\": [{\"role\": \"assistant\",",
+              "code": "async def faq_agent(state: AgentState) -> dict:\n    query = state[\"messages\"][-1][\"content\"]\n    relevant_faqs = await search_faqs(query, top_k=3)\n    if not relevant_faqs or relevant_faqs[0].score < 0.3:\n        return {\n            \"current_agent\": \"faq\",\n            \"intent\": \"needs_escalation\",",
               "why": "M0 Step 2'deki placeholder'ı gerçek implementasyonla değiştiriyoruz. Önce 1.6'daki search_faqs ile arama yapar, sonuç yoksa tech'e yönlendirir, varsa LLM'e context vererek doğal cevap üretir."
             },
             {
               "order": "1.8a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "                \"content\": \"Bu konuda bilgim yeterli değil.\"\n                \" Sizi teknik destek ekibine\"\n                \" yönlendiriyorum.\"}]}\n    context = \"\\n\".join(\n        [f\"S: {f.question}\\nC: {f.answer}\"\n         for f in relevant_faqs])\n    response = await llm.ainvoke([\n        SystemMessage(content=FAQ_SYSTEM_PROMPT),",
-              "why": "Tech agent'ın system prompt'u onu adım adım sorun çözmeye yönlendirir. Yapılandırılmış talimat ile LLM daha tutarlı ve kullanışlı yanıtlar üretir."
+              "code": "            \"messages\": [{\"role\": \"assistant\",\n                \"content\": \"Bu konuda bilgim yeterli değil.\"\n                \" Sizi teknik destek ekibine\"\n                \" yönlendiriyorum.\"}]}\n    context = \"\\n\".join(\n        [f\"S: {f.question}\\nC: {f.answer}\"\n         for f in relevant_faqs])",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "1.8b",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "        HumanMessage(content=\n            f\"Soru: {query}\\nBilgiler:\\n{context}\")])\n    return {\"current_agent\": \"faq\",\n            \"messages\": [{\"role\": \"assistant\",\n                \"content\": response.content}]}",
-              "why": "Agent yanıtını konuşma geçmişine ekliyoruz ve aktif agent'ı güncelliyoruz. Frontend bu bilgiyle hangi agent'ın cevap verdiğini gösterebilir."
+              "code": "    response = await llm.ainvoke([\n        SystemMessage(content=FAQ_SYSTEM_PROMPT),\n        HumanMessage(content=\n            f\"Soru: {query}\\nBilgiler:\\n{context}\")])\n    return {\"current_agent\": \"faq\",\n            \"messages\": [{\"role\": \"assistant\",\n                \"content\": response.content}]}",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "1.9",
@@ -1040,7 +1016,7 @@
               "action": "orchestrator/data/troubleshooting.json dosyasını oluştur — tek bir issue ile başla",
               "type": "code_write",
               "file": "orchestrator/data/troubleshooting.json",
-              "code": "[\n  {\"id\": \"ts-001\",\n   \"issue\": \"Uygulama açılmıyor\",\n   \"steps\": [\n     \"1. Uygulamayı tamamen kapatıp yeniden açın\",\n     \"2. Cihazınızı yeniden başlatın\",\n     \"3. Uygulamayı güncelleyin\",\n     \"4. Uygulamayı silip yeniden yükleyin\"],",
+              "code": "[\n  {\"id\": \"ts-001\",\n   \"issue\": \"Uygulama açılmıyor\",\n   \"steps\": [\n     \"1. Uygulamayı tamamen kapatıp yeniden açın\",\n     \"2. Cihazınızı yeniden başlatın\",\n     \"3. Uygulamayı güncelleyin\",",
               "why": "Senior developer tek bir kayıtla başlar, yapının doğru olduğunu doğrular."
             },
             {
@@ -1048,57 +1024,48 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/data/troubleshooting.json",
-              "code": "   \"category\": \"app\",\n   \"keywords\": [\"açılmıyor\", \"crash\", \"çöküyor\"]}\n]",
-              "why": "Sorun giderme veritabanını JSON formatında tanımlıyoruz. keywords dizisi intent matching için kullanılır — kullanıcı mesajındaki anahtar kelimelerle eşleştirilir."
+              "code": "     \"4. Uygulamayı silip yeniden yükleyin\"],\n   \"category\": \"app\",\n   \"keywords\": [\"açılmıyor\", \"crash\", \"çöküyor\"]}\n]",
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
             },
             {
               "order": "2.2",
               "action": "GERİ DÖN — ikinci troubleshooting kaydını ekle",
               "type": "code_modify",
               "file": "orchestrator/data/troubleshooting.json",
-              "code": "[\n  {\"id\":\"ts-001\",\"issue\":\"Uygulama açılmıyor\",\"steps\":[\"1. Uygulamayı tamamen kapatıp yeniden açın\",\"2. Cihazınızı yeniden başlatın\",\"3. Uygulamayı güncelleyin\",\"4. Uygulamayı silip yeniden yükleyin\",\"5. Ekran görüntüsü ile destek ekibine ulaşın\"],\"category\":\"app\",\"keywords\":[\"açılmıyor\",\"crash\",\"çöküyor\",\"kapanıyor\"]},\n  {\"id\":\"ts-002\",\"issue\":\"Giriş yapamıyorum\",\"steps\":[\"1. E-posta adresinizi doğru yazdığınızdan emin olun\",\"2. Caps Lock kapalı mı kontrol edin\",\"3. Şifremi Unuttum ile sıfırlayın\",\"4. Farklı bir tarayıcı deneyin\",\"5. 15 dakika bekleyin — hesap kilitlenmiş olabilir\"],\"category\":\"auth\",\"keywords\":[\"giriş\",\"login\",\"oturum\",\"giremiyorum\"]}\n]",
+              "code": "[\n  {\"id\":\"ts-001\",\"issue\":\"Uygulama açılmıyor\",\"steps\":[\"1. Uygulamayı tamamen kapatıp yeniden açın\",\"2. Cihazınızı yeniden başlatın\",\"3. Uygulamayı güncelleyin\",\"4. Uygulamayı silip yeniden yükleyin\",\"5. Ekran görüntüsü ile destek ekibine ulaşın\"],\"category\":\"app\",\"keywords\":[\"açılmıyor\",\"crash\",\"çöküyor\",\"kapanıyor\"]},\n  {\"id\":\"ts-002\",\"issue\":\"Giriş yapamıyorum\",\"steps\":[\"1. E-posta adresinizi doğru yazdığınızdan emin olun\",\"2. Caps Lock kapalı mı kontrol edin\",\"3. Şifremi Unuttum ile sıfırlayın\",\"4. Farklı bir tarayıcı deneyin\",\"5. 15 dakika bekleyin — hesap kilitlenmiş olabilir\"],\"category\":\"auth\",\"keywords\":[\"giriş\",\"login\",\"oturum\",\"giremiyorum\"]}\n]\nfrom .prompts import TECH_SYSTEM_PROMPT",
               "why": "2.1'deki tek kaydın yapısı doğruysa geri kalanını ekle. Her issue için sıralı adımlar — agent bunları müşteriye sunacak."
-            },
-            {
-              "order": "2.3",
-              "action": "GERİ DÖN graph.py'ye — ÜSTE ÇIK, TECH_SYSTEM_PROMPT import'unu ekle",
-              "type": "code_modify",
-              "file": "orchestrator/agents/graph.py",
-              "position": "top",
-              "code": "from .prompts import TECH_SYSTEM_PROMPT",
-              "why": "M0 Step 3'te prompts.py'ye yazdığımız TECH_SYSTEM_PROMPT'u tech_agent'ta kullanacağız."
             },
             {
               "order": "2.4",
               "action": "GERİ DÖN tech_agent fonksiyonuna — placeholder'ı gerçek implementasyonla değiştir",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "async def tech_agent(state: AgentState) -> dict:\n    query = state[\"messages\"][-1][\"content\"]\n    attempted = state.get(\n        \"attempted_solutions\", [])\n    context = \"\"\n    if attempted:\n        context = \"\\nDenenen çözümler:\\n\" + \\\n            \"\\n\".join(f\"- {s}\" for s in attempted)",
+              "code": "async def tech_agent(state: AgentState) -> dict:\n    query = state[\"messages\"][-1][\"content\"]\n    attempted = state.get(\n        \"attempted_solutions\", [])\n    context = \"\"\n    if attempted:\n        context = \"\\nDenenen çözümler:\\n\" + \\",
               "why": "M0 Step 2'deki placeholder'ı gerçek implementasyonla değiştiriyoruz. Tech agent önceki denemeleri takip eder (attempted_solutions) ve tekrar etmez. 5 adım sonra çözemezse otomatik escalation yapar."
             },
             {
               "order": "2.4a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "    response = await llm.ainvoke([\n        SystemMessage(content=TECH_SYSTEM_PROMPT),\n        HumanMessage(content=\n            f\"Sorun: {query}{context}\")])\n    new_attempted = attempted + [\n        response.content[:100]]\n    if len(new_attempted) >= 5:\n        return {",
-              "why": "Kullanıcı sorusunu RAG'den gelen bilgilerle birleştirip LLM'e gönderiyoruz. Context injection ile model sadece verilen bilgilere dayanarak cevap verir — hallucination azalır."
+              "code": "            \"\\n\".join(f\"- {s}\" for s in attempted)\n    response = await llm.ainvoke([\n        SystemMessage(content=TECH_SYSTEM_PROMPT),\n        HumanMessage(content=\n            f\"Sorun: {query}{context}\")])\n    new_attempted = attempted + [\n        response.content[:100]]",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "2.4b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "            \"current_agent\": \"tech\",\n            \"intent\": \"escalation\",\n            \"attempted_solutions\": new_attempted,\n            \"escalation_reason\": \"5 adım sonra çözülemedi\",\n            \"messages\": [{\"role\": \"assistant\",\n                \"content\": response.content}]}\n    return {\"current_agent\": \"tech\",\n            \"attempted_solutions\": new_attempted,",
-              "why": "Agent state'ine ek alanlar ekliyoruz. escalation_reason neden insana aktarıldığını kaydeder — handoff sırasında context kaybını önler."
+              "code": "    if len(new_attempted) >= 5:\n        return {\n            \"current_agent\": \"tech\",\n            \"intent\": \"escalation\",\n            \"attempted_solutions\": new_attempted,\n            \"escalation_reason\": \"5 adım sonra çözülemedi\",\n            \"messages\": [{\"role\": \"assistant\",",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "2.4c",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "            \"messages\": [{\"role\": \"assistant\",\n                \"content\": response.content}]}",
-              "why": "Yanıt yapısını oluşturuyoruz. Tutarlı response format'ı frontend'in veriyi güvenilir şekilde parse etmesini sağlar."
+              "code": "                \"content\": response.content}]}\n    return {\"current_agent\": \"tech\",\n            \"attempted_solutions\": new_attempted,\n            \"messages\": [{\"role\": \"assistant\",\n                \"content\": response.content}]}",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "2.5",
@@ -1147,7 +1114,7 @@
               "action": "graph.py'ye dön — route_decision fonksiyonunu güncelle, sentiment kontrolü ekle",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "def route_decision(state: AgentState) -> str:\n    intent = state.get(\"intent\", \"escalation\")\n    confidence = state.get(\"confidence\", 0.0)\n    sentiment = state.get(\n        \"customer_sentiment\", 3)\n    if confidence < 0.7:\n        return \"escalation\"\n    if sentiment <= 2:",
+              "code": "def route_decision(state: AgentState) -> str:\n    intent = state.get(\"intent\", \"escalation\")\n    confidence = state.get(\"confidence\", 0.0)\n    sentiment = state.get(\n        \"customer_sentiment\", 3)\n    if confidence < 0.7:\n        return \"escalation\"",
               "why": "M0 Step 2'de yazdığımız basit route_decision'ı genişletiyoruz. Artık üç faktör değerlendiriliyor: intent, confidence ve sentiment. Bilinmeyen intent'ler her zaman escalation'a — fail-safe yaklaşım."
             },
             {
@@ -1155,8 +1122,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "        return \"escalation\"\n    intent_map = {\n        \"faq\": \"faq\", \"technical\": \"tech\",\n        \"billing\": \"escalation\",\n        \"escalation\": \"escalation\"}\n    return intent_map.get(intent, \"escalation\")",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
+              "code": "    if sentiment <= 2:\n        return \"escalation\"\n    intent_map = {\n        \"faq\": \"faq\", \"technical\": \"tech\",\n        \"billing\": \"escalation\",\n        \"escalation\": \"escalation\"}\n    return intent_map.get(intent, \"escalation\")",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "3.2",
@@ -1164,7 +1131,7 @@
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
               "position": "after_route_decision",
-              "code": "def faq_needs_escalation(state: AgentState) -> str:\n    if state.get(\"intent\") == \"needs_escalation\":\n        return \"tech\"\n    return \"end\"\n\ndef tech_needs_escalation(\n        state: AgentState) -> str:\n    if state.get(\"intent\") == \"escalation\":",
+              "code": "def faq_needs_escalation(state: AgentState) -> str:\n    if state.get(\"intent\") == \"needs_escalation\":\n        return \"tech\"\n    return \"end\"\n\ndef tech_needs_escalation(\n        state: AgentState) -> str:",
               "why": "Agent'lar arası zincirleme geçiş: FAQ cevap bulamazsa Tech'e, Tech çözemezse Escalation'a. Bu kademeli yükseltme müşteri deneyimini iyileştirir."
             },
             {
@@ -1173,8 +1140,8 @@
               "type": "code_add",
               "file": "orchestrator/agents/graph.py",
               "position": "after_route_decision",
-              "code": "        return \"escalation\"\n    return \"end\"",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
+              "code": "    if state.get(\"intent\") == \"escalation\":\n        return \"escalation\"\n    return \"end\"",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "3.3",
@@ -1231,7 +1198,7 @@
               "action": "state.py'ye dön — AgentState'e yeni metadata alanları ekle",
               "type": "code_modify",
               "file": "orchestrator/agents/state.py",
-              "code": "class AgentState(TypedDict):\n    messages: Annotated[list, add_messages]\n    current_agent: str\n    intent: str\n    confidence: float\n    context: dict\n    customer_sentiment: int\n    attempted_solutions: List[str]",
+              "code": "class AgentState(TypedDict):\n    messages: Annotated[list, add_messages]\n    current_agent: str\n    intent: str\n    confidence: float\n    context: dict\n    customer_sentiment: int",
               "why": "M0 Step 2'de yazdığımız state'i genişletiyoruz. conversation_summary uzun konuşmalarda özet tutar. turn_count konuşma uzunluğunu izler. agent_history geçiş tarihçesini korur."
             },
             {
@@ -1239,8 +1206,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/state.py",
-              "code": "    escalation_reason: Optional[str]\n    conversation_summary: str\n    turn_count: int\n    agent_history: List[str]",
-              "why": "Agent state'ine ek alanlar ekliyoruz. escalation_reason neden insana aktarıldığını kaydeder — handoff sırasında context kaybını önler."
+              "code": "    attempted_solutions: List[str]\n    escalation_reason: Optional[str]\n    conversation_summary: str\n    turn_count: int\n    agent_history: List[str]",
+              "why": "State alanlarını tamamlıyoruz. Her alan agent geçişlerinde ve karar mantığında kullanılacak."
             },
             {
               "order": "4.2",
@@ -1256,7 +1223,7 @@
               "type": "code_add",
               "file": "orchestrator/services/sentiment.py",
               "position": "bottom",
-              "code": "SENTIMENT_PROMPT = (\n    \"Müşteri mesajının duygu durumunu 1-5 arası \"\n    \"puanla. 1:Çok kızgın 3:Nötr 5:Çok memnun. \"\n    \"Sadece sayı döndür.\")\n\nasync def analyze_sentiment(message: str) -> int:\n    try:\n        response = await llm.ainvoke([",
+              "code": "SENTIMENT_PROMPT = (\n    \"Müşteri mesajının duygu durumunu 1-5 arası \"\n    \"puanla. 1:Çok kızgın 3:Nötr 5:Çok memnun. \"\n    \"Sadece sayı döndür.\")\n\nasync def analyze_sentiment(message: str) -> int:\n    try:",
               "why": "4.2'de oluşturduğumuz LLM instance'ını kullanarak sentiment analizi yapıyoruz. Hata olursa nötr (3) döner — fail-safe."
             },
             {
@@ -1265,49 +1232,40 @@
               "type": "code_add",
               "file": "orchestrator/services/sentiment.py",
               "position": "bottom",
-              "code": "            SystemMessage(content=SENTIMENT_PROMPT),\n            HumanMessage(content=message)])\n        return max(1, min(5,\n            int(response.content.strip())))\n    except:\n        return 3",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
-            },
-            {
-              "order": "4.4",
-              "action": "GERİ DÖN graph.py'ye — ÜSTE ÇIK, sentiment import'unu ekle",
-              "type": "code_modify",
-              "file": "orchestrator/agents/graph.py",
-              "position": "top",
-              "code": "from ..services.sentiment import analyze_sentiment",
-              "why": "4.2-4.3'te yazdığımız analyze_sentiment fonksiyonunu router_agent'ta kullanacağız."
+              "code": "        response = await llm.ainvoke([\n            SystemMessage(content=SENTIMENT_PROMPT),\n            HumanMessage(content=message)])\n        return max(1, min(5,\n            int(response.content.strip())))\n    except:\n        return 3\nfrom ..services.sentiment import analyze_sentiment",
+              "why": "Sentiment analiz fonksiyonunu tamamlıyoruz. Hata durumunda nötr (3) döner — fail-safe yaklaşım."
             },
             {
               "order": "4.5",
               "action": "GERİ DÖN router_agent'a — sentiment ve turn tracking ekle",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "async def router_agent(state: AgentState) -> dict:\n    last_message = state[\"messages\"][-1]\n    user_msg = (last_message.content\n        if hasattr(last_message, 'content')\n        else last_message[\"content\"])\n    sentiment = await analyze_sentiment(user_msg)\n    response = await llm.ainvoke([\n        SystemMessage(content=ROUTER_SYSTEM_PROMPT),",
+              "code": "async def router_agent(state: AgentState) -> dict:\n    last_message = state[\"messages\"][-1]\n    user_msg = (last_message.content\n        if hasattr(last_message, 'content')\n        else last_message[\"content\"])\n    sentiment = await analyze_sentiment(user_msg)\n    response = await llm.ainvoke([",
               "why": "M0 Step 3'te yazdığımız router_agent'ı genişletiyoruz. Artık her mesajda sentiment analizi yapıyor, turn sayısını ve agent geçiş tarihçesini takip ediyor."
             },
             {
               "order": "4.5a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "        HumanMessage(content=user_msg)])\n    try:\n        result = json.loads(response.content)\n        return {\n            \"current_agent\": \"router\",\n            \"intent\": result[\"intent\"],\n            \"confidence\": result[\"confidence\"],\n            \"customer_sentiment\": sentiment,",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "        SystemMessage(content=ROUTER_SYSTEM_PROMPT),\n        HumanMessage(content=user_msg)])\n    try:\n        result = json.loads(response.content)\n        return {\n            \"current_agent\": \"router\",\n            \"intent\": result[\"intent\"],",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "4.5b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "            \"turn_count\": state.get(\n                \"turn_count\", 0) + 1,\n            \"agent_history\": state.get(\n                \"agent_history\", []) + [\"router\"]}\n    except (json.JSONDecodeError, KeyError):\n        return {\"current_agent\": \"router\",\n                \"intent\": \"escalation\",\n                \"confidence\": 0.0,",
-              "why": "Hata yönetimi ile beklenmedik durumları yakalıyoruz. LLM çağrıları timeout, rate limit veya API hatası verebilir — graceful degradation sağlıyoruz."
+              "code": "            \"confidence\": result[\"confidence\"],\n            \"customer_sentiment\": sentiment,\n            \"turn_count\": state.get(\n                \"turn_count\", 0) + 1,\n            \"agent_history\": state.get(\n                \"agent_history\", []) + [\"router\"]}\n    except (json.JSONDecodeError, KeyError):",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "4.5c",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "                \"customer_sentiment\": sentiment}",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "        return {\"current_agent\": \"router\",\n                \"intent\": \"escalation\",\n                \"confidence\": 0.0,\n                \"customer_sentiment\": sentiment}",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "4.6",
@@ -1389,7 +1347,7 @@
               "action": "İlk knowledge base dokümanını oluştur",
               "type": "code_write",
               "file": "orchestrator/data/knowledge_base/getting-started.md",
-              "code": "# Başlangıç Rehberi\n\n## Hesap Oluşturma\nWeb sitemize giderek 'Kayıt Ol' butonuna\ntıklayın. E-posta ve şifrenizi girin.\n\n## İlk Kurulum\n1. Profil bilgilerinizi doldurun",
+              "code": "# Başlangıç Rehberi\n\n## Hesap Oluşturma\nWeb sitemize giderek 'Kayıt Ol' butonuna\ntıklayın. E-posta ve şifrenizi girin.\n\n## İlk Kurulum",
               "why": "Heading-based chunking için ideal yapıda Markdown. Her ## bölümü ayrı bir chunk olacak."
             },
             {
@@ -1397,15 +1355,15 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/data/knowledge_base/getting-started.md",
-              "code": "2. Tercihlerinizi ayarlayın\n3. Bildirim ayarlarını yapın",
-              "why": "1.3 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "1. Profil bilgilerinizi doldurun\n2. Tercihlerinizi ayarlayın\n3. Bildirim ayarlarını yapın",
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
             },
             {
               "order": "1.4",
               "action": "BAŞKA DOSYAYA GEÇ — document processor servisi oluştur, iskeletini yaz",
               "type": "code_write",
               "file": "orchestrator/services/document_processor.py",
-              "code": "from pathlib import Path\nfrom typing import List\nfrom dataclasses import dataclass\nfrom datetime import datetime\n\n@dataclass\nclass DocumentChunk:\n    content: str",
+              "code": "from pathlib import Path\nfrom typing import List\nfrom dataclasses import dataclass\nfrom datetime import datetime\n\n@dataclass\nclass DocumentChunk:",
               "why": "Önce veri yapısını tanımlıyoruz. DocumentChunk her metin parçasını, metadata'sını ve kimliğini tutar."
             },
             {
@@ -1413,8 +1371,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/services/document_processor.py",
-              "code": "    metadata: dict\n    chunk_id: str",
-              "why": "1.4 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "    content: str\n    metadata: dict\n    chunk_id: str",
+              "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
             },
             {
               "order": "1.5",
@@ -1422,26 +1380,26 @@
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
               "position": "bottom",
-              "code": "def chunk_markdown(text: str, source: str,\n                   max_tokens: int = 400\n                   ) -> List[DocumentChunk]:\n    sections = []\n    current_section = \"\"\n    current_heading = \"\"\n    for line in text.split(\"\\n\"):\n        if line.startswith(\"#\"):",
+              "code": "def chunk_markdown(text: str, source: str,\n                   max_tokens: int = 400\n                   ) -> List[DocumentChunk]:\n    sections = []\n    current_section = \"\"\n    current_heading = \"\"\n    for line in text.split(\"\\n\"):",
               "why": "Heading-based chunking Markdown dokümanları için en uygun strateji. Her bölüm bağımsız chunk olur — semantik bütünlük korunur."
             },
             {
               "order": "1.5a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
               "position": "bottom",
-              "code": "            if current_section.strip():\n                sections.append(\n                    (current_heading,\n                     current_section.strip()))\n            current_heading = line.strip(\"# \")\n            current_section = line + \"\\n\"\n        else:\n            current_section += line + \"\\n\"",
-              "why": "Birikmiş paragrafları heading ile birlikte sections listesine ekliyoruz. Boş bölümleri atlayarak gereksiz veri oluşumunu önlüyoruz."
+              "code": "        if line.startswith(\"#\"):\n            if current_section.strip():\n                sections.append(\n                    (current_heading,\n                     current_section.strip()))\n            current_heading = line.strip(\"# \")\n            current_section = line + \"\\n\"",
+              "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
             },
             {
               "order": "1.5b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
               "position": "bottom",
-              "code": "    if current_section.strip():\n        sections.append(\n            (current_heading, current_section.strip()))\n    chunks = []\n    for i, (heading, content) in enumerate(sections):\n        chunks.append(DocumentChunk(\n            content=content,\n            metadata={\"source\": source,",
-              "why": "Birikmiş paragrafları heading ile birlikte sections listesine ekliyoruz. Boş bölümleri atlayarak gereksiz veri oluşumunu önlüyoruz."
+              "code": "        else:\n            current_section += line + \"\\n\"\n    if current_section.strip():\n        sections.append(\n            (current_heading, current_section.strip()))\n    chunks = []\n    for i, (heading, content) in enumerate(sections):",
+              "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
             },
             {
               "order": "1.5c",
@@ -1449,8 +1407,17 @@
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
               "position": "bottom",
-              "code": "                      \"heading\": heading,\n                      \"chunk_index\": i,\n                      \"last_updated\":\n                          datetime.utcnow().isoformat()},\n            chunk_id=f\"{source}_{i}\"))\n    return chunks",
-              "why": "Zaman damgası alanları kayıtların ne zaman oluşturulduğunu takip eder. Konuşma geçmişini kronolojik sıralama ve analytics için kritik."
+              "code": "        chunks.append(DocumentChunk(\n            content=content,\n            metadata={\"source\": source,\n                      \"heading\": heading,\n                      \"chunk_index\": i,\n                      \"last_updated\":\n                          datetime.utcnow().isoformat()},",
+              "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
+            },
+            {
+              "order": "1.5d",
+              "action": "GERİ DÖN — devamını yaz",
+              "type": "code_add",
+              "file": "orchestrator/services/document_processor.py",
+              "position": "bottom",
+              "code": "            chunk_id=f\"{source}_{i}\"))\n    return chunks",
+              "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
             },
             {
               "order": "1.6",
@@ -1458,7 +1425,7 @@
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
               "position": "bottom",
-              "code": "def load_knowledge_base(\n        kb_dir: str) -> List[DocumentChunk]:\n    all_chunks = []\n    kb_path = Path(kb_dir)\n    for md_file in kb_path.glob(\"*.md\"):\n        text = md_file.read_text(encoding=\"utf-8\")\n        chunks = chunk_markdown(\n            text, source=md_file.stem)",
+              "code": "def load_knowledge_base(\n        kb_dir: str) -> List[DocumentChunk]:\n    all_chunks = []\n    kb_path = Path(kb_dir)\n    for md_file in kb_path.glob(\"*.md\"):\n        text = md_file.read_text(encoding=\"utf-8\")\n        chunks = chunk_markdown(",
               "why": "1.2-1.3'te oluşturduğumuz knowledge_base klasöründeki tüm Markdown dosyalarını okuyup chunk'lar. 1.5'teki chunk_markdown'ı her dosya için çağırır."
             },
             {
@@ -1467,15 +1434,15 @@
               "type": "code_add",
               "file": "orchestrator/services/document_processor.py",
               "position": "bottom",
-              "code": "        all_chunks.extend(chunks)\n    return all_chunks",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
+              "code": "            text, source=md_file.stem)\n        all_chunks.extend(chunks)\n    return all_chunks",
+              "why": "Doküman işleme fonksiyonunu tamamlıyoruz. Her bölüm metadata ile birlikte chunk olarak kaydedilir."
             },
             {
               "order": "1.7",
               "action": "BAŞKA DOSYAYA GEÇ — ChromaDB vektör store servisi oluştur",
               "type": "code_write",
               "file": "orchestrator/services/vector_store.py",
-              "code": "import chromadb\nfrom typing import List\nfrom .document_processor import (\n    DocumentChunk, load_knowledge_base)\n\nclass VectorStore:\n    def __init__(self):\n        self.client = chromadb.Client()",
+              "code": "import chromadb\nfrom typing import List\nfrom .document_processor import (\n    DocumentChunk, load_knowledge_base)\n\nclass VectorStore:\n    def __init__(self):",
               "why": "Senior developer önce minimal çalışan class iskeletini yazar. ChromaDB embedded modda çalışır — ayrı sunucu gerekmez."
             },
             {
@@ -1483,8 +1450,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/services/vector_store.py",
-              "code": "        self.collection = (\n            self.client.get_or_create_collection(\n                name=\"knowledge_base\",\n                metadata={\"hnsw:space\": \"cosine\"}))",
-              "why": "Event listener ile kullanıcı etkileşimlerini dinliyoruz. Her olay için ayrı handler fonksiyonu — temiz ve test edilebilir kod."
+              "code": "        self.client = chromadb.Client()\n        self.collection = (\n            self.client.get_or_create_collection(\n                name=\"knowledge_base\",\n                metadata={\"hnsw:space\": \"cosine\"}))",
+              "why": "VectorStore metodlarını tamamlıyoruz. Doküman ekleme, arama ve toplu yükleme işlemleri sağlanır."
             },
             {
               "order": "1.8",
@@ -1492,26 +1459,26 @@
               "type": "code_add",
               "file": "orchestrator/services/vector_store.py",
               "position": "inside_class",
-              "code": "def add_documents(self,\n                      chunks: List[DocumentChunk]):\n        self.collection.add(\n            documents=[c.content for c in chunks],\n            metadatas=[c.metadata for c in chunks],\n            ids=[c.chunk_id for c in chunks])\n\n    def search(self, query: str,",
+              "code": "def add_documents(self,\n                      chunks: List[DocumentChunk]):\n        self.collection.add(\n            documents=[c.content for c in chunks],\n            metadatas=[c.metadata for c in chunks],\n            ids=[c.chunk_id for c in chunks])\n",
               "why": "1.4-1.6'da yazdığımız document processor'ı burada kullanıyoruz. Singleton pattern ile uygulama boyunca tek VectorStore instance'ı kullanılır."
             },
             {
               "order": "1.8a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/vector_store.py",
               "position": "inside_class",
-              "code": "               top_k: int = 3) -> list:\n        results = self.collection.query(\n            query_texts=[query], n_results=top_k)\n        return [\n            {\"content\": doc, \"metadata\": meta,\n             \"score\": 1 - dist}\n            for doc, meta, dist in zip(\n                results[\"documents\"][0],",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "    def search(self, query: str,\n               top_k: int = 3) -> list:\n        results = self.collection.query(\n            query_texts=[query], n_results=top_k)\n        return [\n            {\"content\": doc, \"metadata\": meta,\n             \"score\": 1 - dist}",
+              "why": "VectorStore metodlarını tamamlıyoruz. Doküman ekleme, arama ve toplu yükleme işlemleri sağlanır."
             },
             {
               "order": "1.8b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/vector_store.py",
               "position": "inside_class",
-              "code": "                results[\"metadatas\"][0],\n                results[\"distances\"][0])]\n\n    def initialize_from_directory(\n            self, kb_dir: str):\n        chunks = load_knowledge_base(kb_dir)\n        if chunks:\n            self.add_documents(chunks)",
-              "why": "ChromaDB sorgu sonuçlarını metadata ve distance değerleriyle birlikte döndürüyoruz. Distance değeri düşükse sonuç daha alakalıdır."
+              "code": "            for doc, meta, dist in zip(\n                results[\"documents\"][0],\n                results[\"metadatas\"][0],\n                results[\"distances\"][0])]\n\n    def initialize_from_directory(\n            self, kb_dir: str):",
+              "why": "VectorStore metodlarını tamamlıyoruz. Doküman ekleme, arama ve toplu yükleme işlemleri sağlanır."
             },
             {
               "order": "1.8c",
@@ -1519,8 +1486,8 @@
               "type": "code_add",
               "file": "orchestrator/services/vector_store.py",
               "position": "inside_class",
-              "code": "        return len(chunks)\n\nvector_store = VectorStore()",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
+              "code": "        chunks = load_knowledge_base(kb_dir)\n        if chunks:\n            self.add_documents(chunks)\n        return len(chunks)\n\nvector_store = VectorStore()",
+              "why": "VectorStore metodlarını tamamlıyoruz. Doküman ekleme, arama ve toplu yükleme işlemleri sağlanır."
             },
             {
               "order": "1.9",
@@ -1577,7 +1544,7 @@
               "action": "BAŞKA DOSYAYA GEÇ — hybrid retrieval servisi oluştur, iskeletini yaz",
               "type": "code_write",
               "file": "orchestrator/services/hybrid_retrieval.py",
-              "code": "from typing import List, Dict\nfrom rank_bm25 import BM25Okapi\nfrom .vector_store import vector_store\nfrom .document_processor import load_knowledge_base\n\nclass HybridRetriever:\n    def __init__(self):\n        self.chunks = []",
+              "code": "from typing import List, Dict\nfrom rank_bm25 import BM25Okapi\nfrom .vector_store import vector_store\nfrom .document_processor import load_knowledge_base\n\nclass HybridRetriever:\n    def __init__(self):",
               "why": "Önce import'lar ve class iskeleti. 1.7-1.8'de yazdığımız vector_store ve document_processor'ı import ediyoruz."
             },
             {
@@ -1585,8 +1552,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/services/hybrid_retrieval.py",
-              "code": "        self.bm25 = None",
-              "why": "2.2 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "        self.chunks = []\n        self.bm25 = None",
+              "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
             },
             {
               "order": "2.3",
@@ -1594,17 +1561,17 @@
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
               "position": "inside_class",
-              "code": "def initialize(self, kb_dir: str):\n        self.chunks = load_knowledge_base(kb_dir)\n        tokenized = [c.content.lower().split()\n                     for c in self.chunks]\n        self.bm25 = BM25Okapi(tokenized)\n        vector_store.initialize_from_directory(\n            kb_dir)\n",
+              "code": "def initialize(self, kb_dir: str):\n        self.chunks = load_knowledge_base(kb_dir)\n        tokenized = [c.content.lower().split()\n                     for c in self.chunks]\n        self.bm25 = BM25Okapi(tokenized)\n        vector_store.initialize_from_directory(\n            kb_dir)",
               "why": "initialize hem BM25 index'ini hem ChromaDB'yi hazırlar. search hem dense (embedding) hem sparse (keyword) sonuçları alır ve birleştirir."
             },
             {
               "order": "2.3a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
               "position": "inside_class",
-              "code": "    def search(self, query: str,\n               top_k: int = 5) -> List[Dict]:\n        dense = vector_store.search(query, top_k)\n        sparse = []\n        if self.bm25 and self.chunks:\n            scores = self.bm25.get_scores(\n                query.lower().split())\n            sparse = sorted(",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "    def search(self, query: str,\n               top_k: int = 5) -> List[Dict]:\n        dense = vector_store.search(query, top_k)\n        sparse = []\n        if self.bm25 and self.chunks:\n            scores = self.bm25.get_scores(\n                query.lower().split())",
+              "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
             },
             {
               "order": "2.3b",
@@ -1612,8 +1579,8 @@
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
               "position": "inside_class",
-              "code": "                [{\"content\": self.chunks[i].content,\n                  \"metadata\": self.chunks[i].metadata,\n                  \"score\": float(s)}\n                 for i, s in enumerate(scores)],\n                key=lambda x: x[\"score\"],\n                reverse=True)[:top_k]\n        return self._rrf_merge(dense, sparse, top_k)",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "            sparse = sorted(\n                [{\"content\": self.chunks[i].content,\n                  \"metadata\": self.chunks[i].metadata,\n                  \"score\": float(s)}\n                 for i, s in enumerate(scores)],\n                key=lambda x: x[\"score\"],\n                reverse=True)[:top_k]\n        return self._rrf_merge(dense, sparse, top_k)",
+              "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
             },
             {
               "order": "2.4",
@@ -1621,26 +1588,26 @@
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
               "position": "inside_class",
-              "code": "def _rrf_merge(self, dense, sparse,\n                   top_k, k=60):\n        scores = {}\n        data = {}\n        for rank, r in enumerate(dense):\n            key = r[\"content\"][:100]\n            scores[key] = scores.get(key, 0) + \\\n                1 / (k + rank + 1)",
+              "code": "def _rrf_merge(self, dense, sparse,\n                   top_k, k=60):\n        scores = {}\n        data = {}\n        for rank, r in enumerate(dense):\n            key = r[\"content\"][:100]\n            scores[key] = scores.get(key, 0) + \\",
               "why": "Reciprocal Rank Fusion (RRF) iki listenin güçlü yanlarını birleştirir. k=60 standart RRF parametresi. Singleton pattern ile uygulama boyunca tek instance."
             },
             {
               "order": "2.4a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
               "position": "inside_class",
-              "code": "            data[key] = r\n        for rank, r in enumerate(sparse):\n            key = r[\"content\"][:100]\n            scores[key] = scores.get(key, 0) + \\\n                1 / (k + rank + 1)\n            if key not in data:\n                data[key] = r\n        results = []",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "                1 / (k + rank + 1)\n            data[key] = r\n        for rank, r in enumerate(sparse):\n            key = r[\"content\"][:100]\n            scores[key] = scores.get(key, 0) + \\\n                1 / (k + rank + 1)\n            if key not in data:",
+              "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
             },
             {
               "order": "2.4b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
               "position": "inside_class",
-              "code": "        for key in sorted(scores,\n                key=scores.get, reverse=True\n                )[:top_k]:\n            d2 = data[key].copy()\n            d2[\"rrf_score\"] = scores[key]\n            results.append(d2)\n        return results\n",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "                data[key] = r\n        results = []\n        for key in sorted(scores,\n                key=scores.get, reverse=True\n                )[:top_k]:\n            d2 = data[key].copy()\n            d2[\"rrf_score\"] = scores[key]",
+              "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
             },
             {
               "order": "2.4c",
@@ -1648,17 +1615,8 @@
               "type": "code_add",
               "file": "orchestrator/services/hybrid_retrieval.py",
               "position": "inside_class",
-              "code": "hybrid_retriever = HybridRetriever()",
-              "why": "2.4 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
-            },
-            {
-              "order": "2.5",
-              "action": "GERİ DÖN graph.py'ye — FAQ agent'ı hybrid retrieval kullanacak şekilde güncelle",
-              "type": "code_modify",
-              "file": "orchestrator/agents/graph.py",
-              "position": "top",
-              "code": "from ..services.hybrid_retrieval import hybrid_retriever",
-              "why": "ÜSTE ÇIK — 2.2-2.4'te yazdığımız hybrid_retriever'ı import et. M1 Step 1'deki search_faqs yerine bunu kullanacağız."
+              "code": "            results.append(d2)\n        return results\nhybrid_retriever = HybridRetriever()\nfrom ..services.hybrid_retrieval import hybrid_retriever",
+              "why": "Hybrid retrieval fonksiyonlarını tamamlıyoruz. Dense ve sparse sonuçları RRF ile birleştirilir."
             },
             {
               "order": "2.6",
@@ -1733,7 +1691,7 @@
               "action": "GERİ DÖN graph.py'ye — faq_agent return'üne citation bilgisi ekle",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "# faq_agent return'ünde:\n    citations = [\n        {\"source\": r[\"metadata\"][\"source\"],\n         \"heading\": r[\"metadata\"].get(\n             \"heading\", \"\"),\n         \"confidence\": r.get(\"rrf_score\", 0)}\n        for r in results]\n    return {\"current_agent\": \"faq\",",
+              "code": "# faq_agent return'ünde:\n    citations = [\n        {\"source\": r[\"metadata\"][\"source\"],\n         \"heading\": r[\"metadata\"].get(\n             \"heading\", \"\"),\n         \"confidence\": r.get(\"rrf_score\", 0)}\n        for r in results]",
               "why": "Step 1'deki hybrid retrieval sonuçlarından metadata çıkararak citation oluşturuyoruz. Müşteri 'bu bilgiyi nereden aldın?' diye sorduğunda gösterilir."
             },
             {
@@ -1741,8 +1699,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "            \"context\": {\"citations\": citations},\n            \"messages\": [...]}",
-              "why": "3.3 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "    return {\"current_agent\": \"faq\",\n            \"context\": {\"citations\": citations},\n            \"messages\": [...]}",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "3.4",
@@ -1810,7 +1768,7 @@
               "action": "BAŞKA DOSYAYA GEÇ — memory servisi oluştur, iskeletini yaz",
               "type": "code_write",
               "file": "orchestrator/services/memory.py",
-              "code": "from typing import List, Dict\nfrom langchain_openai import ChatOpenAI\nfrom langchain_core.messages import (\n    SystemMessage, HumanMessage)\n\nllm = ChatOpenAI(model=\"gpt-4o-mini\",\n                 temperature=0)\nSUMMARY_PROMPT = (",
+              "code": "from typing import List, Dict\nfrom langchain_openai import ChatOpenAI\nfrom langchain_core.messages import (\n    SystemMessage, HumanMessage)\n\nllm = ChatOpenAI(model=\"gpt-4o-mini\",\n                 temperature=0)",
               "why": "Memory management servisi uzun konuşmalarda token maliyetini kontrol eder. Önce LLM instance ve prompt'u tanımlıyoruz."
             },
             {
@@ -1818,8 +1776,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/services/memory.py",
-              "code": "    \"Aşağıdaki konuşmayı kısa özetle. Müşteri adı, \"\n    \"sorun detayı, denenen çözümleri koru. Maks 3 cümle.\")",
-              "why": "1.1 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "SUMMARY_PROMPT = (\n    \"Aşağıdaki konuşmayı kısa özetle. Müşteri adı, \"\n    \"sorun detayı, denenen çözümleri koru. Maks 3 cümle.\")",
+              "why": "Memory management fonksiyonlarını tamamlıyoruz. Özet + son mesajlar stratejisi token maliyetini düşürür."
             },
             {
               "order": "1.2",
@@ -1836,17 +1794,17 @@
               "type": "code_add",
               "file": "orchestrator/services/memory.py",
               "position": "inside_class",
-              "code": "async def get_context(\n            self, messages: List[Dict],\n            summary: str = \"\") -> List[Dict]:\n        if len(messages) <= self.window_size:\n            return messages\n        recent = messages[-self.window_size:]\n        if not summary:\n            old = messages[:-self.window_size]",
+              "code": "async def get_context(\n            self, messages: List[Dict],\n            summary: str = \"\") -> List[Dict]:\n        if len(messages) <= self.window_size:\n            return messages\n        recent = messages[-self.window_size:]\n        if not summary:",
               "why": "get_context 20 mesajlık konuşmayı 6 mesaja indirger: 1 özet + 5 son mesaj. Bu strateji token kullanımını %50 azaltır."
             },
             {
               "order": "1.3a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/memory.py",
               "position": "inside_class",
-              "code": "            summary = await self._summarize(old)\n        return [{\"role\": \"system\",\n                 \"content\": f\"Önceki konuşma özeti: \"\n                            f\"{summary}\"}] + recent\n\n    async def _summarize(\n            self, messages: List[Dict]) -> str:\n        conv = \"\\n\".join(",
-              "why": "Uzun konuşma geçmişini özetleyerek context window sınırını aşmayı önlüyoruz. Özet, tam geçmiş yerine LLM'e gönderilir — token maliyeti düşer."
+              "code": "            old = messages[:-self.window_size]\n            summary = await self._summarize(old)\n        return [{\"role\": \"system\",\n                 \"content\": f\"Önceki konuşma özeti: \"\n                            f\"{summary}\"}] + recent\n\n    async def _summarize(",
+              "why": "Memory management fonksiyonlarını tamamlıyoruz. Özet + son mesajlar stratejisi token maliyetini düşürür."
             },
             {
               "order": "1.3b",
@@ -1854,17 +1812,17 @@
               "type": "code_add",
               "file": "orchestrator/services/memory.py",
               "position": "inside_class",
-              "code": "            [f\"{m['role']}: {m['content']}\"\n             for m in messages])\n        response = await llm.ainvoke([\n            SystemMessage(content=SUMMARY_PROMPT),\n            HumanMessage(content=conv)])\n        return response.content\n\nmemory_manager = ConversationMemory()",
-              "why": "LLM'i async olarak çağırıyoruz. ainvoke ile diğer istekler bloke olmaz — concurrent kullanıcılar aynı anda yanıt alabilir."
+              "code": "            self, messages: List[Dict]) -> str:\n        conv = \"\\n\".join(\n            [f\"{m['role']}: {m['content']}\"\n             for m in messages])\n        response = await llm.ainvoke([\n            SystemMessage(content=SUMMARY_PROMPT),\n            HumanMessage(content=conv)])",
+              "why": "Memory management fonksiyonlarını tamamlıyoruz. Özet + son mesajlar stratejisi token maliyetini düşürür."
             },
             {
-              "order": "1.4",
-              "action": "GERİ DÖN graph.py'ye — ÜSTE ÇIK, memory manager import'unu ekle",
-              "type": "code_modify",
-              "file": "orchestrator/agents/graph.py",
-              "position": "top",
-              "code": "from ..services.memory import memory_manager",
-              "why": "1.1-1.3'te yazdığımız memory_manager'ı agent'larda kullanacağız. Her agent çağrısında context optimize edilir."
+              "order": "1.3c",
+              "action": "GERİ DÖN — devamını yaz",
+              "type": "code_add",
+              "file": "orchestrator/services/memory.py",
+              "position": "inside_class",
+              "code": "        return response.content\n\nmemory_manager = ConversationMemory()\nfrom ..services.memory import memory_manager",
+              "why": "Memory management fonksiyonlarını tamamlıyoruz. Özet + son mesajlar stratejisi token maliyetini düşürür."
             },
             {
               "order": "1.5",
@@ -1913,7 +1871,7 @@
               "action": "BAŞKA DOSYAYA GEÇ — Redis session servisi oluştur, iskeletini yaz",
               "type": "code_write",
               "file": "orchestrator/services/session_store.py",
-              "code": "import json\nimport redis.asyncio as redis\nfrom typing import Optional\n\nclass SessionStore:\n    def __init__(self,\n                 redis_url='redis://localhost:6379'):\n        self.redis = redis.from_url(",
+              "code": "import json\nimport redis.asyncio as redis\nfrom typing import Optional\n\nclass SessionStore:\n    def __init__(self,\n                 redis_url='redis://localhost:6379'):",
               "why": "Redis'te session tutmak server restart ve horizontal scaling'e dayanıklı yapar. TTL ile eski session'lar otomatik temizlenir."
             },
             {
@@ -1921,8 +1879,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/services/session_store.py",
-              "code": "            redis_url, decode_responses=True)\n        self.ttl = 86400  # 24 saat",
-              "why": "Redis ile session state'i kalıcı hale getiriyoruz. Server restart sonrası konuşma kaldığı yerden devam eder — in-memory dict'ten farkı budur."
+              "code": "        self.redis = redis.from_url(\n            redis_url, decode_responses=True)\n        self.ttl = 86400  # 24 saat",
+              "why": "Redis session CRUD operasyonlarını tamamlıyoruz. TTL ile eski session'lar otomatik temizlenir."
             },
             {
               "order": "2.2",
@@ -1930,17 +1888,17 @@
               "type": "code_add",
               "file": "orchestrator/services/session_store.py",
               "position": "inside_class",
-              "code": "async def save_session(self, conv_id: str,\n                           state: dict):\n        await self.redis.setex(\n            f\"session:{conv_id}\", self.ttl,\n            json.dumps(state, default=str))\n\n    async def get_session(\n            self, conv_id: str) -> Optional[dict]:",
+              "code": "async def save_session(self, conv_id: str,\n                           state: dict):\n        await self.redis.setex(\n            f\"session:{conv_id}\", self.ttl,\n            json.dumps(state, default=str))\n\n    async def get_session(",
               "why": "2.1'deki iskeletin üzerine CRUD metodları ekliyoruz. setex TTL ile birlikte kaydetir. default=str datetime serializasyonunu halleder."
             },
             {
               "order": "2.2a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/session_store.py",
               "position": "inside_class",
-              "code": "        data = await self.redis.get(\n            f\"session:{conv_id}\")\n        return json.loads(data) if data else None\n\n    async def delete_session(self, conv_id: str):\n        await self.redis.delete(\n            f\"session:{conv_id}\")\n",
-              "why": "Redis'ten session verisini async olarak okuyoruz. JSON.parse ile Python dict'e çeviriyoruz — Redis string saklar, yapılandırılmış veri için serialize/deserialize gerekir."
+              "code": "            self, conv_id: str) -> Optional[dict]:\n        data = await self.redis.get(\n            f\"session:{conv_id}\")\n        return json.loads(data) if data else None\n\n    async def delete_session(self, conv_id: str):\n        await self.redis.delete(",
+              "why": "Redis session CRUD operasyonlarını tamamlıyoruz. TTL ile eski session'lar otomatik temizlenir."
             },
             {
               "order": "2.2b",
@@ -1948,17 +1906,8 @@
               "type": "code_add",
               "file": "orchestrator/services/session_store.py",
               "position": "inside_class",
-              "code": "    async def extend_ttl(self, conv_id: str):\n        await self.redis.expire(\n            f\"session:{conv_id}\", self.ttl)\n\nsession_store = SessionStore()",
-              "why": "Session TTL'ini uzatıyoruz — aktif konuşmaların zaman aşımına uğramasını önlüyoruz. Her mesajda TTL sıfırlanır."
-            },
-            {
-              "order": "2.3",
-              "action": "GERİ DÖN conversations.py'ye — ÜSTE ÇIK, session_store import'unu ekle",
-              "type": "code_modify",
-              "file": "orchestrator/api/conversations.py",
-              "position": "top",
-              "code": "from ..services.session_store import session_store",
-              "why": "2.1-2.2'de yazdığımız session_store'u M0 Step 4'teki API endpoint'lerinde kullanacağız."
+              "code": "            f\"session:{conv_id}\")\n    async def extend_ttl(self, conv_id: str):\n        await self.redis.expire(\n            f\"session:{conv_id}\", self.ttl)\n\nsession_store = SessionStore()\nfrom ..services.session_store import session_store",
+              "why": "Redis session CRUD operasyonlarını tamamlıyoruz. TTL ile eski session'lar otomatik temizlenir."
             },
             {
               "order": "2.4",
@@ -2015,7 +1964,7 @@
               "action": "BAŞKA DOSYAYA GEÇ — handoff servisi oluştur, iskeletini yaz",
               "type": "code_write",
               "file": "orchestrator/services/handoff.py",
-              "code": "from langchain_openai import ChatOpenAI\nfrom langchain_core.messages import (\n    SystemMessage, HumanMessage)\nfrom typing import Dict\n\nllm = ChatOpenAI(model=\"gpt-4o-mini\",\n                 temperature=0)\nHANDOFF_PROMPT = (",
+              "code": "from langchain_openai import ChatOpenAI\nfrom langchain_core.messages import (\n    SystemMessage, HumanMessage)\nfrom typing import Dict\n\nllm = ChatOpenAI(model=\"gpt-4o-mini\",\n                 temperature=0)",
               "why": "Handoff özeti giren agent'ın konuşmayı sıfırdan anlamasını sağlar. Müşteri 'tekrar anlatmak zorunda kalmamalı' — en önemli UX kuralı."
             },
             {
@@ -2023,8 +1972,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/services/handoff.py",
-              "code": "    \"Müşteri destek konuşmasını özetle: \"\n    \"1.Asıl sorun 2.Denenen çözümler \"\n    \"3.Duygu durumu 4.Geçiş nedeni. Maks 4 cümle.\")",
-              "why": "3.1 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "HANDOFF_PROMPT = (\n    \"Müşteri destek konuşmasını özetle: \"\n    \"1.Asıl sorun 2.Denenen çözümler \"\n    \"3.Duygu durumu 4.Geçiş nedeni. Maks 4 cümle.\")",
+              "why": "Handoff paketini tamamlıyoruz. Tüm context bilgisi yeni agent'a aktarılır."
             },
             {
               "order": "3.2",
@@ -2032,17 +1981,17 @@
               "type": "code_add",
               "file": "orchestrator/services/handoff.py",
               "position": "bottom",
-              "code": "async def create_handoff_summary(\n        state: dict) -> Dict:\n    msgs = \"\\n\".join(\n        [f\"{m.get('role')}: {m.get('content')}\"\n         for m in state.get('messages', [])[-10:]])\n    response = await llm.ainvoke([\n        SystemMessage(content=HANDOFF_PROMPT),\n        HumanMessage(content=msgs)])",
+              "code": "async def create_handoff_summary(\n        state: dict) -> Dict:\n    msgs = \"\\n\".join(\n        [f\"{m.get('role')}: {m.get('content')}\"\n         for m in state.get('messages', [])[-10:]])\n    response = await llm.ainvoke([\n        SystemMessage(content=HANDOFF_PROMPT),",
               "why": "Son 10 mesajı özetleyip transfer metadata'sı oluşturur. 3.1'deki prompt ile LLM kısa özet üretir."
             },
             {
               "order": "3.2a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/handoff.py",
               "position": "bottom",
-              "code": "    return {\n        \"summary\": response.content,\n        \"from_agent\": state.get(\n            \"current_agent\", \"unknown\"),\n        \"attempted_solutions\": state.get(\n            \"attempted_solutions\", []),\n        \"sentiment\": state.get(\n            \"customer_sentiment\", 3),",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "        HumanMessage(content=msgs)])\n    return {\n        \"summary\": response.content,\n        \"from_agent\": state.get(\n            \"current_agent\", \"unknown\"),\n        \"attempted_solutions\": state.get(\n            \"attempted_solutions\", []),",
+              "why": "Handoff paketini tamamlıyoruz. Tüm context bilgisi yeni agent'a aktarılır."
             },
             {
               "order": "3.2b",
@@ -2050,17 +1999,8 @@
               "type": "code_add",
               "file": "orchestrator/services/handoff.py",
               "position": "bottom",
-              "code": "        \"escalation_reason\": state.get(\n            \"escalation_reason\", \"\")}",
-              "why": "Agent state'ine ek alanlar ekliyoruz. escalation_reason neden insana aktarıldığını kaydeder — handoff sırasında context kaybını önler."
-            },
-            {
-              "order": "3.3",
-              "action": "GERİ DÖN graph.py'ye — ÜSTE ÇIK, handoff import'unu ekle",
-              "type": "code_modify",
-              "file": "orchestrator/agents/graph.py",
-              "position": "top",
-              "code": "from ..services.handoff import create_handoff_summary",
-              "why": "3.1-3.2'de yazdığımız create_handoff_summary'yi agent geçişlerinde kullanacağız."
+              "code": "        \"sentiment\": state.get(\n            \"customer_sentiment\", 3),\n        \"escalation_reason\": state.get(\n            \"escalation_reason\", \"\")}\nfrom ..services.handoff import create_handoff_summary",
+              "why": "Handoff paketini tamamlıyoruz. Tüm context bilgisi yeni agent'a aktarılır."
             },
             {
               "order": "3.4",
@@ -2142,7 +2082,7 @@
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
               "position": "bottom",
-              "code": "def determine_escalation(\n        state: dict) -> Optional[Dict]:\n    triggers = []\n    priority = Priority.P4\n    sentiment = state.get(\"customer_sentiment\", 3)\n    attempts = len(\n        state.get(\"attempted_solutions\", []))\n    confidence = state.get(\"confidence\", 1.0)",
+              "code": "def determine_escalation(\n        state: dict) -> Optional[Dict]:\n    triggers = []\n    priority = Priority.P4\n    sentiment = state.get(\"customer_sentiment\", 3)\n    attempts = len(\n        state.get(\"attempted_solutions\", []))",
               "why": "Birden fazla faktörü değerlendiren escalation kararı. Önce tüm girdileri çıkarıyoruz — sentiment, deneme sayısı, confidence ve son mesaj."
             },
             {
@@ -2151,8 +2091,8 @@
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
               "position": "bottom",
-              "code": "    last_msg = (\n        state.get(\"messages\", [])[-1].get(\n            \"content\", \"\")\n        if state.get(\"messages\") else \"\"\n    ).lower()",
-              "why": "1.2 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "    confidence = state.get(\"confidence\", 1.0)\n    last_msg = (\n        state.get(\"messages\", [])[-1].get(\n            \"content\", \"\")\n        if state.get(\"messages\") else \"\"\n    ).lower()",
+              "why": "Escalation trigger mantığını tamamlıyoruz. Birden fazla faktör değerlendirilerek karar verilir."
             },
             {
               "order": "1.3",
@@ -2160,17 +2100,17 @@
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
               "position": "inside_determine",
-              "code": "human_kw = [\"insan\", \"gerçek kişi\",\n                \"yönetici\", \"müdür\", \"temsilci\"]\n    if any(kw in last_msg for kw in human_kw):\n        triggers.append(\"Müşteri insan talep etti\")\n        priority = Priority.P2\n    if sentiment <= 2:\n        triggers.append(\n            f\"Düşük sentiment: {sentiment}/5\")",
+              "code": "human_kw = [\"insan\", \"gerçek kişi\",\n                \"yönetici\", \"müdür\", \"temsilci\"]\n    if any(kw in last_msg for kw in human_kw):\n        triggers.append(\"Müşteri insan talep etti\")\n        priority = Priority.P2\n    if sentiment <= 2:\n        triggers.append(",
               "why": "1.2'de çıkardığımız girdileri kontrol ediyoruz. İnsan talebi P2, kızgın müşteri P1, çözülemeyen sorun P3. Trigger yoksa None döner — escalation gerekmez."
             },
             {
               "order": "1.3a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
               "position": "inside_determine",
-              "code": "        priority = Priority.P1\n    if attempts >= 3:\n        triggers.append(\n            f\"{attempts} çözüm denemesi başarısız\")\n        if priority.value > Priority.P3.value:\n            priority = Priority.P3\n    if confidence < 0.5:\n        triggers.append(",
-              "why": "Öncelik seviyesini belirli koşullara göre yükseltiyoruz. 3+ başarısız deneme otomatik eskalasyon tetikler — müşteri başka bir agent ile daha iyi sonuç alabilir."
+              "code": "            f\"Düşük sentiment: {sentiment}/5\")\n        priority = Priority.P1\n    if attempts >= 3:\n        triggers.append(\n            f\"{attempts} çözüm denemesi başarısız\")\n        if priority.value > Priority.P3.value:\n            priority = Priority.P3",
+              "why": "Escalation trigger mantığını tamamlıyoruz. Birden fazla faktör değerlendirilerek karar verilir."
             },
             {
               "order": "1.3b",
@@ -2178,41 +2118,41 @@
               "type": "code_add",
               "file": "orchestrator/services/escalation.py",
               "position": "inside_determine",
-              "code": "            f\"Düşük confidence: {confidence}\")\n    if not triggers:\n        return None\n    return {\"should_escalate\": True,\n            \"priority\": priority.value,\n            \"triggers\": triggers,\n            \"reason\": \"; \".join(triggers)}",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
+              "code": "    if confidence < 0.5:\n        triggers.append(\n            f\"Düşük confidence: {confidence}\")\n    if not triggers:\n        return None\n    return {\"should_escalate\": True,\n            \"priority\": priority.value,",
+              "why": "Escalation trigger mantığını tamamlıyoruz. Birden fazla faktör değerlendirilerek karar verilir."
             },
             {
-              "order": "1.4",
-              "action": "GERİ DÖN graph.py'ye — ÜSTE ÇIK, escalation import'unu ekle",
-              "type": "code_modify",
-              "file": "orchestrator/agents/graph.py",
-              "position": "top",
-              "code": "from ..services.escalation import determine_escalation",
-              "why": "1.1-1.3'te yazdığımız determine_escalation'ı escalation_agent'ta kullanacağız."
+              "order": "1.3c",
+              "action": "GERİ DÖN — devamını yaz",
+              "type": "code_add",
+              "file": "orchestrator/services/escalation.py",
+              "position": "inside_determine",
+              "code": "            \"triggers\": triggers,\n            \"reason\": \"; \".join(triggers)}\nfrom ..services.escalation import determine_escalation",
+              "why": "Escalation trigger mantığını tamamlıyoruz. Birden fazla faktör değerlendirilerek karar verilir."
             },
             {
               "order": "1.5",
               "action": "GERİ DÖN escalation_agent'a — placeholder'ı gerçek implementasyonla değiştir",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "async def escalation_agent(\n        state: AgentState) -> dict:\n    handoff = await create_handoff_summary(state)\n    esc = determine_escalation(state) or {\n        \"priority\": \"p3\",\n        \"reason\": \"Genel escalation\"}\n    message = (\n        f\"Sizi uzman ekibimize yönlendiriyorum. \"",
+              "code": "async def escalation_agent(\n        state: AgentState) -> dict:\n    handoff = await create_handoff_summary(state)\n    esc = determine_escalation(state) or {\n        \"priority\": \"p3\",\n        \"reason\": \"Genel escalation\"}\n    message = (",
               "why": "M0 Step 2'deki placeholder'ı gerçek implementasyonla değiştiriyoruz. M3 Step 3'teki create_handoff_summary ile özet oluşturup, 1.1-1.3'teki determine_escalation ile öncelik belirleyip müşteriye bilgi veriyor."
             },
             {
               "order": "1.5a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "        f\"Öncelik: {'Acil' if esc['priority']=='p1' else 'Normal'}. \"\n        f\"Tahmini bekleme: \"\n        f\"{'< 2 dk' if esc['priority'] in ['p1','p2'] else '< 10 dk'}. \"\n        f\"Konuşma özetiniz aktarılacak.\")\n    return {\n        \"current_agent\": \"escalation\",\n        \"escalation_reason\": esc[\"reason\"],\n        \"context\": {\"handoff\": handoff,",
-              "why": "JSX ile UI yapısını tanımlıyoruz. Her component tek bir sorumluluğa sahip — küçük, yeniden kullanılabilir parçalar halinde inşa ediyoruz."
+              "code": "        f\"Sizi uzman ekibimize yönlendiriyorum. \"\n        f\"Öncelik: {'Acil' if esc['priority']=='p1' else 'Normal'}. \"\n        f\"Tahmini bekleme: \"\n        f\"{'< 2 dk' if esc['priority'] in ['p1','p2'] else '< 10 dk'}. \"\n        f\"Konuşma özetiniz aktarılacak.\")\n    return {\n        \"current_agent\": \"escalation\",",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "1.5b",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/agents/graph.py",
-              "code": "                    \"escalation\": esc},\n        \"messages\": [{\"role\": \"assistant\",\n                      \"content\": message}]}",
-              "why": "1.5 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "        \"escalation_reason\": esc[\"reason\"],\n        \"context\": {\"handoff\": handoff,\n                    \"escalation\": esc},\n        \"messages\": [{\"role\": \"assistant\",\n                      \"content\": message}]}",
+              "why": "Agent fonksiyonunun gövdesini tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — hata ayıklama ve bakım kolaylaşır."
             },
             {
               "order": "1.6",
@@ -2261,7 +2201,7 @@
               "action": "BAŞKA DOSYAYA GEÇ — Redis priority queue servisi oluştur, iskeletini yaz",
               "type": "code_write",
               "file": "orchestrator/services/queue.py",
-              "code": "import json\nfrom datetime import datetime\nfrom typing import Optional, Dict\nimport redis.asyncio as redis\n\nclass EscalationQueue:\n    def __init__(self,\n                 redis_url='redis://localhost:6379'):",
+              "code": "import json\nfrom datetime import datetime\nfrom typing import Optional, Dict\nimport redis.asyncio as redis\n\nclass EscalationQueue:\n    def __init__(self,",
               "why": "Redis Sorted Set ile priority queue oluşturulur — P1 ticket'lar otomatik olarak önce işlenir."
             },
             {
@@ -2269,8 +2209,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/services/queue.py",
-              "code": "        self.redis = redis.from_url(\n            redis_url, decode_responses=True)",
-              "why": "Redis ile session state'i kalıcı hale getiriyoruz. Server restart sonrası konuşma kaldığı yerden devam eder — in-memory dict'ten farkı budur."
+              "code": "                 redis_url='redis://localhost:6379'):\n        self.redis = redis.from_url(\n            redis_url, decode_responses=True)",
+              "why": "Priority queue operasyonlarını tamamlıyoruz. Redis Sorted Set ile öncelik sıralaması sağlanır."
             },
             {
               "order": "2.2",
@@ -2278,17 +2218,17 @@
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
               "position": "inside_class",
-              "code": "async def enqueue(self, conv_id: str,\n                      handoff: dict,\n                      escalation: dict):\n        ticket = {\n            \"conv_id\": conv_id,\n            \"priority\": escalation.get(\n                \"priority\", \"p4\"),\n            \"reason\": escalation.get(\"reason\", \"\"),",
+              "code": "async def enqueue(self, conv_id: str,\n                      handoff: dict,\n                      escalation: dict):\n        ticket = {\n            \"conv_id\": conv_id,\n            \"priority\": escalation.get(\n                \"priority\", \"p4\"),",
               "why": "zadd score ile P1=4, P4=1 şeklinde puanlama yapar. zrevrange ile en yüksek puanlı (en acil) ticket önce çıkar."
             },
             {
               "order": "2.2a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
               "position": "inside_class",
-              "code": "            \"summary\": handoff.get(\"summary\", \"\"),\n            \"created_at\":\n                datetime.utcnow().isoformat(),\n            \"status\": \"waiting\"}\n        score = {\"p1\":4, \"p2\":3,\n                 \"p3\":2, \"p4\":1}.get(\n                     ticket[\"priority\"], 1)\n        await self.redis.zadd(",
-              "why": "Redis'te session verisi JSON olarak saklanıyor. TTL ile eski session'lar otomatik temizlenir — bellek yönetimi için kritik. Server restart sonrası veri korunur."
+              "code": "            \"reason\": escalation.get(\"reason\", \"\"),\n            \"summary\": handoff.get(\"summary\", \"\"),\n            \"created_at\":\n                datetime.utcnow().isoformat(),\n            \"status\": \"waiting\"}\n        score = {\"p1\":4, \"p2\":3,\n                 \"p3\":2, \"p4\":1}.get(",
+              "why": "Priority queue operasyonlarını tamamlıyoruz. Redis Sorted Set ile öncelik sıralaması sağlanır."
             },
             {
               "order": "2.2b",
@@ -2296,8 +2236,8 @@
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
               "position": "inside_class",
-              "code": "            \"escalation_queue\",\n            {json.dumps(ticket): score})\n        return ticket",
-              "why": "Sentiment analizi ile konuşma kalitesini ölçüyoruz. Düşük skor, müşterinin memnuniyetsiz olduğunu gösterir — escalation kararında kullanılır."
+              "code": "                     ticket[\"priority\"], 1)\n        await self.redis.zadd(\n            \"escalation_queue\",\n            {json.dumps(ticket): score})\n        return ticket",
+              "why": "Priority queue operasyonlarını tamamlıyoruz. Redis Sorted Set ile öncelik sıralaması sağlanır."
             },
             {
               "order": "2.3",
@@ -2305,17 +2245,17 @@
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
               "position": "inside_class",
-              "code": "async def dequeue(self) -> Optional[Dict]:\n        results = await self.redis.zrevrange(\n            \"escalation_queue\", 0, 0)\n        if not results:\n            return None\n        ticket = json.loads(results[0])\n        await self.redis.zrem(\n            \"escalation_queue\", results[0])",
+              "code": "async def dequeue(self) -> Optional[Dict]:\n        results = await self.redis.zrevrange(\n            \"escalation_queue\", 0, 0)\n        if not results:\n            return None\n        ticket = json.loads(results[0])\n        await self.redis.zrem(",
               "why": "2.2'deki enqueue ile eklenen ticket'ları burada çıkarıyoruz. zrevrange(0, 0) en yüksek skorlu (en acil) ticket'ı alır."
             },
             {
               "order": "2.3a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
               "position": "inside_class",
-              "code": "        return ticket\n\n    async def get_queue_status(self) -> Dict:\n        total = await self.redis.zcard(\n            \"escalation_queue\")\n        return {\"total_waiting\": total,\n                \"estimated_wait\":\n                    f\"{total * 3} dakika\"}",
-              "why": "Eskalasyon kuyruğunun durumunu döndürüyoruz. Bekleyen ticket sayısı ve öncelik dağılımı dashboard'da gösterilecek."
+              "code": "            \"escalation_queue\", results[0])\n        return ticket\n\n    async def get_queue_status(self) -> Dict:\n        total = await self.redis.zcard(\n            \"escalation_queue\")\n        return {\"total_waiting\": total,",
+              "why": "Priority queue operasyonlarını tamamlıyoruz. Redis Sorted Set ile öncelik sıralaması sağlanır."
             },
             {
               "order": "2.3b",
@@ -2323,15 +2263,15 @@
               "type": "code_add",
               "file": "orchestrator/services/queue.py",
               "position": "inside_class",
-              "code": "\nescalation_queue = EscalationQueue()",
-              "why": "2.3 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "                \"estimated_wait\":\n                    f\"{total * 3} dakika\"}\n\nescalation_queue = EscalationQueue()",
+              "why": "Priority queue operasyonlarını tamamlıyoruz. Redis Sorted Set ile öncelik sıralaması sağlanır."
             },
             {
               "order": "2.4",
               "action": "BAŞKA DOSYAYA GEÇ — escalation API endpoint'leri oluştur",
               "type": "code_write",
               "file": "orchestrator/api/escalation.py",
-              "code": "from fastapi import APIRouter\nfrom ..services.queue import escalation_queue\nimport json\n\nrouter = APIRouter(\n    prefix=\"/api/escalation\",\n    tags=[\"escalation\"])\n",
+              "code": "from fastapi import APIRouter\nfrom ..services.queue import escalation_queue\nimport json\n\nrouter = APIRouter(\n    prefix=\"/api/escalation\",\n    tags=[\"escalation\"])",
               "why": "2.1-2.3'te yazdığımız queue servisini API endpoint'leri ile sunuyoruz. İnsan agent'lar bu endpoint'ler ile kuyruktan ticket alır."
             },
             {
@@ -2340,7 +2280,7 @@
               "type": "code_write",
               "file": "orchestrator/api/escalation.py",
               "code": "@router.get(\"/queue\")\nasync def get_queue():\n    return await escalation_queue.get_queue_status()\n\n@router.post(\"/dequeue\")\nasync def dequeue_ticket():\n    ticket = await escalation_queue.dequeue()\n    return ticket or {\"message\": \"Kuyruk boş\"}",
-              "why": "Eskalasyon kuyruğunun durumunu döndürüyoruz. Bekleyen ticket sayısı ve öncelik dağılımı dashboard'da gösterilecek."
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
             },
             {
               "order": "2.5",
@@ -2401,41 +2341,32 @@
               "action": "ÜSTE ÇIK — servis import'larını ekle, sonra GERİ DÖN endpoint'leri yaz",
               "type": "code_modify",
               "file": "orchestrator/api/dashboard.py",
-              "code": "from fastapi import APIRouter\nfrom ..services.queue import escalation_queue\nfrom ..services.session_store import session_store\n\nrouter = APIRouter(\n    prefix=\"/api/dashboard\",\n    tags=[\"dashboard\"])\n",
+              "code": "from fastapi import APIRouter\nfrom ..services.queue import escalation_queue\nfrom ..services.session_store import session_store\n\nrouter = APIRouter(\n    prefix=\"/api/dashboard\",\n    tags=[\"dashboard\"])",
               "why": "M4 Step 2'deki queue servisini ve M3 Step 2'deki session_store'u kullanarak dashboard verileri oluşturuyoruz."
             },
             {
               "order": "3.2a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/api/dashboard.py",
-              "code": "@router.get(\"/stats\")\nasync def get_stats():\n    queue_status = await \\\n        escalation_queue.get_queue_status()\n    return {\"queue\": queue_status,\n            \"agents\": {\"online\": 0,\n                       \"busy\": 0,\n                       \"available\": 0}}",
-              "why": "Eskalasyon kuyruğunun durumunu döndürüyoruz. Bekleyen ticket sayısı ve öncelik dağılımı dashboard'da gösterilecek."
+              "code": "@router.get(\"/stats\")\nasync def get_stats():\n    queue_status = await \\\n        escalation_queue.get_queue_status()\n    return {\"queue\": queue_status,\n            \"agents\": {\"online\": 0,\n                       \"busy\": 0,",
+              "why": "Dashboard endpoint'lerini tamamlıyoruz. Operasyonel verileri API üzerinden sunuyoruz."
             },
             {
               "order": "3.2b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/api/dashboard.py",
-              "code": "\n@router.get(\"/active-conversations\")\nasync def get_active_conversations():\n    keys = []\n    async for key in \\\n            session_store.redis.scan_iter(\n                \"session:*\"):\n        keys.append(key)",
-              "why": "Redis'te session verisi JSON olarak saklanıyor. TTL ile eski session'lar otomatik temizlenir — bellek yönetimi için kritik. Server restart sonrası veri korunur."
+              "code": "                       \"available\": 0}}\n\n@router.get(\"/active-conversations\")\nasync def get_active_conversations():\n    keys = []\n    async for key in \\\n            session_store.redis.scan_iter(",
+              "why": "Dashboard endpoint'lerini tamamlıyoruz. Operasyonel verileri API üzerinden sunuyoruz."
             },
             {
               "order": "3.2c",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_modify",
               "file": "orchestrator/api/dashboard.py",
-              "code": "    return {\"active_count\": len(keys),\n            \"conversations\": keys[:20]}",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
-            },
-            {
-              "order": "3.3",
-              "action": "GERİ DÖN main.py'ye — dashboard router'ını include et",
-              "type": "code_modify",
-              "file": "orchestrator/main.py",
-              "position": "bottom",
-              "code": "from api.dashboard import router as dash_router\napp.include_router(dash_router)",
-              "why": "Dashboard endpoint'lerini ana uygulamaya ekliyoruz."
+              "code": "                \"session:*\"):\n        keys.append(key)\n    return {\"active_count\": len(keys),\n            \"conversations\": keys[:20]}\nfrom api.dashboard import router as dash_router\napp.include_router(dash_router)",
+              "why": "Dashboard endpoint'lerini tamamlıyoruz. Operasyonel verileri API üzerinden sunuyoruz."
             },
             {
               "order": "3.4",
@@ -2496,7 +2427,7 @@
               "action": "BAŞKA DOSYAYA GEÇ — analytics servisi oluştur, iskeletini yaz",
               "type": "code_write",
               "file": "orchestrator/services/analytics.py",
-              "code": "import json\nfrom datetime import datetime, timedelta\nfrom typing import Dict, List\nimport redis.asyncio as redis\n\nclass AnalyticsService:\n    def __init__(self,\n                 redis_url='redis://localhost:6379'):",
+              "code": "import json\nfrom datetime import datetime, timedelta\nfrom typing import Dict, List\nimport redis.asyncio as redis\n\nclass AnalyticsService:\n    def __init__(self,",
               "why": "Analytics servisi Redis hash'leri ile günlük metrikler tutar. hincrby ile atomik sayaçlar — concurrent erişimde veri kaybı olmaz."
             },
             {
@@ -2504,8 +2435,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/services/analytics.py",
-              "code": "        self.redis = redis.from_url(\n            redis_url, decode_responses=True)",
-              "why": "Redis ile session state'i kalıcı hale getiriyoruz. Server restart sonrası konuşma kaldığı yerden devam eder — in-memory dict'ten farkı budur."
+              "code": "                 redis_url='redis://localhost:6379'):\n        self.redis = redis.from_url(\n            redis_url, decode_responses=True)",
+              "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
               "order": "1.2",
@@ -2513,26 +2444,26 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "async def track_event(self, event_type: str,\n                          data: dict):\n        event = {\"type\": event_type,\n                 \"data\": data,\n                 \"timestamp\":\n                     datetime.utcnow().isoformat()}\n        await self.redis.lpush(\n            \"analytics:events\",",
+              "code": "async def track_event(self, event_type: str,\n                          data: dict):\n        event = {\"type\": event_type,\n                 \"data\": data,\n                 \"timestamp\":\n                     datetime.utcnow().isoformat()}\n        await self.redis.lpush(",
               "why": "track_event hem event listesine ekler hem günlük sayacı artırır. İki farklı veri yapısı: detaylı analiz için events listesi, hızlı dashboard için daily hash."
             },
             {
               "order": "1.2a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "            json.dumps(event))\n        date_key = datetime.utcnow().strftime(\n            \"%Y-%m-%d\")\n        await self.redis.hincrby(\n            f\"analytics:daily:{date_key}\",\n            event_type, 1)\n\n    async def get_agent_metrics(self) -> Dict:",
-              "why": "Her olayı Redis'e JSON olarak kaydediyoruz. Tarih bazlı key ile günlük metrikler ayrı ayrı sorgulanabilir — analytics aggregation için verimli."
+              "code": "            \"analytics:events\",\n            json.dumps(event))\n        date_key = datetime.utcnow().strftime(\n            \"%Y-%m-%d\")\n        await self.redis.hincrby(\n            f\"analytics:daily:{date_key}\",\n            event_type, 1)",
+              "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
               "order": "1.2b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "        date_key = datetime.utcnow().strftime(\n            \"%Y-%m-%d\")\n        daily = await self.redis.hgetall(\n            f\"analytics:daily:{date_key}\")\n        return {\n            \"date\": date_key,\n            \"total_conversations\": int(\n                daily.get(\"conversation_start\", 0)),",
-              "why": "Redis'te session verisi JSON olarak saklanıyor. TTL ile eski session'lar otomatik temizlenir — bellek yönetimi için kritik. Server restart sonrası veri korunur."
+              "code": "\n    async def get_agent_metrics(self) -> Dict:\n        date_key = datetime.utcnow().strftime(\n            \"%Y-%m-%d\")\n        daily = await self.redis.hgetall(\n            f\"analytics:daily:{date_key}\")\n        return {",
+              "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
               "order": "1.2c",
@@ -2540,8 +2471,8 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "            \"escalations\": int(\n                daily.get(\"escalation\", 0)),\n            \"faq_resolved\": int(\n                daily.get(\"faq_resolved\", 0))}",
-              "why": "1.2 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "code": "            \"date\": date_key,\n            \"total_conversations\": int(\n                daily.get(\"conversation_start\", 0)),\n            \"escalations\": int(\n                daily.get(\"escalation\", 0)),\n            \"faq_resolved\": int(\n                daily.get(\"faq_resolved\", 0))}",
+              "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
               "order": "1.3",
@@ -2549,7 +2480,7 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "async def get_weekly_trends(\n            self) -> List[Dict]:\n        trends = []\n        for i in range(7):\n            date = (datetime.utcnow() -\n                    timedelta(days=i)\n                    ).strftime(\"%Y-%m-%d\")\n            data = await self.redis.hgetall(",
+              "code": "async def get_weekly_trends(\n            self) -> List[Dict]:\n        trends = []\n        for i in range(7):\n            date = (datetime.utcnow() -\n                    timedelta(days=i)\n                    ).strftime(\"%Y-%m-%d\")",
               "why": "1.2'deki günlük hash'leri son 7 gün için çekerek trend analizi sağlar."
             },
             {
@@ -2558,24 +2489,15 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "                f\"analytics:daily:{date}\")\n            trends.append(\n                {\"date\": date,\n                 **{k: int(v)\n                    for k, v in data.items()}})\n        return trends\n\nanalytics_service = AnalyticsService()",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
-            },
-            {
-              "order": "1.4",
-              "action": "GERİ DÖN conversations.py'ye — ÜSTE ÇIK, analytics import'unu ekle",
-              "type": "code_modify",
-              "file": "orchestrator/api/conversations.py",
-              "position": "top",
-              "code": "from ..services.analytics import analytics_service",
-              "why": "1.1-1.3'te yazdığımız analytics_service'i API endpoint'lerinde kullanacağız."
+              "code": "            data = await self.redis.hgetall(\n                f\"analytics:daily:{date}\")\n            trends.append(\n                {\"date\": date,\n                 **{k: int(v)\n                    for k, v in data.items()}})\n        return trends\n\nanalytics_service = AnalyticsService()",
+              "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
               "order": "1.5",
               "action": "GERİ DÖN send_message'a — event tracking ekle",
               "type": "code_modify",
               "file": "orchestrator/api/conversations.py",
-              "code": "# send_message içinde graph.ainvoke sonrası:\n    await analytics_service.track_event(\n        \"message_sent\",\n        {\"conv_id\": conv_id,\n         \"agent\": result.get(\n             \"current_agent\", \"\")})",
+              "code": "from ..services.analytics import analytics_service\n# send_message içinde graph.ainvoke sonrası:\n    await analytics_service.track_event(\n        \"message_sent\",\n        {\"conv_id\": conv_id,\n         \"agent\": result.get(\n             \"current_agent\", \"\")})",
               "why": "M0 Step 4'teki send_message endpoint'ine metrik tracking ekliyoruz. Her mesaj ve agent etkileşimi otomatik kaydedilir."
             },
             {
@@ -2583,7 +2505,7 @@
               "action": "BAŞKA DOSYAYA GEÇ — analytics API endpoint'leri oluştur",
               "type": "code_write",
               "file": "orchestrator/api/analytics.py",
-              "code": "from fastapi import APIRouter\nfrom ..services.analytics import analytics_service\n\nrouter = APIRouter(\n    prefix=\"/api/analytics\",\n    tags=[\"analytics\"])\n\n@router.get(\"/metrics\")",
+              "code": "from fastapi import APIRouter\nfrom ..services.analytics import analytics_service\n\nrouter = APIRouter(\n    prefix=\"/api/analytics\",\n    tags=[\"analytics\"])\n",
               "why": "1.1-1.3'te yazdığımız analytics servisini API endpoint'leri ile sunuyoruz. Dashboard'da performans metriklerini ve trendleri gösterecek."
             },
             {
@@ -2591,8 +2513,16 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/api/analytics.py",
-              "code": "async def get_metrics():\n    return await \\\n        analytics_service.get_agent_metrics()\n\n@router.get(\"/trends\")\nasync def get_trends():\n    return await \\\n        analytics_service.get_weekly_trends()",
-              "why": "Agent performans metriklerini ve konuşma istatistiklerini API endpoint'leri üzerinden sunuyoruz. Dashboard bu verileri grafiklerle görselletirecek."
+              "code": "@router.get(\"/metrics\")\nasync def get_metrics():\n    return await \\\n        analytics_service.get_agent_metrics()\n\n@router.get(\"/trends\")\nasync def get_trends():",
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
+            },
+            {
+              "order": "1.6b",
+              "action": "GERİ DÖN — devamını yaz",
+              "type": "code_write",
+              "file": "orchestrator/api/analytics.py",
+              "code": "    return await \\\n        analytics_service.get_weekly_trends()",
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
             },
             {
               "order": "1.7",
@@ -2637,7 +2567,7 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "async def get_intent_distribution(\n            self) -> Dict:\n        events = await self.redis.lrange(\n            \"analytics:events\", 0, 999)\n        intents = {}\n        for e in events:\n            event = json.loads(e)\n            if event[\"type\"] == \"message_sent\":",
+              "code": "async def get_intent_distribution(\n            self) -> Dict:\n        events = await self.redis.lrange(\n            \"analytics:events\", 0, 999)\n        intents = {}\n        for e in events:\n            event = json.loads(e)",
               "why": "Step 1'deki track_event ile kaydedilen verileri analiz ediyoruz. Intent dağılımı en sık sorulan sorun tiplerini gösterir."
             },
             {
@@ -2646,8 +2576,8 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "                intent = event[\"data\"].get(\n                    \"agent\", \"unknown\")\n                intents[intent] = \\\n                    intents.get(intent, 0) + 1\n        return dict(sorted(\n            intents.items(),\n            key=lambda x: x[1], reverse=True))",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
+              "code": "            if event[\"type\"] == \"message_sent\":\n                intent = event[\"data\"].get(\n                    \"agent\", \"unknown\")\n                intents[intent] = \\\n                    intents.get(intent, 0) + 1\n        return dict(sorted(\n            intents.items(),\n            key=lambda x: x[1], reverse=True))",
+              "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
               "order": "2.2",
@@ -2655,7 +2585,7 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "async def get_avg_conversation_length(\n            self) -> float:\n        events = await self.redis.lrange(\n            \"analytics:events\", 0, 999)\n        conv_lengths = {}\n        for e in events:\n            event = json.loads(e)\n            if event[\"type\"] == \"message_sent\":",
+              "code": "async def get_avg_conversation_length(\n            self) -> float:\n        events = await self.redis.lrange(\n            \"analytics:events\", 0, 999)\n        conv_lengths = {}\n        for e in events:\n            event = json.loads(e)",
               "why": "Ortalama konuşma uzunluğu agent verimliliğinin göstergesi. Kısa konuşma = hızlı çözüm = iyi performans."
             },
             {
@@ -2664,8 +2594,8 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "                cid = event[\"data\"].get(\n                    \"conv_id\", \"\")\n                conv_lengths[cid] = \\\n                    conv_lengths.get(cid, 0) + 1\n        return sum(conv_lengths.values()) / \\\n            max(len(conv_lengths), 1)",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
+              "code": "            if event[\"type\"] == \"message_sent\":\n                cid = event[\"data\"].get(\n                    \"conv_id\", \"\")\n                conv_lengths[cid] = \\\n                    conv_lengths.get(cid, 0) + 1\n        return sum(conv_lengths.values()) / \\\n            max(len(conv_lengths), 1)",
+              "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
             },
             {
               "order": "2.3",
@@ -2673,7 +2603,7 @@
               "type": "code_add",
               "file": "orchestrator/api/analytics.py",
               "position": "bottom",
-              "code": "@router.get(\"/intents\")\nasync def get_intents():\n    return await \\\n        analytics_service.get_intent_distribution()\n\n@router.get(\"/conversation-length\")\nasync def get_conv_length():\n    avg = await \\",
+              "code": "@router.get(\"/intents\")\nasync def get_intents():\n    return await \\\n        analytics_service.get_intent_distribution()\n\n@router.get(\"/conversation-length\")\nasync def get_conv_length():",
               "why": "2.1-2.2'de yazdığımız analiz fonksiyonlarını API endpoint'leri ile sunuyoruz."
             },
             {
@@ -2682,8 +2612,8 @@
               "type": "code_add",
               "file": "orchestrator/api/analytics.py",
               "position": "bottom",
-              "code": "        analytics_service.get_avg_conversation_length()\n    return {\n        \"average_messages_per_conversation\":\n            round(avg, 1)}",
-              "why": "İşlem sonucunu döndürüyoruz. Yapılandırılmış return değeri çağıran kodun sonucu güvenilir şekilde kullanmasını sağlar."
+              "code": "    avg = await \\\n        analytics_service.get_avg_conversation_length()\n    return {\n        \"average_messages_per_conversation\":\n            round(avg, 1)}",
+              "why": "Kodu tamamlıyoruz. Her parça belirli bir sorumluluğu üstlenir — modüler ve bakımı kolay yapı sağlanır."
             },
             {
               "order": "2.4",
@@ -2727,7 +2657,7 @@
               "action": "BAŞKA DOSYAYA GEÇ — gateway/index.js oluştur, server iskeletini yaz",
               "type": "code_write",
               "file": "gateway/index.js",
-              "code": "const WebSocket = require('ws');\nconst http = require('http');\nconst { v4: uuidv4 } = require('uuid');\nrequire('dotenv').config();\n\nconst server = http.createServer();\nconst wss = new WebSocket.Server({ server });\nconst ORCHESTRATOR_URL =",
+              "code": "const WebSocket = require('ws');\nconst http = require('http');\nconst { v4: uuidv4 } = require('uuid');\nrequire('dotenv').config();\n\nconst server = http.createServer();\nconst wss = new WebSocket.Server({ server });",
               "why": "Önce server iskeleti ve konfigürasyon. M0 Step 1'de npm install ettiğimiz ws, http ve uuid'yi kullanıyoruz."
             },
             {
@@ -2735,8 +2665,8 @@
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "gateway/index.js",
-              "code": "  process.env.ORCHESTRATOR_URL ||\n  'http://localhost:8000';\nconst connections = new Map();",
-              "why": "Gateway'in orchestrator'a bağlanacağı URL'i ve bağlantı havuzunu tanımlıyoruz. Map ile her WebSocket bağlantısını takip edeceğiz."
+              "code": "const ORCHESTRATOR_URL =\n  process.env.ORCHESTRATOR_URL ||\n  'http://localhost:8000';\nconst connections = new Map();",
+              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
               "order": "3.2",
@@ -2744,26 +2674,26 @@
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "bottom",
-              "code": "wss.on('connection', (ws) => {\n  const clientId = uuidv4();\n  connections.set(clientId, {\n    ws, convId: null });\n  ws.isAlive = true;\n  ws.on('pong', () => {\n    ws.isAlive = true; });\n  ws.on('message', async (data) => {",
+              "code": "wss.on('connection', (ws) => {\n  const clientId = uuidv4();\n  connections.set(clientId, {\n    ws, convId: null });\n  ws.isAlive = true;\n  ws.on('pong', () => {\n    ws.isAlive = true; });",
               "why": "3.1'deki wss'ye connection handler ekliyoruz. Her bağlantıya benzersiz clientId atanır. M0 Step 4'teki API endpoint'lerine fetch ile istek atar."
             },
             {
               "order": "3.2a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "bottom",
-              "code": "    try {\n      const msg = JSON.parse(data);\n      if (msg.type === 'start_conversation') {\n        const res = await fetch(\n          `${ORCHESTRATOR_URL}/api/conversations`,\n          { method: 'POST',\n            headers: {\n              'Content-Type': 'application/json'},",
-              "why": "JSON serialization ile veri yapılarını ağ üzerinden taşınabilir formata dönüştürüyoruz. WebSocket mesajları string olarak iletilir."
+              "code": "  ws.on('message', async (data) => {\n    try {\n      const msg = JSON.parse(data);\n      if (msg.type === 'start_conversation') {\n        const res = await fetch(\n          `${ORCHESTRATOR_URL}/api/conversations`,\n          { method: 'POST',",
+              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
               "order": "3.2b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "bottom",
-              "code": "            body: '{}' });\n        const conv = await res.json();\n        connections.get(clientId).convId = conv.id;\n        ws.send(JSON.stringify({\n          type: 'conversation_started',\n          data: conv }));\n      }\n    } catch (err) {",
-              "why": "WebSocket event handler'ları ile mesaj alışverişini yönetiyoruz. Her event tipi (message, close, error) için ayrı handler — separation of concerns."
+              "code": "            headers: {\n              'Content-Type': 'application/json'},\n            body: '{}' });\n        const conv = await res.json();\n        connections.get(clientId).convId = conv.id;\n        ws.send(JSON.stringify({\n          type: 'conversation_started',",
+              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
               "order": "3.2c",
@@ -2771,8 +2701,17 @@
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "bottom",
-              "code": "      ws.send(JSON.stringify({\n        type: 'error',\n        message: err.message })); }\n  });\n  ws.on('close', () =>\n    connections.delete(clientId));\n});",
-              "why": "WebSocket event handler'ları ile mesaj alışverişini yönetiyoruz. Her event tipi (message, close, error) için ayrı handler — separation of concerns."
+              "code": "          data: conv }));\n      }\n    } catch (err) {\n      ws.send(JSON.stringify({\n        type: 'error',\n        message: err.message })); }\n  });",
+              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
+            },
+            {
+              "order": "3.2d",
+              "action": "GERİ DÖN — devamını yaz",
+              "type": "code_add",
+              "file": "gateway/index.js",
+              "position": "bottom",
+              "code": "  ws.on('close', () =>\n    connections.delete(clientId));\n});",
+              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
               "order": "3.3",
@@ -2780,17 +2719,17 @@
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "inside_message_handler",
-              "code": "else if (msg.type === 'send_message') {\n        const convId =\n          connections.get(clientId)?.convId;\n        if (!convId) {\n          ws.send(JSON.stringify({\n            type: 'error',\n            message: 'No conversation'}));\n          return; }",
+              "code": "else if (msg.type === 'send_message') {\n        const convId =\n          connections.get(clientId)?.convId;\n        if (!convId) {\n          ws.send(JSON.stringify({\n            type: 'error',\n            message: 'No conversation'}));",
               "why": "3.2'de start_conversation'ı yazdık, şimdi send_message'ı ekliyoruz. M0 Step 4'teki POST /messages endpoint'ine istek atar ve yanıtı client'a iletir."
             },
             {
               "order": "3.3a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "inside_message_handler",
-              "code": "        const res = await fetch(\n          `${ORCHESTRATOR_URL}/api/conversations`\n          + `/${convId}/messages`,\n          { method: 'POST',\n            headers: {\n              'Content-Type': 'application/json'},\n            body: JSON.stringify({\n              content: msg.content }) });",
-              "why": "JSON serialization ile veri yapılarını ağ üzerinden taşınabilir formata dönüştürüyoruz. WebSocket mesajları string olarak iletilir."
+              "code": "          return; }\n        const res = await fetch(\n          `${ORCHESTRATOR_URL}/api/conversations`\n          + `/${convId}/messages`,\n          { method: 'POST',\n            headers: {\n              'Content-Type': 'application/json'},",
+              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
               "order": "3.3b",
@@ -2798,8 +2737,8 @@
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "inside_message_handler",
-              "code": "        ws.send(JSON.stringify({\n          type: 'agent_response',\n          data: await res.json() }));\n      }",
-              "why": "WebSocket event handler'ları ile mesaj alışverişini yönetiyoruz. Her event tipi (message, close, error) için ayrı handler — separation of concerns."
+              "code": "            body: JSON.stringify({\n              content: msg.content }) });\n        ws.send(JSON.stringify({\n          type: 'agent_response',\n          data: await res.json() }));\n      }",
+              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
               "order": "3.4",
@@ -2807,7 +2746,7 @@
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "bottom",
-              "code": "setInterval(() => {\n  wss.clients.forEach(ws => {\n    if (!ws.isAlive)\n      return ws.terminate();\n    ws.isAlive = false;\n    ws.ping();\n  });\n}, 30000);",
+              "code": "setInterval(() => {\n  wss.clients.forEach(ws => {\n    if (!ws.isAlive)\n      return ws.terminate();\n    ws.isAlive = false;\n    ws.ping();\n  });",
               "why": "Heartbeat her 30 saniyede ping gönderir — yanıt vermeyen bağlantıları terminate eder. Zombie connection'ları temizler."
             },
             {
@@ -2816,8 +2755,8 @@
               "type": "code_add",
               "file": "gateway/index.js",
               "position": "bottom",
-              "code": "\nserver.listen(\n  process.env.PORT || 3001,\n  () => console.log('WS Gateway running'));",
-              "why": "WebSocket event handler'ları ile mesaj alışverişini yönetiyoruz. Her event tipi (message, close, error) için ayrı handler — separation of concerns."
+              "code": "}, 30000);\n\nserver.listen(\n  process.env.PORT || 3001,\n  () => console.log('WS Gateway running'));",
+              "why": "WebSocket gateway mesaj işleme mantığını tamamlıyoruz. Her event tipi ayrı handler ile yönetilir."
             },
             {
               "order": "3.5",
@@ -2841,7 +2780,7 @@
               "type": "code_write",
               "file": "frontend/src/hooks/useWebSocket.ts",
               "code": "    useState<any[]>([]);\n  const reconnectRef =\n    useRef<NodeJS.Timeout>();",
-              "why": "React hook'ları ile component state ve yaşam döngüsünü yönetiyoruz. Her state değişikliği component'ı yeniden render eder."
+              "why": "Bağlantı koptuğunda 3 saniye sonra otomatik reconnect dener. Mobilde bağlantı sık kopar — kullanıcı fark etmeden yeniden bağlanır."
             },
             {
               "order": "3.7",
@@ -2859,7 +2798,7 @@
               "file": "frontend/src/hooks/useWebSocket.ts",
               "position": "inside_hook",
               "code": "      setIsConnected(false);\n      reconnectRef.current =\n        setTimeout(connect, 3000); };\n    ws.onerror = (err) =>\n      console.error('WS error:', err);\n  }, [url]);\n\n  useEffect(() => {",
-              "why": "React hook'ları ile component state ve yaşam döngüsünü yönetiyoruz. Her state değişikliği component'ı yeniden render eder."
+              "why": "Bağlantı koptuğunda 3 saniye sonra otomatik reconnect dener. Mobilde bağlantı sık kopar — kullanıcı fark etmeden yeniden bağlanır."
             },
             {
               "order": "3.7b",
@@ -2935,7 +2874,7 @@
               "type": "code_add",
               "file": "orchestrator/Dockerfile.prod",
               "position": "bottom",
-              "code": "FROM python:3.11-slim\nWORKDIR /app\nCOPY --from=builder /root/.local /root/.local\nCOPY . .\nENV PATH=/root/.local/bin:$PATH\nHEALTHCHECK --interval=30s --timeout=10s \\\n    --retries=3 CMD python -c \\\n    \"import urllib.request; \\",
+              "code": "FROM python:3.11-slim\nWORKDIR /app\nCOPY --from=builder /root/.local /root/.local\nCOPY . .\nENV PATH=/root/.local/bin:$PATH\nHEALTHCHECK --interval=30s --timeout=10s \\\n    --retries=3 CMD python -c \\",
               "why": "4.1'deki builder'dan sadece kurulu paketleri kopyalıyoruz. Health check M0 Step 1'deki /health endpoint'ini kullanır. 4 worker production trafiği için."
             },
             {
@@ -2944,32 +2883,32 @@
               "type": "code_add",
               "file": "orchestrator/Dockerfile.prod",
               "position": "bottom",
-              "code": "     urllib.request.urlopen(\\\n       'http://localhost:8000/health')\"\nCMD [\"uvicorn\", \"main:app\", \\\n     \"--host\", \"0.0.0.0\", \\\n     \"--port\", \"8000\", \"--workers\", \"4\"]",
-              "why": "Container başlatıldığında çalışacak komutu tanımlıyoruz. --host 0.0.0.0 ile container dışından erişime izin veriyoruz."
+              "code": "    \"import urllib.request; \\\n     urllib.request.urlopen(\\\n       'http://localhost:8000/health')\"\nCMD [\"uvicorn\", \"main:app\", \\\n     \"--host\", \"0.0.0.0\", \\\n     \"--port\", \"8000\", \"--workers\", \"4\"]",
+              "why": "Dockerfile konfigürasyonunu tamamlıyoruz. Health check ve optimized CMD ile production hazırlığı yapılır."
             },
             {
               "order": "4.3",
               "action": "BAŞKA DOSYAYA GEÇ — docker-compose.prod.yml oluştur",
               "type": "code_write",
               "file": "docker-compose.prod.yml",
-              "code": "version: '3.8'\nservices:\n  postgres:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: support\n      POSTGRES_USER: admin\n      POSTGRES_PASSWORD: ${DB_PASSWORD}",
+              "code": "version: '3.8'\nservices:\n  postgres:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: support\n      POSTGRES_USER: admin",
               "why": "M0 Step 1'deki docker-compose.yml'in production versiyonu. Health check, restart policy ve env var'lar eklendi."
             },
             {
               "order": "4.3a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "docker-compose.prod.yml",
-              "code": "    volumes:\n      - pgdata:/var/lib/postgresql/data\n    restart: unless-stopped\n    healthcheck:\n      test: ['CMD-SHELL',\n             'pg_isready -U admin']\n      interval: 10s\n      timeout: 5s",
-              "why": "Production Docker Compose'da volume, restart policy ve healthcheck ekliyoruz. Veri kalıcılığı ve otomatik kurtarma için kritik."
+              "code": "      POSTGRES_PASSWORD: ${DB_PASSWORD}\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n    restart: unless-stopped\n    healthcheck:\n      test: ['CMD-SHELL',\n             'pg_isready -U admin']",
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
               "order": "4.3b",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "docker-compose.prod.yml",
-              "code": "      retries: 5",
-              "why": "Healthcheck retry sayısını belirliyoruz. 5 başarısız denemeden sonra container unhealthy olarak işaretlenir ve Docker yeniden başlatır."
+              "code": "      interval: 10s\n      timeout: 5s\n      retries: 5",
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
               "order": "4.4",
@@ -2977,26 +2916,26 @@
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
-              "code": "redis:\n    image: redis:7-alpine\n    restart: unless-stopped\n    command: redis-server --maxmemory 256mb\n             --maxmemory-policy allkeys-lru\n  orchestrator:\n    build:\n      context: ./orchestrator",
+              "code": "redis:\n    image: redis:7-alpine\n    restart: unless-stopped\n    command: redis-server --maxmemory 256mb\n             --maxmemory-policy allkeys-lru\n  orchestrator:\n    build:",
               "why": "4.3'teki postgres servisinin üzerine Redis, orchestrator ve gateway'i ekliyoruz. 4.1-4.2'de yazdığımız Dockerfile.prod kullanılıyor."
             },
             {
               "order": "4.4a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
-              "code": "      dockerfile: Dockerfile.prod\n    environment:\n      - DATABASE_URL=postgresql://admin:\\\n          ${DB_PASSWORD}@postgres:5432/support\n      - REDIS_URL=redis://redis:6379\n      - OPENAI_API_KEY=${OPENAI_API_KEY}\n    depends_on:\n      postgres:",
-              "why": "Orchestrator'a veritabanı, Redis ve OpenAI bağlantı bilgilerini environment variable olarak geçiyoruz. Container'lar arasi iletişim servis adıyla yapılır (postgres:5432)."
+              "code": "      context: ./orchestrator\n      dockerfile: Dockerfile.prod\n    environment:\n      - DATABASE_URL=postgresql://admin:\\\n          ${DB_PASSWORD}@postgres:5432/support\n      - REDIS_URL=redis://redis:6379\n      - OPENAI_API_KEY=${OPENAI_API_KEY}",
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
               "order": "4.4b",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
-              "code": "        condition: service_healthy\n    restart: unless-stopped\n  gateway:\n    build: ./gateway\n    environment:\n      - REDIS_URL=redis://redis:6379\n      - ORCHESTRATOR_URL=\\\n          http://orchestrator:8000",
-              "why": "Gateway servisi WebSocket bağlantılarını yönetecek. Orchestrator'a HTTP üzerinden bağlanır — separation of concerns: WS işlemleri gateway'de, AI işlemleri orchestrator'da."
+              "code": "    depends_on:\n      postgres:\n        condition: service_healthy\n    restart: unless-stopped\n  gateway:\n    build: ./gateway\n    environment:",
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
               "order": "4.4c",
@@ -3004,32 +2943,32 @@
               "type": "code_add",
               "file": "docker-compose.prod.yml",
               "position": "bottom",
-              "code": "    depends_on: [orchestrator]\n    restart: unless-stopped\nvolumes:\n  pgdata:",
-              "why": "depends_on ile gateway'in orchestrator'dan önce başlamamasını sağlıyoruz. pgdata volume tanımı YAML'in en altında olmalı — Docker Compose volumes formatı."
+              "code": "      - REDIS_URL=redis://redis:6379\n      - ORCHESTRATOR_URL=\\\n          http://orchestrator:8000\n    depends_on: [orchestrator]\n    restart: unless-stopped\nvolumes:\n  pgdata:",
+              "why": "Docker Compose konfigürasyonunu tamamlıyoruz. Her servis bağımlılıkları ve ortam değişkenleri ile tanımlanır."
             },
             {
               "order": "4.5",
               "action": "BAŞKA DOSYAYA GEÇ — structured logging modülü oluştur",
               "type": "code_write",
               "file": "orchestrator/logging_config.py",
-              "code": "import logging\nimport json\nfrom datetime import datetime\n\nclass JSONFormatter(logging.Formatter):\n    def format(self, record):\n        return json.dumps({\n            \"timestamp\":",
+              "code": "import logging\nimport json\nfrom datetime import datetime\n\nclass JSONFormatter(logging.Formatter):\n    def format(self, record):\n        return json.dumps({",
               "why": "Structured JSON logging production'da log analiz araçları (ELK, Datadog) ile uyumludur. Her log satırı parse edilebilir."
             },
             {
               "order": "4.5a",
-              "action": "GERİ DÖN — devamını ekle",
+              "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/logging_config.py",
-              "code": "                datetime.utcnow().isoformat(),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"module\": record.module})\n\ndef setup_logging():\n    handler = logging.StreamHandler()\n    handler.setFormatter(JSONFormatter())",
-              "why": "Zaman damgası alanları kayıtların ne zaman oluşturulduğunu takip eder. Konuşma geçmişini kronolojik sıralama ve analytics için kritik."
+              "code": "            \"timestamp\":\n                datetime.utcnow().isoformat(),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"module\": record.module})\n\ndef setup_logging():",
+              "why": "Logging konfigürasyonunu tamamlıyoruz. JSON formatter ile yapılandırılmış loglar üretilir."
             },
             {
               "order": "4.5b",
               "action": "GERİ DÖN — devamını yaz",
               "type": "code_write",
               "file": "orchestrator/logging_config.py",
-              "code": "    logging.basicConfig(\n        level=logging.INFO,\n        handlers=[handler])",
-              "why": "Konfigürasyon ayarlarını merkezi bir yerde tanımlıyoruz. Değişiklik gerektiğinde tek bir dosyayı güncellemek yeterli — DRY prensibi."
+              "code": "    handler = logging.StreamHandler()\n    handler.setFormatter(JSONFormatter())\n    logging.basicConfig(\n        level=logging.INFO,\n        handlers=[handler])",
+              "why": "Logging konfigürasyonunu tamamlıyoruz. JSON formatter ile yapılandırılmış loglar üretilir."
             },
             {
               "order": "4.6",
@@ -3226,7 +3165,7 @@
               "file": "README.md",
               "position": "bottom",
               "code": "\n## Getting Started\ngit clone, docker-compose up, env vars\n\n## License\nMIT",
-              "why": "3.3 adımındaki yapıyı genişletiyoruz. Her kod parçası belirli bir sorumluluğu üstlenir — böylece hata durumunda sorunun kaynağı hızla bulunur."
+              "why": "README'yi tamamlıyoruz. Profesyonel README projenin ilk izlenimini belirler — recruiter ve hiring manager ilk olarak buraya bakar."
             },
             {
               "order": "3.4",
