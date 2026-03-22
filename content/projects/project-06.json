@@ -376,8 +376,16 @@
               "type": "code_add",
               "file": "ai_content_platform/core/config.py",
               "position": "after_enum",
-              "code": "\n\nclass OpenAIConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"gpt-4o\"\n    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.0025\n    output_cost_per_1k: float = 0.01\n    model_config = {\"env_prefix\": \"OPENAI_\"}",
+              "code": "\n\nclass OpenAIConfig(BaseSettings):\n    api_key: SecretStr\n    model: str = \"gpt-4o\"",
               "why": "Her provider için ayrı config sınıfı. env_prefix sayesinde .env'deki OPENAI_API_KEY otomatik yüklenir. Maliyet bilgisi tracking için şimdiden ekliyoruz."
+            },
+            {
+              "order": "2.5x",
+              "action": "Enum'un ALTINA OpenAI config sınıfını ekle (devam)",
+              "type": "code_add",
+              "file": "ai_content_platform/core/config.py",
+              "code": "    max_tokens: int = 4096\n    input_cost_per_1k: float = 0.0025\n    output_cost_per_1k: float = 0.01\n    model_config = {\"env_prefix\": \"OPENAI_\"}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "2.6",
@@ -580,17 +588,8 @@
               "type": "code_add",
               "file": "ai_content_platform/providers/base.py",
               "position": "inside_base_class",
-              "code": "    def get_stats(self) -> dict:\n        return {\n            \"provider\": self.provider_name,\n            \"request_count\": self._request_count,\n            \"total_tokens\": self._total_tokens,\n            \"total_cost\": self._total_cost",
+              "code": "    def get_stats(self) -> dict:\n        return {\n            \"provider\": self.provider_name,\n            \"request_count\": self._request_count,\n            \"total_tokens\": self._total_tokens,\n            \"total_cost\": self._total_cost\n        }",
               "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
-            },
-            {
-              "order": "3.7d",
-              "action": "DEVAM: Ortak metodları ekle — bunlar abstract DEĞİL, tüm provider'lar paylaşır (bölüm 4/4)",
-              "type": "code_add",
-              "file": "ai_content_platform/providers/base.py",
-              "position": "inside_base_class",
-              "code": "        }",
-              "why": "Python modül yapısı her dosyanın tek bir sorumluluğa sahip olmasını sağlar — import sistemi bağımlılıkları açıkça tanımlar."
             },
             {
               "order": "3.8",
@@ -2058,8 +2057,16 @@
               "type": "code_add",
               "file": "ai_content_platform/api/routes/content.py",
               "position": "bottom",
-              "code": "\n\n@router.get(\"/costs\")\nasync def get_cost_report():\n    from ai_content_platform.core.database import get_db\n    from ai_content_platform.core.cost_tracker import CostTracker\n    async for db in get_db():\n        tracker = CostTracker(db)\n        return await tracker.get_monthly_report()",
+              "code": "\n\n@router.get(\"/costs\")\nasync def get_cost_report():\n    from ai_content_platform.core.database import get_db",
               "why": "5.7-5.8'de oluşturduğumuz CostTracker'ı API endpoint'i olarak expose ediyoruz. Provider bazında harcama raporu döner."
+            },
+            {
+              "order": "5.9x",
+              "action": "BAŞKA DOSYAYA GEÇ — content.py'ye maliyet raporu endpoint'i ekle (devam)",
+              "type": "code_add",
+              "file": "ai_content_platform/api/routes/content.py",
+              "code": "    from ai_content_platform.core.cost_tracker import CostTracker\n    async for db in get_db():\n        tracker = CostTracker(db)\n        return await tracker.get_monthly_report()",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "5.10",

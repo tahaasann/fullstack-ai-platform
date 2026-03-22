@@ -231,7 +231,7 @@
               "order": "1.8b",
               "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
               "type": "code_add",
-              "why": "Altyapi yapilandirmasinin siradaki bolumunu ekliyoruz.",
+              "why": "PostgreSQL konteynerinin dis dunyadan erisilebilmesi icin 5432 portunu host makineye yonlendiriyoruz.",
               "code": "- '5432:5432'",
               "file": "docker-compose.yml",
               "position": "bottom"
@@ -265,8 +265,16 @@
               "action": "ALTTA DEVAM ET: volume ve healthcheck ekle",
               "type": "code_modify",
               "why": "Veri kaliciligini ve servis saglik kontrolunu yapilandiriyoruz.",
-              "code": "fraud-service:\n    build: ./fraud-detection\n    ports:\n      - '5000:5000'\n    depends_on:\n      - db\n\nvolumes:\n  pgdata:",
+              "code": "fraud-service:\n    build: ./fraud-detection\n    ports:\n      - '5000:5000'\n    depends_on:\n      - db",
               "file": "docker-compose.yml"
+            },
+            {
+              "order": "1.9dx",
+              "action": "ALTTA DEVAM ET: volume ve healthcheck ekle (devam)",
+              "type": "code_modify",
+              "file": "docker-compose.yml",
+              "code": "volumes:\n  pgdata:",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "1.10",
@@ -349,18 +357,17 @@
               "action": "ALTTA DEVAM ET: enum degerlerini tanimla",
               "type": "code_add",
               "why": "Enum ile sadece gecerli degerlerin kullanilmasini garanti ediyoruz.",
-              "code": "enum OrderStatus {\n  PENDING\n  PAID\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n  REFUNDED",
+              "code": "enum OrderStatus {\n  PENDING\n  PAID\n  PROCESSING\n  SHIPPED",
               "file": "prisma/schema.prisma",
               "position": "bottom"
             },
             {
-              "order": "2.3c",
-              "action": "ALTTA DEVAM ET: model tanimini kapat",
+              "order": "2.3bx",
+              "action": "ALTTA DEVAM ET: enum degerlerini tanimla (devam)",
               "type": "code_add",
-              "why": "Model blogu kapatilarak Prisma'nin semayi dogru parse etmesi saglaniyor.",
-              "code": "}",
               "file": "prisma/schema.prisma",
-              "position": "bottom"
+              "code": "  DELIVERED\n  CANCELLED\n  REFUNDED\n}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "2.4",
@@ -386,8 +393,16 @@
               "type": "code_add",
               "file": "prisma/schema.prisma",
               "position": "bottom",
-              "code": "\nmodel Category {\n  id       String    @id @default(cuid())\n  name     String    @unique\n  slug     String    @unique\n  products Product[]\n\n  @@map(\"categories\")\n}",
+              "code": "\nmodel Category {\n  id       String    @id @default(cuid())\n  name     String    @unique\n  slug     String    @unique\n  products Product[]",
               "why": "Ürünleri kategoriye göre filtrelemek için ayrı bir Category modeli. slug alanı URL-friendly isim tutar: 'Elektronik' -> 'elektronik'. products Product[] ile one-to-many ilişki kurulur."
+            },
+            {
+              "order": "2.5x",
+              "action": "ALTA DEVAM ET: Category modelini tanımla (devam)",
+              "type": "code_add",
+              "file": "prisma/schema.prisma",
+              "code": "  @@map(\"categories\")\n}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "2.6",
@@ -429,7 +444,7 @@
               "order": "2.7b",
               "action": "ALTTA DEVAM ET: model alanlarini ekle",
               "type": "code_add",
-              "why": "Modelin ek alanlarini tanimlayarak veri yapisini tamamliyoruz.",
+              "why": "Order modeline Stripe odeme ID'si, ML fraud skoru, siparis kalemleri iliskisi ve zaman damgalarini ekliyoruz. Bu alanlar odeme takibi ve dolandiricilik tespiti icin gerekli.",
               "code": "stripePaymentId String?     @unique\n  fraudScore      Float?      @default(0)\n  items           OrderItem[]\n  createdAt       DateTime    @default(now())\n  updatedAt       DateTime    @updatedAt",
               "file": "prisma/schema.prisma",
               "position": "bottom"
@@ -616,8 +631,16 @@
               "action": "ALTTA DEVAM ET: veritabani sorgusunu yaz",
               "type": "code_modify",
               "why": "Prisma ile veritabanindan veri cekerek istemciye donecek cevabi hazirliyoruz.",
-              "code": "};\n  }\n\n  async getBySlug(slug: string) {\n    return prisma.product.findUnique({\n      where: { slug },\n      include: { category: true },\n    });\n  }",
+              "code": "};\n  }\n\n  async getBySlug(slug: string) {\n    return prisma.product.findUnique({",
               "file": "src/services/product.service.ts"
+            },
+            {
+              "order": "3.4gx",
+              "action": "ALTTA DEVAM ET: veritabani sorgusunu yaz (devam)",
+              "type": "code_modify",
+              "file": "src/services/product.service.ts",
+              "code": "      where: { slug },\n      include: { category: true },\n    });\n  }",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.4h",
@@ -689,7 +712,7 @@
               "order": "3.6e",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "why": "ProductService sinifinin kapanisini yazarak export edilebilir hale getiriyoruz.",
               "code": "};",
               "file": "src/controllers/product.controller.ts",
               "position": "bottom"
@@ -707,16 +730,24 @@
               "order": "3.7b",
               "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
               "type": "code_add",
-              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
-              "code": "};\n\nexport const createProduct = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const product = await productService.create(req.body);\n    res.status(201).json(product);\n  } catch (err) {\n    next(err);\n  }",
+              "why": "getProducts handler'ini kapatip createProduct handler'ini ekliyoruz. Her endpoint bagimsiz try-catch ile hata izolasyonu saglar.",
+              "code": "};\n\nexport const createProduct = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const product = await productService.create(req.body);",
               "file": "src/controllers/product.controller.ts",
               "position": "bottom"
+            },
+            {
+              "order": "3.7bx",
+              "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat (devam)",
+              "type": "code_add",
+              "file": "src/controllers/product.controller.ts",
+              "code": "    res.status(201).json(product);\n  } catch (err) {\n    next(err);\n  }",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.7c",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "why": "createProduct controller fonksiyonunu kapatarak export ediyoruz. Hata durumunda next(err) ile Express error middleware'ine yonlendirir.",
               "code": "};",
               "file": "src/controllers/product.controller.ts",
               "position": "bottom"
@@ -733,8 +764,16 @@
               "action": "Product route tanımlarını yaz",
               "type": "code_write",
               "file": "src/routes/product.routes.ts",
-              "code": "import { Router } from 'express';\nimport {\n  getProducts,\n  getProductBySlug,\n  createProduct,\n} from '../controllers/product.controller';\n\nconst router = Router();\n\nrouter.get('/', getProducts);",
+              "code": "import { Router } from 'express';\nimport {\n  getProducts,\n  getProductBySlug,\n  createProduct,\n} from '../controllers/product.controller';",
               "why": "3.6-3.7'deki controller fonksiyonlarını import edip HTTP verb'lerine bağlıyoruz. GET / listeleme, GET /:slug detay, POST / oluşturma. RESTful API convention'ı."
+            },
+            {
+              "order": "3.9b",
+              "action": "ALTTA DEVAM ET: Product route tanımlarını yaz",
+              "type": "code_write",
+              "file": "src/routes/product.routes.ts",
+              "code": "const router = Router();\n\nrouter.get('/', getProducts);",
+              "why": "Route endpoint tanimlarini ekliyoruz. Her route bir HTTP metodu ve path ile controller fonksiyonunu eslestirir."
             },
             {
               "order": "3.9b",
@@ -1092,7 +1131,7 @@
               "order": "5.3c",
               "action": "ALTTA DEVAM ET: error handler kapanisi",
               "type": "code_add",
-              "why": "Hata yonetimi middleware'inin blok kapanisini tamamliyoruz.",
+              "why": "Bilinmeyen hatalari konsola loglayip istemciye 500 status code ile genel hata mesaji donduruyoruz. Production'da detay gostermemek guvenlik icin onemli.",
               "code": "}\n  console.error(err);\n  res.status(500).json({ error: 'Sunucu hatası' });\n};",
               "file": "src/middleware/error-handler.ts",
               "position": "bottom"
@@ -1117,18 +1156,17 @@
               "action": "ALTTA DEVAM ET: authenticate degerini hesapla",
               "type": "code_add",
               "why": "authenticate degerini hesaplayarak sonraki adimlarda kullanilmak uzere hazirliyoruz.",
-              "code": "export const authenticate = (\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {\n  const authHeader = req.headers.authorization;\n  if (!authHeader?.startsWith('Bearer ')) {\n    throw new AppError('Token gerekli', 401);",
+              "code": "export const authenticate = (\n  req: Request,\n  res: Response,\n  next: NextFunction\n) => {",
               "file": "src/middleware/auth.ts",
               "position": "bottom"
             },
             {
-              "order": "5.5c",
-              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "order": "5.5bx",
+              "action": "ALTTA DEVAM ET: authenticate degerini hesapla (devam)",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
-              "code": "}",
               "file": "src/middleware/auth.ts",
-              "position": "bottom"
+              "code": "  const authHeader = req.headers.authorization;\n  if (!authHeader?.startsWith('Bearer ')) {\n    throw new AppError('Token gerekli', 401);\n}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "5.5d",
@@ -1143,7 +1181,7 @@
               "order": "5.5e",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "why": "Zod validation middleware'ini kapatarak gecersiz input'larin 400 Bad Request ile reddedilmesini sagliyoruz.",
               "code": "};",
               "file": "src/middleware/auth.ts",
               "position": "bottom"
@@ -1160,14 +1198,22 @@
               "action": "Role-based authorization middleware'ini yaz",
               "type": "code_write",
               "file": "src/middleware/authorize.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport { AppError } from './error-handler';\n\nexport const authorize = (...roles: string[]) => {\n  return (req: Request, res: Response, next: NextFunction) => {\n    const userRole = (req as any).user?.role;\n    if (!roles.includes(userRole)) {\n      throw new AppError('Bu işlem için yetkiniz yok', 403);\n    }",
+              "code": "import { Request, Response, NextFunction } from 'express';\nimport { AppError } from './error-handler';\n\nexport const authorize = (...roles: string[]) => {\n  return (req: Request, res: Response, next: NextFunction) => {",
               "why": "Higher-order function pattern — authorize('ADMIN') çağrısı bir middleware döndürür. 5.5'teki authenticate'den sonra çalışır ve req.user.role'ü kontrol eder. 403 Forbidden yetki hatası."
+            },
+            {
+              "order": "5.7x",
+              "action": "Role-based authorization middleware'ini yaz (devam)",
+              "type": "code_write",
+              "file": "src/middleware/authorize.ts",
+              "code": "    const userRole = (req as any).user?.role;\n    if (!roles.includes(userRole)) {\n      throw new AppError('Bu işlem için yetkiniz yok', 403);\n    }",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "5.7b",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "why": "Validation middleware'ini export ederek route tanimlarinda validate(schema) seklinde kullanilabilir hale getiriyoruz.",
               "code": "next();\n  };\n};",
               "file": "src/middleware/authorize.ts",
               "position": "bottom"
@@ -1184,8 +1230,16 @@
               "action": "AuthService iskeletini yaz — register metodu",
               "type": "code_write",
               "file": "src/services/auth.service.ts",
-              "code": "import { PrismaClient } from '@prisma/client';\nimport bcrypt from 'bcrypt';\nimport jwt from 'jsonwebtoken';\n\nconst prisma = new PrismaClient();\n\nexport class AuthService {\n  async register(email: string, name: string, password: string) {\n    const existing = await prisma.user.findUnique({ where: { email } });\n    if (existing) throw new Error('Bu e-posta zaten kayıtlı');",
+              "code": "import { PrismaClient } from '@prisma/client';\nimport bcrypt from 'bcrypt';\nimport jwt from 'jsonwebtoken';\n\nconst prisma = new PrismaClient();",
               "why": "bcrypt.hash ile şifre güvenli şekilde hashlenir — düz metin saklanmaz. JWT token'a kullanıcı bilgileri gömülür. 5.5'teki middleware bu token'ı doğrulayacak."
+            },
+            {
+              "order": "5.9b",
+              "action": "ALTTA DEVAM ET: AuthService iskeletini yaz — register metodu",
+              "type": "code_write",
+              "file": "src/services/auth.service.ts",
+              "code": "export class AuthService {\n  async register(email: string, name: string, password: string) {\n    const existing = await prisma.user.findUnique({ where: { email } });\n    if (existing) throw new Error('Bu e-posta zaten kayıtlı');",
+              "why": "Dosyanin kalan yapilandirma ve tanim kisimlarini ekliyoruz."
             },
             {
               "order": "5.9b",
@@ -1218,7 +1272,7 @@
               "order": "5.10b",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_add",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "why": "Yetki kontrolu basarili oldugunda next() ile istegi controller'a iletiyoruz. Yetkisiz istekler buraya ulasamaz — onceki satirda 403 ile reddedilir.",
               "code": "//      process.env.JWT_SECRET!,\n//      { expiresIn: '7d' }\n//    );\n//    return { user: { id: user.id, email: user.email, name: user.name, role: user.role }, token };\n//  }",
               "file": "src/services/auth.service.ts",
               "position": "bottom"
@@ -1243,18 +1297,17 @@
               "action": "ALTTA DEVAM ET: route endpoint'lerini tanimla",
               "type": "code_add",
               "why": "HTTP verb ve path'leri controller fonksiyonlarina bagliyoruz.",
-              "code": "router.post('/register', async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const { email, name, password } = req.body;\n    const result = await authService.register(email, name, password);\n    res.status(201).json(result);\n  } catch (err) {\n    next(err);\n  }",
+              "code": "router.post('/register', async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const { email, name, password } = req.body;\n    const result = await authService.register(email, name, password);\n    res.status(201).json(result);",
               "file": "src/routes/auth.routes.ts",
               "position": "bottom"
             },
             {
-              "order": "5.12c",
-              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "order": "5.12bx",
+              "action": "ALTTA DEVAM ET: route endpoint'lerini tanimla (devam)",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
-              "code": "});",
               "file": "src/routes/auth.routes.ts",
-              "position": "bottom"
+              "code": "  } catch (err) {\n    next(err);\n  }\n});",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "5.12d",
@@ -1269,7 +1322,7 @@
               "order": "5.12e",
               "action": "ALTTA DEVAM ET: route handler kapanisi",
               "type": "code_add",
-              "why": "Route handler'in try-catch ve yanit islemini tamamliyoruz.",
+              "why": "Register isleminin son asamasi: JWT token uretimi ve kullanici bilgileriyle birlikte donus. Token 7 gun gecerli olacak sekilde ayarlandi.",
               "code": "});\n\nexport default router;",
               "file": "src/routes/auth.routes.ts",
               "position": "bottom"
@@ -1296,7 +1349,16 @@
               "action": "ALTTA DEVAM ET: Express uygulamasini yapilandir",
               "type": "code_add",
               "why": "Middleware ve route'lari Express uygulamasina bagleyerek sunucuyu hazirliyoruz.",
-              "code": "// Public routes\napp.use('/api/auth', authRoutes);\napp.use('/api/products', productRoutes);\n\n// Protected routes\napp.use('/api/cart', authenticate, cartRoutes);\n\napp.use(errorHandler);\n\nconst PORT = process.env.PORT || 3001;\napp.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));",
+              "code": "// Public routes\napp.use('/api/auth', authRoutes);\napp.use('/api/products', productRoutes);\n\n// Protected routes\napp.use('/api/cart', authenticate, cartRoutes);",
+              "file": "src/app.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "5.13cb",
+              "action": "ALTTA DEVAM ET: Express uygulamasini yapilandir",
+              "type": "code_add",
+              "why": "Express uygulamasina route ve middleware tanimlarini baglayip sunucuyu baslatiyoruz.",
+              "code": "app.use(errorHandler);\n\nconst PORT = process.env.PORT || 3001;\napp.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));",
               "file": "src/app.ts",
               "position": "bottom"
             },
@@ -1411,7 +1473,7 @@
               "order": "1.6b",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_modify",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "why": "Login route handler'ini kapatarak POST /api/auth/login endpoint'ini tanimliyoruz.",
               "code": "currency: 'try',\n        product_data: { name: item.name },\n        unit_amount: Math.round(item.price * 100),\n      },\n      quantity: item.quantity,\n    }));",
               "file": "src/services/payment.service.ts"
             },
@@ -1459,7 +1521,7 @@
               "order": "1.8c",
               "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
               "type": "code_add",
-              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
+              "why": "Auth route dosyasini default export ile kapatarak app.ts'de import edilebilir hale getiriyoruz.",
               "code": "orderId,\n      items,\n      email\n    );\n    res.json(session);\n  } catch (err) {\n    next(err);\n  }",
               "file": "src/controllers/payment.controller.ts",
               "position": "bottom"
@@ -1468,7 +1530,7 @@
               "order": "1.8d",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "why": "Stripe'in bekledigibiicimde line_items dizisini olusturuyoruz: TRY cinsinden fiyat (kurus bazinda cevirilmis) ve urun miktari.",
               "code": "};",
               "file": "src/controllers/payment.controller.ts",
               "position": "bottom"
@@ -1485,8 +1547,16 @@
               "action": "Payment route'unu yaz",
               "type": "code_write",
               "file": "src/routes/payment.routes.ts",
-              "code": "import { Router } from 'express';\nimport { createCheckout } from '../controllers/payment.controller';\nimport { authenticate } from '../middleware/auth';\n\nconst router = Router();\n\nrouter.post('/create-checkout', authenticate, createCheckout);\n\nexport default router;",
+              "code": "import { Router } from 'express';\nimport { createCheckout } from '../controllers/payment.controller';\nimport { authenticate } from '../middleware/auth';",
               "why": "Ödeme endpoint'i authenticate middleware ile korunuyor (Milestone 0, Step 5). Sadece giriş yapmış kullanıcılar ödeme başlatabilir."
+            },
+            {
+              "order": "1.10x",
+              "action": "Payment route'unu yaz (devam)",
+              "type": "code_write",
+              "file": "src/routes/payment.routes.ts",
+              "code": "const router = Router();\n\nrouter.post('/create-checkout', authenticate, createCheckout);\n\nexport default router;",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "1.11",
@@ -1553,14 +1623,22 @@
               "action": "Webhook handler iskeletini yaz — önce signature doğrulama",
               "type": "code_write",
               "file": "src/controllers/webhook.controller.ts",
-              "code": "import { Request, Response } from 'express';\nimport Stripe from 'stripe';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {\n  apiVersion: '2024-04-10',\n});\n\nexport const handleWebhook = async (req: Request, res: Response) => {\n  const sig = req.headers['stripe-signature'] as string;\n  let event: Stripe.Event;",
+              "code": "import { Request, Response } from 'express';\nimport Stripe from 'stripe';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {\n  apiVersion: '2024-04-10',",
               "why": "Webhook güvenliği kritik — signature doğrulama olmadan herkes sahte webhook gönderebilir. constructEvent, Stripe'ın imzasını doğrular. req.body raw olmalı (JSON parse edilmemiş), bunu app.ts'te ayarlayacağız."
+            },
+            {
+              "order": "2.2b",
+              "action": "ALTTA DEVAM ET: Webhook handler iskeletini yaz — önce signature doğrulama",
+              "type": "code_write",
+              "file": "src/controllers/webhook.controller.ts",
+              "code": "});\n\nexport const handleWebhook = async (req: Request, res: Response) => {\n  const sig = req.headers['stripe-signature'] as string;\n  let event: Stripe.Event;",
+              "why": "Dosyanin kalan yapilandirma ve tanim kisimlarini ekliyoruz."
             },
             {
               "order": "2.2b",
               "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
               "type": "code_add",
-              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
+              "why": "Controller'in request body'den orderId, items ve email'i alip PaymentService'e iletmesini ve Stripe session URL'ini donduresini sagliyoruz.",
               "code": "try {\n    event = stripe.webhooks.constructEvent(\n      req.body,\n      sig,\n      process.env.STRIPE_WEBHOOK_SECRET!\n    );\n  } catch (err: any) {\n    console.error('Webhook signature doğrulama hatası:', err.message);",
               "file": "src/controllers/webhook.controller.ts",
               "position": "bottom"
@@ -1594,7 +1672,7 @@
               "order": "2.3c",
               "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
               "type": "code_modify",
-              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
+              "why": "createCheckout controller fonksiyonunu export ederek payment route'undan cagirilabilir hale getiriyoruz.",
               "code": "try {\n    event = stripe.webhooks.constructEvent(\n      req.body,\n      sig,\n      process.env.STRIPE_WEBHOOK_SECRET!\n    );\n  } catch (err: any) {\n    console.error('Webhook signature hatası:', err.message);",
               "file": "src/controllers/webhook.controller.ts"
             },
@@ -1618,7 +1696,7 @@
               "order": "2.3f",
               "action": "ALTTA DEVAM ET: controller fonksiyonunu kapat",
               "type": "code_modify",
-              "why": "Controller metodunun try-catch blogunu kapatarak hata yonetimini tamamliyoruz.",
+              "why": "Stripe webhook imzasini dogrulamak icin constructEvent'i try-catch icine aliyoruz. Gecersiz imza 400 ile reddedilir — sahte webhook'lari engeller.",
               "code": "stripeSessionId: session.id,\n            stripePaymentId: session.payment_intent as string,\n          },\n        });\n        console.log(`Sipariş ${orderId} ödendi!`);\n      }\n      break;\n    }",
               "file": "src/controllers/webhook.controller.ts"
             },
@@ -1627,8 +1705,16 @@
               "action": "ALTTA DEVAM ET: event handler case'lerini yaz",
               "type": "code_modify",
               "why": "Her event tipi icin ayri islem mantigi tanimlayarak dogru akisi sagliyoruz.",
-              "code": "case 'payment_intent.payment_failed': {\n      const intent = event.data.object as Stripe.PaymentIntent;\n      console.error('Ödeme başarısız:', intent.id);\n      break;\n    }\n  }\n\n  res.json({ received: true });\n};",
+              "code": "case 'payment_intent.payment_failed': {\n      const intent = event.data.object as Stripe.PaymentIntent;\n      console.error('Ödeme başarısız:', intent.id);\n      break;\n    }\n  }",
               "file": "src/controllers/webhook.controller.ts"
+            },
+            {
+              "order": "2.3gx",
+              "action": "ALTTA DEVAM ET: event handler case'lerini yaz (devam)",
+              "type": "code_modify",
+              "file": "src/controllers/webhook.controller.ts",
+              "code": "  res.json({ received: true });\n};",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "2.4",
@@ -1749,7 +1835,7 @@
               "order": "3.2b",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_add",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "why": "Webhook handler'da Stripe signature dogrulamasini yapiyoruz. Secret key ile imza eslesmezse istek reddedilir — bu man-in-the-middle saldirilarina karsi koruma saglar.",
               "code": "// Geçerli durum geçişleri\nconst VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {\n  PENDING: ['PAID', 'CANCELLED'],\n  PAID: ['PROCESSING', 'REFUNDED'],\n  PROCESSING: ['SHIPPED'],\n  SHIPPED: ['DELIVERED'],\n  DELIVERED: [],\n  CANCELLED: [],",
               "file": "src/services/order.service.ts",
               "position": "bottom"
@@ -1758,7 +1844,7 @@
               "order": "3.2c",
               "action": "ALTTA DEVAM ET: service metodunu kapat",
               "type": "code_add",
-              "why": "Metodun blok kapanisini yazarak fonksiyonu tamamliyoruz.",
+              "why": "Basarili odeme durumunda siparisi PAID olarak guncelleyip Stripe session ve payment ID'lerini kaydediyoruz. Bu bilgiler iade islemlerinde gerekli olacak.",
               "code": "REFUNDED: [],\n};",
               "file": "src/services/order.service.ts",
               "position": "bottom"
@@ -1804,18 +1890,17 @@
               "action": "ALTTA DEVAM ET: getAllOrders fonksiyonunu yaz",
               "type": "code_add",
               "why": "getAllOrders fonksiyonunun is mantigini burada implement ediyoruz.",
-              "code": "async getAllOrders(status?: OrderStatus) {\n    const where = status ? { status } : {};\n    return prisma.order.findMany({\n      where,\n      include: { user: { select: { email: true, name: true } }, items: true },\n      orderBy: { createdAt: 'desc' },\n    });\n  }",
+              "code": "async getAllOrders(status?: OrderStatus) {\n    const where = status ? { status } : {};\n    return prisma.order.findMany({\n      where,\n      include: { user: { select: { email: true, name: true } }, items: true },",
               "file": "src/services/order.service.ts",
               "position": "bottom"
             },
             {
-              "order": "3.3f",
-              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "order": "3.3ex",
+              "action": "ALTTA DEVAM ET: getAllOrders fonksiyonunu yaz (devam)",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
-              "code": "}",
               "file": "src/services/order.service.ts",
-              "position": "bottom"
+              "code": "      orderBy: { createdAt: 'desc' },\n    });\n  }\n}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.4",
@@ -1888,7 +1973,16 @@
               "action": "ALTTA DEVAM ET: route endpoint'lerini tanimla",
               "type": "code_add",
               "why": "HTTP verb ve path'leri controller fonksiyonlarina bagliyoruz.",
-              "code": "} from '../controllers/order.controller';\n\nconst router = Router();\n\n// Müşteri route'ları\nrouter.get('/my-orders', authenticate, getMyOrders);\nrouter.get('/:id', authenticate, getOrderDetail);\n\n// Admin route'ları\nrouter.get('/', authenticate, authorize('ADMIN'), getAllOrders);\nrouter.patch('/:id/status', authenticate, authorize('ADMIN'), updateOrderStatus);",
+              "code": "} from '../controllers/order.controller';\n\nconst router = Router();\n\n// Müşteri route'ları\nrouter.get('/my-orders', authenticate, getMyOrders);\nrouter.get('/:id', authenticate, getOrderDetail);",
+              "file": "src/routes/order.routes.ts",
+              "position": "bottom"
+            },
+            {
+              "order": "3.7c",
+              "action": "ALTTA DEVAM ET: route endpoint'lerini tanimla",
+              "type": "code_add",
+              "why": "Route endpoint tanimlarini ekliyoruz. Her route bir HTTP metodu ve path ile controller fonksiyonunu eslestirir.",
+              "code": "// Admin route'ları\nrouter.get('/', authenticate, authorize('ADMIN'), getAllOrders);\nrouter.patch('/:id/status', authenticate, authorize('ADMIN'), updateOrderStatus);",
               "file": "src/routes/order.routes.ts",
               "position": "bottom"
             },
@@ -2113,7 +2207,7 @@
               "order": "5.5c",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "why": "Siparis durumu gecis kurallarini tanimliyoruz: her durum sadece belirli durumlara gecebilir. Ornegin PENDING sadece PAID veya CANCELLED olabilir — gecersiz gecisler engellenir.",
               "code": "};",
               "file": "src/controllers/payment.controller.ts",
               "position": "bottom"
@@ -2246,7 +2340,7 @@
               "order": "1.4c",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_modify",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "why": "Durum gecis haritasinin son satirlarini ekliyoruz: DELIVERED ve REFUNDED terminal durumlardir, baska duruma gecilemez.",
               "code": "}\n        await tx.product.update({\n          where: { id: item.product.id },\n          data: { stock: { decrement: item.quantity } },\n        });\n      }",
               "file": "src/services/order.service.ts"
             },
@@ -2254,7 +2348,7 @@
               "order": "1.4d",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_modify",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "why": "updateStatus metodunu kapatiyoruz. Gecersiz gecislerde hata firlatir, gecerlilerde veritabanini gunceller.",
               "code": "// 2. Toplam tutarı hesapla\n      const totalAmount = cartItems.reduce(\n        (sum, item) => sum + Number(item.product.price) * item.quantity,\n        0\n      );",
               "file": "src/services/order.service.ts"
             },
@@ -2262,7 +2356,7 @@
               "order": "1.4e",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_modify",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "why": "Rate limiter middleware'ini export ederek API endpoint'lerinde saniyede/dakikada istek sinirlamasi uygulanabilir hale getiriyoruz.",
               "code": "// 3. Siparişi oluştur\n      const order = await tx.order.create({\n        data: {\n          userId,\n          shippingAddress,\n          totalAmount,\n          items: {\n            create: cartItems.map((item) => ({",
               "file": "src/services/order.service.ts"
             },
@@ -2270,7 +2364,7 @@
               "order": "1.4f",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_modify",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "why": "Stok kontrolunden sonra atomik stok dusurme islemi yapiyoruz. Prisma'nin decrement operatoru race condition'lara karsi guvenli calisir.",
               "code": "productId: item.product.id,\n              quantity: item.quantity,\n              unitPrice: item.product.price,\n            })),\n          },\n        },\n        include: { items: { include: { product: true } } },\n      });",
               "file": "src/services/order.service.ts"
             },
@@ -2278,7 +2372,7 @@
               "order": "1.4g",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_modify",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "why": "Sepetteki urunlerin fiyat x miktar carpimini toplayarak toplam siparis tutarini hesapliyoruz.",
               "code": "// 4. Sepeti temizle\n      await cartService.clearCart(userId);\n\n      return order;\n    });\n  }",
               "file": "src/services/order.service.ts"
             },
@@ -2295,7 +2389,7 @@
               "order": "1.5b",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "why": "Prisma transaction icinde siparis kaydini olusturup siparis kalemlerini nested create ile ekliyoruz.",
               "code": "}\n};",
               "file": "src/controllers/order.controller.ts",
               "position": "bottom"
@@ -2547,8 +2641,16 @@
               "action": "StockService iskeletini yaz — boş sınıf",
               "type": "code_write",
               "file": "src/services/stock.service.ts",
-              "code": "export class StockService {\n  async getLowStockProducts(threshold?: number) {\n    // TODO\n  }\n\n  async getStockReport() {\n    // TODO\n  }\n}",
+              "code": "export class StockService {\n  async getLowStockProducts(threshold?: number) {\n    // TODO\n  }",
               "why": "Önce hangi metodlar lazım belirliyoruz. getLowStockProducts düşük stoklu ürünleri, getStockReport genel stok durumunu döndürecek."
+            },
+            {
+              "order": "3.2x",
+              "action": "StockService iskeletini yaz — boş sınıf (devam)",
+              "type": "code_write",
+              "file": "src/services/stock.service.ts",
+              "code": "  async getStockReport() {\n    // TODO\n  }\n}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.3",
@@ -2570,7 +2672,7 @@
               "order": "3.4b",
               "action": "ALTTA DEVAM ET: service metodunu kapat",
               "type": "code_modify",
-              "why": "Metodun blok kapanisini yazarak fonksiyonu tamamliyoruz.",
+              "why": "Her siparis kalemi icin siparis anindaki birim fiyati kaydediyoruz. Urun fiyati sonradan degisse bile siparis tutari degismemeli.",
               "code": "orderBy: { stock: 'asc' },\n    });\n  }",
               "file": "src/services/stock.service.ts"
             },
@@ -2635,8 +2737,16 @@
               "action": "Stock route'larını yaz — admin-only",
               "type": "code_write",
               "file": "src/routes/stock.routes.ts",
-              "code": "import { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { authorize } from '../middleware/authorize';\nimport { getLowStock, getStockReport } from '../controllers/stock.controller';\n\nconst router = Router();\n\nrouter.get('/low', authenticate, authorize('ADMIN'), getLowStock);\nrouter.get('/report', authenticate, authorize('ADMIN'), getStockReport);\n\nexport default router;",
+              "code": "import { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { authorize } from '../middleware/authorize';\nimport { getLowStock, getStockReport } from '../controllers/stock.controller';\n\nconst router = Router();",
               "why": "Stok bilgileri sadece admin görmeli — Milestone 0 Step 5'teki authenticate ve authorize middleware'lerini kullanıyoruz."
+            },
+            {
+              "order": "3.8b",
+              "action": "ALTTA DEVAM ET: Stock route'larını yaz — admin-only",
+              "type": "code_write",
+              "file": "src/routes/stock.routes.ts",
+              "code": "router.get('/low', authenticate, authorize('ADMIN'), getLowStock);\nrouter.get('/report', authenticate, authorize('ADMIN'), getStockReport);\n\nexport default router;",
+              "why": "Route endpoint tanimlarini ekliyoruz. Her route bir HTTP metodu ve path ile controller fonksiyonunu eslestirir."
             },
             {
               "order": "3.9",
@@ -2911,8 +3021,16 @@
               "type": "code_add",
               "file": "fraud-detection/train_model.py",
               "position": "bottom",
-              "code": "\n# Model eğit\nmodel = RandomForestClassifier(\n    n_estimators=100,\n    max_depth=10,\n    class_weight='balanced',\n    random_state=42,\n)\nmodel.fit(X_train_scaled, y_train)",
+              "code": "\n# Model eğit\nmodel = RandomForestClassifier(\n    n_estimators=100,\n    max_depth=10,",
               "why": "class_weight='balanced' ile nadir fraud sınıfına daha fazla ağırlık veriyoruz — aksi halde model her şeyi 'normal' diyerek %95 doğruluk elde eder ama hiç fraud yakalamaz."
+            },
+            {
+              "order": "2.5x",
+              "action": "AYNI DOSYADA DEVAM ET: Model eğitimi (devam)",
+              "type": "code_add",
+              "file": "fraud-detection/train_model.py",
+              "code": "    class_weight='balanced',\n    random_state=42,\n)\nmodel.fit(X_train_scaled, y_train)",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "2.6",
@@ -3017,8 +3135,16 @@
               "action": "Flask app iskeletini yaz — boş route'lar",
               "type": "code_write",
               "file": "fraud-detection/app.py",
-              "code": "from flask import Flask, jsonify\n\napp = Flask(__name__)\n\n@app.route('/health')\ndef health():\n    return jsonify({'status': 'ok'})\n\n@app.route('/predict', methods=['POST'])",
+              "code": "from flask import Flask, jsonify\n\napp = Flask(__name__)",
               "why": "Önce çalışan bir iskelet — health endpoint ile API'nin ayakta olduğunu kontrol edebiliriz. predict endpoint'i sonra dolduracağız."
+            },
+            {
+              "order": "3.2x",
+              "action": "Flask app iskeletini yaz — boş route'lar (devam)",
+              "type": "code_write",
+              "file": "fraud-detection/app.py",
+              "code": "@app.route('/health')\ndef health():\n    return jsonify({'status': 'ok'})\n\n@app.route('/predict', methods=['POST'])",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.2b",
@@ -3106,8 +3232,16 @@
               "action": "Dockerfile yaz",
               "type": "code_write",
               "file": "fraud-detection/Dockerfile",
-              "code": "FROM python:3.11-slim\n\nWORKDIR /app\n\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\n\nCOPY . .\n\nEXPOSE 5000\n\nCMD [\"gunicorn\", \"--bind\", \"0.0.0.0:5000\", \"app:app\"]",
+              "code": "FROM python:3.11-slim\n\nWORKDIR /app\n\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt",
               "why": "slim image ile boyut küçülür. Önce requirements.txt kopyalanır — Docker cache layer'ı sayesinde kod değişince bağımlılıklar tekrar yüklenmez. gunicorn production-grade WSGI server."
+            },
+            {
+              "order": "3.10b",
+              "action": "ALTTA DEVAM ET: Dockerfile yaz",
+              "type": "code_write",
+              "file": "fraud-detection/Dockerfile",
+              "code": "COPY . .\n\nEXPOSE 5000\n\nCMD [\"gunicorn\", \"--bind\", \"0.0.0.0:5000\", \"app:app\"]",
+              "why": "Konteynerin dinleyecegi portu belirtip baslatma komutunu tanimliyoruz."
             },
             {
               "order": "3.11",
@@ -3204,7 +3338,7 @@
               "order": "4.5b",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_modify",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
+              "why": "Siparis basarildiktan sonra sepeti temizliyoruz. Transaction icinde — siparis basarisiz olursa sepet de temizlenmez.",
               "code": "}) {\n    try {\n      const response = await axios.post(`${FRAUD_SERVICE_URL}/predict`, {\n        amount: orderData.amount,\n        num_items: orderData.numItems,\n        hour_of_day: orderData.hourOfDay,\n        days_since_registration: orderData.daysSinceRegistration,\n        previous_orders: orderData.previousOrders,",
               "file": "src/services/fraud.service.ts"
             },
@@ -3212,17 +3346,17 @@
               "order": "4.5c",
               "action": "ALTTA DEVAM ET: service islem mantigi",
               "type": "code_modify",
-              "why": "Is katmanindaki islem mantiginin kalan kismini tamamliyoruz.",
-              "code": "different_shipping: orderData.differentShipping ? 1 : 0,\n      });\n      return response.data;\n    } catch (error) {\n      console.error('Fraud servis hatası:', error);\n      return { is_fraud: false, fraud_probability: 0, risk_level: 'UNKNOWN' };\n    }\n  }",
+              "why": "OrderService sinifini ve createOrder metodunu kapatarak export ediyoruz.",
+              "code": "different_shipping: orderData.differentShipping ? 1 : 0,\n      });\n      return response.data;\n    } catch (error) {\n      console.error('Fraud servis hatası:', error);",
               "file": "src/services/fraud.service.ts"
             },
             {
-              "order": "4.5d",
-              "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
+              "order": "4.5cx",
+              "action": "ALTTA DEVAM ET: service islem mantigi (devam)",
               "type": "code_modify",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
-              "code": "}",
-              "file": "src/services/fraud.service.ts"
+              "file": "src/services/fraud.service.ts",
+              "code": "      return { is_fraud: false, fraud_probability: 0, risk_level: 'UNKNOWN' };\n    }\n  }\n}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "4.6",
@@ -3346,7 +3480,7 @@
               "order": "1.2b",
               "action": "ALTTA DEVAM ET: blok ve fonksiyon kapanislari",
               "type": "code_add",
-              "why": "Acik bloklari kapatarak JavaScript/TypeScript syntax'ini tamamliyoruz.",
+              "why": "Dusuk stoklu urunleri stok miktarina gore siralayarak envanter yonetimini kolaylastiriyoruz.",
               "code": "};",
               "file": "jest.config.ts",
               "position": "bottom"
@@ -3363,8 +3497,16 @@
               "action": "Test setup dosyasını yaz",
               "type": "code_write",
               "file": "tests/setup.ts",
-              "code": "import { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\nbeforeAll(async () => {\n  // Test veritabanına bağlan\n});\n\nafterAll(async () => {\n  await prisma.$disconnect();\n});",
+              "code": "import { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\n\nbeforeAll(async () => {\n  // Test veritabanına bağlan",
               "why": "Her test izole olmalı — önceki testin verileri sonrakini etkilememeli. Silme sırası foreign key constraint'lerine göre: önce bağımlı tablolar (OrderItem), sonra ana tablolar (User)."
+            },
+            {
+              "order": "1.4b",
+              "action": "ALTTA DEVAM ET: Test setup dosyasını yaz",
+              "type": "code_write",
+              "file": "tests/setup.ts",
+              "code": "});\n\nafterAll(async () => {\n  await prisma.$disconnect();\n});",
+              "why": "Dosyanin kalan yapilandirma ve tanim kisimlarini ekliyoruz."
             },
             {
               "order": "1.4b",
@@ -3557,7 +3699,7 @@
               "order": "2.3c",
               "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
               "type": "code_add",
-              "why": "Altyapi yapilandirmasinin siradaki bolumunu ekliyoruz.",
+              "why": "Fraud detection Python servisine HTTP POST ile siparis ozelliklerini (tutar, urun sayisi, saat) gonderiyoruz.",
               "code": "- run: echo 'TODO: test adımları'",
               "file": ".github/workflows/ci.yml",
               "position": "bottom"
@@ -3574,7 +3716,7 @@
               "order": "2.4b",
               "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
               "type": "code_modify",
-              "why": "Altyapi yapilandirmasinin siradaki bolumunu ekliyoruz.",
+              "why": "ML servisi hata verdiginde guvenli varsayilan (is_fraud: false) donduruyoruz — siparis akisi ML servisi cokse bile durmamali.",
               "code": "jobs:\n  test:\n    runs-on: ubuntu-latest",
               "file": ".github/workflows/ci.yml"
             },
@@ -3599,7 +3741,15 @@
               "action": "ALTTA DEVAM ET: CI pipeline adimlarini ekle",
               "type": "code_modify",
               "why": "GitHub Actions pipeline'ina test ve build adimlarini ekliyoruz.",
-              "code": "ports:\n          - 6379:6379\n\n    env:\n      DATABASE_URL: postgresql://ecomuser:ecompass@localhost:5432/ecommerce_test\n      REDIS_URL: redis://localhost:6379\n      JWT_SECRET: test-secret\n      STRIPE_SECRET_KEY: sk_test_mock\n\n    steps:",
+              "code": "ports:\n          - 6379:6379\n\n    env:\n      DATABASE_URL: postgresql://ecomuser:ecompass@localhost:5432/ecommerce_test\n      REDIS_URL: redis://localhost:6379\n      JWT_SECRET: test-secret\n      STRIPE_SECRET_KEY: sk_test_mock",
+              "file": ".github/workflows/ci.yml"
+            },
+            {
+              "order": "2.4eb",
+              "action": "ALTTA DEVAM ET: CI pipeline adimlarini ekle",
+              "type": "code_modify",
+              "why": "CI pipeline adimlarini tanimliyoruz: bagimlilik kurulumu, migration, test ve tip kontrolu.",
+              "code": "    steps:",
               "file": ".github/workflows/ci.yml"
             },
             {
@@ -3614,7 +3764,7 @@
               "order": "2.4g",
               "action": "ALTTA DEVAM ET: YAML konfigurasyonunu tamamla",
               "type": "code_modify",
-              "why": "Altyapi yapilandirmasinin siradaki bolumunu ekliyoruz.",
+              "why": "FraudService sinifini kapatarak siparis olusturma akisinda import edilebilir hale getiriyoruz.",
               "code": "- run: pnpm dlx prisma migrate deploy\n      - run: pnpm test\n      - run: pnpm tsc --noEmit",
               "file": ".github/workflows/ci.yml"
             },
@@ -3744,7 +3894,7 @@
               "order": "3.4b",
               "action": "ALTTA DEVAM ET: route handler kapanisi",
               "type": "code_add",
-              "why": "Route handler'in try-catch ve yanit islemini tamamliyoruz.",
+              "why": "Test yardimci dosyasinin modul kapanisini yazarak Jest'in dosyayi dogru parse etmesini sagliyoruz.",
               "code": "*         name: page\n *         schema: { type: integer, default: 1 }\n *       - in: query\n *         name: search\n *         schema: { type: string }\n *     responses:\n *       200:\n *         description: Ürün listesi",
               "file": "src/routes/product.routes.ts",
               "position": "bottom"
@@ -3753,7 +3903,7 @@
               "order": "3.4c",
               "action": "ALTTA DEVAM ET: route handler kapanisi",
               "type": "code_add",
-              "why": "Route handler'in try-catch ve yanit islemini tamamliyoruz.",
+              "why": "CI pipeline'ina gecici test adimi ekliyoruz. Gercek komutlar sonraki adimlarda tanimlanacak — once pipeline'in calistigini dogruluyoruz.",
               "code": "*/",
               "file": "src/routes/product.routes.ts",
               "position": "bottom"
@@ -3877,8 +4027,16 @@
               "action": "Cache utility iskeletini yaz — getCached fonksiyonu",
               "type": "code_write",
               "file": "src/utils/cache.ts",
-              "code": "import { redis } from './redis';\n\nexport async function getCached<T>(\n  key: string,\n  ttl: number,\n  fetcher: () => Promise<T>\n): Promise<T> {\n  // TODO\n}",
+              "code": "import { redis } from './redis';\n\nexport async function getCached<T>(\n  key: string,\n  ttl: number,",
               "why": "Generic cache fonksiyonu: key ile cache'te ara, varsa döndür, yoksa fetcher'ı çağır, sonucu cache'le ve döndür. Milestone 0 Step 3'teki redis utility'yi kullanıyoruz."
+            },
+            {
+              "order": "1.2x",
+              "action": "Cache utility iskeletini yaz — getCached fonksiyonu (devam)",
+              "type": "code_write",
+              "file": "src/utils/cache.ts",
+              "code": "  fetcher: () => Promise<T>\n): Promise<T> {\n  // TODO\n}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "1.3",
@@ -4018,8 +4176,16 @@
               "action": "Multi-stage Dockerfile iskeletini yaz — build aşaması",
               "type": "code_write",
               "file": "Dockerfile",
-              "code": "# Build aşaması\nFROM node:20-alpine AS builder\n\nWORKDIR /app\n\nCOPY package.json pnpm-lock.yaml ./\nRUN npm install -g pnpm && pnpm install --frozen-lockfile\n\nCOPY . .\nRUN pnpm dlx prisma generate\nRUN pnpm tsc",
+              "code": "# Build aşaması\nFROM node:20-alpine AS builder\n\nWORKDIR /app",
               "why": "Önce bağımlılıkları, sonra kaynak kodunu kopyalıyoruz — Docker cache layer'ı sayesinde kod değişince bağımlılıklar tekrar yüklenmez. prisma generate client kodu üretir, tsc TypeScript derler."
+            },
+            {
+              "order": "2.2b",
+              "action": "ALTTA DEVAM ET: Multi-stage Dockerfile iskeletini yaz — build aşaması",
+              "type": "code_write",
+              "file": "Dockerfile",
+              "code": "COPY package.json pnpm-lock.yaml ./\nRUN npm install -g pnpm && pnpm install --frozen-lockfile\n\nCOPY . .\nRUN pnpm dlx prisma generate\nRUN pnpm tsc",
+              "why": "Dosyanin kalan yapilandirma ve tanim kisimlarini ekliyoruz."
             },
             {
               "order": "2.3",
@@ -4027,8 +4193,17 @@
               "type": "code_add",
               "file": "Dockerfile",
               "position": "bottom",
-              "code": "# Production aşaması\nFROM node:20-alpine\n\nWORKDIR /app\n\nCOPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules ./node_modules\nCOPY --from=builder /app/prisma ./prisma\nCOPY --from=builder /app/package.json ./\n\nEXPOSE 3001",
+              "code": "# Production aşaması\nFROM node:20-alpine\n\nWORKDIR /app",
               "why": "2.2'deki builder'dan sadece gerekli dosyaları kopyalıyoruz — TypeScript kaynak kodu, devDependencies hariç. Image boyutu ~200MB'den ~100MB'ye düşer."
+            },
+            {
+              "order": "2.3b",
+              "action": "ALTTA DEVAM ET: Production aşamasını ekle",
+              "type": "code_add",
+              "file": "Dockerfile",
+              "position": "bottom",
+              "code": "COPY --from=builder /app/dist ./dist\nCOPY --from=builder /app/node_modules ./node_modules\nCOPY --from=builder /app/prisma ./prisma\nCOPY --from=builder /app/package.json ./\n\nEXPOSE 3001",
+              "why": "Konteynerin dinleyecegi portu belirtip baslatma komutunu tanimliyoruz."
             },
             {
               "order": "2.3b",
@@ -4397,17 +4572,33 @@
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "## Kurulum\n\n```bash\n# Repo'yu klonla\ngit clone https://github.com/USERNAME/ecommerce-api.git\ncd ecommerce-api\n\n# Bağımlılıkları kur\npnpm install",
+              "code": "## Kurulum\n\n```bash\n# Repo'yu klonla\ngit clone https://github.com/USERNAME/ecommerce-api.git\ncd ecommerce-api",
               "why": "Klonlayan kişi 5 komutla projeyi çalıştırabilmeli. Milestone 0'daki adımların özeti."
+            },
+            {
+              "order": "3.4x",
+              "action": "AYNI DOSYADA DEVAM ET: Kurulum talimatları (devam)",
+              "type": "code_add",
+              "file": "README.md",
+              "code": "# Bağımlılıkları kur\npnpm install",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.4b",
               "action": "ALTTA DEVAM ET: kalan kodu ekle",
               "type": "code_add",
               "why": "Onceki adimda baslanan yapinin kalan bilesenlerini ekliyoruz.",
-              "code": "# Docker servislerini başlat\ndocker-compose up -d db redis\n\n# Migration uygula\npnpm dlx prisma migrate dev\n\n# Sunucuyu başlat\npnpm dev\n```",
+              "code": "# Docker servislerini başlat\ndocker-compose up -d db redis\n\n# Migration uygula\npnpm dlx prisma migrate dev",
               "file": "README.md",
               "position": "bottom"
+            },
+            {
+              "order": "3.4bx",
+              "action": "ALTTA DEVAM ET: kalan kodu ekle (devam)",
+              "type": "code_add",
+              "file": "README.md",
+              "code": "# Sunucuyu başlat\npnpm dev\n```",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.5",
@@ -4487,8 +4678,17 @@
               "type": "code_add",
               "file": "README.md",
               "position": "bottom",
-              "code": "## Environment Variables\n\n`.env.example` dosyasını `.env` olarak kopyala ve değerleri doldur.\n\n## Testler\n\n```bash\npnpm test           # Testleri çalıştır\npnpm test:coverage  # Coverage raporu\n```\n\n## Lisans",
+              "code": "## Environment Variables\n\n`.env.example` dosyasını `.env` olarak kopyala ve değerleri doldur.\n\n## Testler",
               "why": "Son bölümler: environment setup referansı, test komutları ve lisans. MIT lisansı open source projeler için standart."
+            },
+            {
+              "order": "3.8b",
+              "action": "ALTTA DEVAM ET: Environment variables ve lisans",
+              "type": "code_add",
+              "file": "README.md",
+              "position": "bottom",
+              "code": "```bash\npnpm test           # Testleri çalıştır\npnpm test:coverage  # Coverage raporu\n```\n\n## Lisans",
+              "why": "README dokumantasyonuna ortam degiskenleri tablosu, test komutlari ve lisans bilgisini ekliyoruz."
             },
             {
               "order": "3.8b",

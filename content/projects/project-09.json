@@ -327,8 +327,16 @@
               "type": "code_add",
               "file": "api/models.py",
               "position": "bottom",
-              "code": "\nclass Dataset(Base):\n    __tablename__ = \"datasets\"\n    id = Column(Integer, primary_key=True, index=True)\n    name = Column(String(255), nullable=False)\n    file_path = Column(String(500), nullable=False)\n    file_size = Column(Integer)\n    row_count = Column(Integer)\n    column_count = Column(Integer)",
+              "code": "\nclass Dataset(Base):\n    __tablename__ = \"datasets\"\n    id = Column(Integer, primary_key=True, index=True)\n    name = Column(String(255), nullable=False)",
               "why": "2.2'de yazdığımız Base'den miras alan Dataset sınıfı. Her sütun bir Column — primary_key otomatik artış sağlar, index=True sorguları hızlandırır."
+            },
+            {
+              "order": "2.2ax",
+              "action": "Base'in ALTINA Dataset sınıfını ekle (devam)",
+              "type": "code_add",
+              "file": "api/models.py",
+              "code": "    file_path = Column(String(500), nullable=False)\n    file_size = Column(Integer)\n    row_count = Column(Integer)\n    column_count = Column(Integer)",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "2.2b",
@@ -608,8 +616,16 @@
               "type": "code_add",
               "file": "api/services/data_cleaner.py",
               "position": "bottom",
-              "code": "\n    def clean(self):\n        self.report[\"final_shape\"] = self.df.shape\n        missing = self.df.isnull().sum().sum()\n        total = self.df.shape[0] * self.df.shape[1]\n        self.report[\"quality_score\"] = round(\n            (1 - missing / total) * 100, 2\n        ) if total > 0 else 0\n        return self.df, self.report",
+              "code": "\n    def clean(self):\n        self.report[\"final_shape\"] = self.df.shape\n        missing = self.df.isnull().sum().sum()\n        total = self.df.shape[0] * self.df.shape[1]",
               "why": "3.2-3.3'te eklediğimiz adımlardan sonra son halini döndürüyoruz. quality_score temizleme sonrası veri kalitesini ölçer — 100'e yakın olmalı."
+            },
+            {
+              "order": "3.4x",
+              "action": "clean() metodu — sonuçları döndür (devam)",
+              "type": "code_add",
+              "file": "api/services/data_cleaner.py",
+              "code": "        self.report[\"quality_score\"] = round(\n            (1 - missing / total) * 100, 2\n        ) if total > 0 else 0\n        return self.df, self.report",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.5",
@@ -820,8 +836,16 @@
               "type": "code_add",
               "file": "api/routers/datasets.py",
               "position": "bottom",
-              "code": "\n@router.get(\"/{dataset_id}/versions\")\nasync def list_versions(\n    dataset_id: int,\n    db: Session = Depends(get_db)\n):\n    return db.query(DatasetVersion).filter(\n        DatasetVersion.dataset_id == dataset_id\n    ).all()",
+              "code": "\n@router.get(\"/{dataset_id}/versions\")\nasync def list_versions(\n    dataset_id: int,\n    db: Session = Depends(get_db)",
               "why": "4.3'te versiyon oluşturduk — şimdi belirli bir dataset'in tüm versiyonlarını listeleme endpoint'i ekliyoruz."
+            },
+            {
+              "order": "4.4x",
+              "action": "Versiyonları listeleme endpoint'i ekle (devam)",
+              "type": "code_add",
+              "file": "api/routers/datasets.py",
+              "code": "):\n    return db.query(DatasetVersion).filter(\n        DatasetVersion.dataset_id == dataset_id\n    ).all()",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "4.5",
@@ -1943,8 +1967,16 @@
               "type": "code_add",
               "file": "api/routers/model_registry.py",
               "position": "bottom",
-              "code": "\n@router.post(\"/transition\")\nasync def transition(req: TransitionRequest):\n    if req.stage not in [\"Staging\", \"Production\", \"Archived\"]:\n        raise HTTPException(400, \"Geçersiz stage\")\n    client.transition_model_version_stage(\n        req.model_name, req.version, req.stage\n    )\n    return {\"version\": req.version, \"stage\": req.stage}",
+              "code": "\n@router.post(\"/transition\")\nasync def transition(req: TransitionRequest):\n    if req.stage not in [\"Staging\", \"Production\", \"Archived\"]:\n        raise HTTPException(400, \"Geçersiz stage\")",
               "why": "transition_model_version_stage modelin yaşam döngüsünü yönetir. Staging → Production geçişi test sonrası, Production → Archived rollback için kullanılır."
+            },
+            {
+              "order": "4.2bx",
+              "action": "Register ve transition endpoint'leri (devamı) (devam)",
+              "type": "code_add",
+              "file": "api/routers/model_registry.py",
+              "code": "    client.transition_model_version_stage(\n        req.model_name, req.version, req.stage\n    )\n    return {\"version\": req.version, \"stage\": req.stage}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "4.3",
@@ -2140,8 +2172,16 @@
               "type": "code_add",
               "file": "api/routers/inference.py",
               "position": "bottom",
-              "code": "\n@router.post(\"/load/{model_name}\")\nasync def load_model(model_name: str):\n    loaded = model_server.load_production_model(\n        model_name\n    )\n    if not loaded:\n        raise HTTPException(503, \"Model yüklenemedi\")\n    return {\"status\": \"loaded\", \"model_name\": model_name}",
+              "code": "\n@router.post(\"/load/{model_name}\")\nasync def load_model(model_name: str):\n    loaded = model_server.load_production_model(\n        model_name",
               "why": "1.4b'deki lazy-load'a ek olarak explicit load endpoint'i. Warmup amaçlı — deployment sonrası ilk isteği beklemeden modeli yükle."
+            },
+            {
+              "order": "1.5x",
+              "action": "Model yükleme endpoint'i (devam)",
+              "type": "code_add",
+              "file": "api/routers/inference.py",
+              "code": "    )\n    if not loaded:\n        raise HTTPException(503, \"Model yüklenemedi\")\n    return {\"status\": \"loaded\", \"model_name\": model_name}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "1.6",
@@ -2712,9 +2752,17 @@
               "action": "monitoring/drift_detector.py dosyasını oluştur — DriftDetector iskeleti (devamı)",
               "type": "code_add",
               "file": "monitoring/drift_detector.py",
-              "code": "\n    def set_baseline(self, df: pd.DataFrame,\n                     feature_columns: List[str]):\n        for col in feature_columns:\n            if pd.api.types.is_numeric_dtype(df[col]):\n                self.baseline_stats[col] = {\n                    \"values\": df[col].dropna().values,\n                    \"mean\": float(df[col].mean())\n}",
+              "code": "\n    def set_baseline(self, df: pd.DataFrame,\n                     feature_columns: List[str]):\n        for col in feature_columns:\n            if pd.api.types.is_numeric_dtype(df[col]):",
               "why": "set_baseline her sayısal sütunun değerlerini ve ortalamasını kaydeder. Bu baseline production verisinin karşılaştırma referansı olacak.",
               "position": "bottom"
+            },
+            {
+              "order": "2.1ax",
+              "action": "monitoring/drift_detector.py dosyasını oluştur — DriftDetector iskeleti (devamı) (devam)",
+              "type": "code_add",
+              "file": "monitoring/drift_detector.py",
+              "code": "                self.baseline_stats[col] = {\n                    \"values\": df[col].dropna().values,\n                    \"mean\": float(df[col].mean())\n}",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "2.2",

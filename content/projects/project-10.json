@@ -672,8 +672,16 @@
               "type": "code_add",
               "file": "backend/app/api/webhooks.py",
               "position": "before:router = APIRouter()",
-              "code": "def verify_github_signature(payload: bytes, signature: str, secret: str) -> bool:\n    \"\"\"GitHub webhook HMAC-SHA256 signature doğrulaması.\"\"\"\n    expected = 'sha256=' + hmac.new(\n        secret.encode('utf-8'),\n        payload,\n        hashlib.sha256\n    ).hexdigest()\n    return hmac.compare_digest(expected, signature)\n",
+              "code": "def verify_github_signature(payload: bytes, signature: str, secret: str) -> bool:\n    \"\"\"GitHub webhook HMAC-SHA256 signature doğrulaması.\"\"\"\n    expected = 'sha256=' + hmac.new(\n        secret.encode('utf-8'),\n        payload,",
               "why": "compare_digest timing attack'lara karşı korur — normal string karşılaştırma yerine sabit zamanlı karşılaştırma yapar. Bu güvenlik fonksiyonunu endpoint'ten önce tanımlıyoruz."
+            },
+            {
+              "order": "3.10x",
+              "action": "GERİ DÖN — signature doğrulama fonksiyonunu endpoint'in ÜSTÜNE yaz (devam)",
+              "type": "code_add",
+              "file": "backend/app/api/webhooks.py",
+              "code": "        hashlib.sha256\n    ).hexdigest()\n    return hmac.compare_digest(expected, signature)\n",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.11",
@@ -1316,8 +1324,16 @@
               "type": "code_add",
               "file": "analysis/metrics/complexity.py",
               "position": "bottom",
-              "code": "\ndef _cyclomatic_complexity(tree: ast.AST) -> int:\n    complexity = 1\n    for node in ast.walk(tree):\n        if isinstance(node, (ast.If, ast.While, ast.For,\n                             ast.ExceptHandler, ast.With,\n                             ast.Assert, ast.BoolOp)):\n            complexity += 1\n    return complexity",
+              "code": "\ndef _cyclomatic_complexity(tree: ast.AST) -> int:\n    complexity = 1\n    for node in ast.walk(tree):\n        if isinstance(node, (ast.If, ast.While, ast.For,",
               "why": "Cyclomatic complexity = karar noktası sayısı + 1. If, while, for, except, and/or — her biri bir karar noktası. Yüksek CC = karmaşık, test edilmesi zor kod."
+            },
+            {
+              "order": "2.11x",
+              "action": "GERİ DÖN — _cyclomatic_complexity yardımcı fonksiyonunu yaz (devam)",
+              "type": "code_add",
+              "file": "analysis/metrics/complexity.py",
+              "code": "                             ast.ExceptHandler, ast.With,\n                             ast.Assert, ast.BoolOp)):\n            complexity += 1\n    return complexity",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "2.12",
@@ -1532,8 +1548,16 @@
               "type": "code_add",
               "file": "analysis/metrics/pattern_detector.py",
               "position": "before:return smells",
-              "code": "    # TODO/FIXME yorumları\n    for i, line in enumerate(lines, 1):\n        if re.search(r'#\\s*(TODO|FIXME|HACK|XXX)', line, re.IGNORECASE):\n            smells.append(CodeSmell(\n                'todo_comment', 'suggestion', i,\n                f'Satır {i}\\'de çözülmemiş TODO/FIXME yorumu',\n                'Teknik borcu takip et ve sprint planlamasına ekle.',\n            ))\n",
+              "code": "    # TODO/FIXME yorumları\n    for i, line in enumerate(lines, 1):\n        if re.search(r'#\\s*(TODO|FIXME|HACK|XXX)', line, re.IGNORECASE):\n            smells.append(CodeSmell(\n                'todo_comment', 'suggestion', i,",
               "why": "TODO/FIXME yorumları teknik borcu gösterir. Bunları takip etmek ve sprint planlamasına dahil etmek kodun zamanla bozulmasını önler."
+            },
+            {
+              "order": "3.13x",
+              "action": "GERİ DÖN — TODO/FIXME yorum tespitini ekle (devam)",
+              "type": "code_add",
+              "file": "analysis/metrics/pattern_detector.py",
+              "code": "                f'Satır {i}\\'de çözülmemiş TODO/FIXME yorumu',\n                'Teknik borcu takip et ve sprint planlamasına ekle.',\n            ))\n",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.14",
@@ -1674,8 +1698,16 @@
               "type": "code_add",
               "file": "analysis/metrics/scoring.py",
               "position": "bottom",
-              "code": "\ndef calculate_score(\n    complexity: ComplexityResult,\n    pattern_count: int,\n    security_issue_count: int,\n) -> ScoreBreakdown:\n    cc_score = _normalize(complexity.cyclomatic_complexity, 1, 30, invert=True)\n    nesting_score = _normalize(complexity.max_nesting_depth, 0, 8, invert=True)\n    func_len_score = _normalize(complexity.max_function_length, 0, 100, invert=True)",
+              "code": "\ndef calculate_score(\n    complexity: ComplexityResult,\n    pattern_count: int,\n    security_issue_count: int,",
               "why": "Her metrik 0-100 aralığına normalize edilir. invert=True ile yüksek complexity = düşük skor. Cyclomatic complexity %50, nesting %30, fonksiyon uzunluğu %20 ağırlıkta."
+            },
+            {
+              "order": "4.5x",
+              "action": "calculate_score fonksiyonunun alt skor hesaplamalarını yaz (devam)",
+              "type": "code_add",
+              "file": "analysis/metrics/scoring.py",
+              "code": ") -> ScoreBreakdown:\n    cc_score = _normalize(complexity.cyclomatic_complexity, 1, 30, invert=True)\n    nesting_score = _normalize(complexity.max_nesting_depth, 0, 8, invert=True)\n    func_len_score = _normalize(complexity.max_function_length, 0, 100, invert=True)",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "4.6",
@@ -3052,8 +3084,16 @@
               "type": "code_add",
               "file": "backend/app/services/github_comment_service.py",
               "position": "bottom",
-              "code": "\n    def _build_security_summary(self, security_result: dict) -> str:\n        summary = security_result.get('summary', {})\n        findings = security_result.get('findings_by_severity', [])\n        text = '## 🛡️ Güvenlik Taraması\\n\\n'\n        if summary.get('pass'):\n            text += '✅ **BAŞARILI** — Kritik güvenlik açığı bulunamadı.\\n\\n'\n        else:\n            text += f\"❌ **BAŞARISIZ** — {summary.get('critical', 0)} kritik, {summary.get('high', 0)} yüksek seviye bulgu.\\n\\n\"",
+              "code": "\n    def _build_security_summary(self, security_result: dict) -> str:\n        summary = security_result.get('summary', {})\n        findings = security_result.get('findings_by_severity', [])\n        text = '## 🛡️ Güvenlik Taraması\\n\\n'",
               "why": "Güvenlik özetinin ilk kısmı pass/fail durumunu gösterir. Kritik bulgu yoksa yeşil tik, varsa kırmızı çarpı ile anında durumu belirtir."
+            },
+            {
+              "order": "3.7x",
+              "action": "github_comment_service.py'ye GERİ DÖN — güvenlik özeti başlangıcını yaz (devam)",
+              "type": "code_add",
+              "file": "backend/app/services/github_comment_service.py",
+              "code": "        if summary.get('pass'):\n            text += '✅ **BAŞARILI** — Kritik güvenlik açığı bulunamadı.\\n\\n'\n        else:\n            text += f\"❌ **BAŞARISIZ** — {summary.get('critical', 0)} kritik, {summary.get('high', 0)} yüksek seviye bulgu.\\n\\n\"",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "3.8",
@@ -3157,17 +3197,16 @@
               "action": "frontend/src/app/dashboard/layout.tsx dosyasını oluştur — dashboard layout iskeletini yaz",
               "type": "code_write",
               "file": "frontend/src/app/dashboard/layout.tsx",
-              "code": "export default async function DashboardLayout({ children }: { children: React.ReactNode }) {\n  return (\n    <div className=\"min-h-screen bg-gray-900 flex\">\n      <main className=\"flex-1 p-6 overflow-auto\">\n        {children}\n      </main>\n    </div>\n  );",
+              "code": "export default async function DashboardLayout({ children }: { children: React.ReactNode }) {\n  return (\n    <div className=\"min-h-screen bg-gray-900 flex\">\n      <main className=\"flex-1 p-6 overflow-auto\">\n        {children}",
               "why": "Önce minimum layout iskeletini yazıyoruz — dark tema arka planı ve flex yapısı. Sidebar ve auth kontrolünü adım adım ekleyeceğiz."
             },
             {
-              "order": "1.2",
-              "action": "DEVAM — dashboard layout iskeletini yaz",
-              "type": "code_add",
-              "file": "frontend/src/app/dashboard/layout.tsx",
-              "code": "}",
-              "why": "Önceki adımda başladığımız yapının devamını yazıyoruz — }...",
-              "position": "bottom"
+              "order": "1.1z",
+              "action": "frontend/src/app/dashboard/layout.tsx dosyasını oluştur — dashboard layout iskeletini yaz (son kisim)",
+              "type": "code_write",
+              "code": "      </main>\n    </div>\n  );\n}",
+              "why": "JSX return blogunu tamamliyoruz.",
+              "file": "frontend/src/app/dashboard/layout.tsx"
             },
             {
               "order": "1.3",
@@ -4034,17 +4073,16 @@
               "action": "analysis/rules/config_parser.py dosyasını oluştur — YAML parser iskeletini yaz",
               "type": "code_write",
               "file": "analysis/rules/config_parser.py",
-              "code": "DEFAULT_CONFIG = {\n    'ignore_paths': ['test/', 'tests/', 'migrations/', '__pycache__/', 'node_modules/'],\n    'max_complexity': 15,\n    'max_function_length': 50,\n    'max_params': 5,\n    'max_nesting': 4,\n    'severity_overrides': {},\n    'custom_rules': [],",
+              "code": "DEFAULT_CONFIG = {\n    'ignore_paths': ['test/', 'tests/', 'migrations/', '__pycache__/', 'node_modules/'],\n    'max_complexity': 15,\n    'max_function_length': 50,\n    'max_params': 5,",
               "why": "Önce varsayılan konfigürasyonu tanımlıyoruz. Bu değerler .codereview.yml yoksa kullanılır — sensible defaults ile hemen çalışabilir."
             },
             {
-              "order": "2.2",
-              "action": "DEVAM — YAML parser iskeletini yaz",
-              "type": "code_add",
-              "file": "analysis/rules/config_parser.py",
-              "code": "}",
-              "why": "Önceki adımda başladığımız yapının devamını yazıyoruz — }...",
-              "position": "bottom"
+              "order": "2.1z",
+              "action": "analysis/rules/config_parser.py dosyasını oluştur — YAML parser iskeletini yaz (son kisim)",
+              "type": "code_write",
+              "code": "    'max_nesting': 4,\n    'severity_overrides': {},\n    'custom_rules': [],\n}",
+              "why": "JSX return blogunu tamamliyoruz.",
+              "file": "analysis/rules/config_parser.py"
             },
             {
               "order": "2.3",
@@ -4061,8 +4099,16 @@
               "type": "code_add",
               "file": "analysis/rules/config_parser.py",
               "position": "bottom",
-              "code": "\ndef parse_config(yaml_content: str) -> dict:\n    try:\n        config = yaml.safe_load(yaml_content) or {}\n    except yaml.YAMLError:\n        return DEFAULT_CONFIG.copy()\n    merged = DEFAULT_CONFIG.copy()\n    merged.update(config)\n    return merged",
+              "code": "\ndef parse_config(yaml_content: str) -> dict:\n    try:\n        config = yaml.safe_load(yaml_content) or {}\n    except yaml.YAMLError:",
               "why": "YAML parse hatası olursa varsayılan config kullanılır — uygulama kırılmaz. merged ile kullanıcı değerleri varsayılanların üstüne yazılır."
+            },
+            {
+              "order": "2.4x",
+              "action": "GERİ DÖN — parse_config ve apply_config_to_engine fonksiyonlarını yaz (devam)",
+              "type": "code_add",
+              "file": "analysis/rules/config_parser.py",
+              "code": "        return DEFAULT_CONFIG.copy()\n    merged = DEFAULT_CONFIG.copy()\n    merged.update(config)\n    return merged",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "2.5",

@@ -499,16 +499,8 @@
               "action": "DEVAM: INTERVAL_MAP ve validation yaz (bölüm 2/3)",
               "type": "code_write",
               "file": "packages/api/src/routes/metrics.ts",
-              "code": "router.get('/metrics', async (req, res) => {\n  const { source, metric, from, to, interval = '1h' } = req.query;\n  const pgInterval = INTERVAL_MAP[interval as string];\n  if (!pgInterval) {\n    return res.status(400).json({ error: 'Geçersiz interval' });\n  }",
+              "code": "router.get('/metrics', async (req, res) => {\n  const { source, metric, from, to, interval = '1h' } = req.query;\n  const pgInterval = INTERVAL_MAP[interval as string];\n  if (!pgInterval) {\n    return res.status(400).json({ error: 'Geçersiz interval' });\n  }\n});",
               "why": "Bu kısım asenkron işlem ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
-            },
-            {
-              "order": "3.10c",
-              "action": "DEVAM: INTERVAL_MAP ve validation yaz (bölüm 3/3)",
-              "type": "code_write",
-              "file": "packages/api/src/routes/metrics.ts",
-              "code": "});",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
             },
             {
               "order": "3.11",
@@ -647,16 +639,8 @@
               "action": "DEVAM: props interface ve chart JSX'ini yaz (bölüm 3/4)",
               "type": "code_write",
               "file": "packages/dashboard/src/components/ChartWidget.tsx",
-              "code": "          <YAxis />\n          <Tooltip />\n          <Line type=\"monotone\" dataKey=\"avg_value\" stroke={color} dot={false} />\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );",
+              "code": "          <YAxis />\n          <Tooltip />\n          <Line type=\"monotone\" dataKey=\"avg_value\" stroke={color} dot={false} />\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}",
               "why": "JSX yapısı HTML benzeri sözdizimi ile UI tanımlar — React'in declarative yaklaşımı kodu okunabilir kılar."
-            },
-            {
-              "order": "4.6d",
-              "action": "DEVAM: props interface ve chart JSX'ini yaz (bölüm 4/4)",
-              "type": "code_write",
-              "file": "packages/dashboard/src/components/ChartWidget.tsx",
-              "code": "}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
             },
             {
               "order": "4.7",
@@ -778,16 +762,8 @@
               "action": "DEVAM: source ve metric tanımlarını ekle (bölüm 2/3)",
               "type": "code_write",
               "file": "packages/api/scripts/seed.ts",
-              "code": "function getBaseValue(metric: string): number {\n  const bases: Record<string, number> = {\n    cpu_usage: 55, memory_usage: 70,\n    response_time: 150, error_rate: 2,\n    request_count: 1000,\n  };\n  return bases[metric] || 50;",
+              "code": "function getBaseValue(metric: string): number {\n  const bases: Record<string, number> = {\n    cpu_usage: 55, memory_usage: 70,\n    response_time: 150, error_rate: 2,\n    request_count: 1000,\n  };\n  return bases[metric] || 50;\n}",
               "why": "Bu kısım fonksiyon tanımı ve değişken tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
-            },
-            {
-              "order": "1.4c",
-              "action": "DEVAM: source ve metric tanımlarını ekle (bölüm 3/3)",
-              "type": "code_write",
-              "file": "packages/api/scripts/seed.ts",
-              "code": "}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
             },
             {
               "order": "1.5",
@@ -1458,16 +1434,16 @@
               "action": "DEVAM: kaynak filtresi yaz (bölüm 3/4)",
               "type": "code_write",
               "file": "packages/dashboard/src/components/SourceFilter.tsx",
-              "code": "              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'\n          }`}\n          onClick={() => onChange(s)}>\n          {s}\n        </button>\n      ))}\n    </div>\n  );",
+              "code": "              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'\n          }`}\n          onClick={() => onChange(s)}>\n          {s}\n        </button>",
               "why": "Bu kısım fonksiyon tanımı içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
             },
             {
-              "order": "2.5d",
-              "action": "DEVAM: kaynak filtresi yaz (bölüm 4/4)",
+              "order": "2.5cz",
+              "action": "DEVAM: kaynak filtresi yaz (bölüm 3/4) (son kisim)",
               "type": "code_write",
-              "file": "packages/dashboard/src/components/SourceFilter.tsx",
-              "code": "}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
+              "code": "      ))}\n    </div>\n  );\n}",
+              "why": "JSX return blogunu tamamliyoruz.",
+              "file": "packages/dashboard/src/components/SourceFilter.tsx"
             },
             {
               "order": "2.6",
@@ -2814,16 +2790,8 @@
               "action": "DEVAM: IntersectionObserver logic'ini yaz (bölüm 4/5)",
               "type": "code_write",
               "file": "packages/dashboard/src/components/LazyChart.tsx",
-              "code": "  return (\n    <div ref={ref} className=\"min-h-[200px]\">\n      {isVisible ? children : (\n        <div className=\"h-[200px] bg-gray-800 rounded-lg animate-pulse\" />\n      )}\n    </div>\n  );",
+              "code": "  return (\n    <div ref={ref} className=\"min-h-[200px]\">\n      {isVisible ? children : (\n        <div className=\"h-[200px] bg-gray-800 rounded-lg animate-pulse\" />\n      )}\n    </div>\n  );\n}",
               "why": "Bu kısım dönüş değeri içerir — kodun modüler ve okunabilir kalması için ayrı tutuldu."
-            },
-            {
-              "order": "2.3e",
-              "action": "DEVAM: IntersectionObserver logic'ini yaz (bölüm 5/5)",
-              "type": "code_write",
-              "file": "packages/dashboard/src/components/LazyChart.tsx",
-              "code": "}",
-              "why": "TypeScript dosya yapısı tip güvenliği ile birlikte modüler mimariyi destekler — derleme zamanında hataları yakalar."
             },
             {
               "order": "2.4",

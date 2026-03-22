@@ -739,8 +739,16 @@
               "type": "code_add",
               "file": "orchestrator/api/conversations.py",
               "position": "bottom",
-              "code": "\n@router.post(\"/{conv_id}/messages\")\nasync def send_message(conv_id: str,\n                       msg: MessageRequest):\n    if conv_id not in conversations:\n        raise HTTPException(404, \"Not found\")\n    conv = conversations[conv_id]\n    conv[\"messages\"].append(\n        {\"role\": msg.role, \"content\": msg.content})",
+              "code": "\n@router.post(\"/{conv_id}/messages\")\nasync def send_message(conv_id: str,\n                       msg: MessageRequest):\n    if conv_id not in conversations:",
               "why": "Hata yönetimi ile beklenmedik durumları yakalıyoruz. LLM çağrıları timeout, rate limit veya API hatası verebilir — graceful degradation sağlıyoruz."
+            },
+            {
+              "order": "4.7ax",
+              "action": "GERİ DÖN — devamını ekle (devam)",
+              "type": "code_add",
+              "file": "orchestrator/api/conversations.py",
+              "code": "        raise HTTPException(404, \"Not found\")\n    conv = conversations[conv_id]\n    conv[\"messages\"].append(\n        {\"role\": msg.role, \"content\": msg.content})",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "4.8",
@@ -2489,8 +2497,16 @@
               "type": "code_add",
               "file": "orchestrator/services/analytics.py",
               "position": "inside_class",
-              "code": "            data = await self.redis.hgetall(\n                f\"analytics:daily:{date}\")\n            trends.append(\n                {\"date\": date,\n                 **{k: int(v)\n                    for k, v in data.items()}})\n        return trends\n\nanalytics_service = AnalyticsService()",
+              "code": "            data = await self.redis.hgetall(\n                f\"analytics:daily:{date}\")\n            trends.append(\n                {\"date\": date,\n                 **{k: int(v)",
               "why": "Analytics servis metodlarını tamamlıyoruz. Redis hash'leri ile günlük metrikler takip edilir."
+            },
+            {
+              "order": "1.3ax",
+              "action": "GERİ DÖN — devamını yaz (devam)",
+              "type": "code_add",
+              "file": "orchestrator/services/analytics.py",
+              "code": "                    for k, v in data.items()}})\n        return trends\n\nanalytics_service = AnalyticsService()",
+              "why": "Onceki adimda baslanan kodun mantiksal devami."
             },
             {
               "order": "1.5",
