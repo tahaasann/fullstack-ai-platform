@@ -569,11 +569,19 @@
             },
             {
               "order": "4.4",
-              "action": "CartService iskeletini yaz — önce boş metodlar",
+              "action": "CartService sınıfını oluştur — export ve ilk iki metod iskeleti",
               "type": "code_write",
               "file": "src/services/cart.service.ts",
-              "code": "export class CartService {\n  async addItem(userId: string, productId: string, quantity: number) {\n    // TODO\n  }\n\n  async getCart(userId: string) {\n    // TODO\n  }\n\n  async removeItem(userId: string, productId: string) {\n    // TODO\n  }\n\n  async clearCart(userId: string) {\n    // TODO\n  }\n}",
-              "why": "Önce hangi metodlar lazım onu belirliyoruz. addItem, getCart, removeItem, clearCart — sepet işlemlerinin dört temel operasyonu. İskelet netleşince import'ları ve implementasyonu ekleyeceğiz."
+              "code": "export class CartService {\n  async addItem(userId: string, productId: string, quantity: number) {\n    // TODO\n  }\n\n  async getCart(userId: string) {\n    // TODO\n  }",
+              "why": "Önce sınıfı export ile açıyoruz. addItem ve getCart en kritik iki metod — sepete ekleme ve sepeti okuma. İskelet ile hangi parametrelere ihtiyacımız olduğunu netleştiriyoruz."
+            },
+            {
+              "order": "4.4b",
+              "action": "ALTTA DEVAM ET: removeItem ve clearCart iskeletlerini ekle",
+              "type": "code_write",
+              "file": "src/services/cart.service.ts",
+              "code": "  async removeItem(userId: string, productId: string) {\n    // TODO\n  }\n\n  async clearCart(userId: string) {\n    // TODO\n  }\n}",
+              "why": "Sepet işlemlerinin dört temel operasyonu tamamlandı: addItem, getCart, removeItem, clearCart. Şimdi import ve implementasyonu ekleyeceğiz."
             },
             {
               "order": "4.5",
@@ -585,11 +593,51 @@
             },
             {
               "order": "4.6",
-              "action": "GERİ DÖN: addItem ve getCart metodlarını doldur",
+              "action": "GERİ DÖN: addItem metodunu doldur — ürün kontrolü ve Redis ekleme",
               "type": "code_modify",
               "file": "src/services/cart.service.ts",
-              "code": "export class CartService {\n  async addItem(userId: string, productId: string, quantity: number) {\n    const product = await productService.getById(productId);\n    if (!product) throw new Error('Ürün bulunamadı');\n    if (product.stock < quantity) throw new Error('Yetersiz stok');\n\n    const key = CART_KEY(userId);\n    await redis.hset(key, productId, quantity.toString());\n    await redis.expire(key, CART_TTL);\n    return this.getCart(userId);\n  }\n\n  async getCart(userId: string) {\n    const items = await redis.hgetall(CART_KEY(userId));\n    const cartItems = [];\n    for (const [productId, qty] of Object.entries(items)) {\n      const product = await productService.getById(productId);\n      if (product) {\n        cartItems.push({ product, quantity: parseInt(qty) });\n      }\n    }\n    return cartItems;\n  }\n\n  async removeItem(userId: string, productId: string) {\n    await redis.hdel(CART_KEY(userId), productId);\n    return this.getCart(userId);\n  }\n\n  async clearCart(userId: string) {\n    await redis.del(CART_KEY(userId));\n  }\n}",
-              "why": "Redis Hash yapısını kullanıyoruz: hset ile ürün ekleme, hgetall ile tüm sepeti okuma, hdel ile tek ürün silme. Her addItem'da expire ile TTL yenilenir — kullanıcı aktifse sepet süresi uzar."
+              "code": "  async addItem(userId: string, productId: string, quantity: number) {\n    const product = await productService.getById(productId);\n    if (!product) throw new Error('Ürün bulunamadı');\n    if (product.stock < quantity) throw new Error('Yetersiz stok');\n\n    const key = CART_KEY(userId);\n    await redis.hset(key, productId, quantity.toString());\n    await redis.expire(key, CART_TTL);",
+              "why": "addItem iki iş yapar: (1) ürün var mı ve stokta yeterli mi kontrol et, (2) Redis Hash'e ürünü ekle. hset ile productId-quantity çifti saklanır, expire ile TTL yenilenir."
+            },
+            {
+              "order": "4.6b",
+              "action": "ALTTA DEVAM ET: addItem dönüş değerini ekle",
+              "type": "code_modify",
+              "file": "src/services/cart.service.ts",
+              "code": "    return this.getCart(userId);\n  }",
+              "why": "addItem sonunda güncel sepeti döndürüyoruz — kullanıcı ekleme sonrası sepetini hemen görebilsin. this.getCart ile kendi metodumuzu çağırıyoruz."
+            },
+            {
+              "order": "4.6c",
+              "action": "GERİ DÖN: getCart metodunu başlat — Redis'den veri çek",
+              "type": "code_modify",
+              "file": "src/services/cart.service.ts",
+              "code": "  async getCart(userId: string) {\n    const items = await redis.hgetall(CART_KEY(userId));\n    const cartItems = [];",
+              "why": "hgetall ile tüm Hash alanlarını alıyoruz. Boş bir cartItems dizisi hazırlıyoruz — her ürünü zenginleştirip buraya ekleyeceğiz."
+            },
+            {
+              "order": "4.6c2",
+              "action": "ALTTA DEVAM ET: getCart döngüsü ve dönüş değeri",
+              "type": "code_modify",
+              "file": "src/services/cart.service.ts",
+              "code": "    for (const [productId, qty] of Object.entries(items)) {\n      const product = await productService.getById(productId);\n      if (product) {\n        cartItems.push({ product, quantity: parseInt(qty) });\n      }\n    }\n    return cartItems;\n  }",
+              "why": "Her productId için veritabanından güncel ürün bilgisini çekiyoruz — fiyat değişmişse güncel fiyatı göstermiş oluruz. parseInt ile Redis'ten gelen string'i sayıya çeviriyoruz."
+            },
+            {
+              "order": "4.6d",
+              "action": "ALTTA DEVAM ET: removeItem metodunu doldur",
+              "type": "code_modify",
+              "file": "src/services/cart.service.ts",
+              "code": "  async removeItem(userId: string, productId: string) {\n    await redis.hdel(CART_KEY(userId), productId);\n    return this.getCart(userId);\n  }",
+              "why": "hdel ile Hash'ten tek bir alanı siliyoruz. addItem gibi güncel sepeti döndürüyoruz — tutarlı API davranışı."
+            },
+            {
+              "order": "4.6e",
+              "action": "ALTTA DEVAM ET: clearCart metodunu doldur",
+              "type": "code_modify",
+              "file": "src/services/cart.service.ts",
+              "code": "  async clearCart(userId: string) {\n    await redis.del(CART_KEY(userId));\n  }",
+              "why": "del ile tüm Hash key'ini siliyoruz — checkout sonrası sepeti temizlemek için kullanacağız. Dönüş değeri yok çünkü sepet zaten boş."
             },
             {
               "order": "4.7",
@@ -600,11 +648,43 @@
             },
             {
               "order": "4.8",
-              "action": "Cart controller'ı yaz",
+              "action": "Cart controller iskeletini yaz — import ve service instance",
               "type": "code_write",
               "file": "src/controllers/cart.controller.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport { CartService } from '../services/cart.service';\n\nconst cartService = new CartService();\n\nexport const addToCart = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const { productId, quantity } = req.body;\n    const cart = await cartService.addItem(userId, productId, quantity);\n    res.json(cart);\n  } catch (err) {\n    next(err);\n  }\n};\n\nexport const getCart = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const cart = await cartService.getCart(userId);\n    res.json(cart);\n  } catch (err) {\n    next(err);\n  }\n};\n\nexport const removeFromCart = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const cart = await cartService.removeItem(userId, req.params.productId);\n    res.json(cart);\n  } catch (err) {\n    next(err);\n  }\n};\n\nexport const clearCart = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    await cartService.clearCart(userId);\n    res.json({ message: 'Sepet temizlendi' });\n  } catch (err) {\n    next(err);\n  }\n};",
-              "why": "4.6'daki CartService'i import edip her metodu bir endpoint'e bağlıyoruz. req.user.id JWT middleware'den gelecek (Step 5'te yazacağız). Türkçe hata mesajları kullanıcı dostu."
+              "code": "import { Request, Response, NextFunction } from 'express';\nimport { CartService } from '../services/cart.service';\n\nconst cartService = new CartService();",
+              "why": "Controller dosyasını açıp Express type'larını ve CartService'i import ediyoruz. Service instance'ı modül seviyesinde oluşturuyoruz — singleton pattern."
+            },
+            {
+              "order": "4.8b",
+              "action": "ALTTA DEVAM ET: addToCart endpoint fonksiyonunu yaz",
+              "type": "code_write",
+              "file": "src/controllers/cart.controller.ts",
+              "code": "export const addToCart = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const { productId, quantity } = req.body;\n    const cart = await cartService.addItem(userId, productId, quantity);\n    res.json(cart);\n  } catch (err) { next(err); }\n};",
+              "why": "req.body'den productId ve quantity alıyoruz. userId JWT middleware'den gelecek (Step 5). try-catch ile hataları Express error handler'a yönlendiriyoruz."
+            },
+            {
+              "order": "4.8c",
+              "action": "ALTTA DEVAM ET: getCart endpoint fonksiyonunu yaz",
+              "type": "code_write",
+              "file": "src/controllers/cart.controller.ts",
+              "code": "export const getCart = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const cart = await cartService.getCart(userId);\n    res.json(cart);\n  } catch (err) { next(err); }\n};",
+              "why": "En basit endpoint — userId al, sepeti getir, JSON olarak dön. Her controller aynı try-catch pattern'ını kullanıyor — tutarlılık."
+            },
+            {
+              "order": "4.8d",
+              "action": "ALTTA DEVAM ET: removeFromCart endpoint fonksiyonunu yaz",
+              "type": "code_write",
+              "file": "src/controllers/cart.controller.ts",
+              "code": "export const removeFromCart = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const cart = await cartService.removeItem(userId, req.params.productId);\n    res.json(cart);\n  } catch (err) { next(err); }\n};",
+              "why": "productId URL parametresinden geliyor (DELETE /items/:productId). Service'ten güncel sepeti dönüyoruz — frontend sepeti yeniden çizmek için kullanır."
+            },
+            {
+              "order": "4.8e",
+              "action": "ALTTA DEVAM ET: clearCart endpoint fonksiyonunu yaz",
+              "type": "code_write",
+              "file": "src/controllers/cart.controller.ts",
+              "code": "export const clearCart = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    await cartService.clearCart(userId);\n    res.json({ message: 'Sepet temizlendi' });\n  } catch (err) { next(err); }\n};",
+              "why": "clearCart void dönüyor (4.6e), bu yüzden başarı mesajı ile cevap veriyoruz. Checkout sonrası otomatik çağrılacak."
             },
             {
               "order": "4.9",
@@ -615,11 +695,19 @@
             },
             {
               "order": "4.10",
-              "action": "Cart route tanımlarını yaz",
+              "action": "Cart route dosyasını oluştur — import ve router",
               "type": "code_write",
               "file": "src/routes/cart.routes.ts",
-              "code": "import { Router } from 'express';\nimport {\n  addToCart,\n  getCart,\n  removeFromCart,\n  clearCart,\n} from '../controllers/cart.controller';\n\nconst router = Router();\n\nrouter.get('/', getCart);\nrouter.post('/items', addToCart);\nrouter.delete('/items/:productId', removeFromCart);\nrouter.delete('/', clearCart);\n\nexport default router;",
-              "why": "RESTful convention: GET / sepeti getir, POST /items ürün ekle, DELETE /items/:id ürün çıkar, DELETE / sepeti temizle. 4.8'deki controller fonksiyonlarını doğru HTTP verb'lerine bağlıyoruz."
+              "code": "import { Router } from 'express';\nimport {\n  addToCart, getCart,\n  removeFromCart, clearCart,\n} from '../controllers/cart.controller';\n\nconst router = Router();",
+              "why": "4.8'deki tüm controller fonksiyonlarını import ediyoruz. Router instance'ı oluşturuyoruz — her modülün kendi router'ı olur."
+            },
+            {
+              "order": "4.10b",
+              "action": "ALTTA DEVAM ET: Route tanımlarını ekle ve export et",
+              "type": "code_write",
+              "file": "src/routes/cart.routes.ts",
+              "code": "router.get('/', getCart);\nrouter.post('/items', addToCart);\nrouter.delete('/items/:productId', removeFromCart);\nrouter.delete('/', clearCart);\n\nexport default router;",
+              "why": "RESTful convention: GET / sepeti getir, POST /items ürün ekle, DELETE /items/:id ürün çıkar, DELETE / sepeti temizle. HTTP verb'leri CRUD işlemlerine doğal eşleşiyor."
             },
             {
               "order": "4.11",
@@ -1550,35 +1638,83 @@
             },
             {
               "order": "2.2",
-              "action": "getUserOrders'a pagination ekle",
+              "action": "getUserOrders'a pagination parametreleri ve where koşulunu ekle",
               "type": "code_modify",
               "file": "src/services/order.service.ts",
-              "code": "  async getUserOrders(userId: string, page = 1, limit = 10, status?: OrderStatus) {\n    const where: any = { userId };\n    if (status) where.status = status;\n\n    const [orders, total] = await Promise.all([\n      prisma.order.findMany({\n        where,\n        include: { items: { include: { product: true } } },\n        orderBy: { createdAt: 'desc' },\n        skip: (page - 1) * limit,\n        take: limit,\n      }),\n      prisma.order.count({ where }),\n    ]);\n\n    return {\n      orders,\n      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },\n    };\n  }",
-              "why": "Milestone 0 Step 2'deki (3.4) ürün listeleme ile aynı pagination pattern'ını kullanıyoruz. Promise.all ile paralel sorgulama — tutarlı pattern, öğrenme kolaylığı."
+              "code": "  async getUserOrders(userId: string, page = 1, limit = 10, status?: OrderStatus) {\n    const where: any = { userId };\n    if (status) where.status = status;",
+              "why": "Varsayılan değerler ile pagination: page=1, limit=10. Status opsiyonel filtre — müşteri 'sadece teslim edilenler' diye filtreleyebilsin."
+            },
+            {
+              "order": "2.2b",
+              "action": "ALTTA DEVAM ET: findMany ile siparişleri çek",
+              "type": "code_modify",
+              "file": "src/services/order.service.ts",
+              "code": "    const [orders, total] = await Promise.all([\n      prisma.order.findMany({\n        where,\n        include: { items: { include: { product: true } } },\n        orderBy: { createdAt: 'desc' },\n        skip: (page - 1) * limit,\n        take: limit,\n      }),",
+              "why": "Promise.all ile findMany ve count paralel çalışır. include ile sipariş kalemleri ve ürün bilgisini de getiriyoruz. skip/take ile offset-based pagination."
+            },
+            {
+              "order": "2.2b2",
+              "action": "ALTTA DEVAM ET: count sorgusunu ekle ve Promise.all'u kapat",
+              "type": "code_modify",
+              "file": "src/services/order.service.ts",
+              "code": "      prisma.order.count({ where }),\n    ]);",
+              "why": "Aynı where koşuluyla count çağırıyoruz — toplam sonuç sayısını bilmek için. findMany ile paralel çalışır, ekstra bekleme yok."
+            },
+            {
+              "order": "2.2c",
+              "action": "ALTTA DEVAM ET: meta bilgisi ile dönüş değerini ekle",
+              "type": "code_modify",
+              "file": "src/services/order.service.ts",
+              "code": "    return {\n      orders,\n      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },\n    };\n  }",
+              "why": "Frontend pagination kontrolü için meta bilgisi döndürüyoruz: toplam kayıt, toplam sayfa sayısı. Math.ceil ile son sayfayı doğru hesaplıyoruz."
             },
             {
               "order": "2.3",
-              "action": "getOrderById'ı zenginleştir — admin bypass",
+              "action": "getOrderById'ı güncelle — admin bypass parametresi ve sorgu",
               "type": "code_modify",
               "file": "src/services/order.service.ts",
-              "code": "  async getOrderById(orderId: string, userId: string, isAdmin = false) {\n    const order = await prisma.order.findUnique({\n      where: { id: orderId },\n      include: {\n        items: { include: { product: true } },\n        user: { select: { email: true, name: true } },\n      },\n    });\n    if (!order) return null;\n    if (!isAdmin && order.userId !== userId) return null;\n    return order;\n  }",
-              "why": "IDOR korumasını koruyoruz ama admin bypass ekliyoruz. Admin tüm siparişleri görebilmeli. user bilgisi de include ediliyor — admin siparişi kimin verdiğini görmeli."
+              "code": "  async getOrderById(orderId: string, userId: string, isAdmin = false) {\n    const order = await prisma.order.findUnique({\n      where: { id: orderId },\n      include: {\n        items: { include: { product: true } },\n        user: { select: { email: true, name: true } },\n      },\n    });",
+              "why": "isAdmin parametresi eklendi — varsayılan false. user bilgisini de include ediyoruz çünkü admin siparişin kime ait olduğunu görmeli."
+            },
+            {
+              "order": "2.3b",
+              "action": "ALTTA DEVAM ET: IDOR koruması ve admin bypass kontrolü",
+              "type": "code_modify",
+              "file": "src/services/order.service.ts",
+              "code": "    if (!order) return null;\n    if (!isAdmin && order.userId !== userId) return null;\n    return order;\n  }",
+              "why": "IDOR koruması: normal kullanıcı başkasının siparişini göremez. Admin ise userId kontrolü atlanır. İki ayrı null dönüşü — biri 'yok', biri 'yetkisiz'."
             },
             {
               "order": "2.4",
-              "action": "BAŞKA DOSYAYA GEÇ: src/controllers/order.controller.ts — controller'ı güncelle",
+              "action": "BAŞKA DOSYAYA GEÇ: src/controllers/order.controller.ts — getMyOrders'a pagination ekle",
               "type": "code_modify",
               "file": "src/controllers/order.controller.ts",
-              "code": "export const getMyOrders = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const page = parseInt(req.query.page as string) || 1;\n    const limit = parseInt(req.query.limit as string) || 10;\n    const status = req.query.status as any;\n    const result = await orderService.getUserOrders(userId, page, limit, status);\n    res.json(result);\n  } catch (err) { next(err); }\n};",
-              "why": "2.2'de service'e eklediğimiz pagination parametrelerini query string'den alıp iletiyoruz. Kullanıcı ?page=2&limit=5&status=PAID ile filtreleyebilir."
+              "code": "export const getMyOrders = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const page = parseInt(req.query.page as string) || 1;\n    const limit = parseInt(req.query.limit as string) || 10;",
+              "why": "Query string'den page ve limit parametrelerini parse ediyoruz. parseInt ile sayıya çevirip varsayılan değerler veriyoruz — parametre yoksa page=1, limit=10."
+            },
+            {
+              "order": "2.4b",
+              "action": "ALTTA DEVAM ET: status filtresi ve service çağrısını tamamla",
+              "type": "code_modify",
+              "file": "src/controllers/order.controller.ts",
+              "code": "    const status = req.query.status as any;\n    const result = await orderService.getUserOrders(userId, page, limit, status);\n    res.json(result);\n  } catch (err) { next(err); }\n};",
+              "why": "2.2'de service'e eklediğimiz tüm parametreleri iletiyoruz. Kullanıcı ?page=2&limit=5&status=PAID ile filtreleyebilir."
             },
             {
               "order": "2.5",
-              "action": "getOrderDetail'ı güncelle — admin desteği",
+              "action": "getOrderDetail'ı güncelle — isAdmin kontrolü ekle",
               "type": "code_modify",
               "file": "src/controllers/order.controller.ts",
-              "code": "export const getOrderDetail = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const isAdmin = (req as any).user.role === 'ADMIN';\n    const order = await orderService.getOrderById(req.params.id, userId, isAdmin);\n    if (!order) return res.status(404).json({ error: 'Sipariş bulunamadı' });\n    res.json(order);\n  } catch (err) { next(err); }\n};",
-              "why": "2.3'te eklediğimiz isAdmin parametresini kullanıyoruz. Admin her siparişi görebilir, müşteri sadece kendininkileri."
+              "code": "export const getOrderDetail = async (req: Request, res: Response, next: NextFunction) => {\n  try {\n    const userId = (req as any).user.id;\n    const isAdmin = (req as any).user.role === 'ADMIN';",
+              "why": "JWT'den gelen user objesinden hem userId hem role bilgisini alıyoruz. isAdmin flag'i ile 2.3'teki admin bypass'i tetikleyeceğiz."
+            },
+            {
+              "order": "2.5b",
+              "action": "ALTTA DEVAM ET: service çağrısı ve 404 kontrolü",
+              "type": "code_modify",
+              "file": "src/controllers/order.controller.ts",
+              "code": "    const order = await orderService.getOrderById(req.params.id, userId, isAdmin);\n    if (!order) return res.status(404).json({ error: 'Sipariş bulunamadı' });\n    res.json(order);\n  } catch (err) { next(err); }\n};",
+              "why": "2.3'te eklediğimiz isAdmin parametresini kullanıyoruz. null dönüşü hem 'yok' hem 'yetkisiz' anlamına gelir — IDOR bilgi sızıntısını önler."
             },
             {
               "order": "2.6",

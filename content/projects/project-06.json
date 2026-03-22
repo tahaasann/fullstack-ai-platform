@@ -180,7 +180,7 @@
   ],
   "milestones": [
     {
-      "id": "m1",
+      "id": "p06-m1",
       "title": "Project Setup & LLM Architecture",
       "estimated_hours": 8,
       "must_note": "Provider Abstraction Layer, tüm LLM projelerinin temelidir. Bu pattern'i bir kez doğru kurarsanız, ömür boyu kullanırsınız. Strategy Pattern + Factory Pattern kombinasyonu, SOLID prensiplerinin gerçek dünya uygulamasıdır. Her yeni LLM provider çıktığında (ve çok sık çıkıyor) sadece bir class eklersiniz — mevcut koda dokunmazsınız.",
@@ -797,7 +797,7 @@
       ]
     },
     {
-      "id": "m2",
+      "id": "p06-m2",
       "title": "Multi-Provider LLM Integration",
       "estimated_hours": 10,
       "must_note": "Bu milestone'da öğreneceğin en önemli şey: Her LLM provider'ın API'si farklıdır ama ortak bir abstraction oluşturabilirsiniz. OpenAI messages formatı, Anthropic'in system prompt ayrımı, Gemini'nin contents yapısı — bunları normalize etmek gerçek bir mühendislik becerisidir. Streaming response'u doğru handle etmek de kritik — production'da her zaman streaming kullanırsınız çünkü kullanıcı beklememeli.",

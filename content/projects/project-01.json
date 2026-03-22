@@ -1039,11 +1039,35 @@
             },
             {
               "order": "2.11",
-              "action": "Fonksiyona GERİ DÖN — getAllPosts'u doldur, tüm import'ları kullan",
+              "action": "getAllPosts iskeletini güncelle — Post[] tipi ve klasör kontrolü",
               "type": "code_modify",
               "file": "src/lib/mdx.ts",
-              "code": "export async function getAllPosts(): Promise<Post[]> {\n  if (!fs.existsSync(POSTS_PATH)) return [];\n\n  const files = fs.readdirSync(POSTS_PATH);\n\n  const posts = files\n    .filter((file) => file.endsWith('.mdx'))\n    .map((file) => {\n      const slug = file.replace('.mdx', '');\n      const source = fs.readFileSync(path.join(POSTS_PATH, file), 'utf-8');\n      const { data, content } = matter(source);\n      const stats = readingTime(content);\n\n      return {\n        slug,\n        title: data.title,\n        date: data.date,\n        summary: data.summary,\n        tags: data.tags || [],\n        readingTime: stats.text,\n        content,\n      };\n    })\n    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());\n\n  return posts;\n}",
-              "why": "2.5'te import ettiğimiz fs ile dosyaları okuyoruz, 2.6'daki path ile yolları birleştiriyoruz, 2.8'deki matter ile frontmatter parse ediyoruz, 2.9'daki readingTime ile okuma süresini hesaplıyoruz. Tüm parçalar bir araya geldi."
+              "code": "export async function getAllPosts(): Promise<Post[]> {\n  if (!fs.existsSync(POSTS_PATH)) return [];\n  return [];\n}",
+              "why": "Fonksiyonun dönüş tipini Post[] olarak belirtiyoruz ve klasör yoksa boş dizi döndürüyoruz. Defensive programming — dosya sistemi hataları önlenir."
+            },
+            {
+              "order": "2.11a",
+              "action": "GERİ DÖN — dosya listesini oku ve .mdx filtrele",
+              "type": "code_modify",
+              "file": "src/lib/mdx.ts",
+              "code": "export async function getAllPosts(): Promise<Post[]> {\n  if (!fs.existsSync(POSTS_PATH)) return [];\n\n  const files = fs.readdirSync(POSTS_PATH)\n    .filter((file) => file.endsWith('.mdx'));\n\n  return [];\n}",
+              "why": "fs.readdirSync ile klasördeki tüm dosyaları okuyoruz, sonra sadece .mdx uzantılı olanları filtreliyoruz. .DS_Store gibi sistem dosyalarını işlemekten kaçınıyoruz."
+            },
+            {
+              "order": "2.11b",
+              "action": "GERİ DÖN — dosyaları map ile Post objesine dönüştür",
+              "type": "code_modify",
+              "file": "src/lib/mdx.ts",
+              "code": "  const posts = files.map((file) => {\n    const slug = file.replace('.mdx', '');\n    const source = fs.readFileSync(path.join(POSTS_PATH, file), 'utf-8');\n    const { data, content } = matter(source);\n    return { slug, title: data.title, date: data.date,\n      summary: data.summary, tags: data.tags || [],\n      readingTime: readingTime(content).text, content };\n  });",
+              "why": "Her .mdx dosyasını okuyup gray-matter ile frontmatter ayrıştırıyoruz. readingTime ile tahmini okuma süresi hesaplanıyor. slug, dosya adından .mdx uzantısı çıkarılarak elde ediliyor."
+            },
+            {
+              "order": "2.11c",
+              "action": "GERİ DÖN — tarihe göre sırala ve return et",
+              "type": "code_modify",
+              "file": "src/lib/mdx.ts",
+              "code": "  const sorted = posts.sort(\n    (a, b) => new Date(b.date).getTime()\n      - new Date(a.date).getTime()\n  );\n\n  return sorted;\n}",
+              "why": "En yeni yazı en üstte görünmeli. Date objesini getTime() ile milisaniyeye çevirip karşılaştırıyoruz. b - a sıralaması descending (yeniden eskiye) sonuç verir."
             },
             {
               "order": "2.12",
@@ -1149,11 +1173,43 @@
             },
             {
               "order": "3.7",
-              "action": "Fonksiyonun İÇİNE geri dön — getAllPosts'u çağır ve yazıları listele",
+              "action": "Fonksiyona getAllPosts çağrısını ekle — veriyi çek",
               "type": "code_modify",
               "file": "src/app/blog/page.tsx",
-              "code": "export default async function BlogPage() {\n  const posts = await getAllPosts();\n\n  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1 className=\"mb-4 text-3xl font-bold text-gray-900 dark:text-white\">Blog</h1>\n      <p className=\"mb-12 text-gray-600 dark:text-gray-400\">\n        Yazılım geliştirme deneyimlerimi ve öğrendiklerimi paylaştığım teknik blog.\n      </p>\n      <div className=\"space-y-8\">\n        {posts.map((post) => (\n          <article key={post.slug} className=\"group\">\n            <Link href={`/blog/${post.slug}`} className=\"block\">\n              <div className=\"flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400\">\n                <time>{post.date}</time>\n                <span>·</span>\n                <span>{post.readingTime}</span>\n              </div>\n              <h2 className=\"mt-2 text-xl font-semibold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400\">{post.title}</h2>\n              <p className=\"mt-2 text-gray-600 dark:text-gray-400\">{post.summary}</p>\n              <div className=\"mt-3 flex gap-2\">\n                {post.tags.map((tag) => (\n                  <span key={tag} className=\"rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300\">{tag}</span>\n                ))}\n              </div>\n            </Link>\n          </article>\n        ))}\n      </div>\n    </main>\n  );\n}",
-              "why": "3.3'te import ettiğimiz getAllPosts ile yazıları çekip, 3.4'teki Link ile tıklanabilir kartlar oluşturuyoruz. group/group-hover pattern'ı ile hover efekti."
+              "code": "export default async function BlogPage() {\n  const posts = await getAllPosts();\n  return (\n    <main className=\"mx-auto max-w-3xl px-4 py-16\">\n      <h1>Blog</h1>\n    </main>\n  );\n}",
+              "why": "Server Component olduğu için doğrudan await kullanabiliyoruz — useEffect veya state gerekmiyor. getAllPosts tüm MDX dosyalarını okuyup sıralı döndürür."
+            },
+            {
+              "order": "3.7a",
+              "action": "GERİ DÖN — posts.map ile yazı kartlarını oluştur",
+              "type": "code_modify",
+              "file": "src/app/blog/page.tsx",
+              "code": "<div className=\"space-y-8\">\n  {posts.map((post) => (\n    <article key={post.slug} className=\"group\">\n      <Link href={`/blog/${post.slug}`} className=\"block\">\n      </Link>\n    </article>\n  ))}\n</div>",
+              "why": "Her yazıyı article ile sarıyoruz. key={post.slug} React reconciliation için gerekli. group class'ı child elementlerde hover efekti için kullanılacak."
+            },
+            {
+              "order": "3.7b",
+              "action": "GERİ DÖN — Link içine tarih ve okuma süresi ekle",
+              "type": "code_modify",
+              "file": "src/app/blog/page.tsx",
+              "code": "              <div className=\"flex items-center\n                gap-3 text-sm text-gray-500\">\n                <time>{post.date}</time>\n                <span>·</span>\n                <span>{post.readingTime}</span>\n              </div>",
+              "why": "Tarih ve okuma süresi kullanıcıya içeriğin ne kadar güncel ve uzun olduğunu gösterir. Ortadaki nokta (·) görsel ayırıcı olarak kullanılıyor."
+            },
+            {
+              "order": "3.7c",
+              "action": "GERİ DÖN — başlık ve özet ekle",
+              "type": "code_modify",
+              "file": "src/app/blog/page.tsx",
+              "code": "<h2 className=\"mt-2 text-xl font-semibold\n  text-gray-900 group-hover:text-primary-600\">\n  {post.title}\n</h2>\n<p className=\"mt-2 text-gray-600\n  dark:text-gray-400\">\n  {post.summary}\n</p>",
+              "why": "group-hover ile parent article üzerine gelince başlık rengi değişir — kullanıcıya tıklanabilir olduğunu gösterir. summary frontmatter'dan gelir ve kısa özet sunar."
+            },
+            {
+              "order": "3.7d",
+              "action": "GERİ DÖN — tag etiketlerini ekle",
+              "type": "code_modify",
+              "file": "src/app/blog/page.tsx",
+              "code": "<div className=\"mt-3 flex gap-2\">\n  {post.tags.map((tag) => (\n    <span key={tag} className=\"rounded-full bg-primary-50\n      px-3 py-1 text-xs text-primary-700\">\n      {tag}\n    </span>\n  ))}\n</div>",
+              "why": "Tag'ler yazıları kategorize eder ve ileride filtreleme özelliği eklemek için altyapı oluşturur. rounded-full ile pill şeklinde görsel etiketler oluşturuyoruz."
             },
             {
               "order": "3.8",

@@ -256,7 +256,7 @@
               "type": "code_write",
               "file": "server/src/models/user.model.ts",
               "code": "export {};  // placeholder",
-              "why": "Her zaman iskelet ile başlıyoruz. Dosyayı oluşturup TypeScript'in tanımasını sağlıyoruz. İçeriği adım adım dolduracağız."
+              "why": "Her zaman iskelet ile başlıyoruz. Dosyayı oluşturup TypeScript'in tanımasını sağlıyoruz."
             },
             {
               "order": "2.2",
@@ -264,70 +264,110 @@
               "type": "code_write",
               "file": "server/src/models/user.model.ts",
               "code": "import mongoose, { Schema, Document } from 'mongoose';",
-              "why": "Mongoose'u kullanacağız çünkü şimdi schema tanımlayacağız. Import'u KULLANMADAN ÖNCE ekliyoruz — gerçek geliştiricide bu refleks olmalı."
+              "why": "Mongoose'u kullanacağız çünkü şimdi schema tanımlayacağız. Import'u KULLANMADAN ÖNCE ekliyoruz."
             },
             {
               "order": "2.3",
-              "action": "Import'un altına IUser interface'ini tanımla",
-              "type": "code_write",
+              "action": "Import'un altına — IUser interface'ini tanımla",
+              "type": "code_add",
               "file": "server/src/models/user.model.ts",
-              "code": "import mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IUser extends Document {\n  email: string;\n  name: string;\n  password: string;\n  avatar?: string;\n  isOnline: boolean;\n  lastSeen: Date;\n}",
-              "why": "TypeScript interface ile User modelinin şemasını tanımlıyoruz. Document'ı extend ediyoruz çünkü Mongoose doküman metodlarına erişmek istiyoruz. isOnline ve lastSeen presence sistemi için gerekli."
+              "position": "after:import",
+              "code": "\nexport interface IUser extends Document {\n  email: string;\n  name: string;\n  password: string;\n  avatar?: string;\n  isOnline: boolean;\n  lastSeen: Date;\n}",
+              "why": "TypeScript interface ile User modelinin şemasını tanımlıyoruz. Document'ı extend ediyoruz çünkü Mongoose doküman metodlarına erişmek istiyoruz."
             },
             {
               "order": "2.4",
-              "action": "Interface'in altına schema ve model tanımını ekle",
-              "type": "code_write",
+              "action": "Interface'in altına — userSchema tanımla",
+              "type": "code_add",
               "file": "server/src/models/user.model.ts",
-              "code": "import mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IUser extends Document {\n  email: string;\n  name: string;\n  password: string;\n  avatar?: string;\n  isOnline: boolean;\n  lastSeen: Date;\n}\n\nconst userSchema = new Schema<IUser>({\n  email: { type: String, required: true, unique: true, lowercase: true },\n  name: { type: String, required: true, minlength: 2 },\n  password: { type: String, required: true, select: false },\n  avatar: String,\n  isOnline: { type: Boolean, default: false },\n  lastSeen: { type: Date, default: Date.now },\n}, { timestamps: true });\n\nexport const User = mongoose.model<IUser>('User', userSchema);",
-              "why": "select: false ile password varsayılan sorgularda dönmez — güvenlik için ŞART. timestamps: true otomatik createdAt ve updatedAt ekler. lowercase: true email'i otomatik küçük harfe çevirir."
+              "position": "after:interface",
+              "code": "\nconst userSchema = new Schema<IUser>({\n  email: { type: String, required: true, unique: true, lowercase: true },\n  name: { type: String, required: true, minlength: 2 },\n  password: { type: String, required: true, select: false },\n  avatar: String,\n  isOnline: { type: Boolean, default: false },\n  lastSeen: { type: Date, default: Date.now },\n}, { timestamps: true });",
+              "why": "select: false ile password varsayılan sorgularda dönmez — güvenlik için ŞART. timestamps: true otomatik createdAt ve updatedAt ekler."
             },
             {
               "order": "2.5",
-              "action": "BAŞKA DOSYAYA GEÇ — server/src/models/conversation.model.ts aç — İSKELET yaz",
-              "type": "code_write",
-              "file": "server/src/models/conversation.model.ts",
-              "code": "import mongoose, { Schema, Document } from 'mongoose';",
-              "why": "Az önce user.model.ts'de mongoose import pattern'ını öğrendik. Aynı pattern'ı burada da kullanıyoruz — bu sefer import'u direkt yazıyoruz çünkü ihtiyacımız olduğunu BİLİYORUZ."
+              "action": "Schema'nın altına — model export'unu ekle",
+              "type": "code_add",
+              "file": "server/src/models/user.model.ts",
+              "position": "after:schema",
+              "code": "\nexport const User = mongoose.model<IUser>('User', userSchema);",
+              "why": "Schema'yı Mongoose model'ine çeviriyoruz. IUser generic tipi ile model metodları TypeScript tip güvenliğine sahip olur."
             },
             {
               "order": "2.6",
-              "action": "Import'un altına Conversation interface ve schema'sını yaz",
+              "action": "BAŞKA DOSYAYA GEÇ — server/src/models/conversation.model.ts aç — import yaz",
               "type": "code_write",
               "file": "server/src/models/conversation.model.ts",
-              "code": "import mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IConversation extends Document {\n  type: 'direct' | 'group';\n  name?: string;\n  participants: mongoose.Types.ObjectId[];\n  lastMessage?: mongoose.Types.ObjectId;\n  lastActivity: Date;\n}\n\nconst conversationSchema = new Schema<IConversation>({\n  type: { type: String, enum: ['direct', 'group'], required: true },\n  name: String,\n  participants: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],\n  lastMessage: { type: Schema.Types.ObjectId, ref: 'Message' },\n  lastActivity: { type: Date, default: Date.now },\n}, { timestamps: true });",
-              "why": "type: 'direct' | 'group' ile birebir ve grup sohbetlerini ayırıyoruz. participants ObjectId dizisi — User modeline referans veriyor. lastMessage ile konuşma listesinde son mesajı göstereceğiz."
+              "code": "import mongoose, { Schema, Document } from 'mongoose';",
+              "why": "Az önce user.model.ts'de mongoose import pattern'ını öğrendik. Aynı pattern'ı burada da kullanıyoruz."
             },
             {
               "order": "2.7",
-              "action": "Schema'nın altına index'leri ve model export'unu ekle",
-              "type": "code_write",
+              "action": "Import'un altına — IConversation interface'ini tanımla",
+              "type": "code_add",
               "file": "server/src/models/conversation.model.ts",
-              "code": "import mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IConversation extends Document {\n  type: 'direct' | 'group';\n  name?: string;\n  participants: mongoose.Types.ObjectId[];\n  lastMessage?: mongoose.Types.ObjectId;\n  lastActivity: Date;\n}\n\nconst conversationSchema = new Schema<IConversation>({\n  type: { type: String, enum: ['direct', 'group'], required: true },\n  name: String,\n  participants: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],\n  lastMessage: { type: Schema.Types.ObjectId, ref: 'Message' },\n  lastActivity: { type: Date, default: Date.now },\n}, { timestamps: true });\n\nconversationSchema.index({ participants: 1 });\nconversationSchema.index({ lastActivity: -1 });\n\nexport const Conversation = mongoose.model<IConversation>('Conversation', conversationSchema);",
-              "why": "Index'leri AYRI adımda ekliyoruz çünkü schema yazıldıktan sonra 'bu alanları nasıl sorgulayacağım?' diye düşünüyoruz. participants index'i kullanıcının konuşmalarını hızlı bulmayı, lastActivity index'i son aktiviteye göre sıralamayı sağlar."
+              "position": "after:import",
+              "code": "\nexport interface IConversation extends Document {\n  type: 'direct' | 'group';\n  name?: string;\n  participants: mongoose.Types.ObjectId[];\n  lastMessage?: mongoose.Types.ObjectId;\n  lastActivity: Date;\n}",
+              "why": "type: 'direct' | 'group' ile birebir ve grup sohbetlerini ayırıyoruz. participants ObjectId dizisi — User modeline referans veriyor."
             },
             {
               "order": "2.8",
-              "action": "BAŞKA DOSYAYA GEÇ — server/src/models/message.model.ts aç — Tam modeli yaz",
-              "type": "code_write",
-              "file": "server/src/models/message.model.ts",
-              "code": "import mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IMessage extends Document {\n  conversationId: mongoose.Types.ObjectId;\n  sender: mongoose.Types.ObjectId;\n  content: string;\n  type: 'text' | 'image' | 'file' | 'ai_response';\n  readBy: mongoose.Types.ObjectId[];\n  metadata?: Record<string, any>;\n}\n\nconst messageSchema = new Schema<IMessage>({\n  conversationId: { type: Schema.Types.ObjectId, ref: 'Conversation', required: true, index: true },\n  sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },\n  content: { type: String, required: true },\n  type: { type: String, enum: ['text', 'image', 'file', 'ai_response'], default: 'text' },\n  readBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],\n  metadata: Schema.Types.Mixed,\n}, { timestamps: true });\n\nmessageSchema.index({ conversationId: 1, createdAt: -1 });\n\nexport const Message = mongoose.model<IMessage>('Message', messageSchema);",
-              "why": "Artık pattern'ı biliyoruz — User ve Conversation modellerini yazdıktan sonra Message'ı tek seferde yazabiliyoruz. Compound index { conversationId: 1, createdAt: -1 } bir konuşmanın mesajlarını tarih sırasına göre ÇOK hızlı sorgular. Schema.Types.Mixed farklı mesaj tiplerinin metadata'sını esnek şekilde saklar."
+              "action": "Interface'in altına — conversationSchema'yı tanımla",
+              "type": "code_add",
+              "file": "server/src/models/conversation.model.ts",
+              "position": "after:interface",
+              "code": "\nconst conversationSchema = new Schema<IConversation>({\n  type: { type: String, enum: ['direct', 'group'], required: true },\n  name: String,\n  participants: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],\n  lastMessage: { type: Schema.Types.ObjectId, ref: 'Message' },\n  lastActivity: { type: Date, default: Date.now },\n}, { timestamps: true });",
+              "why": "enum ile type sadece 'direct' veya 'group' olabilir. ref: 'User' ile participants alanı User modeline REFERANS verir — populate ile doldurulabilir."
             },
             {
               "order": "2.9",
+              "action": "Schema'nın altına — index'leri ve model export'unu ekle",
+              "type": "code_add",
+              "file": "server/src/models/conversation.model.ts",
+              "position": "after:schema",
+              "code": "\nconversationSchema.index({ participants: 1 });\nconversationSchema.index({ lastActivity: -1 });\n\nexport const Conversation = mongoose.model<IConversation>('Conversation', conversationSchema);",
+              "why": "Index'leri AYRI adımda ekliyoruz çünkü schema yazıldıktan sonra 'bu alanları nasıl sorgulayacağım?' diye düşünüyoruz. participants index'i kullanıcının konuşmalarını hızlı bulmayı sağlar."
+            },
+            {
+              "order": "2.10",
+              "action": "BAŞKA DOSYAYA GEÇ — server/src/models/message.model.ts aç — import ve interface yaz",
+              "type": "code_write",
+              "file": "server/src/models/message.model.ts",
+              "code": "import mongoose, { Schema, Document } from 'mongoose';\n\nexport interface IMessage extends Document {\n  conversationId: mongoose.Types.ObjectId;\n  sender: mongoose.Types.ObjectId;\n  content: string;\n  type: 'text' | 'image' | 'file' | 'ai_response';\n  readBy: mongoose.Types.ObjectId[];\n  metadata?: Record<string, any>;\n}",
+              "why": "Artık pattern'ı biliyoruz — import ve interface'i birlikte yazabiliyoruz. 'ai_response' tipi M4'te AI asistan için kullanılacak."
+            },
+            {
+              "order": "2.11",
+              "action": "Interface'in altına — messageSchema'yı tanımla",
+              "type": "code_add",
+              "file": "server/src/models/message.model.ts",
+              "position": "after:interface",
+              "code": "\nconst messageSchema = new Schema<IMessage>({\n  conversationId: { type: Schema.Types.ObjectId, ref: 'Conversation', required: true, index: true },\n  sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },\n  content: { type: String, required: true },\n  type: { type: String, enum: ['text', 'image', 'file', 'ai_response'], default: 'text' },\n  readBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],\n  metadata: Schema.Types.Mixed,\n}, { timestamps: true });",
+              "why": "index: true ile conversationId alanında indeks oluşturulur — mesaj sorgulama hızlanır. Schema.Types.Mixed farklı mesaj tiplerinin metadata'sını esnek şekilde saklar."
+            },
+            {
+              "order": "2.12",
+              "action": "Schema'nın altına — compound index ve model export ekle",
+              "type": "code_add",
+              "file": "server/src/models/message.model.ts",
+              "position": "after:schema",
+              "code": "\nmessageSchema.index({ conversationId: 1, createdAt: -1 });\n\nexport const Message = mongoose.model<IMessage>('Message', messageSchema);",
+              "why": "Compound index { conversationId: 1, createdAt: -1 } bir konuşmanın mesajlarını tarih sırasına göre ÇOK hızlı sorgular. M2'deki cursor-based pagination bu index'e DAYANIR."
+            },
+            {
+              "order": "2.13",
               "action": "Terminale geç — TypeScript derleme kontrolü yap",
               "type": "terminal",
               "command": "cd server && pnpm dlx tsc --noEmit",
               "expected_output": "Hata olmamalı",
-              "why": "Az önce yazdığımız 3 model dosyasının TypeScript hatası olmadığını doğruluyoruz. Bu alışkanlık her dosya yazdıktan sonra yapılmalı — sorunları erken yakalamak için."
+              "why": "Az önce yazdığımız 3 model dosyasının TypeScript hatası olmadığını doğruluyoruz. Bu alışkanlık her dosya yazdıktan sonra yapılmalı."
             },
             {
-              "order": "2.10",
+              "order": "2.14",
               "action": "Model'lerin hatasız derlenmesini doğrula",
               "type": "validate",
               "validation": "tsc --noEmit komutu hata vermemeli. 3 model dosyası oluşturulmuş olmalı: user.model.ts, conversation.model.ts, message.model.ts",
-              "why": "TypeScript derleme kontrolü, tip hatalarını erken yakalamak için önemlidir. Model tanımlarındaki hatalar runtime'da zor tespit edilir."
+              "why": "TypeScript derleme kontrolü, tip hatalarını erken yakalamak için önemlidir."
             }
           ],
           "folder_structure_after": "realtime-chat/\n├── server/\n│   ├── src/\n│   │   ├── controllers/\n│   │   ├── services/\n│   │   ├── models/\n│   │   │   ├── user.model.ts        ← YENİ\n│   │   │   ├── conversation.model.ts ← YENİ\n│   │   │   └── message.model.ts      ← YENİ\n│   │   ├── middleware/\n│   │   ├── events/\n│   │   └── utils/\n│   ├── package.json\n│   └── tsconfig.json\n├── client/\n│   └── ...\n└── docker-compose.yml",
@@ -360,22 +400,38 @@
           "substeps": [
             {
               "order": "3.1",
-              "action": "server/src/utils/config.ts dosyasını aç — tüm config'i merkezi yaz",
+              "action": "server/src/utils/config.ts dosyasını aç — İSKELET export yaz",
               "type": "code_write",
               "file": "server/src/utils/config.ts",
-              "code": "import dotenv from 'dotenv';\ndotenv.config();\n\nexport const config = {\n  port: parseInt(process.env.PORT || '3001'),\n  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/chatapp',\n  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',\n  jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',\n  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',\n  openaiApiKey: process.env.OPENAI_API_KEY || '',\n};",
-              "why": "Environment variable'lar tek dosyada toplanır. Default değerler geliştirme ortamında .env dosyası olmadan çalışmayı sağlar. Bu dosyayı İLK yazıyoruz çünkü index.ts'de kullanacağız."
+              "code": "export const config = {\n  // config değerleri buraya gelecek\n};",
+              "why": "Konfigürasyonu tek dosyada toplamak, değerlerin dağılmasını önler. İskelet ile başlayıp sonra dolduracağız."
             },
             {
               "order": "3.2",
+              "action": "ÜSTE ÇIK — dotenv import'unu ekle (config'i doldurmadan ÖNCE)",
+              "type": "code_write",
+              "file": "server/src/utils/config.ts",
+              "code": "import dotenv from 'dotenv';\ndotenv.config();",
+              "why": "dotenv .env dosyasını okur ve process.env'e yükler. Bu import'u ŞİMDİ ekliyoruz çünkü birazdan environment variable'ları okuyacağız."
+            },
+            {
+              "order": "3.3",
+              "action": "GERİ DÖN config nesnesine — temel değerleri doldur",
+              "type": "code_write",
+              "file": "server/src/utils/config.ts",
+              "code": "import dotenv from 'dotenv';\ndotenv.config();\n\nexport const config = {\n  port: parseInt(process.env.PORT || '3001'),\n  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/chatapp',\n  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',\n  jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',\n  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',\n  openaiApiKey: process.env.OPENAI_API_KEY || '',\n};",
+              "why": "Her config değerinin varsayılanı var — .env dosyası olmadan bile çalışır. parseInt() ile port'u string'den number'a çeviriyoruz. Default değerler geliştirme ortamı için."
+            },
+            {
+              "order": "3.4",
               "action": "BAŞKA DOSYAYA GEÇ — server/.env dosyasını oluştur",
               "type": "code_write",
               "file": "server/.env",
               "code": "PORT=3001\nMONGO_URI=mongodb://localhost:27017/chatapp\nREDIS_URL=redis://localhost:6379\nJWT_SECRET=your-super-secret-jwt-key-change-this\nCLIENT_URL=http://localhost:5173\nOPENAI_API_KEY=sk-your-openai-api-key",
-              "why": "3.1'de config.ts'i yazdık, şimdi o dosyanın okuyacağı .env dosyasını oluşturuyoruz. Hassas bilgiler (API key, JWT secret) burada saklanır ve git'e commit EDİLMEZ."
+              "why": "3.3'te config.ts'i yazdık, şimdi o dosyanın okuyacağı .env dosyasını oluşturuyoruz. Hassas bilgiler burada saklanır ve git'e commit EDİLMEZ."
             },
             {
-              "order": "3.3",
+              "order": "3.5",
               "action": "BAŞKA DOSYAYA GEÇ — server/src/index.ts aç — İSKELET yaz",
               "type": "code_write",
               "file": "server/src/index.ts",
@@ -383,39 +439,85 @@
               "why": "Uygulamanın giriş noktasını İSKELET olarak oluşturuyoruz. İlk önce 'çalışıyor mu?' diye doğrulayacağız, sonra import'ları ekleyeceğiz."
             },
             {
-              "order": "3.4",
-              "action": "ÜSTE ÇIK — gerekli import'ları ekle",
-              "type": "code_write",
-              "file": "server/src/index.ts",
-              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\nimport cors from 'cors';\nimport mongoose from 'mongoose';\nimport { config } from './utils/config';",
-              "why": "Express, Socket.io, Mongoose ve 3.1'de yazdığımız config'i import ediyoruz. createServer gerekli çünkü Socket.io, Express'in HTTP server'ı üzerinden WebSocket upgrade yapar."
-            },
-            {
-              "order": "3.5",
-              "action": "Import'ların altına Express + Socket.io server kurulumunu yaz",
-              "type": "code_write",
-              "file": "server/src/index.ts",
-              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\nimport cors from 'cors';\nimport mongoose from 'mongoose';\nimport { config } from './utils/config';\n\nconst app = express();\nconst httpServer = createServer(app);\n\nconst io = new Server(httpServer, {\n  cors: {\n    origin: config.clientUrl,\n    methods: ['GET', 'POST'],\n    credentials: true,\n  },\n  pingTimeout: 60000,\n  pingInterval: 25000,\n});",
-              "why": "createServer(app) ile Express uygulaması HTTP server'a sarılıyor — Socket.io bu HTTP server üzerinden WebSocket upgrade yapar. CORS ayarları client URL'e göre yapılandırılıyor. pingTimeout/pingInterval bağlantının canlı olduğunu kontrol eder."
-            },
-            {
               "order": "3.6",
-              "action": "Server kurulumunun altına middleware ve auth middleware'ini ekle",
+              "action": "ÜSTE ÇIK — express import'unu ekle ve app oluştur",
               "type": "code_write",
               "file": "server/src/index.ts",
-              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\nimport cors from 'cors';\nimport mongoose from 'mongoose';\nimport { config } from './utils/config';\n\nconst app = express();\nconst httpServer = createServer(app);\n\nconst io = new Server(httpServer, {\n  cors: {\n    origin: config.clientUrl,\n    methods: ['GET', 'POST'],\n    credentials: true,\n  },\n  pingTimeout: 60000,\n  pingInterval: 25000,\n});\n\napp.use(cors({ origin: config.clientUrl, credentials: true }));\napp.use(express.json());\n\n// Socket.io authentication middleware\nio.use(async (socket, next) => {\n  try {\n    const token = socket.handshake.auth.token;\n    if (!token) return next(new Error('Authentication required'));\n    const jwt = require('jsonwebtoken');\n    const payload = jwt.verify(token, config.jwtSecret);\n    socket.data.userId = payload.userId;\n    next();\n  } catch (error) {\n    next(new Error('Invalid token'));\n  }\n});",
-              "why": "io.use() middleware HER yeni socket bağlantısından önce çalışır — JWT doğrulaması burada yapılır. socket.handshake.auth, client'ın bağlantı sırasında gönderdiği auth bilgisini içerir. Token olmadan bağlantı reddedilir."
+              "code": "import express from 'express';\n\nconst app = express();",
+              "why": "İlk import — Express framework. İskelet'teki placeholder'ı gerçek Express uygulaması ile değiştiriyoruz."
             },
             {
               "order": "3.7",
-              "action": "Auth middleware'inin altına connection event ve MongoDB bağlantısını ekle",
+              "action": "ÜSTE ÇIK — http ve Socket.io import'larını ekle",
               "type": "code_write",
               "file": "server/src/index.ts",
-              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\nimport cors from 'cors';\nimport mongoose from 'mongoose';\nimport { config } from './utils/config';\n\nconst app = express();\nconst httpServer = createServer(app);\n\nconst io = new Server(httpServer, {\n  cors: {\n    origin: config.clientUrl,\n    methods: ['GET', 'POST'],\n    credentials: true,\n  },\n  pingTimeout: 60000,\n  pingInterval: 25000,\n});\n\napp.use(cors({ origin: config.clientUrl, credentials: true }));\napp.use(express.json());\n\nio.use(async (socket, next) => {\n  try {\n    const token = socket.handshake.auth.token;\n    if (!token) return next(new Error('Authentication required'));\n    const jwt = require('jsonwebtoken');\n    const payload = jwt.verify(token, config.jwtSecret);\n    socket.data.userId = payload.userId;\n    next();\n  } catch (error) {\n    next(new Error('Invalid token'));\n  }\n});\n\nio.on('connection', (socket) => {\n  console.log(`User connected: ${socket.data.userId}`);\n  socket.on('disconnect', () => {\n    console.log(`User disconnected: ${socket.data.userId}`);\n  });\n});\n\nmongoose.connect(config.mongoUri)\n  .then(() => console.log('MongoDB connected'))\n  .catch((err) => console.error('MongoDB error:', err));\n\nhttpServer.listen(config.port, () => {\n  console.log(`Server running on port ${config.port}`);\n});\n\nexport { io };",
-              "why": "io.on('connection') placeholder event handler. MongoDB bağlantısını 1.5'te Docker ile başlattığımız veritabanına kuruyoruz. httpServer.listen ile server'ı başlatıyoruz. io'yu export ediyoruz çünkü başka dosyalardan erişeceğiz."
+              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';",
+              "why": "Socket.io, Express'in HTTP server'ı üzerinden WebSocket upgrade yapar — bu yüzden createServer gerekli. Server Socket.io'nun ana sınıfı."
             },
             {
               "order": "3.8",
+              "action": "Import'ların altına httpServer ve io oluştur",
+              "type": "code_write",
+              "file": "server/src/index.ts",
+              "code": "import express from 'express';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\n\nconst app = express();\nconst httpServer = createServer(app);",
+              "why": "createServer(app) ile Express uygulaması HTTP server'a sarılıyor. Socket.io bu HTTP server üzerinden WebSocket bağlantısı kuracak."
+            },
+            {
+              "order": "3.9",
+              "action": "httpServer'ın altına Socket.io server'ını CORS ile oluştur",
+              "type": "code_add",
+              "file": "server/src/index.ts",
+              "position": "after:httpServer",
+              "code": "\nimport { config } from './utils/config';\n\nconst io = new Server(httpServer, {\n  cors: {\n    origin: config.clientUrl,\n    methods: ['GET', 'POST'],\n    credentials: true,\n  },\n});",
+              "why": "3.3'te yazdığımız config'i import edip clientUrl'i CORS ayarına veriyoruz. credentials: true ile cookie/auth header gönderimi sağlanır."
+            },
+            {
+              "order": "3.10",
+              "action": "io'nun altına Express middleware'lerini ekle",
+              "type": "code_add",
+              "file": "server/src/index.ts",
+              "position": "after:io",
+              "code": "\nimport cors from 'cors';\n\napp.use(cors({ origin: config.clientUrl, credentials: true }));\napp.use(express.json());",
+              "why": "cors middleware'i frontend'den gelen isteklere izin verir. express.json() request body'yi parse eder. Bunları io'dan SONRA yazıyoruz çünkü sıralı ekliyoruz."
+            },
+            {
+              "order": "3.11",
+              "action": "Middleware'lerin altına Socket.io auth middleware'ini ekle",
+              "type": "code_add",
+              "file": "server/src/index.ts",
+              "position": "after:middleware",
+              "code": "\nio.use(async (socket, next) => {\n  try {\n    const token = socket.handshake.auth.token;\n    if (!token) return next(new Error('Authentication required'));\n    const jwt = require('jsonwebtoken');\n    const payload = jwt.verify(token, config.jwtSecret);\n    socket.data.userId = payload.userId;\n    next();\n  } catch (error) {\n    next(new Error('Invalid token'));\n  }\n});",
+              "why": "io.use() middleware HER yeni socket bağlantısından önce çalışır. Client bağlanırken auth: { token } gönderir — biz burada JWT'yi doğruluyoruz. Token geçersizse bağlantı REDDEDİLİR."
+            },
+            {
+              "order": "3.12",
+              "action": "Auth middleware'inin altına connection event handler'ını ekle",
+              "type": "code_add",
+              "file": "server/src/index.ts",
+              "position": "after:auth",
+              "code": "\nio.on('connection', (socket) => {\n  console.log(`User connected: ${socket.data.userId}`);\n  socket.on('disconnect', () => {\n    console.log(`User disconnected: ${socket.data.userId}`);\n  });\n});",
+              "why": "Placeholder connection handler — gerçek event handler'ları M1 Adım 4'te AYRI dosyada yazacağız. Şimdilik bağlantının ÇALIŞTIĞINI doğruluyoruz."
+            },
+            {
+              "order": "3.13",
+              "action": "ÜSTE ÇIK — mongoose import'unu ekle",
+              "type": "code_add",
+              "file": "server/src/index.ts",
+              "position": "top",
+              "code": "import mongoose from 'mongoose';",
+              "why": "MongoDB bağlantısı için mongoose'u import ediyoruz. 1.5'te Docker ile başlattığımız MongoDB'ye bağlanacağız."
+            },
+            {
+              "order": "3.14",
+              "action": "Dosyanın ALTINA MongoDB bağlantısını ve server başlatmayı ekle",
+              "type": "code_add",
+              "file": "server/src/index.ts",
+              "position": "bottom",
+              "code": "\nmongoose.connect(config.mongoUri)\n  .then(() => console.log('MongoDB connected'))\n  .catch((err) => console.error('MongoDB error:', err));\n\nhttpServer.listen(config.port, () => {\n  console.log(`Server running on port ${config.port}`);\n});\n\nexport { io };",
+              "why": "MongoDB bağlantısını 1.5'te Docker ile başlattığımız veritabanına kuruyoruz. httpServer.listen ile server'ı başlatıyoruz. io'yu export ediyoruz çünkü başka dosyalardan erişeceğiz."
+            },
+            {
+              "order": "3.15",
               "action": "Server'ı başlatıp MongoDB bağlantısını doğrula",
               "type": "validate",
               "validation": "cd server && pnpm run dev çalıştırıldığında 'Server running on port 3001' ve 'MongoDB connected' mesajları görülmeli.",
@@ -461,66 +563,122 @@
             {
               "order": "4.2",
               "action": "ÜSTE ÇIK — Model import'larını ekle (birazdan kullanacağız)",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
-              "code": "import { Server, Socket } from 'socket.io';\nimport { Message } from '../models/message.model';\nimport { Conversation } from '../models/conversation.model';\nimport { User } from '../models/user.model';",
-              "why": "2. adımda yazdığımız modelleri import ediyoruz — birazdan connection event'inde User'ı online yapacağız ve mesaj event'inde Message oluşturacağız. Import'u KULLANMADAN HEMEN ÖNCE ekliyoruz."
+              "position": "top",
+              "code": "import { Message } from '../models/message.model';\nimport { Conversation } from '../models/conversation.model';\nimport { User } from '../models/user.model';",
+              "why": "2. adımda yazdığımız modelleri import ediyoruz — birazdan connection event'inde User'ı online yapacağız ve mesaj event'inde Message oluşturacağız."
             },
             {
               "order": "4.3",
-              "action": "GERİ DÖN fonksiyon içine — connection event'ine presence ve room katılma ekle",
-              "type": "code_write",
+              "action": "GERİ DÖN fonksiyon içine — userId'yi al ve kullanıcıyı online yap",
+              "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
-              "code": "import { Server, Socket } from 'socket.io';\nimport { Message } from '../models/message.model';\nimport { Conversation } from '../models/conversation.model';\nimport { User } from '../models/user.model';\n\nexport function setupSocketHandlers(io: Server) {\n  io.on('connection', async (socket: Socket) => {\n    const userId = socket.data.userId;\n    console.log(`User connected: ${userId}`);\n\n    // Kullanıcıyı online yap\n    await User.findByIdAndUpdate(userId, { isOnline: true });\n    \n    // Kullanıcının konuşma odalarına katıl\n    const conversations = await Conversation.find({ participants: userId });\n    conversations.forEach((conv) => {\n      socket.join(conv.id);\n    });\n\n    // Online durumunu bildir\n    socket.broadcast.emit('user:online', { userId });\n  });\n}",
-              "why": "Her kullanıcı bağlandığında 3 şey yapıyoruz: 1) 2.4'te tanımladığımız isOnline alanını true yapıyoruz, 2) Kullanıcının tüm konuşma odalarına katılıyoruz, 3) Diğer kullanıcılara 'ben online'ım' diyoruz. socket.broadcast.emit gönderen HARİÇ herkese mesaj yollar."
+              "position": "inside:connection",
+              "code": "    const userId = socket.data.userId;\n\n    // Kullanıcıyı online yap\n    await User.findByIdAndUpdate(userId, { isOnline: true });",
+              "why": "3.11'de auth middleware'inde socket.data.userId'yi SET ettik — şimdi KULLANIYORUZ. 2.4'te tanımladığımız isOnline alanını true yapıyoruz."
             },
             {
               "order": "4.4",
-              "action": "Presence kodunun altına mesaj gönderme event handler'ını ekle",
+              "action": "Online yapmanın altına — kullanıcıyı konuşma odalarına katıl",
               "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
-              "code": "\n    // Mesaj gönderme\n    socket.on('message:send', async (data, callback) => {\n      try {\n        const { conversationId, content, type = 'text' } = data;\n        const message = await Message.create({\n          conversationId,\n          sender: userId,\n          content,\n          type,\n          readBy: [userId],\n        });\n        await Conversation.findByIdAndUpdate(conversationId, {\n          lastMessage: message.id,\n          lastActivity: new Date(),\n        });\n        const populated = await message.populate('sender', 'name avatar');\n        io.to(conversationId).emit('message:received', populated);\n        callback({ status: 'ok', messageId: message.id });\n      } catch (error) {\n        callback({ status: 'error', message: 'Mesaj gönderilemedi' });\n      }\n    });",
-              "position": "bottom",
-              "why": "Mesaj akışı: veritabanına kaydet → konuşmayı güncelle (2.6'da tanımladığımız lastMessage alanı) → populate ile gönderici bilgisini ekle → odadaki HERKESE emit et → callback ile onay gönder. Bu WhatsApp'taki tek tik mekanizmasıdır."
+              "position": "after:online",
+              "code": "    // Kullanıcının konuşma odalarına katıl\n    const conversations = await Conversation.find({ participants: userId });\n    conversations.forEach((conv) => {\n      socket.join(conv.id);\n    });",
+              "why": "socket.join(roomId) ile kullanıcı, tüm konuşma odalarına katılır. Bu sayede io.to(roomId).emit() ile odadaki herkese mesaj gönderebileceğiz."
             },
             {
               "order": "4.5",
-              "action": "Mesaj handler'ının altına typing indicator event'lerini ekle",
+              "action": "Room katılımının altına — online durumunu diğer kullanıcılara bildir",
               "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
-              "code": "\n    // Yazıyor bildirimi\n    socket.on('typing:start', (data) => {\n      socket.to(data.conversationId).emit('typing:update', {\n        userId,\n        conversationId: data.conversationId,\n        isTyping: true,\n      });\n    });\n\n    socket.on('typing:stop', (data) => {\n      socket.to(data.conversationId).emit('typing:update', {\n        userId,\n        conversationId: data.conversationId,\n        isTyping: false,\n      });\n    });",
-              "position": "bottom",
-              "why": "socket.to() mesajı gönderen HARİÇ odadaki herkese iletir — io.to()'dan farkı bu. Typing event'leri veritabanına KAYDEDİLMEZ — anlık, geçici bilgidir. Start/stop ikili yapısı ile typing durumu yönetilir."
+              "position": "after:rooms",
+              "code": "    // Online durumunu bildir\n    socket.broadcast.emit('user:online', { userId });",
+              "why": "socket.broadcast.emit gönderen HARİÇ herkese mesaj yollar. Diğer kullanıcılar 'bu kişi online oldu' bilgisini alır."
             },
             {
               "order": "4.6",
-              "action": "Typing'in altına okundu bilgisi event'ini ekle",
+              "action": "Broadcast'in altına — message:send event handler'ını ekle (BAŞLANGIÇ)",
               "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
-              "code": "\n    // Mesaj okundu\n    socket.on('message:read', async (data) => {\n      await Message.updateMany(\n        {\n          conversationId: data.conversationId,\n          sender: { $ne: userId },\n          readBy: { $nin: [userId] },\n        },\n        { $addToSet: { readBy: userId } }\n      );\n      socket.to(data.conversationId).emit('message:read:update', {\n        conversationId: data.conversationId,\n        userId,\n      });\n    });",
-              "position": "bottom",
-              "why": "$ne kendi mesajlarını hariç tutar — kendi mesajını 'okumak' anlamsız. $nin zaten okunmuş mesajları hariç tutar. $addToSet duplicate eklemeden readBy'a kullanıcı ekler. 2.8'de tanımladığımız readBy alanı burada KULLANILIYOR."
+              "position": "after:broadcast",
+              "code": "    // Mesaj gönderme\n    socket.on('message:send', async (data, callback) => {\n      try {\n        const { conversationId, content, type = 'text' } = data;",
+              "why": "Mesaj gönderme event handler'ını AÇIYORUZ. data'dan conversationId, content ve type'ı destructure ediyoruz. callback ile gönderene onay döneceğiz."
             },
             {
               "order": "4.7",
-              "action": "Okundu event'inin altına disconnect handler'ını ekle ve fonksiyonu kapat",
+              "action": "message:send içinde — mesajı veritabanına kaydet",
               "type": "code_add",
               "file": "server/src/events/socket-handler.ts",
-              "code": "\n    // Bağlantı kopma\n    socket.on('disconnect', async () => {\n      await User.findByIdAndUpdate(userId, {\n        isOnline: false,\n        lastSeen: new Date(),\n      });\n      socket.broadcast.emit('user:offline', { userId });\n      console.log(`User disconnected: ${userId}`);\n    });\n  });\n}",
-              "position": "bottom",
-              "why": "Disconnect'te 4.3'teki online yapma işleminin TAM TERSİNİ yapıyoruz: isOnline false, lastSeen güncelle, herkese 'offline oldum' de. Bu, WhatsApp'taki 'son görülme' özelliğidir."
+              "position": "inside:message:send",
+              "code": "        const message = await Message.create({\n          conversationId,\n          sender: userId,\n          content,\n          type,\n          readBy: [userId],\n        });",
+              "why": "2.8'de tanımladığımız Message modeliyle mesajı kaydediyoruz. readBy'a göndereni ekliyoruz — kendi mesajını 'okumuş' sayıyoruz."
             },
             {
               "order": "4.8",
+              "action": "Mesaj kaydının altına — konuşmayı güncelle ve emit et",
+              "type": "code_add",
+              "file": "server/src/events/socket-handler.ts",
+              "position": "after:message-create",
+              "code": "        await Conversation.findByIdAndUpdate(conversationId, {\n          lastMessage: message.id,\n          lastActivity: new Date(),\n        });\n        const populated = await message.populate('sender', 'name avatar');\n        io.to(conversationId).emit('message:received', populated);\n        callback({ status: 'ok', messageId: message.id });",
+              "why": "2.6'da tanımladığımız lastMessage alanını güncelliyoruz. populate ile gönderici bilgisini ekleyip odadaki HERKESE emit ediyoruz. callback ile gönderene 'mesaj alındı' onayı — WhatsApp'taki tek tik."
+            },
+            {
+              "order": "4.9",
+              "action": "message:send'in catch bloğunu ve kapanış süslü parantezini ekle",
+              "type": "code_add",
+              "file": "server/src/events/socket-handler.ts",
+              "position": "after:emit",
+              "code": "      } catch (error) {\n        callback({ status: 'error', message: 'Mesaj gönderilemedi' });\n      }\n    });",
+              "why": "Hata durumunda callback ile client'a bilgi dönüyoruz. try/catch ile veritabanı hatası veya network sorunu yakalanır."
+            },
+            {
+              "order": "4.10",
+              "action": "message:send'in altına — typing indicator event'lerini ekle",
+              "type": "code_add",
+              "file": "server/src/events/socket-handler.ts",
+              "position": "after:message-handler",
+              "code": "    // Yazıyor bildirimi\n    socket.on('typing:start', (data) => {\n      socket.to(data.conversationId).emit('typing:update', {\n        userId,\n        conversationId: data.conversationId,\n        isTyping: true,\n      });\n    });",
+              "why": "socket.to() mesajı gönderen HARİÇ odadaki herkese iletir. Typing event'leri veritabanına KAYDEDİLMEZ — anlık, geçici bilgidir."
+            },
+            {
+              "order": "4.11",
+              "action": "typing:start'ın altına — typing:stop event'ini ekle",
+              "type": "code_add",
+              "file": "server/src/events/socket-handler.ts",
+              "position": "after:typing-start",
+              "code": "    socket.on('typing:stop', (data) => {\n      socket.to(data.conversationId).emit('typing:update', {\n        userId,\n        conversationId: data.conversationId,\n        isTyping: false,\n      });\n    });",
+              "why": "Start/stop ikili yapısı ile typing durumu yönetilir. isTyping: false ile karşı taraf 'artık yazmıyor' bilgisini alır."
+            },
+            {
+              "order": "4.12",
+              "action": "Typing'in altına — mesaj okundu event'ini ekle",
+              "type": "code_add",
+              "file": "server/src/events/socket-handler.ts",
+              "position": "after:typing-stop",
+              "code": "    // Mesaj okundu\n    socket.on('message:read', async (data) => {\n      await Message.updateMany(\n        {\n          conversationId: data.conversationId,\n          sender: { $ne: userId },\n          readBy: { $nin: [userId] },\n        },\n        { $addToSet: { readBy: userId } }\n      );\n      socket.to(data.conversationId).emit('message:read:update', {\n        conversationId: data.conversationId,\n        userId,\n      });\n    });",
+              "why": "$ne kendi mesajlarını hariç tutar. $nin zaten okunmuş mesajları hariç tutar. $addToSet duplicate eklemeden readBy'a kullanıcı ekler. 2.8'de tanımladığımız readBy alanı burada KULLANILIYOR."
+            },
+            {
+              "order": "4.13",
+              "action": "Okundu event'inin altına — disconnect handler'ını ekle",
+              "type": "code_add",
+              "file": "server/src/events/socket-handler.ts",
+              "position": "after:message-read",
+              "code": "    // Bağlantı kopma\n    socket.on('disconnect', async () => {\n      await User.findByIdAndUpdate(userId, {\n        isOnline: false,\n        lastSeen: new Date(),\n      });\n      socket.broadcast.emit('user:offline', { userId });\n    });",
+              "why": "Disconnect'te 4.3'teki online yapma işleminin TAM TERSİNİ yapıyoruz: isOnline false, lastSeen güncelle, herkese 'offline oldum' de. WhatsApp'taki 'son görülme' özelliği."
+            },
+            {
+              "order": "4.14",
               "action": "index.ts dosyasına GERİ DÖN — socket handler'ı import et ve kullan",
               "type": "code_modify",
               "file": "server/src/index.ts",
               "code": "import { setupSocketHandlers } from './events/socket-handler';\n\n// Mevcut io.on('connection'...) bloğunu kaldır ve yerine ekle:\nsetupSocketHandlers(io);",
               "position": "top",
-              "why": "3.7'de yazdığımız placeholder io.on('connection') bloğunu kaldırıp, az önce yazdığımız socket handler modülünü bağlıyoruz. Ana dosya temiz kalır, event logic'i ayrı modülde yönetilir."
+              "why": "3.12'de yazdığımız placeholder io.on('connection') bloğunu kaldırıp, az önce yazdığımız socket handler modülünü bağlıyoruz. Ana dosya temiz kalır."
             },
             {
-              "order": "4.9",
+              "order": "4.15",
               "action": "Server'ı yeniden başlat ve bağlantıyı test et",
               "type": "validate",
               "validation": "Server loglarında 'User connected' mesajları görülmeli. Bir client mesaj gönderdiğinde diğer client'ta 'message:received' event'i tetiklenmeli.",
@@ -850,51 +1008,99 @@
               "type": "code_write",
               "file": "server/src/middleware/auth.ts",
               "code": "import { Request, Response, NextFunction } from 'express';\n\nexport function authenticate(req: Request, res: Response, next: NextFunction) {\n  // TODO: JWT doğrulama\n  next();\n}",
-              "why": "İskelet middleware ile başlıyoruz. Express tiplerini import ediyoruz çünkü parametre tiplerinde KULLANACAĞIZ. Önce çerçeveyi yazıyoruz, sonra JWT mantığını ekleyeceğiz."
+              "why": "İskelet middleware ile başlıyoruz. Express tiplerini import ediyoruz çünkü parametre tiplerinde KULLANACAĞIZ."
             },
             {
               "order": "4.2",
-              "action": "ÜSTE ÇIK — jwt ve config import'larını ekle (şimdi kullanacağız)",
-              "type": "code_write",
+              "action": "ÜSTE ÇIK — jwt ve config import'larını ekle",
+              "type": "code_add",
               "file": "server/src/middleware/auth.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport jwt from 'jsonwebtoken';\nimport { config } from '../utils/config';",
-              "why": "M1 3.1'de yazdığımız config'i ve jsonwebtoken'ı import ediyoruz. jwt.verify ile token doğrulaması yapacağız."
+              "position": "top",
+              "code": "import jwt from 'jsonwebtoken';\nimport { config } from '../utils/config';",
+              "why": "M1 3.3'te yazdığımız config'i ve jsonwebtoken'ı import ediyoruz. jwt.verify ile token doğrulaması yapacağız."
             },
             {
               "order": "4.3",
-              "action": "GERİ DÖN fonksiyon içine — TypeScript tip genişletme ve JWT doğrulama mantığını yaz",
-              "type": "code_write",
+              "action": "GERİ DÖN fonksiyon ÜSTÜne — TypeScript tip genişletme ekle",
+              "type": "code_add",
               "file": "server/src/middleware/auth.ts",
-              "code": "import { Request, Response, NextFunction } from 'express';\nimport jwt from 'jsonwebtoken';\nimport { config } from '../utils/config';\n\ndeclare global {\n  namespace Express {\n    interface Request {\n      userId?: string;\n    }\n  }\n}\n\nexport function authenticate(req: Request, res: Response, next: NextFunction) {\n  const token = req.headers.authorization?.split(' ')[1];\n  if (!token) {\n    return res.status(401).json({ status: 'error', message: 'Token gerekli' });\n  }\n  try {\n    const payload = jwt.verify(token, config.jwtSecret) as { userId: string };\n    req.userId = payload.userId;\n    next();\n  } catch (error) {\n    res.status(401).json({ status: 'error', message: 'Geçersiz token' });\n  }\n}",
-              "why": "Bearer token Authorization header'dan çıkarılır. declare global ile TypeScript'te Request tipini genişletiyoruz — req.userId kullanabilmek için. M1 3.6'da Socket.io için de benzer JWT doğrulaması yapmıştık — aynı mantık REST API için."
+              "position": "before:function",
+              "code": "declare global {\n  namespace Express {\n    interface Request {\n      userId?: string;\n    }\n  }\n}",
+              "why": "TypeScript'te Request tipini genişletiyoruz — req.userId kullanabilmek için. Bu OLMADAN TypeScript 'userId property does not exist' hatası verir."
             },
             {
               "order": "4.4",
+              "action": "GERİ DÖN fonksiyon içine — token'ı header'dan çıkar",
+              "type": "code_write",
+              "file": "server/src/middleware/auth.ts",
+              "code": "export function authenticate(req: Request, res: Response, next: NextFunction) {\n  const token = req.headers.authorization?.split(' ')[1];\n  if (!token) {\n    return res.status(401).json({ status: 'error', message: 'Token gerekli' });\n  }",
+              "why": "Bearer token'ı Authorization header'dan çıkarıyoruz. split(' ')[1] 'Bearer TOKEN' formatından token kısmını alır. Token yoksa 401 dönüyoruz."
+            },
+            {
+              "order": "4.5",
+              "action": "Token kontrolünün altına — JWT doğrulama mantığını ekle",
+              "type": "code_add",
+              "file": "server/src/middleware/auth.ts",
+              "position": "after:token-check",
+              "code": "  try {\n    const payload = jwt.verify(token, config.jwtSecret) as { userId: string };\n    req.userId = payload.userId;\n    next();\n  } catch (error) {\n    res.status(401).json({ status: 'error', message: 'Geçersiz token' });\n  }\n}",
+              "why": "jwt.verify token'ı doğrular ve payload'ı döner. 4.3'te eklediğimiz userId'ye erişim sayesinde req.userId'ye atayabiliyoruz. M1 3.11'de Socket.io için de benzer JWT doğrulaması yapmıştık."
+            },
+            {
+              "order": "4.6",
               "action": "BAŞKA DOSYAYA GEÇ — server/src/routes/conversation.routes.ts aç — İSKELET yaz",
               "type": "code_write",
               "file": "server/src/routes/conversation.routes.ts",
               "code": "import { Router } from 'express';\n\nconst router = Router();\n\nexport default router;",
-              "why": "Route dosyasını iskelet olarak oluşturuyoruz. Router() Express'in modüler routing mekanizması — her resource'un kendi route dosyası olur."
-            },
-            {
-              "order": "4.5",
-              "action": "ÜSTE ÇIK — service ve middleware import'larını ekle",
-              "type": "code_write",
-              "file": "server/src/routes/conversation.routes.ts",
-              "code": "import { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { ConversationService } from '../services/conversation.service';\nimport { MessageService } from '../services/message.service';\n\nconst router = Router();\nconst conversationService = new ConversationService();\nconst messageService = new MessageService();\n\nrouter.use(authenticate);",
-              "why": "4.3'te yazdığımız auth middleware'i, 1.3'teki ConversationService'i ve 2.3'teki MessageService'i import ediyoruz. router.use(authenticate) TÜM route'lara auth uygulanmasını sağlar — her endpoint korunmuş olur."
-            },
-            {
-              "order": "4.6",
-              "action": "GERİ DÖN route tanımlarına — GET /, GET /:id/messages, GET /:id/search endpoint'lerini yaz",
-              "type": "code_write",
-              "file": "server/src/routes/conversation.routes.ts",
-              "code": "import { Router } from 'express';\nimport { authenticate } from '../middleware/auth';\nimport { ConversationService } from '../services/conversation.service';\nimport { MessageService } from '../services/message.service';\n\nconst router = Router();\nconst conversationService = new ConversationService();\nconst messageService = new MessageService();\n\nrouter.use(authenticate);\n\nrouter.get('/', async (req, res, next) => {\n  try {\n    const conversations = await conversationService.getUserConversations(req.userId!);\n    const unreadCounts = await messageService.getUnreadCounts(req.userId!);\n    const enriched = conversations.map((conv: any) => ({\n      ...conv,\n      unreadCount: unreadCounts[conv._id.toString()] || 0,\n    }));\n    res.json({ status: 'success', data: enriched });\n  } catch (error) {\n    next(error);\n  }\n});\n\nrouter.get('/:id/messages', async (req, res, next) => {\n  try {\n    const { cursor, limit } = req.query;\n    const result = await messageService.getMessages(\n      req.params.id,\n      cursor as string,\n      parseInt(limit as string) || 50\n    );\n    res.json({ status: 'success', data: result });\n  } catch (error) {\n    next(error);\n  }\n});\n\nrouter.get('/:id/search', async (req, res, next) => {\n  try {\n    const messages = await messageService.searchMessages(\n      req.params.id,\n      req.query.q as string\n    );\n    res.json({ status: 'success', data: messages });\n  } catch (error) {\n    next(error);\n  }\n});\n\nexport default router;",
-              "why": "Konuşma listesine unread count ekleniyor — 3.2'de yazdığımız getUnreadCounts burada KULLANILIYOR. Mesaj endpoint'i 2.3'teki cursor-based pagination'ı kullanıyor. Arama 2.4'teki searchMessages'ı kullanıyor. Her şey BİRBİRİNE bağlanıyor."
+              "why": "Route dosyasını iskelet olarak oluşturuyoruz. Router() Express'in modüler routing mekanizması."
             },
             {
               "order": "4.7",
-              "action": "index.ts dosyasına GERİ DÖN — ÜSTE ÇIK, route'u import et ve kaydet",
+              "action": "ÜSTE ÇIK — service ve middleware import'larını ekle",
+              "type": "code_add",
+              "file": "server/src/routes/conversation.routes.ts",
+              "position": "top",
+              "code": "import { authenticate } from '../middleware/auth';\nimport { ConversationService } from '../services/conversation.service';\nimport { MessageService } from '../services/message.service';",
+              "why": "4.5'te yazdığımız auth middleware'i, 1.3'teki ConversationService'i ve 2.3'teki MessageService'i import ediyoruz."
+            },
+            {
+              "order": "4.8",
+              "action": "Import'ların altına — service instance'ları oluştur ve auth middleware'i uygula",
+              "type": "code_add",
+              "file": "server/src/routes/conversation.routes.ts",
+              "position": "after:imports",
+              "code": "const conversationService = new ConversationService();\nconst messageService = new MessageService();\n\nrouter.use(authenticate);",
+              "why": "Service instance'larını dosya seviyesinde oluşturuyoruz. router.use(authenticate) TÜM route'lara auth uygulanmasını sağlar — her endpoint korunmuş olur."
+            },
+            {
+              "order": "4.9",
+              "action": "Auth middleware'inin altına — GET / konuşma listesi endpoint'ini yaz",
+              "type": "code_add",
+              "file": "server/src/routes/conversation.routes.ts",
+              "position": "after:auth",
+              "code": "router.get('/', async (req, res, next) => {\n  try {\n    const conversations = await conversationService.getUserConversations(req.userId!);\n    const unreadCounts = await messageService.getUnreadCounts(req.userId!);\n    const enriched = conversations.map((conv: any) => ({\n      ...conv,\n      unreadCount: unreadCounts[conv._id.toString()] || 0,\n    }));\n    res.json({ status: 'success', data: enriched });\n  } catch (error) {\n    next(error);\n  }\n});",
+              "why": "Konuşma listesine unread count ekleniyor — 3.2'de yazdığımız getUnreadCounts burada KULLANILIYOR. Enrichment pattern ile API response'u kullanılabilir hale getiriyoruz."
+            },
+            {
+              "order": "4.10",
+              "action": "GET / endpoint'inin altına — mesaj geçmişi endpoint'ini ekle",
+              "type": "code_add",
+              "file": "server/src/routes/conversation.routes.ts",
+              "position": "after:get-conversations",
+              "code": "router.get('/:id/messages', async (req, res, next) => {\n  try {\n    const { cursor, limit } = req.query;\n    const result = await messageService.getMessages(\n      req.params.id,\n      cursor as string,\n      parseInt(limit as string) || 50\n    );\n    res.json({ status: 'success', data: result });\n  } catch (error) {\n    next(error);\n  }\n});",
+              "why": "2.3'teki cursor-based pagination'ı KULLANIYOR. cursor query parameter'ı opsiyonel — ilk yüklemede gönderilmez, sonraki sayfalarda gönderilir."
+            },
+            {
+              "order": "4.11",
+              "action": "Mesaj endpoint'inin altına — arama endpoint'ini ekle",
+              "type": "code_add",
+              "file": "server/src/routes/conversation.routes.ts",
+              "position": "after:get-messages",
+              "code": "router.get('/:id/search', async (req, res, next) => {\n  try {\n    const messages = await messageService.searchMessages(\n      req.params.id,\n      req.query.q as string\n    );\n    res.json({ status: 'success', data: messages });\n  } catch (error) {\n    next(error);\n  }\n});",
+              "why": "2.4'teki searchMessages'ı KULLANIYOR. HER endpoint aynı pattern: try/catch + next(error). Bu tutarlılık kodun okunurluğunu artırır."
+            },
+            {
+              "order": "4.12",
+              "action": "index.ts dosyasına GERİ DÖN — route'u import et ve kaydet",
               "type": "code_modify",
               "file": "server/src/index.ts",
               "code": "import conversationRoutes from './routes/conversation.routes';\n\napp.use('/api/conversations', conversationRoutes);",
@@ -902,7 +1108,7 @@
               "why": "Az önce yazdığımız route dosyasını ana server'a bağlıyoruz. /api/conversations prefix'i altındaki TÜM istekler conversation router'a yönlendirilir."
             },
             {
-              "order": "4.8",
+              "order": "4.13",
               "action": "API endpoint'lerini test et",
               "type": "validate",
               "validation": "curl veya Postman ile GET /api/conversations isteği yapıldığında konuşma listesi dönmeli. Authorization header'sız isteklerde 401 hatası alınmalı.",
@@ -956,6 +1162,14 @@
           "substeps": [
             {
               "order": "1.1",
+              "action": "client/src/stores/ klasörünü oluştur (yoksa)",
+              "type": "terminal",
+              "command": "mkdir -p client/src/stores",
+              "expected_output": "Klasör oluşturuldu",
+              "why": "Frontend state yönetimi dosyaları bu klasörde yaşayacak. Zustand store'ları burada olacak."
+            },
+            {
+              "order": "1.2",
               "action": "client/src/stores/socket-store.ts dosyasını aç — İSKELET interface yaz",
               "type": "code_write",
               "file": "client/src/stores/socket-store.ts",
@@ -963,7 +1177,7 @@
               "why": "Frontend tarafına geçtik. İlk önce dosyayı oluşturuyoruz, sonra Zustand store'unu adım adım inşa edeceğiz."
             },
             {
-              "order": "1.2",
+              "order": "1.3",
               "action": "ÜSTE ÇIK — zustand ve socket.io-client import'larını ekle",
               "type": "code_write",
               "file": "client/src/stores/socket-store.ts",
@@ -971,23 +1185,114 @@
               "why": "M1 1.4'te kurduğumuz zustand ve socket.io-client'ı import ediyoruz. create ile Zustand store oluşturacağız, io ile Socket.io bağlantısı kuracağız."
             },
             {
-              "order": "1.3",
-              "action": "Import'ların altına interface ve store'u yaz",
-              "type": "code_write",
-              "file": "client/src/stores/socket-store.ts",
-              "code": "import { create } from 'zustand';\nimport { io, Socket } from 'socket.io-client';\n\ninterface SocketStore {\n  socket: Socket | null;\n  isConnected: boolean;\n  connect: (token: string) => void;\n  disconnect: () => void;\n}\n\nexport const useSocketStore = create<SocketStore>((set, get) => ({\n  socket: null,\n  isConnected: false,\n\n  connect: (token: string) => {\n    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {\n      auth: { token },\n      reconnection: true,\n      reconnectionAttempts: 10,\n      reconnectionDelay: 1000,\n    });\n\n    socket.on('connect', () => {\n      set({ isConnected: true });\n    });\n\n    socket.on('disconnect', () => {\n      set({ isConnected: false });\n    });\n\n    socket.on('connect_error', (error) => {\n      console.error('Connection error:', error.message);\n    });\n\n    set({ socket });\n  },\n\n  disconnect: () => {\n    get().socket?.disconnect();\n    set({ socket: null, isConnected: false });\n  },\n}));",
-              "why": "auth: { token } ile M1 3.6'da yazdığımız Socket.io auth middleware'ine JWT gönderiyoruz. reconnection: true ile bağlantı koptuğunda OTOMATİK yeniden bağlanır. Zustand Redux'a göre ÇOK daha az boilerplate gerektirir."
-            },
-            {
               "order": "1.4",
-              "action": "BAŞKA DOSYAYA GEÇ — client/src/stores/chat-store.ts dosyasını aç ve tam store'u yaz",
-              "type": "code_write",
-              "file": "client/src/stores/chat-store.ts",
-              "code": "import { create } from 'zustand';\n\ninterface ChatStore {\n  conversations: any[];\n  activeConversation: string | null;\n  messages: Record<string, any[]>;\n  typingUsers: Record<string, string[]>;\n  setConversations: (conversations: any[]) => void;\n  setActiveConversation: (id: string | null) => void;\n  addMessage: (conversationId: string, message: any) => void;\n  setMessages: (conversationId: string, messages: any[]) => void;\n  setTyping: (conversationId: string, userId: string, isTyping: boolean) => void;\n}\n\nexport const useChatStore = create<ChatStore>((set, get) => ({\n  conversations: [],\n  activeConversation: null,\n  messages: {},\n  typingUsers: {},\n\n  setConversations: (conversations) => set({ conversations }),\n  setActiveConversation: (id) => set({ activeConversation: id }),\n\n  addMessage: (conversationId, message) => {\n    set((state) => ({\n      messages: {\n        ...state.messages,\n        [conversationId]: [\n          ...(state.messages[conversationId] || []),\n          message,\n        ],\n      },\n    }));\n  },\n\n  setMessages: (conversationId, messages) => {\n    set((state) => ({\n      messages: { ...state.messages, [conversationId]: messages },\n    }));\n  },\n\n  setTyping: (conversationId, userId, isTyping) => {\n    set((state) => {\n      const current = state.typingUsers[conversationId] || [];\n      const updated = isTyping\n        ? [...new Set([...current, userId])]\n        : current.filter((id) => id !== userId);\n      return {\n        typingUsers: { ...state.typingUsers, [conversationId]: updated },\n      };\n    });\n  },\n}));",
-              "why": "1.3'te socket store'u yazdık, şimdi chat state store'unu yazıyoruz. messages Record<string, any[]> ile her konuşmanın mesajları AYRI AYRI saklanır. Zustand pattern'ını artık biliyoruz — ikinci store'u daha HIZLI yazdık."
+              "action": "Import'ların altına — SocketStore interface'ini tanımla",
+              "type": "code_add",
+              "file": "client/src/stores/socket-store.ts",
+              "position": "after:imports",
+              "code": "\ninterface SocketStore {\n  socket: Socket | null;\n  isConnected: boolean;\n  connect: (token: string) => void;\n  disconnect: () => void;\n}",
+              "why": "TypeScript ile store'un ŞEKLİNİ önce tanımlıyoruz. Socket null olabilir çünkü bağlantı kurulmadan önce null. connect token alır, disconnect parametre almaz."
             },
             {
               "order": "1.5",
+              "action": "Interface'in altına — store iskeletini oluştur (state kısmı)",
+              "type": "code_add",
+              "file": "client/src/stores/socket-store.ts",
+              "position": "after:interface",
+              "code": "\nexport const useSocketStore = create<SocketStore>((set, get) => ({\n  socket: null,\n  isConnected: false,",
+              "why": "Zustand store'unun STATE kısmını yazıyoruz. Başlangıçta socket null ve bağlantı yok. set ile state güncelleyeceğiz, get ile okuyacağız."
+            },
+            {
+              "order": "1.6",
+              "action": "State'in altına — connect fonksiyonunu yaz (bağlantı oluşturma)",
+              "type": "code_add",
+              "file": "client/src/stores/socket-store.ts",
+              "position": "after:state",
+              "code": "\n  connect: (token: string) => {\n    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {\n      auth: { token },\n      reconnection: true,\n      reconnectionAttempts: 10,\n      reconnectionDelay: 1000,\n    });",
+              "why": "auth: { token } ile M1 3.11'de yazdığımız Socket.io auth middleware'ine JWT gönderiyoruz. reconnection: true ile bağlantı koptuğunda OTOMATİK yeniden bağlanır."
+            },
+            {
+              "order": "1.7",
+              "action": "Socket oluşturmanın altına — event listener'ları ekle",
+              "type": "code_add",
+              "file": "client/src/stores/socket-store.ts",
+              "position": "after:socket-create",
+              "code": "    socket.on('connect', () => {\n      set({ isConnected: true });\n    });\n\n    socket.on('disconnect', () => {\n      set({ isConnected: false });\n    });\n\n    socket.on('connect_error', (error) => {\n      console.error('Connection error:', error.message);\n    });",
+              "why": "Bağlantı durumu değiştiğinde Zustand state'i güncelleniyor. connect_error ile hata loglanır — debug için önemli."
+            },
+            {
+              "order": "1.8",
+              "action": "Event listener'ların altına — socket'i state'e kaydet ve connect fonksiyonunu kapat",
+              "type": "code_add",
+              "file": "client/src/stores/socket-store.ts",
+              "position": "after:listeners",
+              "code": "    set({ socket });\n  },",
+              "why": "Oluşturduğumuz socket'i Zustand state'ine kaydediyoruz. Artık useSocketStore().socket ile her component'ten erişilebilir."
+            },
+            {
+              "order": "1.9",
+              "action": "Connect'in altına — disconnect fonksiyonunu yaz ve store'u kapat",
+              "type": "code_add",
+              "file": "client/src/stores/socket-store.ts",
+              "position": "after:connect",
+              "code": "\n  disconnect: () => {\n    get().socket?.disconnect();\n    set({ socket: null, isConnected: false });\n  },\n}));",
+              "why": "get() ile mevcut socket'e erişip disconnect() çağırıyoruz. State'i sıfırlıyoruz — socket null, bağlantı yok."
+            },
+            {
+              "order": "1.10",
+              "action": "BAŞKA DOSYAYA GEÇ — client/src/stores/chat-store.ts aç — İSKELET interface yaz",
+              "type": "code_write",
+              "file": "client/src/stores/chat-store.ts",
+              "code": "import { create } from 'zustand';",
+              "why": "İkinci store dosyasına geçiyoruz. Zustand pattern'ını 1.3-1.9'da öğrendik — aynı pattern'ı tekrarlayacağız."
+            },
+            {
+              "order": "1.11",
+              "action": "Import'un altına — ChatStore interface'ini tanımla",
+              "type": "code_add",
+              "file": "client/src/stores/chat-store.ts",
+              "position": "after:import",
+              "code": "\ninterface ChatStore {\n  conversations: any[];\n  activeConversation: string | null;\n  messages: Record<string, any[]>;\n  typingUsers: Record<string, string[]>;\n  setConversations: (conversations: any[]) => void;\n  setActiveConversation: (id: string | null) => void;\n  addMessage: (conversationId: string, message: any) => void;\n  setMessages: (conversationId: string, messages: any[]) => void;\n  setTyping: (conversationId: string, userId: string, isTyping: boolean) => void;\n}",
+              "why": "Chat state'i: konuşma listesi, aktif konuşma, mesajlar (conversationId bazında) ve typing kullanıcılar. Record<string, any[]> ile her konuşmanın mesajları AYRI AYRI saklanır."
+            },
+            {
+              "order": "1.12",
+              "action": "Interface'in altına — store'u oluştur (basit setter'lar)",
+              "type": "code_add",
+              "file": "client/src/stores/chat-store.ts",
+              "position": "after:interface",
+              "code": "\nexport const useChatStore = create<ChatStore>((set, get) => ({\n  conversations: [],\n  activeConversation: null,\n  messages: {},\n  typingUsers: {},\n\n  setConversations: (conversations) => set({ conversations }),\n  setActiveConversation: (id) => set({ activeConversation: id }),",
+              "why": "Basit setter fonksiyonları: setConversations tüm listeyi değiştirir, setActiveConversation seçili konuşmayı belirler."
+            },
+            {
+              "order": "1.13",
+              "action": "Setter'ların altına — addMessage fonksiyonunu ekle",
+              "type": "code_add",
+              "file": "client/src/stores/chat-store.ts",
+              "position": "after:setters",
+              "code": "\n  addMessage: (conversationId, message) => {\n    set((state) => ({\n      messages: {\n        ...state.messages,\n        [conversationId]: [\n          ...(state.messages[conversationId] || []),\n          message,\n        ],\n      },\n    }));\n  },",
+              "why": "Yeni mesaj ilgili konuşmanın dizisinin SONUNA eklenir. spread ile mevcut mesajlar korunur. conversationId bazında ayrı diziler kullanmak, farklı konuşmalar arası karışmayı ÖNLER."
+            },
+            {
+              "order": "1.14",
+              "action": "addMessage'ın altına — setMessages fonksiyonunu ekle",
+              "type": "code_add",
+              "file": "client/src/stores/chat-store.ts",
+              "position": "after:addMessage",
+              "code": "\n  setMessages: (conversationId, messages) => {\n    set((state) => ({\n      messages: { ...state.messages, [conversationId]: messages },\n    }));\n  },",
+              "why": "Tüm mesaj listesini değiştirir — ilk yüklemede veya pagination'da kullanılır. addMessage tek mesaj ekler, setMessages TÜM listeyi set eder."
+            },
+            {
+              "order": "1.15",
+              "action": "setMessages'ın altına — setTyping fonksiyonunu ekle ve store'u kapat",
+              "type": "code_add",
+              "file": "client/src/stores/chat-store.ts",
+              "position": "after:setMessages",
+              "code": "\n  setTyping: (conversationId, userId, isTyping) => {\n    set((state) => {\n      const current = state.typingUsers[conversationId] || [];\n      const updated = isTyping\n        ? [...new Set([...current, userId])]\n        : current.filter((id) => id !== userId);\n      return {\n        typingUsers: { ...state.typingUsers, [conversationId]: updated },\n      };\n    });\n  },\n}));",
+              "why": "Set ile typing users'da duplicate ÖNLENIR. isTyping true ise kullanıcıyı ekle, false ise çıkar. M1 4.10-4.11'deki typing event'leri bu fonksiyonu TETİKLEYECEK."
+            },
+            {
+              "order": "1.16",
               "action": "Store'ların import edilip kullanılabildiğini doğrula",
               "type": "validate",
               "validation": "Client dev server çalışıyorken browser console'da hata olmamalı. useSocketStore ve useChatStore import edilebilmeli.",
@@ -1024,38 +1329,85 @@
           "substeps": [
             {
               "order": "2.1",
-              "action": "client/src/lib/api.ts dosyasını aç — Axios instance oluştur",
+              "action": "client/src/lib/api.ts dosyasını aç — İSKELET axios instance yaz",
               "type": "code_write",
               "file": "client/src/lib/api.ts",
-              "code": "import axios from 'axios';\n\nexport const api = axios.create({\n  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:3001') + '/api',\n  headers: { 'Content-Type': 'application/json' },\n});\n\napi.interceptors.request.use((config) => {\n  const token = localStorage.getItem('token');\n  if (token) {\n    config.headers.Authorization = `Bearer ${token}`;\n  }\n  return config;\n});",
-              "why": "Interceptor her istekte OTOMATİK olarak JWT token'ı header'a ekler — M2 4.3'te yazdığımız auth middleware bu token'ı kontrol edecek. baseURL ile her istekte tam URL yazmak zorunda kalmayız."
+              "code": "import axios from 'axios';\n\nexport const api = axios.create({\n  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:3001') + '/api',\n  headers: { 'Content-Type': 'application/json' },\n});",
+              "why": "baseURL ile her istekte tam URL yazmak zorunda kalmayız. Vite environment variable'ı ile farklı ortamlarda farklı URL kullanılabilir."
             },
             {
               "order": "2.2",
+              "action": "api instance'ının altına — interceptor ekle (otomatik JWT token)",
+              "type": "code_add",
+              "file": "client/src/lib/api.ts",
+              "position": "after:api",
+              "code": "\napi.interceptors.request.use((config) => {\n  const token = localStorage.getItem('token');\n  if (token) {\n    config.headers.Authorization = `Bearer ${token}`;\n  }\n  return config;\n});",
+              "why": "Interceptor her istekte OTOMATİK olarak JWT token'ı header'a ekler — M2 4.5'te yazdığımız auth middleware bu token'ı kontrol edecek."
+            },
+            {
+              "order": "2.3",
               "action": "BAŞKA DOSYAYA GEÇ — client/src/pages/chat.tsx aç — İSKELET component yaz",
               "type": "code_write",
               "file": "client/src/pages/chat.tsx",
               "code": "export function ChatPage() {\n  return (\n    <div className=\"flex h-screen\">\n      <div className=\"w-80 border-r border-gray-800\">\n        <p className=\"p-4 text-gray-400\">Konuşmalar</p>\n      </div>\n      <div className=\"flex-1 flex items-center justify-center text-gray-400\">\n        Bir konuşma seçin\n      </div>\n    </div>\n  );\n}",
-              "why": "İskelet layout ile başlıyoruz — master-detail pattern. Sol panel sabit genişlik (w-80 = 320px), sağ panel kalan alanı kaplar (flex-1). İlk önce GÖRÜNÜMÜ doğruluyoruz."
-            },
-            {
-              "order": "2.3",
-              "action": "ÜSTE ÇIK — React hook'ları ve store import'larını ekle",
-              "type": "code_write",
-              "file": "client/src/pages/chat.tsx",
-              "code": "import { useEffect } from 'react';\nimport { useSocketStore } from '../stores/socket-store';\nimport { useChatStore } from '../stores/chat-store';\nimport { api } from '../lib/api';",
-              "why": "1.3'te yazdığımız socket store, 1.4'teki chat store ve 2.1'deki api helper'ı import ediyoruz. useEffect ile konuşma listesini yükleyip socket event'lerini dinleyeceğiz."
+              "why": "İskelet layout ile başlıyoruz — master-detail pattern. Sol panel sabit genişlik (w-80 = 320px), sağ panel kalan alanı kaplar (flex-1)."
             },
             {
               "order": "2.4",
-              "action": "GERİ DÖN component içine — useEffect'leri ve event listener'ları ekle",
-              "type": "code_write",
+              "action": "ÜSTE ÇIK — useEffect import'unu ekle",
+              "type": "code_add",
               "file": "client/src/pages/chat.tsx",
-              "code": "import { useEffect } from 'react';\nimport { useSocketStore } from '../stores/socket-store';\nimport { useChatStore } from '../stores/chat-store';\nimport { api } from '../lib/api';\n\nexport function ChatPage() {\n  const { socket } = useSocketStore();\n  const { activeConversation, setConversations, addMessage, setTyping } = useChatStore();\n\n  useEffect(() => {\n    api.get('/conversations').then(({ data }) => {\n      setConversations(data.data);\n    });\n  }, []);\n\n  useEffect(() => {\n    if (!socket) return;\n    socket.on('message:received', (message) => {\n      addMessage(message.conversationId, message);\n    });\n    socket.on('typing:update', ({ userId, conversationId, isTyping }) => {\n      setTyping(conversationId, userId, isTyping);\n    });\n    return () => {\n      socket.off('message:received');\n      socket.off('typing:update');\n    };\n  }, [socket]);\n\n  return (\n    <div className=\"flex h-screen\">\n      <div className=\"w-80 border-r border-gray-800\">\n        <p className=\"p-4 text-gray-400\">Konuşmalar</p>\n      </div>\n      <div className=\"flex-1\">\n        {activeConversation ? (\n          <p className=\"p-4\">Chat Window - {activeConversation}</p>\n        ) : (\n          <div className=\"flex h-full items-center justify-center text-gray-400\">\n            Bir konuşma seçin\n          </div>\n        )}\n      </div>\n    </div>\n  );\n}",
-              "why": "İlk useEffect konuşma listesini M2 4.6'da yazdığımız GET /api/conversations endpoint'inden çekiyor. İkinci useEffect M1 4.4-4.5'te tanımladığımız socket event'lerini dinliyor. return'daki cleanup memory leak ÖNLER."
+              "position": "top",
+              "code": "import { useEffect } from 'react';",
+              "why": "useEffect ile konuşma listesini yükleyip socket event'lerini dinleyeceğiz."
             },
             {
               "order": "2.5",
+              "action": "ÜSTE ÇIK — store ve api import'larını ekle",
+              "type": "code_add",
+              "file": "client/src/pages/chat.tsx",
+              "position": "after:react",
+              "code": "import { useSocketStore } from '../stores/socket-store';\nimport { useChatStore } from '../stores/chat-store';\nimport { api } from '../lib/api';",
+              "why": "1.5-1.9'da yazdığımız socket store, 1.12-1.15'teki chat store ve 2.1'deki api helper'ı import ediyoruz."
+            },
+            {
+              "order": "2.6",
+              "action": "GERİ DÖN component içine — store bağlantılarını ekle",
+              "type": "code_add",
+              "file": "client/src/pages/chat.tsx",
+              "position": "inside:component",
+              "code": "  const { socket } = useSocketStore();\n  const { activeConversation, setConversations, addMessage, setTyping } = useChatStore();",
+              "why": "Store'lardan socket bağlantısını ve chat state fonksiyonlarını çekiyoruz. Bunları birazdan useEffect'lerde KULLANACAĞIZ."
+            },
+            {
+              "order": "2.7",
+              "action": "Store bağlantılarının altına — konuşma listesini yükleyen useEffect ekle",
+              "type": "code_add",
+              "file": "client/src/pages/chat.tsx",
+              "position": "after:stores",
+              "code": "  useEffect(() => {\n    api.get('/conversations').then(({ data }) => {\n      setConversations(data.data);\n    });\n  }, []);",
+              "why": "M2 4.9'da yazdığımız GET /api/conversations endpoint'inden konuşma listesini çekiyor. Boş dependency array ile SADECE ilk render'da çalışır."
+            },
+            {
+              "order": "2.8",
+              "action": "Yükleme useEffect'inin altına — socket event listener useEffect ekle",
+              "type": "code_add",
+              "file": "client/src/pages/chat.tsx",
+              "position": "after:load-effect",
+              "code": "  useEffect(() => {\n    if (!socket) return;\n    socket.on('message:received', (message) => {\n      addMessage(message.conversationId, message);\n    });\n    socket.on('typing:update', ({ userId, conversationId, isTyping }) => {\n      setTyping(conversationId, userId, isTyping);\n    });\n    return () => {\n      socket.off('message:received');\n      socket.off('typing:update');\n    };\n  }, [socket]);",
+              "why": "M1 4.8'de emit ettiğimiz message:received ve 4.10-4.11'deki typing:update event'lerini DİNLİYORUZ. return'daki cleanup memory leak ÖNLER."
+            },
+            {
+              "order": "2.9",
+              "action": "JSX'e GERİ DÖN — activeConversation kontrolü ekle",
+              "type": "code_modify",
+              "file": "client/src/pages/chat.tsx",
+              "code": "      <div className=\"flex-1\">\n        {activeConversation ? (\n          <p className=\"p-4\">Chat Window - {activeConversation}</p>\n        ) : (\n          <div className=\"flex h-full items-center justify-center text-gray-400\">\n            Bir konuşma seçin\n          </div>\n        )}\n      </div>",
+              "position": "inside:right-panel",
+              "why": "Konuşma seçildiyse içerik göster, seçilmediyse placeholder göster. ChatWindow component'ini M3 Adım 3'te yazacağız."
+            },
+            {
+              "order": "2.10",
               "action": "Chat sayfasının render edildiğini doğrula",
               "type": "validate",
               "validation": "Browser'da chat sayfası açıldığında sol panel ve sağ panel görünmeli. Console'da Socket bağlantı logları görülmeli.",
@@ -1100,49 +1452,113 @@
             },
             {
               "order": "3.2",
-              "action": "ÜSTE ÇIK — gerekli hook'ları ve store'ları import et",
-              "type": "code_write",
+              "action": "ÜSTE ÇIK — React hook'ları import et",
+              "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
-              "code": "import { useState, useEffect, useRef, useCallback } from 'react';\nimport { useSocketStore } from '../stores/socket-store';\nimport { useChatStore } from '../stores/chat-store';\nimport { api } from '../lib/api';",
-              "why": "useState input değeri için, useEffect veri çekme için, useRef scroll target için, useCallback fonksiyon memoization için gerekli. 1.3-1.4'te yazdığımız store'ları ve 2.1'deki api'yi import ediyoruz."
+              "position": "top",
+              "code": "import { useState, useEffect, useRef, useCallback } from 'react';",
+              "why": "useState input değeri için, useEffect veri çekme için, useRef scroll target için, useCallback fonksiyon memoization için gerekli."
             },
             {
               "order": "3.3",
-              "action": "GERİ DÖN component içine — state tanımlarını ve store bağlantılarını ekle",
-              "type": "code_write",
+              "action": "ÜSTE ÇIK — store ve api import'larını ekle",
+              "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
-              "code": "import { useState, useEffect, useRef, useCallback } from 'react';\nimport { useSocketStore } from '../stores/socket-store';\nimport { useChatStore } from '../stores/chat-store';\nimport { api } from '../lib/api';\n\nexport function ChatWindow({ conversationId }: { conversationId: string }) {\n  const [input, setInput] = useState('');\n  const [isLoading, setIsLoading] = useState(false);\n  const messagesEndRef = useRef<HTMLDivElement>(null);\n  const { socket } = useSocketStore();\n  const { messages, typingUsers, setMessages } = useChatStore();\n\n  const conversationMessages = messages[conversationId] || [];\n  const typing = typingUsers[conversationId] || [];",
-              "why": "useRef ile mesaj listesinin sonuna scroll yapılacak element referansı tutulur. conversationId DEĞİŞTİĞİNDE ilgili konuşmanın mesajları ve typing durumu alınır."
+              "position": "after:react-imports",
+              "code": "import { useSocketStore } from '../stores/socket-store';\nimport { useChatStore } from '../stores/chat-store';\nimport { api } from '../lib/api';",
+              "why": "1.5-1.9'da yazdığımız socket store, 1.12-1.15'teki chat store ve 2.1'deki api helper'ı import ediyoruz."
             },
             {
               "order": "3.4",
-              "action": "State'lerin altına useEffect'leri ve sendMessage fonksiyonunu ekle",
+              "action": "GERİ DÖN component içine — state tanımlarını ve store bağlantılarını ekle",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
-              "code": "\n  useEffect(() => {\n    setIsLoading(true);\n    api.get(`/conversations/${conversationId}/messages`)\n      .then(({ data }) => setMessages(conversationId, data.data.messages))\n      .finally(() => setIsLoading(false));\n    socket?.emit('message:read', { conversationId });\n  }, [conversationId]);\n\n  useEffect(() => {\n    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });\n  }, [conversationMessages.length]);\n\n  const sendMessage = useCallback(() => {\n    if (!input.trim() || !socket) return;\n    socket.emit('message:send', {\n      conversationId,\n      content: input.trim(),\n      type: 'text',\n    }, (response: any) => {\n      if (response.status !== 'ok') {\n        console.error('Mesaj gönderilemedi');\n      }\n    });\n    setInput('');\n    socket.emit('typing:stop', { conversationId });\n  }, [input, socket, conversationId]);\n\n  const handleTyping = useCallback(() => {\n    socket?.emit('typing:start', { conversationId });\n  }, [socket, conversationId]);",
-              "position": "bottom",
-              "why": "İlk useEffect M2 4.6'da yazdığımız /messages endpoint'inden mesaj geçmişini çekiyor. sendMessage M1 4.4'teki message:send event'ini tetikliyor. Typing M1 4.5'teki event'leri kullanıyor. HER ŞEY backend'le BAĞLANIYOR."
+              "position": "inside:component-top",
+              "code": "  const [input, setInput] = useState('');\n  const [isLoading, setIsLoading] = useState(false);\n  const messagesEndRef = useRef<HTMLDivElement>(null);\n  const { socket } = useSocketStore();\n  const { messages, typingUsers, setMessages } = useChatStore();",
+              "why": "input: kullanıcının yazdığı metin. isLoading: mesaj yüklenirken spinner. messagesEndRef: otomatik scroll için div referansı. Store'lardan socket ve mesaj state'i çekiliyor."
             },
             {
               "order": "3.5",
-              "action": "Fonksiyonların altına return JSX'i ekle — tam chat window UI",
+              "action": "State'lerin altına — mesaj ve typing verilerini conversationId'ye göre filtrele",
               "type": "code_add",
               "file": "client/src/components/chat-window.tsx",
-              "code": "\n  return (\n    <div className=\"flex h-full flex-col\">\n      <div className=\"border-b px-4 py-3\">\n        <h2 className=\"font-semibold\">Konuşma</h2>\n      </div>\n      <div className=\"flex-1 overflow-y-auto p-4 space-y-3\">\n        {isLoading ? (\n          <div className=\"text-center text-gray-400\">Yükleniyor...</div>\n        ) : (\n          conversationMessages.map((msg: any) => (\n            <div key={msg._id} className=\"p-2 bg-gray-800 rounded\">\n              <p className=\"text-sm text-gray-300\">{msg.content}</p>\n            </div>\n          ))\n        )}\n        {typing.length > 0 && (\n          <div className=\"text-sm text-gray-400 italic\">\n            {typing.length === 1 ? 'Yazıyor...' : `${typing.length} kişi yazıyor...`}\n          </div>\n        )}\n        <div ref={messagesEndRef} />\n      </div>\n      <div className=\"border-t p-4\">\n        <div className=\"flex gap-2\">\n          <textarea\n            value={input}\n            onChange={(e) => { setInput(e.target.value); handleTyping(); }}\n            onKeyDown={(e) => {\n              if (e.key === 'Enter' && !e.shiftKey) {\n                e.preventDefault();\n                sendMessage();\n              }\n            }}\n            placeholder=\"Mesajınızı yazın... (@ai ile AI asistanı kullanın)\"\n            className=\"flex-1 resize-none rounded-lg border p-2 focus:border-blue-500 focus:outline-none border-gray-700 bg-gray-800\"\n            rows={1}\n          />\n          <button\n            onClick={sendMessage}\n            disabled={!input.trim()}\n            className=\"rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50\"\n          >\n            Gönder\n          </button>\n        </div>\n      </div>\n    </div>\n  );\n}",
-              "position": "bottom",
-              "why": "3.1'deki iskelet layout'u DOLDURUYORUZ. Enter ile gönderme, Shift+Enter ile yeni satır standart chat UX'i. messagesEndRef ile yeni mesajda OTOMATİK scroll. disabled={!input.trim()} boş mesaj göndermeyi engeller."
+              "position": "after:state",
+              "code": "  const conversationMessages = messages[conversationId] || [];\n  const typing = typingUsers[conversationId] || [];",
+              "why": "1.13-1.15'te tanımladığımız Record<string, any[]> yapısından aktif konuşmanın verilerini çekiyoruz. || [] ile undefined durumunda boş dizi."
             },
             {
               "order": "3.6",
+              "action": "Filtrelemenin altına — mesaj geçmişini yükleyen useEffect ekle",
+              "type": "code_add",
+              "file": "client/src/components/chat-window.tsx",
+              "position": "after:filter",
+              "code": "  useEffect(() => {\n    setIsLoading(true);\n    api.get(`/conversations/${conversationId}/messages`)\n      .then(({ data }) => setMessages(conversationId, data.data.messages))\n      .finally(() => setIsLoading(false));\n    socket?.emit('message:read', { conversationId });\n  }, [conversationId]);",
+              "why": "M2 4.10'da yazdığımız /messages endpoint'inden mesaj geçmişini çekiyor. conversationId DEĞİŞTİĞİNDE yeniden yüklenir. message:read ile mesajları okundu işaretliyoruz."
+            },
+            {
+              "order": "3.7",
+              "action": "Yükleme useEffect'inin altına — otomatik scroll useEffect ekle",
+              "type": "code_add",
+              "file": "client/src/components/chat-window.tsx",
+              "position": "after:load-effect",
+              "code": "  useEffect(() => {\n    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });\n  }, [conversationMessages.length]);",
+              "why": "Yeni mesaj geldiğinde en alta scroll yapılır. behavior: 'smooth' ile yumuşak kaydırma. conversationMessages.length DEĞİŞTİĞİNDE tetiklenir."
+            },
+            {
+              "order": "3.8",
+              "action": "Scroll useEffect'inin altına — sendMessage fonksiyonunu yaz",
+              "type": "code_add",
+              "file": "client/src/components/chat-window.tsx",
+              "position": "after:scroll-effect",
+              "code": "  const sendMessage = useCallback(() => {\n    if (!input.trim() || !socket) return;\n    socket.emit('message:send', {\n      conversationId,\n      content: input.trim(),\n      type: 'text',\n    }, (response: any) => {\n      if (response.status !== 'ok') console.error('Mesaj gönderilemedi');\n    });\n    setInput('');\n    socket.emit('typing:stop', { conversationId });\n  }, [input, socket, conversationId]);",
+              "why": "M1 4.6-4.9'da yazdığımız message:send event'ini tetikliyor. callback ile gönderim onayı alınır. Mesaj gönderildikten sonra input TEMİZLENİR ve typing durdurulur."
+            },
+            {
+              "order": "3.9",
+              "action": "sendMessage'ın altına — handleTyping fonksiyonunu yaz",
+              "type": "code_add",
+              "file": "client/src/components/chat-window.tsx",
+              "position": "after:sendMessage",
+              "code": "  const handleTyping = useCallback(() => {\n    socket?.emit('typing:start', { conversationId });\n  }, [socket, conversationId]);",
+              "why": "M1 4.10'daki typing:start event'ini tetikliyor. Her tuş basımında çağrılır — production'da throttle/debounce eklenmeli."
+            },
+            {
+              "order": "3.10",
+              "action": "Fonksiyonların altına — mesaj listesi JSX'ini yaz (header + mesajlar)",
+              "type": "code_write",
+              "file": "client/src/components/chat-window.tsx",
+              "code": "  return (\n    <div className=\"flex h-full flex-col\">\n      <div className=\"border-b px-4 py-3\">\n        <h2 className=\"font-semibold\">Konuşma</h2>\n      </div>\n      <div className=\"flex-1 overflow-y-auto p-4 space-y-3\">\n        {isLoading ? (\n          <div className=\"text-center text-gray-400\">Yükleniyor...</div>\n        ) : (\n          conversationMessages.map((msg: any) => (\n            <div key={msg._id} className=\"p-2 bg-gray-800 rounded\">\n              <p className=\"text-sm text-gray-300\">{msg.content}</p>\n            </div>\n          ))\n        )}",
+              "why": "3.1'deki iskelet layout'u DOLDURUYORUZ. isLoading sırasında spinner, değilse mesaj listesi. overflow-y-auto ile mesajlar ekrandan taşınca scroll yapılır."
+            },
+            {
+              "order": "3.11",
+              "action": "Mesaj listesinin altına — typing indicator ve scroll div ekle",
+              "type": "code_add",
+              "file": "client/src/components/chat-window.tsx",
+              "position": "after:messages",
+              "code": "        {typing.length > 0 && (\n          <div className=\"text-sm text-gray-400 italic\">\n            {typing.length === 1 ? 'Yazıyor...' : `${typing.length} kişi yazıyor...`}\n          </div>\n        )}\n        <div ref={messagesEndRef} />\n      </div>",
+              "why": "1.15'te tanımladığımız setTyping ile güncellenen typing state'i burada GÖSTERİLİYOR. messagesEndRef ile 3.7'deki scrollIntoView ÇALIŞIR."
+            },
+            {
+              "order": "3.12",
+              "action": "Scroll div'in altına — input alanı ve gönder butonunu ekle",
+              "type": "code_add",
+              "file": "client/src/components/chat-window.tsx",
+              "position": "after:typing",
+              "code": "      <div className=\"border-t p-4\">\n        <div className=\"flex gap-2\">\n          <textarea\n            value={input}\n            onChange={(e) => { setInput(e.target.value); handleTyping(); }}\n            onKeyDown={(e) => {\n              if (e.key === 'Enter' && !e.shiftKey) {\n                e.preventDefault();\n                sendMessage();\n              }\n            }}\n            placeholder=\"Mesajınızı yazın... (@ai ile AI asistanı kullanın)\"\n            className=\"flex-1 resize-none rounded-lg border p-2 focus:border-blue-500 focus:outline-none border-gray-700 bg-gray-800\"\n            rows={1}\n          />\n          <button\n            onClick={sendMessage}\n            disabled={!input.trim()}\n            className=\"rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50\"\n          >\n            Gönder\n          </button>\n        </div>\n      </div>\n    </div>\n  );\n}",
+              "why": "Enter ile gönderme, Shift+Enter ile yeni satır standart chat UX'i. disabled={!input.trim()} boş mesaj göndermeyi engeller. 3.8'deki sendMessage ve 3.9'daki handleTyping burada BAĞLANIYOR."
+            },
+            {
+              "order": "3.13",
               "action": "chat.tsx dosyasına GERİ DÖN — ChatWindow'u import et ve placeholder'ı değiştir",
               "type": "code_modify",
               "file": "client/src/pages/chat.tsx",
               "code": "import { ChatWindow } from '../components/chat-window';\n\n// Placeholder <p> tag'ini şununla değiştir:\n{activeConversation && <ChatWindow conversationId={activeConversation} />}",
               "position": "top",
-              "why": "2.4'te yazdığımız placeholder'ı az önce oluşturduğumuz ChatWindow component'i ile değiştiriyoruz. conversationId prop ile HANGI konuşmanın gösterileceği belirlenir."
+              "why": "2.4'te yazdığımız placeholder'ı az önce oluşturduğumuz ChatWindow component'i ile DEĞİŞTİRİYORUZ."
             },
             {
-              "order": "3.7",
+              "order": "3.14",
               "action": "Mesaj gönderme ve alma işlevini doğrula",
               "type": "validate",
               "validation": "Mesaj yazıp Enter'a basıldığında mesaj gönderilmeli ve ekranda görünmeli. Typing indicator yazarken görünmeli.",
@@ -1187,23 +1603,59 @@
             },
             {
               "order": "4.2",
-              "action": "İskeletin içine — isOwn ve isAI kontrolü ekle, koşullu stil uygula",
-              "type": "code_write",
+              "action": "İskeletin içine — isOwn ve isAI kontrol değişkenlerini tanımla",
+              "type": "code_add",
               "file": "client/src/components/message-bubble.tsx",
-              "code": "export function MessageBubble({ message }: { message: any }) {\n  const isOwn = false; // TODO: auth context'ten user.id ile karşılaştır\n  const isAI = message.type === 'ai_response';\n\n  return (\n    <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>\n      <div className=\"flex max-w-[70%] gap-2\">\n        {!isOwn && (\n          <div className=\"flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-700 text-sm font-medium text-gray-300\">\n            {isAI ? 'AI' : message.sender?.name?.[0]?.toUpperCase()}\n          </div>\n        )}\n        <div>\n          {!isOwn && (\n            <p className=\"mb-1 text-xs text-gray-500\">\n              {isAI ? 'AI Asistan' : message.sender?.name}\n            </p>\n          )}\n          <div\n            className={`rounded-2xl px-4 py-2 ${\n              isOwn\n                ? 'bg-blue-600 text-white'\n                : isAI\n                ? 'border border-purple-800 bg-purple-900/20 text-gray-200'\n                : 'bg-gray-700 text-gray-200'\n            }`}\n          >\n            <p className=\"whitespace-pre-wrap text-sm\">{message.content}</p>\n          </div>\n          <div className={`mt-1 flex items-center gap-1 text-xs text-gray-500 ${isOwn ? 'justify-end' : ''}`}>\n            <span>\n              {new Date(message.createdAt).toLocaleTimeString('tr-TR', {\n                hour: '2-digit',\n                minute: '2-digit',\n              })}\n            </span>\n            {isOwn && (\n              <span>{message.readBy?.length > 1 ? '\\u2713\\u2713' : '\\u2713'}</span>\n            )}\n          </div>\n        </div>\n      </div>\n    </div>\n  );\n}",
-              "why": "max-w-[70%] ile mesaj baloncuğu ekranın %70'inden fazla genişlemez. whitespace-pre-wrap ile satır sonları korunur. readBy.length > 1 ise çift tik — karşı taraf okumuş demek (M1 2.8'de tanımladığımız readBy alanı). AI mesajları MOR tema ile ayrılır."
+              "position": "inside:component",
+              "code": "  const isOwn = false; // TODO: auth context'ten user.id ile karşılaştır\n  const isAI = message.type === 'ai_response';",
+              "why": "isOwn kendi mesajımız mı kontrolü — M1 2.8'deki 'ai_response' tipi burada KULLANILIYOR. Auth context entegrasyonu sonra yapılacak."
             },
             {
               "order": "4.3",
-              "action": "chat-window.tsx dosyasına GERİ DÖN — MessageBubble'ı import et ve placeholder div'i değiştir",
+              "action": "Return JSX'ini güncelle — flex yönünü isOwn'a göre ayarla",
+              "type": "code_write",
+              "file": "client/src/components/message-bubble.tsx",
+              "code": "  return (\n    <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>\n      <div className=\"flex max-w-[70%] gap-2\">\n      </div>\n    </div>\n  );",
+              "why": "Kendi mesajlarımız SAĞDA (justify-end), karşıdakiler SOLDA (justify-start). max-w-[70%] ile balon ekranın %70'inden fazla genişlemez."
+            },
+            {
+              "order": "4.4",
+              "action": "flex div'in içine — avatar göster (sadece karşıdakinin mesajlarında)",
+              "type": "code_add",
+              "file": "client/src/components/message-bubble.tsx",
+              "position": "inside:flex-div",
+              "code": "        {!isOwn && (\n          <div className=\"flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-700 text-sm font-medium text-gray-300\">\n            {isAI ? 'AI' : message.sender?.name?.[0]?.toUpperCase()}\n          </div>\n        )}",
+              "why": "Kendi mesajlarımızda avatar GÖSTERMEZ. AI mesajlarında 'AI' yazar, normal mesajlarda ismin ilk harfi. flex-shrink-0 ile avatar sıkışmaz."
+            },
+            {
+              "order": "4.5",
+              "action": "Avatar'ın altına — gönderici adı ve mesaj baloncuğu ekle",
+              "type": "code_add",
+              "file": "client/src/components/message-bubble.tsx",
+              "position": "after:avatar",
+              "code": "        <div>\n          {!isOwn && (\n            <p className=\"mb-1 text-xs text-gray-500\">\n              {isAI ? 'AI Asistan' : message.sender?.name}\n            </p>\n          )}\n          <div\n            className={`rounded-2xl px-4 py-2 ${\n              isOwn\n                ? 'bg-blue-600 text-white'\n                : isAI\n                ? 'border border-purple-800 bg-purple-900/20 text-gray-200'\n                : 'bg-gray-700 text-gray-200'\n            }`}\n          >\n            <p className=\"whitespace-pre-wrap text-sm\">{message.content}</p>\n          </div>",
+              "why": "Kendi mesajlar MAVİ, AI mesajları MOR, karşıdakiler GRİ. whitespace-pre-wrap ile satır sonları korunur. Üç farklı renk şeması ile mesaj tiplerini GÖRSEL olarak ayırıyoruz."
+            },
+            {
+              "order": "4.6",
+              "action": "Balon div'inin altına — zaman damgası ve okundu tikleri ekle",
+              "type": "code_add",
+              "file": "client/src/components/message-bubble.tsx",
+              "position": "after:bubble",
+              "code": "          <div className={`mt-1 flex items-center gap-1 text-xs text-gray-500 ${isOwn ? 'justify-end' : ''}`}>\n            <span>\n              {new Date(message.createdAt).toLocaleTimeString('tr-TR', {\n                hour: '2-digit',\n                minute: '2-digit',\n              })}\n            </span>\n            {isOwn && (\n              <span>{message.readBy?.length > 1 ? '\\u2713\\u2713' : '\\u2713'}</span>\n            )}\n          </div>\n        </div>",
+              "why": "readBy.length > 1 ise çift tik — karşı taraf okumuş demek (M1 2.8'de tanımladığımız readBy alanı). Saat formatı Türkçe locale ile 24 saat formatında."
+            },
+            {
+              "order": "4.7",
+              "action": "chat-window.tsx dosyasına GERİ DÖN — MessageBubble'ı import et ve placeholder'ı değiştir",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
               "code": "import { MessageBubble } from './message-bubble';\n\n// Mesaj listesindeki placeholder div'i MessageBubble ile değiştir:\n<MessageBubble key={msg._id} message={msg} />",
               "position": "top",
-              "why": "3.5'te yazdığımız placeholder mesaj div'ini az önce oluşturduğumuz stilize MessageBubble component'i ile DEĞİŞTİRİYORUZ. key prop React'in liste render optimizasyonu için gerekli."
+              "why": "3.10'da yazdığımız placeholder mesaj div'ini az önce oluşturduğumuz stilize MessageBubble component'i ile DEĞİŞTİRİYORUZ."
             },
             {
-              "order": "4.4",
+              "order": "4.8",
               "action": "Mesaj bubble stillerini doğrula",
               "type": "validate",
               "validation": "Mesajlar baloncuk şeklinde görünmeli. Zaman damgası doğru formatta olmalı. Farklı mesaj tipleri farklı renklerde olmalı.",
@@ -1252,31 +1704,68 @@
               "type": "code_write",
               "file": "client/src/hooks/use-infinite-messages.ts",
               "code": "import { useState, useCallback, useRef, useEffect } from 'react';\nimport { api } from '../lib/api';\nimport { useChatStore } from '../stores/chat-store';",
-              "why": "2.1'de yazdığımız api helper'ı ve 1.4'teki chat store'u import ediyoruz. useRef ile cursor değerini re-render'lar arasında KORUYACAĞIZ."
+              "why": "2.1'de yazdığımız api helper'ı ve 1.12'deki chat store'u import ediyoruz. useRef ile cursor değerini re-render'lar arasında KORUYACAĞIZ."
             },
             {
               "order": "5.3",
-              "action": "GERİ DÖN hook içine — tam infinite scroll mantığını yaz",
-              "type": "code_write",
+              "action": "GERİ DÖN hook içine — state ve ref tanımlarını yaz",
+              "type": "code_add",
               "file": "client/src/hooks/use-infinite-messages.ts",
-              "code": "import { useState, useCallback, useRef, useEffect } from 'react';\nimport { api } from '../lib/api';\nimport { useChatStore } from '../stores/chat-store';\n\nexport function useInfiniteMessages(conversationId: string) {\n  const [hasMore, setHasMore] = useState(true);\n  const [isLoadingMore, setIsLoadingMore] = useState(false);\n  const cursorRef = useRef<string | null>(null);\n  const { messages, setMessages } = useChatStore();\n  const observerRef = useRef<HTMLDivElement>(null);\n\n  const loadMore = useCallback(async () => {\n    if (isLoadingMore || !hasMore) return;\n    setIsLoadingMore(true);\n    try {\n      const params = cursorRef.current\n        ? `?cursor=${cursorRef.current}&limit=50`\n        : '?limit=50';\n      const { data } = await api.get(\n        `/conversations/${conversationId}/messages${params}`\n      );\n      const newMessages = data.data.messages;\n      const existing = messages[conversationId] || [];\n      setMessages(conversationId, [...newMessages, ...existing]);\n      setHasMore(data.data.hasMore);\n      cursorRef.current = data.data.nextCursor;\n    } catch (error) {\n      console.error('Mesaj yükleme hatası:', error);\n    } finally {\n      setIsLoadingMore(false);\n    }\n  }, [conversationId, isLoadingMore, hasMore]);\n\n  useEffect(() => {\n    const observer = new IntersectionObserver(\n      (entries) => {\n        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {\n          loadMore();\n        }\n      },\n      { threshold: 0.1 }\n    );\n    if (observerRef.current) {\n      observer.observe(observerRef.current);\n    }\n    return () => observer.disconnect();\n  }, [loadMore, hasMore, isLoadingMore]);\n\n  return { isLoadingMore, hasMore, observerRef, loadMore };\n}",
-              "why": "M2 2.3'te yazdığımız cursor-based pagination endpoint'ini kullanıyoruz. IntersectionObserver scroll event listener'dan DAHA performanslıdır. Yeni mesajlar mevcut mesajların BAŞINA eklenir çünkü eski mesajlar üstte gösterilir. cursorRef state DEĞİŞİKLİĞİ tetiklemeden cursor değerini korur."
+              "position": "inside:hook",
+              "code": "  const [hasMore, setHasMore] = useState(true);\n  const [isLoadingMore, setIsLoadingMore] = useState(false);\n  const cursorRef = useRef<string | null>(null);\n  const { messages, setMessages } = useChatStore();\n  const observerRef = useRef<HTMLDivElement>(null);",
+              "why": "hasMore: daha fazla mesaj var mı. cursorRef: son çekilen mesajın zamanı — state DEĞİŞİKLİĞİ tetiklemeden saklanır. observerRef: IntersectionObserver'ın izleyeceği div."
             },
             {
               "order": "5.4",
-              "action": "chat-window.tsx dosyasına GERİ DÖN — hook'u import et ve mesaj listesinin üstüne observer ekle",
+              "action": "State'lerin altına — loadMore fonksiyonunu yaz (API çağrısı)",
+              "type": "code_add",
+              "file": "client/src/hooks/use-infinite-messages.ts",
+              "position": "after:state",
+              "code": "  const loadMore = useCallback(async () => {\n    if (isLoadingMore || !hasMore) return;\n    setIsLoadingMore(true);\n    try {\n      const params = cursorRef.current\n        ? `?cursor=${cursorRef.current}&limit=50`\n        : '?limit=50';\n      const { data } = await api.get(\n        `/conversations/${conversationId}/messages${params}`\n      );",
+              "why": "İlk kontrol: zaten yüklüyorsak veya daha fazla mesaj yoksa ÇIK. M2 4.10'da yazdığımız /messages endpoint'ini cursor parametresiyle çağırıyoruz."
+            },
+            {
+              "order": "5.5",
+              "action": "API çağrısının altına — mesajları state'e ekle ve cursor'ı güncelle",
+              "type": "code_add",
+              "file": "client/src/hooks/use-infinite-messages.ts",
+              "position": "after:api-call",
+              "code": "      const newMessages = data.data.messages;\n      const existing = messages[conversationId] || [];\n      setMessages(conversationId, [...newMessages, ...existing]);\n      setHasMore(data.data.hasMore);\n      cursorRef.current = data.data.nextCursor;\n    } catch (error) {\n      console.error('Mesaj yükleme hatası:', error);\n    } finally {\n      setIsLoadingMore(false);\n    }\n  }, [conversationId, isLoadingMore, hasMore]);",
+              "why": "Yeni mesajlar mevcut mesajların BAŞINA eklenir çünkü eski mesajlar üstte gösterilir. M2 2.3'teki cursor-based pagination'ın döndürdüğü nextCursor ve hasMore burada KULLANILIYOR."
+            },
+            {
+              "order": "5.6",
+              "action": "loadMore'un altına — IntersectionObserver useEffect ekle",
+              "type": "code_add",
+              "file": "client/src/hooks/use-infinite-messages.ts",
+              "position": "after:loadMore",
+              "code": "  useEffect(() => {\n    const observer = new IntersectionObserver(\n      (entries) => {\n        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {\n          loadMore();\n        }\n      },\n      { threshold: 0.1 }\n    );\n    if (observerRef.current) {\n      observer.observe(observerRef.current);\n    }\n    return () => observer.disconnect();\n  }, [loadMore, hasMore, isLoadingMore]);",
+              "why": "IntersectionObserver scroll event listener'dan DAHA performanslıdır. threshold: 0.1 ile element %10 görünür olduğunda tetiklenir. return'da observer TEMİZLENİR."
+            },
+            {
+              "order": "5.7",
+              "action": "useEffect'in altına — return statement yaz",
+              "type": "code_add",
+              "file": "client/src/hooks/use-infinite-messages.ts",
+              "position": "after:observer",
+              "code": "  return { isLoadingMore, hasMore, observerRef, loadMore };",
+              "why": "Hook'un dışarıya sunduğu değerler: yükleme durumu, daha fazla var mı, observer referansı ve manuel yükleme fonksiyonu."
+            },
+            {
+              "order": "5.8",
+              "action": "chat-window.tsx dosyasına GERİ DÖN — hook'u import et ve entegre et",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
               "code": "import { useInfiniteMessages } from '../hooks/use-infinite-messages';\n\n// Component içinde:\nconst { isLoadingMore, hasMore, observerRef } = useInfiniteMessages(conversationId);\n\n// Mesaj listesinin en üstüne ekle:\n{hasMore && <div ref={observerRef} className=\"text-center text-gray-400 py-2\">{isLoadingMore ? 'Yükleniyor...' : ''}</div>}",
               "position": "top",
-              "why": "Az önce yazdığımız hook'u ChatWindow'a bağlıyoruz. observerRef mesaj listesinin EN ÜSTÜNE yerleştirilir — kullanıcı yukarı scroll yapıp bu element'i GÖRDÜĞÜNDE otomatik olarak eski mesajlar yüklenir."
+              "why": "observerRef mesaj listesinin EN ÜSTÜNE yerleştirilir — kullanıcı yukarı scroll yapıp bu element'i GÖRDÜĞÜNDE otomatik olarak eski mesajlar yüklenir."
             },
             {
-              "order": "5.5",
+              "order": "5.9",
               "action": "Infinite scroll'un çalıştığını doğrula",
               "type": "validate",
               "validation": "60+ mesajı olan bir konuşmada yukarı scroll yapıldığında eski mesajlar otomatik yüklenmeli. Tüm mesajlar yüklendiğinde loadMore çağrılmamalı.",
-              "why": "Infinite scroll, chat uygulamasının temel UX özelliğidir. Tüm mesajları tek seferde yüklemek performans sorunlarına yol açar."
+              "why": "Infinite scroll, chat uygulamasının temel UX özelliğidir."
             }
           ],
           "folder_structure_after": "realtime-chat/\n├── client/\n│   ├── src/\n│   │   ├── stores/\n│   │   ├── lib/\n│   │   ├── hooks/\n│   │   │   └── use-infinite-messages.ts ← YENİ\n│   │   ├── pages/\n│   │   │   └── chat.tsx\n│   │   ├── components/\n│   │   │   ├── chat-window.tsx          ← GÜNCELLENDİ\n│   │   │   └── message-bubble.tsx\n│   │   └── main.tsx\n│   └── ...\n└── ...",
@@ -1335,38 +1824,68 @@
             {
               "order": "1.2",
               "action": "ÜSTE ÇIK — OpenAI import'unu ve config'i ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "server/src/services/ai.service.ts",
+              "position": "top",
               "code": "import OpenAI from 'openai';\nimport { config } from '../utils/config';\n\nconst openai = new OpenAI({ apiKey: config.openaiApiKey });",
-              "why": "M1 1.2'de kurduğumuz openai paketini import ediyoruz. M1 3.1'de config'e eklediğimiz openaiApiKey burada KULLANILIYOR. Client'ı dosya seviyesinde oluşturuyoruz — her metotta tekrar oluşturmaya gerek yok."
+              "why": "M1 1.2'de kurduğumuz openai paketini import ediyoruz. M1 3.3'te config'e eklediğimiz openaiApiKey burada KULLANILIYOR."
             },
             {
               "order": "1.3",
-              "action": "Import'ların altına system prompt tanımla",
-              "type": "code_write",
+              "action": "OpenAI client'ın altına — system prompt tanımla",
+              "type": "code_add",
               "file": "server/src/services/ai.service.ts",
-              "code": "import OpenAI from 'openai';\nimport { config } from '../utils/config';\n\nconst openai = new OpenAI({ apiKey: config.openaiApiKey });\n\nconst SYSTEM_PROMPT = `Sen yardımsever bir AI asistansın. Chat uygulamasında kullanıcılara yardım ediyorsun.\nKurallar:\n- Kısa ve öz cevaplar ver (maksimum 500 kelime)\n- Kod sorularında syntax highlighting için markdown kullan\n- Türkçe cevap ver (teknik terimler İngilizce kalabilir)\n- Zararlı veya uygunsuz içerik üretme\n- Emin olmadığın konularda bunu belirt`;",
-              "why": "System prompt AI'ın DAVRANIŞINI belirler. Kurallar ile yanıt kalitesi ve güvenliği kontrol altına alınır. Türkçe yanıt vermesi HEDEF KİTLE için önemli."
+              "position": "after:client",
+              "code": "const SYSTEM_PROMPT = `Sen yardımsever bir AI asistansın. Chat uygulamasında kullanıcılara yardım ediyorsun.\nKurallar:\n- Kısa ve öz cevaplar ver (maksimum 500 kelime)\n- Kod sorularında syntax highlighting için markdown kullan\n- Türkçe cevap ver (teknik terimler İngilizce kalabilir)\n- Zararlı veya uygunsuz içerik üretme\n- Emin olmadığın konularda bunu belirt`;",
+              "why": "System prompt AI'ın DAVRANIŞINI belirler. Kurallar ile yanıt kalitesi ve güvenliği kontrol altına alınır."
             },
             {
               "order": "1.4",
-              "action": "GERİ DÖN class içine — generateResponse metodunu yaz",
-              "type": "code_write",
+              "action": "GERİ DÖN class içine — generateResponse için message dizisi hazırla",
+              "type": "code_add",
               "file": "server/src/services/ai.service.ts",
-              "code": "import OpenAI from 'openai';\nimport { config } from '../utils/config';\n\nconst openai = new OpenAI({ apiKey: config.openaiApiKey });\n\nconst SYSTEM_PROMPT = `Sen yardımsever bir AI asistansın. Chat uygulamasında kullanıcılara yardım ediyorsun.\nKurallar:\n- Kısa ve öz cevaplar ver (maksimum 500 kelime)\n- Kod sorularında syntax highlighting için markdown kullan\n- Türkçe cevap ver (teknik terimler İngilizce kalabilir)\n- Zararlı veya uygunsuz içerik üretme\n- Emin olmadığın konularda bunu belirt`;\n\nexport class AIService {\n  async generateResponse(userMessage: string, conversationHistory: any[] = []) {\n    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [\n      { role: 'system', content: SYSTEM_PROMPT },\n      ...conversationHistory.slice(-10).map((msg) => ({\n        role: msg.type === 'ai_response' ? 'assistant' as const : 'user' as const,\n        content: msg.content,\n      })),\n      { role: 'user', content: userMessage },\n    ];\n\n    const completion = await openai.chat.completions.create({\n      model: 'gpt-4o-mini',\n      messages,\n      max_tokens: 1000,\n      temperature: 0.7,\n    });\n\n    return completion.choices[0].message.content || 'Yanıt oluşturulamadı.';\n  }",
-              "why": "Son 10 mesaj context olarak gönderilir — token limitini aşmamak için SINIRLANDIRILIR. temperature: 0.7 yaratıcılık ve tutarlılık arasında denge sağlar. M1 2.8'de tanımladığımız 'ai_response' tipi burada role belirleme için KULLANILIYOR."
+              "position": "inside:class",
+              "code": "  private buildMessages(userMessage: string, conversationHistory: any[] = []) {\n    return [\n      { role: 'system' as const, content: SYSTEM_PROMPT },\n      ...conversationHistory.slice(-10).map((msg) => ({\n        role: msg.type === 'ai_response' ? 'assistant' as const : 'user' as const,\n        content: msg.content,\n      })),\n      { role: 'user' as const, content: userMessage },\n    ];\n  }",
+              "why": "Son 10 mesaj context olarak gönderilir — token limitini aşmamak için SINIRLANDIRILIR. M1 2.8'de tanımladığımız 'ai_response' tipi burada role belirleme için KULLANILIYOR. Private helper metot ile DRY — generateResponse ve streaming ikisi de bunu kullanır."
             },
             {
               "order": "1.5",
-              "action": "generateResponse'un altına generateStreamingResponse metodunu ekle",
+              "action": "buildMessages'ın altına — generateResponse metodunu yaz",
               "type": "code_add",
               "file": "server/src/services/ai.service.ts",
-              "code": "\n  async generateStreamingResponse(\n    userMessage: string,\n    conversationHistory: any[] = [],\n    onToken: (token: string) => void\n  ) {\n    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [\n      { role: 'system', content: SYSTEM_PROMPT },\n      ...conversationHistory.slice(-10).map((msg) => ({\n        role: msg.type === 'ai_response' ? 'assistant' as const : 'user' as const,\n        content: msg.content,\n      })),\n      { role: 'user', content: userMessage },\n    ];\n\n    const stream = await openai.chat.completions.create({\n      model: 'gpt-4o-mini',\n      messages,\n      max_tokens: 1000,\n      temperature: 0.7,\n      stream: true,\n    });\n\n    let fullResponse = '';\n    for await (const chunk of stream) {\n      const token = chunk.choices[0]?.delta?.content || '';\n      if (token) {\n        fullResponse += token;\n        onToken(token);\n      }\n    }\n    return fullResponse;\n  }\n}",
-              "position": "bottom",
-              "why": "stream: true ile OpenAI token token yanıt döndürür. for await...of ile async iterator olarak okunur. Her token geldiğinde onToken callback'i Socket.io üzerinden client'a emit edecek — BU BAĞLANTILYI sonraki adımda kuracağız."
+              "position": "after:buildMessages",
+              "code": "  async generateResponse(userMessage: string, conversationHistory: any[] = []) {\n    const completion = await openai.chat.completions.create({\n      model: 'gpt-4o-mini',\n      messages: this.buildMessages(userMessage, conversationHistory),\n      max_tokens: 1000,\n      temperature: 0.7,\n    });\n    return completion.choices[0].message.content || 'Yanıt oluşturulamadı.';\n  }",
+              "why": "gpt-4o-mini hız ve maliyet açısından chat uygulamaları için ideal. temperature: 0.7 yaratıcılık ve tutarlılık arasında denge sağlar. 1.4'te yazdığımız buildMessages'ı KULLANIYORUZ."
             },
             {
               "order": "1.6",
+              "action": "generateResponse'un altına — streaming response metodunun İSKELETİNİ yaz",
+              "type": "code_add",
+              "file": "server/src/services/ai.service.ts",
+              "position": "after:generateResponse",
+              "code": "  async generateStreamingResponse(\n    userMessage: string,\n    conversationHistory: any[] = [],\n    onToken: (token: string) => void\n  ) {",
+              "why": "Streaming versiyonu onToken callback alır — her token geldiğinde Socket.io ile client'a emit edecek. Bu BAĞLANTIYI M4 Adım 2'de kuracağız."
+            },
+            {
+              "order": "1.7",
+              "action": "Streaming fonksiyonunun içine — OpenAI stream çağrısını yaz",
+              "type": "code_add",
+              "file": "server/src/services/ai.service.ts",
+              "position": "inside:streaming",
+              "code": "    const stream = await openai.chat.completions.create({\n      model: 'gpt-4o-mini',\n      messages: this.buildMessages(userMessage, conversationHistory),\n      max_tokens: 1000,\n      temperature: 0.7,\n      stream: true,\n    });",
+              "why": "stream: true ile OpenAI token token yanıt döndürür. 1.5'teki ile AYNI parametreler, tek fark stream: true."
+            },
+            {
+              "order": "1.8",
+              "action": "Stream'in altına — token'ları oku ve fonksiyonu kapat",
+              "type": "code_add",
+              "file": "server/src/services/ai.service.ts",
+              "position": "after:stream-create",
+              "code": "    let fullResponse = '';\n    for await (const chunk of stream) {\n      const token = chunk.choices[0]?.delta?.content || '';\n      if (token) {\n        fullResponse += token;\n        onToken(token);\n      }\n    }\n    return fullResponse;\n  }",
+              "why": "for await...of ile async iterator olarak okunur. Her token geldiğinde onToken callback'i tetiklenir VE fullResponse'a eklenir. Tam yanıt döndürülür — veritabanına kaydedilmek için."
+            },
+            {
+              "order": "1.9",
               "action": "AI service'in çalıştığını doğrula",
               "type": "validate",
               "validation": "OPENAI_API_KEY .env'de tanımlı olmalı. Test amaçlı generateResponse çağrıldığında yanıt dönmeli.",
@@ -1411,31 +1930,105 @@
             },
             {
               "order": "2.2",
-              "action": "ÜSTE ÇIK — AI service ve model import'larını ekle",
-              "type": "code_write",
+              "action": "ÜSTE ÇIK — AI service import'unu ekle",
+              "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
-              "code": "import { Socket, Server } from 'socket.io';\nimport { AIService } from '../services/ai.service';\nimport { Message } from '../models/message.model';\nimport { Conversation } from '../models/conversation.model';\n\nconst aiService = new AIService();",
-              "why": "1.4'te yazdığımız AIService'i import ediyoruz. M1'de yazdığımız Message ve Conversation modellerini de import ediyoruz çünkü AI yanıtını veritabanına KAYDEDECEĞİZ."
+              "position": "top",
+              "code": "import { AIService } from '../services/ai.service';\n\nconst aiService = new AIService();",
+              "why": "1.4'te yazdığımız AIService'i import ediyoruz. Instance'ı dosya seviyesinde oluşturuyoruz — her event'te yeniden oluşturmaya gerek yok."
             },
             {
               "order": "2.3",
-              "action": "GERİ DÖN fonksiyon içine — ai:ask event handler'ının tam mantığını yaz",
-              "type": "code_write",
+              "action": "ÜSTE ÇIK — Message ve Conversation model import'larını ekle",
+              "type": "code_add",
               "file": "server/src/events/ai-handler.ts",
-              "code": "import { Socket, Server } from 'socket.io';\nimport { AIService } from '../services/ai.service';\nimport { Message } from '../models/message.model';\nimport { Conversation } from '../models/conversation.model';\n\nconst aiService = new AIService();\n\nexport function setupAIHandler(io: Server, socket: Socket) {\n  socket.on('ai:ask', async (data, callback) => {\n    const { conversationId, question } = data;\n    const userId = socket.data.userId;\n\n    try {\n      const userMessage = await Message.create({\n        conversationId,\n        sender: userId,\n        content: question,\n        type: 'text',\n        readBy: [userId],\n      });\n      io.to(conversationId).emit('message:received',\n        await userMessage.populate('sender', 'name avatar')\n      );\n\n      const history = await Message.find({ conversationId })\n        .sort({ createdAt: -1 })\n        .limit(10)\n        .lean();\n\n      const aiMessage = await Message.create({\n        conversationId,\n        sender: userId,\n        content: '',\n        type: 'ai_response',\n        readBy: [userId],\n      });\n\n      io.to(conversationId).emit('ai:stream:start', {\n        messageId: aiMessage.id,\n        conversationId,\n      });\n\n      const fullResponse = await aiService.generateStreamingResponse(\n        question,\n        history.reverse(),\n        (token) => {\n          io.to(conversationId).emit('ai:stream:token', {\n            messageId: aiMessage.id,\n            token,\n          });\n        }\n      );\n\n      await Message.findByIdAndUpdate(aiMessage.id, { content: fullResponse });\n      io.to(conversationId).emit('ai:stream:end', {\n        messageId: aiMessage.id,\n        fullContent: fullResponse,\n      });\n\n      await Conversation.findByIdAndUpdate(conversationId, {\n        lastMessage: aiMessage.id,\n        lastActivity: new Date(),\n      });\n\n      callback({ status: 'ok' });\n    } catch (error) {\n      console.error('AI error:', error);\n      callback({ status: 'error', message: 'AI yanıt veremedi' });\n    }\n  });\n}",
-              "why": "Streaming pattern: boş placeholder mesaj → token'ları emit → tam yanıtı kaydet. 1.5'te yazdığımız generateStreamingResponse'un onToken callback'i HER token geldiğinde Socket.io ile emit eder — ChatGPT'nin yazıyor efektini replike eder."
+              "position": "top",
+              "code": "import { Message } from '../models/message.model';\nimport { Conversation } from '../models/conversation.model';",
+              "why": "M1'de yazdığımız modelleri import ediyoruz — AI yanıtını veritabanına KAYDEDECEĞİZ ve konuşma geçmişini OKUYACAĞIZ."
             },
             {
               "order": "2.4",
-              "action": "socket-handler.ts dosyasına GERİ DÖN — AI handler'ı import et ve connection callback'ine ekle",
+              "action": "GERİ DÖN fonksiyon içine — ai:ask event handler'ını aç",
+              "type": "code_add",
+              "file": "server/src/events/ai-handler.ts",
+              "position": "inside:function",
+              "code": "  socket.on('ai:ask', async (data, callback) => {\n    const { conversationId, question } = data;\n    const userId = socket.data.userId;\n\n    try {",
+              "why": "Event handler'ı AÇIYORUZ. data'dan conversationId ve question'ı destructure ediyoruz. userId'yi M1 3.11'deki auth middleware'den alıyoruz."
+            },
+            {
+              "order": "2.5",
+              "action": "try bloğunun içine — kullanıcı mesajını veritabanına kaydet",
+              "type": "code_add",
+              "file": "server/src/events/ai-handler.ts",
+              "position": "inside:try",
+              "code": "      // Kullanıcı mesajını kaydet\n      const userMessage = await Message.create({\n        conversationId,\n        sender: userId,\n        content: question,\n        type: 'text',\n        readBy: [userId],\n      });\n      io.to(conversationId).emit('message:received',\n        await userMessage.populate('sender', 'name avatar')\n      );",
+              "why": "Önce kullanıcının sorusunu normal mesaj olarak kaydedip odadaki herkese gönderiyoruz. M1 4.7-4.8'deki mesaj kaydetme pattern'ının AYNISI."
+            },
+            {
+              "order": "2.6",
+              "action": "Kullanıcı mesajının altına — konuşma geçmişini context olarak al",
+              "type": "code_add",
+              "file": "server/src/events/ai-handler.ts",
+              "position": "after:user-message",
+              "code": "      // Son mesajları context olarak al\n      const history = await Message.find({ conversationId })\n        .sort({ createdAt: -1 })\n        .limit(10)\n        .lean();",
+              "why": "AI'ın konuşmanın bağlamını ANLAMası için son 10 mesajı çekiyoruz. 1.4'te tanımladığımız generateStreamingResponse bu history'yi kullanacak."
+            },
+            {
+              "order": "2.7",
+              "action": "History'nin altına — placeholder AI mesajı oluştur",
+              "type": "code_add",
+              "file": "server/src/events/ai-handler.ts",
+              "position": "after:history",
+              "code": "      // AI yanıtı için placeholder mesaj oluştur\n      const aiMessage = await Message.create({\n        conversationId,\n        sender: userId,\n        content: '',\n        type: 'ai_response',\n        readBy: [userId],\n      });",
+              "why": "BOŞ bir AI mesajı oluşturuyoruz — streaming sırasında token'lar gelecek, sonunda tam içerik ile GÜNCELLENECEK. M1 2.8'de tanımladığımız 'ai_response' tipi burada KULLANILIYOR."
+            },
+            {
+              "order": "2.8",
+              "action": "Placeholder'ın altına — streaming başladı bildirimi gönder",
+              "type": "code_add",
+              "file": "server/src/events/ai-handler.ts",
+              "position": "after:placeholder",
+              "code": "      // Streaming başladı bildirimi\n      io.to(conversationId).emit('ai:stream:start', {\n        messageId: aiMessage.id,\n        conversationId,\n      });",
+              "why": "Client'a 'streaming başlıyor' sinyali gönderiyoruz. Frontend bu event'i alınca cursor animasyonu gösterecek."
+            },
+            {
+              "order": "2.9",
+              "action": "Bildirimin altına — streaming yanıtı başlat",
+              "type": "code_add",
+              "file": "server/src/events/ai-handler.ts",
+              "position": "after:stream-start",
+              "code": "      // Streaming yanıt\n      const fullResponse = await aiService.generateStreamingResponse(\n        question,\n        history.reverse(),\n        (token) => {\n          io.to(conversationId).emit('ai:stream:token', {\n            messageId: aiMessage.id,\n            token,\n          });\n        }\n      );",
+              "why": "1.5'te yazdığımız generateStreamingResponse'un onToken callback'i HER token geldiğinde Socket.io ile emit eder — ChatGPT'nin yazıyor efektini replike eder."
+            },
+            {
+              "order": "2.10",
+              "action": "Streaming'in altına — final mesajı güncelle ve tamamlandı bildirimi gönder",
+              "type": "code_add",
+              "file": "server/src/events/ai-handler.ts",
+              "position": "after:streaming",
+              "code": "      // Final mesajı güncelle\n      await Message.findByIdAndUpdate(aiMessage.id, { content: fullResponse });\n\n      io.to(conversationId).emit('ai:stream:end', {\n        messageId: aiMessage.id,\n        fullContent: fullResponse,\n      });",
+              "why": "2.7'de oluşturduğumuz BOŞ placeholder mesajı tam yanıtla güncelliyoruz. ai:stream:end ile client'a 'streaming bitti' sinyali gönderiyoruz."
+            },
+            {
+              "order": "2.11",
+              "action": "Stream end'in altına — konuşmayı güncelle ve handler'ı kapat",
+              "type": "code_add",
+              "file": "server/src/events/ai-handler.ts",
+              "position": "after:stream-end",
+              "code": "      await Conversation.findByIdAndUpdate(conversationId, {\n        lastMessage: aiMessage.id,\n        lastActivity: new Date(),\n      });\n\n      callback({ status: 'ok' });\n    } catch (error) {\n      console.error('AI error:', error);\n      callback({ status: 'error', message: 'AI yanıt veremedi' });\n    }\n  });\n}",
+              "why": "Konuşmanın lastMessage ve lastActivity alanlarını güncelliyoruz. callback ile client'a onay gönderiyoruz. catch bloğunda hata durumu yakalanıp client'a bildirilir."
+            },
+            {
+              "order": "2.12",
+              "action": "socket-handler.ts dosyasına GERİ DÖN — AI handler'ı import et ve bağla",
               "type": "code_modify",
               "file": "server/src/events/socket-handler.ts",
               "code": "import { setupAIHandler } from './ai-handler';\n\n// io.on('connection') callback'inin içine ekle:\nsetupAIHandler(io, socket);",
               "position": "top",
-              "why": "M1 4.1'de yazdığımız socket-handler'a AI handler'ı BAĞLIYORUZ. Her socket bağlantısında AI handler da kurulur — her kullanıcı @ai komutuyla AI asistana erişebilir."
+              "why": "M1 4.1'de yazdığımız socket-handler'a AI handler'ı BAĞLIYORUZ. Her socket bağlantısında AI handler da kurulur."
             },
             {
-              "order": "2.5",
+              "order": "2.13",
               "action": "AI streaming'in çalıştığını doğrula",
               "type": "validate",
               "validation": "Client'tan ai:ask event'i gönderildiğinde ai:stream:start, ardından ai:stream:token event'leri ve son olarak ai:stream:end event'i gelmeli.",
@@ -1481,42 +2074,89 @@
             {
               "order": "3.2",
               "action": "ÜSTE ÇIK — React hook'ları ve socket store import'unu ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/hooks/use-ai-stream.ts",
+              "position": "top",
               "code": "import { useEffect, useState } from 'react';\nimport { useSocketStore } from '../stores/socket-store';",
-              "why": "M3 1.3'te yazdığımız socket store'u import ediyoruz. useEffect ile socket event'lerini dinleyeceğiz, useState ile streaming state'i tutacağız."
+              "why": "M3 1.5-1.9'da yazdığımız socket store'u import ediyoruz. useEffect ile socket event'lerini dinleyeceğiz."
             },
             {
               "order": "3.3",
-              "action": "GERİ DÖN hook içine — tam streaming state yönetimini yaz",
-              "type": "code_write",
+              "action": "GERİ DÖN hook içine — state ve socket bağlantısını kur",
+              "type": "code_add",
               "file": "client/src/hooks/use-ai-stream.ts",
-              "code": "import { useEffect, useState } from 'react';\nimport { useSocketStore } from '../stores/socket-store';\n\nexport function useAIStream() {\n  const { socket } = useSocketStore();\n  const [streamingMessages, setStreamingMessages] = useState<Record<string, string>>({});\n\n  useEffect(() => {\n    if (!socket) return;\n\n    socket.on('ai:stream:start', ({ messageId }) => {\n      setStreamingMessages((prev) => ({ ...prev, [messageId]: '' }));\n    });\n\n    socket.on('ai:stream:token', ({ messageId, token }) => {\n      setStreamingMessages((prev) => ({\n        ...prev,\n        [messageId]: (prev[messageId] || '') + token,\n      }));\n    });\n\n    socket.on('ai:stream:end', ({ messageId }) => {\n      setStreamingMessages((prev) => {\n        const next = { ...prev };\n        delete next[messageId];\n        return next;\n      });\n    });\n\n    return () => {\n      socket.off('ai:stream:start');\n      socket.off('ai:stream:token');\n      socket.off('ai:stream:end');\n    };\n  }, [socket]);\n\n  return { streamingMessages };\n}",
-              "why": "2.3'te backend'de emit ettiğimiz ai:stream:start/token/end event'lerini BURADA dinliyoruz. Her token geldiğinde ilgili mesajın content'i güncellenir. Streaming bittiğinde mesaj bu state'ten SİLİNİR ve normal mesaj listesine taşınır."
+              "position": "inside:hook",
+              "code": "  const { socket } = useSocketStore();\n  const [streamingMessages, setStreamingMessages] = useState<Record<string, string>>({});",
+              "why": "streamingMessages: aktif streaming mesajları messageId bazında izler. Record<string, string> — key: messageId, value: biriken token'lar."
             },
             {
               "order": "3.4",
-              "action": "BAŞKA DOSYAYA GEÇ — client/src/components/streaming-message.tsx aç ve tam component'i yaz",
-              "type": "code_write",
-              "file": "client/src/components/streaming-message.tsx",
-              "code": "export function StreamingMessage({ content }: { content: string }) {\n  return (\n    <div className=\"rounded-2xl border border-purple-800 bg-purple-900/20 px-4 py-2\">\n      <p className=\"mb-1 text-xs text-purple-400\">AI Asistan</p>\n      <p className=\"whitespace-pre-wrap text-sm text-gray-200\">\n        {content}\n        <span className=\"inline-block h-4 w-1 animate-pulse bg-purple-500\" />\n      </p>\n    </div>\n  );\n}",
-              "why": "animate-pulse ile blinking cursor efekti AI'ın HALA yazdığını gösterir. M3 4.2'de mesaj bubble'da kullandığımız mor tema AYNI — tutarlı tasarım. Bu component SADECE streaming sırasında görünür."
+              "action": "State'in altına — ai:stream:start event listener ekle",
+              "type": "code_add",
+              "file": "client/src/hooks/use-ai-stream.ts",
+              "position": "after:state",
+              "code": "  useEffect(() => {\n    if (!socket) return;\n\n    socket.on('ai:stream:start', ({ messageId }) => {\n      setStreamingMessages((prev) => ({ ...prev, [messageId]: '' }));\n    });",
+              "why": "M4 2.8'de backend'de emit ettiğimiz ai:stream:start event'ini DİNLİYORUZ. Yeni streaming mesaj için BOŞ string ile başlatıyoruz."
             },
             {
               "order": "3.5",
-              "action": "chat-window.tsx dosyasına GERİ DÖN — streaming hook ve component'i import et, entegre et",
+              "action": "stream:start listener'ının altına — ai:stream:token listener ekle",
+              "type": "code_add",
+              "file": "client/src/hooks/use-ai-stream.ts",
+              "position": "after:stream-start",
+              "code": "    socket.on('ai:stream:token', ({ messageId, token }) => {\n      setStreamingMessages((prev) => ({\n        ...prev,\n        [messageId]: (prev[messageId] || '') + token,\n      }));\n    });",
+              "why": "M4 2.9'da her token geldiğinde emit edilen event'i dinliyoruz. İlgili mesajın content'ine token EKLENİR — ChatGPT'nin yazıyor efekti."
+            },
+            {
+              "order": "3.6",
+              "action": "stream:token listener'ının altına — ai:stream:end listener ekle",
+              "type": "code_add",
+              "file": "client/src/hooks/use-ai-stream.ts",
+              "position": "after:stream-token",
+              "code": "    socket.on('ai:stream:end', ({ messageId }) => {\n      setStreamingMessages((prev) => {\n        const next = { ...prev };\n        delete next[messageId];\n        return next;\n      });\n    });",
+              "why": "Streaming bittiğinde mesaj bu state'ten SİLİNİR. Normal mesaj listesine message:received event'i ile eklenecek. Geçici streaming → kalıcı mesaj dönüşümü."
+            },
+            {
+              "order": "3.7",
+              "action": "stream:end listener'ının altına — cleanup fonksiyonunu yaz ve useEffect'i kapat",
+              "type": "code_add",
+              "file": "client/src/hooks/use-ai-stream.ts",
+              "position": "after:stream-end",
+              "code": "    return () => {\n      socket.off('ai:stream:start');\n      socket.off('ai:stream:token');\n      socket.off('ai:stream:end');\n    };\n  }, [socket]);",
+              "why": "Cleanup fonksiyonu ile listener'lar TEMİZLENİR — memory leak önlenir. socket bağımlılığı ile socket değiştiğinde yeniden bağlanır."
+            },
+            {
+              "order": "3.8",
+              "action": "useEffect'in altına — return statement ekle",
+              "type": "code_add",
+              "file": "client/src/hooks/use-ai-stream.ts",
+              "position": "after:effect",
+              "code": "  return { streamingMessages };",
+              "why": "Hook'un dışarıya sunduğu tek değer: aktif streaming mesajları. ChatWindow bu değeri kullanarak streaming UI render edecek."
+            },
+            {
+              "order": "3.9",
+              "action": "BAŞKA DOSYAYA GEÇ — client/src/components/streaming-message.tsx aç ve component'i yaz",
+              "type": "code_write",
+              "file": "client/src/components/streaming-message.tsx",
+              "code": "export function StreamingMessage({ content }: { content: string }) {\n  return (\n    <div className=\"rounded-2xl border border-purple-800 bg-purple-900/20 px-4 py-2\">\n      <p className=\"mb-1 text-xs text-purple-400\">AI Asistan</p>\n      <p className=\"whitespace-pre-wrap text-sm text-gray-200\">\n        {content}\n        <span className=\"inline-block h-4 w-1 animate-pulse bg-purple-500\" />\n      </p>\n    </div>\n  );\n}",
+              "why": "animate-pulse ile blinking cursor efekti AI'ın HALA yazdığını gösterir. M3 4.5'te mesaj bubble'da kullandığımız mor tema AYNI — tutarlı tasarım."
+            },
+            {
+              "order": "3.10",
+              "action": "chat-window.tsx dosyasına GERİ DÖN — streaming hook ve component'i entegre et",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
               "code": "import { useAIStream } from '../hooks/use-ai-stream';\nimport { StreamingMessage } from './streaming-message';\n\n// Component içinde:\nconst { streamingMessages } = useAIStream();\n\n// Mesaj listesinin sonuna, typing indicator'dan önce ekle:\n{Object.entries(streamingMessages).map(([id, content]) => (\n  <StreamingMessage key={id} content={content} />\n))}",
               "position": "top",
-              "why": "Az önce yazdığımız hook ve component'i ChatWindow'a BAĞLIYORUZ. Streaming mesajlar normal mesaj listesinin SONUNDA gösterilir. Object.entries ile streaming state'teki tüm aktif stream'ler render edilir."
+              "why": "Hook ve component'i ChatWindow'a BAĞLIYORUZ. Streaming mesajlar normal mesaj listesinin SONUNDA gösterilir."
             },
             {
-              "order": "3.6",
+              "order": "3.11",
               "action": "AI streaming UI'ın çalıştığını doğrula",
               "type": "validate",
               "validation": "AI'a soru sorulduğunda yanıt karakter karakter ekranda görünmeli. Streaming sırasında blinking cursor olmalı. Streaming bitince normal mesaj olarak kalmalı.",
-              "why": "Streaming UI, AI entegrasyonunun en GÖRSEL ve ETKİLEYİCİ parçasıdır. Portfolio sunumunda öne çıkar."
+              "why": "Streaming UI, AI entegrasyonunun en GÖRSEL ve ETKİLEYİCİ parçasıdır."
             }
           ],
           "folder_structure_after": "realtime-chat/\n├── client/\n│   ├── src/\n│   │   ├── hooks/\n│   │   │   ├── use-infinite-messages.ts\n│   │   │   └── use-ai-stream.ts        ← YENİ\n│   │   ├── components/\n│   │   │   ├── chat-window.tsx          ← GÜNCELLENDİ\n│   │   │   ├── message-bubble.tsx\n│   │   │   └── streaming-message.tsx    ← YENİ\n│   │   ├── stores/\n│   │   ├── pages/\n│   │   └── main.tsx\n│   └── ...\n└── ...",
@@ -1739,22 +2379,50 @@
             {
               "order": "2.2",
               "action": "ÜSTE ÇIK — useRef, api ve socket store import'larını ekle",
-              "type": "code_write",
+              "type": "code_add",
               "file": "client/src/components/file-upload-button.tsx",
+              "position": "top",
               "code": "import { useRef } from 'react';\nimport { api } from '../lib/api';\nimport { useSocketStore } from '../stores/socket-store';",
-              "why": "useRef hidden file input'u referans etmek için, M3 2.1'deki api dosya yüklemek için, M3 1.3'teki socket store mesaj göndermek için gerekli."
+              "why": "useRef hidden file input'u referans etmek için, M3 2.1'deki api dosya yüklemek için, M3 1.5-1.9'daki socket store mesaj göndermek için gerekli."
             },
             {
               "order": "2.3",
-              "action": "GERİ DÖN component içine — dosya seçme ve yükleme mantığını yaz",
-              "type": "code_write",
+              "action": "GERİ DÖN component içine — ref ve socket tanımlarını ekle",
+              "type": "code_add",
               "file": "client/src/components/file-upload-button.tsx",
-              "code": "import { useRef } from 'react';\nimport { api } from '../lib/api';\nimport { useSocketStore } from '../stores/socket-store';\n\nexport function FileUploadButton({ conversationId }: { conversationId: string }) {\n  const fileInputRef = useRef<HTMLInputElement>(null);\n  const { socket } = useSocketStore();\n\n  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {\n    const file = e.target.files?.[0];\n    if (!file) return;\n\n    const formData = new FormData();\n    formData.append('file', file);\n\n    try {\n      const { data } = await api.post('/upload', formData, {\n        headers: { 'Content-Type': 'multipart/form-data' },\n      });\n      socket?.emit('message:send', {\n        conversationId,\n        content: data.data.url,\n        type: file.type.startsWith('image/') ? 'image' : 'file',\n        metadata: {\n          originalName: data.data.originalName,\n          size: data.data.size,\n          mimetype: data.data.mimetype,\n        },\n      });\n    } catch (error) {\n      console.error('Dosya yükleme hatası:', error);\n    }\n  };\n\n  return (\n    <>\n      <button\n        onClick={() => fileInputRef.current?.click()}\n        className=\"rounded-lg p-2 text-gray-500 hover:bg-gray-700\"\n        title=\"Dosya ekle\"\n      >\n        <svg className=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13\" />\n        </svg>\n      </button>\n      <input\n        ref={fileInputRef}\n        type=\"file\"\n        onChange={handleFileSelect}\n        accept=\"image/*,.pdf,.txt,.csv\"\n        className=\"hidden\"\n      />\n    </>\n  );\n}",
-              "why": "1.6'da yazdığımız /api/upload endpoint'ine FormData ile dosya gönderiyoruz. Sonra M1 4.4'teki message:send event'ini tetikliyoruz — dosya URL'i mesaj content'i olarak gönderiliyor. Hidden file input + button pattern'ı ile özel stilize edilmiş dosya seçici oluşturulur."
+              "position": "inside:component",
+              "code": "  const fileInputRef = useRef<HTMLInputElement>(null);\n  const { socket } = useSocketStore();",
+              "why": "fileInputRef ile hidden file input'a erişeceğiz. socket ile dosya yüklendikten sonra mesaj göndereceğiz."
             },
             {
               "order": "2.4",
-              "action": "chat-window.tsx dosyasına GERİ DÖN — FileUploadButton'ı import et ve input alanına ekle",
+              "action": "Ref tanımlarının altına — handleFileSelect fonksiyonunu yaz (dosya yükleme)",
+              "type": "code_add",
+              "file": "client/src/components/file-upload-button.tsx",
+              "position": "after:refs",
+              "code": "  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {\n    const file = e.target.files?.[0];\n    if (!file) return;\n\n    const formData = new FormData();\n    formData.append('file', file);",
+              "why": "FormData ile multipart/form-data formatında dosya gönderilecek — JSON'da binary veri taşınamaz."
+            },
+            {
+              "order": "2.5",
+              "action": "FormData'nın altına — API çağrısı ve socket mesaj gönderme",
+              "type": "code_add",
+              "file": "client/src/components/file-upload-button.tsx",
+              "position": "after:formdata",
+              "code": "    try {\n      const { data } = await api.post('/upload', formData, {\n        headers: { 'Content-Type': 'multipart/form-data' },\n      });\n      socket?.emit('message:send', {\n        conversationId,\n        content: data.data.url,\n        type: file.type.startsWith('image/') ? 'image' : 'file',\n        metadata: {\n          originalName: data.data.originalName,\n          size: data.data.size,\n          mimetype: data.data.mimetype,\n        },\n      });\n    } catch (error) {\n      console.error('Dosya yükleme hatası:', error);\n    }\n  };",
+              "why": "1.6'da yazdığımız /api/upload endpoint'ine dosyayı yüklüyoruz. Sonra M1 4.6'daki message:send event'ini tetikliyoruz — dosya URL'i mesaj content'i olarak gönderiliyor."
+            },
+            {
+              "order": "2.6",
+              "action": "Return JSX'ini güncelle — SVG ikon ve hidden file input ekle",
+              "type": "code_write",
+              "file": "client/src/components/file-upload-button.tsx",
+              "code": "  return (\n    <>\n      <button\n        onClick={() => fileInputRef.current?.click()}\n        className=\"rounded-lg p-2 text-gray-500 hover:bg-gray-700\"\n        title=\"Dosya ekle\"\n      >\n        <svg className=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13\" />\n        </svg>\n      </button>\n      <input\n        ref={fileInputRef}\n        type=\"file\"\n        onChange={handleFileSelect}\n        accept=\"image/*,.pdf,.txt,.csv\"\n        className=\"hidden\"\n      />\n    </>\n  );",
+              "why": "Hidden file input + button pattern'ı ile özel stilize edilmiş dosya seçici oluşturulur. accept attribute'u dosya seçim dialogunda gösterilen tipleri filtreler."
+            },
+            {
+              "order": "2.7",
+              "action": "chat-window.tsx dosyasına GERİ DÖN — FileUploadButton'ı import et",
               "type": "code_modify",
               "file": "client/src/components/chat-window.tsx",
               "code": "import { FileUploadButton } from './file-upload-button';\n\n// Input alanının soluna ekle:\n<FileUploadButton conversationId={conversationId} />",
@@ -1762,7 +2430,7 @@
               "why": "Az önce yazdığımız dosya yükleme butonunu ChatWindow'un input alanına BAĞLIYORUZ — WhatsApp'taki ataç ikonu gibi."
             },
             {
-              "order": "2.5",
+              "order": "2.8",
               "action": "Dosya gönderiminin çalıştığını doğrula",
               "type": "validate",
               "validation": "Ataç ikonuna tıklayıp dosya seçildiğinde dosya yüklenmeli ve mesaj olarak gönderilmeli.",
@@ -1798,27 +2466,45 @@
               "type": "code_write",
               "file": "client/src/components/file-message.tsx",
               "code": "export function FileMessage({ message }: { message: any }) {\n  return <p>Dosya: {message.content}</p>;\n}",
-              "why": "İskelet ile başlıyoruz — dosya URL'inin GÖRÜNDÜğünü doğrulayacağız, sonra resim önizleme ve indirme linki ekleyeceğiz."
+              "why": "İskelet ile başlıyoruz — dosya URL'inin GÖRÜNDÜğünü doğrulayacağız."
             },
             {
               "order": "3.2",
-              "action": "İskeletin içine — resim ve dosya tipine göre farklı render mantığını yaz",
-              "type": "code_write",
+              "action": "İskeletin içine — değişken tanımlarını ekle",
+              "type": "code_add",
               "file": "client/src/components/file-message.tsx",
-              "code": "export function FileMessage({ message }: { message: any }) {\n  const isImage = message.type === 'image';\n  const metadata = message.metadata || {};\n  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';\n\n  if (isImage) {\n    return (\n      <div className=\"max-w-sm\">\n        <img\n          src={`${baseUrl}${message.content}`}\n          alt=\"Paylaşılan resim\"\n          className=\"rounded-lg cursor-pointer hover:opacity-90 transition-opacity\"\n          loading=\"lazy\"\n          onClick={() => window.open(`${baseUrl}${message.content}`, '_blank')}\n        />\n      </div>\n    );\n  }\n\n  return (\n    <a\n      href={`${baseUrl}${message.content}`}\n      download={metadata.originalName}\n      className=\"flex items-center gap-3 rounded-lg border p-3 transition-colors border-gray-600 hover:bg-gray-700\"\n    >\n      <div className=\"flex h-10 w-10 items-center justify-center rounded-lg bg-blue-900 text-blue-300\">\n        <svg className=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z\" />\n        </svg>\n      </div>\n      <div>\n        <p className=\"text-sm font-medium text-gray-200\">{metadata.originalName || 'Dosya'}</p>\n        <p className=\"text-xs text-gray-500\">\n          {metadata.size ? `${(metadata.size / 1024).toFixed(1)} KB` : ''}\n        </p>\n      </div>\n    </a>\n  );\n}",
-              "why": "loading='lazy' ile resimler viewport'a girene kadar YÜKLENMEZ — performans optimizasyonu. download attribute'u dosya indirmeyi TETİKLER. 1.6'da yazdığımız upload endpoint'in döndürdüğü metadata burada GÖSTERİLİYOR."
+              "position": "inside:component",
+              "code": "  const isImage = message.type === 'image';\n  const metadata = message.metadata || {};\n  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';",
+              "why": "Resim ve dosya tiplerini ayırt edecek değişkenler. baseUrl ile server'daki dosyalara erişeceğiz."
             },
             {
               "order": "3.3",
+              "action": "Return JSX'ini güncelle — resim tipiyse inline göster",
+              "type": "code_write",
+              "file": "client/src/components/file-message.tsx",
+              "code": "  if (isImage) {\n    return (\n      <div className=\"max-w-sm\">\n        <img\n          src={`${baseUrl}${message.content}`}\n          alt=\"Paylaşılan resim\"\n          className=\"rounded-lg cursor-pointer hover:opacity-90 transition-opacity\"\n          loading=\"lazy\"\n          onClick={() => window.open(`${baseUrl}${message.content}`, '_blank')}\n        />\n      </div>\n    );\n  }",
+              "why": "loading='lazy' ile resimler viewport'a girene kadar YÜKLENMEZ — performans optimizasyonu. Tıklayınca yeni sekmede tam boyut açılır."
+            },
+            {
+              "order": "3.4",
+              "action": "Resim kontrolünün altına — dosya tipiyse indirme linki göster",
+              "type": "code_add",
+              "file": "client/src/components/file-message.tsx",
+              "position": "after:image-check",
+              "code": "  return (\n    <a\n      href={`${baseUrl}${message.content}`}\n      download={metadata.originalName}\n      className=\"flex items-center gap-3 rounded-lg border p-3 transition-colors border-gray-600 hover:bg-gray-700\"\n    >\n      <div className=\"flex h-10 w-10 items-center justify-center rounded-lg bg-blue-900 text-blue-300\">\n        <svg className=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n          <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z\" />\n        </svg>\n      </div>\n      <div>\n        <p className=\"text-sm font-medium text-gray-200\">{metadata.originalName || 'Dosya'}</p>\n        <p className=\"text-xs text-gray-500\">\n          {metadata.size ? `${(metadata.size / 1024).toFixed(1)} KB` : ''}\n        </p>\n      </div>\n    </a>\n  );",
+              "why": "download attribute'u dosya indirmeyi TETİKLER. 1.6'da yazdığımız upload endpoint'in döndürdüğü metadata burada GÖSTERİLİYOR."
+            },
+            {
+              "order": "3.5",
               "action": "message-bubble.tsx dosyasına GERİ DÖN — FileMessage'ı import et ve tip kontrolü ekle",
               "type": "code_modify",
               "file": "client/src/components/message-bubble.tsx",
               "code": "import { FileMessage } from './file-message';\n\n// content render kısmında tip kontrolü ekle:\n{message.type === 'image' || message.type === 'file'\n  ? <FileMessage message={message} />\n  : <p className=\"whitespace-pre-wrap text-sm\">{message.content}</p>\n}",
               "position": "top",
-              "why": "M3 4.2'de yazdığımız MessageBubble'da mesaj tipine göre FARKLI component render ediliyor. M1 2.8'de tanımladığımız message type enum'ları burada İŞ YAPIYOR."
+              "why": "M3 4.5'te yazdığımız MessageBubble'da mesaj tipine göre FARKLI component render ediliyor."
             },
             {
-              "order": "3.4",
+              "order": "3.6",
               "action": "Resim ve dosya gösterimini doğrula",
               "type": "validate",
               "validation": "Resim mesajları inline önizleme göstermeli. PDF/dosya mesajlarında indirme linki çalışmalı.",
@@ -1866,27 +2552,73 @@
             },
             {
               "order": "4.3",
-              "action": "GERİ DÖN hook içine — tam drag & drop mantığını yaz",
-              "type": "code_write",
+              "action": "GERİ DÖN hook içine — isDragging state'ini tanımla",
+              "type": "code_add",
               "file": "client/src/hooks/use-drag-drop.ts",
-              "code": "import { useState, useCallback, DragEvent } from 'react';\n\nexport function useDragDrop(onFileDrop: (file: File) => void) {\n  const [isDragging, setIsDragging] = useState(false);\n\n  const handleDragEnter = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n    setIsDragging(true);\n  }, []);\n\n  const handleDragLeave = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n    setIsDragging(false);\n  }, []);\n\n  const handleDragOver = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n  }, []);\n\n  const handleDrop = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n    setIsDragging(false);\n    const file = e.dataTransfer.files[0];\n    if (file) onFileDrop(file);\n  }, [onFileDrop]);\n\n  return {\n    isDragging,\n    dragHandlers: {\n      onDragEnter: handleDragEnter,\n      onDragLeave: handleDragLeave,\n      onDragOver: handleDragOver,\n      onDrop: handleDrop,\n    },\n  };\n}",
-              "why": "preventDefault() HER drag event'inde çağrılmalı — yoksa tarayıcı varsayılan davranışı (dosyayı açma) uygular. isDragging state'i ile drop zone HIGHLIGHT gösterilir. stopPropagation() ile event üst element'lere YAYILMAZ."
+              "position": "inside:hook",
+              "code": "  const [isDragging, setIsDragging] = useState(false);",
+              "why": "Dosya sürüklenirken true olur — drop zone HIGHLIGHT göstermek için kullanılacak."
             },
             {
               "order": "4.4",
-              "action": "chat-window.tsx dosyasına GERİ DÖN — drag & drop hook'unu import et ve entegre et",
-              "type": "code_modify",
-              "file": "client/src/components/chat-window.tsx",
-              "code": "import { useDragDrop } from '../hooks/use-drag-drop';\n\n// Component içinde:\nconst { isDragging, dragHandlers } = useDragDrop(async (file) => {\n  const formData = new FormData();\n  formData.append('file', file);\n  // 2.3'teki yükleme mantığının aynısı\n});\n\n// Ana div'e dragHandlers'ı ekle:\n<div className={`flex h-full flex-col ${isDragging ? 'ring-2 ring-blue-500 ring-inset' : ''}`} {...dragHandlers}>",
-              "position": "top",
-              "why": "Az önce yazdığımız hook'u ChatWindow'a BAĞLIYORUZ. isDragging true olduğunda mavi border gösterilir — kullanıcı dosyayı NEREYE bırakacağını anlar. 2.3'teki dosya yükleme mantığını TEKRAR kullanıyoruz."
+              "action": "State'in altına — dragEnter ve dragLeave handler'larını yaz",
+              "type": "code_add",
+              "file": "client/src/hooks/use-drag-drop.ts",
+              "position": "after:state",
+              "code": "  const handleDragEnter = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n    setIsDragging(true);\n  }, []);\n\n  const handleDragLeave = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n    setIsDragging(false);\n  }, []);",
+              "why": "preventDefault() HER drag event'inde çağrılmalı — yoksa tarayıcı varsayılan davranışı uygular. stopPropagation() ile event üst element'lere YAYILMAZ."
             },
             {
               "order": "4.5",
+              "action": "DragLeave'in altına — dragOver handler'ını yaz",
+              "type": "code_add",
+              "file": "client/src/hooks/use-drag-drop.ts",
+              "position": "after:drag-leave",
+              "code": "  const handleDragOver = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n  }, []);",
+              "why": "dragOver'da preventDefault() OLMADAN drop event'i tetiklenmez. Bu en sık yapılan hatadır."
+            },
+            {
+              "order": "4.6",
+              "action": "DragOver'ın altına — drop handler'ını yaz",
+              "type": "code_add",
+              "file": "client/src/hooks/use-drag-drop.ts",
+              "position": "after:drag-over",
+              "code": "  const handleDrop = useCallback((e: DragEvent) => {\n    e.preventDefault();\n    e.stopPropagation();\n    setIsDragging(false);\n    const file = e.dataTransfer.files[0];\n    if (file) onFileDrop(file);\n  }, [onFileDrop]);",
+              "why": "Dosya bırakıldığında isDragging false yapılır ve onFileDrop callback'i çağrılır. dataTransfer.files ile sürüklenen dosyalara erişilir."
+            },
+            {
+              "order": "4.7",
+              "action": "Drop handler'ın altına — return statement yaz",
+              "type": "code_add",
+              "file": "client/src/hooks/use-drag-drop.ts",
+              "position": "after:drop",
+              "code": "  return {\n    isDragging,\n    dragHandlers: {\n      onDragEnter: handleDragEnter,\n      onDragLeave: handleDragLeave,\n      onDragOver: handleDragOver,\n      onDrop: handleDrop,\n    },\n  };",
+              "why": "dragHandlers objesi JSX'e spread edilebilir: {...dragHandlers}. isDragging ile koşullu stil uygulanır."
+            },
+            {
+              "order": "4.8",
+              "action": "chat-window.tsx dosyasına GERİ DÖN — hook'u import et ve entegre et",
+              "type": "code_modify",
+              "file": "client/src/components/chat-window.tsx",
+              "code": "import { useDragDrop } from '../hooks/use-drag-drop';\n\n// Component içinde:\nconst { isDragging, dragHandlers } = useDragDrop(async (file) => {\n  const formData = new FormData();\n  formData.append('file', file);\n  // 2.5'teki yükleme mantığının aynısı\n});",
+              "position": "top",
+              "why": "Az önce yazdığımız hook'u ChatWindow'a BAĞLIYORUZ. 2.5'teki dosya yükleme mantığını TEKRAR kullanıyoruz."
+            },
+            {
+              "order": "4.9",
+              "action": "Ana div'e dragHandlers'ı ve isDragging stilini ekle",
+              "type": "code_modify",
+              "file": "client/src/components/chat-window.tsx",
+              "code": "<div className={`flex h-full flex-col ${isDragging ? 'ring-2 ring-blue-500 ring-inset' : ''}`} {...dragHandlers}>",
+              "position": "inside:return",
+              "why": "isDragging true olduğunda mavi border gösterilir — kullanıcı dosyayı NEREYE bırakacağını anlar."
+            },
+            {
+              "order": "4.10",
               "action": "Drag & drop'un çalıştığını doğrula",
               "type": "validate",
               "validation": "Dosya sürüklendiğinde chat penceresi mavi çerçeve ile highlight olmalı. Dosya bırakıldığında yüklenip mesaj olarak gönderilmeli.",
-              "why": "Drag & drop, dosya paylaşımının en DOĞAL yöntemidir. Modern web uygulamalarının standart özelliğidir."
+              "why": "Drag & drop, dosya paylaşımının en DOĞAL yöntemidir."
             }
           ],
           "folder_structure_after": "realtime-chat/\n├── client/\n│   ├── src/\n│   │   ├── hooks/\n│   │   │   ├── use-infinite-messages.ts\n│   │   │   ├── use-ai-stream.ts\n│   │   │   └── use-drag-drop.ts         ← YENİ\n│   │   ├── components/\n│   │   │   ├── chat-window.tsx           ← GÜNCELLENDİ\n│   │   │   ├── message-bubble.tsx\n│   │   │   ├── streaming-message.tsx\n│   │   │   ├── file-upload-button.tsx\n│   │   │   └── file-message.tsx\n│   │   └── ...\n│   └── ...\n└── ...",
@@ -1949,8 +2681,16 @@
               "action": "BAŞKA DOSYAYA GEÇ — docker-compose.prod.yml dosyasını aç ve tam ortamı tanımla",
               "type": "code_write",
               "file": "docker-compose.prod.yml",
-              "code": "services:\n  server:\n    build: ./server\n    ports:\n      - '3001:3001'\n    environment:\n      - NODE_ENV=production\n      - MONGO_URI=mongodb://mongo:27017/chatapp\n      - REDIS_URL=redis://redis:6379\n      - JWT_SECRET=${JWT_SECRET}\n      - OPENAI_API_KEY=${OPENAI_API_KEY}\n    depends_on:\n      - mongo\n      - redis\n    restart: unless-stopped\n\n  mongo:\n    image: mongo:7\n    volumes:\n      - mongodata:/data/db\n    restart: unless-stopped\n\n  redis:\n    image: redis:7-alpine\n    restart: unless-stopped\n\n  client:\n    build: ./client\n    ports:\n      - '80:80'\n    depends_on:\n      - server\n    restart: unless-stopped\n\nvolumes:\n  mongodata:",
+              "code": "services:\n  server:\n    build: ./server\n    ports:\n      - '3001:3001'\n    environment:\n      - NODE_ENV=production\n      - MONGO_URI=mongodb://mongo:27017/chatapp\n      - REDIS_URL=redis://redis:6379\n      - JWT_SECRET=${JWT_SECRET}\n      - OPENAI_API_KEY=${OPENAI_API_KEY}\n    depends_on:\n      - mongo\n      - redis\n    restart: unless-stopped\n\n  mongo:\n    image: mongo:7",
               "why": "M1 1.5'te geliştirme için yazdığımız docker-compose.yml'in PRODUCTION versiyonu. restart: unless-stopped ile container crash olursa OTOMATİK yeniden başlar. Environment variable'lar .env dosyasından inject edilir."
+            },
+            {
+              "order": "1.3b",
+              "action": "BAŞKA DOSYAYA GEÇ — docker-compose.prod.yml dosyasını aç ve tam ortamı tanımla (devamı)",
+              "type": "code_write",
+              "file": "docker-compose.prod.yml",
+              "code": "    volumes:\n      - mongodata:/data/db\n    restart: unless-stopped\n\n  redis:\n    image: redis:7-alpine\n    restart: unless-stopped\n\n  client:\n    build: ./client\n    ports:\n      - '80:80'\n    depends_on:\n      - server\n    restart: unless-stopped\n\nvolumes:\n  mongodata:",
+              "why": "1.3'deki kodun devamı."
             },
             {
               "order": "1.4",
@@ -2017,8 +2757,16 @@
               "action": "ÜSTE ÇIK — Socket.io test import'larını ekle ve tam testi yaz",
               "type": "code_write",
               "file": "server/tests/socket.test.ts",
-              "code": "import { describe, it, expect, beforeAll, afterAll } from 'vitest';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\nimport { io as Client } from 'socket.io-client';\n\ndescribe('Socket.io Events', () => {\n  let io: Server;\n  let clientSocket: any;\n  let httpServer: any;\n\n  beforeAll((done) => {\n    httpServer = createServer();\n    io = new Server(httpServer);\n    httpServer.listen(() => {\n      const port = (httpServer.address() as any).port;\n      clientSocket = Client(`http://localhost:${port}`, {\n        auth: { token: 'test-token' },\n      });\n      clientSocket.on('connect', done);\n    });\n  });\n\n  afterAll(() => {\n    io.close();\n    clientSocket.close();\n  });\n\n  it('should receive message after sending', (done) => {\n    io.on('connection', (socket) => {\n      socket.on('message:send', (data, callback) => {\n        socket.emit('message:received', {\n          ...data,\n          id: 'test-id',\n          sender: { name: 'Test User' },\n          createdAt: new Date(),\n        });\n        callback({ status: 'ok' });\n      });\n    });\n\n    clientSocket.on('message:received', (message: any) => {\n      expect(message.content).toBe('Hello!');\n      done();\n    });\n\n    clientSocket.emit('message:send', {\n      conversationId: 'conv-1',\n      content: 'Hello!',\n      type: 'text',\n    }, () => {});\n  });\n});",
+              "code": "import { describe, it, expect, beforeAll, afterAll } from 'vitest';\nimport { createServer } from 'http';\nimport { Server } from 'socket.io';\nimport { io as Client } from 'socket.io-client';\n\ndescribe('Socket.io Events', () => {\n  let io: Server;\n  let clientSocket: any;\n  let httpServer: any;\n\n  beforeAll((done) => {\n    httpServer = createServer();\n    io = new Server(httpServer);\n    httpServer.listen(() => {\n      const port = (httpServer.address() as any).port;\n      clientSocket = Client(`http://localhost:${port}`, {\n        auth: { token: 'test-token' },\n      });\n      clientSocket.on('connect', done);\n    });\n  });\n\n  afterAll(() => {\n    io.close();\n    clientSocket.close();\n  });",
               "why": "M1 4.4'te yazdığımız message:send event'ini test ediyoruz. Test server'ı RANDOM port'ta çalışır — port çakışması önlenir. done callback ile async event-driven testler yönetilir."
+            },
+            {
+              "order": "2.4b",
+              "action": "ÜSTE ÇIK — Socket.io test import'larını ekle ve tam testi yaz (devamı)",
+              "type": "code_write",
+              "file": "server/tests/socket.test.ts",
+              "code": "\n  it('should receive message after sending', (done) => {\n    io.on('connection', (socket) => {\n      socket.on('message:send', (data, callback) => {\n        socket.emit('message:received', {\n          ...data,\n          id: 'test-id',\n          sender: { name: 'Test User' },\n          createdAt: new Date(),\n        });\n        callback({ status: 'ok' });\n      });\n    });\n\n    clientSocket.on('message:received', (message: any) => {\n      expect(message.content).toBe('Hello!');\n      done();\n    });\n\n    clientSocket.emit('message:send', {\n      conversationId: 'conv-1',\n      content: 'Hello!',\n      type: 'text',\n    }, () => {});\n  });\n});",
+              "why": "2.4'deki kodun devamı."
             },
             {
               "order": "2.5",
@@ -2118,8 +2866,16 @@
               "action": "README.md dosyasını aç ve profesyonel README yaz",
               "type": "code_write",
               "file": "README.md",
-              "code": "# Real-time Chat + AI Assistant\n\nWhatsApp/Slack benzeri gerçek zamanlı mesajlaşma uygulaması. Socket.io ile anlık iletişim, OpenAI API ile AI asistan entegrasyonu.\n\n## Özellikler\n\n- Gerçek zamanlı mesajlaşma (Socket.io)\n- AI asistan (@ai komutu ile)\n- Streaming AI yanıtları\n- Dosya paylaşımı (drag & drop)\n- Typing indicator ve online durum\n- Mesaj okundu bilgisi\n- Cursor-based pagination\n\n## Teknoloji Stack'i\n\n| Katman | Teknoloji |\n|--------|----------|\n| Frontend | React, TypeScript, Tailwind CSS, Zustand |\n| Backend | Node.js, Express, Socket.io |\n| Veritabanı | MongoDB, Redis |\n| AI | OpenAI API (GPT-4o-mini) |\n| DevOps | Docker, Docker Compose |\n\n## Hızlı Başlangıç\n\n```bash\ngit clone <repo-url>\ndocker-compose up -d\ncd server && pnpm install && pnpm run dev\ncd client && pnpm install && pnpm run dev\n```\n\n## Lisans\n\nMIT",
+              "code": "# Real-time Chat + AI Assistant\n\nWhatsApp/Slack benzeri gerçek zamanlı mesajlaşma uygulaması. Socket.io ile anlık iletişim, OpenAI API ile AI asistan entegrasyonu.\n\n## Özellikler\n\n- Gerçek zamanlı mesajlaşma (Socket.io)\n- AI asistan (@ai komutu ile)\n- Streaming AI yanıtları\n- Dosya paylaşımı (drag & drop)\n- Typing indicator ve online durum\n- Mesaj okundu bilgisi\n- Cursor-based pagination\n\n## Teknoloji Stack'i\n\n| Katman | Teknoloji |\n|--------|----------|",
               "why": "README projenin İLK İZLENİMİNİ belirler. Özellikler, Tech Stack, Hızlı Başlangıç bölümleri ŞART. Recruiter'lar GENELLIKLE sadece README'ye bakar."
+            },
+            {
+              "order": "4.1b",
+              "action": "README.md dosyasını aç ve profesyonel README yaz (devamı)",
+              "type": "code_write",
+              "file": "README.md",
+              "code": "| Frontend | React, TypeScript, Tailwind CSS, Zustand |\n| Backend | Node.js, Express, Socket.io |\n| Veritabanı | MongoDB, Redis |\n| AI | OpenAI API (GPT-4o-mini) |\n| DevOps | Docker, Docker Compose |\n\n## Hızlı Başlangıç\n\n```bash\ngit clone <repo-url>\ndocker-compose up -d\ncd server && pnpm install && pnpm run dev\ncd client && pnpm install && pnpm run dev\n```\n\n## Lisans\n\nMIT",
+              "why": "4.1'deki kodun devamı."
             },
             {
               "order": "4.2",

@@ -2144,6 +2144,18 @@
             "Production Kontrol Listesi",
             "README.md ve Proje Dokümantasyonu"
           ]
+        },
+        {
+          "id": "p01-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 5,
+          "checklist": [
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
+          ]
         }
       ]
     },
@@ -2261,6 +2273,18 @@
             "Profesyonel README ve Proje Dokümantasyonu",
             "Final Review ve Production Checklist"
           ]
+        },
+        {
+          "id": "p02-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 7,
+          "checklist": [
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
+          ]
         }
       ]
     },
@@ -2359,6 +2383,18 @@
             "README ve Demo Hazırlığı",
             "[Kontrol] README profesyonel görünmeli. Demo materyali hazır olmalı. Kurulum 3 adımda tamamlanabilmeli."
           ]
+        },
+        {
+          "id": "p03-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 6,
+          "checklist": [
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
+          ]
         }
       ]
     },
@@ -2452,6 +2488,18 @@
             "Redis Caching Stratejisi",
             "Production Docker ve Final Checklist"
           ]
+        },
+        {
+          "id": "p04-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 6,
+          "checklist": [
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
+          ]
         }
       ]
     },
@@ -2540,6 +2588,18 @@
             "Docker Compose Setup",
             "Performance Optimization"
           ]
+        },
+        {
+          "id": "p05-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 6,
+          "checklist": [
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
+          ]
         }
       ]
     },
@@ -2586,52 +2646,15 @@
           ]
         },
         {
-          "id": "p06-m3",
-          "title": "AI İçerik Üretimi & Prompt Engineering",
-          "description": "Bu milestone'da projenin AI kalbini oluşturuyoruz. Kullanıcının bir konu, ton ve içerik türü seçerek AI ile içerik üretmesini sağlayacağız. Prompt engineering burada kritik — iyi bir prompt ile vasat ",
+          "id": "p06-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 6,
           "checklist": [
-            "Prompt Template Sistemi",
-            "Streaming Content Generation API",
-            "Frontend Streaming UI",
-            "Prompt Injection Koruması",
-            "Token Yönetimi ve Maliyet Takibi"
-          ]
-        },
-        {
-          "id": "p06-m4",
-          "title": "Fine-tuning & Stil Adaptasyonu",
-          "description": "Bu milestone'da platformun en güçlü özelliğini geliştiriyoruz: kullanıcının yazım stilini öğrenme ve o stilde içerik üretme. Kullanıcı kendi yazılarını yükleyecek, sistem bu yazılardan stil profili çı",
-          "checklist": [
-            "Yazım Örnekleri Toplama ve Analiz",
-            "Few-shot Learning ile Stil Adaptasyonu",
-            "OpenAI Fine-tuning Pipeline",
-            "Model Evaluation ve Kalite Ölçümü",
-            "Fine-tuning Yönetim Arayüzü"
-          ]
-        },
-        {
-          "id": "p06-m5",
-          "title": "SEO & Arama Sistemi",
-          "description": "Bu milestone'da içerik platformunun keşfedilebilirlik katmanını oluşturuyoruz. SEO analizi ve optimizasyon önerileri, otomatik etiketleme (auto-tagging), embedding tabanlı semantik arama ve hybrid sea",
-          "checklist": [
-            "Embedding Pipeline ve pgvector Kurulumu",
-            "Hybrid Search (Full-text + Semantic)",
-            "Auto-tagging Sistemi",
-            "SEO Analiz ve Optimizasyon Önerileri",
-            "İlgili İçerik Önerileri"
-          ]
-        },
-        {
-          "id": "p06-m6",
-          "title": "Analytics Dashboard & Production Deployment",
-          "description": "Son milestone'da platformun analytics dashboard'unu ve production deployment altyapısını oluşturuyoruz. Kullanıcıların içerik performansını takip edebileceği metrikler (görüntüleme, etkileşim, AI kull",
-          "checklist": [
-            "Analytics Event Tracking Sistemi",
-            "Analytics Dashboard UI",
-            "Backend Analytics Aggregation API",
-            "Docker Multi-Stage Build ve Production Config",
-            "CI/CD Pipeline ve Monitoring",
-            "Performance Optimizasyon ve Son Dokunuşlar"
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
           ]
         }
       ]
@@ -2656,7 +2679,7 @@
       ],
       "milestones": [
         {
-          "id": "m1",
+          "id": "p07-m1",
           "title": "RAG Architecture & Project Setup",
           "description": "",
           "checklist": [
@@ -2667,7 +2690,7 @@
           ]
         },
         {
-          "id": "m2",
+          "id": "p07-m2",
           "title": "Document Processing Pipeline",
           "description": "",
           "checklist": [
@@ -2679,7 +2702,7 @@
           ]
         },
         {
-          "id": "m3",
+          "id": "p07-m3",
           "title": "Chunking Strategies — Karşılaştırmalı Analiz",
           "description": "",
           "checklist": [
@@ -2690,7 +2713,7 @@
           ]
         },
         {
-          "id": "m4",
+          "id": "p07-m4",
           "title": "Embedding & Vector Store",
           "description": "",
           "checklist": [
@@ -2701,7 +2724,7 @@
           ]
         },
         {
-          "id": "m5",
+          "id": "p07-m5",
           "title": "Retrieval System — Dense, Sparse, Hybrid",
           "description": "",
           "checklist": [
@@ -2713,7 +2736,7 @@
           ]
         },
         {
-          "id": "m6",
+          "id": "p07-m6",
           "title": "Generation & Conversation",
           "description": "",
           "checklist": [
@@ -2724,26 +2747,15 @@
           ]
         },
         {
-          "id": "m7",
-          "title": "Evaluation & Optimization",
-          "description": "",
+          "id": "p07-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 8,
           "checklist": [
-            "Evaluation Dataset Oluşturma",
-            "RAGAS ile RAG Evaluation",
-            "Chunk Size Optimization",
-            "Retrieval Quality Metrics"
-          ]
-        },
-        {
-          "id": "m8",
-          "title": "Production — API, Caching, Monitoring, Docker",
-          "description": "",
-          "checklist": [
-            "FastAPI REST API",
-            "Redis Semantic Cache",
-            "Monitoring ve Structured Logging",
-            "Docker ile Containerization",
-            "Performance Testing ve p95 Optimizasyonu"
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
           ]
         }
       ]
@@ -2828,6 +2840,18 @@
             "Conversation Analytics",
             "WebSocket Integration",
             "Docker & Production Hardening"
+          ]
+        },
+        {
+          "id": "p08-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 6,
+          "checklist": [
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
           ]
         }
       ]
@@ -2915,6 +2939,18 @@
             "Monitoring Dashboard",
             "Docker & Production Config",
             "Model Card & Documentation"
+          ]
+        },
+        {
+          "id": "p09-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 6,
+          "checklist": [
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
           ]
         }
       ]
@@ -3022,6 +3058,18 @@
             "Monitoring & Alerting",
             "Error Tracking & Logging",
             "Performance Optimization"
+          ]
+        },
+        {
+          "id": "p10-deployment",
+          "title": "Deployment ve Portfolio Showcase",
+          "description": "Projeyi deploy et, README yaz, demo video hazirla",
+          "order_index": 8,
+          "checklist": [
+            "Production build",
+            "Deploy",
+            "README",
+            "Demo"
           ]
         }
       ]

@@ -620,11 +620,27 @@
             },
             {
               "order": "4.7",
-              "action": "DOCXExtractor.extract metodunu implement et — heading bazlı bölme",
+              "action": "DOCXExtractor iskeletini güncelle — değişken tanımları",
               "type": "code_modify",
               "file": "backend/app/services/extractors.py",
-              "code": "class DOCXExtractor:\n    def extract(self, file_path: str) -> List[ExtractedPage]:\n        doc = DocxDocument(file_path)\n        pages = []\n        current_page = []\n        current_heading = \"\"\n        for para in doc.paragraphs:\n            if para.style.name.startswith('Heading'):\n                if current_page:\n                    pages.append(ExtractedPage(\n                        content=\"\\n\".join(current_page),\n                        page_number=len(pages) + 1,\n                        metadata={\"heading\": current_heading, \"source_type\": \"docx\"}\n                    ))\n                    current_page = []\n                current_heading = para.text\n            current_page.append(para.text)\n        if current_page:\n            pages.append(ExtractedPage(\n                content=\"\\n\".join(current_page),\n                page_number=len(pages) + 1,\n                metadata={\"heading\": current_heading, \"source_type\": \"docx\"}\n            ))\n        return pages",
-              "why": "DOCX'te fiziksel sayfa kavramı yok. Heading'lere göre bölüyoruz — her Heading yeni bir bölüm başlatır. Bu yapı chunking aşamasında daha anlamlı parçalar üretir."
+              "code": "class DOCXExtractor:\n    def extract(self, file_path: str) -> List[ExtractedPage]:\n        doc = DocxDocument(file_path)\n        pages = []\n        current_page = []\n        current_heading = \"\"\n        return pages",
+              "why": "DOCX'te fiziksel sayfa kavramı yok — PDF gibi sayfa sayfa okuyamıyoruz. Heading'lere göre mantıksal bölümler oluşturacağız. Önce değişkenleri hazırlıyoruz."
+            },
+            {
+              "order": "4.7a",
+              "action": "GERİ DÖN — paragrafları iterate et ve heading'e göre böl",
+              "type": "code_modify",
+              "file": "backend/app/services/extractors.py",
+              "code": "        for para in doc.paragraphs:\n            if para.style.name.startswith('Heading'):\n                if current_page:\n                    meta = {\"heading\": current_heading, \"source_type\": \"docx\"}\n                    pages.append(ExtractedPage(content=\"\\n\".join(current_page), page_number=len(pages)+1, metadata=meta))\n                current_page, current_heading = [], para.text\n            else:\n                current_page.append(para.text)",
+              "why": "Her Heading stili yeni bir bölüm başlatır. Önceki paragrafları ExtractedPage olarak kaydedip yeni bölüme geçiyoruz. Bu yapı chunking aşamasında daha anlamlı parçalar üretir."
+            },
+            {
+              "order": "4.7b",
+              "action": "GERİ DÖN — son bölümü ekle (kalan paragraflar)",
+              "type": "code_modify",
+              "file": "backend/app/services/extractors.py",
+              "code": "        if current_page:\n            pages.append(ExtractedPage(\n                content=\"\\n\".join(current_page),\n                page_number=len(pages) + 1,\n                metadata={\"heading\": current_heading,\n                          \"source_type\": \"docx\"}))\n        return pages",
+              "why": "Döngü bittiğinde son bölüm henüz eklenmemiş olur — çünkü yeni Heading görmeden döngü biter. Bu kontrol olmadan son bölüm kaybolur."
             },
             {
               "order": "4.8",
@@ -637,11 +653,27 @@
             },
             {
               "order": "4.9",
-              "action": "TXTExtractor.extract metodunu implement et — encoding algılama",
+              "action": "TXTExtractor iskeletini güncelle — encoding algılama",
               "type": "code_modify",
               "file": "backend/app/services/extractors.py",
-              "code": "class TXTExtractor:\n    def extract(self, file_path: str) -> List[ExtractedPage]:\n        with open(file_path, 'rb') as f:\n            raw = f.read()\n        detected = chardet.detect(raw)\n        encoding = detected['encoding'] or 'utf-8'\n        text = raw.decode(encoding, errors='replace')\n        lines = text.split('\\n')\n        pages = []\n        chunk = []\n        for line in lines:\n            chunk.append(line)\n            if len(chunk) >= 100:\n                pages.append(ExtractedPage(\n                    content=\"\\n\".join(chunk),\n                    page_number=len(pages) + 1,\n                    metadata={\"encoding\": encoding, \"source_type\": \"txt\"}\n                ))\n                chunk = []\n        if chunk:\n            pages.append(ExtractedPage(\n                content=\"\\n\".join(chunk),\n                page_number=len(pages) + 1,\n                metadata={\"encoding\": encoding, \"source_type\": \"txt\"}\n            ))\n        return pages",
-              "why": "TXT dosyalarında encoding problemi sık yaşanır (UTF-8 vs Windows-1254 vs Latin1). chardet ile encoding'i otomatik algılıyoruz. Her 100 satırı bir sayfa olarak grupluyoruz."
+              "code": "class TXTExtractor:\n    def extract(self, file_path: str) -> List[ExtractedPage]:\n        with open(file_path, 'rb') as f:\n            raw = f.read()\n        detected = chardet.detect(raw)\n        encoding = detected['encoding'] or 'utf-8'\n        text = raw.decode(encoding, errors='replace')\n        return []",
+              "why": "TXT dosyalarının encoding'i belirsizdir — UTF-8, Windows-1254 veya ISO-8859-9 olabilir. chardet kütüphanesi byte pattern'lerini analiz ederek encoding'i otomatik algılar."
+            },
+            {
+              "order": "4.9a",
+              "action": "GERİ DÖN — satırları 100'lük chunk'lara böl",
+              "type": "code_modify",
+              "file": "backend/app/services/extractors.py",
+              "code": "        lines = text.split('\\n')\n        pages, chunk = [], []\n        for line in lines:\n            chunk.append(line)\n            if len(chunk) >= 100:\n                meta = {\"encoding\": encoding, \"source_type\": \"txt\"}\n                pages.append(ExtractedPage(content=\"\\n\".join(chunk), page_number=len(pages)+1, metadata=meta))\n                chunk = []",
+              "why": "TXT dosyalarında sayfa kavramı yok. Her 100 satırı bir sayfa olarak grupluyoruz — bu, chunking aşamasında makul boyutta parçalar üretir. encoding metadata'ya ekleniyor."
+            },
+            {
+              "order": "4.9b",
+              "action": "GERİ DÖN — kalan satırları son chunk olarak ekle",
+              "type": "code_modify",
+              "file": "backend/app/services/extractors.py",
+              "code": "        if chunk:\n            pages.append(ExtractedPage(\n                content=\"\\n\".join(chunk),\n                page_number=len(pages) + 1,\n                metadata={\"encoding\": encoding,\n                          \"source_type\": \"txt\"}))\n        return pages",
+              "why": "Son chunk 100 satıra ulaşmamış olabilir ama içeriği yine de kaydetmeliyiz. Bu kontrol olmadan dosyanın son kısmı kaybolur — DOCXExtractor'daki aynı pattern."
             },
             {
               "order": "4.10",
