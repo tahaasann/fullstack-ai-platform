@@ -1374,6 +1374,365 @@ print(f"Toplam parametre: {total_params:,}")
 
 **Beklenen Sonuc:** Confusion matrix'te diagonal degerler yuksek olmali. En cok karistirilan cift genelde (3,5) veya (4,9) olur. Yanlis tahmin orneklerinde el yazisinin zor okunabilir oldugu gorulebilir.
 **Ipucu:** `classification_report` precision, recall ve F1-score'u sinif bazinda gosterir. Dusuk recall'lu siniflar modelin zorluk cektigi rakamlari gosterir.
+
+---
+
+### Alistirma 4: Backpropagation Sifirdan (Kolay)
+
+Chain rule ile gradient hesaplamasini elle uygula ve autograd ile dogrula.
+
+```python
+import numpy as np
+
+# Basit 2-layer network (sifirdan)
+class SimpleNet:
+    def __init__(self, input_size, hidden_size, output_size):
+        self.W1 = np.random.randn(input_size, hidden_size) * 0.01
+        self.b1 = np.zeros(hidden_size)
+        self.W2 = np.random.randn(hidden_size, output_size) * 0.01
+        self.b2 = np.zeros(output_size)
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-np.clip(x, -500, 500)))
+
+    def forward(self, X):
+        self.z1 = X @ self.W1 + self.b1
+        self.a1 = self.sigmoid(self.z1)
+        self.z2 = self.a1 @ self.W2 + self.b2
+        self.a2 = self.sigmoid(self.z2)
+        return self.a2
+
+    def backward(self, X, y, output):
+        m = X.shape[0]
+        # Output layer gradient
+        dz2 = output - y
+        dW2 = (1/m) * self.a1.T @ dz2
+        db2 = (1/m) * np.sum(dz2, axis=0)
+
+        # Hidden layer gradient (chain rule)
+        da1 = dz2 @ self.W2.T
+        dz1 = da1 * self.a1 * (1 - self.a1)
+        dW1 = (1/m) * X.T @ dz1
+        db1 = (1/m) * np.sum(dz1, axis=0)
+
+        return dW1, db1, dW2, db2
+
+    # TODO: Training loop yaz (forward + backward + weight update)
+    # TODO: XOR problemini coz (non-linear)
+    # TODO: Loss history ciz ve convergence'i gozlemle
+    # TODO: PyTorch autograd ile gradient'leri dogrula
+
+net = SimpleNet(2, 4, 1)
+```
+
+**Beklenen Sonuc:** XOR problemi %95+ accuracy ile cozulmeli. Elle hesaplanan gradient'ler PyTorch autograd ile uyusmali.
+**Ipucu:** XOR lineer olarak ayrilamaz — en az 1 hidden layer gerektirir. Bu derin ogrenmenin temel motivasyonudur.
+
+---
+
+### Alistirma 5: CNN ile Goruntu Siniflandirma (Kolay)
+
+CIFAR-10 uzerinde basit bir CNN modeli egit.
+
+```python
+import torch
+import torch.nn as nn
+import torchvision
+import torchvision.transforms as transforms
+
+# Data augmentation ve normalizasyon
+transform_train = transforms.Compose([
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomCrop(32, padding=4),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
+
+class SimpleCNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, 3, padding=1), nn.BatchNorm2d(64), nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(),
+            nn.AdaptiveAvgPool2d(1),
+        )
+        self.classifier = nn.Sequential(
+            nn.Flatten(), nn.Dropout(0.5), nn.Linear(128, 10)
+        )
+
+    def forward(self, x):
+        return self.classifier(self.features(x))
+
+# TODO: Model egit (10 epoch, Adam optimizer, CrossEntropyLoss)
+# TODO: Train ve validation accuracy grafigi ciz
+# TODO: Yanlis siniflandirilan ornekleri gorsellestir
+# TODO: Data augmentation olmadan egit ve farki gozlemle
+```
+
+**Beklenen Sonuc:** CIFAR-10'da %85+ test accuracy elde edilmeli. Data augmentation ile %3-5 accuracy artisi olmali. BatchNorm training'i hizlandirmali.
+**Ipucu:** Conv layer filtreleri kenar, doku gibi low-level feature'lari, derin katmanlar nesne parcalarini ogrenrir.
+
+---
+
+### Alistirma 6: Overfitting Tespiti ve Onleme (Orta)
+
+Kasitli olarak overfit eden bir model olustur ve duzelltme tekniklerini uygula.
+
+```python
+import torch
+import torch.nn as nn
+
+# Kucuk veri seti ile kasitli overfitting
+X_train = torch.randn(50, 10)
+y_train = torch.randint(0, 2, (50,))
+X_test = torch.randn(200, 10)
+y_test = torch.randint(0, 2, (200,))
+
+# Asiri buyuk model (overfit edecek)
+class OverfitNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(10, 256), nn.ReLU(),
+            nn.Linear(256, 256), nn.ReLU(),
+            nn.Linear(256, 256), nn.ReLU(),
+            nn.Linear(256, 2)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+# Regularized model
+class RegularizedNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(10, 64), nn.ReLU(), nn.Dropout(0.3),
+            nn.Linear(64, 32), nn.ReLU(), nn.Dropout(0.3),
+            nn.Linear(32, 2)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+# TODO: Her iki modeli 200 epoch egit
+# TODO: Train vs Test loss grafigi ciz (overfitting gorsel)
+# TODO: Early stopping implement et
+# TODO: L2 regularization ekle (weight_decay parametresi)
+# TODO: Model boyutu vs overfitting iliskisini analiz et
+```
+
+**Beklenen Sonuc:** OverfitNet'te train accuracy %100, test accuracy dusuk olmali. RegularizedNet'te gap cok daha kucuk olmali. Early stopping ile optimal epoch bulunmali.
+**Ipucu:** Train loss duserken test loss artiyorsa = overfitting. Dropout, weight decay, early stopping, data augmentation ve daha kucuk model kullan.
+
+---
+
+### Alistirma 7: Transfer Learning ile Ozel Veri Seti (Orta)
+
+Pre-trained ResNet modeli ile kendi veri setinde siniflandirma yap.
+
+```python
+import torch
+import torch.nn as nn
+import torchvision.models as models
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader, Dataset
+from PIL import Image
+import os
+
+# Pre-trained ResNet18 yukle
+model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+
+# Son katmani degistir (kendi sinif sayina gore)
+num_classes = 3  # ornek: kedi, kopek, kus
+model.fc = nn.Linear(model.fc.in_features, num_classes)
+
+# Feature extractor olarak kullan (sadece son katmani egit)
+for param in model.parameters():
+    param.requires_grad = False
+model.fc.requires_grad_(True)
+
+transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
+
+# TODO: Custom Dataset class'i yaz (klasor yapisinden veri yukle)
+# TODO: Feature extraction mode ile egit (hizli, 5 epoch yeterli)
+# TODO: Fine-tuning mode ile egit (tum katmanlar, dusuk lr)
+# TODO: Feature extraction vs fine-tuning performansini karsilastir
+# TODO: Grad-CAM ile modelin neye baktigini gorseellestir
+```
+
+**Beklenen Sonuc:** Transfer learning ile kucuk veri setinde bile %90+ accuracy elde edilmeli. Feature extraction 10x daha hizli egitilmeli. Fine-tuning %2-5 daha iyi sonuc vermeli.
+**Ipucu:** ImageNet'te egitilmis modeller genel gorsel feature'lari (kenar, doku, sekil) zaten ogrenmis. Kendi veri setinde sadece son katmanlari egitmek yeterli.
+
+---
+
+### Alistirma 8: RNN/LSTM ile Metin Siniflandirma (Orta)
+
+LSTM ile sentiment analizi modeli egit.
+
+```python
+import torch
+import torch.nn as nn
+from torchtext.datasets import IMDB
+from torchtext.data.utils import get_tokenizer
+from torchtext.vocab import build_vocab_from_iterator
+
+tokenizer = get_tokenizer("basic_english")
+
+class LSTMClassifier(nn.Module):
+    def __init__(self, vocab_size, embed_dim=128, hidden_dim=256, num_layers=2):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, num_layers=num_layers,
+                           batch_first=True, dropout=0.3, bidirectional=True)
+        self.classifier = nn.Sequential(
+            nn.Linear(hidden_dim * 2, 64),  # bidirectional -> 2x hidden
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(64, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        embedded = self.embedding(x)
+        lstm_out, (hidden, cell) = self.lstm(embedded)
+        # Son hidden state'leri birlestir (forward + backward)
+        hidden = torch.cat((hidden[-2], hidden[-1]), dim=1)
+        return self.classifier(hidden)
+
+# TODO: IMDB dataset'ini yukle ve tokenize et
+# TODO: Vocabulary olustur ve text'leri numerik index'lere cevir
+# TODO: Padding ile batch olustur (pad_sequence)
+# TODO: Model egit ve test accuracy raporla
+# TODO: Ornek cumlelerle sentiment tahmini yap
+```
+
+**Beklenen Sonuc:** IMDB'de %85+ test accuracy elde edilmeli. Bidirectional LSTM tek yonlu LSTM'den daha iyi sonuc vermeli.
+**Ipucu:** LSTM vanishing gradient problemini cozer (forget gate ile). Bidirectional hem soldan saga hem sagdan sola kontekst okur.
+
+---
+
+### Alistirma 9: Hyperparameter Tuning ile Model Optimizasyonu (Zor)
+
+Sistematik hyperparameter arama ile en iyi model konfigurasyonunu bul.
+
+```python
+import torch
+import torch.nn as nn
+import optuna
+
+def objective(trial):
+    # Hyperparameter'lari tanimla
+    lr = trial.suggest_float("lr", 1e-5, 1e-2, log=True)
+    hidden_size = trial.suggest_categorical("hidden_size", [64, 128, 256, 512])
+    num_layers = trial.suggest_int("num_layers", 1, 4)
+    dropout = trial.suggest_float("dropout", 0.1, 0.5)
+    batch_size = trial.suggest_categorical("batch_size", [32, 64, 128])
+    optimizer_name = trial.suggest_categorical("optimizer", ["Adam", "AdamW", "SGD"])
+
+    # Model olustur
+    layers = []
+    in_features = 784  # MNIST
+    for i in range(num_layers):
+        layers.extend([
+            nn.Linear(in_features, hidden_size),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+        ])
+        in_features = hidden_size
+    layers.append(nn.Linear(hidden_size, 10))
+    model = nn.Sequential(*layers)
+
+    # Optimizer sec
+    if optimizer_name == "Adam":
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    elif optimizer_name == "AdamW":
+        optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+    else:
+        optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
+
+    # TODO: Training loop yaz
+    # TODO: Validation accuracy'yi return et (Optuna minimize/maximize eder)
+    # TODO: Early pruning ekle (trial.report + trial.should_prune)
+    # TODO: En iyi 5 trial'i raporla
+
+    return val_accuracy
+
+study = optuna.create_study(direction="maximize")
+study.optimize(objective, n_trials=50)
+print(f"En iyi parametreler: {study.best_params}")
+print(f"En iyi skor: {study.best_value:.4f}")
+
+# TODO: Optuna visualization ile parametre onemini gor
+# TODO: En iyi model ile test seti uzerinde final evaluation yap
+```
+
+**Beklenen Sonuc:** Optuna 50 trial'da en iyi hyperparameter kombinasyonunu bulmali. Learning rate ve dropout en onemli parametreler olmali. Final model %98+ MNIST accuracy'si elde etmeli.
+**Ipucu:** `log=True` ile learning rate logaritmik olcekte aranir (1e-5 ile 1e-2 arasi). Pruning ile kotu trial'lar erken sonlandirilir.
+
+---
+
+### Alistirma 10: Model Deployment — PyTorch to ONNX (Zor)
+
+Egitilmis modeli ONNX formatina cevirip inference pipeline olustur.
+
+```python
+import torch
+import torch.nn as nn
+import onnx
+import onnxruntime as ort
+import numpy as np
+
+# Egitilmis model (ornek)
+class SimpleModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(784, 128), nn.ReLU(),
+            nn.Linear(128, 64), nn.ReLU(),
+            nn.Linear(64, 10)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+model = SimpleModel()
+model.eval()
+
+# ONNX'e cevir
+dummy_input = torch.randn(1, 784)
+torch.onnx.export(
+    model, dummy_input, "model.onnx",
+    input_names=["input"],
+    output_names=["output"],
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+)
+
+# ONNX Runtime ile inference
+session = ort.InferenceSession("model.onnx")
+input_data = np.random.randn(1, 784).astype(np.float32)
+result = session.run(None, {"input": input_data})
+print(f"Prediction: {np.argmax(result[0])}")
+
+# TODO: PyTorch ve ONNX Runtime ciktilarini karsilastir (fark < 1e-5)
+# TODO: Batch inference performansini olc (100 ornek)
+# TODO: Quantization uygula (INT8) ve boyut/hiz karsilastirmasi yap
+# TODO: FastAPI ile basit inference API olustur
+```
+
+**Beklenen Sonuc:** ONNX modeli PyTorch ile ayni sonuclari vermeli. ONNX Runtime inference %30-50 daha hizli olmali. INT8 quantization ile model boyutu %50-75 kuculmeli.
+**Ipucu:** ONNX platform bagimsizdir — PyTorch modeli TensorFlow, C++ veya JavaScript'te calistirilabilir. Production'da ONNX Runtime tercih edilir.
 :::
 
 :::deha-tip

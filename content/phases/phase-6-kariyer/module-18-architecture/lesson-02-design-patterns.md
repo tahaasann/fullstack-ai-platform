@@ -1931,6 +1931,323 @@ Aşağıdaki gerçek dünya senaryolarında hangi design pattern kullanılmalı?
 6. Kullanıcı kaydı sonrası email gönderme, analytics kaydetme ve stok güncelleme
 
 **Beklenen cevaplar:** (1) Strategy, (2) Command, (3) Observer veya Strategy, (4) Adapter + Factory, (5) Decorator, (6) Observer/Event-driven
+
+---
+
+### Alıştırma 6: Command Pattern — Undo/Redo Sistemi (Orta)
+
+Bir text editor icin command pattern ile undo/redo ozelligini implement edin.
+
+```python
+from abc import ABC, abstractmethod
+
+class Command(ABC):
+    @abstractmethod
+    def execute(self): pass
+    @abstractmethod
+    def undo(self): pass
+
+class TextEditor:
+    def __init__(self):
+        self.content = ""
+        self.history = []
+        self.redo_stack = []
+
+    def execute(self, command):
+        command.execute()
+        self.history.append(command)
+        self.redo_stack.clear()
+
+    def undo(self):
+        if self.history:
+            cmd = self.history.pop()
+            cmd.undo()
+            self.redo_stack.append(cmd)
+
+    def redo(self):
+        if self.redo_stack:
+            cmd = self.redo_stack.pop()
+            cmd.execute()
+            self.history.append(cmd)
+
+class InsertTextCommand(Command):
+    def __init__(self, editor, text, position):
+        self.editor = editor
+        self.text = text
+        self.position = position
+
+    def execute(self):
+        self.editor.content = (
+            self.editor.content[:self.position] +
+            self.text +
+            self.editor.content[self.position:]
+        )
+
+    def undo(self):
+        self.editor.content = (
+            self.editor.content[:self.position] +
+            self.editor.content[self.position + len(self.text):]
+        )
+
+# TODO: DeleteTextCommand implement et
+# TODO: ReplaceTextCommand implement et
+# TODO: Macro command ekle (birden fazla komutu tek undo ile geri al)
+# TODO: History limit ekle (max 50 undo)
+
+editor = TextEditor()
+editor.execute(InsertTextCommand(editor, "Hello ", 0))
+editor.execute(InsertTextCommand(editor, "World", 6))
+print(editor.content)  # "Hello World"
+editor.undo()
+print(editor.content)  # "Hello "
+editor.redo()
+print(editor.content)  # "Hello World"
+```
+
+**Beklenen Sonuc:** Undo ve redo sinirsiz sayida calismali. Macro command birden fazla islemi tek adimda geri alabilmeli.
+**Ipucu:** Command pattern her islemi nesne olarak saklar. Bu sayede undo, redo, replay ve audit trail mumkun olur.
+
+---
+
+### Alıştırma 7: Factory + Strategy — Odeme Sistemi (Orta)
+
+Factory ve Strategy pattern'larini birlikte kullanarak genisletilebilir bir odeme sistemi tasarlayin.
+
+```python
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+@dataclass
+class PaymentResult:
+    success: bool
+    transaction_id: str
+    message: str
+
+class PaymentStrategy(ABC):
+    @abstractmethod
+    def process(self, amount: float) -> PaymentResult: pass
+    @abstractmethod
+    def refund(self, transaction_id: str) -> PaymentResult: pass
+
+class CreditCardPayment(PaymentStrategy):
+    def process(self, amount):
+        # Kredi karti odeme islemi
+        return PaymentResult(True, "CC-12345", f"{amount} TL kredi karti ile odendi")
+    def refund(self, transaction_id):
+        return PaymentResult(True, transaction_id, "Iade yapildi")
+
+class PaymentFactory:
+    _strategies = {}
+
+    @classmethod
+    def register(cls, name, strategy_class):
+        cls._strategies[name] = strategy_class
+
+    @classmethod
+    def create(cls, name) -> PaymentStrategy:
+        if name not in cls._strategies:
+            raise ValueError(f"Bilinmeyen odeme yontemi: {name}")
+        return cls._strategies[name]()
+
+PaymentFactory.register("credit_card", CreditCardPayment)
+
+# TODO: BankTransferPayment implement et ve register et
+# TODO: DigitalWalletPayment implement et (Papara, Tosla)
+# TODO: PaymentProcessor class'i yaz (strategy secimi + validation + logging)
+# TODO: Yeni odeme yontemi eklemek icin mevcut kodu DEGISTIRMEDEN sadece register et (OCP)
+```
+
+**Beklenen Sonuc:** Yeni odeme yontemi eklemek sadece yeni class + register gerektirmeli. Mevcut kod degistirilmemeli (Open/Closed Principle).
+
+---
+
+### Alıştırma 8: Builder Pattern — Query Builder (Zor)
+
+Karmasik SQL sorgulari olusturmak icin fluent API ile builder pattern implement edin.
+
+```python
+class QueryBuilder:
+    def __init__(self):
+        self._select = []
+        self._from = ""
+        self._where = []
+        self._join = []
+        self._order_by = []
+        self._limit = None
+        self._offset = None
+        self._params = []
+
+    def select(self, *columns):
+        self._select.extend(columns)
+        return self
+
+    def from_table(self, table):
+        self._from = table
+        return self
+
+    def where(self, condition, *params):
+        self._where.append(condition)
+        self._params.extend(params)
+        return self
+
+    def join(self, table, on):
+        self._join.append(f"JOIN {table} ON {on}")
+        return self
+
+    def order_by(self, column, direction="ASC"):
+        self._order_by.append(f"{column} {direction}")
+        return self
+
+    def limit(self, n):
+        self._limit = n
+        return self
+
+    def build(self):
+        parts = [f"SELECT {', '.join(self._select) or '*'}"]
+        parts.append(f"FROM {self._from}")
+        parts.extend(self._join)
+        if self._where:
+            parts.append(f"WHERE {' AND '.join(self._where)}")
+        if self._order_by:
+            parts.append(f"ORDER BY {', '.join(self._order_by)}")
+        if self._limit:
+            parts.append(f"LIMIT {self._limit}")
+        return " ".join(parts), self._params
+
+# Kullanim
+query, params = (QueryBuilder()
+    .select("u.name", "u.email", "COUNT(o.id) as order_count")
+    .from_table("users u")
+    .join("orders o", "u.id = o.user_id")
+    .where("u.active = %s", True)
+    .where("o.created_at > %s", "2024-01-01")
+    .order_by("order_count", "DESC")
+    .limit(10)
+    .build())
+print(query)
+
+# TODO: GROUP BY ve HAVING destegi ekle
+# TODO: Subquery destegi ekle
+# TODO: INSERT, UPDATE, DELETE builder'lari yaz
+# TODO: SQL injection korunmasi icin parameterized query kullan
+```
+
+**Beklenen Sonuc:** Fluent API ile okunabilir sorgu olusturulmali. Parameterized query ile SQL injection onlenmeli.
+
+---
+
+### Alıştırma 9: Mediator Pattern — Event Bus (Zor)
+
+Loose coupling saglayan bir event bus sistemi implement edin.
+
+```python
+from typing import Callable, Any
+from collections import defaultdict
+import asyncio
+
+class EventBus:
+    def __init__(self):
+        self._handlers: dict[str, list[Callable]] = defaultdict(list)
+        self._middleware: list[Callable] = []
+
+    def on(self, event_name: str, handler: Callable):
+        self._handlers[event_name].append(handler)
+        return self
+
+    def off(self, event_name: str, handler: Callable):
+        self._handlers[event_name].remove(handler)
+        return self
+
+    def use(self, middleware: Callable):
+        self._middleware.append(middleware)
+        return self
+
+    def emit(self, event_name: str, data: Any = None):
+        # Middleware chain
+        for mw in self._middleware:
+            data = mw(event_name, data)
+            if data is None:
+                return  # Middleware engelledi
+
+        for handler in self._handlers[event_name]:
+            handler(data)
+
+    def once(self, event_name: str, handler: Callable):
+        def wrapper(data):
+            handler(data)
+            self.off(event_name, wrapper)
+        self.on(event_name, wrapper)
+
+# Kullanim
+bus = EventBus()
+
+# Logging middleware
+bus.use(lambda event, data: (print(f"[LOG] {event}: {data}"), data)[1])
+
+# Handler'lar
+bus.on("user:registered", lambda user: print(f"Welcome email: {user['email']}"))
+bus.on("user:registered", lambda user: print(f"Analytics: new user {user['id']}"))
+bus.on("order:placed", lambda order: print(f"Stock update: {order['items']}"))
+
+bus.emit("user:registered", {"id": 1, "email": "test@test.com"})
+
+# TODO: Async handler destegi ekle
+# TODO: Priority-based handler siralama ekle
+# TODO: Error handling (bir handler fail ederse digerlerine etkisi olmamali)
+# TODO: Dead letter queue ekle (handle edilmeyen event'ler)
+# TODO: TypedEvent class'i ile type-safe event tanimlama
+```
+
+**Beklenen Sonuc:** Event emit edildiginde tum handler'lar calismali. Middleware chain ile cross-cutting concern'ler uygulanmali. once() ile tek seferlik handler calismali.
+
+---
+
+### Alıştırma 10: Anti-Pattern Refactoring Challenge (Zor)
+
+Asagidaki anti-pattern'leri tespit edin ve dogru pattern ile refactor edin.
+
+```python
+# Anti-pattern 1: God Object
+class ApplicationManager:
+    def __init__(self):
+        self.users = []
+        self.orders = []
+        self.products = []
+        self.emails_sent = []
+        self.logs = []
+
+    def create_user(self, name, email): pass
+    def delete_user(self, user_id): pass
+    def create_order(self, user_id, products): pass
+    def process_payment(self, order_id, amount): pass
+    def send_email(self, to, subject, body): pass
+    def generate_report(self, type): pass
+    def update_inventory(self, product_id, qty): pass
+    def log_action(self, action): pass
+    # ... 50+ method daha
+
+# Anti-pattern 2: Callback Hell
+def process_order(order):
+    validate_order(order, lambda valid:
+        check_inventory(order, lambda available:
+            process_payment(order, lambda paid:
+                update_inventory(order, lambda updated:
+                    send_confirmation(order, lambda sent:
+                        log_order(order, lambda logged:
+                            print("Done!")))))))
+
+# Anti-pattern 3: Primitive Obsession
+def create_user(name, email, phone, street, city, zip_code, country,
+                card_number, card_expiry, card_cvv, role, department):
+    pass  # 12 parametre!
+
+# TODO: God Object'i Single Responsibility ile parcala (UserService, OrderService, EmailService...)
+# TODO: Callback Hell'i async/await veya Pipeline pattern ile duzelt
+# TODO: Primitive Obsession'i Value Object'ler ile coz (Address, CreditCard, UserRole)
+# TODO: Her refactoring icin SOLID prensiplerinin hangisini uyguladiginizi belirtin
+```
+
+**Beklenen Sonuc:** Her anti-pattern icin dogru pattern uygulanmali. God Object en az 4 ayri servise parcalanmali. Callback hell okunabilir pipeline'a donusmeli. 12 parametreli fonksiyon 3-4 Value Object alacak sekilde refactor edilmeli.
 :::
 
 :::knowledge-check

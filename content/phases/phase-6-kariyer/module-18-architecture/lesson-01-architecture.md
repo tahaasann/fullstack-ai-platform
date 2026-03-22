@@ -1616,6 +1616,62 @@ Bir startup'ın büyüme aşamalarına göre mimari evrim planı yazın:
 - **100K-1M kullanıcı**: Hangi component'ler ayrılmalı?
 - **1M+ kullanıcı**: Full microservices'e geçiş stratejisi nedir?
 Her aşamada trade-off'ları ve geçiş maliyetlerini belirtin.
+
+---
+
+### Alıştırma 7: Strangler Fig Pattern ile Modernizasyon (Orta)
+
+Legacy monolith'ten microservices'e adim adim gecis plani yazin.
+
+1. Mevcut monolith'teki module sinirlarini belirleyin
+2. Ilk ayrilacak servisi secin (en az bagimliligi olan)
+3. Strangler Fig pattern ile yeni servisin monolith'in onune nasil konacagini cizelgelleyin
+4. API Gateway ile trafik yonlendirme stratejisi yazin
+5. Veri migrasyon plani olusturun (shared DB → service-per-DB)
+
+**Beklenen Sonuc:** Migrasyon plani risk bazli onceliklendirme icermeli. Her adimda rollback stratejisi tanimlanmali. Veri tutarliligi icin eventual consistency deseni aciklanmali.
+
+---
+
+### Alıştırma 8: Event Storming Workshop Simulasyonu (Orta)
+
+Bir e-ticaret sistemi icin Event Storming oturumu simulasyonu yapin.
+
+1. Domain event'leri tanimlayin (OrderPlaced, PaymentProcessed, ItemShipped...)
+2. Command'lari belirleyin (PlaceOrder, ProcessPayment, ShipItem...)
+3. Aggregate'leri tanimlayin (Order, Payment, Shipment...)
+4. Bounded context'leri cizin (Ordering, Payment, Fulfillment, Inventory)
+5. Context Map olusturun (context'ler arasi iliskiler)
+
+**Beklenen Sonuc:** En az 15 domain event, 10 command ve 5 aggregate tanimlanmali. Bounded context'ler arasindaki bagimlilklar net olmali. Context Map'te upstream/downstream iliskileri gosterilmeli.
+
+---
+
+### Alıştırma 9: API Versioning ve Backward Compatibility (Zor)
+
+API versioning stratejisi tasarlayin ve breaking change yonetim plani olusturun.
+
+1. URL versioning (`/v1/users`), header versioning (`Accept: application/vnd.api.v1+json`) ve query parameter versioning (`?version=1`) arasinda secim yapin ve nedenleri aciklayin
+2. Deprecation policy yazin (ne zaman eski versiyon kapatilir, nasil bildirilir)
+3. Breaking change ornegi: `User.name` → `User.firstName + User.lastName` icin migration plani
+4. SDK/client library versioning stratejisi
+
+**Beklenen Sonuc:** Versioning stratejisi secimi ve gerekceleri aciklanmali. Deprecation timeline'i net olmali (ornek: 6 ay uyari → 3 ay sunset → kaldirma). Migration guide ornegi hazirlanmali.
+
+---
+
+### Alıştırma 10: Disaster Recovery ve Business Continuity Plani (Zor)
+
+Bir SaaS urunun icin disaster recovery plani olusturun.
+
+1. **RPO (Recovery Point Objective):** Maksimum ne kadar veri kaybi kabul edilebilir? (ornek: 1 saat)
+2. **RTO (Recovery Time Objective):** Sistemin ne kadar surede ayaga kalkmasi gerekir? (ornek: 15 dakika)
+3. Multi-region deployment stratejisi cizelgelleyin (active-active vs active-passive)
+4. Failover suresci tanimlayin (otomatik vs manuel)
+5. Backup ve restore prosedurlerini yazin (DB, file storage, config)
+6. DR drill plani olusturun (yilda 2 kez test senaryosu)
+
+**Beklenen Sonuc:** RPO ve RTO hedefleri net olmali. Multi-region mimarisi diyagrami cizilebilmeli. DR drill senaryolari tanimlanmali. Maliyet analizi yapilmali (active-active vs active-passive).
 :::
 
 :::knowledge-check

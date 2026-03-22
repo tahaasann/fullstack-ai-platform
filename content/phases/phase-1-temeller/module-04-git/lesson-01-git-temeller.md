@@ -716,6 +716,627 @@ Git sorunlariyla karsilastiginda AI'a `git status` ve `git log --oneline` ciktis
 - **Senior cevabi:** Staging area, commit'e neyin dahil edilecegini kontrol etmenizi sağlar. Büyük değişiklikleri mantıksal commit'lere ayirabilirsiniz: `git add -p` ile ayni dosyanin farklı parcalarini farklı commit'lere koyabilirsiniz. Bu atomic commit prensibini destekler: her commit tek bir mantıksal değişikliği temsil etmelidir. Code review ve git bisect gibi işlemler için temiz commit geçmişi kritiktir.
 :::
 
+:::exercise
+### Alıştırma 4: Git Log Analiz Aracı
+
+**Görev:** `git log` çıktısını parse eden ve commit istatistikleri çıkaran bir bash script yaz.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+# Ornek bir repo uzerinde calis
+mkdir git-stats-lab && cd git-stats-lab && git init
+
+# Ornek commit'ler olustur
+for i in {1..10}; do
+    echo "Line $i" >> file.txt
+    git add file.txt
+    git commit -m "feat: add line $i" --date="2026-03-$(printf '%02d' $i) 10:00:00"
+done
+
+# TODO: Istatistikleri hesapla
+echo "=== Git Istatistikleri ==="
+
+# 1. Toplam commit sayisi
+TOTAL=$(git rev-list --count HEAD)
+echo "Toplam commit: $TOTAL"
+
+# 2. Son 7 gundeki commit sayisi
+# TODO: git log --since="7 days ago" --oneline | wc -l
+
+# 3. En cok commit atan yazar
+# TODO: git shortlog -sn | head -3
+
+# 4. Dosya basina commit sayisi
+# TODO: git log --pretty=format: --name-only | sort | uniq -c | sort -rn | head -5
+
+# 5. Gune gore commit dagilimi
+# TODO: git log --format='%ad' --date=format:'%A' | sort | uniq -c | sort -rn
+```
+
+**Beklenen çıktı:**
+```
+=== Git Istatistikleri ===
+Toplam commit: 10
+Son 7 gun: 7
+En aktif yazar: Your Name (10)
+En cok degisen dosya: file.txt (10)
+```
+
+**İpucu:** `git log --format='%an'` yazar adını, `--format='%ad'` commit tarihini verir.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Interactive Staging Simülasyonu
+
+**Görev:** Bir dosyadaki farklı değişiklikleri ayrı commit'lere bölme pratiği yap.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir staging-lab && cd staging-lab && git init
+
+# Baslangic dosyasi
+cat > app.py << 'EOF'
+def greet(name):
+    return f"Hello, {name}"
+
+def add(a, b):
+    return a + b
+
+def multiply(a, b):
+    return a * b
+EOF
+
+git add app.py && git commit -m "initial: add math and greet functions"
+
+# Birden fazla degisiklik yap
+cat > app.py << 'EOF'
+def greet(name):
+    """Kullaniciyi selamla."""
+    return f"Merhaba, {name}!"
+
+def add(a, b):
+    """Iki sayiyi topla."""
+    return a + b
+
+def multiply(a, b):
+    """Iki sayiyi carp."""
+    return a * b
+
+def subtract(a, b):
+    """Iki sayinin farkini al."""
+    return a - b
+EOF
+
+# GOREV: Bu degisiklikleri 3 ayri commit'e bol:
+# Commit 1: greet fonksiyonu Turkceye cevrild  + docstring
+# Commit 2: add ve multiply fonksiyonlarina docstring eklendi
+# Commit 3: subtract fonksiyonu eklendi
+
+# Ipucu: git add -p ile hunk'lari secerek stage et
+# y = bu hunk'i stage et
+# n = bu hunk'i atlat
+# s = daha kucuk hunk'lara bol
+
+echo "GOREV: Asagidaki komutlari kullanarak 3 ayri commit yap:"
+echo "1. git add -p app.py  (sadece greet degisikliklerini sec)"
+echo "2. git commit -m 'refactor: convert greet to Turkish'"
+echo "3. git add -p app.py  (sadece docstring'leri sec)"
+echo "4. git commit -m 'docs: add docstrings to math functions'"
+echo "5. git add app.py && git commit -m 'feat: add subtract function'"
+
+git diff
+```
+
+**Beklenen çıktı:**
+```
+3 commit olusturulduktan sonra:
+$ git log --oneline
+abc1234 feat: add subtract function
+def5678 docs: add docstrings to math functions
+ghi9012 refactor: convert greet to Turkish
+```
+
+**İpucu:** `git add -p` komutu her değişiklik bloğu (hunk) için y/n/s sorar. `s` ile hunk'ı daha küçük parçalara bölebilirsin.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Git Alias Koleksiyonu
+
+**Görev:** Günlük Git iş akışını hızlandıran alias'lar oluştur ve test et.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+# Git alias'lari tanimla
+git config --global alias.st "status -sb"
+git config --global alias.lg "log --oneline --graph --all --decorate"
+git config --global alias.last "log -1 --stat"
+git config --global alias.unstage "restore --staged"
+git config --global alias.amend "commit --amend --no-edit"
+git config --global alias.branches "branch -a -v"
+git config --global alias.contributors "shortlog -sn --all"
+
+# TODO: Bu alias'lari da ekle:
+# git undo -> son commit'i geri al (degisiklikler working directory'de kalsin)
+# git wip -> hizli "work in progress" commit
+# git cleanup -> merged branch'leri sil
+# git find -> commit mesajinda arama yap
+
+# Test
+mkdir alias-lab && cd alias-lab && git init
+
+echo "# Proje" > README.md && git add . && git commit -m "initial commit"
+echo "Icerik" >> README.md && git add . && git commit -m "feat: add content"
+
+echo "=== git st ==="
+git st
+
+echo -e "\n=== git lg ==="
+git lg
+
+echo -e "\n=== git last ==="
+git last
+
+echo -e "\n=== git branches ==="
+git branches
+
+echo -e "\n=== git contributors ==="
+git contributors
+```
+
+**Beklenen çıktı:**
+```
+=== git st ===
+## main
+
+=== git lg ===
+* abc1234 (HEAD -> main) feat: add content
+* def5678 initial commit
+
+=== git last ===
+commit abc1234
+  feat: add content
+  README.md | 1 +
+
+=== git branches ===
+* main abc1234 feat: add content
+
+=== git contributors ===
+  2  Your Name
+```
+
+**İpucu:** `git config --global alias.undo "reset --soft HEAD~1"` ile son commit geri alınır ama değişiklikler staging'de kalır.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 7: Git Bisect ile Bug Bulma
+
+**Görev:** `git bisect` kullanarak bir bug'ın hangi commit'te girdiğini bulma pratiği yap.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir bisect-lab && cd bisect-lab && git init
+
+# 10 commit olustur, 5. commit'te bug gir
+for i in {1..10}; do
+    if [ $i -lt 5 ]; then
+        echo "function calculate() { return 2 + 2; }" > app.js
+    else
+        # Bug: 5. commit'ten itibaren yanlis hesaplama
+        echo "function calculate() { return 2 + 3; }" > app.js
+    fi
+    git add app.js
+    git commit -m "commit $i: update calculation"
+done
+
+# Test script'i: cikti 4 olmali, degilse bug var
+cat > test.sh << 'SCRIPT'
+#!/bin/bash
+result=$(node -e "$(cat app.js); console.log(calculate())")
+if [ "$result" = "4" ]; then
+    exit 0  # iyi commit
+else
+    exit 1  # bug var
+fi
+SCRIPT
+chmod +x test.sh
+
+# GOREV: git bisect ile bug'i bul
+echo "=== Git Bisect ile Bug Bulma ==="
+echo "1. git bisect start"
+echo "2. git bisect bad HEAD          # son commit'te bug var"
+echo "3. git bisect good HEAD~9       # ilk commit iyiydi"
+echo "4. git bisect run ./test.sh     # otomatik bisect"
+echo ""
+echo "Veya manuel:"
+echo "  git bisect start && git bisect bad && git bisect good HEAD~9"
+echo "  Her adimda ./test.sh calistir, sonuca gore git bisect good/bad yaz"
+
+# Otomatik bisect
+git bisect start
+git bisect bad HEAD
+git bisect good HEAD~9
+git bisect run ./test.sh 2>/dev/null
+echo ""
+echo "Bug ilk kez yukaridaki commit'te girdi!"
+git bisect reset
+```
+
+**Beklenen çıktı:**
+```
+=== Git Bisect ile Bug Bulma ===
+Bisecting: ... revisions left to test
+...
+abc1234 is the first bad commit
+commit abc1234
+  commit 5: update calculation
+
+Bug ilk kez yukaridaki commit'te girdi!
+```
+
+**İpucu:** `git bisect run script.sh` ile otomatik bisect yapılır. Script exit 0 = iyi, exit 1 = kötü.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Git Hooks ile Commit Kalitesi
+
+**Görev:** Pre-commit hook yazarak commit öncesi kod kalitesini kontrol eden otomatik kurallar oluştur.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir hooks-lab && cd hooks-lab && git init
+
+# Pre-commit hook olustur
+cat > .git/hooks/pre-commit << 'HOOK'
+#!/bin/bash
+
+echo "=== Pre-commit Kontroller ==="
+
+# 1. Debug/console satirlari kontrolu
+if git diff --cached --name-only | xargs grep -l "console.log\|debugger\|print(" 2>/dev/null; then
+    echo "HATA: Debug satirlari bulundu! Commit oncesi temizle."
+    echo "Ipucu: git diff --cached ile kontrol et"
+    exit 1
+fi
+
+# TODO: 2. Dosya boyutu kontrolu (1MB'den buyuk dosya commit'lenmesin)
+
+# TODO: 3. Commit mesaji formati kontrolu (prepare-commit-msg hook ile)
+# Format: type(scope): description
+# Ornekler: feat(auth): add login page
+#           fix(api): resolve timeout issue
+
+# TODO: 4. Belirli dosyalarin commit'lenmesini engelle (.env, secrets, *.log)
+
+echo "Tum kontrollar basarili!"
+exit 0
+HOOK
+chmod +x .git/hooks/pre-commit
+
+# Test 1: Temiz commit
+echo "const x = 42;" > clean.js
+git add clean.js && git commit -m "feat: add clean code"
+echo "Sonuc: Basarili"
+
+# Test 2: Debug kodu ile commit denemesi
+echo "console.log('debug');" > dirty.js
+git add dirty.js
+git commit -m "feat: add dirty code" || echo "Sonuc: Reddedildi (beklenen)"
+
+# Temizle ve tekrar dene
+echo "const y = 100;" > dirty.js
+git add dirty.js && git commit -m "feat: add clean replacement"
+```
+
+**Beklenen çıktı:**
+```
+=== Pre-commit Kontroller ===
+Tum kontrollar basarili!
+[main abc1234] feat: add clean code
+
+=== Pre-commit Kontroller ===
+HATA: Debug satirlari bulundu! Commit oncesi temizle.
+Sonuc: Reddedildi (beklenen)
+```
+
+**İpucu:** Hook'lar `.git/hooks/` dizininde bulunur. `exit 1` commit'i engeller, `exit 0` izin verir.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: Git Stash İleri Kullanım
+
+**Görev:** `git stash` komutunun ileri özelliklerini kullanarak karmaşık senaryoları yönet.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir stash-lab && cd stash-lab && git init
+
+echo "# Project" > README.md && git add . && git commit -m "initial"
+echo "code" > main.js && git add . && git commit -m "feat: add main"
+
+# Senaryo 1: Birden fazla stash yonetimi
+echo "feature-1 code" > feature1.js
+git stash push -m "WIP: feature 1 in progress"
+
+echo "hotfix code" > hotfix.js
+git stash push -m "WIP: urgent hotfix"
+
+echo "feature-2 code" > feature2.js
+git stash push -m "WIP: feature 2 started"
+
+# GOREV 1: Stash listesini goster
+echo "=== Stash Listesi ==="
+git stash list
+
+# GOREV 2: Belirli bir stash'i uygula (hotfix)
+# TODO: git stash apply stash@{1}
+
+# GOREV 3: Stash icerigi goruntuleme
+echo -e "\n=== Stash Icerigi ==="
+git stash show -p stash@{0}
+
+# Senaryo 2: Partial stash (sadece bazi dosyalari stash'le)
+git stash pop stash@{0}
+echo "extra code" >> main.js
+echo "new feature" > feature3.js
+
+# TODO: Sadece feature3.js'i stash'le, main.js'deki degisiklikler kalsin
+# git stash push -m "WIP: feature 3" -- feature3.js
+
+# Senaryo 3: Stash'ten branch olusturma
+# TODO: git stash branch feature/from-stash stash@{0}
+echo -e "\n=== Stash'ten Branch ==="
+echo "git stash branch feature/from-stash stash@{0}"
+
+echo -e "\n=== Final Stash Listesi ==="
+git stash list
+```
+
+**Beklenen çıktı:**
+```
+=== Stash Listesi ===
+stash@{0}: On main: WIP: feature 2 started
+stash@{1}: On main: WIP: urgent hotfix
+stash@{2}: On main: WIP: feature 1 in progress
+
+=== Stash Icerigi ===
+diff --git a/feature2.js b/feature2.js
++feature-2 code
+```
+
+**İpucu:** `git stash push -m "mesaj" -- dosya.js` ile sadece belirli dosyaları stash'le. `stash@{n}` ile belirli stash'e eriş.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 10: Git Reflog ile Kayıp Commit Kurtarma
+
+**Görev:** `git reflog` kullanarak yanlışlıkla silinen commit'leri kurtarma pratiği yap.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir reflog-lab && cd reflog-lab && git init
+
+# Degerli commit'ler olustur
+echo "v1" > important.txt && git add . && git commit -m "feat: version 1"
+echo "v2" > important.txt && git add . && git commit -m "feat: version 2"
+echo "v3" > important.txt && git add . && git commit -m "feat: version 3 (very important!)"
+
+echo "=== Commit gecmisi ==="
+git log --oneline
+
+# Yanlis islem: Son 2 commit'i hard reset ile sil
+echo -e "\n=== Yanlis islem: git reset --hard HEAD~2 ==="
+git reset --hard HEAD~2
+
+echo "Kalan commit'ler:"
+git log --oneline
+echo "important.txt icerigi: $(cat important.txt)"  # v1 (v3 kayboldu!)
+
+# KURTARMA: reflog ile kayip commit'leri bul
+echo -e "\n=== Reflog ==="
+git reflog --oneline | head -5
+
+# GOREV: v3 commit'ini kurtarma yontemleri:
+
+# Yontem 1: Cherry-pick ile belirli commit'i geri al
+# TODO: git cherry-pick <commit-hash>
+
+# Yontem 2: Reset ile o noktaya don
+# TODO: git reset --hard <commit-hash>
+
+# Yontem 3: Yeni branch ile kurtarma
+# TODO: git branch recovery <commit-hash>
+
+echo -e "\n=== Kurtarma sonrasi ==="
+# Reflog'dan v3 commit hash'ini bul ve kurtarma yap
+V3_HASH=$(git reflog --oneline | grep "version 3" | head -1 | cut -d' ' -f1)
+echo "Kurtarilacak commit: $V3_HASH"
+
+git cherry-pick $V3_HASH 2>/dev/null || git reset --hard $V3_HASH
+echo "important.txt icerigi: $(cat important.txt)"  # v3 geri geldi!
+git log --oneline
+```
+
+**Beklenen çıktı:**
+```
+=== Commit gecmisi ===
+abc1234 feat: version 3 (very important!)
+def5678 feat: version 2
+ghi9012 feat: version 1
+
+=== Yanlis islem: git reset --hard HEAD~2 ===
+Kalan commit'ler:
+ghi9012 feat: version 1
+important.txt icerigi: v1
+
+=== Reflog ===
+ghi9012 HEAD@{0}: reset: moving to HEAD~2
+abc1234 HEAD@{1}: commit: feat: version 3 (very important!)
+...
+
+=== Kurtarma sonrasi ===
+important.txt icerigi: v3
+```
+
+**İpucu:** `git reflog` tüm HEAD hareketlerini kaydeder. Silinen commit'ler 90 gün boyunca reflog'da kalır. `git fsck --lost-found` ile orphan commit'leri de bulabilirsin.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Git Diff Analiz Aracı
+
+**Görev:** `git diff` çıktısını parse edip özet bilgi çıkaran bir bash script yaz.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir diff-lab && cd diff-lab && git init
+
+cat > app.py << 'EOF'
+def hello():
+    print("Hello World")
+
+def add(a, b):
+    return a + b
+EOF
+git add . && git commit -m "initial"
+
+cat > app.py << 'EOF'
+def hello(name="World"):
+    """Kullaniciyi selamla."""
+    print(f"Hello, {name}!")
+
+def add(a, b):
+    """Iki sayiyi topla."""
+    return a + b
+
+def subtract(a, b):
+    """Fark hesapla."""
+    return a - b
+EOF
+
+echo "=== Diff Ozeti ==="
+echo "Eklenen satirlar: $(git diff --numstat | awk '{sum+=$1} END {print sum}')"
+echo "Silinen satirlar: $(git diff --numstat | awk '{sum+=$2} END {print sum}')"
+echo "Degisen dosyalar: $(git diff --name-only | wc -l)"
+
+echo -e "\n=== Dosya bazinda degisiklikler ==="
+git diff --stat
+
+echo -e "\n=== Sadece eklenen satirlar ==="
+git diff | grep "^+" | grep -v "^+++" | head -10
+
+echo -e "\n=== Sadece silinen satirlar ==="
+git diff | grep "^-" | grep -v "^---" | head -10
+```
+
+**Beklenen çıktı:**
+```
+=== Diff Ozeti ===
+Eklenen satirlar: 10
+Silinen satirlar: 3
+Degisen dosyalar: 1
+
+=== Dosya bazinda degisiklikler ===
+ app.py | 13 ++++++++++---
+```
+
+**İpucu:** `git diff --numstat` eklenen/silinen satır sayılarını verir. `git diff --stat` dosya bazında özet gösterir.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 12: Git Clean ve Reset Senaryoları
+
+**Görev:** `git clean`, `git reset` ve `git restore` komutlarının farklı modlarını karşılaştır.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir reset-lab && cd reset-lab && git init
+
+echo "v1" > tracked.txt && git add . && git commit -m "v1"
+echo "v2" > tracked.txt && git add . && git commit -m "v2"
+echo "v3" > tracked.txt && git add . && git commit -m "v3"
+
+# Untracked dosya olustur
+echo "temp" > untracked.txt
+echo "build output" > dist.js
+
+# Staged degisiklik
+echo "v4" > tracked.txt && git add tracked.txt
+
+echo "=== Baslangic Durumu ==="
+git status -sb
+
+echo -e "\n=== Komut Karsilastirmasi ==="
+echo "git restore tracked.txt           -> Working directory'deki degisikligi geri al"
+echo "git restore --staged tracked.txt  -> Staging'den cikar (unstage)"
+echo "git reset --soft HEAD~1           -> Son commit'i geri al, degisiklikler staged'de"
+echo "git reset --mixed HEAD~1          -> Son commit'i geri al, degisiklikler unstaged'de"
+echo "git reset --hard HEAD~1           -> Son commit'i geri al, degisiklikler SILINIR"
+echo "git clean -fd                     -> Untracked dosyalari sil"
+echo "git clean -fxd                    -> Untracked + gitignore'd dosyalari sil"
+
+# Gosterim
+echo -e "\n=== Reset --soft HEAD~1 ==="
+git reset --soft HEAD~1
+git status -sb
+echo "tracked.txt icerigi: $(cat tracked.txt)"
+
+echo -e "\n=== Reset --mixed (geri al) ==="
+git commit -m "v3 restored" && git reset --mixed HEAD~1
+git status -sb
+
+echo -e "\n=== Clean (dry run) ==="
+git clean -n  # Nelerin silinecegini goster (silmeden)
+```
+
+**Beklenen çıktı:**
+```
+=== Baslangic Durumu ===
+## main
+M  tracked.txt
+?? dist.js
+?? untracked.txt
+
+=== Reset --soft HEAD~1 ===
+## main
+M  tracked.txt
+tracked.txt icerigi: v4
+
+=== Clean (dry run) ===
+Would remove dist.js
+Would remove untracked.txt
+```
+
+**İpucu:** `git clean -n` dry run yapar (silmez, ne silineceğini gösterir). `--soft` commit'i geri alır ama değişiklikler staged kalır.
+
+**Zorluk:** Orta
+:::
+
 :::must-note
 - Version control = kodun zaman içindeki tüm değişikliklerini takip eden sistem
 - Git snapshot tabanlıdir (delta değil), değişmeyen dosyalar için referans tutar

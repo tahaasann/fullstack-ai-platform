@@ -109,6 +109,36 @@
       "explanation": "401 Unauthorized: Kimlik doğrulama (authentication) yapılmamış, giriş yapılması gerekiyor. 403 Forbidden: Kimlik doğrulanmış AMA yetki (authorization) yok. Örneğin: giriş yapmış normal kullanıcı admin sayfasına erişmeye çalışıyor = 403. Giriş yapmamış kullanıcı korumalı endpoint'e erişmeye çalışıyor = 401.",
       "difficulty": "kolay",
       "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "API versiyonlama yöntemlerinden hangisi en yaygın ve önerilen yaklaşımdır?",
+      "options": [
+        "Query parameter: /api/users?version=2",
+        "URL path: /api/v2/users",
+        "Custom header: X-API-Version: 2",
+        "Accept header: Accept: application/vnd.myapi.v2+json"
+      ],
+      "correct": 1,
+      "explanation": "URL path versiyonlama (/api/v1/, /api/v2/) en yaygın ve anlaşılır yöntemdir. GitHub, Twitter, Stripe gibi büyük API'ler bu yöntemi kullanır. Avantajları: kolay anlaşılır, cache-friendly, debug ve test etmesi kolay. Header-based yöntemler daha 'RESTful' kabul edilir ama pratikliği düşüktür.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": "GraphQL'de N+1 query problemi ne anlama gelir ve nasıl çözülür?",
+      "options": [
+        "N+1 tane API endpoint oluşturmak gerekir; çözümü endpoint birleştirmedir",
+        "Bir liste sorgusu 1 query, her öğenin ilişkisel verisi için N ayrı query çalışır; çözümü DataLoader ile batching yapmaktır",
+        "N+1 tane subscription açılır; çözümü WebSocket kullanmaktır",
+        "N+1 mutation aynı anda çalışır; çözümü transaction kullanmaktır"
+      ],
+      "correct": 1,
+      "explanation": "N+1 problemi: 10 kullanıcı listelerken 1 query (kullanıcıları getir) + 10 query (her kullanıcının siparişlerini getir) = 11 query çalışır. DataLoader, bu istekleri batch'leyerek tek bir query'ye dönüştürür. Örneğin: SELECT * FROM orders WHERE user_id IN (1,2,3,...,10). Bu, GraphQL'in en kritik performans optimizasyonudur.",
+      "difficulty": "zor",
+      "points": 10
     }
   ]
 }

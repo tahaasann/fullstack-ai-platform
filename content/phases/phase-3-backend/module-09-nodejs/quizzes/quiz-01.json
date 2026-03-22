@@ -103,6 +103,36 @@
       "explanation": "Doğru! Winston'da log seviyeleri hiyerarşik çalışır: error (0) > warn (1) > info (2) > http (3) > verbose (4) > debug (5) > silly (6). Seviye 'warn' ayarlandığında, sadece warn (1) ve error (0) yani kendisi ve üstündeki seviyeler loglanır. Bu, production'da gereksiz log üretimini önler.",
       "difficulty": "orta",
       "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "Aşağıdaki kodda ne problemi vardır?\n\napp.get('/users/:id', async (req, res) => {\n  const user = await User.findById(req.params.id);\n  res.json(user);\n});",
+      "options": [
+        "async/await kullanılmamalı",
+        "req.params.id string olarak gelir, validate edilmeli",
+        "try-catch yoktur; veritabanı hatası olursa Express hata fırlatır ve sunucu çökebilir",
+        "res.json yerine res.send kullanılmalı"
+      ],
+      "correct": 2,
+      "explanation": "async route handler'larda try-catch kullanılmazsa, veritabanı bağlantı hatası veya geçersiz ID gibi durumlar UnhandledPromiseRejection oluşturur. Express 4'te bu hatalar yakalanmaz ve sunucu çökebilir. Çözüm: try-catch ile sarmalamak veya express-async-errors gibi bir paket kullanmak. Express 5'te async hatalar otomatik yakalanır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": "process.env.NODE_ENV değişkeni production ortamında hangi amaçla kullanılır?",
+      "options": [
+        "Sadece log dosyasının adını belirler",
+        "Node.js'in hangi portta çalışacağını belirler",
+        "Uygulamanın davranışını ortama göre ayarlar: hata detayları gizlenir, cache aktifleşir, debug logları kapatılır",
+        "Veritabanı şifresini saklar"
+      ],
+      "correct": 2,
+      "explanation": "NODE_ENV=production ayarlandığında: Express hata detaylarını gizler, template engine'ler cache kullanır, debug logları devre dışı kalır, bazı paketler (React dahil) production optimizasyonları uygular. Development'ta detaylı hata mesajları ve hot-reload aktiftir. Bu değişken, aynı kodun farklı ortamlarda farklı davranmasını sağlar.",
+      "difficulty": "kolay",
+      "points": 10
     }
   ]
 }

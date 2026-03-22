@@ -5098,5 +5098,21 @@
     ],
     "live_demo_url_template": "https://rag-qa-system.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/rag-document-qa"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "LLM API kullanimi ve prompt engineering",
+      "Python ile backend gelistirme (FastAPI)",
+      "Embedding ve vektor benzerlik kavramlari",
+      "Temel NLP bilgisi"
+    ],
+    "what_you_should_know": [
+      "Phase 5 Module 17 - RAG, AI Agents ve LangChain",
+      "Phase 5 Module 16 - Transformers ve Hugging Face",
+      "Phase 5 Module 15 - ML matematik temelleri (vektor islemleri)",
+      "Phase 3 Module 11 - Veritabani yonetimi"
+    ],
+    "next_project": "project-08",
+    "skills_bridge": "Bu projede ogrendigin RAG pipeline, vektor veritabani ve dokuman isleme bilgisi, sonraki projede multi-agent sistem ve karmasik AI workflow tasarimi icin retrieval ve context yonetimi becerilerini saglayacak."
   }
 }

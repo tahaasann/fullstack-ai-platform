@@ -4262,5 +4262,21 @@
     ],
     "live_demo_url_template": "https://realtime-chat.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/realtime-chat-ai"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "Full-stack web uygulama gelistirme deneyimi",
+      "REST API tasarimi ve implementasyonu",
+      "React state management",
+      "Temel veritabani islemleri"
+    ],
+    "what_you_should_know": [
+      "Phase 3 Module 9 - Node.js ve Express ileri konular",
+      "Phase 3 Module 10 - REST API tasarimi",
+      "Phase 3 Module 11 - MongoDB (NoSQL) temelleri",
+      "Phase 3 Module 12 - Authentication ve JWT"
+    ],
+    "next_project": "project-04",
+    "skills_bridge": "Bu projede ogrendigin WebSocket, real-time iletisim ve AI API entegrasyonu bilgisi, sonraki projede e-ticaret backend API ve fraud detection sistemi icin event-driven mimari ve AI entegrasyonu temelini atacak."
   }
 }

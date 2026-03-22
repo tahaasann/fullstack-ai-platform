@@ -748,6 +748,669 @@ pair_programming_tip: "Git branch sorunlariyla karsilastiginda AI'a `git log --o
 - **Senior cevabi:** `<<<<<<<`, `=======`, `>>>>>>>` isaretleri conflict bolgesini gösterir. VS Code gibi editor'lerin merge tool'lari ile görsel olarak cozulebilir. Conflict'leri minimize etmek için: küçük, focused PR'lar acilmali, feature branch'ler kısa omurlu olmali (1-2 gun), main'den sik pull/rebase yapilmali, büyük refactoring'ler ayrı PR'da yapilmali. `git rerere` (reuse recorded resolution) tekrarlayan conflict'leri otomatik çözer.
 :::
 
+:::exercise
+### Alıştırma 4: Rebase vs Merge Karşılaştırması
+
+**Görev:** Aynı senaryoyu hem merge hem rebase ile uygulayarak farkları gözlemle.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+# === MERGE SENARYOSU ===
+mkdir merge-demo && cd merge-demo && git init
+echo "v1" > file.txt && git add . && git commit -m "initial"
+
+# Feature branch
+git checkout -b feature/login
+echo "login" > login.js && git add . && git commit -m "feat: add login"
+echo "auth" > auth.js && git add . && git commit -m "feat: add auth"
+
+# Main'de paralel degisiklik
+git checkout main
+echo "v2" > file.txt && git add . && git commit -m "fix: update version"
+
+# Merge
+git merge feature/login -m "merge: add login feature"
+
+echo "=== MERGE Sonucu ==="
+git log --oneline --graph --all
+
+cd ..
+
+# === REBASE SENARYOSU ===
+mkdir rebase-demo && cd rebase-demo && git init
+echo "v1" > file.txt && git add . && git commit -m "initial"
+
+git checkout -b feature/login
+echo "login" > login.js && git add . && git commit -m "feat: add login"
+echo "auth" > auth.js && git add . && git commit -m "feat: add auth"
+
+git checkout main
+echo "v2" > file.txt && git add . && git commit -m "fix: update version"
+
+# TODO: Rebase - feature branch'i main'in ucune tasi
+git checkout feature/login
+git rebase main
+
+git checkout main
+git merge feature/login  # Simdi fast-forward olur
+
+echo -e "\n=== REBASE Sonucu ==="
+git log --oneline --graph --all
+```
+
+**Beklenen çıktı:**
+```
+=== MERGE Sonucu ===
+*   abc1234 merge: add login feature
+|\
+| * def5678 feat: add auth
+| * ghi9012 feat: add login
+* | jkl3456 fix: update version
+|/
+* mno7890 initial
+
+=== REBASE Sonucu ===
+* abc1234 feat: add auth
+* def5678 feat: add login
+* ghi9012 fix: update version
+* jkl3456 initial
+```
+
+**İpucu:** Merge dallanmayı korur (geçmişi gösterir). Rebase düz bir çizgi oluşturur (temiz geçmiş). Public branch'lerde rebase tehlikelidir!
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Cherry-Pick ile Seçici Commit Taşıma
+
+**Görev:** Farklı branch'lerden belirli commit'leri cherry-pick ile seçerek taşı.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir cherry-lab && cd cherry-lab && git init
+
+echo "base" > app.js && git add . && git commit -m "initial"
+
+# Feature branch'te birden fazla commit
+git checkout -b feature/dashboard
+echo "chart" > chart.js && git add . && git commit -m "feat: add chart component"
+echo "table" > table.js && git add . && git commit -m "feat: add table component"
+echo "export" > export.js && git add . && git commit -m "feat: add export feature"
+
+# GOREV: Main'e sadece "chart" ve "export" commit'lerini al (table'i alma)
+git checkout main
+
+echo "=== Feature branch commit'leri ==="
+git log --oneline feature/dashboard
+
+# TODO: Cherry-pick ile secili commit'leri tasi
+# git cherry-pick <chart-commit-hash>
+# git cherry-pick <export-commit-hash>
+
+# Veya: Commit range ile
+# git cherry-pick <hash1> <hash3>  (sadece belirtilenleri alir)
+
+echo -e "\n=== Main branch sonucu ==="
+git log --oneline
+
+# Beklenen: chart ve export var, table yok
+ls *.js
+```
+
+**Beklenen çıktı:**
+```
+=== Feature branch commit'leri ===
+abc1234 feat: add export feature
+def5678 feat: add table component
+ghi9012 feat: add chart component
+
+=== Main branch sonucu ===
+xxx1234 feat: add export feature
+yyy5678 feat: add chart component
+zzz9012 initial
+
+chart.js export.js (table.js YOK)
+```
+
+**İpucu:** `git cherry-pick hash1 hash2` ile birden fazla commit aynı anda taşınabilir. `--no-commit` flag'i ile commit etmeden staging'e alabilirsin.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: Karmaşık Merge Conflict Çözme
+
+**Görev:** Üç farklı branch'in aynı dosyayı değiştirdiği karmaşık bir conflict senaryosu oluştur ve çöz.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir conflict-lab && cd conflict-lab && git init
+
+# Baslangic kodu
+cat > config.json << 'EOF'
+{
+  "app": {
+    "name": "MyApp",
+    "version": "1.0.0",
+    "port": 3000
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "name": "myapp_db"
+  },
+  "cache": {
+    "enabled": false,
+    "ttl": 300
+  }
+}
+EOF
+git add . && git commit -m "initial: add config"
+
+# Branch 1: Database ayarlarini degistir
+git checkout -b feature/new-database
+cat > config.json << 'EOF'
+{
+  "app": {
+    "name": "MyApp",
+    "version": "1.0.0",
+    "port": 3000
+  },
+  "database": {
+    "host": "db.production.com",
+    "port": 5433,
+    "name": "myapp_production",
+    "ssl": true
+  },
+  "cache": {
+    "enabled": false,
+    "ttl": 300
+  }
+}
+EOF
+git add . && git commit -m "feat: update database config for production"
+
+# Branch 2: Cache ayarlarini degistir
+git checkout main
+git checkout -b feature/enable-cache
+cat > config.json << 'EOF'
+{
+  "app": {
+    "name": "MyApp",
+    "version": "1.1.0",
+    "port": 3000
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "name": "myapp_db"
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": 600,
+    "driver": "redis"
+  }
+}
+EOF
+git add . && git commit -m "feat: enable redis cache"
+
+# Merge islemi
+git checkout main
+echo "=== Branch 1'i merge et ==="
+git merge feature/new-database -m "merge: database config"
+
+echo -e "\n=== Branch 2'yi merge et (CONFLICT bekleniyor) ==="
+git merge feature/enable-cache || echo "CONFLICT! Cozum gerekli."
+
+echo -e "\n=== Conflict dosyasi ==="
+cat config.json
+
+# GOREV: Conflict'i coz
+# Her iki branch'in degisikliklerini birlestir:
+# - database: production ayarlari (branch 1)
+# - cache: redis ayarlari (branch 2)
+# - version: 1.1.0 (branch 2)
+
+echo -e "\nGOREV: config.json'i duzenle, conflict isaretlerini kaldir"
+echo "Sonra: git add config.json && git commit -m 'resolve: merge config changes'"
+```
+
+**Beklenen çıktı:**
+```
+=== Branch 1'i merge et ===
+Merge made by the 'ort' strategy.
+
+=== Branch 2'yi merge et (CONFLICT bekleniyor) ===
+CONFLICT (content): Merge conflict in config.json
+CONFLICT! Cozum gerekli.
+```
+
+**İpucu:** Conflict çözerken `<<<<<<<`, `=======`, `>>>>>>>` işaretlerini kaldır ve her iki branch'in istenen değişikliklerini birleştir.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Git Flow Simülasyonu
+
+**Görev:** Git Flow iş akışını simüle eden bir senaryo oluştur: develop, feature, release ve hotfix branch'leri ile çalış.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir gitflow-lab && cd gitflow-lab && git init
+
+# main ve develop branch'leri
+echo "v1.0" > VERSION && echo "# MyApp" > README.md
+git add . && git commit -m "initial release: v1.0"
+git checkout -b develop
+
+# Feature 1
+git checkout -b feature/user-auth develop
+echo "auth code" > auth.js && git add . && git commit -m "feat: add user authentication"
+echo "login code" > login.js && git add . && git commit -m "feat: add login page"
+git checkout develop && git merge --no-ff feature/user-auth -m "merge: user auth feature"
+
+# TODO: Feature 2 - ayni anda baska bir feature
+# git checkout -b feature/payment develop
+# ...
+
+# Release branch
+git checkout -b release/1.1 develop
+echo "v1.1" > VERSION && git add . && git commit -m "bump: version to 1.1"
+# Bug fix in release
+echo "fix" >> auth.js && git add . && git commit -m "fix: auth edge case"
+
+# Release'i main ve develop'a merge et
+git checkout main && git merge --no-ff release/1.1 -m "release: v1.1"
+git tag -a v1.1 -m "Version 1.1"
+git checkout develop && git merge --no-ff release/1.1 -m "merge: release 1.1 to develop"
+
+# Hotfix (production'da acil bug)
+git checkout -b hotfix/security main
+echo "security patch" >> auth.js && git add . && git commit -m "fix: critical security patch"
+git checkout main && git merge --no-ff hotfix/security -m "hotfix: security"
+git tag -a v1.1.1 -m "Hotfix 1.1.1"
+git checkout develop && git merge --no-ff hotfix/security -m "merge: hotfix to develop"
+
+echo "=== Branch Yapisi ==="
+git log --oneline --graph --all | head -20
+
+echo -e "\n=== Tags ==="
+git tag -l
+```
+
+**Beklenen çıktı:**
+```
+=== Branch Yapisi ===
+*   merge: hotfix to develop
+|\
+| *   hotfix: security
+| |\
+| | * fix: critical security patch
+...
+
+=== Tags ===
+v1.1
+v1.1.1
+```
+
+**İpucu:** Git Flow'da: `main` = production, `develop` = entegrasyon, `feature/*` = yeni özellik, `release/*` = sürüm hazırlığı, `hotfix/*` = acil düzeltme.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Git Worktree ile Paralel Çalışma
+
+**Görev:** `git worktree` kullanarak aynı repo'nun birden fazla branch'inde eş zamanlı çalış.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir worktree-lab && cd worktree-lab && git init
+
+echo "main code" > app.js && git add . && git commit -m "initial"
+
+# Feature branch
+git checkout -b feature/new-ui
+echo "new ui" > ui.js && git add . && git commit -m "feat: new ui"
+git checkout main
+
+# GOREV: Worktree ile paralel calisma
+
+# 1. Hotfix icin ayri worktree olustur
+echo "=== Worktree olustur ==="
+git worktree add ../hotfix-work hotfix/urgent -b
+
+# 2. Hotfix worktree'de calis
+echo "hotfix code" > ../hotfix-work/fix.js
+cd ../hotfix-work
+git add . && git commit -m "fix: urgent bug"
+cd ../worktree-lab
+
+# 3. Ayni anda feature worktree
+git worktree add ../feature-work feature/new-ui
+
+echo -e "\n=== Worktree listesi ==="
+git worktree list
+
+echo -e "\n=== Ayni anda 3 branch aktif ==="
+echo "Main: $(git branch --show-current)"
+echo "Hotfix: $(cd ../hotfix-work && git branch --show-current)"
+echo "Feature: $(cd ../feature-work && git branch --show-current)"
+
+# Temizlik
+# git worktree remove ../hotfix-work
+# git worktree remove ../feature-work
+```
+
+**Beklenen çıktı:**
+```
+=== Worktree olustur ===
+Preparing worktree (new branch 'hotfix/urgent')
+
+=== Worktree listesi ===
+/path/to/worktree-lab       abc1234 [main]
+/path/to/hotfix-work        def5678 [hotfix/urgent]
+/path/to/feature-work       ghi9012 [feature/new-ui]
+
+=== Ayni anda 3 branch aktif ===
+Main: main
+Hotfix: hotfix/urgent
+Feature: feature/new-ui
+```
+
+**İpucu:** `git worktree add <path> <branch>` ile ayrı dizinde branch checkout yapar. Stash'e gerek kalmadan branch'ler arası geçiş yapabilirsin.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: Interactive Rebase ile Commit Düzenleme
+
+**Görev:** Interactive rebase kullanarak commit geçmişini düzenle: birleştir, yeniden sırala, mesaj değiştir.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir rebase-lab && cd rebase-lab && git init
+
+# Dagimik commit gecmisi olustur
+echo "feat 1" > f1.js && git add . && git commit -m "add feature 1"
+echo "fix typo" >> f1.js && git add . && git commit -m "fix typo in feature 1"
+echo "feat 2" > f2.js && git add . && git commit -m "WIP: starting feature 2"
+echo "feat 2 done" >> f2.js && git add . && git commit -m "complete feature 2"
+echo "readme" > README.md && git add . && git commit -m "add readme"
+echo "more typo" >> f1.js && git add . && git commit -m "oops another typo"
+
+echo "=== Onceki gecmis ==="
+git log --oneline
+
+# GOREV: Interactive rebase ile temizle
+# git rebase -i HEAD~6
+# Hedef commit gecmisi:
+# 1. feat: add feature 1 (feat1 + iki typo fix birlestirildi)
+# 2. feat: add feature 2 (WIP + complete birlestirildi)
+# 3. docs: add readme
+
+echo -e "\nGOREV: Asagidaki komutu calistir ve editor'de degisiklikleri yap:"
+echo "git rebase -i HEAD~6"
+echo ""
+echo "Editor'de:"
+echo "  pick abc1234 add feature 1"
+echo "  fixup def5678 fix typo in feature 1"
+echo "  fixup mno3456 oops another typo"
+echo "  pick ghi9012 WIP: starting feature 2"
+echo "  fixup jkl0123 complete feature 2"
+echo "  reword pqr7890 add readme"
+echo ""
+echo "Komutlar: pick=kullan, fixup=birlesir(mesaj atilir), reword=mesaj degistir"
+echo "squash=birlesir(mesaj birlesiir), drop=sil, edit=duraklat"
+```
+
+**Beklenen çıktı:**
+```
+=== Onceki gecmis ===
+pqr7890 oops another typo
+mno3456 add readme
+jkl0123 complete feature 2
+ghi9012 WIP: starting feature 2
+def5678 fix typo in feature 1
+abc1234 add feature 1
+
+Temizlenmis gecmis (hedef):
+abc9999 docs: add readme
+def8888 feat: add feature 2
+ghi7777 feat: add feature 1
+```
+
+**İpucu:** `fixup` üstteki commit'e birleştirir ve mesajını atar. `squash` birleştirir ama mesajları da birleştirir. Sıra değiştirmek için satırları taşı.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 10: Git Blame ve Tarihçe Analizi
+
+**Görev:** `git blame` ve `git log` komutlarıyla bir dosyanın değişiklik geçmişini analiz et.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir blame-lab && cd blame-lab && git init
+git config user.name "Developer A"
+
+# Farkli yazarlarla commit'ler olustur
+cat > app.js << 'EOF'
+function fetchData(url) {
+  return fetch(url).then(r => r.json());
+}
+EOF
+git add . && git commit -m "initial: add fetchData" --author="Ali <ali@dev.com>"
+
+# Ikinci yazar
+cat > app.js << 'EOF'
+async function fetchData(url) {
+  const response = await fetch(url);
+  return response.json();
+}
+
+function processData(data) {
+  return data.filter(item => item.active);
+}
+EOF
+git add . && git commit -m "refactor: use async/await + add processData" --author="Ayse <ayse@dev.com>"
+
+# Ucuncu yazar
+cat > app.js << 'EOF'
+async function fetchData(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('HTTP Error');
+    return response.json();
+  } catch (error) {
+    console.error('Fetch failed:', error);
+    return null;
+  }
+}
+
+function processData(data) {
+  return data.filter(item => item.active);
+}
+EOF
+git add . && git commit -m "feat: add error handling to fetchData" --author="Mehmet <mehmet@dev.com>"
+
+echo "=== Git Blame ==="
+git blame app.js
+
+echo -e "\n=== Dosya gecmisi ==="
+git log --oneline -- app.js
+
+echo -e "\n=== Her commit'in degisikligi ==="
+git log -p --follow -- app.js | head -40
+
+echo -e "\n=== Kim ne kadar degistirdi ==="
+git blame app.js | awk '{print $2}' | sort | uniq -c | sort -rn
+```
+
+**Beklenen çıktı:**
+```
+=== Git Blame ===
+abc1234 (Mehmet 2026-03-22) async function fetchData(url) {
+abc1234 (Mehmet 2026-03-22)   try {
+abc1234 (Mehmet 2026-03-22)     const response = await fetch(url);
+...
+def5678 (Ayse  2026-03-22) function processData(data) {
+def5678 (Ayse  2026-03-22)   return data.filter(item => item.active);
+
+=== Kim ne kadar degistirdi ===
+  9 Mehmet
+  2 Ayse
+```
+
+**İpucu:** `git blame -L 1,5 dosya` ile belirli satır aralığını incele. `git log -S "keyword"` ile belirli bir string'in eklendiği/kaldırıldığı commit'leri bul.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 11: Merge Strategy Karşılaştırması
+
+**Görev:** Farklı merge stratejilerini (recursive, ours, theirs, octopus) gösteren bir senaryo oluştur.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir strategy-lab && cd strategy-lab && git init
+
+echo "base" > config.txt && git add . && git commit -m "initial"
+
+# Branch 1
+git checkout -b feature-a
+echo "feature-a config" > config.txt && git add . && git commit -m "feat: config A"
+
+# Branch 2
+git checkout main
+git checkout -b feature-b
+echo "feature-b config" > config.txt && git add . && git commit -m "feat: config B"
+
+# Merge stratejileri
+git checkout main
+
+echo "=== 1. Recursive (varsayilan) ==="
+echo "git merge feature-a  (conflict olursa manuel coz)"
+
+echo -e "\n=== 2. Ours (bizim versiyonu al) ==="
+echo "git merge -s ours feature-b  (bizim branch'i koru, feature-b'yi at)"
+
+echo -e "\n=== 3. Theirs (onlarin versiyonunu al - checkout ile) ==="
+echo "git merge feature-b -X theirs  (conflict'lerde onlarin versiyonunu sec)"
+
+# Gosterim: Ours stratejisi
+git merge -s ours feature-b -m "merge: keep our config (ours strategy)"
+echo "config.txt (ours): $(cat config.txt)"
+
+echo -e "\n=== Sonuc ==="
+git log --oneline --graph --all | head -10
+```
+
+**Beklenen çıktı:**
+```
+=== 1. Recursive (varsayilan) ===
+git merge feature-a  (conflict olursa manuel coz)
+
+=== 2. Ours (bizim versiyonu al) ===
+git merge -s ours feature-b  (bizim branch'i koru, feature-b'yi at)
+
+config.txt (ours): base
+```
+
+**İpucu:** `-s ours` merge yapar ama bizim versiyonu korur. `-X theirs` conflict'lerde karşı tarafın versiyonunu otomatik seçer. Octopus 3+ branch'i aynı anda merge eder.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 12: Branch Temizleme Otomasyonu
+
+**Görev:** Merged ve stale branch'leri tespit edip temizleyen bir bash script yaz.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir cleanup-lab && cd cleanup-lab && git init
+
+echo "base" > app.js && git add . && git commit -m "initial"
+
+# Merged branch'ler olustur
+for branch in feature/old-1 feature/old-2 fix/bug-1; do
+    git checkout -b $branch
+    echo "$branch" > temp.txt && git add . && git commit -m "work on $branch"
+    git checkout main
+    git merge --no-ff $branch -m "merge: $branch"
+done
+
+# Unmerged branch
+git checkout -b feature/wip
+echo "wip" > wip.txt && git add . && git commit -m "WIP: in progress"
+git checkout main
+
+echo "=== Tum Branch'ler ==="
+git branch -a
+
+echo -e "\n=== Merged Branch'ler (main'e merge edilmis) ==="
+git branch --merged main | grep -v "main"
+
+echo -e "\n=== Unmerged Branch'ler (hala aktif) ==="
+git branch --no-merged main
+
+echo -e "\n=== Temizleme Script'i ==="
+echo "# Merged branch'leri sil (main ve develop haric):"
+echo 'git branch --merged main | grep -vE "main|develop" | xargs git branch -d'
+
+# Otomatik temizleme (guvenli - sadece merged)
+echo -e "\n=== Otomatik Temizleme ==="
+merged=$(git branch --merged main | grep -v "main" | tr -d ' ')
+for branch in $merged; do
+    echo "  Siliniyor: $branch"
+    git branch -d "$branch"
+done
+
+echo -e "\n=== Temizlik Sonrasi ==="
+git branch
+```
+
+**Beklenen çıktı:**
+```
+=== Merged Branch'ler (main'e merge edilmis) ===
+  feature/old-1
+  feature/old-2
+  fix/bug-1
+
+=== Unmerged Branch'ler (hala aktif) ===
+  feature/wip
+
+=== Otomatik Temizleme ===
+  Siliniyor: feature/old-1
+  Siliniyor: feature/old-2
+  Siliniyor: fix/bug-1
+
+=== Temizlik Sonrasi ===
+* main
+  feature/wip
+```
+
+**İpucu:** `git branch --merged` main'e merge edilmiş branch'leri listeler. `git branch -d` sadece merged branch'leri siler (güvenli). `-D` force delete yapar.
+
+**Zorluk:** Kolay
+:::
+
 :::must-note
 - Branch oluşturma: `git switch -c branch-adi` (modern), `git checkout -b branch-adi` (eski)
 - Fast-forward merge: Hedef branch'te değişiklik yoksa pointer ileri tasir, merge commit oluşturmaz

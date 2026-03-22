@@ -1135,6 +1135,238 @@ cumle_ciftleri = [
 ```
 
 **Beklenen sonuç:** Zero-shot classification doğru kategoriler vermeli. NER en az 3 entity bulmalı. Semantic similarity benzer cümleler için >0.7, farklı cümleler için <0.3 olmalı.
+
+---
+
+### Alıştırma 4: Tokenizer Derinlemesine Analiz (Kolay)
+
+Farkli tokenizer'larin ayni metni nasil parcaladigini incele.
+
+```python
+from transformers import AutoTokenizer
+
+models = ["bert-base-uncased", "gpt2", "xlm-roberta-base"]
+text = "Transformer modelleri NLP'yi devrimleştirdi. Self-attention mekanizması çok güçlü!"
+
+for model_name in models:
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokens = tokenizer.tokenize(text)
+    ids = tokenizer.encode(text)
+    decoded = tokenizer.decode(ids)
+
+    print(f"\n=== {model_name} ===")
+    print(f"Token sayisi: {len(tokens)}")
+    print(f"Tokens: {tokens[:20]}")
+    print(f"Vocab size: {tokenizer.vocab_size}")
+
+    # TODO: Turkce metin ile token sayisini karsilastir
+    # TODO: Subword tokenization'in nadir kelimeleri nasil paredaladigini gozlemle
+    # TODO: Special token'lari incele ([CLS], [SEP], <s>, </s>)
+    # TODO: max_length ve padding/truncation etkisini test et
+```
+
+**Beklenen Sonuc:** BERT WordPiece, GPT-2 BPE, XLM-RoBERTa SentencePiece kullanir. Turkce metin daha fazla token uretir. Nadir kelimeler subword'lere parcalanir.
+**Ipucu:** Token sayisi = islem maliyeti. Turkce gibi aglutine dillerde token sayisi Ingilizce'nin 1.5-2x'i olabilir.
+
+---
+
+### Alıştırma 5: Text Embedding ve Semantic Search (Orta)
+
+Sentence-BERT ile metin embedding'leri olustur ve anlamsal arama yap.
+
+```python
+from sentence_transformers import SentenceTransformer
+import numpy as np
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# Dokuman koleksiyonu
+documents = [
+    "Python programlama dili web gelistirme icin kullanilir",
+    "Machine learning algoritmalari veriyi analiz eder",
+    "React ile modern kullanici arayuzleri olusturulur",
+    "Docker container'lari uygulama dagitimini kolaylastirir",
+    "PostgreSQL iliskisel veritabani yonetimidir",
+    "Neural network'ler derin ogrenmenin temelidir",
+    "Git versiyon kontrol sistemi kod yonetimi saglar",
+    "Kubernetes container orchestration platformudur",
+]
+
+# Embedding'leri olustur
+doc_embeddings = model.encode(documents)
+
+def semantic_search(query, top_k=3):
+    query_embedding = model.encode([query])
+    similarities = np.dot(doc_embeddings, query_embedding.T).flatten()
+    top_indices = np.argsort(similarities)[::-1][:top_k]
+    for idx in top_indices:
+        print(f"Score: {similarities[idx]:.4f} | {documents[idx]}")
+
+semantic_search("yapay zeka ve derin ogrenme")
+semantic_search("web uygulamasi gelistirme")
+
+# TODO: 50+ dokuman ile daha buyuk bir koleksiyon olustur
+# TODO: FAISS ile hizli nearest neighbor aramasi yap
+# TODO: Turkce model dene (sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
+# TODO: Cosine similarity vs dot product karsilastir
+```
+
+**Beklenen Sonuc:** Anlamca benzer dokumanlar en yuksek skor almali. "yapay zeka" sorgusu neural network ve ML dokumanlarini bulmali. FAISS ile buyuk veri setlerinde milisaniyede arama yapilabilmeli.
+**Ipucu:** Sentence-BERT cumlyeleri sabit boyutlu vektorlere cevirir. FAISS milyonlarca vektorde milisaniyede arama yapar.
+
+---
+
+### Alıştırma 6: Positional Encoding Implementasyonu (Orta)
+
+Transformer'in pozisyon bilgisini nasil kodladigini sifirdan implement et.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+def positional_encoding(max_len, d_model):
+    pe = np.zeros((max_len, d_model))
+    position = np.arange(max_len)[:, np.newaxis]
+    div_term = np.exp(np.arange(0, d_model, 2) * -(np.log(10000.0) / d_model))
+
+    pe[:, 0::2] = np.sin(position * div_term)  # cift indeksler: sin
+    pe[:, 1::2] = np.cos(position * div_term)  # tek indeksler: cos
+    return pe
+
+pe = positional_encoding(100, 64)
+
+# Gorsellestir
+plt.figure(figsize=(12, 6))
+plt.imshow(pe, aspect="auto", cmap="RdBu")
+plt.colorbar()
+plt.xlabel("Embedding Dimension")
+plt.ylabel("Position")
+plt.title("Positional Encoding")
+plt.show()
+
+# TODO: Farkli pozisyonlardaki encoding vektorlerinin cosine similarity'sini hesapla
+# TODO: Yakin pozisyonlarin benzer encoding'e sahip oldugunu dogrula
+# TODO: RoPE (Rotary Position Embedding) implementasyonu yap
+# TODO: Learned vs sinusoidal positional encoding karsilastir
+```
+
+**Beklenen Sonuc:** Yakin pozisyonlarin encoding'leri birbirine benzer olmali. Uzak pozisyonlarin encoding'leri farkli olmali. Heatmap'te periyodik patern gorunmeli.
+**Ipucu:** Sin/cos farkli frekanslarda, farkli pozisyon ciftlerini ayirt etmeyi saglar. PE(pos+k) lineer olarak PE(pos)'tan elde edilebilir.
+
+---
+
+### Alıştırma 7: Model Distillation — Buyuk Modeli Kucult (Zor)
+
+Knowledge distillation ile buyuk bir modelin bilgisini kucuk modele aktar.
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class TeacherModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(784, 512), nn.ReLU(), nn.Dropout(0.3),
+            nn.Linear(512, 256), nn.ReLU(), nn.Dropout(0.3),
+            nn.Linear(256, 10)
+        )
+    def forward(self, x): return self.net(x)
+
+class StudentModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(784, 64), nn.ReLU(),
+            nn.Linear(64, 10)
+        )
+    def forward(self, x): return self.net(x)
+
+def distillation_loss(student_logits, teacher_logits, labels, temperature=4.0, alpha=0.7):
+    # Soft target loss (teacher'dan ogrenme)
+    soft_loss = F.kl_div(
+        F.log_softmax(student_logits / temperature, dim=1),
+        F.softmax(teacher_logits / temperature, dim=1),
+        reduction="batchmean"
+    ) * (temperature ** 2)
+
+    # Hard target loss (gercek etiketlerden ogrenme)
+    hard_loss = F.cross_entropy(student_logits, labels)
+
+    return alpha * soft_loss + (1 - alpha) * hard_loss
+
+# TODO: Teacher modeli normal sekilde egit
+# TODO: Student modeli distillation_loss ile egit
+# TODO: Student'i distillation olmadan egit ve karsilastir
+# TODO: Temperature ve alpha parametrelerinin etkisini analiz et
+# TODO: Model boyutlarini ve inference hizlarini karsilastir
+```
+
+**Beklenen Sonuc:** Distilled student, normal student'tan daha yuksek accuracy vermeli. Student model teacher'in %90+ performansini yakalamali. Student model 4-8x daha kucuk olmali.
+**Ipucu:** Temperature arttikca soft target'lar daha informatif olur (siniflar arasi iliski bilgisi). Alpha dengesini ayarla: cok yuksekse student teacher'a aşiri bagimli olur.
+
+---
+
+### Alıştırma 8: Transformer Blogu Sifirdan (Zor)
+
+Minimal bir Transformer decoder blogu sifirdan implement et.
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import math
+
+class MultiHeadAttention(nn.Module):
+    def __init__(self, d_model, num_heads):
+        super().__init__()
+        assert d_model % num_heads == 0
+        self.d_k = d_model // num_heads
+        self.num_heads = num_heads
+        self.W_q = nn.Linear(d_model, d_model)
+        self.W_k = nn.Linear(d_model, d_model)
+        self.W_v = nn.Linear(d_model, d_model)
+        self.W_o = nn.Linear(d_model, d_model)
+
+    def forward(self, x, mask=None):
+        B, T, C = x.shape
+        Q = self.W_q(x).view(B, T, self.num_heads, self.d_k).transpose(1, 2)
+        K = self.W_k(x).view(B, T, self.num_heads, self.d_k).transpose(1, 2)
+        V = self.W_v(x).view(B, T, self.num_heads, self.d_k).transpose(1, 2)
+
+        # Scaled dot-product attention
+        scores = (Q @ K.transpose(-2, -1)) / math.sqrt(self.d_k)
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, float("-inf"))
+        attn = F.softmax(scores, dim=-1)
+        out = (attn @ V).transpose(1, 2).contiguous().view(B, T, C)
+        return self.W_o(out)
+
+class TransformerBlock(nn.Module):
+    def __init__(self, d_model, num_heads, d_ff, dropout=0.1):
+        super().__init__()
+        self.attn = MultiHeadAttention(d_model, num_heads)
+        self.norm1 = nn.LayerNorm(d_model)
+        self.norm2 = nn.LayerNorm(d_model)
+        self.ff = nn.Sequential(
+            nn.Linear(d_model, d_ff), nn.GELU(), nn.Linear(d_ff, d_model)
+        )
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x, mask=None):
+        x = x + self.dropout(self.attn(self.norm1(x), mask))
+        x = x + self.dropout(self.ff(self.norm2(x)))
+        return x
+
+# TODO: 4 katmanli mini GPT modeli olustur
+# TODO: Causal mask (otoregresif) implement et
+# TODO: Shakespeare metni uzerinde karakter bazli egit
+# TODO: Olusturulan metni temperature sampling ile uret
+```
+
+**Beklenen Sonuc:** Model Shakespeare tarzinda tutarli metin uretebilmeli. Attention pattern'leri gorsellestirildiginde diyagonal ve yakin kelimelere yoğunlasma gorunmeli. 4 katmanli model 100 epoch'ta anlamli cikti uretmeli.
+**Ipucu:** Causal mask ile her token sadece onceki token'lari gorebilir (autoregressive). Pre-norm (LayerNorm once) modern transformer'larda tercih edilir.
 :::
 
 :::external-resource

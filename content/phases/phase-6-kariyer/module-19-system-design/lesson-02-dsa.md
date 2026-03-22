@@ -2258,6 +2258,230 @@ assert search_rotated([3, 1], 1) == 1
 ```
 
 **Beklenen sonuc:** O(log n) modified binary search. Her adimda left/right yarinin hangisinin sorted oldugunu belirle, target o range'te mi kontrol et.
+
+---
+
+### Alistirma 7: Stack — Valid Parentheses ve Monotonic Stack (Orta)
+
+Stack veri yapisiyla parantez dogrulama ve monotonic stack problemlerini coz.
+
+```python
+def is_valid_parentheses(s: str) -> bool:
+    """LeetCode #20 — Valid Parentheses"""
+    stack = []
+    mapping = {")": "(", "]": "[", "}": "{"}
+
+    for char in s:
+        if char in mapping:
+            if not stack or stack[-1] != mapping[char]:
+                return False
+            stack.pop()
+        else:
+            stack.append(char)
+
+    return len(stack) == 0
+
+def daily_temperatures(temperatures: list[int]) -> list[int]:
+    """LeetCode #739 — Monotonic Stack ile her gun icin kac gun sonra daha sicak olacagini bul"""
+    n = len(temperatures)
+    result = [0] * n
+    stack = []  # (index) — monotonically decreasing
+
+    for i in range(n):
+        while stack and temperatures[i] > temperatures[stack[-1]]:
+            prev = stack.pop()
+            result[prev] = i - prev
+        stack.append(i)
+
+    return result
+
+# Test
+assert is_valid_parentheses("({[]})") == True
+assert is_valid_parentheses("([)]") == False
+assert daily_temperatures([73,74,75,71,69,72,76,73]) == [1,1,4,2,1,1,0,0]
+
+# TODO: Min Stack implement et — O(1) push, pop ve getMin (LeetCode #155)
+# TODO: Largest Rectangle in Histogram (LeetCode #84) — Monotonic stack
+# TODO: Time ve space complexity analiz et
+```
+
+**Beklenen Sonuc:** Valid parentheses O(n) time, O(n) space. Daily temperatures monotonic decreasing stack ile O(n) cozulmeli. Min Stack'te getMin O(1) olmali.
+**Ipucu:** Monotonic stack: her eleman en fazla 1 kez push ve 1 kez pop edilir → amortized O(n).
+
+---
+
+### Alistirma 8: Tree/BST — DFS ve BFS Traversal (Orta)
+
+Binary tree uzerinde traversal ve ortak ata bulma problemlerini coz.
+
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def level_order(root: TreeNode) -> list[list[int]]:
+    """LeetCode #102 — BFS ile seviye sirasinda traversal"""
+    if not root:
+        return []
+    result = []
+    queue = [root]
+    while queue:
+        level = []
+        next_queue = []
+        for node in queue:
+            level.append(node.val)
+            if node.left: next_queue.append(node.left)
+            if node.right: next_queue.append(node.right)
+        result.append(level)
+        queue = next_queue
+    return result
+
+def lowest_common_ancestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+    """LeetCode #236 — En yakin ortak ata"""
+    if not root or root == p or root == q:
+        return root
+    left = lowest_common_ancestor(root.left, p, q)
+    right = lowest_common_ancestor(root.right, p, q)
+    if left and right:
+        return root
+    return left or right
+
+# TODO: Inorder, preorder, postorder traversal (iterative + recursive)
+# TODO: Maximum depth of binary tree (LeetCode #104)
+# TODO: Validate BST (LeetCode #98) — inorder traversal ile
+# TODO: Serialize and deserialize binary tree (LeetCode #297)
+```
+
+**Beklenen Sonuc:** Level order BFS ile O(n) time. LCA recursive DFS ile O(n) time. BST validation inorder traversal ile O(n) cozulmeli.
+**Ipucu:** Tree problemlerinin cogu DFS (recursive) ile cozulur. BFS genellikle level-order islemlerde kullanilir.
+
+---
+
+### Alistirma 9: Heap — Top-K ve Median (Zor)
+
+Heap ile priority queue problemlerini coz.
+
+```python
+import heapq
+
+def top_k_frequent(nums: list[int], k: int) -> list[int]:
+    """LeetCode #347 — En sik tekrar eden k eleman"""
+    from collections import Counter
+    count = Counter(nums)
+    # Min-heap of size k (en kucugu tepede, daha buyuk gelince degistir)
+    return heapq.nlargest(k, count.keys(), key=count.get)
+
+class MedianFinder:
+    """LeetCode #295 — Streaming median (iki heap)"""
+    def __init__(self):
+        self.small = []  # max-heap (negatif olarak sakla)
+        self.large = []  # min-heap
+
+    def addNum(self, num: int):
+        heapq.heappush(self.small, -num)
+        # small'daki max, large'daki min'den buyukse tasi
+        if self.small and self.large and -self.small[0] > self.large[0]:
+            val = -heapq.heappop(self.small)
+            heapq.heappush(self.large, val)
+        # Boyut dengesini koru (fark max 1)
+        if len(self.small) > len(self.large) + 1:
+            val = -heapq.heappop(self.small)
+            heapq.heappush(self.large, val)
+        if len(self.large) > len(self.small) + 1:
+            val = heapq.heappop(self.large)
+            heapq.heappush(self.small, -val)
+
+    def findMedian(self) -> float:
+        if len(self.small) > len(self.large):
+            return -self.small[0]
+        if len(self.large) > len(self.small):
+            return self.large[0]
+        return (-self.small[0] + self.large[0]) / 2
+
+# TODO: Merge K Sorted Lists (LeetCode #23) — min heap ile
+# TODO: Task Scheduler (LeetCode #621) — max heap + cooldown
+# TODO: Her cozumun time/space complexity'sini analiz et
+```
+
+**Beklenen Sonuc:** Top-K O(n log k). MedianFinder addNum O(log n), findMedian O(1). Merge K Lists O(N log k) olmali.
+**Ipucu:** Python'da heapq min-heap'tir. Max-heap icin degerleri negatif olarak sakla.
+
+---
+
+### Alistirma 10: Trie — Autocomplete ve Word Search (Zor)
+
+Trie (prefix tree) veri yapisini implement et ve gercek dunya problemlerini coz.
+
+```python
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+        self.frequency = 0  # Autocomplete icin
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word: str, freq: int = 1):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end = True
+        node.frequency += freq
+
+    def search(self, word: str) -> bool:
+        node = self._find(word)
+        return node is not None and node.is_end
+
+    def starts_with(self, prefix: str) -> bool:
+        return self._find(prefix) is not None
+
+    def _find(self, prefix: str) -> TrieNode:
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return None
+            node = node.children[char]
+        return node
+
+    def autocomplete(self, prefix: str, limit: int = 5) -> list[str]:
+        node = self._find(prefix)
+        if not node:
+            return []
+        results = []
+        self._dfs(node, prefix, results)
+        results.sort(key=lambda x: x[1], reverse=True)
+        return [word for word, freq in results[:limit]]
+
+    def _dfs(self, node, path, results):
+        if node.is_end:
+            results.append((path, node.frequency))
+        for char, child in node.children.items():
+            self._dfs(child, path + char, results)
+
+# Test
+trie = Trie()
+words = [("python", 100), ("pytorch", 80), ("pandas", 90), ("pip", 70), ("pillow", 30)]
+for word, freq in words:
+    trie.insert(word, freq)
+
+print(trie.autocomplete("py"))   # ["python", "pytorch"]
+print(trie.autocomplete("pa"))   # ["pandas"]
+print(trie.search("python"))     # True
+
+# TODO: Delete operasyonu implement et
+# TODO: Word Search II (LeetCode #212) — Trie + Backtracking
+# TODO: Design Search Autocomplete System (LeetCode #642)
+# TODO: Turkce karakter destegi ekle (ğ, ü, ş, ı, ö, ç)
+```
+
+**Beklenen Sonuc:** Insert ve search O(m) time (m = kelime uzunlugu). Autocomplete frequency'ye gore sirali sonuc donmeli. Turkce karakterler dogru islenmeli.
+**Ipucu:** Trie autocomplete, spell checker ve IP routing'de kullanilir. Memory-efficient varyant: compressed trie (radix tree).
 :::
 
 :::realworld

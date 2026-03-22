@@ -103,6 +103,36 @@
       "explanation": "Helmet.js, Express uygulamalarına güvenlik HTTP header'larını ekleyen bir middleware'dir. app.use(helmet()) tek satırıyla: Strict-Transport-Security (HTTPS zorunlu), X-Content-Type-Options: nosniff (MIME sniffing engelleme), X-Frame-Options: DENY (clickjacking engelleme), Content-Security-Policy, Referrer-Policy ve daha fazla header otomatik eklenir. Her Express uygulamasının ilk middleware'i helmet olmalıdır.",
       "difficulty": "kolay",
       "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "Content Security Policy (CSP) header'ının temel amacı nedir?",
+      "options": [
+        "Kullanıcı şifrelerini şifrelemek",
+        "Sayfanın hangi kaynaklardan (script, style, image) içerik yükleyebileceğini kısıtlayarak XSS saldırılarını önlemek",
+        "API rate limiting uygulamak",
+        "SSL sertifikasını doğrulamak"
+      ],
+      "correct": 1,
+      "explanation": "CSP, tarayıcıya hangi kaynaklardan script, style, image vb. yüklenebileceğini söyler. Örneğin: Content-Security-Policy: script-src 'self' ayarı, sadece kendi domain'inden script yüklenmesine izin verir. Saldırgan XSS ile zararlı script enjekte etse bile, CSP nedeniyle tarayıcı bu scripti çalıştırmaz. Defense-in-depth stratejisinin kritik bir parçasıdır.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": "Bir uygulamada JWT token'ın localStorage yerine httpOnly cookie'de saklanmasının güvenlik avantajı nedir?",
+      "options": [
+        "Cookie'ler daha hızlı erişilir",
+        "Cookie'ler otomatik olarak şifrelenir",
+        "httpOnly cookie'ye JavaScript erişemez, bu sayede XSS saldırısıyla token çalınamaz",
+        "Cookie'ler daha fazla veri saklayabilir"
+      ],
+      "correct": 2,
+      "explanation": "localStorage'a JavaScript ile erişilebilir (document.cookie, localStorage.getItem). XSS saldırısında saldırgan bu token'ı çalabilir. httpOnly flag'li cookie'ye JavaScript erişemez, sadece tarayıcı HTTP isteklerinde otomatik gönderir. Ancak httpOnly cookie CSRF'e karşı savunmasızdır, bu yüzden SameSite=Strict veya CSRF token ile birlikte kullanılmalıdır.",
+      "difficulty": "orta",
+      "points": 10
     }
   ]
 }

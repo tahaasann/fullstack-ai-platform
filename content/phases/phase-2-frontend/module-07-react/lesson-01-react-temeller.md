@@ -859,6 +859,380 @@ function App() {
 Component yazarken AI'a React DevTools Profiler ciktisini goster ve sor: "Bu component neden 5 kez render oldu? Profiler flame graph'ini analiz et ve gereksiz render'larin kaynagini tespit edip coz."
 :::
 
+:::exercise
+### Alıştırma 4: Props ile Kart Component'i
+**Görev:** TypeScript ile tip güvenli bir `ProductCard` component'i oluştur.
+**Başlangıç kodu:**
+```tsx
+// TODO: ProductCardProps interface'ini tanımla
+interface ProductCardProps {
+  // title: string (zorunlu)
+  // price: number (zorunlu)
+  // image?: string (opsiyonel)
+  // onSale?: boolean (opsiyonel, varsayılan false)
+}
+
+// TODO: Component'i yaz
+function ProductCard(/* props */) {
+  return (
+    <div className="border rounded-lg p-4">
+      {/* TODO: image varsa göster, yoksa placeholder */}
+      {/* TODO: title'ı h3 ile göster */}
+      {/* TODO: price'ı formatlı göster (₺199.99) */}
+      {/* TODO: onSale true ise "İndirimde!" badge'i göster */}
+    </div>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+interface ProductCardProps {
+  title: string;
+  price: number;
+  image?: string;
+  onSale?: boolean;
+}
+
+function ProductCard({ title, price, image, onSale = false }: ProductCardProps) {
+  return (
+    <div className="border rounded-lg p-4">
+      {image ? <img src={image} alt={title} /> : <div className="bg-gray-200 h-48" />}
+      <h3 className="font-bold mt-2">{title}</h3>
+      <p className="text-emerald-500">₺{price.toFixed(2)}</p>
+      {onSale && <span className="bg-red-500 text-white px-2 py-1 rounded text-sm">İndirimde!</span>}
+    </div>
+  );
+}
+```
+**İpucu:** Destructuring ile props al, varsayılan değer için `= false` kullan. Koşullu render için `&&` operatörü.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: useState ile Sayaç ve Toggle
+**Görev:** Birden fazla state kullanan bir component yaz: sayaç ve tema toggle.
+**Başlangıç kodu:**
+```tsx
+import { useState } from "react";
+
+function CounterWithTheme() {
+  // TODO: count state'i (başlangıç: 0)
+  // TODO: isDark state'i (başlangıç: true)
+
+  // TODO: increment fonksiyonu (prev => prev + 1 kullan)
+  // TODO: decrement fonksiyonu (0'ın altına düşmesin)
+  // TODO: reset fonksiyonu
+  // TODO: toggleTheme fonksiyonu
+
+  return (
+    <div className={/* TODO: isDark'a göre arka plan */}>
+      <h2>Sayaç: {/* TODO */}</h2>
+      <button onClick={/* TODO */}>+</button>
+      <button onClick={/* TODO */}>-</button>
+      <button onClick={/* TODO */}>Sıfırla</button>
+      <button onClick={/* TODO */}>
+        {/* TODO: isDark ? "☀️ Light" : "🌙 Dark" */}
+      </button>
+    </div>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+const [count, setCount] = useState(0);
+const [isDark, setIsDark] = useState(true);
+
+const increment = () => setCount(prev => prev + 1);
+const decrement = () => setCount(prev => Math.max(0, prev - 1));
+const reset = () => setCount(0);
+const toggleTheme = () => setIsDark(prev => !prev);
+```
+**İpucu:** `setCount(prev => prev + 1)` updater function'ı batch güncelleme için güvenlidir. `Math.max(0, prev - 1)` negatif değeri engeller.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: useEffect ile API Çağrısı
+**Görev:** useEffect ile component mount olduğunda API'den veri çek, loading ve error state'lerini yönet.
+**Başlangıç kodu:**
+```tsx
+import { useState, useEffect } from "react";
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+function UserList() {
+  // TODO: users, loading, error state'lerini tanımla
+
+  useEffect(() => {
+    // TODO: fetchUsers async fonksiyonu yaz
+    // 1. loading = true yap
+    // 2. fetch("https://jsonplaceholder.typicode.com/users")
+    // 3. response.ok kontrolü
+    // 4. data'yı users state'ine set et
+    // 5. hata varsa error state'ine set et
+    // 6. finally'de loading = false
+
+    // TODO: cleanup fonksiyonu (AbortController)
+  }, []); // Sadece mount'ta çalış
+
+  // TODO: loading, error, empty state render'ları
+  // TODO: users listesini render et
+}
+```
+**Beklenen çıktı:**
+```tsx
+const [users, setUsers] = useState<User[]>([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState<string | null>(null);
+
+useEffect(() => {
+  const controller = new AbortController();
+
+  async function fetchUsers() {
+    try {
+      setLoading(true);
+      const res = await fetch("https://jsonplaceholder.typicode.com/users", {
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error("API hatası");
+      const data: User[] = await res.json();
+      setUsers(data);
+    } catch (err) {
+      if (err instanceof Error && err.name !== "AbortError") {
+        setError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+  fetchUsers();
+
+  return () => controller.abort();
+}, []);
+```
+**İpucu:** `AbortController` ile unmount olduğunda isteği iptal et. `AbortError`'ı yakalayıp yoksay - bu beklenen bir durum.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Liste Render ve Key Kullanımı
+**Görev:** Bir yapılacaklar listesi oluştur: ekleme, silme ve tamamlama işlevleri olsun.
+**Başlangıç kodu:**
+```tsx
+import { useState } from "react";
+
+interface Todo {
+  id: number;
+  text: string;
+  completed: boolean;
+}
+
+function TodoList() {
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [input, setInput] = useState("");
+
+  // TODO: addTodo - yeni todo ekle (id için Date.now() kullan)
+  // TODO: toggleTodo - completed değerini tersle
+  // TODO: deleteTodo - id'ye göre sil
+
+  return (
+    <div>
+      <input value={input} onChange={e => setInput(e.target.value)} />
+      <button onClick={/* TODO */}>Ekle</button>
+
+      <ul>
+        {/* TODO: todos.map ile listele
+            - key olarak todo.id kullan (index KULLANMA!)
+            - completed ise üzeri çizili göster
+            - Tamamla ve Sil butonları ekle */}
+      </ul>
+    </div>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+const addTodo = () => {
+  if (!input.trim()) return;
+  setTodos(prev => [...prev, { id: Date.now(), text: input, completed: false }]);
+  setInput("");
+};
+
+const toggleTodo = (id: number) => {
+  setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+};
+
+const deleteTodo = (id: number) => {
+  setTodos(prev => prev.filter(t => t.id !== id));
+};
+
+// JSX:
+{todos.map(todo => (
+  <li key={todo.id} style={{ textDecoration: todo.completed ? "line-through" : "none" }}>
+    {todo.text}
+    <button onClick={() => toggleTodo(todo.id)}>Tamamla</button>
+    <button onClick={() => deleteTodo(todo.id)}>Sil</button>
+  </li>
+))}
+```
+**İpucu:** `key` olarak array index kullanma - silme/ekleme işlemlerinde React elementleri karıştırır. Benzersiz `id` kullan.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: useRef ile DOM Manipülasyonu
+**Görev:** useRef kullanarak input'a otomatik focus ver ve scroll-to-top butonu oluştur.
+**Başlangıç kodu:**
+```tsx
+import { useRef, useEffect } from "react";
+
+function SearchPage() {
+  // TODO: inputRef tanımla (HTMLInputElement)
+  // TODO: topRef tanımla (HTMLDivElement)
+
+  // TODO: Sayfa yüklendiğinde input'a focus ver
+  useEffect(() => {
+    // ???
+  }, []);
+
+  const scrollToTop = () => {
+    // TODO: topRef'e smooth scroll yap
+  };
+
+  return (
+    <div>
+      <div ref={/* TODO */}>Sayfa Başı</div>
+      <input ref={/* TODO */} placeholder="Ara..." />
+      {/* Uzun içerik */}
+      <div style={{ height: "2000px" }}>İçerik</div>
+      <button onClick={scrollToTop}>Yukarı Git</button>
+    </div>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+const inputRef = useRef<HTMLInputElement>(null);
+const topRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+  inputRef.current?.focus();
+}, []);
+
+const scrollToTop = () => {
+  topRef.current?.scrollIntoView({ behavior: "smooth" });
+};
+```
+**İpucu:** `useRef<HTMLInputElement>(null)` ile tip belirt. `.current?.focus()` optional chaining ile güvenli erişim sağlar.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 9: Custom Hook Yazma
+**Görev:** `useLocalStorage` custom hook'u yaz: state'i localStorage ile senkronize etsin.
+**Başlangıç kodu:**
+```tsx
+// TODO: useLocalStorage hook'unu yaz
+function useLocalStorage<T>(key: string, initialValue: T) {
+  // TODO: useState ile başlangıç değerini localStorage'dan oku
+  // Eğer localStorage'da varsa parse et, yoksa initialValue kullan
+
+  // TODO: setValue fonksiyonu - hem state'i hem localStorage'ı güncelle
+
+  // TODO: [value, setValue] döndür (useState gibi)
+}
+
+// Kullanım:
+function Settings() {
+  const [theme, setTheme] = useLocalStorage("theme", "dark");
+  const [fontSize, setFontSize] = useLocalStorage("fontSize", 16);
+
+  return (
+    <div>
+      <select value={theme} onChange={e => setTheme(e.target.value)}>
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+      </select>
+    </div>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  const setValue = (value: T) => {
+    setStoredValue(value);
+    localStorage.setItem(key, JSON.stringify(value));
+  };
+
+  return [storedValue, setValue];
+}
+```
+**İpucu:** `useState(() => ...)` lazy initializer ile localStorage'ı sadece ilk render'da oku. JSON.parse/stringify ile her tipi destekle.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: Hooks Kuralları Hata Tespiti
+**Görev:** Aşağıdaki kodda hooks kurallarını ihlal eden 5 hatayı bul ve düzelt.
+**Başlangıç kodu:**
+```tsx
+function BrokenComponent({ isAdmin }: { isAdmin: boolean }) {
+  const [count, setCount] = useState(0);
+
+  // HATA 1: Koşullu hook
+  if (isAdmin) {
+    const [adminData, setAdminData] = useState(null);
+  }
+
+  // HATA 2: Döngü içinde hook
+  for (let i = 0; i < 3; i++) {
+    useEffect(() => console.log(i), []);
+  }
+
+  // HATA 3: İç içe fonksiyon içinde hook
+  function handleClick() {
+    const [clicked, setClicked] = useState(false);
+  }
+
+  // HATA 4: return'dan sonra hook
+  if (count > 10) return <p>Limit aşıldı</p>;
+  const [extra, setExtra] = useState("");
+
+  // HATA 5: useEffect'te eksik dependency
+  const [data, setData] = useState("");
+  useEffect(() => {
+    fetchData(count).then(setData);
+  }, []); // count dependency eksik
+
+  return <div>{count}</div>;
+}
+```
+**Beklenen çıktı:**
+```
+HATA 1: Hook'lar koşul içinde çağrılamaz → adminData'yı her zaman tanımla, koşulu render'da kullan
+HATA 2: Hook'lar döngü içinde çağrılamaz → useEffect'i tek sefer çağır, döngüyü içinde yap
+HATA 3: Hook'lar sadece component/custom hook'un en üst seviyesinde çağrılabilir
+HATA 4: Hook'lar koşullu return'dan sonra olamaz → return'u en sona taşı
+HATA 5: useEffect dependency array'inde count eksik → [count] ekle
+```
+**İpucu:** Hooks kuralları: 1) Her zaman aynı sırada çağır, 2) Sadece fonksiyon component veya custom hook içinde çağır, 3) Koşul/döngü/iç fonksiyon içinde çağırma.
+**Zorluk:** Zor
+:::
+
 :::must-note
 - React = declarative UI kütüphanesi, Virtual DOM ile sadece değişen kısmı günceller
 - JSX kuralları: tek kök element, className (class değil), htmlFor (for değil), {} ile JS ifadesi

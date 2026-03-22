@@ -625,6 +625,358 @@ API tasarlarken AI'a endpoint listeni goster ve sor: "Bu API tasarimimi RESTful 
 - **Senior cevabi:** Tutarli error response formati: `{ error: { code: "VALIDATION_ERROR", message: "...", details: [...] } }`. Status code'lar: 400 (bad input), 401 (not authenticated), 403 (not authorized), 404 (not found), 409 (conflict), 422 (unprocessable), 429 (rate limit), 500 (server error). Detayli hata mesajlari development'ta, generic mesajlar production'da donmeli. Validation error'larda hangi field'in neden gecersiz oldugu belirtilmeli. Stack trace asla client'a gonderilmemeli. Error code'lar (string) status code'lardan daha spesifik olabilir.
 :::
 
+:::exercise
+### Alıştırma 4: URL Tasarımı Düzeltme
+**Görev:** Aşağıdaki yanlış URL'leri RESTful standartlara göre düzelt.
+**Başlangıç kodu:**
+```
+YANLIŞ URL'ler:
+1. GET  /getUsers
+2. POST /createNewUser
+3. GET  /user/123/getOrders
+4. PUT  /deleteUser/123
+5. GET  /api/v1/User_Profile/123
+6. POST /api/products/search
+7. GET  /api/getAllProductsByCategory/electronics
+8. PUT  /api/users/123/updateEmail
+9. DELETE /api/v1/Remove-Item/456
+10. GET /api/user/123/order/456/item/789/detail
+
+TODO: Her birini doğru RESTful formata dönüştür
+```
+**Beklenen çıktı:**
+```
+DOĞRU URL'ler:
+1. GET    /api/users                     (fiil yok, çoğul isim)
+2. POST   /api/users                     (POST zaten "oluştur" demek)
+3. GET    /api/users/123/orders           (nested resource, çoğul)
+4. DELETE /api/users/123                  (DELETE metodu kullan)
+5. GET    /api/v1/user-profiles/123       (kebab-case, çoğul, küçük harf)
+6. GET    /api/products?q=arama-terimi    (search → query param)
+7. GET    /api/products?category=electronics (filtre → query param)
+8. PATCH  /api/users/123                  (PATCH ile kısmi güncelleme)
+9. DELETE /api/items/456                  (tutarlı format)
+10. GET   /api/orders/456/items/789       (max 2 seviye nesting)
+```
+**İpucu:** Kurallar: fiil kullanma (HTTP metodu yeterli), çoğul isim, küçük harf, tire ile ayır, max 2 seviye nesting, filtreler query param olarak.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: HTTP Status Code Seçimi
+**Görev:** Her senaryo için doğru HTTP status code'unu seç ve açıkla.
+**Başlangıç kodu:**
+```
+Senaryolar:
+1. Kullanıcı başarıyla oluşturuldu → ???
+2. İstek gövdesi boş gönderildi → ???
+3. Token geçersiz veya süresi dolmuş → ???
+4. Kullanıcı başka kullanıcının verisine erişmeye çalışıyor → ???
+5. Aynı email ile tekrar kayıt olmaya çalışıyor → ???
+6. Ürün başarıyla silindi (body yok) → ???
+7. Sunucu veritabanına bağlanamıyor → ???
+8. İstek çok fazla, rate limit aşıldı → ???
+9. Email formatı geçersiz → ???
+10. GET /users başarılı, boş liste döndü → ???
+```
+**Beklenen çıktı:**
+```
+1.  201 Created        → Yeni kaynak oluşturuldu
+2.  400 Bad Request    → İstek formatı hatalı
+3.  401 Unauthorized   → Kimlik doğrulama başarısız
+4.  403 Forbidden      → Yetki yok (kimlik doğru ama izin yok)
+5.  409 Conflict       → Kaynak çakışması (duplicate)
+6.  204 No Content     → Başarılı ama döndürülecek içerik yok
+7.  503 Service Unavailable → Sunucu geçici olarak kullanılamıyor
+8.  429 Too Many Requests  → Rate limit aşıldı
+9.  422 Unprocessable Entity → Syntax doğru ama semantik hatalı
+10. 200 OK             → Başarılı (boş array de 200'dür, 404 DEĞİL)
+```
+**İpucu:** 401 vs 403: 401 = "sen kimsin bilmiyorum", 403 = "seni biliyorum ama izin yok". 400 vs 422: 400 = format bozuk (JSON parse edilemiyor), 422 = format doğru ama içerik geçersiz.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: Cursor-Based Pagination Uygulaması
+**Görev:** Cursor-based pagination endpoint'i tasarla ve implement et.
+**Başlangıç kodu:**
+```javascript
+// Offset-based: /api/products?page=5&limit=20
+// Sorun: Veri eklenince sayfa kayması olur
+
+// TODO: Cursor-based pagination endpoint'i yaz
+// GET /api/products?cursor=xxx&limit=20
+// Response formatı: { data: [...], meta: { nextCursor, prevCursor, hasMore } }
+```
+**Beklenen çıktı:**
+```javascript
+app.get("/api/products", async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+  const cursor = req.query.cursor;
+  const direction = req.query.direction || "next"; // "next" veya "prev"
+
+  let query = "SELECT * FROM products";
+  const params = [];
+
+  if (cursor) {
+    const decodedCursor = Buffer.from(cursor, "base64").toString();
+    const { id, created_at } = JSON.parse(decodedCursor);
+
+    if (direction === "next") {
+      query += " WHERE (created_at, id) < ($1, $2)";
+    } else {
+      query += " WHERE (created_at, id) > ($1, $2)";
+    }
+    params.push(created_at, id);
+  }
+
+  query += " ORDER BY created_at DESC, id DESC LIMIT $" + (params.length + 1);
+  params.push(limit + 1); // +1 ile hasMore kontrol
+
+  const results = await db.query(query, params);
+  const hasMore = results.rows.length > limit;
+  const data = hasMore ? results.rows.slice(0, limit) : results.rows;
+
+  const nextCursor = hasMore
+    ? Buffer.from(JSON.stringify({
+        id: data[data.length - 1].id,
+        created_at: data[data.length - 1].created_at,
+      })).toString("base64")
+    : null;
+
+  res.json({
+    data,
+    meta: { nextCursor, hasMore, limit },
+  });
+});
+```
+**İpucu:** Cursor = son elemanın benzersiz tanımlayıcısı (id + timestamp). Base64 encode ile opaque cursor oluştur. `limit + 1` çekerek sonraki sayfa var mı kontrol et.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 7: API Versioning Stratejileri
+**Görev:** Aynı API'nin v1 ve v2 versiyonunu Express'te implement et.
+**Başlangıç kodu:**
+```javascript
+// TODO: URL-based versioning
+// GET /api/v1/users → eski format { name, email }
+// GET /api/v2/users → yeni format { firstName, lastName, email, avatar }
+
+// TODO: Header-based versioning (alternatif)
+// Accept: application/vnd.myapp.v1+json
+// Accept: application/vnd.myapp.v2+json
+```
+**Beklenen çıktı:**
+```javascript
+// URL-based versioning
+const v1Router = require("express").Router();
+const v2Router = require("express").Router();
+
+// v1: Eski format
+v1Router.get("/users", async (req, res) => {
+  const users = await db.users.findAll();
+  res.json(users.map(u => ({
+    name: u.first_name + " " + u.last_name,
+    email: u.email,
+  })));
+});
+
+// v2: Yeni format
+v2Router.get("/users", async (req, res) => {
+  const users = await db.users.findAll();
+  res.json(users.map(u => ({
+    firstName: u.first_name,
+    lastName: u.last_name,
+    email: u.email,
+    avatar: u.avatar_url,
+  })));
+});
+
+app.use("/api/v1", v1Router);
+app.use("/api/v2", v2Router);
+
+// Header-based versioning
+function versionMiddleware(req, res, next) {
+  const accept = req.headers.accept || "";
+  const match = accept.match(/application\/vnd\.myapp\.v(\d+)\+json/);
+  req.apiVersion = match ? parseInt(match[1]) : 2; // varsayılan v2
+  next();
+}
+```
+**İpucu:** URL versioning basit ve açıktır (Stripe, GitHub kullanır). Header versioning daha temiz URL sağlar ama karmaşıktır. Genelde URL versioning tercih edilir.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Error Response Standardizasyonu
+**Görev:** RFC 7807 (Problem Details) standardına uygun hata response formatı oluştur.
+**Başlangıç kodu:**
+```javascript
+// TODO: Standart error response formatı
+// TODO: Her hata tipi için tutarlı yapı
+// TODO: Express error handler'ı
+```
+**Beklenen çıktı:**
+```javascript
+// RFC 7807 uyumlu error response
+class ApiError extends Error {
+  constructor(statusCode, code, message, details = null) {
+    super(message);
+    this.statusCode = statusCode;
+    this.code = code;
+    this.details = details;
+  }
+
+  toJSON() {
+    return {
+      type: `https://api.example.com/errors/${this.code}`,
+      title: this.message,
+      status: this.statusCode,
+      detail: this.details,
+      instance: null, // request URL eklenecek
+      timestamp: new Date().toISOString(),
+    };
+  }
+}
+
+// Önceden tanımlı hatalar
+const Errors = {
+  notFound: (resource) => new ApiError(404, "NOT_FOUND", `${resource} bulunamadı`),
+  validation: (details) => new ApiError(422, "VALIDATION_ERROR", "Doğrulama hatası", details),
+  unauthorized: () => new ApiError(401, "UNAUTHORIZED", "Kimlik doğrulama gerekli"),
+  forbidden: () => new ApiError(403, "FORBIDDEN", "Bu işlem için yetkiniz yok"),
+  conflict: (field) => new ApiError(409, "CONFLICT", `${field} zaten mevcut`),
+  rateLimit: () => new ApiError(429, "RATE_LIMIT", "Çok fazla istek, lütfen bekleyin"),
+};
+
+// Kullanım:
+throw Errors.notFound("Kullanıcı");
+throw Errors.validation({ email: ["Geçerli email girin"] });
+
+// Global handler
+app.use((err, req, res, next) => {
+  if (err instanceof ApiError) {
+    const body = err.toJSON();
+    body.instance = req.originalUrl;
+    return res.status(err.statusCode).json(body);
+  }
+  res.status(500).json({
+    type: "https://api.example.com/errors/INTERNAL",
+    title: "Sunucu hatası",
+    status: 500,
+    timestamp: new Date().toISOString(),
+  });
+});
+```
+**İpucu:** Tutarlı error format: her hata aynı yapıda döner. `type` URL'i hata dokümantasyonuna link verir. `code` string olarak frontend'de koşul kontrolü için kullanılır.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: HATEOAS Uygulaması
+**Görev:** REST response'larına HATEOAS linkleri ekle.
+**Başlangıç kodu:**
+```javascript
+// TODO: Ürün detay endpoint'ine HATEOAS linkleri ekle
+// - self: kendi URL'i
+// - update: güncelleme URL'i
+// - delete: silme URL'i
+// - category: kategori URL'i
+// - reviews: yorumlar URL'i
+```
+**Beklenen çıktı:**
+```javascript
+app.get("/api/products/:id", async (req, res) => {
+  const product = await db.products.findById(req.params.id);
+  if (!product) return res.status(404).json({ error: "Ürün bulunamadı" });
+
+  res.json({
+    data: {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      categoryId: product.category_id,
+    },
+    _links: {
+      self: { href: `/api/products/${product.id}`, method: "GET" },
+      update: { href: `/api/products/${product.id}`, method: "PUT" },
+      delete: { href: `/api/products/${product.id}`, method: "DELETE" },
+      category: { href: `/api/categories/${product.category_id}`, method: "GET" },
+      reviews: { href: `/api/products/${product.id}/reviews`, method: "GET" },
+      addReview: { href: `/api/products/${product.id}/reviews`, method: "POST" },
+    },
+  });
+});
+
+// Liste endpoint'inde pagination linkleri:
+res.json({
+  data: products,
+  _links: {
+    self: { href: `/api/products?page=${page}&limit=${limit}` },
+    next: hasMore ? { href: `/api/products?page=${page + 1}&limit=${limit}` } : null,
+    prev: page > 1 ? { href: `/api/products?page=${page - 1}&limit=${limit}` } : null,
+    first: { href: `/api/products?page=1&limit=${limit}` },
+  },
+  meta: { page, limit, total, totalPages },
+});
+```
+**İpucu:** HATEOAS = Hypermedia As The Engine Of Application State. Client sonraki aksiyonları response'taki linklerden keşfeder, URL'leri hardcode etmez.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: Tam RESTful API Tasarımı
+**Görev:** Bir blog platformu için eksiksiz RESTful API tasarla: URL'ler, HTTP metodları, status code'ları, request/response formatları.
+**Başlangıç kodu:**
+```
+Blog platformu gereksinimleri:
+- Yazarlar yazı oluşturabilir, düzenleyebilir, silebilir
+- Okuyucular yazılara yorum yapabilir
+- Yazılar kategorilere ayrılır
+- Yazılar etiketlenebilir
+- Beğeni sistemi var
+
+TODO: Tüm endpoint'leri tasarla
+```
+**Beklenen çıktı:**
+```
+# Blog API Tasarımı
+
+## Posts
+GET    /api/posts                          → 200 (liste, pagination)
+GET    /api/posts?category=tech&tag=react  → 200 (filtreleme)
+GET    /api/posts/:slug                    → 200 | 404
+POST   /api/posts                          → 201 | 400 | 401
+PUT    /api/posts/:slug                    → 200 | 404 | 401 | 403
+PATCH  /api/posts/:slug                    → 200 | 404 | 401 | 403
+DELETE /api/posts/:slug                    → 204 | 404 | 401 | 403
+
+## Comments (nested under posts)
+GET    /api/posts/:slug/comments           → 200
+POST   /api/posts/:slug/comments           → 201 | 400 | 401
+DELETE /api/posts/:slug/comments/:id       → 204 | 401 | 403
+
+## Likes
+POST   /api/posts/:slug/like              → 200 (toggle)
+GET    /api/posts/:slug/likes/count        → 200
+
+## Categories
+GET    /api/categories                     → 200
+GET    /api/categories/:slug/posts         → 200
+
+## Tags
+GET    /api/tags                           → 200
+GET    /api/tags/:name/posts               → 200
+
+## Users (authors)
+GET    /api/users/:username                → 200 | 404
+GET    /api/users/:username/posts          → 200
+```
+**İpucu:** Slug kullanmak SEO-friendly URL sağlar. Nested resource max 2 seviye. Likes toggle pattern: POST ile beğen/beğenmekten vazgeç. Filtreleme query param ile yapılır.
+**Zorluk:** Zor
+:::
+
 :::must-note
 - REST 6 prensibi: Client-Server, Stateless, Cacheable, Uniform Interface, Layered System, Code on Demand (opsiyonel)
 - URL kuralları: çoğul isim kullan (users), fiil kullanma (GET zaten okuma demek), küçük harf, tire ile ayır

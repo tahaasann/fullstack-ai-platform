@@ -868,6 +868,658 @@ JS bug'i debug ederken AI'a hata mesajini ve kodu yapistir: "Bu kodda 'this' und
 - **Senior cevabi:** == (loose equality) type coercion uygular ve beklenmeyen sonuclar uretir: `"" == false` true doner, `0 == ""` true doner. === (strict equality) hem tip hem deger kontrolu yapar. Pratikte her zaman === kullanilir. Tek istisna: `value == null` kontrolu hem null hem undefined'i yakalar, bu ESLint'te bile kabul edilen bir pattern'dir.
 :::
 
+:::exercise
+### Alıştırma 4: Closure ile Private Counter Modülü
+
+**Görev:** Closure kullanarak private state'e sahip bir counter modülü yaz. Dışarıdan doğrudan erişilemez olsun.
+
+**Başlangıç kodu:**
+```javascript
+function createCounterModule(initialValue = 0, step = 1) {
+  // TODO: Private degiskenler (closure ile gizli)
+  // let count = initialValue;
+  // let history = [];
+
+  return {
+    increment() { /* TODO */ },
+    decrement() { /* TODO */ },
+    reset() { /* TODO */ },
+    getCount() { /* TODO */ },
+    getHistory() { /* TODO: history'nin kopyasini dondur (orijinali degil) */ },
+    undo() { /* TODO: son islemi geri al */ },
+  };
+}
+
+// Test
+const counter = createCounterModule(0, 5);
+
+counter.increment();
+counter.increment();
+counter.increment();
+console.log(counter.getCount());  // 15
+
+counter.decrement();
+console.log(counter.getCount());  // 10
+
+counter.undo();
+console.log(counter.getCount());  // 15
+
+console.log(counter.getHistory());
+// [0, 5, 10, 15, 10, 15]
+
+// Private'a direkt erisim yok:
+console.log(counter.count);     // undefined
+console.log(counter.history);   // undefined
+
+counter.reset();
+console.log(counter.getCount());  // 0
+```
+
+**Beklenen çıktı:**
+```
+15
+10
+15
+[0, 5, 10, 15, 10, 15]
+undefined
+undefined
+0
+```
+
+**İpucu:** `getHistory()` orijinal array referansı yerine `[...history]` dönsün, dışarıdan mutate edilmesin.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Event Loop Sıralama Tahmini
+
+**Görev:** Aşağıdaki kodların çıktı sırasını tahmin et ve nedenlerini açıkla. Her birini önce tahmin et, sonra çalıştır.
+
+**Başlangıç kodu:**
+```javascript
+// Senaryo 1: Karisik async
+console.log("1");
+setTimeout(() => console.log("2"), 0);
+Promise.resolve().then(() => console.log("3"));
+setTimeout(() => console.log("4"), 0);
+Promise.resolve().then(() => {
+  console.log("5");
+  Promise.resolve().then(() => console.log("6"));
+});
+console.log("7");
+// Tahmin: ?
+
+// Senaryo 2: Nested setTimeout ve Promise
+console.log("A");
+setTimeout(() => {
+  console.log("B");
+  Promise.resolve().then(() => console.log("C"));
+}, 0);
+Promise.resolve().then(() => {
+  console.log("D");
+  setTimeout(() => console.log("E"), 0);
+});
+console.log("F");
+// Tahmin: ?
+
+// Senaryo 3: queueMicrotask
+console.log("X");
+queueMicrotask(() => console.log("Y"));
+setTimeout(() => console.log("Z"), 0);
+queueMicrotask(() => {
+  console.log("W");
+  queueMicrotask(() => console.log("V"));
+});
+console.log("U");
+// Tahmin: ?
+```
+
+**Beklenen çıktı:**
+```
+Senaryo 1: 1, 7, 3, 5, 6, 2, 4
+Senaryo 2: A, F, D, B, C, E
+Senaryo 3: X, U, Y, W, V, Z
+```
+
+**İpucu:** Sıra: Sync kodu -> Microtask queue (Promise.then, queueMicrotask) -> Macrotask queue (setTimeout). Microtask'lar boşalana kadar macrotask çalışmaz.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: this Bağlamı Bulmaca
+
+**Görev:** Aşağıdaki `this` senaryolarının çıktısını tahmin et. Arrow function, bind, call, apply farklarını göster.
+
+**Başlangıç kodu:**
+```javascript
+const user = {
+  name: "Ahmet",
+  greet() {
+    console.log(`Merhaba, ${this.name}`);
+  },
+  greetDelayed() {
+    setTimeout(function () {
+      console.log(`Delayed: ${this.name}`);
+    }, 100);
+  },
+  greetDelayedArrow() {
+    setTimeout(() => {
+      console.log(`Arrow: ${this.name}`);
+    }, 100);
+  },
+};
+
+// Senaryo 1: Normal cagri
+user.greet(); // ?
+
+// Senaryo 2: Referans olarak atama
+const greetFn = user.greet;
+greetFn(); // ?
+
+// Senaryo 3: bind ile
+const boundGreet = user.greet.bind({ name: "Ayse" });
+boundGreet(); // ?
+
+// Senaryo 4: call ile
+user.greet.call({ name: "Mehmet" }); // ?
+
+// Senaryo 5: setTimeout icinde
+user.greetDelayed(); // ?
+
+// Senaryo 6: Arrow function ile
+user.greetDelayedArrow(); // ?
+
+// GOREV: Her senaryonun ciktisini tahmin et ve NEDENINI yaz
+// Arrow: this = lexical scope (tanimlandigi yerdeki this)
+// Regular: this = cagri noktasina bagli (dynamic)
+```
+
+**Beklenen çıktı:**
+```
+Merhaba, Ahmet
+Merhaba, undefined
+Merhaba, Ayse
+Merhaba, Mehmet
+Delayed: undefined
+Arrow: Ahmet
+```
+
+**İpucu:** Arrow function kendi `this`'ini oluşturmaz, tanımlandığı scope'un `this`'ini kullanır. Regular function'da `this` çağrı şekline bağlıdır.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Prototype Chain Keşfi
+
+**Görev:** Prototype chain'i gösteren bir `inspectPrototypeChain` fonksiyonu yaz. Herhangi bir objenin prototype zincirini listesin.
+
+**Başlangıç kodu:**
+```javascript
+function inspectPrototypeChain(obj) {
+  // TODO:
+  // 1. Object.getPrototypeOf() ile zinciri takip et
+  // 2. Her seviyede prototype'in constructor adini ve property'lerini listele
+  // 3. null'a ulasana kadar devam et
+  const chain = [];
+  let current = obj;
+
+  while (current !== null) {
+    const proto = Object.getPrototypeOf(current);
+    chain.push({
+      constructor: current.constructor?.name || "null",
+      ownProps: Object.getOwnPropertyNames(current),
+      level: chain.length,
+    });
+    current = proto;
+  }
+
+  return chain;
+}
+
+// Test 1: Array
+console.log("=== Array Prototype Chain ===");
+const arr = [1, 2, 3];
+inspectPrototypeChain(arr).forEach((level) => {
+  console.log(`  Level ${level.level}: ${level.constructor}`);
+  console.log(`    Props: ${level.ownProps.slice(0, 5).join(", ")}...`);
+});
+
+// Test 2: Custom class
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    return `${this.name} ses cikarir`;
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name);
+    this.breed = breed;
+  }
+  bark() {
+    return "Hav hav!";
+  }
+}
+
+console.log("\n=== Dog Prototype Chain ===");
+const dog = new Dog("Karabas", "Golden");
+inspectPrototypeChain(dog).forEach((level) => {
+  console.log(`  Level ${level.level}: ${level.constructor} -> [${level.ownProps.join(", ")}]`);
+});
+
+// Test 3: Method resolution
+console.log(`\ndog.bark(): ${dog.bark()}`);
+console.log(`dog.speak(): ${dog.speak()}`);
+console.log(`dog.toString(): ${dog.toString()}`);
+console.log(`dog.hasOwnProperty("name"): ${dog.hasOwnProperty("name")}`);
+```
+
+**Beklenen çıktı:**
+```
+=== Array Prototype Chain ===
+  Level 0: Array
+    Props: 0, 1, 2, length...
+  Level 1: Array
+    Props: length, constructor, concat, copyWithin, fill...
+  Level 2: Object
+    Props: constructor, __defineGetter__, __defineSetter__...
+
+=== Dog Prototype Chain ===
+  Level 0: Dog -> [name, breed]
+  Level 1: Dog -> [constructor, bark]
+  Level 2: Animal -> [constructor, speak]
+  Level 3: Object -> [constructor, __defineGetter__, ...]
+
+dog.bark(): Hav hav!
+dog.speak(): Karabas ses cikarir
+dog.toString(): [object Object]
+dog.hasOwnProperty("name"): true
+```
+
+**İpucu:** `Object.getPrototypeOf(obj)` ile bir üst prototype'a geç. Chain `null`'a ulaşana kadar devam eder.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Debounce ve Throttle Implementasyonu
+
+**Görev:** `debounce` ve `throttle` fonksiyonlarını sıfırdan yaz. Arama kutusu ve scroll event senaryolarında test et.
+
+**Başlangıç kodu:**
+```javascript
+function debounce(func, delay) {
+  // TODO:
+  // 1. Her cagridiginda onceki timer'i iptal et (clearTimeout)
+  // 2. Yeni timer baslat
+  // 3. delay ms boyunca yeni cagri gelmezse fonksiyonu calistir
+  let timerId;
+  return function (...args) {
+    // TODO
+  };
+}
+
+function throttle(func, limit) {
+  // TODO:
+  // 1. Son cagri zamanini takip et
+  // 2. limit ms icinde sadece bir kez calistir
+  // 3. Aradaki cagrilari atla
+  let lastCall = 0;
+  return function (...args) {
+    // TODO
+  };
+}
+
+// Test: Debounce
+const searchAPI = debounce((query) => {
+  console.log(`API cagrildi: "${query}"`);
+}, 300);
+
+// Hizli ardisik cagrilar (sadece sonuncusu calismali)
+console.log("=== Debounce Test ===");
+searchAPI("j");
+searchAPI("ja");
+searchAPI("jav");
+searchAPI("java");
+searchAPI("javas");
+searchAPI("javasc");
+searchAPI("javascript"); // Sadece bu calismali
+
+// Test: Throttle
+let scrollCount = 0;
+const handleScroll = throttle(() => {
+  scrollCount++;
+  console.log(`Scroll handled: ${scrollCount}`);
+}, 100);
+
+console.log("\n=== Throttle Test ===");
+// 10 hizli cagri simulasyonu
+for (let i = 0; i < 10; i++) {
+  handleScroll();
+}
+// Sadece 1 kez calismali (ilk cagri)
+```
+
+**Beklenen çıktı:**
+```
+=== Debounce Test ===
+API cagrildi: "javascript"
+
+=== Throttle Test ===
+Scroll handled: 1
+```
+
+**İpucu:** Debounce: `clearTimeout(timerId); timerId = setTimeout(...)`. Throttle: `Date.now() - lastCall >= limit` kontrolü.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: Mini DOM Manipülasyon Kütüphanesi
+
+**Görev:** jQuery benzeri zincirleme (chaining) destekleyen basit bir DOM manipülasyon kütüphanesi yaz.
+
+**Başlangıç kodu:**
+```javascript
+// Not: Bu kodu bir HTML dosyasinda <script> icinde calistir
+function $(selector) {
+  const elements =
+    typeof selector === "string"
+      ? document.querySelectorAll(selector)
+      : [selector];
+
+  const api = {
+    elements: Array.from(elements),
+
+    css(property, value) {
+      // TODO: Her elemana style uygula, chaining icin this dondur
+    },
+
+    text(content) {
+      // TODO: content verilmisse set et, verilmemisse get et
+    },
+
+    addClass(className) {
+      // TODO: Her elemana class ekle
+    },
+
+    removeClass(className) {
+      // TODO: Her elemandan class kaldir
+    },
+
+    on(event, callback) {
+      // TODO: Her elemana event listener ekle
+    },
+
+    html(content) {
+      // TODO: innerHTML set/get
+    },
+
+    each(callback) {
+      // TODO: Her eleman icin callback cagir
+    },
+
+    hide() {
+      return this.css("display", "none");
+    },
+
+    show() {
+      return this.css("display", "");
+    },
+  };
+
+  return api;
+}
+
+// Test (console'da calistir)
+// $("p").css("color", "red").css("font-size", "18px").addClass("highlight");
+// $(".btn").on("click", (e) => console.log("Tiklandi!"));
+// $("h1").text("Yeni Baslik");
+
+// Node.js ile test (DOM simulasyonu)
+console.log("Mini DOM kutuphanesi hazirlandi");
+console.log("Ornekler:");
+console.log('  $("p").css("color", "red").addClass("highlight")');
+console.log('  $("h1").text("Yeni Baslik")');
+console.log('  $(".btn").on("click", handler).hide()');
+```
+
+**Beklenen çıktı:**
+```
+Mini DOM kutuphanesi hazirlandi
+Ornekler:
+  $("p").css("color", "red").addClass("highlight")
+  $("h1").text("Yeni Baslik")
+  $(".btn").on("click", handler).hide()
+```
+
+**İpucu:** Her metod `this` (api nesnesini) dönerek method chaining sağlar. `elements.forEach()` ile tüm eşleşen elemanları dolaş.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 10: Custom Promise Implementasyonu
+
+**Görev:** `Promise`'in basitleştirilmiş bir versiyonunu sıfırdan yaz. `then`, `catch` ve `resolve`/`reject` desteklesin.
+
+**Başlangıç kodu:**
+```javascript
+class MyPromise {
+  constructor(executor) {
+    this.state = "pending"; // pending, fulfilled, rejected
+    this.value = undefined;
+    this.callbacks = [];
+
+    const resolve = (value) => {
+      // TODO: state'i fulfilled yap, value'yu kaydet, callback'leri cagir
+    };
+
+    const reject = (reason) => {
+      // TODO: state'i rejected yap, reason'i kaydet, callback'leri cagir
+    };
+
+    try {
+      executor(resolve, reject);
+    } catch (error) {
+      reject(error);
+    }
+  }
+
+  then(onFulfilled, onRejected) {
+    // TODO:
+    // 1. Yeni MyPromise dondur (chaining icin)
+    // 2. State fulfilled ise onFulfilled'i hemen cagir
+    // 3. State pending ise callback listesine ekle
+    // 4. onFulfilled'in donusu sonraki then'e gecmeli
+  }
+
+  catch(onRejected) {
+    return this.then(null, onRejected);
+  }
+
+  static resolve(value) {
+    return new MyPromise((resolve) => resolve(value));
+  }
+
+  static reject(reason) {
+    return new MyPromise((_, reject) => reject(reason));
+  }
+}
+
+// Test 1: Basit resolve
+new MyPromise((resolve) => {
+  setTimeout(() => resolve(42), 100);
+})
+  .then((value) => {
+    console.log(`Resolved: ${value}`); // 42
+    return value * 2;
+  })
+  .then((value) => {
+    console.log(`Chained: ${value}`); // 84
+  });
+
+// Test 2: Error handling
+new MyPromise((_, reject) => {
+  setTimeout(() => reject("Hata olustu!"), 100);
+}).catch((error) => {
+  console.log(`Caught: ${error}`);
+});
+
+// Test 3: Sync resolve
+MyPromise.resolve("hemen")
+  .then((v) => console.log(`Static resolve: ${v}`));
+```
+
+**Beklenen çıktı:**
+```
+Static resolve: hemen
+Resolved: 42
+Chained: 84
+Caught: Hata olustu!
+```
+
+**İpucu:** `then()` her zaman yeni MyPromise döner. State zaten fulfilled ise callback'i `queueMicrotask` veya `setTimeout` ile async çağır.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Curry ve Partial Application
+
+**Görev:** `curry` fonksiyonu yaz. Herhangi bir fonksiyonu curried versiyonuna çevirsin.
+
+**Başlangıç kodu:**
+```javascript
+function curry(fn) {
+  // TODO: fn'in tum argumanlari gelene kadar yeni fonksiyon dondur
+  // Tum argumanlar geldiginde fonksiyonu calistir
+  return function curried(...args) {
+    if (args.length >= fn.length) {
+      return fn.apply(this, args);
+    }
+    return function (...args2) {
+      return curried.apply(this, args.concat(args2));
+    };
+  };
+}
+
+// Test
+const add = curry((a, b, c) => a + b + c);
+console.log(add(1)(2)(3));     // 6
+console.log(add(1, 2)(3));     // 6
+console.log(add(1)(2, 3));     // 6
+console.log(add(1, 2, 3));     // 6
+
+const multiply = curry((a, b) => a * b);
+const double = multiply(2);
+const triple = multiply(3);
+console.log(double(5));   // 10
+console.log(triple(5));   // 15
+
+// Pratik kullanim
+const filter = curry((predicate, arr) => arr.filter(predicate));
+const map = curry((transform, arr) => arr.map(transform));
+
+const getAdults = filter(p => p.age >= 18);
+const getNames = map(p => p.name);
+
+const people = [{name:"Ali",age:25},{name:"Can",age:15},{name:"Eda",age:30}];
+console.log(getNames(getAdults(people))); // ["Ali", "Eda"]
+```
+
+**Beklenen çıktı:**
+```
+6
+6
+6
+6
+10
+15
+["Ali", "Eda"]
+```
+
+**İpucu:** `fn.length` fonksiyonun beklediği parametre sayısını döner. Yeterli argüman gelmediyse yeni fonksiyon döndür.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 12: WeakRef ile Memory-Safe Cache
+
+**Görev:** `WeakRef` kullanarak garbage collection'a izin veren bir cache sistemi yaz.
+
+**Başlangıç kodu:**
+```javascript
+class WeakCache {
+  constructor() {
+    this.cache = new Map();
+    this.registry = new FinalizationRegistry((key) => {
+      console.log(`  [GC] Cache'ten silindi: ${key}`);
+      this.cache.delete(key);
+    });
+  }
+
+  set(key, value) {
+    const ref = new WeakRef(value);
+    this.cache.set(key, ref);
+    this.registry.register(value, key);
+  }
+
+  get(key) {
+    const ref = this.cache.get(key);
+    if (!ref) return undefined;
+    const value = ref.deref();
+    if (!value) {
+      this.cache.delete(key);
+      return undefined;
+    }
+    return value;
+  }
+
+  get size() {
+    return this.cache.size;
+  }
+}
+
+// Test
+const cache = new WeakCache();
+let user1 = { id: 1, name: "Ahmet", data: new Array(1000).fill("x") };
+let user2 = { id: 2, name: "Ayse", data: new Array(1000).fill("y") };
+
+cache.set("user:1", user1);
+cache.set("user:2", user2);
+
+console.log("Cache size:", cache.size);
+console.log("user:1:", cache.get("user:1")?.name);
+
+// Referansi kaldir (GC'ye hazir)
+user1 = null;
+// GC tetiklenmesi garanti degil ama WeakRef bunu mumkun kilar
+
+console.log("user:2:", cache.get("user:2")?.name);
+console.log("WeakRef cache hafiza-guvenli!");
+```
+
+**Beklenen çıktı:**
+```
+Cache size: 2
+user:1: Ahmet
+user:2: Ayse
+WeakRef cache hafiza-guvenli!
+```
+
+**İpucu:** `WeakRef` objeye zayıf referans tutar, GC'yi engellemez. `FinalizationRegistry` obje GC tarafından temizlendiğinde callback çağırır.
+
+**Zorluk:** Zor
+:::
+
 :::must-note
 - **Scope:** var = function scope, let/const = block scope. Önce const, gerekirse let kullan, var asla
 - **Hoisting:** var tanımı yukarı taşınır (undefined), let/const da hoist edilir ama TDZ nedeniyle erişilemez

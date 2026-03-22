@@ -6071,5 +6071,23 @@
     ],
     "live_demo_url_template": "https://ai-code-review.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/ai-code-review-tool"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "Full-stack web uygulama gelistirme (React + Node.js/FastAPI)",
+      "LLM API entegrasyonu ve prompt engineering",
+      "Git ve GitHub API kullanimi",
+      "Docker ve CI/CD pipeline deneyimi",
+      "Yazilim mimarisi ve design patterns bilgisi"
+    ],
+    "what_you_should_know": [
+      "Phase 6 Module 18 - Yazilim mimarisi ve design patterns",
+      "Phase 6 Module 19 - System design temelleri",
+      "Phase 5 Module 17 - RAG ve AI Agents",
+      "Phase 4 Module 13 - Docker, CI/CD ve deployment",
+      "Phase 4 Module 14 - Web guvenligi"
+    ],
+    "next_project": "none",
+    "skills_bridge": "Bu capstone projesi tum egitim boyunca ogrendigin becerileri birlestiriyor: frontend, backend, AI/ML, DevOps ve yazilim mimarisi. Tamamladiginda portfolio, CV ve is basvurulari icin guclu bir vitrin projen olacak."
   }
 }

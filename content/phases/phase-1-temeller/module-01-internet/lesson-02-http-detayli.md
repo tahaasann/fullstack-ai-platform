@@ -693,6 +693,575 @@ Same-Origin Policy geregi, frontend.com'dan api.backend.com'a istek gonderilemez
 API gelistirirken AI'a curl ciktini yapistir: "Bu curl -v ciktisindaki request/response header'larini analiz et. Güvenlik, performans ve REST best practices acisindan neleri degistirmeliyim?"
 :::
 
+:::exercise
+### Alıştırma 4: REST API Client Sınıfı
+
+**Görev:** Python ile bir REST API client sınıfı yaz. GET, POST, PUT, DELETE metodlarını desteklesin ve response'ları güzel formatlasın.
+
+**Başlangıç kodu:**
+```python
+import json
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError
+
+class RestClient:
+    def __init__(self, base_url: str):
+        self.base_url = base_url.rstrip("/")
+
+    def _request(self, method: str, path: str, data: dict = None) -> dict:
+        """HTTP istegi gonder ve sonucu dondur."""
+        url = f"{self.base_url}{path}"
+        # TODO:
+        # 1. Request objesi olustur (url, method, headers)
+        # 2. data varsa JSON'a cevir ve body olarak ekle
+        # 3. urlopen ile istegi gonder
+        # 4. Response'u parse et ve dondur: {"status": int, "body": dict, "headers": dict}
+        pass
+
+    def get(self, path: str) -> dict:
+        return self._request("GET", path)
+
+    def post(self, path: str, data: dict) -> dict:
+        return self._request("POST", path, data)
+
+    def put(self, path: str, data: dict) -> dict:
+        return self._request("PUT", path, data)
+
+    def delete(self, path: str) -> dict:
+        return self._request("DELETE", path)
+
+# Test
+client = RestClient("https://jsonplaceholder.typicode.com")
+
+# GET
+resp = client.get("/posts/1")
+print(f"GET /posts/1 -> Status: {resp['status']}, Title: {resp['body']['title'][:30]}...")
+
+# POST
+resp = client.post("/posts", {"title": "Yeni Post", "body": "Icerik", "userId": 1})
+print(f"POST /posts -> Status: {resp['status']}, ID: {resp['body']['id']}")
+
+# PUT
+resp = client.put("/posts/1", {"title": "Guncellenmis", "body": "Yeni icerik", "userId": 1})
+print(f"PUT /posts/1 -> Status: {resp['status']}")
+
+# DELETE
+resp = client.delete("/posts/1")
+print(f"DELETE /posts/1 -> Status: {resp['status']}")
+```
+
+**Beklenen çıktı:**
+```
+GET /posts/1 -> Status: 200, Title: sunt aut facere repellat pr...
+POST /posts -> Status: 201, ID: 101
+PUT /posts/1 -> Status: 200
+DELETE /posts/1 -> Status: 200
+```
+
+**İpucu:** `Request` objesine `method` parametresi ver. JSON body için `data=json.dumps(data).encode()` kullan.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: HTTP Status Code Quiz Uygulaması
+
+**Görev:** Terminal tabanlı bir HTTP status code quiz uygulaması yaz. Rastgele status code gösterip kullanıcıdan anlamını sorarak öğrenmesini sağla.
+
+**Başlangıç kodu:**
+```python
+import random
+
+STATUS_CODES = {
+    200: ("OK", "Istek basarili"),
+    201: ("Created", "Kaynak olusturuldu"),
+    204: ("No Content", "Basarili ama icerik yok"),
+    301: ("Moved Permanently", "Kalici yonlendirme"),
+    302: ("Found", "Gecici yonlendirme"),
+    304: ("Not Modified", "Cache gecerli, icerik degismedi"),
+    400: ("Bad Request", "Hatali istek"),
+    401: ("Unauthorized", "Kimlik dogrulama gerekli"),
+    403: ("Forbidden", "Erisim reddedildi"),
+    404: ("Not Found", "Kaynak bulunamadi"),
+    409: ("Conflict", "Catisma var"),
+    429: ("Too Many Requests", "Rate limit asildi"),
+    500: ("Internal Server Error", "Sunucu hatasi"),
+    502: ("Bad Gateway", "Upstream sunucu hatasi"),
+    503: ("Service Unavailable", "Sunucu gecici olarak kulanilamaz"),
+}
+
+def run_quiz(num_questions: int = 5):
+    score = 0
+    codes = list(STATUS_CODES.keys())
+
+    for i in range(num_questions):
+        # TODO:
+        # 1. Rastgele bir status code sec
+        # 2. 4 secenekli coktan secmeli soru olustur (1 dogru + 3 yanlis)
+        # 3. Kullanicidan cevap al
+        # 4. Dogru/yanlis kontrolu yap ve skoru guncelle
+        pass
+
+    print(f"\nSonuc: {score}/{num_questions}")
+
+run_quiz()
+```
+
+**Beklenen çıktı:**
+```
+Soru 1/5: HTTP 403 ne anlama gelir?
+  A) Kaynak bulunamadi
+  B) Erisim reddedildi
+  C) Sunucu hatasi
+  D) Kimlik dogrulama gerekli
+Cevap (A/B/C/D): B
+Dogru!
+
+Sonuc: 4/5
+```
+
+**İpucu:** `random.sample()` ile yanlış seçenekleri rastgele seç, `random.shuffle()` ile karıştır.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: Cookie ve Session Simülatörü
+
+**Görev:** HTTP cookie mekanizmasını simüle eden bir program yaz. Set-Cookie header'ını parse etsin ve sonraki isteklere cookie eklesin.
+
+**Başlangıç kodu:**
+```python
+from datetime import datetime, timedelta
+
+class CookieJar:
+    def __init__(self):
+        self.cookies: dict[str, dict] = {}
+
+    def set_cookie(self, header: str):
+        """Set-Cookie header'ini parse et ve sakla."""
+        # TODO: "name=value; Path=/; Max-Age=3600; HttpOnly; Secure" formatini parse et
+        # Ornek: "session_id=abc123; Path=/; Max-Age=3600; HttpOnly"
+        pass
+
+    def get_cookie_header(self, path: str = "/") -> str:
+        """Gecerli cookie'leri Cookie header formatinda dondur."""
+        # TODO: Suresi dolmamis ve path'i uygun cookie'leri "name=value; name2=value2" formatinda dondur
+        pass
+
+    def is_expired(self, cookie_name: str) -> bool:
+        """Cookie'nin suresinin dolup dolmadigini kontrol et."""
+        pass
+
+# Test
+jar = CookieJar()
+
+# Sunucu Set-Cookie header'lari gonderiyor
+jar.set_cookie("session_id=abc123; Path=/; Max-Age=3600; HttpOnly")
+jar.set_cookie("theme=dark; Path=/; Max-Age=86400")
+jar.set_cookie("tracking=xyz; Path=/analytics; Max-Age=2592000")
+
+# Istemci cookie header'ini olustur
+print(f"Cookie header (/): {jar.get_cookie_header('/')}")
+print(f"Cookie header (/analytics): {jar.get_cookie_header('/analytics')}")
+print(f"Toplam cookie: {len(jar.cookies)}")
+print(f"session_id expired: {jar.is_expired('session_id')}")
+```
+
+**Beklenen çıktı:**
+```
+Cookie header (/): session_id=abc123; theme=dark
+Cookie header (/analytics): session_id=abc123; theme=dark; tracking=xyz
+Toplam cookie: 3
+session_id expired: False
+```
+
+**İpucu:** `header.split(";")` ile attributeleri ayır. Her attribute'u `strip()` ile temizle.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: CORS Simülatörü
+
+**Görev:** CORS (Cross-Origin Resource Sharing) kontrolünü simüle eden bir fonksiyon yaz. Origin, method ve headers'a göre isteğin kabul edilip edilmeyeceğini belirlesin.
+
+**Başlangıç kodu:**
+```python
+class CORSPolicy:
+    def __init__(self):
+        self.allowed_origins: list[str] = []
+        self.allowed_methods: list[str] = ["GET", "HEAD"]
+        self.allowed_headers: list[str] = []
+        self.allow_credentials: bool = False
+        self.max_age: int = 0
+
+    def allow_origin(self, origin: str):
+        self.allowed_origins.append(origin)
+        return self
+
+    def allow_method(self, method: str):
+        self.allowed_methods.append(method)
+        return self
+
+    def allow_header(self, header: str):
+        self.allowed_headers.append(header)
+        return self
+
+    def check_request(self, origin: str, method: str, headers: list[str] = None) -> dict:
+        """
+        CORS istegini kontrol et.
+        Returns: {"allowed": bool, "reason": str, "response_headers": dict}
+        """
+        # TODO:
+        # 1. Origin kontrolu (allowed_origins'te var mi veya "*" mi?)
+        # 2. Method kontrolu
+        # 3. Header kontrolu (preflight icin)
+        # 4. Uygun response headers olustur
+        pass
+
+    def is_preflight(self, method: str) -> bool:
+        """Preflight (OPTIONS) gereken bir istek mi?"""
+        # TODO: "Simple request" degilse preflight gerekir
+        # Simple: GET/HEAD/POST + standart headers
+        pass
+
+# Test
+cors = CORSPolicy()
+cors.allow_origin("https://frontend.example.com")
+cors.allow_origin("https://admin.example.com")
+cors.allow_method("POST")
+cors.allow_method("PUT")
+cors.allow_method("DELETE")
+cors.allow_header("Authorization")
+cors.allow_header("Content-Type")
+
+# Test senaryolari
+tests = [
+    ("https://frontend.example.com", "GET", []),
+    ("https://frontend.example.com", "POST", ["Content-Type"]),
+    ("https://evil.com", "GET", []),
+    ("https://frontend.example.com", "DELETE", ["Authorization"]),
+    ("https://admin.example.com", "PUT", ["Content-Type", "X-Custom"]),
+]
+
+for origin, method, headers in tests:
+    result = cors.check_request(origin, method, headers)
+    status = "ALLOWED" if result["allowed"] else "BLOCKED"
+    print(f"{origin:40s} {method:6s} -> {status}: {result['reason']}")
+```
+
+**Beklenen çıktı:**
+```
+https://frontend.example.com             GET    -> ALLOWED: Origin and method permitted
+https://frontend.example.com             POST   -> ALLOWED: Origin and method permitted
+https://evil.com                         GET    -> BLOCKED: Origin not allowed
+https://frontend.example.com             DELETE -> ALLOWED: Origin and method permitted
+https://admin.example.com                PUT    -> BLOCKED: Header 'X-Custom' not allowed
+```
+
+**İpucu:** Simple request'ler preflight gerektirmez: GET/HEAD/POST + sadece `Accept`, `Content-Type` (belirli değerler), `Content-Language` header'ları.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: HTTP Cache Simülatörü
+
+**Görev:** HTTP cache mekanizmasını simüle eden bir program yaz. Cache-Control header'ına göre cache'ten mi sunucudan mı yükleneceğine karar versin.
+
+**Başlangıç kodu:**
+```python
+import time
+import hashlib
+
+class HTTPCache:
+    def __init__(self):
+        self.cache: dict[str, dict] = {}
+        self.stats = {"hits": 0, "misses": 0, "revalidations": 0}
+
+    def store(self, url: str, body: str, headers: dict):
+        """Response'u cache'e kaydet."""
+        # TODO:
+        # 1. Cache-Control header'ini parse et (max-age, no-cache, no-store, must-revalidate)
+        # 2. ETag olustur (body'nin hash'i)
+        # 3. Cache'e kaydet: body, etag, stored_at, max_age, directives
+        pass
+
+    def get(self, url: str) -> dict:
+        """
+        Cache'ten response al.
+        Returns: {"source": "cache"|"revalidate"|"network", "body": str, "age": int}
+        """
+        # TODO:
+        # 1. Cache'te var mi kontrol et
+        # 2. no-store ise her zaman network
+        # 3. max-age suresini kontrol et
+        # 4. Suresi dolmussa revalidation gerekir (ETag ile)
+        pass
+
+# Test
+cache = HTTPCache()
+
+# Farkli cache stratejileri
+cache.store("/style.css", "body { color: red; }", {"Cache-Control": "max-age=31536000"})
+cache.store("/api/users", '[{"id":1}]', {"Cache-Control": "no-cache"})
+cache.store("/api/token", '{"token":"secret"}', {"Cache-Control": "no-store"})
+cache.store("/index.html", "<html>...</html>", {"Cache-Control": "max-age=300"})
+
+# Cache lookup
+for url in ["/style.css", "/api/users", "/api/token", "/index.html", "/not-cached"]:
+    result = cache.get(url)
+    print(f"{url:20s} -> Source: {result['source']:12s} Age: {result.get('age', '-')}s")
+
+print(f"\nStats: {cache.stats}")
+```
+
+**Beklenen çıktı:**
+```
+/style.css           -> Source: cache        Age: 0s
+/api/users           -> Source: revalidate   Age: 0s
+/api/token           -> Source: network      Age: -s
+/index.html          -> Source: cache        Age: 0s
+/not-cached          -> Source: network      Age: -s
+
+Stats: {'hits': 2, 'misses': 2, 'revalidations': 1}
+```
+
+**İpucu:** `Cache-Control` header'ını `;` ile split et. `time.time()` ile stored timestamp'ı karşılaştır.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: URL Parser
+
+**Görev:** Bir URL'i bileşenlerine ayıran bir parser yaz. Scheme, host, port, path, query parameters ve fragment'ı çıkarsın.
+
+**Başlangıç kodu:**
+```python
+def parse_url(url: str) -> dict:
+    """
+    URL'i bilesenlerine ayir.
+    Returns: {"scheme", "host", "port", "path", "query_params", "fragment"}
+    """
+    # TODO: Regex veya string islemleri ile parse et
+    # Ornek: https://example.com:8080/api/users?page=1&limit=10#section2
+    # scheme=https, host=example.com, port=8080, path=/api/users
+    # query_params={"page": "1", "limit": "10"}, fragment=section2
+    pass
+
+# Test
+urls = [
+    "https://example.com:8080/api/users?page=1&limit=10#section2",
+    "http://localhost:3000/",
+    "https://google.com/search?q=python+tutorial&lang=tr",
+    "ftp://files.example.com/docs/readme.txt",
+    "https://api.github.com/repos/user/repo/issues?state=open&sort=created",
+]
+
+for url in urls:
+    parsed = parse_url(url)
+    print(f"\nURL: {url}")
+    print(f"  Scheme: {parsed['scheme']}")
+    print(f"  Host:   {parsed['host']}")
+    print(f"  Port:   {parsed['port']}")
+    print(f"  Path:   {parsed['path']}")
+    print(f"  Query:  {parsed['query_params']}")
+    print(f"  Fragment: {parsed.get('fragment', '')}")
+```
+
+**Beklenen çıktı:**
+```
+URL: https://example.com:8080/api/users?page=1&limit=10#section2
+  Scheme: https
+  Host:   example.com
+  Port:   8080
+  Path:   /api/users
+  Query:  {'page': '1', 'limit': '10'}
+  Fragment: section2
+```
+
+**İpucu:** `://` ile scheme'i, `:` ile port'u, `?` ile query'yi, `#` ile fragment'ı ayır. `urllib.parse` kullanmadan kendin yaz.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: HTTP Rate Limiter Simülasyonu
+
+**Görev:** Bir HTTP API'nin rate limiting mekanizmasını simüle eden bir program yaz. Sliding window algoritması kullan.
+
+**Başlangıç kodu:**
+```python
+import time
+from collections import defaultdict
+
+class RateLimiter:
+    def __init__(self, max_requests: int, window_seconds: int):
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+        self.requests: dict[str, list[float]] = defaultdict(list)
+
+    def is_allowed(self, client_ip: str) -> dict:
+        """
+        Istegin kabul edilip edilmeyecegini kontrol et.
+        Returns: {
+            "allowed": bool,
+            "remaining": int,
+            "reset_at": float,
+            "retry_after": int | None,
+            "headers": dict  # X-RateLimit-* headers
+        }
+        """
+        # TODO:
+        # 1. Mevcut zamani al
+        # 2. Window disindaki eski istekleri temizle
+        # 3. Mevcut istek sayisini kontrol et
+        # 4. Izin veriliyorsa istegi kaydet
+        # 5. Rate limit header'larini olustur
+        pass
+
+# Test: Dakikada 5 istek limiti
+limiter = RateLimiter(max_requests=5, window_seconds=60)
+
+# Ayni IP'den 7 istek simule et
+for i in range(7):
+    result = limiter.is_allowed("192.168.1.100")
+    status = "ALLOWED" if result["allowed"] else "BLOCKED"
+    print(f"Request {i+1}: {status} | "
+          f"Remaining: {result['remaining']} | "
+          f"X-RateLimit-Limit: {result['headers']['X-RateLimit-Limit']}")
+
+# Farkli IP test
+result = limiter.is_allowed("10.0.0.1")
+print(f"\nFarkli IP: {'ALLOWED' if result['allowed'] else 'BLOCKED'} | Remaining: {result['remaining']}")
+```
+
+**Beklenen çıktı:**
+```
+Request 1: ALLOWED | Remaining: 4 | X-RateLimit-Limit: 5
+Request 2: ALLOWED | Remaining: 3 | X-RateLimit-Limit: 5
+Request 3: ALLOWED | Remaining: 2 | X-RateLimit-Limit: 5
+Request 4: ALLOWED | Remaining: 1 | X-RateLimit-Limit: 5
+Request 5: ALLOWED | Remaining: 0 | X-RateLimit-Limit: 5
+Request 6: BLOCKED | Remaining: 0 | X-RateLimit-Limit: 5
+Request 7: BLOCKED | Remaining: 0 | X-RateLimit-Limit: 5
+
+Farkli IP: ALLOWED | Remaining: 4
+```
+
+**İpucu:** Her istek timestamp'ını listeye ekle. `time.time() - window_seconds`'tan eski kayıtları sil.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Content Negotiation Simülatörü
+
+**Görev:** HTTP Content Negotiation mekanizmasını simüle eden bir program yaz. Accept header'a göre uygun format dönsün.
+
+**Başlangıç kodu:**
+```python
+def negotiate_content(accept_header: str, available_types: list[str]) -> str | None:
+    """Accept header'a gore en uygun content type'i sec."""
+    # TODO:
+    # 1. Accept header'i parse et (type/subtype;q=value)
+    # 2. Quality factor'e gore sirala
+    # 3. Available types ile eslestir
+    # 4. En uygun type'i dondur
+    pass
+
+# Test
+tests = [
+    ("text/html, application/json;q=0.9, */*;q=0.1", ["application/json", "text/html", "text/xml"]),
+    ("application/json", ["text/html", "application/json"]),
+    ("application/xml;q=0.9, application/json;q=1.0", ["application/json", "application/xml"]),
+    ("text/plain", ["application/json", "text/html"]),
+]
+
+for accept, available in tests:
+    result = negotiate_content(accept, available)
+    print(f"Accept: {accept[:50]:50s} -> {result or '406 Not Acceptable'}")
+```
+
+**Beklenen çıktı:**
+```
+Accept: text/html, application/json;q=0.9, */*;q=0.1  -> text/html
+Accept: application/json                               -> application/json
+Accept: application/xml;q=0.9, application/json;q=1.0  -> application/json
+Accept: text/plain                                     -> 406 Not Acceptable
+```
+
+**İpucu:** Quality factor varsayılan 1.0'dır. `*/*` tüm tipleri kabul eder. Virgül ile ayrılan tipleri parse et.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 12: HTTP/2 Multiplexing Simülasyonu
+
+**Görev:** HTTP/1.1 ile HTTP/2 multiplexing farkını gösteren bir simülasyon yaz.
+
+**Başlangıç kodu:**
+```python
+import asyncio
+import time
+
+async def fetch_resource(name: str, size_kb: int, delay: float) -> dict:
+    """Kaynak indirme simulasyonu."""
+    await asyncio.sleep(delay)
+    return {"name": name, "size": size_kb, "time": delay}
+
+async def http11_sequential(resources: list[dict]) -> float:
+    """HTTP/1.1: Kaynaklar sirayla indirilir (6 baglanti limiti)."""
+    start = time.time()
+    # TODO: Her kaynagi sirayla indir (max 6 paralel baglanti)
+    for r in resources:
+        await fetch_resource(r["name"], r["size"], r["delay"])
+    return time.time() - start
+
+async def http2_multiplexed(resources: list[dict]) -> float:
+    """HTTP/2: Tum kaynaklar tek baglanti uzerinde paralel."""
+    start = time.time()
+    tasks = [fetch_resource(r["name"], r["size"], r["delay"]) for r in resources]
+    await asyncio.gather(*tasks)
+    return time.time() - start
+
+# Test
+resources = [
+    {"name": "index.html", "size": 5, "delay": 0.1},
+    {"name": "style.css", "size": 20, "delay": 0.15},
+    {"name": "app.js", "size": 100, "delay": 0.3},
+    {"name": "vendor.js", "size": 200, "delay": 0.4},
+    {"name": "hero.webp", "size": 150, "delay": 0.25},
+    {"name": "font.woff2", "size": 30, "delay": 0.1},
+    {"name": "logo.svg", "size": 2, "delay": 0.05},
+    {"name": "analytics.js", "size": 15, "delay": 0.1},
+]
+
+async def main():
+    t1 = await http11_sequential(resources)
+    t2 = await http2_multiplexed(resources)
+    print(f"HTTP/1.1 (sirayla): {t1:.2f}s")
+    print(f"HTTP/2 (paralel):   {t2:.2f}s")
+    print(f"Hizlanma: {t1/t2:.1f}x")
+
+asyncio.run(main())
+```
+
+**Beklenen çıktı:**
+```
+HTTP/1.1 (sirayla): 1.45s
+HTTP/2 (paralel):   0.40s
+Hizlanma: 3.6x
+```
+
+**İpucu:** `asyncio.gather()` tüm task'ları paralel çalıştırır. HTTP/2'nin avantajı tek TCP bağlantısında multiplexing yapmasıdır.
+
+**Zorluk:** Zor
+:::
+
 :::must-note
 - HTTP Methods: GET=oku, POST=oluştur, PUT=tamamen güncelle, PATCH=kısmen güncelle, DELETE=sil
 - İdempotent: GET, PUT, DELETE (tekrar çağırsan aynı sonuç). POST idempotent DEĞİL!

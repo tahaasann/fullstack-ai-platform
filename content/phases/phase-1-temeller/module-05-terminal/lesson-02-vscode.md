@@ -754,6 +754,636 @@ explanation: "Step Over (F10), fonksiyon çağrısını tek adımda geçer. Step
 > **Pair Programming İpucu:** AI'a VS Code'da yavaş hissettiğin bir işlemi anlat. Daha hızlı yapmanın yolunu ve ilgili shortcut'ları öğren.
 :::
 
+:::exercise
+### Alıştırma 4: Multi-Cursor ile Toplu Düzenleme
+
+**Görev:** VS Code multi-cursor özelliklerini kullanarak bir dosyayı verimli şekilde düzenle.
+
+**Başlangıç kodu:**
+```javascript
+// Bu kodu VS Code'da ac ve asagidaki gorevleri yap
+
+// GOREV 1: Tum "var" kelimelerini "const" yap (Ctrl+D)
+var name = "Ahmet";
+var age = 25;
+var email = "ahmet@test.com";
+var city = "Istanbul";
+var role = "developer";
+
+// GOREV 2: Her satirin sonuna noktalı virgul ekle (Alt+Shift+I ile satir sonlarina cursor koy)
+const items = [
+  { id: 1, name: "Laptop", price: 15000 }
+  { id: 2, name: "Phone", price: 8000 }
+  { id: 3, name: "Tablet", price: 5000 }
+  { id: 4, name: "Monitor", price: 3000 }
+]
+
+// GOREV 3: Her objenin "price" anahtarini "cost" olarak degistir
+// Ctrl+Shift+L ile tum "price" secimlerini yap, sonra "cost" yaz
+
+// GOREV 4: Satir numaralarini ekle (Alt+Click ile multi-cursor)
+function processItem(item) {}
+function validateItem(item) {}
+function saveItem(item) {}
+function deleteItem(item) {}
+function updateItem(item) {}
+
+// Her fonksiyonun basina yorum olarak numara ekle:
+// // 1. processItem
+// // 2. validateItem
+// vb.
+```
+
+**Beklenen çıktı:**
+```
+Tum degisiklikler fare kullanmadan sadece klavye ile yapilmis.
+- 5 "var" -> "const" donusumu (Ctrl+D ile)
+- 4 satir sonuna "," eklenmis (Alt+Shift+I ile)
+- 4 "price" -> "cost" degisimi (Ctrl+Shift+L ile)
+```
+
+**İpucu:** `Ctrl+D` = sonraki eşleşmeyi ekle. `Alt+Shift+I` = seçili satırların sonlarına cursor koy. `Alt+Click` = istediğin yere cursor ekle.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: VS Code Snippet Oluşturma
+
+**Görev:** Kendi özel code snippet'lerini oluştur ve kullan.
+
+**Başlangıç kodu:**
+```json
+// VS Code: Ctrl+Shift+P -> "Preferences: Configure User Snippets"
+// javascript.json secilecek
+
+// GOREV: Asagidaki snippet'leri ekle:
+
+{
+  "React Functional Component": {
+    "prefix": "rfc",
+    "body": [
+      "import React from 'react';",
+      "",
+      "interface ${1:ComponentName}Props {",
+      "  $2",
+      "}",
+      "",
+      "export const ${1:ComponentName}: React.FC<${1:ComponentName}Props> = ({ $3 }) => {",
+      "  return (",
+      "    <div>",
+      "      <h1>${1:ComponentName}</h1>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "};",
+      "",
+      "export default ${1:ComponentName};"
+    ],
+    "description": "React functional component with TypeScript"
+  },
+
+  "Console Log Variable": {
+    "prefix": "clv",
+    "body": "console.log('${1:variable}:', ${1:variable});",
+    "description": "Console log with variable name"
+  },
+
+  "Try-Catch Async": {
+    "prefix": "tca",
+    "body": [
+      "try {",
+      "  const result = await ${1:asyncFunction}($2);",
+      "  $0",
+      "} catch (error) {",
+      "  console.error('${1:asyncFunction} failed:', error);",
+      "  throw error;",
+      "}"
+    ],
+    "description": "Try-catch wrapper for async function"
+  }
+}
+```
+
+**Beklenen çıktı:**
+```
+"rfc" yazip Tab'a bastiginda:
+  React component sablonu olusuyor
+  Tab ile placeholder'lar arasinda geziniliyor
+  Component adi otomatik her yere yansıyor
+
+"clv" yazip Tab'a bastiginda:
+  console.log('variable:', variable); olusuyor
+  Variable adini yazinca her iki yerde de degisiyor
+```
+
+**İpucu:** `$1` ilk placeholder, `$0` son cursor pozisyonu. `${1:default}` varsayılan değerli placeholder. Aynı numara = aynı anda değişir.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: VS Code Debugger ile Karmaşık Bug Bulma
+
+**Görev:** VS Code debugger kullanarak çok adımlı bir bug'ı tespit et ve düzelt.
+
+**Başlangıç kodu:**
+```javascript
+// debug-challenge.js
+// Bu kodda 3 bug var. Debugger ile bul!
+
+class ShoppingCart {
+  constructor() {
+    this.items = [];
+    this.discount = 0;
+  }
+
+  addItem(name, price, quantity) {
+    this.items.push({ name, price, quantity });
+  }
+
+  removeItem(name) {
+    // BUG 1: Nerede?
+    this.items = this.items.filter(item => item.name !== name);
+  }
+
+  applyDiscount(percentage) {
+    // BUG 2: Nerede?
+    this.discount = percentage;
+  }
+
+  getTotal() {
+    let total = 0;
+    for (let i = 0; i <= this.items.length; i++) {  // BUG 3: Nerede?
+      total += this.items[i].price * this.items[i].quantity;
+    }
+    return total * (1 - this.discount / 100);
+  }
+
+  getSummary() {
+    return {
+      itemCount: this.items.length,
+      total: this.getTotal(),
+      discount: `${this.discount}%`,
+      items: this.items.map(i => `${i.name} x${i.quantity}`),
+    };
+  }
+}
+
+// Test
+const cart = new ShoppingCart();
+cart.addItem("Laptop", 15000, 1);
+cart.addItem("Mouse", 200, 2);
+cart.addItem("Keyboard", 500, 1);
+
+console.log("Before discount:", cart.getSummary());
+
+cart.applyDiscount(10);
+console.log("After 10% discount:", cart.getSummary());
+
+cart.removeItem("Mouse");
+console.log("After remove Mouse:", cart.getSummary());
+
+// GOREV: VS Code'da:
+// 1. F5 ile debug baslat (launch.json olustur)
+// 2. getTotal() icine breakpoint koy
+// 3. Step over (F10) ile satir satir ilerle
+// 4. Variables panelinde i, total, this.items degerlerini izle
+// 5. 3 bug'i bul ve duzelt
+```
+
+**Beklenen çıktı:**
+```
+HATALI: TypeError veya yanlis toplam (bug'lar yuzunden)
+
+DUZELTILMIS:
+Before discount: { itemCount: 3, total: 15900, discount: '0%' }
+After 10% discount: { itemCount: 3, total: 14310, discount: '10%' }
+After remove Mouse: { itemCount: 2, total: 13950, discount: '10%' }
+```
+
+**İpucu:** Bug 3: `i <= this.items.length` off-by-one hatası (`<` olmalı). Debugger'da Variables paneli ile `i` değerini izle.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: VS Code Tasks ile Otomasyon
+
+**Görev:** `tasks.json` ile proje görevlerini otomatize et.
+
+**Başlangıç kodu:**
+```json
+// .vscode/tasks.json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev Server",
+      "type": "shell",
+      "command": "npm run dev",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Run Tests",
+      "type": "shell",
+      "command": "npm test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": ["$jest"]
+    },
+    {
+      "label": "Lint Fix",
+      "type": "shell",
+      "command": "npx eslint --fix src/",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "Build & Test",
+      "dependsOn": ["Lint Fix", "Run Tests"],
+      "dependsOrder": "sequence",
+      "group": "build"
+    }
+  ]
+}
+```
+
+**Beklenen çıktı:**
+```
+Tasks:
+- "Dev Server" -> npm run dev (arka planda calisir)
+- "Run Tests" -> npm test (Ctrl+Shift+B ile calistirilir)
+- "Lint Fix" -> eslint --fix
+- "Build & Test" -> Lint + Test sirayla calisir
+```
+
+**İpucu:** `Ctrl+Shift+B` ile build task çalıştırılır. `dependsOn` ile task'lar zincirlenir. `isBackground` arka plan task'ları için kullanılır.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 8: VS Code Extensions Yapılandırması
+
+**Görev:** Takım standardı olarak kullanılacak extension listesi ve ayarları oluştur.
+
+**Başlangıç kodu:**
+```json
+// .vscode/extensions.json - Takima onerilen extension'lar
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "usernamehw.errorlens",
+    "eamodio.gitlens",
+    "pkief.material-icon-theme",
+    "github.copilot"
+  ],
+  "unwantedRecommendations": [
+    "hookyqr.beautify"
+  ]
+}
+```
+
+```json
+// .vscode/settings.json - Proje ayarlari
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.tabSize": 2,
+  "editor.rulers": [80, 120],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact"
+  }
+}
+```
+
+**Beklenen çıktı:**
+```
+Proje acildiginda:
+- VS Code onerilen extension'lari kurmasi icin bildirim gosterir
+- formatOnSave aktif, her kayitte kod formatlanir
+- ESLint hatalari aninda duzeltilir
+- Import'lar otomatik organize edilir
+```
+
+**İpucu:** `.vscode/` dizini repo'ya dahil edilir. `settings.json` proje bazlı ayarları, `extensions.json` takım extension'larını tanımlar.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 9: VS Code Remote Development
+
+**Görev:** VS Code'un Remote SSH ve Dev Containers özelliklerini yapılandır.
+
+**Başlangıç kodu:**
+```json
+// .devcontainer/devcontainer.json
+{
+  "name": "Node.js Development",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [3000, 5173, 8080],
+  "postCreateCommand": "npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  }
+}
+```
+
+```bash
+#!/bin/bash
+echo "=== Dev Container Kullanimi ==="
+echo "1. VS Code'da F1 -> 'Dev Containers: Reopen in Container'"
+echo "2. Docker container icinde VS Code acilir"
+echo "3. Tum extension'lar ve ayarlar otomatik yuklenir"
+echo "4. Port forwarding ile localhost:3000'e erisim"
+
+echo -e "\n=== Remote SSH Kullanimi ==="
+echo "1. VS Code'da F1 -> 'Remote-SSH: Connect to Host'"
+echo "2. ~/.ssh/config'deki host'lardan birini sec"
+echo "3. Uzak sunucuda VS Code acilir"
+echo "4. Terminal, debugger, extension'lar uzakta calisir"
+
+echo -e "\n=== GOREV ==="
+echo "1. devcontainer.json dosyasini projene ekle"
+echo "2. Docker kurulu ise 'Reopen in Container' yap"
+echo "3. Container icinde terminal ac ve node --version calistir"
+echo "4. Port 3000'de bir server baslat ve tarayicida ac"
+```
+
+**Beklenen çıktı:**
+```
+=== Dev Container Kullanimi ===
+1. Docker container icinde calisma ortami hazir
+2. Tum takım ayni ortamda calisir ("works on my machine" yok)
+3. Yeni gelistirici 1 komutla baslar
+
+=== Remote SSH Kullanimi ===
+1. Uzak sunucuda lokal gibi gelistirme
+```
+
+**İpucu:** Dev Container'lar Docker kullanır. `"postCreateCommand"` container oluşturulduktan sonra çalışır. `"forwardPorts"` ile container portları lokale yönlendirilir.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: launch.json ile Gelişmiş Debug Konfigürasyonu
+
+**Görev:** Farklı senaryolar için debug konfigürasyonları oluştur: Node.js, fullstack, test debugging.
+
+**Başlangıç kodu:**
+```json
+// .vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Node.js: Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Node.js: Backend API",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/src/index.js",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "8000",
+        "DB_HOST": "localhost"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Jest: Current Test File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "${relativeFile}",
+        "--config", "jest.config.js",
+        "--no-coverage"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Chrome: Frontend",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend/src",
+      "sourceMaps": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Fullstack: Backend + Frontend",
+      "configurations": ["Node.js: Backend API", "Chrome: Frontend"],
+      "stopAll": true
+    }
+  ]
+}
+```
+
+```bash
+echo "=== Debug Konfigurasyonlari ==="
+echo "F5 ile debug baslat, dropdown'dan konfigurasyon sec:"
+echo ""
+echo "1. Node.js: Current File   -> Acik dosyayi debug et"
+echo "2. Node.js: Backend API    -> Backend'i env vars ile debug et"
+echo "3. Jest: Current Test File  -> Acik test dosyasini debug et"
+echo "4. Chrome: Frontend        -> Frontend'i Chrome ile debug et"
+echo "5. Fullstack               -> Backend + Frontend birlikte"
+
+echo -e "\n=== GOREV ==="
+echo "1. Bir JS dosyasi ac, breakpoint koy (satir numarasina tikla)"
+echo "2. F5 ile 'Current File' konfigurasyonu ile baslat"
+echo "3. Variables panelinde degiskenleri incele"
+echo "4. Watch paneline 'this.items.length' gibi ifadeler ekle"
+echo "5. Call Stack panelinde fonksiyon cagri zincirini gor"
+echo "6. Debug Console'da runtime ifadeler yaz"
+```
+
+**Beklenen çıktı:**
+```
+=== Debug Konfigurasyonlari ===
+F5 ile debug baslat, dropdown'dan konfigurasyon sec:
+
+1. Node.js: Current File   -> Acik dosyayi debug et
+2. Node.js: Backend API    -> Backend'i env vars ile debug et
+3. Jest: Current Test File  -> Acik test dosyasini debug et
+4. Chrome: Frontend        -> Frontend'i Chrome ile debug et
+5. Fullstack               -> Backend + Frontend birlikte
+```
+
+**İpucu:** `compounds` birden fazla debug session'ı aynı anda başlatır. `skipFiles` ile node_modules içine girmekten kaçın. `env` ile ortam değişkenlerini override et.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: VS Code Workspace Yapılandırması
+
+**Görev:** Multi-root workspace ve proje bazlı ayarlar oluştur.
+
+**Başlangıç kodu:**
+```json
+// myproject.code-workspace
+{
+  "folders": [
+    { "path": "frontend", "name": "Frontend (React)" },
+    { "path": "backend", "name": "Backend (Python)" },
+    { "path": "shared", "name": "Shared Libraries" }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/__pycache__": true,
+      "**/.pytest_cache": true
+    },
+    "search.exclude": {
+      "**/dist": true,
+      "**/build": true,
+      "**/coverage": true
+    },
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter",
+      "editor.formatOnSave": true,
+      "editor.rulers": [88]
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+  },
+  "launch": {
+    "configurations": [],
+    "compounds": []
+  }
+}
+```
+
+**Beklenen çıktı:**
+```
+Workspace acildiginda:
+- Sol panelde 3 ayri klasor gorunur
+- Python dosyalari black ile formatlanir (88 karakter siniri)
+- TypeScript dosyalari prettier ile formatlanir
+- node_modules ve __pycache__ gizlenir
+- Arama sonuclarinda dist/build/coverage cikartilir
+```
+
+**İpucu:** `.code-workspace` dosyasını `File > Open Workspace from File` ile aç. Her klasöre özel ayarlar `[python]` gibi dil bazlı yapılabilir.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 12: Refactoring Araçları ile Kod İyileştirme
+
+**Görev:** VS Code'un refactoring araçlarını kullanarak kodu iyileştir.
+
+**Başlangıç kodu:**
+```javascript
+// refactor-practice.js
+// Bu kodu VS Code'da ac ve refactoring araclarini kullan
+
+// GOREV 1: "Extract Function" (F2 veya sag tik > Refactor)
+function processOrder(order) {
+  // Bu blogu sec ve "Extract Function" yap -> "calculateTotal"
+  let total = 0;
+  for (const item of order.items) {
+    total += item.price * item.quantity;
+    if (item.discount) {
+      total -= item.price * item.quantity * item.discount / 100;
+    }
+  }
+
+  // Bu blogu sec ve "Extract Function" yap -> "applyTax"
+  const taxRate = 0.18;
+  const tax = total * taxRate;
+  const grandTotal = total + tax;
+
+  return { total, tax, grandTotal };
+}
+
+// GOREV 2: "Rename Symbol" (F2)
+// "processOrder" fonksiyonunu "calculateOrderTotal" olarak yeniden adlandir
+// Tum referanslar otomatik guncellenir
+
+// GOREV 3: "Extract Variable"
+function getUserDisplayName(user) {
+  // Bu uzun ifadeyi sec -> "Extract Variable"
+  return `${user.firstName} ${user.lastName} (${user.role === 'admin' ? 'Yonetici' : 'Kullanici'})`;
+}
+
+// GOREV 4: "Move to New File"
+// getUserDisplayName fonksiyonunu sec -> "Move to New File"
+// VS Code otomatik import ekler
+
+console.log("Refactoring gorevlerini VS Code ile yap:");
+console.log("1. Kod blogunu sec > Sag tik > Refactor > Extract Function");
+console.log("2. Degisken/fonksiyon adina tikla > F2 > Yeni ad yaz");
+console.log("3. Ifadeyi sec > Sag tik > Refactor > Extract Variable");
+console.log("4. Fonksiyonu sec > Sag tik > Refactor > Move to New File");
+```
+
+**Beklenen çıktı:**
+```
+Refactoring sonrasi kod:
+1. calculateTotal() ve applyTax() fonksiyonlari cikarilmis
+2. processOrder -> calculateOrderTotal olarak yeniden adlandirilmis
+3. Uzun ifade bir degiskene atanmis
+4. getUserDisplayName ayri dosyaya tasinmis ve import eklenmis
+```
+
+**İpucu:** `F2` = Rename Symbol (tüm referansları günceller). `Ctrl+.` = Quick Fix menüsü (extract function, extract variable vb.). VS Code TypeScript/JavaScript dosyalarında en iyi refactoring desteği sunar.
+
+**Zorluk:** Orta
+:::
+
 :::must-note
 - `Ctrl+P` → dosya hızlı aç, `Ctrl+Shift+P` → Command Palette (en önemli shortcut!)
 - `Ctrl+D` → kelimeyi seç + sonraki eşleşmeyi ekle (multi-cursor editing)

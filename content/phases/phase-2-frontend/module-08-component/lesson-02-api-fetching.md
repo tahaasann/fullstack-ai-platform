@@ -867,6 +867,397 @@ explanation: "Optimistic update'in amaci sunucu yanıtını BEKLEMEDEN UI'i heme
 API entegrasyonlarında AI'a Network tab çıktısını yapıştır ve sor: "Bu API response'unu TanStack Query ile nasıl cache'lerim? staleTime ve gcTime ne olmalı? Mutation sonrası hangi query'leri invalidate etmeliyim?"
 :::
 
+:::exercise
+### Alıştırma 4: fetch vs Axios Karşılaştırma
+**Görev:** Aynı API çağrısını hem fetch hem Axios ile yaz ve hata yönetimini karşılaştır.
+**Başlangıç kodu:**
+```tsx
+const API_URL = "https://api.example.com/users";
+
+// TODO 1: fetch ile GET isteği (headers, error handling)
+async function fetchUsers_fetch() {
+  // - Authorization header ekle
+  // - response.ok kontrolü
+  // - JSON parse
+  // - Network hatası ve HTTP hatası ayrı yönet
+}
+
+// TODO 2: Axios ile aynı istek
+async function fetchUsers_axios() {
+  // - Authorization header ekle
+  // - Otomatik JSON parse
+  // - Error handling (axios otomatik reject eder)
+}
+```
+**Beklenen çıktı:**
+```tsx
+// fetch
+async function fetchUsers_fetch() {
+  try {
+    const res = await fetch(API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    return await res.json();
+  } catch (err) {
+    if (err instanceof TypeError) console.error("Network hatası");
+    throw err;
+  }
+}
+
+// Axios
+async function fetchUsers_axios() {
+  try {
+    const { data } = await axios.get(API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data; // Otomatik JSON parse
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.error(`HTTP ${err.response?.status}`);
+    }
+    throw err;
+  }
+}
+```
+**İpucu:** fetch'te 404 bir hata DEĞİLDİR (Promise resolve olur), Axios'ta 404 otomatik reject eder. Bu en önemli fark.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Axios Interceptor ile Token Yönetimi
+**Görev:** Axios interceptor ile otomatik token ekleme ve 401 hatalarında token yenileme yaz.
+**Başlangıç kodu:**
+```tsx
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "https://api.example.com",
+});
+
+// TODO: Request interceptor - her isteğe token ekle
+api.interceptors.request.use(/* ? */);
+
+// TODO: Response interceptor - 401 hatalarında refresh token ile yenile
+api.interceptors.response.use(
+  /* success handler */,
+  /* error handler - 401 ise token yenile ve isteği tekrarla */
+);
+```
+**Beklenen çıktı:**
+```tsx
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const { data } = await axios.post("/auth/refresh", {
+          refreshToken: localStorage.getItem("refresh_token"),
+        });
+        localStorage.setItem("access_token", data.accessToken);
+        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        return api(originalRequest);
+      } catch {
+        localStorage.clear();
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+```
+**İpucu:** `_retry` flag'i ile sonsuz döngüyü engelle. Refresh token da geçersizse kullanıcıyı login'e yönlendir.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: TanStack Query - useQuery Temelleri
+**Görev:** TanStack Query ile veri çekme, loading/error yönetimi ve cache yapılandırması yaz.
+**Başlangıç kodu:**
+```tsx
+import { useQuery } from "@tanstack/react-query";
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+}
+
+// TODO: useProducts hook'u yaz
+function useProducts(category?: string) {
+  return useQuery({
+    // queryKey: category'ye göre farklı cache
+    // queryFn: API çağrısı
+    // staleTime: 5 dakika
+    // retry: 2 kez
+    // enabled: ???
+  });
+}
+
+// TODO: Component'te kullan
+function ProductList() {
+  const [category, setCategory] = useState("all");
+  const { data, isLoading, isError, error, refetch } = useProducts(category);
+
+  // TODO: loading, error, success durumlarını render et
+}
+```
+**Beklenen çıktı:**
+```tsx
+function useProducts(category?: string) {
+  return useQuery<Product[]>({
+    queryKey: ["products", category],
+    queryFn: async () => {
+      const url = category && category !== "all"
+        ? `/api/products?category=${category}`
+        : "/api/products";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Ürünler yüklenemedi");
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+  });
+}
+
+// Component:
+if (isLoading) return <Skeleton />;
+if (isError) return <p>Hata: {error.message} <button onClick={() => refetch()}>Tekrar</button></p>;
+if (!data?.length) return <p>Ürün bulunamadı</p>;
+return data.map(p => <ProductCard key={p.id} product={p} />);
+```
+**İpucu:** `queryKey` array olarak cache anahtarıdır - `["products", "electronics"]` ve `["products", "books"]` farklı cache'lenir. `staleTime` milisaniye cinsindendir.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: useMutation ile Optimistic Update
+**Görev:** TanStack Query useMutation ile bir todo'yu tamamla ve optimistic update uygula.
+**Başlangıç kodu:**
+```tsx
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+// TODO: useMutation ile toggleTodo yaz
+// - API'ye PATCH isteği gönder
+// - Optimistic update: UI'ı hemen güncelle
+// - Hata durumunda eski state'e geri dön (rollback)
+// - Başarıda cache'i invalidate et
+```
+**Beklenen çıktı:**
+```tsx
+function useToggleTodo() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (todoId: number) => {
+      const res = await fetch(`/api/todos/${todoId}/toggle`, { method: "PATCH" });
+      if (!res.ok) throw new Error("Güncelleme başarısız");
+      return res.json();
+    },
+    onMutate: async (todoId) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+      const previousTodos = queryClient.getQueryData<Todo[]>(["todos"]);
+
+      queryClient.setQueryData<Todo[]>(["todos"], (old) =>
+        old?.map(t => t.id === todoId ? { ...t, completed: !t.completed } : t)
+      );
+
+      return { previousTodos };
+    },
+    onError: (_err, _todoId, context) => {
+      queryClient.setQueryData(["todos"], context?.previousTodos);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
+}
+```
+**İpucu:** `onMutate` API çağrısından ÖNCE çalışır (optimistic). `onError`'da eski veriyi geri yükle. `onSettled` her durumda çalışır ve gerçek veriyi getirir.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 8: Infinite Scroll ile Sayfalama
+**Görev:** TanStack Query `useInfiniteQuery` ile sonsuz scroll uygula.
+**Başlangıç kodu:**
+```tsx
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useRef, useCallback } from "react";
+
+// TODO: useInfiniteQuery ile sayfalı veri çek
+// TODO: IntersectionObserver ile son eleman göründüğünde yeni sayfa yükle
+```
+**Beklenen çıktı:**
+```tsx
+function useInfiniteProducts() {
+  return useInfiniteQuery({
+    queryKey: ["products", "infinite"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await fetch(`/api/products?page=${pageParam}&limit=20`);
+      return res.json();
+    },
+    getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
+    initialPageParam: 1,
+  });
+}
+
+function ProductFeed() {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteProducts();
+  const observerRef = useRef<IntersectionObserver>();
+
+  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (isFetchingNextPage) return;
+    if (observerRef.current) observerRef.current.disconnect();
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+    if (node) observerRef.current.observe(node);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+
+  return (
+    <div>
+      {data?.pages.flatMap((page, i) =>
+        page.items.map((item: any, j: number) => {
+          const isLast = i === data.pages.length - 1 && j === page.items.length - 1;
+          return <div ref={isLast ? lastElementRef : null} key={item.id}>{item.name}</div>;
+        })
+      )}
+      {isFetchingNextPage && <p>Yükleniyor...</p>}
+    </div>
+  );
+}
+```
+**İpucu:** `IntersectionObserver` son elementi izler, görünür olunca `fetchNextPage()` çağrılır. `getNextPageParam` sonraki sayfa numarasını döndürür, yoksa `undefined` dönerek daha fazla sayfa olmadığını belirtir.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: API Error Handler Utility
+**Görev:** Merkezi bir API error handler fonksiyonu yaz ve tüm hata tiplerini yönet.
+**Başlangıç kodu:**
+```tsx
+// TODO: ApiError class'ı oluştur
+// TODO: handleApiError fonksiyonu yaz
+// - Network hatası, timeout, 4xx, 5xx ayrımı
+// - Kullanıcıya anlamlı mesaj döndür
+// - Error tracking (Sentry benzeri) entegrasyonu
+```
+**Beklenen çıktı:**
+```tsx
+class ApiError extends Error {
+  constructor(
+    public statusCode: number,
+    message: string,
+    public code?: string,
+    public details?: Record<string, string[]>
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+function handleApiError(error: unknown): string {
+  if (error instanceof ApiError) {
+    switch (error.statusCode) {
+      case 400: return `Geçersiz istek: ${error.message}`;
+      case 401: return "Oturum süresi doldu. Lütfen tekrar giriş yapın.";
+      case 403: return "Bu işlem için yetkiniz yok.";
+      case 404: return "İstenen kaynak bulunamadı.";
+      case 409: return "Çakışma: Bu kayıt zaten mevcut.";
+      case 422: return `Doğrulama hatası: ${error.message}`;
+      case 429: return "Çok fazla istek. Lütfen biraz bekleyin.";
+      default:
+        if (error.statusCode >= 500) return "Sunucu hatası. Lütfen daha sonra tekrar deneyin.";
+        return error.message;
+    }
+  }
+  if (error instanceof TypeError && error.message === "Failed to fetch") {
+    return "Bağlantı hatası. İnternet bağlantınızı kontrol edin.";
+  }
+  return "Beklenmeyen bir hata oluştu.";
+}
+```
+**İpucu:** Custom error class ile hata tiplerini yapılandır. HTTP status code'lara göre kullanıcıya Türkçe anlamlı mesajlar göster.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: WebSocket ile Gerçek Zamanlı Bildirim
+**Görev:** WebSocket bağlantısı kuran ve TanStack Query cache'ini güncelleyen bir hook yaz.
+**Başlangıç kodu:**
+```tsx
+// TODO: useRealtimeNotifications hook'u yaz
+// - WebSocket bağlantısı kur
+// - Gelen mesajları parse et
+// - TanStack Query cache'ini güncelle
+// - Bağlantı koptuğunda yeniden bağlan
+// - Cleanup (unmount'ta bağlantıyı kapat)
+```
+**Beklenen çıktı:**
+```tsx
+function useRealtimeNotifications() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    let ws: WebSocket;
+    let reconnectTimer: NodeJS.Timeout;
+
+    function connect() {
+      ws = new WebSocket("wss://api.example.com/ws");
+
+      ws.onopen = () => console.log("WebSocket bağlandı");
+
+      ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+
+        switch (message.type) {
+          case "NEW_NOTIFICATION":
+            queryClient.setQueryData<Notification[]>(
+              ["notifications"],
+              (old) => [message.payload, ...(old ?? [])]
+            );
+            break;
+          case "DATA_UPDATED":
+            queryClient.invalidateQueries({ queryKey: [message.resource] });
+            break;
+        }
+      };
+
+      ws.onclose = () => {
+        reconnectTimer = setTimeout(connect, 3000);
+      };
+
+      ws.onerror = (err) => console.error("WebSocket hatası:", err);
+    }
+
+    connect();
+
+    return () => {
+      clearTimeout(reconnectTimer);
+      ws?.close();
+    };
+  }, [queryClient]);
+}
+```
+**İpucu:** WebSocket kapandığında otomatik yeniden bağlanma (reconnect) uygula. Cleanup'ta hem WebSocket'i hem timer'ı temizle. `queryClient.setQueryData` ile cache'i doğrudan güncelle.
+**Zorluk:** Zor
+:::
+
 :::must-note
 - fetch API: 4xx/5xx için reject ETMEZ (response.ok kontrol et), Axios: otomatik reject eder
 - Axios interceptors: request'te token ekle, response'ta 401 yakala ve token yenile

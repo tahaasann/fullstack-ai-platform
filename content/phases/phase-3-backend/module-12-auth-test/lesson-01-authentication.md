@@ -742,6 +742,458 @@ explanation: "401 Unauthorized: Kullanıcının kimliği doğrulanmamış (token
 Authentication kodunu yazarken AI'a JWT token'ini jwt.io'da decode ederek goster ve sor: "Bu token'in payload'inda hassas veri var mi? Token suresi uygun mu? Refresh token rotation dogru calisiyor mu? OWASP Authentication Cheat Sheet'e gore eksiklerim ne?"
 :::
 
+:::exercise
+### Alıştırma 4: bcrypt ile Şifre Hashleme
+**Görev:** bcrypt kullanarak güvenli şifre kayıt ve doğrulama fonksiyonları yaz.
+**Başlangıç kodu:**
+```javascript
+const bcrypt = require("bcrypt");
+
+// TODO: hashPassword - şifreyi hashle (saltRounds: 12)
+// TODO: verifyPassword - şifreyi doğrula
+// TODO: Neden MD5 veya SHA-256 şifre için kullanılmamalı?
+// TODO: Salt nedir ve neden gerekli?
+```
+**Beklenen çıktı:**
+```javascript
+async function hashPassword(plainPassword) {
+  const saltRounds = 12; // İşlem süresi: ~250ms (2^12 iterasyon)
+  const hash = await bcrypt.hash(plainPassword, saltRounds);
+  return hash;
+  // Örnek çıktı: $2b$12$LJ3m4ys3Lg7BNKkF9gZxAeWz9tBrwOJvQqYwV1h...
+  // $2b$ = bcrypt versiyon, 12$ = salt rounds, sonrası = salt + hash
+}
+
+async function verifyPassword(plainPassword, hashedPassword) {
+  const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
+  return isMatch; // true veya false
+}
+
+// Kullanım:
+// Kayıt
+const hash = await hashPassword("MySecureP@ss1");
+await db.users.create({ email, password: hash });
+
+// Giriş
+const user = await db.users.findOne({ email });
+const valid = await verifyPassword(inputPassword, user.password);
+if (!valid) throw new Error("Geçersiz şifre");
+
+// Neden MD5/SHA-256 olmaz?
+// - Çok hızlıdır (saniyede milyarlarca deneme - brute force kolay)
+// - Salt içermez (rainbow table saldırısı)
+// - bcrypt kasıtlı olarak yavaştır (saltRounds ile ayarlanır)
+```
+**İpucu:** `saltRounds: 12` iyi bir denge (güvenlik vs performans). Her artış süreyi 2x yapar. Salt, aynı şifrelerin farklı hash'ler üretmesini sağlar.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: JWT Token Oluşturma ve Doğrulama
+**Görev:** Access token ve refresh token sistemi kur.
+**Başlangıç kodu:**
+```javascript
+const jwt = require("jsonwebtoken");
+
+// TODO: generateTokens - access + refresh token oluştur
+// TODO: verifyAccessToken - access token'ı doğrula
+// TODO: refreshAccessToken - refresh token ile yeni access token al
+// TODO: Token'da hangi bilgiler olmalı, hangisi OLMAMALI?
+```
+**Beklenen çıktı:**
+```javascript
+const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
+const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+
+function generateTokens(user) {
+  const accessToken = jwt.sign(
+    {
+      sub: user.id,        // Kullanıcı ID
+      role: user.role,     // Yetki kontrolü için
+      // ASLA KOYMA: şifre, kredi kartı, kişisel veriler
+    },
+    ACCESS_SECRET,
+    { expiresIn: "15m" }   // Kısa süreli
+  );
+
+  const refreshToken = jwt.sign(
+    { sub: user.id, type: "refresh" },
+    REFRESH_SECRET,
+    { expiresIn: "7d" }    // Uzun süreli
+  );
+
+  return { accessToken, refreshToken };
+}
+
+function verifyAccessToken(token) {
+  try {
+    return jwt.verify(token, ACCESS_SECRET);
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      throw new Error("Token süresi dolmuş");
+    }
+    throw new Error("Geçersiz token");
+  }
+}
+
+async function refreshAccessToken(refreshToken) {
+  try {
+    const payload = jwt.verify(refreshToken, REFRESH_SECRET);
+
+    // Refresh token'ın veritabanında hala geçerli olduğunu kontrol et
+    const storedToken = await db.refreshTokens.findOne({
+      userId: payload.sub,
+      token: refreshToken,
+      revoked: false,
+    });
+    if (!storedToken) throw new Error("Token iptal edilmiş");
+
+    const user = await db.users.findById(payload.sub);
+    const { accessToken } = generateTokens(user);
+    return accessToken;
+  } catch {
+    throw new Error("Refresh token geçersiz");
+  }
+}
+```
+**İpucu:** Access token kısa ömürlü (15dk), refresh token uzun ömürlü (7 gün). JWT Base64 encode'dur, şifrelenmez - jwt.io ile decode edilebilir, hassas veri koyma!
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Auth Middleware
+**Görev:** Express middleware ile JWT doğrulama ve role-based authorization yaz.
+**Başlangıç kodu:**
+```javascript
+// TODO: authenticate middleware - token doğrula, req.user'a ekle
+// TODO: authorize middleware factory - belirli rollere izin ver
+// TODO: optionalAuth middleware - token varsa doğrula, yoksa devam et
+```
+**Beklenen çıktı:**
+```javascript
+// Authentication middleware
+function authenticate(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Token gerekli" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const payload = jwt.verify(token, ACCESS_SECRET);
+    req.user = { id: payload.sub, role: payload.role };
+    next();
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ error: "Token süresi dolmuş", code: "TOKEN_EXPIRED" });
+    }
+    return res.status(401).json({ error: "Geçersiz token" });
+  }
+}
+
+// Authorization middleware factory
+function authorize(...roles) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Önce giriş yapın" });
+    }
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ error: "Bu işlem için yetkiniz yok" });
+    }
+    next();
+  };
+}
+
+// Optional auth (public + authenticated ortak endpoint)
+function optionalAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    try {
+      const token = authHeader.split(" ")[1];
+      req.user = jwt.verify(token, ACCESS_SECRET);
+    } catch {} // Token geçersizse sessizce devam et
+  }
+  next();
+}
+
+// Kullanım:
+app.get("/api/profile", authenticate, getProfile);
+app.delete("/api/users/:id", authenticate, authorize("admin"), deleteUser);
+app.get("/api/posts", optionalAuth, getPosts); // Giriş yapan kendi like'larını görür
+```
+**İpucu:** `authenticate` = kim olduğunu belirle, `authorize` = ne yapabileceğini kontrol et. Factory pattern ile `authorize("admin", "moderator")` şeklinde esnek kullanım.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: OAuth 2.0 Google Login
+**Görev:** Passport.js ile Google OAuth 2.0 login akışını implement et.
+**Başlangıç kodu:**
+```javascript
+// TODO: Passport Google Strategy konfigürasyonu
+// TODO: OAuth callback endpoint
+// TODO: Kullanıcı yoksa oluştur, varsa giriş yap
+// TODO: JWT token döndür
+```
+**Beklenen çıktı:**
+```javascript
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "/api/auth/google/callback",
+  },
+  async (accessToken, refreshToken, profile, done) => {
+    try {
+      // Kullanıcı var mı kontrol et
+      let user = await db.users.findOne({ googleId: profile.id });
+
+      if (!user) {
+        // Yoksa oluştur
+        user = await db.users.create({
+          googleId: profile.id,
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          avatar: profile.photos[0].value,
+          provider: "google",
+        });
+      }
+
+      done(null, user);
+    } catch (err) {
+      done(err, null);
+    }
+  }
+));
+
+// Route'lar
+app.get("/api/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+app.get("/api/auth/google/callback",
+  passport.authenticate("google", { session: false }),
+  (req, res) => {
+    const { accessToken, refreshToken } = generateTokens(req.user);
+    // Frontend'e yönlendir (token ile)
+    res.redirect(
+      `${process.env.FRONTEND_URL}/auth/callback?token=${accessToken}`
+    );
+  }
+);
+```
+**İpucu:** OAuth akışı: 1) Kullanıcı Google'a yönlendirilir 2) Google'da onay verir 3) Google callback URL'e code ile döner 4) Backend code ile token alır 5) Profil bilgisiyle kullanıcı oluşturur/günceller 6) JWT döndürür.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 8: Refresh Token Rotation
+**Görev:** Güvenli refresh token rotation sistemi implement et. Çalınmış token tespit edilebilmeli.
+**Başlangıç kodu:**
+```javascript
+// TODO: Refresh token rotation
+// - Her kullanım sonrası eski token'ı iptal et ve yeni token ver
+// - Aynı refresh token 2. kez kullanılırsa TÜM token'ları iptal et (çalınma tespiti)
+// - Token ailesi (family) ile takip et
+```
+**Beklenen çıktı:**
+```javascript
+async function rotateRefreshToken(oldRefreshToken) {
+  const decoded = jwt.verify(oldRefreshToken, REFRESH_SECRET);
+
+  // Token'ı veritabanında bul
+  const storedToken = await db.refreshTokens.findOne({
+    token: oldRefreshToken,
+  });
+
+  if (!storedToken) {
+    throw new Error("Token bulunamadı");
+  }
+
+  // Token zaten kullanılmış mı? (çalınma tespiti!)
+  if (storedToken.used) {
+    // Tüm aile token'larını iptal et
+    await db.refreshTokens.updateMany(
+      { family: storedToken.family },
+      { revoked: true }
+    );
+    throw new Error("Token yeniden kullanımı tespit edildi! Tüm oturumlar kapatıldı.");
+  }
+
+  // Eski token'ı "kullanıldı" olarak işaretle
+  await db.refreshTokens.updateOne(
+    { _id: storedToken._id },
+    { used: true }
+  );
+
+  // Yeni token oluştur (aynı aile)
+  const user = await db.users.findById(decoded.sub);
+  const { accessToken, refreshToken } = generateTokens(user);
+
+  await db.refreshTokens.create({
+    token: refreshToken,
+    userId: user.id,
+    family: storedToken.family, // Aynı aile
+    used: false,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
+
+  return { accessToken, refreshToken };
+}
+```
+**İpucu:** Token rotation: her kullanımda yeni token ver, eskisini iptal et. Token family ile aynı login oturumunu takip et. Eski token tekrar kullanılırsa = çalınmış demektir, TÜM token'ları iptal et.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: RBAC (Role-Based Access Control)
+**Görev:** Esnek bir RBAC sistemi tasarla: roller, izinler ve kaynak sahipliği kontrolü.
+**Başlangıç kodu:**
+```javascript
+// TODO: Permission tabanlı RBAC sistemi
+// - Roller: admin, moderator, user
+// - İzinler: create, read, update, delete
+// - Kaynak sahipliği: kullanıcı sadece kendi verisini değiştirebilir
+```
+**Beklenen çıktı:**
+```javascript
+// İzin tanımları
+const PERMISSIONS = {
+  admin: {
+    posts: ["create", "read", "update", "delete"],
+    users: ["create", "read", "update", "delete"],
+    comments: ["create", "read", "update", "delete"],
+  },
+  moderator: {
+    posts: ["read", "update"],         // Düzenleyebilir ama oluşturamaz
+    users: ["read"],
+    comments: ["read", "update", "delete"], // Yorumları yönetebilir
+  },
+  user: {
+    posts: ["create", "read", "update", "delete"], // Sadece kendi post'u
+    users: ["read"],
+    comments: ["create", "read", "update", "delete"], // Sadece kendi yorumu
+  },
+};
+
+// İzin kontrolü middleware
+function can(resource, action) {
+  return (req, res, next) => {
+    const userRole = req.user.role;
+    const allowed = PERMISSIONS[userRole]?.[resource]?.includes(action);
+    if (!allowed) {
+      return res.status(403).json({ error: "Bu işlem için yetkiniz yok" });
+    }
+    next();
+  };
+}
+
+// Kaynak sahipliği kontrolü
+function isOwnerOrAdmin(resourceField = "userId") {
+  return async (req, res, next) => {
+    if (req.user.role === "admin") return next();
+
+    const resource = await db[req.baseUrl.split("/").pop()].findById(req.params.id);
+    if (!resource) return res.status(404).json({ error: "Bulunamadı" });
+
+    if (resource[resourceField].toString() !== req.user.id) {
+      return res.status(403).json({ error: "Sadece kendi kaynağınızı değiştirebilirsiniz" });
+    }
+    next();
+  };
+}
+
+// Kullanım:
+app.put("/api/posts/:id",
+  authenticate,
+  can("posts", "update"),
+  isOwnerOrAdmin("authorId"),
+  updatePost
+);
+```
+**İpucu:** RBAC = rol bazlı, ABAC = öznitelik bazlı (daha esnek). Kaynak sahipliği kontrolü admin'ler için atlanır. İzinleri veritabanında tutarsan dinamik olarak değiştirebilirsin.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: Tam Authentication Akışı
+**Görev:** Register, login, refresh ve logout endpoint'lerini içeren eksiksiz bir auth sistemi yaz.
+**Başlangıç kodu:**
+```javascript
+// TODO: POST /api/auth/register - Kayıt ol
+// TODO: POST /api/auth/login - Giriş yap (access + refresh token)
+// TODO: POST /api/auth/refresh - Token yenile
+// TODO: POST /api/auth/logout - Çıkış yap (refresh token iptal)
+// TODO: POST /api/auth/logout-all - Tüm cihazlardan çıkış
+```
+**Beklenen çıktı:**
+```javascript
+// Register
+app.post("/api/auth/register", async (req, res) => {
+  const { name, email, password } = req.body;
+
+  const exists = await db.users.findOne({ email });
+  if (exists) return res.status(409).json({ error: "Email zaten kayıtlı" });
+
+  const hashedPassword = await bcrypt.hash(password, 12);
+  const user = await db.users.create({ name, email, password: hashedPassword });
+
+  const tokens = generateTokens(user);
+  await saveRefreshToken(user.id, tokens.refreshToken);
+
+  res.status(201).json({ user: { id: user.id, name, email }, ...tokens });
+});
+
+// Login
+app.post("/api/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await db.users.findOne({ email }).select("+password");
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(401).json({ error: "Email veya şifre hatalı" });
+  }
+
+  const tokens = generateTokens(user);
+  await saveRefreshToken(user.id, tokens.refreshToken);
+
+  res.json({ user: { id: user.id, name: user.name }, ...tokens });
+});
+
+// Refresh
+app.post("/api/auth/refresh", async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(400).json({ error: "Refresh token gerekli" });
+
+  try {
+    const tokens = await rotateRefreshToken(refreshToken);
+    res.json(tokens);
+  } catch (err) {
+    res.status(401).json({ error: err.message });
+  }
+});
+
+// Logout
+app.post("/api/auth/logout", authenticate, async (req, res) => {
+  const { refreshToken } = req.body;
+  await db.refreshTokens.updateOne({ token: refreshToken }, { revoked: true });
+  res.status(204).send();
+});
+
+// Logout all devices
+app.post("/api/auth/logout-all", authenticate, async (req, res) => {
+  await db.refreshTokens.updateMany(
+    { userId: req.user.id, revoked: false },
+    { revoked: true }
+  );
+  res.json({ message: "Tüm cihazlardan çıkış yapıldı" });
+});
+```
+**İpucu:** Login'de "email veya şifre hatalı" dön (hangisinin yanlış olduğunu söyleme - güvenlik). Register'da 409 Conflict ile duplicate email kontrolü. Logout-all ile tüm refresh token'ları iptal et.
+**Zorluk:** Zor
+:::
+
 :::must-note
 - Authentication = "Sen kimsin?" (401), Authorization = "Ne yapabilirsin?" (403)
 - Şifre hash'leme: bcrypt (saltRounds: 12) veya Argon2id kullan. MD5/SHA-256 şifre için ASLA kullanma

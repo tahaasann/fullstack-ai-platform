@@ -4712,5 +4712,20 @@
     ],
     "live_demo_url_template": "https://portfolio-site.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/portfolio-site"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "HTML, CSS ve JavaScript temel bilgisi",
+      "Terminal/komut satiri kullanimi",
+      "Git temel komutlari (add, commit, push)"
+    ],
+    "what_you_should_know": [
+      "Phase 1 Module 1 - Internet ve HTTP temelleri",
+      "Phase 1 Module 3 - JavaScript ve TypeScript temelleri",
+      "Phase 2 Module 6 - HTML, CSS ve Tailwind CSS",
+      "Phase 2 Module 7 - React temelleri ve Next.js"
+    ],
+    "next_project": "project-02",
+    "skills_bridge": "Bu projede ogrendigin Next.js App Router, TypeScript ve Tailwind CSS bilgisi, sonraki projede full-stack uygulama gelistirmek icin frontend temelini olusturacak. Vercel deployment deneyimin CI/CD kavramlarini anlamani kolaylastiracak."
   }
 }

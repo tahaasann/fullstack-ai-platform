@@ -813,6 +813,203 @@ Bir arkadasinla veya timer ile şu problemi UMPIRE method ile coz:
 - 45 dakika süre ver
 - Sesli düşün (kayıt al)
 - Sonra kendini değerlendir
+
+---
+
+### Alistirma 2: Teknik Soru Bankasi Hazirlama (Kolay)
+
+Her ana konu icin 5'er soru ve cevap hazirla.
+
+1. **JavaScript/TypeScript:** Closure, event loop, promise, prototype, hoisting
+2. **React:** Virtual DOM, hooks, state management, lifecycle, performance
+3. **Backend:** REST vs GraphQL, authentication, database design, caching
+4. **DevOps:** Docker, CI/CD, monitoring, deployment strategies
+5. **System Design:** Scalability, caching, load balancing, database sharding
+
+**Beklenen Sonuc:** Her soruya Junior ve Senior seviyesinde iki ayri cevap yazilmali. Senior cevap trade-off'lari ve gercek dunya orneklerini icermeli. Toplam 25 soru-cevap cifti hazirlanmali.
+
+---
+
+### Alistirma 3: UMPIRE Method ile Problem Cozme (Kolay)
+
+Asagidaki problemi UMPIRE method ile coz (sesli dusunmeyi simule et):
+
+**Problem:** Verilen bir string'de en uzun tekrarsiz alt stringi bul (LeetCode #3).
+
+1. **Understand:** Problemi kendi cumlellerinle yeniden ifade et. Edge case'leri listele.
+2. **Match:** Hangi pattern/algoritma uygulanabilir? (Sliding window)
+3. **Plan:** Pseudocode yaz. Veri yapisi secimini acikla.
+4. **Implement:** Python/JavaScript ile kodla.
+5. **Review:** Kodu satir satir gozden gecir, hata ara.
+6. **Evaluate:** Time ve space complexity belirt.
+
+**Beklenen Sonuc:** Sliding window + hash set ile O(n) cozum yazilmali. Edge case'ler (bos string, tek karakter, tum ayni) handle edilmeli. UMPIRE'in her adimi yazili olarak belgelenmeli.
+
+---
+
+### Alistirma 4: System Design Mock Interview (Orta)
+
+45 dakikada bir system design sorusunu coz:
+
+**Soru:** "Design a URL shortener like bit.ly"
+
+Timer'i baslat ve su adimlari takip et:
+1. **Requirements (5 dk):** Functional ve non-functional requirements listele
+2. **Estimation (5 dk):** QPS, storage, bandwidth hesapla
+3. **High-Level Design (10 dk):** Bilesenler ve akis diyagrami ciz
+4. **Detailed Design (15 dk):** Veritabani semasiÿ, API tasarimi, caching stratejisi
+5. **Deep Dive (10 dk):** Bottleneck'ler ve cozumleri
+
+**Beklenen Sonuc:** Back-of-envelope hesaplamalar dogru olmali. Mimari diyagram anlasilir olmali. CAP theorem trade-off'lari tartisılmali. Caching, sharding ve rate limiting ele alinmali.
+
+---
+
+### Alistirma 5: Behavioral Interview Pratigi (Orta)
+
+STAR formatinda 8 hikaye hazirla ve her birini 2 dakikada anlatma pratigi yap:
+
+1. En zorlu teknik problemin ve nasil cozdugun
+2. Deadline baskisi altinda bir proje teslim ettigin bir an
+3. Takim arkadaşinla fikir ayriligi yasadigin ve nasil cozdugun
+4. Bir hatanin production'a gitmesini onledigin (veya duzelttigin)
+5. Yeni bir teknolojiyi hizla ogrendigin bir deneyim
+6. Liderlik yaptigin bir durum (resmi veya gayri resmi)
+7. Basarisiz oldugun ve bundan ders cikardigin bir an
+8. Musteriye veya kullaniciya onemli bir deger kattigin
+
+**Beklenen Sonuc:** Her hikaye 1-2 dakikada anlatilabiir olmali. STAR formatinda: Situation (2 cumle) → Task (1 cumle) → Action (3-4 cumle) → Result (1-2 cumle, rakamlsarla). Hikayeler birbirinden farkli konulari kapsamali.
+
+---
+
+### Alistirma 6: Live Coding Pratigi — Timer ile (Orta)
+
+Her problem icin 20 dakika sure ver ve sesli dusunmeyi pratik yap:
+
+```python
+# Problem 1: Two Sum (LeetCode #1) — 10 dakika
+def two_sum(nums, target):
+    # Sesli dusun: "Brute force O(n^2), ama hash map ile O(n) yapabilirim..."
+    # TODO: Coz
+
+# Problem 2: Valid Anagram (LeetCode #242) — 10 dakika
+def is_anagram(s, t):
+    # Sesli dusun: "Harf sayilarini karsilastirabilirim, Counter kullanabilirim..."
+    # TODO: Coz
+
+# Problem 3: Merge Two Sorted Lists (LeetCode #21) — 15 dakika
+def merge_two_lists(list1, list2):
+    # Sesli dusun: "Iki pointer ile karsilastirip birlestireyim..."
+    # TODO: Coz
+
+# Problem 4: Best Time to Buy and Sell Stock (LeetCode #121) — 15 dakika
+def max_profit(prices):
+    # Sesli dusun: "Minimum fiyati takip edip, her gunun karini hesaplayayim..."
+    # TODO: Coz
+```
+
+**Beklenen Sonuc:** Her problemi suresi icinde coz. Cozume baslamadan once yaklasimi sözlu acikla. En az 2 test case'i elle calistir. Time ve space complexity belirt.
+**Ipucu:** Interview'da susma — dusundugunu sesli soyle. "Simdi brute force dusunuyorum, sonra optimize ederim" demek suskunluktan cok daha iyi.
+
+---
+
+### Alistirma 7: Maas Muzakere Simulasyonu (Orta)
+
+Farkli senaryolarda maas muzakere pratigi yap:
+
+**Senaryo 1:** Recruiter soruyor: "Beklentiniz nedir?"
+- YANLIS: "5000 TL yeter"
+- DOGRU: "Pozisyonun sorumlulukları ve paketin tamamini gormek isterim. Siz bu rol icin hangi aralikta dusunuyorsunuz?"
+
+**Senaryo 2:** Teklif geldi: 25,000 TL net.
+- Arastirma yap: Glassdoor, levels.fyi, LinkedIn'den benzer pozisyonlarin ortalamasi
+- Counter-offer hazirla: "Bu rol icin piyasa araligi X-Y. Deneyimim ve becerilerim goz onune alindiginda Z makul olur"
+
+**Senaryo 3:** Birden fazla teklif var.
+- YANLIS: Yalan soyle
+- DOGRU: "Baska bir sirketin teklifini de degerlendiriyorum. Sizinle calismayi tercih ederim ama paketin X seviyesinde olmasi gerekir"
+
+**Beklenen Sonuc:** Her senaryo icin yazili script hazirla. Rakam belirtme zamanlamasi dogru olmali (once teklifi gor). Toplam paketi (maas + bonus + esop + yan haklar) degerlendir.
+
+---
+
+### Alistirma 8: Code Review Interview Pratigi (Zor)
+
+Asagidaki kodu "code review" formatinda incele ve geri bildirim ver:
+
+```javascript
+// Incelenecek kod
+app.post('/api/users', (req, res) => {
+  const { name, email, password } = req.body
+  const query = `INSERT INTO users (name, email, password) VALUES ('${name}', '${email}', '${password}')`
+  db.query(query, (err, result) => {
+    if (err) {
+      console.log(err)
+      res.status(500).send('Error')
+    }
+    res.json({ id: result.insertId, name, email, password })
+  })
+})
+```
+
+Bulman gereken sorunlar:
+1. SQL Injection acikligi (string concatenation)
+2. Sifre plaintext saklama (bcrypt kullanilmali)
+3. Sifre response'ta donuyor (data leakage)
+4. Input validation yok
+5. Error handling yetersiz (err durumunda return yok)
+6. Async/await kullanilmamis (callback hell)
+
+**Beklenen Sonuc:** En az 5 sorunu tespit et. Her sorun icin guvenli versiyonunu yaz. Oncelik sirasi: guvenlik > dogrruluk > performans > okunabilirlik.
+
+---
+
+### Alistirma 9: Takip Sorusu Hazirlama (Zor)
+
+Interview sonunda "Sorulariniz var mi?" dendiginde sorulacak stratejik sorular hazirla:
+
+**Takim ve Kultur:**
+1. "Takim su an hangi buyuk teknik zorlukla karsi karsiya?"
+2. "Yeni bir muhendis ilk 30-60-90 gunde neler yapmasi beklenir?"
+3. "Code review sureci nasil isliyor? PR ortalama ne kadar surede merge ediliyor?"
+
+**Teknik:**
+4. "Tech stack'te son 1 yilda en buyuk degisiklik ne oldu ve neden?"
+5. "Monitoring ve observability icin hangi araclari kullaniyorsunuz?"
+6. "Technical debt nasil yonetiliyor? Sprint'in yuzde kaci iyilestirmeye ayrilyor?"
+
+**Kariyer:**
+7. "Bu roldeki basarili bir muhendis 1 yil sonra hangi seviyede olur?"
+8. "Mentorluk programiniz var mi?"
+
+**Beklenen Sonuc:** En az 5 soru hazirla. Her soru sirkete gercekten ilgilendigini gostermeli. "Maas ne kadar" gibi erken sorulardan kacin. Sorular sirkete ozel adapte edilebilir olmali.
+
+---
+
+### Alistirma 10: 4 Haftalik Interview Hazirlik Plani (Zor)
+
+Kisisel interview hazirlik plani olustur:
+
+**Hafta 1: Temeller**
+- Gunluk 2 Easy LeetCode problemi (Hash Map, Two Pointers, String)
+- 5 STAR hikayesi yaz
+- Resume/CV guncelle
+
+**Hafta 2: Orta Seviye**
+- Gunluk 1 Medium LeetCode (Sliding Window, BFS/DFS, DP)
+- System Design: URL Shortener + Twitter Feed tasarla
+- 3 mock behavioral interview yap
+
+**Hafta 3: Ileri Seviye**
+- Gunluk 1 Medium/Hard LeetCode (Graph, Trie, Advanced DP)
+- System Design: Chat System + Payment System tasarla
+- Full mock interview (coding + system design + behavioral)
+
+**Hafta 4: Polish**
+- Zayif konulara odaklan
+- Her gun 1 full mock interview
+- Maas arastirmasi ve muzakere stratejisi hazirla
+
+**Beklenen Sonuc:** Her gun icin spesifik gorevler tanimlanmali. Haftalik hedefler olculebilir olmali (X problem cozuldu, Y mock yapildi). Zayif alanlarin tespiti icin haftalik retrospektif planlanmali.
 :::
 
 :::external-resource

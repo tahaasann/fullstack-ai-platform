@@ -2699,5 +2699,21 @@
     ],
     "live_demo_url_template": "https://ai-content-platform.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/ai-content-platform"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "Python ve FastAPI ile backend gelistirme",
+      "LLM API kullanimi (OpenAI, Anthropic)",
+      "Temel prompt engineering bilgisi",
+      "Next.js ile frontend gelistirme"
+    ],
+    "what_you_should_know": [
+      "Phase 5 Module 16 - Transformers ve modern AI",
+      "Phase 5 Module 17 - LLM API ve prompt engineering",
+      "Phase 3 Module 9 - FastAPI temelleri",
+      "Phase 4 Module 13 - Docker ve CI/CD"
+    ],
+    "next_project": "project-07",
+    "skills_bridge": "Bu projede ogrendigin multi-provider LLM entegrasyonu, prompt template yonetimi ve AI content pipeline bilgisi, sonraki projede RAG sistemi ve vektor veritabani kullanimi icin temel olusturacak."
   }
 }

@@ -4265,5 +4265,21 @@
     ],
     "live_demo_url_template": "https://trello-clone.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/trello-clone"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "React component yapisi ve hooks kullanimi",
+      "TypeScript temel tipleri",
+      "REST API kavrami",
+      "SQL temel sorgulari"
+    ],
+    "what_you_should_know": [
+      "Phase 2 Module 7 - React state management ve hooks",
+      "Phase 2 Module 8 - Component patterns ve API fetching",
+      "Phase 3 Module 9 - Node.js ve Express temelleri",
+      "Phase 3 Module 11 - SQL ve PostgreSQL"
+    ],
+    "next_project": "project-03",
+    "skills_bridge": "Bu projede ogrendigin full-stack CRUD, authentication ve state management bilgisi, sonraki projede real-time iletisim ve WebSocket kullanimi icin saglam bir altyapi olusturacak. Prisma ORM deneyimin veritabani islemlerini hizlandiracak."
   }
 }

@@ -759,6 +759,292 @@ Tailwind class'larini yazarken AI'a UI screenshot veya Figma tasarimini goster v
 - **Senior cevabi:** Tailwind mobile-first yaklasimi benimser: prefix'siz class'lar tum ekranlarda gecerlidir, sm: (640px+), md: (768px+), lg: (1024px+), xl: (1280px+) buyuyen ekranlara uygulanir. Ornegin `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3` mobilde tek sutun, tablette 2, desktop'ta 3 sutun olusturur. Container query'ler (@container) ile parent boyutuna gore responsive tasarim yapilabilir. Custom breakpoint'ler tailwind.config.js'te tanimlanir. Responsive debugging icin dev tools'un device emulation'i kullanilir.
 :::
 
+:::exercise
+### Alıştırma 4: Tailwind ile Responsive Navbar
+**Görev:** Tailwind CSS kullanarak mobilde hamburger menü, desktop'ta yatay navigasyon olan bir navbar oluştur.
+**Başlangıç kodu:**
+```html
+<nav class="bg-gray-900 p-4">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <span class="text-white text-xl font-bold">Logo</span>
+
+    <!-- TODO: Desktop menü - mobilde gizle -->
+    <ul class="??? flex gap-6">
+      <li><a href="#" class="text-gray-300 hover:text-white">Ana Sayfa</a></li>
+      <li><a href="#" class="text-gray-300 hover:text-white">Ürünler</a></li>
+      <li><a href="#" class="text-gray-300 hover:text-white">İletişim</a></li>
+    </ul>
+
+    <!-- TODO: Hamburger butonu - desktop'ta gizle -->
+    <button class="??? text-white">☰</button>
+  </div>
+</nav>
+```
+**Beklenen çıktı:**
+```html
+<ul class="hidden md:flex flex gap-6">
+<button class="md:hidden text-white">☰</button>
+```
+**İpucu:** `hidden md:flex` → mobilde gizle, md ve üstünde göster. `md:hidden` → md ve üstünde gizle.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Tailwind Spacing ve Sizing Hesaplama
+**Görev:** Tailwind birimlerini piksel cinsinden hesapla ve doğru sınıfları seç.
+**Başlangıç kodu:**
+```html
+<!-- 1 Tailwind birimi = 4px -->
+
+<!-- TODO: 24px padding istiyorsan hangi class? -->
+<div class="p-???">24px padding</div>
+
+<!-- TODO: 48px margin-top istiyorsan? -->
+<div class="mt-???">48px margin-top</div>
+
+<!-- TODO: 320px genişlik istiyorsan? -->
+<div class="w-???">320px genişlik</div>
+
+<!-- TODO: 64px yükseklik istiyorsan? -->
+<div class="h-???">64px yükseklik</div>
+
+<!-- TODO: 12px gap istiyorsan? -->
+<div class="flex gap-???">12px gap</div>
+```
+**Beklenen çıktı:**
+```
+p-6     → 6 × 4 = 24px
+mt-12   → 12 × 4 = 48px
+w-80    → 80 × 4 = 320px
+h-16    → 16 × 4 = 64px
+gap-3   → 3 × 4 = 12px
+```
+**İpucu:** Tailwind'de 1 birim = 4px. Yani px değerini 4'e böl. `p-6` = 24px, `w-80` = 320px.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: Dark Mode Toggle Stilleri
+**Görev:** Tailwind `dark:` prefix'i ile hem light hem dark mode'u destekleyen bir kart tasarla.
+**Başlangıç kodu:**
+```html
+<!-- TODO: Her class'a dark mode karşılığını ekle -->
+<div class="bg-white ??? rounded-lg shadow-md ??? p-6">
+  <h2 class="text-gray-900 ??? text-xl font-bold">Kart Başlığı</h2>
+  <p class="text-gray-600 ??? mt-2">Kart açıklaması burada yer alır.</p>
+  <button class="mt-4 bg-blue-500 ??? text-white px-4 py-2 rounded
+                 hover:bg-blue-600 ???">
+    Detay
+  </button>
+</div>
+```
+**Beklenen çıktı:**
+```html
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900 p-6">
+  <h2 class="text-gray-900 dark:text-gray-100 text-xl font-bold">Kart Başlığı</h2>
+  <p class="text-gray-600 dark:text-gray-400 mt-2">Kart açıklaması burada yer alır.</p>
+  <button class="mt-4 bg-blue-500 dark:bg-blue-600 text-white px-4 py-2 rounded
+                 hover:bg-blue-600 dark:hover:bg-blue-700">
+    Detay
+  </button>
+</div>
+```
+**İpucu:** `dark:` prefix'ini her renk sınıfına ekle. Dark mode'da genellikle arka plan koyulaşır, metin açılır.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 7: CSS Custom Properties ile Tema Sistemi
+**Görev:** CSS Custom Properties kullanarak light/dark tema değişimi yapan bir sistem oluştur.
+**Başlangıç kodu:**
+```css
+/* TODO: :root'ta light tema değişkenlerini tanımla */
+:root {
+  --bg-primary: /* ? */;
+  --bg-secondary: /* ? */;
+  --text-primary: /* ? */;
+  --text-secondary: /* ? */;
+  --accent: /* ? */;
+}
+
+/* TODO: data-theme="dark" için değişkenleri override et */
+[data-theme="dark"] {
+  --bg-primary: /* ? */;
+  --bg-secondary: /* ? */;
+  --text-primary: /* ? */;
+  --text-secondary: /* ? */;
+  --accent: /* ? */;
+}
+
+/* Değişkenleri kullan */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.card {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--accent);
+}
+```
+**Beklenen çıktı:**
+```css
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --accent: #3b82f6;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --accent: #60a5fa;
+}
+```
+**İpucu:** `document.documentElement.setAttribute('data-theme', 'dark')` ile JavaScript'ten tema değiştirilebilir.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Tailwind ile Kart Grid Sistemi
+**Görev:** Tailwind Grid kullanarak responsive ürün kartları oluştur: mobilde 1, tablette 2, desktop'ta 3 sütun.
+**Başlangıç kodu:**
+```html
+<div class="??? gap-6 p-6">
+  <!-- Kart 1 -->
+  <div class="bg-gray-800 rounded-lg overflow-hidden">
+    <div class="h-48 bg-gray-700"></div> <!-- Resim alanı -->
+    <div class="p-4">
+      <h3 class="text-white font-bold">Ürün Adı</h3>
+      <p class="text-gray-400 mt-1 text-sm">Açıklama</p>
+      <div class="??? mt-3">
+        <span class="text-emerald-400 font-bold text-lg">₺199</span>
+        <button class="bg-emerald-600 text-white px-3 py-1 rounded text-sm
+                       hover:bg-emerald-700">Sepete Ekle</button>
+      </div>
+    </div>
+  </div>
+  <!-- Kart 2 ve 3 aynı yapıda -->
+</div>
+```
+**Beklenen çıktı:**
+```html
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+<!-- ... -->
+<div class="flex items-center justify-between mt-3">
+```
+**İpucu:** `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3` mobile-first responsive grid oluşturur. Fiyat ve buton için `flex justify-between` kullan.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: CSS Transition ve Animation
+**Görev:** CSS transition ile hover efekti ve `@keyframes` ile loading spinner oluştur.
+**Başlangıç kodu:**
+```css
+/* TODO 1: Buton hover'da büyüsün ve renk değiştirsin (0.3s ease) */
+.btn-animated {
+  background: #3b82f6;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  /* TODO: transition ekle */
+}
+
+.btn-animated:hover {
+  /* TODO: scale ve background değiştir */
+}
+
+/* TODO 2: Dönen loading spinner */
+@keyframes spin {
+  /* TODO: 0'dan 360 dereceye dön */
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #333;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  /* TODO: animation uygula (1s, linear, infinite) */
+}
+```
+**Beklenen çıktı:**
+```css
+.btn-animated {
+  transition: all 0.3s ease;
+}
+.btn-animated:hover {
+  transform: scale(1.05);
+  background: #2563eb;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  animation: spin 1s linear infinite;
+}
+```
+**İpucu:** `transition: all 0.3s ease` tüm değişen özelliklere animasyon uygular. `@keyframes` ile özel animasyon tanımla.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: Tailwind ile Kompleks Form Tasarımı
+**Görev:** Tailwind kullanarak doğrulama durumlarını (başarı, hata) gösteren bir kayıt formu oluştur.
+**Başlangıç kodu:**
+```html
+<form class="max-w-md mx-auto p-6 bg-gray-900 rounded-lg">
+  <!-- Email alanı - hata durumu -->
+  <div class="mb-4">
+    <label class="??? text-sm font-medium mb-1">Email</label>
+    <input type="email"
+      class="w-full px-3 py-2 rounded-md bg-gray-800
+             ??? ??? ???"
+      placeholder="ornek@email.com" />
+    <!-- TODO: Hata mesajı -->
+    <p class="??? text-sm mt-1">Geçerli bir email girin</p>
+  </div>
+
+  <!-- Şifre alanı - başarı durumu -->
+  <div class="mb-4">
+    <label class="??? text-sm font-medium mb-1">Şifre</label>
+    <input type="password"
+      class="w-full px-3 py-2 rounded-md bg-gray-800
+             ??? ??? ???" />
+    <p class="??? text-sm mt-1">Şifre yeterince güçlü ✓</p>
+  </div>
+
+  <button class="w-full py-2 rounded-md ??? ??? ???
+                 ??? transition-colors">
+    Kayıt Ol
+  </button>
+</form>
+```
+**Beklenen çıktı:**
+```html
+<label class="block text-gray-300 text-sm font-medium mb-1">Email</label>
+<input class="w-full px-3 py-2 rounded-md bg-gray-800
+       border-2 border-red-500 text-white focus:outline-none focus:ring-2 focus:ring-red-500" />
+<p class="text-red-400 text-sm mt-1">Geçerli bir email girin</p>
+
+<input class="... border-2 border-emerald-500 ... focus:ring-emerald-500" />
+<p class="text-emerald-400 text-sm mt-1">Şifre yeterince güçlü ✓</p>
+
+<button class="w-full py-2 rounded-md bg-emerald-600 text-white font-medium
+       hover:bg-emerald-700 transition-colors">
+```
+**İpucu:** Hata durumu için `border-red-500` ve `text-red-400`, başarı için `border-emerald-500` ve `text-emerald-400` kullan. `focus:ring-2` ile odaklandığında halka efekti ekle.
+**Zorluk:** Zor
+:::
+
 :::must-note
 - Tailwind CSS utility-first yaklaşım: HTML'de sınıflarla stil yazarsın, ayrı CSS dosyası gerekmez
 - Tailwind spacing: 1 birim = 4px (p-4 = 16px, m-8 = 32px)

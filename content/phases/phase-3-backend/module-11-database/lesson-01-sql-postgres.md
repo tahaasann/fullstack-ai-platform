@@ -857,6 +857,441 @@ explanation: "Window Function'lar OVER() clause ile kullanılır. ROW_NUMBER(), 
 SQL yazarken AI'a EXPLAIN ANALYZE ciktisini yapistir ve sor: "Bu sorgunun calisma planini analiz et. Seq Scan neden Index Scan yerine secildi? Hangi index'i eklemeliyim? Estimated rows ile actual rows arasindaki fark neden bu kadar buyuk?"
 :::
 
+:::exercise
+### Alıştırma 3: SELECT ve WHERE Koşulları
+**Görev:** Farklı WHERE koşullarını kullanarak sorgular yaz.
+**Başlangıç kodu:**
+```sql
+-- Tablo: products (id, name, price, category, stock, created_at)
+
+-- TODO 1: Fiyatı 100-500 arasında olan ürünleri getir
+-- TODO 2: Adında "Pro" VEYA "Premium" geçen ürünleri bul
+-- TODO 3: Stoku 0 olan VE kategorisi 'electronics' olan ürünleri getir
+-- TODO 4: Son 30 günde eklenen ürünleri getir
+-- TODO 5: Fiyatı NULL olmayan ve stoku 10'dan fazla olan ürünleri getir
+```
+**Beklenen çıktı:**
+```sql
+-- 1. BETWEEN
+SELECT * FROM products WHERE price BETWEEN 100 AND 500;
+
+-- 2. OR + ILIKE
+SELECT * FROM products WHERE name ILIKE '%Pro%' OR name ILIKE '%Premium%';
+
+-- 3. AND
+SELECT * FROM products WHERE stock = 0 AND category = 'electronics';
+
+-- 4. Date karşılaştırma
+SELECT * FROM products WHERE created_at >= NOW() - INTERVAL '30 days';
+
+-- 5. IS NOT NULL + karşılaştırma
+SELECT * FROM products WHERE price IS NOT NULL AND stock > 10;
+```
+**İpucu:** `ILIKE` büyük/küçük harf duyarsız arama yapar (PostgreSQL). `BETWEEN` hem alt hem üst sınırı dahil eder. NULL kontrolü için `= NULL` DEĞİL `IS NULL` kullan.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 4: JOIN Sorguları
+**Görev:** Farklı JOIN türlerini kullanarak ilişkisel verileri birleştir.
+**Başlangıç kodu:**
+```sql
+-- Tablolar:
+-- users (id, name, email)
+-- orders (id, user_id, total, status, created_at)
+-- order_items (id, order_id, product_id, quantity, price)
+-- products (id, name, price, category)
+
+-- TODO 1: Her kullanıcıyı ve sipariş sayısını getir (siparişi olmayanlar da dahil)
+-- TODO 2: Her siparişin detayını getir (kullanıcı adı, ürün adı, miktar)
+-- TODO 3: Hiç sipariş vermemiş kullanıcıları bul
+-- TODO 4: Her kategorideki toplam satış miktarını getir
+```
+**Beklenen çıktı:**
+```sql
+-- 1. LEFT JOIN + COUNT
+SELECT u.name, COUNT(o.id) AS order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+GROUP BY u.id, u.name
+ORDER BY order_count DESC;
+
+-- 2. Çoklu INNER JOIN
+SELECT u.name AS customer, p.name AS product, oi.quantity, oi.price
+FROM orders o
+INNER JOIN users u ON o.user_id = u.id
+INNER JOIN order_items oi ON o.id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.id
+ORDER BY o.created_at DESC;
+
+-- 3. LEFT JOIN + IS NULL
+SELECT u.name, u.email
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE o.id IS NULL;
+
+-- 4. JOIN + GROUP BY
+SELECT p.category, SUM(oi.quantity) AS total_sold, SUM(oi.quantity * oi.price) AS revenue
+FROM order_items oi
+INNER JOIN products p ON oi.product_id = p.id
+GROUP BY p.category
+ORDER BY revenue DESC;
+```
+**İpucu:** LEFT JOIN sol tablonun tüm satırlarını korur (eşleşme olmasa da). INNER JOIN sadece eşleşenleri gösterir. "Olmayanları bul" → LEFT JOIN + WHERE ... IS NULL.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 5: Aggregation ve GROUP BY
+**Görev:** Toplama fonksiyonları ve gruplama ile analitik sorgular yaz.
+**Başlangıç kodu:**
+```sql
+-- Tablo: orders (id, user_id, total, status, created_at)
+
+-- TODO 1: Toplam sipariş sayısı, ortalama tutar, en yüksek ve en düşük tutar
+-- TODO 2: Her ay kaç sipariş verilmiş ve toplam tutar ne?
+-- TODO 3: 1000 TL'den fazla harcayan kullanıcıları getir (HAVING)
+-- TODO 4: Son 7 günün günlük sipariş istatistikleri
+```
+**Beklenen çıktı:**
+```sql
+-- 1. Temel aggregation
+SELECT
+  COUNT(*) AS total_orders,
+  ROUND(AVG(total), 2) AS avg_amount,
+  MAX(total) AS max_amount,
+  MIN(total) AS min_amount,
+  SUM(total) AS total_revenue
+FROM orders
+WHERE status = 'completed';
+
+-- 2. Aylık grupla
+SELECT
+  DATE_TRUNC('month', created_at) AS month,
+  COUNT(*) AS order_count,
+  SUM(total) AS monthly_revenue
+FROM orders
+GROUP BY DATE_TRUNC('month', created_at)
+ORDER BY month DESC;
+
+-- 3. HAVING ile filtre (GROUP BY sonrası)
+SELECT user_id, SUM(total) AS total_spent
+FROM orders
+WHERE status = 'completed'
+GROUP BY user_id
+HAVING SUM(total) > 1000
+ORDER BY total_spent DESC;
+
+-- 4. Günlük istatistik
+SELECT
+  DATE(created_at) AS day,
+  COUNT(*) AS orders,
+  SUM(total) AS revenue,
+  ROUND(AVG(total), 2) AS avg_order
+FROM orders
+WHERE created_at >= NOW() - INTERVAL '7 days'
+GROUP BY DATE(created_at)
+ORDER BY day;
+```
+**İpucu:** `WHERE` gruplama ÖNCESI filtreler, `HAVING` gruplama SONRASI filtreler. `DATE_TRUNC('month', date)` tarihi aya yuvarlar. `ROUND(value, 2)` ondalık basamak.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Window Functions
+**Görev:** Window function'lar ile sıralama, kümülatif toplam ve karşılaştırma sorguları yaz.
+**Başlangıç kodu:**
+```sql
+-- Tablo: sales (id, product_id, amount, category, sale_date)
+
+-- TODO 1: Her kategoride satış tutarına göre sıralama (RANK)
+-- TODO 2: Kümülatif satış toplamı (SUM OVER)
+-- TODO 3: Bir önceki satışla fark hesapla (LAG)
+-- TODO 4: Her kategorideki en yüksek satışı bul (partition)
+```
+**Beklenen çıktı:**
+```sql
+-- 1. RANK - kategoride sıralama
+SELECT
+  category,
+  product_id,
+  amount,
+  RANK() OVER (PARTITION BY category ORDER BY amount DESC) AS rank_in_category,
+  DENSE_RANK() OVER (PARTITION BY category ORDER BY amount DESC) AS dense_rank
+FROM sales;
+
+-- 2. Kümülatif toplam
+SELECT
+  sale_date,
+  amount,
+  SUM(amount) OVER (ORDER BY sale_date) AS cumulative_total,
+  SUM(amount) OVER (
+    PARTITION BY category ORDER BY sale_date
+  ) AS category_cumulative
+FROM sales;
+
+-- 3. Önceki satışla karşılaştırma
+SELECT
+  sale_date,
+  amount,
+  LAG(amount, 1) OVER (ORDER BY sale_date) AS prev_amount,
+  amount - LAG(amount, 1) OVER (ORDER BY sale_date) AS diff,
+  LEAD(amount, 1) OVER (ORDER BY sale_date) AS next_amount
+FROM sales;
+
+-- 4. Her kategoride en yüksek satış
+SELECT DISTINCT ON (category)
+  category, product_id, amount
+FROM sales
+ORDER BY category, amount DESC;
+-- veya Window Function ile:
+SELECT * FROM (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY category ORDER BY amount DESC) AS rn
+  FROM sales
+) sub WHERE rn = 1;
+```
+**İpucu:** `PARTITION BY` = GROUP BY gibi ama satırları daraltmaz. `RANK` boşluk bırakır (1,2,2,4), `DENSE_RANK` bırakmaz (1,2,2,3). `LAG` önceki, `LEAD` sonraki satır.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 7: CTE ve Recursive Query
+**Görev:** CTE (Common Table Expression) ile karmaşık sorguları parçala ve recursive CTE ile hiyerarşik veri sorgula.
+**Başlangıç kodu:**
+```sql
+-- TODO 1: CTE ile "VIP müşteriler ve son siparişleri" sorgusunu yaz
+-- TODO 2: Recursive CTE ile kategori hiyerarşisi sorgula
+
+-- categories (id, name, parent_id)
+-- Elektronik (parent_id=NULL)
+--   Telefonlar (parent_id=1)
+--     Akıllı Telefonlar (parent_id=2)
+--   Bilgisayarlar (parent_id=1)
+```
+**Beklenen çıktı:**
+```sql
+-- 1. CTE ile karmaşık sorgu
+WITH vip_customers AS (
+  SELECT user_id, SUM(total) AS total_spent
+  FROM orders
+  WHERE status = 'completed'
+  GROUP BY user_id
+  HAVING SUM(total) > 5000
+),
+latest_orders AS (
+  SELECT DISTINCT ON (user_id)
+    user_id, id AS last_order_id, total AS last_order_total, created_at
+  FROM orders
+  ORDER BY user_id, created_at DESC
+)
+SELECT
+  u.name, u.email,
+  vc.total_spent,
+  lo.last_order_total,
+  lo.created_at AS last_order_date
+FROM vip_customers vc
+JOIN users u ON vc.user_id = u.id
+JOIN latest_orders lo ON vc.user_id = lo.user_id
+ORDER BY vc.total_spent DESC;
+
+-- 2. Recursive CTE - kategori ağacı
+WITH RECURSIVE category_tree AS (
+  -- Base case: kök kategoriler
+  SELECT id, name, parent_id, 0 AS depth, name::text AS path
+  FROM categories
+  WHERE parent_id IS NULL
+
+  UNION ALL
+
+  -- Recursive step: alt kategoriler
+  SELECT c.id, c.name, c.parent_id, ct.depth + 1,
+         ct.path || ' > ' || c.name
+  FROM categories c
+  INNER JOIN category_tree ct ON c.parent_id = ct.id
+)
+SELECT * FROM category_tree ORDER BY path;
+
+-- Sonuç:
+-- Elektronik (depth:0, path: Elektronik)
+-- Elektronik > Bilgisayarlar (depth:1)
+-- Elektronik > Telefonlar (depth:1)
+-- Elektronik > Telefonlar > Akıllı Telefonlar (depth:2)
+```
+**İpucu:** CTE = `WITH ... AS (SELECT ...)` ile sorguyu parçalara böler. Recursive CTE: base case + `UNION ALL` + recursive step. Organizasyon şemaları, dosya yapıları, yorum ağaçları için idealdir.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 8: Index Stratejisi
+**Görev:** Aşağıdaki sorgular için uygun index'leri oluştur ve EXPLAIN ANALYZE ile doğrula.
+**Başlangıç kodu:**
+```sql
+-- Sık çalışan sorgular:
+-- 1. SELECT * FROM users WHERE email = 'test@test.com'
+-- 2. SELECT * FROM products WHERE category = 'electronics' AND price < 1000
+-- 3. SELECT * FROM orders WHERE user_id = 5 ORDER BY created_at DESC
+-- 4. SELECT * FROM products WHERE name ILIKE '%laptop%'
+-- 5. SELECT * FROM logs WHERE created_at BETWEEN '2024-01-01' AND '2024-12-31'
+
+-- TODO: Her sorgu için uygun index oluştur
+-- TODO: EXPLAIN ANALYZE ile index kullanımını doğrula
+```
+**Beklenen çıktı:**
+```sql
+-- 1. Unique B-tree index (eşitlik araması)
+CREATE UNIQUE INDEX idx_users_email ON users (email);
+-- EXPLAIN: Index Scan using idx_users_email
+
+-- 2. Composite index (birden fazla kolon)
+CREATE INDEX idx_products_category_price ON products (category, price);
+-- Sıra önemli: önce eşitlik (category), sonra aralık (price)
+
+-- 3. Composite index (sıralama dahil)
+CREATE INDEX idx_orders_user_created ON orders (user_id, created_at DESC);
+-- DESC sıralama index'te tanımlanırsa ek sıralama gerekmez
+
+-- 4. GIN trigram index (ILIKE aramalar)
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX idx_products_name_trgm ON products USING GIN (name gin_trgm_ops);
+-- ILIKE pattern aramaları B-tree ile çalışMAZ, GIN trigram gerekir
+
+-- 5. B-tree index (aralık araması)
+CREATE INDEX idx_logs_created_at ON logs (created_at);
+-- BETWEEN sorguları B-tree index ile verimli çalışır
+
+-- Doğrulama:
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'test@test.com';
+-- Index Scan using idx_users_email (cost=0.29..8.30 rows=1 width=...)
+-- Execution Time: 0.05 ms ← Seq Scan yerine Index Scan = başarı
+```
+**İpucu:** B-tree = eşitlik ve aralık, GIN = full-text search ve ILIKE, GiST = geometrik/coğrafi. Composite index'te kolon sırası önemli: önce eşitlik, sonra aralık, sonra sıralama.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: Transaction ve ACID
+**Görev:** Transaction kullanarak bir para transfer işlemini güvenli şekilde uygula.
+**Başlangıç kodu:**
+```sql
+-- Tablo: accounts (id, user_id, balance)
+
+-- TODO: Kullanıcı A'dan Kullanıcı B'ye 500 TL transfer et
+-- - Bakiye kontrolü yap (yetersiz bakiye → rollback)
+-- - A'dan düş, B'ye ekle
+-- - Transfer logunu kaydet
+-- - Hata olursa tüm işlemi geri al
+```
+**Beklenen çıktı:**
+```sql
+BEGIN;
+
+-- 1. Bakiye kontrolü (FOR UPDATE ile satır kilitle)
+SELECT balance FROM accounts WHERE user_id = 1 FOR UPDATE;
+-- Eğer balance < 500 ise:
+-- ROLLBACK; -- İşlemi geri al
+-- RAISE EXCEPTION 'Yetersiz bakiye';
+
+-- 2. Gönderenden düş
+UPDATE accounts SET balance = balance - 500 WHERE user_id = 1;
+
+-- 3. Alıcıya ekle
+UPDATE accounts SET balance = balance + 500 WHERE user_id = 2;
+
+-- 4. Transfer logunu kaydet
+INSERT INTO transfers (from_user, to_user, amount, created_at)
+VALUES (1, 2, 500, NOW());
+
+-- 5. Her şey başarılıysa onayla
+COMMIT;
+
+-- PL/pgSQL fonksiyon olarak:
+CREATE OR REPLACE FUNCTION transfer_money(
+  sender_id INT, receiver_id INT, amount DECIMAL
+) RETURNS VOID AS $$
+BEGIN
+  -- Bakiye kontrolü
+  IF (SELECT balance FROM accounts WHERE user_id = sender_id FOR UPDATE) < amount THEN
+    RAISE EXCEPTION 'Yetersiz bakiye';
+  END IF;
+
+  UPDATE accounts SET balance = balance - amount WHERE user_id = sender_id;
+  UPDATE accounts SET balance = balance + amount WHERE user_id = receiver_id;
+  INSERT INTO transfers (from_user, to_user, amount) VALUES (sender_id, receiver_id, amount);
+END;
+$$ LANGUAGE plpgsql;
+```
+**İpucu:** `FOR UPDATE` satırı kilitler - başka transaction aynı satırı değiştiremez. ACID: Atomicity (ya hep ya hiç), Consistency (kurallar korunur), Isolation (paralel işlemler birbirini etkilemez), Durability (commit sonrası kalıcı).
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: E-ticaret Veritabanı Tasarımı
+**Görev:** Normalleştirilmiş (3NF) bir e-ticaret veritabanı şeması tasarla.
+**Başlangıç kodu:**
+```sql
+-- TODO: Aşağıdaki tabloları oluştur:
+-- users, products, categories, orders, order_items
+-- Uygun veri tipleri, constraints ve ilişkiler kullan
+-- En az 3 index ekle
+```
+**Beklenen çıktı:**
+```sql
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE categories (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  slug VARCHAR(100) UNIQUE NOT NULL,
+  parent_id INT REFERENCES categories(id) ON DELETE SET NULL
+);
+
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(200) NOT NULL,
+  slug VARCHAR(200) UNIQUE NOT NULL,
+  price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
+  stock INT NOT NULL DEFAULT 0 CHECK (stock >= 0),
+  category_id INT REFERENCES categories(id) ON DELETE SET NULL,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE orders (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCES users(id),
+  status VARCHAR(20) NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending', 'confirmed', 'shipped', 'delivered', 'cancelled')),
+  total DECIMAL(10, 2) NOT NULL CHECK (total >= 0),
+  shipping_address TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE order_items (
+  id SERIAL PRIMARY KEY,
+  order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  product_id INT NOT NULL REFERENCES products(id),
+  quantity INT NOT NULL CHECK (quantity > 0),
+  unit_price DECIMAL(10, 2) NOT NULL CHECK (unit_price >= 0),
+  UNIQUE (order_id, product_id)
+);
+
+-- Index'ler
+CREATE INDEX idx_products_category ON products (category_id);
+CREATE INDEX idx_orders_user ON orders (user_id, created_at DESC);
+CREATE INDEX idx_order_items_order ON order_items (order_id);
+CREATE INDEX idx_products_price ON products (price);
+```
+**İpucu:** `DECIMAL(10,2)` para için (float KULLANMA). `CHECK` constraint ile geçersiz veriyi engelle. `ON DELETE CASCADE` parent silinince child'ları da sil. `TIMESTAMPTZ` timezone-aware tarih.
+**Zorluk:** Zor
+:::
+
 :::must-note
 - CRUD: SELECT (sorgula), INSERT (ekle), UPDATE (güncelle), DELETE (sil)
 - JOIN türleri: INNER (sadece eşleşen), LEFT (sol tablo tümü), RIGHT (sağ tablo tümü), FULL (her ikisi tümü), SELF (tablo kendisiyle), CROSS (kartezyen çarpım)

@@ -1308,6 +1308,303 @@ grid_search = GridSearchCV(
 
 **Beklenen Sonuc:** GridSearchCV ile en iyi hyperparameter kombinasyonu bulunmali. MedInc (medyan gelir) en onemli feature olmali. Model joblib ile kaydedilip yeniden yuklenebilmeli. Yeni veri ile tahmin yapilabilmeli.
 **Ipucu:** `n_jobs=-1` tum CPU core'lari kullanir (GridSearch hizlanir). `verbose=1` ilerleme durumunu gosterir. Buyuk grid'lerde `RandomizedSearchCV` daha hizlidir.
+
+---
+
+### Alistirma 4: Pandas ile Veri Temizleme Pipeline (Kolay)
+
+Eksik veri, outlier ve tutarsizliklari sistematik olarak temizle.
+
+```python
+import pandas as pd
+import numpy as np
+
+# Kirli veri olustur
+np.random.seed(42)
+df = pd.DataFrame({
+    "yas": [25, 30, None, 45, 200, 35, -5, 28, None, 40],
+    "maas": [5000, None, 7000, 8000, 6000, None, 9000, 5500, 10000, 7500],
+    "sehir": ["Istanbul", "istanbul", "ANKARA", "Ankara", "İstanbul", None, "izmir", "Izmir", "ankara", "Istanbul"],
+    "email": ["a@b.com", "invalid", "c@d.com", None, "e@f", "g@h.com", "", "i@j.com", "k@l.com", "m@n.com"],
+})
+
+def clean_pipeline(df):
+    df = df.copy()
+
+    # 1. Yas: negatif ve 120+ degerleri NaN yap
+    df.loc[~df["yas"].between(0, 120), "yas"] = np.nan
+
+    # 2. Eksik yaslari medyan ile doldur
+    df["yas"] = df["yas"].fillna(df["yas"].median())
+
+    # 3. Sehir isimlerini standardize et
+    df["sehir"] = df["sehir"].str.strip().str.title()
+    df["sehir"] = df["sehir"].replace({"İstanbul": "Istanbul"})
+
+    # TODO: Eksik maaslari grup ortalamasiyla doldur (sehir bazli)
+    # TODO: Email validasyonu yap (gecersizleri NaN yap)
+    # TODO: Duplicate satirlari tespit et ve kaldir
+    # TODO: Veri tiplerini optimize et (category, int16 vs.)
+
+    return df
+
+cleaned = clean_pipeline(df)
+print(cleaned.info())
+print(cleaned.describe())
+```
+
+**Beklenen Sonuc:** Tum sehir isimleri standard formatta olmali. Eksik degerler anlamli sekilde doldurulmali. Gecersiz email'ler NaN olmali.
+**Ipucu:** `df.nunique()` ile unique deger sayisini gor. `df.memory_usage()` ile bellek kullanimini optimize et.
+
+---
+
+### Alistirma 5: Feature Engineering Teknikleri (Kolay)
+
+Ham veriden anlamli feature'lar turet ve model performansina etkisini olc.
+
+```python
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import PolynomialFeatures, LabelEncoder
+
+# Ev fiyat tahmini verisi
+df = pd.DataFrame({
+    "metrekare": [80, 120, 60, 150, 200, 90, 110, 75],
+    "oda_sayisi": [2, 3, 1, 4, 5, 2, 3, 2],
+    "kat": [3, 5, 1, 8, 12, 2, 6, 4],
+    "bina_yasi": [5, 15, 30, 2, 1, 20, 10, 25],
+    "ilce": ["Kadikoy", "Besiktas", "Uskudar", "Kadikoy", "Besiktas", "Uskudar", "Kadikoy", "Besiktas"],
+    "fiyat": [1500000, 2500000, 800000, 3500000, 5000000, 1200000, 2200000, 1000000],
+})
+
+# Feature engineering
+df["m2_basina_oda"] = df["oda_sayisi"] / df["metrekare"]
+df["bina_durumu"] = pd.cut(df["bina_yasi"], bins=[0, 5, 15, 50], labels=["yeni", "orta", "eski"])
+
+# TODO: Polynomial features ekle (metrekare^2)
+# TODO: One-hot encoding yap (ilce icin)
+# TODO: Log transform uygula (fiyat icin — skewness azalt)
+# TODO: Interaction feature'lar olustur (metrekare * oda_sayisi)
+# TODO: Feature engineering oncesi ve sonrasi model performansini karsilastir
+```
+
+**Beklenen Sonuc:** Feature engineering sonrasi model R2 skoru artmali. Log transform ile fiyat dagilimi normal'e yaklasmali. Polynomial feature'lar non-linear iliskileri yakalamalı.
+**Ipucu:** Feature engineering model performansini %20-50 artirabilir. Domain bilgisi en iyi feature'lari olusturur.
+
+---
+
+### Alistirma 6: Imbalanced Data ile Classification (Orta)
+
+Dengesiz veri setinde (fraud detection) model egit ve degerlendir.
+
+```python
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, roc_auc_score
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.pipeline import Pipeline
+
+# Dengesiz veri olustur (%95 normal, %5 fraud)
+X, y = make_classification(
+    n_samples=10000, n_features=20, n_informative=10,
+    n_redundant=5, weights=[0.95], random_state=42
+)
+print(f"Sinif dagilimi: {np.bincount(y)}")  # ~9500 vs ~500
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
+
+# 1. Naive yaklaşim (dengesiz)
+rf_naive = RandomForestClassifier(random_state=42)
+rf_naive.fit(X_train, y_train)
+print("Naive:", classification_report(y_test, rf_naive.predict(X_test)))
+
+# 2. SMOTE ile oversampling
+smote_pipeline = Pipeline([
+    ("smote", SMOTE(random_state=42)),
+    ("rf", RandomForestClassifier(random_state=42))
+])
+smote_pipeline.fit(X_train, y_train)
+
+# TODO: Undersampling yaklasimiyle karsilastir
+# TODO: class_weight="balanced" ile karsilastir
+# TODO: Threshold tuning yap (default 0.5 yerine optimal threshold bul)
+# TODO: Precision-Recall curve ciz ve AUC-PR hesapla
+```
+
+**Beklenen Sonuc:** SMOTE ile minority class recall'u artmali. Threshold tuning ile F1 score optimize edilmeli. AUC-ROC tum yontemler icin raporlanmali.
+**Ipucu:** Imbalanced data'da accuracy yanilticidir (hep majority class tahmin etsen bile %95). F1, AUC-ROC ve AUC-PR daha anlamlidir.
+
+---
+
+### Alistirma 7: Time Series Analizi ve Tahmin (Orta)
+
+Zaman serisi verisinde trend, mevsimsellik analizi yap ve tahmin modeli kur.
+
+```python
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+
+# Sentetik zaman serisi (2 yillik gunluk satis verisi)
+np.random.seed(42)
+dates = pd.date_range("2023-01-01", periods=730, freq="D")
+trend = np.linspace(100, 200, 730)
+seasonality = 30 * np.sin(2 * np.pi * np.arange(730) / 365)
+noise = np.random.normal(0, 10, 730)
+sales = trend + seasonality + noise
+
+df = pd.DataFrame({"tarih": dates, "satis": sales})
+df.set_index("tarih", inplace=True)
+
+# Feature engineering (zaman bazli)
+df["gun_of_week"] = df.index.dayofweek
+df["ay"] = df.index.month
+df["yil_gunu"] = df.index.dayofyear
+df["rolling_7"] = df["satis"].rolling(7).mean()
+df["rolling_30"] = df["satis"].rolling(30).mean()
+
+# TODO: Train/test split yap (son 60 gun test)
+# TODO: Linear Regression ile tahmin yap
+# TODO: MAPE (Mean Absolute Percentage Error) hesapla
+# TODO: Tahmin vs gercek grafigi ciz
+# TODO: Farkli rolling window boyutlarini karsilastir
+```
+
+**Beklenen Sonuc:** Model trend ve mevsimselliği yakalayabilmeli. MAPE %10 altinda olmali. Rolling average noise'u yumusatmali.
+**Ipucu:** Zaman serisi split'inde shuffle yapma! Kronolojik sira korunmali. `TimeSeriesSplit` kullan.
+
+---
+
+### Alistirma 8: Ensemble Learning — Stacking (Orta)
+
+Birden fazla modeli birlestirerek daha guclu bir tahmin modeli olustur.
+
+```python
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, StackingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import cross_val_score
+
+X, y = load_breast_cancer(return_X_y=True)
+
+# Tek modeller
+models = {
+    "RF": RandomForestClassifier(n_estimators=100, random_state=42),
+    "GBM": GradientBoostingClassifier(n_estimators=100, random_state=42),
+    "SVM": SVC(kernel="rbf", probability=True, random_state=42),
+}
+
+# Tek model performanslari
+for name, model in models.items():
+    scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
+    print(f"{name}: {scores.mean():.4f} ± {scores.std():.4f}")
+
+# Stacking ensemble
+stacking = StackingClassifier(
+    estimators=[(n, m) for n, m in models.items()],
+    final_estimator=LogisticRegression(),
+    cv=5
+)
+
+# TODO: Stacking ensemble performansini olc
+# TODO: Voting classifier ile karsilastir (hard ve soft voting)
+# TODO: Her base model'in stacking'e katgisini analiz et
+# TODO: Feature importance'i ensemble icin hesapla
+```
+
+**Beklenen Sonuc:** Stacking ensemble tek modellerin hepsinden yuksek accuracy vermeli. Soft voting hard voting'den daha iyi sonuc vermeli.
+**Ipucu:** Stacking'de base model'ler ceshitli olmali (farkli algoritmalar). Benzer modelleri birlesittirmek az fayda saglar.
+
+---
+
+### Alistirma 9: ML Pipeline ve Reproducibility (Zor)
+
+End-to-end ML pipeline olustur: veri yukleme, preprocessing, training, evaluation.
+
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import cross_val_score
+import joblib
+
+# Numeric ve categorical feature'lar icin ayri transformer
+numeric_features = ["metrekare", "oda_sayisi", "kat", "bina_yasi"]
+categorical_features = ["ilce", "isitma_tipi"]
+
+numeric_transformer = Pipeline([
+    ("imputer", SimpleImputer(strategy="median")),
+    ("scaler", StandardScaler()),
+])
+
+categorical_transformer = Pipeline([
+    ("imputer", SimpleImputer(strategy="most_frequent")),
+    ("encoder", OneHotEncoder(handle_unknown="ignore")),
+])
+
+preprocessor = ColumnTransformer([
+    ("num", numeric_transformer, numeric_features),
+    ("cat", categorical_transformer, categorical_features),
+])
+
+full_pipeline = Pipeline([
+    ("preprocessor", preprocessor),
+    ("model", RandomForestRegressor(n_estimators=100, random_state=42)),
+])
+
+# TODO: Pipeline'i fit et ve cross-validation ile degerlendir
+# TODO: Pipeline'i joblib ile kaydet ve yukle
+# TODO: Yeni veri ile prediction yap (preprocessing otomatik)
+# TODO: Pipeline adimlarini inspect et (get_params, named_steps)
+# TODO: Custom transformer yaz (feature engineering adimi)
+```
+
+**Beklenen Sonuc:** Pipeline tum preprocessing ve training adimlarini tek bir objede birlistirmeli. Kaydedilen pipeline yeni veri ile preprocessing yapmadan dogrudan tahmin yapabilmeli.
+**Ipucu:** Pipeline data leakage'i onler — preprocessing train/test split sonrasi uygulanir. Custom transformer icin `BaseEstimator` ve `TransformerMixin` miras al.
+
+---
+
+### Alistirma 10: Model Interpretability — SHAP ve LIME (Zor)
+
+Model tahminlerini yorumla: hangi feature'lar neden onemli?
+
+```python
+import shap
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+
+X, y = load_breast_cancer(return_X_y=True)
+feature_names = load_breast_cancer().feature_names
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = GradientBoostingClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# SHAP (SHapley Additive exPlanations)
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(X_test)
+
+# Global feature importance
+shap.summary_plot(shap_values, X_test, feature_names=feature_names)
+
+# Tek bir tahmin icin aciklama
+shap.force_plot(explainer.expected_value, shap_values[0], X_test[0], feature_names=feature_names)
+
+# TODO: SHAP dependence plot ile feature interaction'lari gor
+# TODO: LIME ile ayni tahminleri acikla ve SHAP ile karsilastir
+# TODO: En onemli 5 feature'i belirle ve modeli sadece onlarla yeniden egit
+# TODO: Partial Dependence Plot (PDP) ciz
+```
+
+**Beklenen Sonuc:** SHAP ile her feature'in tahmine katkisi gorunmeli. LIME ve SHAP benzer sonuclar vermeli. Top-5 feature ile model performansi %90+ korunmali.
+**Ipucu:** SHAP Shapley value'lara dayanir (oyun teorisi). Pozitif SHAP degeri tahimini arttirir, negatif azaltir. TreeExplainer agac modelleri icin O(TLD) hizinda calisir.
 :::
 
 :::external-resource

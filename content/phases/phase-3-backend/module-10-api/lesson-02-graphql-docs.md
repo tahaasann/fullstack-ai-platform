@@ -781,6 +781,487 @@ GraphQL schema tasarlarken AI'a schema'ni goster ve sor: "Bu GraphQL schema'sind
 - **Senior cevabi:** N+1 problemi: users listesi icin 1 query + her user'in posts'lari icin N ayri query yapilir. DataLoader (Facebook'un kutuphanesi) batch ve cache mekanizmasi saglar: ayni tick'teki tum user ID'lerini toplar ve tek bir `WHERE id IN (...)` sorgusuyla ceker. Per-request DataLoader instance'i olusturulur (request bazli cache). Ayrica: query depth limiting ile recursive sorular engellenir, query cost analysis ile pahali sorgulara limit konur, persisted queries ile sadece izin verilen sorgular calistirilir. APQ (Automatic Persisted Queries) bandwidth tasarrufu saglar.
 :::
 
+:::exercise
+### Alıştırma 4: GraphQL Schema Tasarımı
+**Görev:** Bir e-ticaret uygulaması için GraphQL schema tanımla: tipler, query'ler ve mutation'lar.
+**Başlangıç kodu:**
+```graphql
+# TODO: Product, Category, User, Order tipleri tanımla
+# TODO: Query tipleri (ürün listesi, detay, arama)
+# TODO: Mutation tipleri (sepete ekle, sipariş oluştur)
+# TODO: Input tipleri (CreateOrderInput)
+```
+**Beklenen çıktı:**
+```graphql
+type Product {
+  id: ID!
+  name: String!
+  price: Float!
+  description: String
+  category: Category!
+  reviews: [Review!]!
+  averageRating: Float
+  inStock: Boolean!
+}
+
+type Category {
+  id: ID!
+  name: String!
+  products(limit: Int = 10, offset: Int = 0): [Product!]!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  orders: [Order!]!
+}
+
+type Order {
+  id: ID!
+  user: User!
+  items: [OrderItem!]!
+  total: Float!
+  status: OrderStatus!
+  createdAt: String!
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+type Query {
+  products(category: ID, search: String, limit: Int = 20): [Product!]!
+  product(id: ID!): Product
+  categories: [Category!]!
+  me: User
+  order(id: ID!): Order
+}
+
+input CreateOrderInput {
+  items: [OrderItemInput!]!
+  shippingAddress: String!
+}
+
+input OrderItemInput {
+  productId: ID!
+  quantity: Int!
+}
+
+type Mutation {
+  createOrder(input: CreateOrderInput!): Order!
+  cancelOrder(id: ID!): Order!
+  addReview(productId: ID!, rating: Int!, comment: String): Review!
+}
+```
+**İpucu:** `!` zorunlu alan, `[Type!]!` zorunlu liste ve her eleman zorunlu. `input` tipleri mutation parametreleri için kullanılır, normal `type`'tan ayrıdır.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 5: GraphQL Resolver Yazma
+**Görev:** Apollo Server ile GraphQL resolver'ları yaz: Query, Mutation ve ilişkisel veri çözümle.
+**Başlangıç kodu:**
+```javascript
+// TODO: Query resolver'ları
+// TODO: Mutation resolver'ları
+// TODO: Type resolver'ları (Product.category ilişkisi)
+// TODO: N+1 problemi için DataLoader kullan
+```
+**Beklenen çıktı:**
+```javascript
+const resolvers = {
+  Query: {
+    products: async (_, { category, search, limit = 20 }, { db }) => {
+      let query = db("products");
+      if (category) query = query.where("category_id", category);
+      if (search) query = query.whereILike("name", `%${search}%`);
+      return query.limit(limit);
+    },
+    product: async (_, { id }, { db }) => {
+      return db("products").where("id", id).first();
+    },
+    me: async (_, __, { user }) => {
+      if (!user) throw new AuthenticationError("Giriş yapmalısınız");
+      return user;
+    },
+  },
+
+  Mutation: {
+    createOrder: async (_, { input }, { user, db }) => {
+      if (!user) throw new AuthenticationError("Giriş yapmalısınız");
+      const order = await db.transaction(async (trx) => {
+        const [order] = await trx("orders")
+          .insert({ user_id: user.id, status: "PENDING" })
+          .returning("*");
+        await trx("order_items").insert(
+          input.items.map((item) => ({
+            order_id: order.id,
+            product_id: item.productId,
+            quantity: item.quantity,
+          }))
+        );
+        return order;
+      });
+      return order;
+    },
+  },
+
+  Product: {
+    category: async (product, _, { dataSources }) => {
+      return dataSources.categoryLoader.load(product.category_id);
+    },
+    reviews: async (product, _, { db }) => {
+      return db("reviews").where("product_id", product.id);
+    },
+  },
+};
+```
+**İpucu:** Resolver imzası: `(parent, args, context, info)`. Context'te db, user, dataLoaders gibi paylaşılan kaynaklar bulunur. Type resolver'lar ilişkisel veriyi çözer.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: GraphQL Query Yazma (Client)
+**Görev:** Aşağıdaki senaryolar için GraphQL query'leri yaz.
+**Başlangıç kodu:**
+```graphql
+# TODO: Senaryo 1 - Ürün listesi (ad, fiyat, kategori adı)
+# TODO: Senaryo 2 - Tek ürün detayı (tüm bilgiler + son 5 yorum)
+# TODO: Senaryo 3 - Sipariş oluştur (mutation)
+# TODO: Senaryo 4 - Fragment ile tekrar eden alanları paylaş
+# TODO: Senaryo 5 - Variable kullanımı
+```
+**Beklenen çıktı:**
+```graphql
+# Senaryo 1: Sadece ihtiyaç duyulan alanlar (over-fetching yok)
+query GetProducts {
+  products(limit: 10) {
+    id
+    name
+    price
+    category {
+      name
+    }
+  }
+}
+
+# Senaryo 2: Nested query
+query GetProduct($id: ID!) {
+  product(id: $id) {
+    id
+    name
+    price
+    description
+    inStock
+    averageRating
+    category { name }
+    reviews(limit: 5) {
+      rating
+      comment
+      user { name }
+    }
+  }
+}
+
+# Senaryo 3: Mutation
+mutation CreateOrder($input: CreateOrderInput!) {
+  createOrder(input: $input) {
+    id
+    total
+    status
+    items { product { name } quantity }
+  }
+}
+
+# Senaryo 4: Fragment
+fragment ProductFields on Product {
+  id
+  name
+  price
+  inStock
+}
+
+query CompareProducts($id1: ID!, $id2: ID!) {
+  product1: product(id: $id1) { ...ProductFields }
+  product2: product(id: $id2) { ...ProductFields }
+}
+
+# Variables: { "id1": "1", "id2": "2" }
+```
+**İpucu:** Fragment ile ortak alanları paylaş. Alias (`product1:`, `product2:`) ile aynı query'yi farklı argümanlarla çağır. Variable (`$id`) ile dinamik değerler geçir.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 7: OpenAPI/Swagger Dokümantasyonu
+**Görev:** Express API için OpenAPI 3.0 spesifikasyonu yaz ve swagger-ui-express ile göster.
+**Başlangıç kodu:**
+```javascript
+// TODO: OpenAPI spec objesi oluştur
+// TODO: swagger-ui-express ile /api-docs endpoint'i kur
+// TODO: En az 2 endpoint'i dokümante et (GET ve POST)
+```
+**Beklenen çıktı:**
+```javascript
+const swaggerUi = require("swagger-ui-express");
+
+const openApiSpec = {
+  openapi: "3.0.0",
+  info: {
+    title: "Blog API",
+    version: "1.0.0",
+    description: "Blog uygulaması REST API dokümantasyonu",
+  },
+  servers: [{ url: "/api/v1", description: "Development" }],
+  paths: {
+    "/posts": {
+      get: {
+        summary: "Tüm yazıları listele",
+        tags: ["Posts"],
+        parameters: [
+          { name: "page", in: "query", schema: { type: "integer", default: 1 } },
+          { name: "limit", in: "query", schema: { type: "integer", default: 20 } },
+          { name: "category", in: "query", schema: { type: "string" } },
+        ],
+        responses: {
+          200: {
+            description: "Başarılı",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: { type: "array", items: { $ref: "#/components/schemas/Post" } },
+                    meta: { $ref: "#/components/schemas/PaginationMeta" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        summary: "Yeni yazı oluştur",
+        tags: ["Posts"],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreatePost" },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Yazı oluşturuldu" },
+          401: { description: "Yetkilendirme gerekli" },
+        },
+      },
+    },
+  },
+  components: {
+    schemas: {
+      Post: {
+        type: "object",
+        properties: {
+          id: { type: "integer" },
+          title: { type: "string" },
+          content: { type: "string" },
+          author: { type: "string" },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+      CreatePost: {
+        type: "object",
+        required: ["title", "content"],
+        properties: {
+          title: { type: "string", minLength: 5 },
+          content: { type: "string", minLength: 50 },
+          categoryId: { type: "integer" },
+        },
+      },
+    },
+    securitySchemes: {
+      bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+    },
+  },
+};
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
+```
+**İpucu:** OpenAPI spec JSON veya YAML formatında yazılır. `$ref` ile schema'ları yeniden kullan. `security` ile hangi endpoint'lerin auth gerektirdiğini belirt.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: N+1 Query Problemi ve DataLoader
+**Görev:** GraphQL'de N+1 query problemini tespit et ve DataLoader ile çöz.
+**Başlangıç kodu:**
+```javascript
+// YANLIŞ: N+1 problemi
+// 10 user için 1 + 10 = 11 DB sorgusu
+
+const resolvers = {
+  Query: {
+    users: () => db("users").limit(10), // 1 sorgu
+  },
+  User: {
+    posts: (user) => db("posts").where("author_id", user.id), // N sorgu!
+  },
+};
+
+// TODO: DataLoader ile düzelt (1 + 1 = 2 sorgu olmalı)
+```
+**Beklenen çıktı:**
+```javascript
+const DataLoader = require("dataloader");
+
+// DataLoader: birden fazla key'i batch olarak çözer
+function createLoaders() {
+  return {
+    postsByAuthor: new DataLoader(async (authorIds) => {
+      // Tek sorgu: WHERE author_id IN (1, 2, 3, ..., 10)
+      const posts = await db("posts").whereIn("author_id", authorIds);
+
+      // Her author_id için ilgili post'ları grupla
+      const postsByAuthor = {};
+      for (const post of posts) {
+        if (!postsByAuthor[post.author_id]) {
+          postsByAuthor[post.author_id] = [];
+        }
+        postsByAuthor[post.author_id].push(post);
+      }
+
+      // authorIds sırasına göre döndür
+      return authorIds.map(id => postsByAuthor[id] || []);
+    }),
+  };
+}
+
+// Context'te her request için yeni loader oluştur
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: () => ({ loaders: createLoaders() }),
+});
+
+// Resolver güncelleme
+const resolvers = {
+  User: {
+    posts: (user, _, { loaders }) => loaders.postsByAuthor.load(user.id),
+  },
+};
+
+// Sonuç: 1 (users) + 1 (posts batch) = 2 sorgu!
+```
+**İpucu:** DataLoader aynı tick'teki tüm `load()` çağrılarını toplar ve tek `batchFn` çağrısıyla çözer. HER REQUEST için yeni DataLoader instance'ı oluştur (cache request-scoped olmalı).
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: API Testing ile Postman/httpie
+**Görev:** Aşağıdaki API endpoint'lerini curl/httpie komutları ile test et.
+**Başlangıç kodu:**
+```bash
+# TODO: Her endpoint için test komutunu yaz
+# 1. GET  /api/products (query params ile filtreleme)
+# 2. POST /api/products (JSON body ile)
+# 3. PUT  /api/products/1 (güncelleme)
+# 4. DELETE /api/products/1 (silme)
+# 5. POST /api/auth/login (token alma)
+# 6. GET  /api/profile (Authorization header ile)
+```
+**Beklenen çıktı:**
+```bash
+# 1. GET ile filtreleme
+curl -X GET "http://localhost:3000/api/products?category=electronics&limit=5" \
+  -H "Accept: application/json"
+
+# 2. POST ile oluşturma
+curl -X POST http://localhost:3000/api/products \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbG..." \
+  -d '{"name": "Yeni Ürün", "price": 199.99, "categoryId": 1}'
+
+# 3. PUT ile güncelleme
+curl -X PUT http://localhost:3000/api/products/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbG..." \
+  -d '{"name": "Güncel Ürün", "price": 249.99}'
+
+# 4. DELETE ile silme
+curl -X DELETE http://localhost:3000/api/products/1 \
+  -H "Authorization: Bearer eyJhbG..."
+
+# 5. Login ve token alma
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@test.com", "password": "Test1234!"}'
+
+# 6. Korumalı endpoint
+TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@test.com", "password": "Test1234!"}' | jq -r '.token')
+
+curl -X GET http://localhost:3000/api/profile \
+  -H "Authorization: Bearer $TOKEN"
+```
+**İpucu:** `-H` header, `-d` body, `-X` method belirtir. `jq` ile JSON parse edip token çıkarabilirsin. `-s` silent mode (progress bar göstermez).
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 10: REST vs GraphQL Karar Matrisi
+**Görev:** Aşağıdaki proje senaryoları için REST mi yoksa GraphQL mi kullanılması gerektiğine karar ver.
+**Başlangıç kodu:**
+```
+Senaryolar:
+1. Public API (3rd party geliştiriciler kullanacak)
+2. Mobil uygulama (bant genişliği sınırlı)
+3. Basit CRUD blog API
+4. Çok farklı client'lar (web, mobil, TV, IoT)
+5. Gerçek zamanlı chat uygulaması
+6. E-ticaret (ürün + yorum + stok + öneri)
+7. Microservice-to-microservice iletişim
+8. İç yönetim paneli (dashboard)
+
+TODO: Her biri için REST/GraphQL/gRPC seç ve nedenini açıkla
+```
+**Beklenen çıktı:**
+```
+1. Public API → REST ✓
+   Neden: HTTP cache, basit, iyi anlaşılır, dokümantasyonu kolay
+
+2. Mobil uygulama → GraphQL ✓
+   Neden: Over-fetching yok, bant genişliği tasarrufu, tek istek
+
+3. Basit CRUD blog → REST ✓
+   Neden: Basit yapı, GraphQL overkill, hızlı geliştirme
+
+4. Çok farklı client'lar → GraphQL ✓
+   Neden: Her client ihtiyacı kadar veri çeker, BFF'ye gerek yok
+
+5. Gerçek zamanlı chat → WebSocket + gRPC
+   Neden: Subscription var ama WebSocket daha verimli, gRPC düşük latency
+
+6. E-ticaret → GraphQL ✓
+   Neden: İlişkisel veri yoğun, nested sorgular (ürün→yorumlar→kullanıcı)
+
+7. Microservice iletişim → gRPC ✓
+   Neden: Binary protocol, çok hızlı, contract-first, streaming
+
+8. İç yönetim paneli → REST veya GraphQL
+   Neden: İkisi de çalışır, ekip deneyimine göre seç
+```
+**İpucu:** Tek doğru cevap yok - trade-off'ları anlayıp proje gereksinimlerine göre seç. Büyük projelerde birden fazla paradigma birlikte kullanılabilir (polyglot API).
+**Zorluk:** Orta
+:::
+
 :::must-note
 - GraphQL 3 operasyon tipi: Query (oku), Mutation (değiştir), Subscription (gerçek zamanlı)
 - GraphQL avantajları: over-fetching yok, under-fetching yok, tek endpoint, strong typing

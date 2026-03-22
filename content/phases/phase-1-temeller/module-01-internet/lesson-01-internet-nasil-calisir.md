@@ -654,6 +654,585 @@ explanation: "Video streaming'de hız, güvenilirlikten önemlidir. Birkaç kay�
 Network debugging yaparken AI'a DevTools Network tab ciktini yapistir ve sor: "Bu request'in timing breakdown'ini analiz et. DNS lookup, TCP handshake ve TTFB surelerinden hangisi darbogazda? Nasil optimize ederim?"
 :::
 
+:::exercise
+### Alıştırma 4: TCP 3-Way Handshake Simülasyonu
+
+**Görev:** Python ile basit bir TCP 3-way handshake simülasyonu yaz. İstemci ve sunucu arasındaki SYN, SYN-ACK, ACK mesaj alışverişini simüle et.
+
+**Başlangıç kodu:**
+```python
+import random
+
+class TCPEndpoint:
+    def __init__(self, name: str):
+        self.name = name
+        self.seq_num = random.randint(1000, 9999)
+        self.state = "CLOSED"
+
+    def send_syn(self):
+        # TODO: state'i "SYN_SENT" yap, SYN mesaji dondur
+        pass
+
+    def receive_syn_send_synack(self, syn_seq: int):
+        # TODO: state'i "SYN_RECEIVED" yap, SYN-ACK mesaji dondur
+        pass
+
+    def receive_synack_send_ack(self, synack_seq: int):
+        # TODO: state'i "ESTABLISHED" yap, ACK mesaji dondur
+        pass
+
+# Test
+client = TCPEndpoint("Client")
+server = TCPEndpoint("Server")
+
+syn = client.send_syn()
+print(f"1. {client.name} -> SYN (seq={syn}), State: {client.state}")
+
+synack = server.receive_syn_send_synack(syn)
+print(f"2. {server.name} -> SYN-ACK (seq={synack['seq']}, ack={synack['ack']}), State: {server.state}")
+
+ack = client.receive_synack_send_ack(synack['seq'])
+print(f"3. {client.name} -> ACK (ack={ack}), State: {client.state}")
+```
+
+**Beklenen çıktı:**
+```
+1. Client -> SYN (seq=XXXX), State: SYN_SENT
+2. Server -> SYN-ACK (seq=YYYY, ack=XXXX+1), State: SYN_RECEIVED
+3. Client -> ACK (ack=YYYY+1), State: ESTABLISHED
+```
+
+**İpucu:** SYN-ACK mesajında ack değeri = alınan seq + 1 olmalıdır.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: IP Adresi Doğrulayıcı
+
+**Görev:** Bir IPv4 adresi doğrulama fonksiyonu yaz. Geçerli ve geçersiz IP adreslerini ayırt etsin.
+
+**Başlangıç kodu:**
+```python
+def validate_ipv4(ip: str) -> dict:
+    """
+    IPv4 adresini dogrula ve bilgilerini dondur.
+    Returns: {"valid": bool, "class": str, "type": str, "reason": str}
+    """
+    # TODO:
+    # 1. "." ile split et, 4 parca olmali
+    # 2. Her parca 0-255 arasi sayi olmali
+    # 3. Sinifi belirle: A (1-126), B (128-191), C (192-223), D (224-239), E (240-255)
+    # 4. Tipi belirle: Private (10.x, 172.16-31.x, 192.168.x), Loopback (127.x), Public
+    pass
+
+# Test
+test_ips = [
+    "192.168.1.1",      # Private, Class C
+    "10.0.0.1",          # Private, Class A
+    "8.8.8.8",           # Public, Class A (Google DNS)
+    "256.1.1.1",         # Gecersiz
+    "172.16.0.1",        # Private, Class B
+    "127.0.0.1",         # Loopback
+    "192.168.1",         # Gecersiz (3 oktet)
+    "abc.def.ghi.jkl",   # Gecersiz
+]
+
+for ip in test_ips:
+    result = validate_ipv4(ip)
+    print(f"{ip:20s} -> Valid: {result['valid']}, Class: {result.get('class', '-')}, Type: {result.get('type', '-')}")
+```
+
+**Beklenen çıktı:**
+```
+192.168.1.1          -> Valid: True, Class: C, Type: Private
+10.0.0.1             -> Valid: True, Class: A, Type: Private
+8.8.8.8              -> Valid: True, Class: A, Type: Public
+256.1.1.1            -> Valid: False, Class: -, Type: -
+172.16.0.1           -> Valid: True, Class: B, Type: Private
+127.0.0.1            -> Valid: True, Class: A, Type: Loopback
+192.168.1            -> Valid: False, Class: -, Type: -
+abc.def.ghi.jkl      -> Valid: False, Class: -, Type: -
+```
+
+**İpucu:** `str.split(".")` ile böl, `str.isdigit()` ile sayı kontrolü yap.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: Port Tarayıcı
+
+**Görev:** Python socket modülü ile basit bir port tarayıcı yaz. Yaygın portları kontrol edip açık olanları listelesin.
+
+**Başlangıç kodu:**
+```python
+import socket
+
+COMMON_PORTS = {
+    21: "FTP",
+    22: "SSH",
+    25: "SMTP",
+    53: "DNS",
+    80: "HTTP",
+    443: "HTTPS",
+    3306: "MySQL",
+    5432: "PostgreSQL",
+    6379: "Redis",
+    8080: "HTTP-Alt",
+    8443: "HTTPS-Alt",
+}
+
+def scan_port(host: str, port: int, timeout: float = 1.0) -> bool:
+    """Belirtilen host:port'un acik olup olmadigini kontrol et."""
+    # TODO: socket.socket ile baglanti denemesi yap
+    # socket.settimeout(timeout) ile timeout ayarla
+    # connect_ex() kullan (0 donerse acik)
+    pass
+
+def scan_host(host: str) -> list[dict]:
+    """Host'un yaygin portlarini tara ve sonuclari dondur."""
+    results = []
+    for port, service in COMMON_PORTS.items():
+        is_open = scan_port(host, port)
+        if is_open:
+            results.append({"port": port, "service": service, "status": "OPEN"})
+    return results
+
+# Test
+host = "google.com"
+print(f"Tarama: {host}")
+open_ports = scan_host(host)
+for p in open_ports:
+    print(f"  Port {p['port']:5d} ({p['service']:10s}) -> {p['status']}")
+```
+
+**Beklenen çıktı:**
+```
+Tarama: google.com
+  Port    80 (HTTP      ) -> OPEN
+  Port   443 (HTTPS     ) -> OPEN
+```
+
+**İpucu:** `socket.connect_ex()` başarılıysa 0 döner. Timeout değerini düşük tutarak hızlandırabilirsin.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: HTTP İstek Yapısını Parse Etme
+
+**Görev:** Ham bir HTTP request string'ini parse eden bir fonksiyon yaz. Method, path, headers ve body'yi ayıklasın.
+
+**Başlangıç kodu:**
+```python
+def parse_http_request(raw_request: str) -> dict:
+    """
+    Ham HTTP request'i parse et.
+    Returns: {"method": str, "path": str, "version": str, "headers": dict, "body": str}
+    """
+    # TODO:
+    # 1. Ilk satir = request line (method, path, version)
+    # 2. Bos satira kadar headers
+    # 3. Bos satirdan sonra body
+    pass
+
+# Test
+raw = """GET /api/users?page=1 HTTP/1.1
+Host: example.com
+Accept: application/json
+Authorization: Bearer token123
+User-Agent: Mozilla/5.0
+
+"""
+
+result = parse_http_request(raw)
+print(f"Method:  {result['method']}")
+print(f"Path:    {result['path']}")
+print(f"Version: {result['version']}")
+print(f"Headers: {result['headers']}")
+print(f"Body:    '{result['body']}'")
+
+print("\n---\n")
+
+raw_post = """POST /api/users HTTP/1.1
+Host: example.com
+Content-Type: application/json
+Content-Length: 42
+
+{"name": "Ahmet", "email": "a@test.com"}"""
+
+result2 = parse_http_request(raw_post)
+print(f"Method:  {result2['method']}")
+print(f"Path:    {result2['path']}")
+print(f"Body:    {result2['body']}")
+```
+
+**Beklenen çıktı:**
+```
+Method:  GET
+Path:    /api/users?page=1
+Version: HTTP/1.1
+Headers: {'Host': 'example.com', 'Accept': 'application/json', 'Authorization': 'Bearer token123', 'User-Agent': 'Mozilla/5.0'}
+Body:    ''
+
+---
+
+Method:  POST
+Path:    /api/users
+Body:    {"name": "Ahmet", "email": "a@test.com"}
+```
+
+**İpucu:** `\r\n\r\n` veya `\n\n` ile headers ve body'yi ayır. İlk satırı space ile böl.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Subnet Hesaplayıcı
+
+**Görev:** Bir IP adresi ve subnet mask verildiğinde network address, broadcast address ve kullanılabilir host sayısını hesapla.
+
+**Başlangıç kodu:**
+```python
+def ip_to_binary(ip: str) -> str:
+    """IP adresini 32-bit binary string'e cevir."""
+    # TODO: Her okteti 8-bit binary'ye cevir ve birlestir
+    pass
+
+def binary_to_ip(binary: str) -> str:
+    """32-bit binary string'i IP adresine cevir."""
+    # TODO: 8'erli gruplara bol ve decimal'e cevir
+    pass
+
+def calculate_subnet(ip: str, cidr: int) -> dict:
+    """
+    Subnet bilgilerini hesapla.
+    Returns: {"network": str, "broadcast": str, "first_host": str,
+              "last_host": str, "total_hosts": int, "subnet_mask": str}
+    """
+    # TODO:
+    # 1. IP'yi binary'ye cevir
+    # 2. Subnet mask = cidr kadar 1 + geri kalan 0
+    # 3. Network = IP AND Mask
+    # 4. Broadcast = Network OR (NOT Mask)
+    # 5. First host = Network + 1, Last host = Broadcast - 1
+    pass
+
+# Test
+subnets = [
+    ("192.168.1.100", 24),
+    ("10.0.0.50", 8),
+    ("172.16.5.130", 20),
+]
+
+for ip, cidr in subnets:
+    result = calculate_subnet(ip, cidr)
+    print(f"\nIP: {ip}/{cidr}")
+    print(f"  Subnet Mask:  {result['subnet_mask']}")
+    print(f"  Network:      {result['network']}")
+    print(f"  Broadcast:    {result['broadcast']}")
+    print(f"  First Host:   {result['first_host']}")
+    print(f"  Last Host:    {result['last_host']}")
+    print(f"  Total Hosts:  {result['total_hosts']}")
+```
+
+**Beklenen çıktı:**
+```
+IP: 192.168.1.100/24
+  Subnet Mask:  255.255.255.0
+  Network:      192.168.1.0
+  Broadcast:    192.168.1.255
+  First Host:   192.168.1.1
+  Last Host:    192.168.1.254
+  Total Hosts:  254
+```
+
+**İpucu:** Bitwise AND (`&`) ve OR (`|`) operatörlerini kullan. `int(octet)` ile sayıya çevir.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: Paket Encapsulation Simülasyonu
+
+**Görev:** TCP/IP katman modelinde verinin her katmanda nasıl sarmalandığını (encapsulation) simüle eden bir program yaz.
+
+**Başlangıç kodu:**
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Packet:
+    layer: str
+    header: dict
+    payload: str
+
+    def __str__(self):
+        header_str = ", ".join(f"{k}={v}" for k, v in self.header.items())
+        return f"[{self.layer}] Header({header_str}) | Payload: {self.payload[:50]}..."
+
+def encapsulate(data: str, src_ip: str, dst_ip: str, src_port: int, dst_port: int) -> list[Packet]:
+    """
+    Veriyi Application -> Transport -> Network -> Data Link katmanlarinda sarmala.
+    Her katmanin ekledigi header bilgilerini goster.
+    """
+    packets = []
+
+    # TODO: Application Layer - HTTP header ekle
+    # TODO: Transport Layer - TCP header ekle (src_port, dst_port, seq, ack, flags)
+    # TODO: Network Layer - IP header ekle (src_ip, dst_ip, ttl, protocol)
+    # TODO: Data Link Layer - Ethernet header ekle (src_mac, dst_mac, type)
+
+    return packets
+
+# Test
+packets = encapsulate(
+    data="Hello, World!",
+    src_ip="192.168.1.100",
+    dst_ip="93.184.216.34",
+    src_port=54321,
+    dst_port=80
+)
+
+print("=== Encapsulation Sureci ===")
+for i, pkt in enumerate(packets, 1):
+    print(f"\nAdim {i}: {pkt}")
+```
+
+**Beklenen çıktı:**
+```
+=== Encapsulation Sureci ===
+
+Adim 1: [Application] Header(method=GET, host=93.184.216.34) | Payload: Hello, World!...
+Adim 2: [Transport] Header(src_port=54321, dst_port=80, seq=1000, flags=SYN) | Payload: [Application] Header(method=GET...
+Adim 3: [Network] Header(src_ip=192.168.1.100, dst_ip=93.184.216.34, ttl=64) | Payload: [Transport] Header(src_port=543...
+Adim 4: [Data Link] Header(src_mac=AA:BB:CC:DD:EE:FF, dst_mac=11:22:33:44:55:66) | Payload: [Network] Header(src_ip=192...
+```
+
+**İpucu:** Her katman önceki katmanın çıktısını payload olarak alır. `str(previous_packet)` kullanabilirsin.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: Network Latency Karşılaştırma Aracı
+
+**Görev:** Birden fazla sunucuya ping atarak latency istatistiklerini hesaplayan ve karşılaştıran bir bash script yaz.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+# Sunucu listesi
+SERVERS=("google.com" "cloudflare.com" "amazon.com" "github.com" "stackoverflow.com")
+PING_COUNT=5
+
+echo "=== Network Latency Karsilastirma ==="
+echo "Her sunucuya $PING_COUNT ping gonderiliyor..."
+echo ""
+
+# TODO: Her sunucu icin:
+# 1. ping -c $PING_COUNT ile ping at
+# 2. Ortalama, minimum ve maksimum latency'yi parse et
+# 3. Sonuclari tablo formatinda goster
+# 4. En dusuk latency'li sunucuyu belirle
+
+printf "%-20s %-10s %-10s %-10s %-10s\n" "Sunucu" "Min(ms)" "Avg(ms)" "Max(ms)" "Kayip(%)"
+printf "%-20s %-10s %-10s %-10s %-10s\n" "--------------------" "--------" "--------" "--------" "--------"
+
+for server in "${SERVERS[@]}"; do
+    # TODO: ping ciktisini parse et
+    # ping -c $PING_COUNT $server 2>/dev/null | tail -1
+    # Format: rtt min/avg/max/mdev = X/Y/Z/W ms
+    echo "  $server -> ???"
+done
+
+echo ""
+echo "En hizli sunucu: ???"
+```
+
+**Beklenen çıktı:**
+```
+=== Network Latency Karsilastirma ===
+Her sunucuya 5 ping gonderiliyor...
+
+Sunucu               Min(ms)    Avg(ms)    Max(ms)    Kayip(%)
+--------------------  --------   --------   --------   --------
+google.com            12.5       15.3       18.1       0
+cloudflare.com        8.2        10.1       12.4       0
+amazon.com            85.3       90.2       95.1       0
+github.com            45.2       48.7       52.3       0
+stackoverflow.com     42.1       45.6       49.8       0
+
+En hizli sunucu: cloudflare.com (10.1 ms)
+```
+
+**İpucu:** `ping` çıktısının son satırını `tail -1` ile al, `awk -F'/' '{print $5}'` ile ortalama değeri çıkar.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Wireshark Benzeri Paket Yakalayıcı
+
+**Görev:** Python socket modülü ile basit bir paket sniffer simülasyonu yaz. Gelen/giden paketlerin özetini göstersin.
+
+**Başlangıç kodu:**
+```python
+from dataclasses import dataclass
+from datetime import datetime
+import random
+
+@dataclass
+class Packet:
+    timestamp: str
+    src_ip: str
+    dst_ip: str
+    protocol: str
+    src_port: int
+    dst_port: int
+    size: int
+    flags: str = ""
+
+def generate_traffic(count: int = 20) -> list[Packet]:
+    """Ornek network trafigi olustur."""
+    protocols = ["TCP", "UDP", "HTTP", "HTTPS", "DNS"]
+    packets = []
+    for _ in range(count):
+        proto = random.choice(protocols)
+        dst_port = {"HTTP": 80, "HTTPS": 443, "DNS": 53}.get(proto, random.randint(1024, 65535))
+        packets.append(Packet(
+            timestamp=datetime.now().strftime("%H:%M:%S.%f")[:12],
+            src_ip=f"192.168.1.{random.randint(1, 254)}",
+            dst_ip=f"{random.randint(1, 223)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(1, 254)}",
+            protocol=proto,
+            src_port=random.randint(49152, 65535),
+            dst_port=dst_port,
+            size=random.randint(40, 1500),
+            flags=random.choice(["SYN", "ACK", "SYN-ACK", "FIN", "PSH-ACK", ""])
+        ))
+    return packets
+
+def analyze_traffic(packets: list[Packet]) -> dict:
+    """Trafik istatistiklerini hesapla."""
+    # TODO:
+    # 1. Protokol bazinda paket sayisi
+    # 2. Toplam veri boyutu
+    # 3. En cok iletisim kuran IP
+    # 4. Port dagilimi
+    pass
+
+# Test
+packets = generate_traffic(30)
+print(f"{'No':>3} {'Zaman':>12} {'Kaynak':>20} {'Hedef':>20} {'Proto':>6} {'Boyut':>6}")
+print("-" * 75)
+for i, pkt in enumerate(packets[:10], 1):
+    print(f"{i:>3} {pkt.timestamp:>12} {pkt.src_ip}:{pkt.src_port:>5} -> {pkt.dst_ip}:{pkt.dst_port:>5} {pkt.protocol:>6} {pkt.size:>5}B")
+
+stats = analyze_traffic(packets)
+print(f"\nToplam: {len(packets)} paket")
+```
+
+**Beklenen çıktı:**
+```
+ No        Zaman               Kaynak                Hedef  Proto  Boyut
+---------------------------------------------------------------------------
+  1  10:15:23.12  192.168.1.42:54321 -> 142.250.1.100:  443  HTTPS  1200B
+  2  10:15:23.13  192.168.1.42:54321 -> 8.8.8.8:   53    DNS    64B
+...
+Toplam: 30 paket
+```
+
+**İpucu:** `collections.Counter` ile frekans analizi yap. `defaultdict(int)` ile sayaç tut.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 12: NAT Simülatörü
+
+**Görev:** Network Address Translation (NAT) mekanizmasını simüle eden bir program yaz.
+
+**Başlangıç kodu:**
+```python
+class NATTable:
+    def __init__(self, public_ip: str):
+        self.public_ip = public_ip
+        self.table: dict[str, dict] = {}
+        self.next_port = 10000
+
+    def translate_outgoing(self, private_ip: str, private_port: int, dest_ip: str, dest_port: int) -> dict:
+        """Iç ağdan dış ağa: private IP -> public IP çevirisi."""
+        key = f"{private_ip}:{private_port}"
+        if key not in self.table:
+            self.table[key] = {
+                "public_port": self.next_port,
+                "private_ip": private_ip,
+                "private_port": private_port,
+                "dest_ip": dest_ip,
+                "dest_port": dest_port,
+            }
+            self.next_port += 1
+        entry = self.table[key]
+        return {"src": f"{self.public_ip}:{entry['public_port']}", "dst": f"{dest_ip}:{dest_port}"}
+
+    def translate_incoming(self, public_port: int) -> dict | None:
+        """Dış ağdan iç ağa: public port -> private IP çevirisi."""
+        for key, entry in self.table.items():
+            if entry["public_port"] == public_port:
+                return {"dst": f"{entry['private_ip']}:{entry['private_port']}"}
+        return None
+
+    def show_table(self):
+        print(f"{'Ic Adres':>22} -> {'Dis Adres':>22} -> {'Hedef':>22}")
+        print("-" * 72)
+        for key, entry in self.table.items():
+            print(f"{key:>22} -> {self.public_ip}:{entry['public_port']:>15} -> {entry['dest_ip']}:{entry['dest_port']}")
+
+# Test
+nat = NATTable("203.0.113.1")
+
+devices = [
+    ("192.168.1.10", 5000, "93.184.216.34", 80),
+    ("192.168.1.20", 3000, "142.250.185.14", 443),
+    ("192.168.1.10", 5001, "93.184.216.34", 80),
+    ("192.168.1.30", 8080, "151.101.1.69", 443),
+]
+
+print("=== Giden Trafik (NAT Translation) ===")
+for priv_ip, priv_port, dest_ip, dest_port in devices:
+    result = nat.translate_outgoing(priv_ip, priv_port, dest_ip, dest_port)
+    print(f"  {priv_ip}:{priv_port} -> {result['src']} -> {result['dst']}")
+
+print(f"\n=== NAT Tablosu ===")
+nat.show_table()
+
+print(f"\n=== Gelen Trafik ===")
+incoming = nat.translate_incoming(10001)
+print(f"  Port 10001 -> {incoming}")
+```
+
+**Beklenen çıktı:**
+```
+=== Giden Trafik (NAT Translation) ===
+  192.168.1.10:5000 -> 203.0.113.1:10000 -> 93.184.216.34:80
+  192.168.1.20:3000 -> 203.0.113.1:10001 -> 142.250.185.14:443
+  192.168.1.10:5001 -> 203.0.113.1:10002 -> 93.184.216.34:80
+  192.168.1.30:8080 -> 203.0.113.1:10003 -> 151.101.1.69:443
+
+=== NAT Tablosu ===
+          Ic Adres ->            Dis Adres ->                Hedef
+------------------------------------------------------------------------
+  192.168.1.10:5000 -> 203.0.113.1:10000  -> 93.184.216.34:80
+...
+```
+
+**İpucu:** NAT her iç IP:port çiftine benzersiz bir dış port atar. Gelen trafik bu port üzerinden doğru iç cihaza yönlendirilir.
+
+**Zorluk:** Zor
+:::
+
 :::must-note
 - TCP/IP 5 katman sırası: Physical → Data Link → Network → Transport → Application
 - TCP = güvenilir (3-way handshake: SYN → SYN-ACK → ACK), UDP = hızlı ama güvenilir değil

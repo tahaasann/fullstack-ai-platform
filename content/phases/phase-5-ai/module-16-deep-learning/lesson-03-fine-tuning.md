@@ -1560,6 +1560,257 @@ pipeline.generate_report()
 ```
 :::
 
+:::exercise
+## Alıştırma 5: Dataset Hazırlama ve Temizleme
+
+**Görev:** Fine-tuning icin kaliteli dataset olustur ve temizle.
+
+```python
+import json
+import re
+
+def prepare_instruction_dataset(raw_data):
+    """Ham veriyi instruction fine-tuning formatina cevir."""
+    cleaned = []
+    for item in raw_data:
+        # Temizleme
+        instruction = item["instruction"].strip()
+        response = item["response"].strip()
+
+        # Kalite filtreleri
+        if len(instruction) < 10 or len(response) < 20:
+            continue
+        if response.count("\n") < 1 and len(response) < 50:
+            continue
+
+        cleaned.append({
+            "instruction": instruction,
+            "input": item.get("input", ""),
+            "output": response,
+        })
+
+    return cleaned
+
+# TODO: 30+ instruction-response cifti olustur (Turkce yazilim konulari)
+# TODO: Veri kalitesi metriklerini hesapla (ortalama uzunluk, distribution)
+# TODO: Train/validation split yap (%90/%10)
+# TODO: JSONL formatinda kaydet
+# TODO: Duplicate ve yakin-duplicate kontrol et (cosine similarity ile)
+```
+
+**Beklenen Sonuc:** En az 30 kaliteli instruction-response cifti olusturulmali. Ortalama response uzunlugu 100+ kelime olmali. Duplicate orani %0 olmali.
+**Ipucu:** Veri kalitesi > veri miktari. 100 kaliteli ornek, 10000 dusuk kaliteli ornekten daha iyi sonuc verir.
+:::
+
+:::exercise
+## Alıştırma 6: QLoRA ile Bellek-Verimli Fine-tuning
+
+**Görev:** 4-bit quantization ile buyuk bir modeli kucuk GPU'da fine-tune et.
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+import torch
+
+# 4-bit quantization config
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_use_double_quant=True,
+)
+
+model_name = "microsoft/phi-2"  # 2.7B parametre
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name, quantization_config=bnb_config)
+
+# LoRA config
+lora_config = LoraConfig(
+    r=16, lora_alpha=32, lora_dropout=0.1,
+    target_modules=["q_proj", "k_proj", "v_proj", "dense"],
+    task_type="CAUSAL_LM",
+)
+
+model = prepare_model_for_kbit_training(model)
+model = get_peft_model(model, lora_config)
+model.print_trainable_parameters()
+
+# TODO: Trainable parameter yuzdesini hesapla (<%1 olmali)
+# TODO: GPU bellek kullanimini olc (torch.cuda.memory_allocated)
+# TODO: Kendi dataset'inle fine-tune et (Alistirma 5'ten)
+# TODO: Full fine-tuning vs QLoRA bellek karsilastirmasi yap
+```
+
+**Beklenen Sonuc:** Trainable parametreler toplam parametrenin %1'inden az olmali. 2.7B model 8GB GPU'da fine-tune edilebilmeli. QLoRA full fine-tuning'in %95+ performansini yakalamali.
+**Ipucu:** nf4 (NormalFloat4) standart int4'ten daha iyi sonuc verir. Double quantization ek %0.4 bellek tasarrufu saglar.
+:::
+
+:::exercise
+## Alıştırma 7: Hyperparameter Sweep ile Fine-tuning Optimizasyonu
+
+**Görev:** Fine-tuning hyperparameter'larini sistematik olarak optimize et.
+
+```python
+from transformers import TrainingArguments, Trainer
+import wandb
+
+def train_with_config(lr, epochs, batch_size, warmup_ratio, lora_r):
+    training_args = TrainingArguments(
+        output_dir=f"./results/lr{lr}_ep{epochs}_bs{batch_size}",
+        learning_rate=lr,
+        num_train_epochs=epochs,
+        per_device_train_batch_size=batch_size,
+        warmup_ratio=warmup_ratio,
+        weight_decay=0.01,
+        evaluation_strategy="epoch",
+        save_strategy="epoch",
+        load_best_model_at_end=True,
+        report_to="wandb",
+    )
+
+    # TODO: LoRA config'i lora_r ile olustur
+    # TODO: Trainer ile egit ve eval metriklerini kaydet
+    # TODO: En iyi modeli kaydet
+
+# Hyperparameter grid
+configs = [
+    {"lr": 1e-4, "epochs": 3, "batch_size": 8, "warmup_ratio": 0.1, "lora_r": 8},
+    {"lr": 2e-5, "epochs": 5, "batch_size": 4, "warmup_ratio": 0.05, "lora_r": 16},
+    {"lr": 5e-5, "epochs": 3, "batch_size": 8, "warmup_ratio": 0.1, "lora_r": 32},
+    # TODO: 3 config daha ekle
+]
+
+# TODO: Her config'i calistir ve sonuclari karsilastir
+# TODO: wandb ile experiment tracking yap
+# TODO: En iyi config'i belirle (eval loss + accuracy)
+```
+
+**Beklenen Sonuc:** Learning rate ve LoRA rank en etkili parametreler olmali. wandb dashboard'unda tum denemelerin karsilastirmasi gorunmeli.
+**Ipucu:** lr=2e-5 cogu fine-tuning senaryosunda iyi calisir. LoRA r=16 genellikle r=8'den iyi, r=32'den cok farkli degil.
+:::
+
+:::exercise
+## Alıştırma 8: Model Merging — Farkli Yetenekleri Birlestir
+
+**Görev:** Farkli gorevler icin fine-tune edilmis LoRA adapter'larini birlestir.
+
+```python
+from peft import PeftModel, PeftConfig
+from transformers import AutoModelForCausalLM
+
+# Base model
+base_model = AutoModelForCausalLM.from_pretrained("microsoft/phi-2")
+
+# Farkli adapter'lari yukle
+coding_adapter = PeftModel.from_pretrained(base_model, "./adapters/coding")
+turkish_adapter = PeftModel.from_pretrained(base_model, "./adapters/turkish")
+
+# Adapter'lari merge et
+merged_model = coding_adapter.merge_and_unload()
+
+# TODO: Iki farkli adapter'i egit (coding + turkish)
+# TODO: Linear interpolation ile merge et (alpha=0.5)
+# TODO: Merge edilmis modeli her iki gorevde test et
+# TODO: Farkli alpha degerleriyle merge et ve performansi olc
+# TODO: TIES-Merging veya DARE yontemiyle karsilastir
+```
+
+**Beklenen Sonuc:** Merge edilmis model her iki gorevde de makul performans gostermeli. Alpha=0.5 dengeli sonuc, gorev-spesifik alpha daha iyi sonuc verebilir.
+**Ipucu:** Model merging "catastrophic forgetting" sorununu cozmeye calisir. TIES-Merging gereksiz parametre degisikliklerini eler.
+:::
+
+:::exercise
+## Alıştırma 9: Deployment — Fine-tuned Model Servisi
+
+**Görev:** Fine-tuned modeli FastAPI ile serve et.
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+
+app = FastAPI()
+
+# Model yukle (startup'ta)
+model_path = "./fine-tuned-model"
+tokenizer = AutoTokenizer.from_pretrained(model_path)
+model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.float16)
+model.eval()
+
+class PromptRequest(BaseModel):
+    prompt: str
+    max_tokens: int = 256
+    temperature: float = 0.7
+
+@app.post("/generate")
+async def generate(req: PromptRequest):
+    inputs = tokenizer(req.prompt, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=req.max_tokens,
+            temperature=req.temperature,
+            do_sample=True,
+            top_p=0.9,
+        )
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return {"response": response[len(req.prompt):]}
+
+# TODO: Health check endpoint ekle
+# TODO: Request/response logging ekle
+# TODO: Rate limiting ekle
+# TODO: Batch inference destegi ekle
+# TODO: Docker container'i olustur ve deploy et
+```
+
+**Beklenen Sonuc:** API endpoint'i fine-tuned modelden tutarli ciktilar uretmeli. Response time kucuk model icin <2 saniye olmali. Health check endpoint'i model durumunu raporlamali.
+**Ipucu:** `torch.float16` bellek kullanimini yarisina indirir. `torch.no_grad()` inference sirasinda gradient hesaplamasini kapatir (hiz ve bellek kazanimi).
+:::
+
+:::exercise
+## Alıştırma 10: DPO (Direct Preference Optimization) ile Alignment
+
+**Görev:** DPO ile modeli kullanici tercihlerine gore hizala.
+
+```python
+from trl import DPOTrainer
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+# Preference dataset formati
+preference_data = [
+    {
+        "prompt": "Python'da liste siralama nasil yapilir?",
+        "chosen": "Python'da liste siralamak icin `sorted()` fonksiyonu veya `.sort()` metodu kullanilir:\n\n```python\n# sorted() yeni liste doner\nnumbers = [3, 1, 4, 1, 5]\nsorted_numbers = sorted(numbers)  # [1, 1, 3, 4, 5]\n\n# .sort() mevcut listeyi degistirir\nnumbers.sort()  # in-place\n```\n\n`key` parametresi ile ozel siralama yapabilirsin: `sorted(students, key=lambda s: s['grade'])`",
+        "rejected": "sort kullan",
+    },
+    # TODO: 20+ preference cifti daha ekle
+    # TODO: Chosen: detayli, ornekli, dogru cevaplar
+    # TODO: Rejected: kisa, eksik veya yanlis cevaplar
+]
+
+# DPO Training
+model = AutoModelForCausalLM.from_pretrained("microsoft/phi-2")
+ref_model = AutoModelForCausalLM.from_pretrained("microsoft/phi-2")
+
+dpo_trainer = DPOTrainer(
+    model=model,
+    ref_model=ref_model,
+    train_dataset=preference_data,
+    tokenizer=tokenizer,
+    beta=0.1,  # KL divergence penalty
+)
+
+# TODO: DPO ile egit
+# TODO: DPO oncesi ve sonrasi ciktilari karsilastir
+# TODO: Beta parametresinin etkisini analiz et
+# TODO: RLHF vs DPO avantaj/dezavantajlarini raporla
+```
+
+**Beklenen Sonuc:** DPO sonrasi model daha detayli ve yardimci cevaplar uretmeli. Rejected tarzinda kisa/eksik cevaplar azalmali. Beta=0.1 ile model base model'den cok uzaklasmamali.
+**Ipucu:** DPO, RLHF'ye gore daha basit (reward model gerektirmez). Beta kucukse model daha cok tercih verisine uyar, buyukse base model'e yakin kalir.
+:::
+
 ---
 
 ## Mulakat Sorulari

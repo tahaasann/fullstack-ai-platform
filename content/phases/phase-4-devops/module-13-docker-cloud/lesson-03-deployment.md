@@ -1413,6 +1413,101 @@ Bu soruya "Vercel'e push ederim" demek junior cevabı. Tüm pipeline'ı anlatan 
 - Health check tüm dependency'leri kontrol etmeli
 :::
 
+:::exercise[Egzersiz 5: Environment Variable Yonetimi]
+**Görev:** Farkli ortamlar (development, staging, production) icin guvenli environment variable yonetimi kur.
+
+**Adimlar:**
+1. `.env.example` dosyasi olustur (tum degiskenlerin listesi, degerleri bos)
+2. `dotenv-vault` veya `infisical` ile secret yonetimi kur
+3. CI/CD pipeline'da GitHub Secrets kullanarak inject et
+4. Runtime'da eksik environment variable kontrolu ekle (startup validation)
+
+**Basari kriterleri:**
+- Hicbir secret Git history'sinde bulunmamali
+- Her ortam kendi konfigurasyonuyla calismali
+- Eksik env var'da uygulama anlamli hata mesajiyla baslatilmamali
+:::
+
+:::exercise[Egzersiz 6: Domain ve SSL Yapilandirmasi]
+**Görev:** Custom domain baglayip SSL sertifikasi yapilandir.
+
+**Adimlar:**
+1. Ucuz bir domain satin al (Namecheap, Porkbun)
+2. DNS kayitlarini yapilandir (A record, CNAME)
+3. Vercel/Netlify'da custom domain ekle
+4. SSL sertifikasinin otomatik yenilenmesini dogrula
+5. www → non-www (veya tersi) yonlendirmesi ekle
+
+**Basari kriterleri:**
+- `https://yourdomain.com` ile siteye erisim saglanmali
+- SSL Labs testinde A+ rating alinmali
+- HTTP → HTTPS yonlendirmesi calismali
+:::
+
+:::exercise[Egzersiz 7: Monitoring ve Error Tracking]
+**Görev:** Production uygulamana monitoring ve hata takip sistemi entegre et.
+
+**Adimlar:**
+1. Sentry free tier hesabi olustur ve SDK'yi entegre et
+2. Uptime monitoring kur (UptimeRobot veya BetterStack free)
+3. Custom error boundary component'i ekle (React)
+4. Backend'de structured logging ekle (JSON format)
+5. Basit bir Grafana dashboard olustur (opsiyonel)
+
+**Basari kriterleri:**
+- Test error'u Sentry dashboard'unda gorunmeli
+- Uptime monitor 5 dakikada bir health check yapmali
+- Unhandled exception'lar otomatik raporlanmali
+:::
+
+:::exercise[Egzersiz 8: Preview Deployments ve Feature Flags]
+**Görev:** Her PR icin preview deployment ve feature flag sistemi kur.
+
+**Adimlar:**
+1. Vercel preview deployments'i aktiflestir (otomatik)
+2. Basit bir feature flag servisi kur (LaunchDarkly free veya environment variable bazli)
+3. Bir ozelliği feature flag arkasına al
+4. Preview deployment'ta flagi aktif, production'da pasif yap
+
+**Basari kriterleri:**
+- Her PR'da unique preview URL olusturulmali
+- Feature flag ile ozellik acilip kapatilabilmeli
+- Production'da flag pasifken ozellik gorunmemeli
+:::
+
+:::exercise[Egzersiz 9: Database Migration ve Seed]
+**Görev:** Production-safe database migration workflow'u olustur.
+
+**Adimlar:**
+1. Migration araci sec (Prisma Migrate, Alembic, Drizzle)
+2. Ilk migration'i olustur (initial schema)
+3. Yeni bir kolon ekleme migration'i yaz
+4. Seed script'i olustur (test/demo verisi)
+5. CI/CD'de migration'i deploy oncesi otomatik calistir
+
+**Basari kriterleri:**
+- Migration'lar sirayla ve idempotent calismali
+- Rollback migration'i mevcut olmali
+- Seed data development ortaminda otomatik yuklenmeli
+:::
+
+:::exercise[Egzersiz 10: Load Testing ve Performance Baseline]
+**Görev:** Deploy edilmis uygulamani load test ile performans olc.
+
+**Adimlar:**
+1. k6 veya Artillery yukle
+2. Temel endpoint'ler icin load test scripti yaz
+3. 100 concurrent user ile 1 dakika test et
+4. Response time, throughput ve error rate raporla
+5. Performance baseline'i belirle ve CI'a ekle
+
+**Basari kriterleri:**
+- p95 response time 500ms altinda olmali
+- Error rate %1'in altinda olmali
+- Throughput beklenen seviyede olmali (en az 50 req/s)
+- Sonuclar CI artifact olarak saklanmali
+:::
+
 ## Özet: Deployment Karar Ağacı
 
 Hangi platformu ne zaman kullanacağını bilmek, deployment bilgisinin yarısıdır:

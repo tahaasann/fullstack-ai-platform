@@ -777,6 +777,410 @@ Proje yapisini olusturken AI'a mevcut kodunu goster ve sor: "Bu tek dosyadaki Ex
 - **Senior cevabi:** Layered architecture: routes (HTTP endpoint tanimlari), controllers (request/response handling), services (is mantigi), repositories (data access), middleware (cross-cutting concerns), validators (input validation). Her katman sadece altindaki katmani cagirir. Dependency injection ile test edilebilirlik saglanir. Config management: environment-based (.env, config/), secrets icin vault. Modular yaklasim: feature-based klasor yapisi (users/, products/) buyuk projelerde tercih edilir. index.ts barrel export ile temiz import'lar saglanir.
 :::
 
+:::exercise
+### Alıştırma 4: Zod ile Request Validation
+**Görev:** Zod kullanarak bir kullanıcı kayıt endpoint'i için request body validasyonu yaz.
+**Başlangıç kodu:**
+```typescript
+import { z } from "zod";
+import { Request, Response, NextFunction } from "express";
+
+// TODO: Zod schema tanımla
+const registerSchema = z.object({
+  // username: 3-20 karakter, sadece harf/rakam/alt çizgi
+  // email: geçerli email formatı
+  // password: min 8, en az 1 büyük harf, 1 rakam, 1 özel karakter
+  // age: opsiyonel, 18-120 arası
+  // role: "user" veya "admin" (varsayılan "user")
+});
+
+// TODO: Zod schema'dan TypeScript tipi çıkar
+type RegisterInput = ???;
+
+// TODO: Validation middleware yaz
+function validate(schema: z.ZodSchema) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    // schema.safeParse ile doğrula
+    // Hata varsa 400 döndür (detaylı hata mesajları ile)
+    // Başarılıysa req.body'yi parse edilmiş veri ile değiştir
+  };
+}
+
+app.post("/api/register", validate(registerSchema), (req, res) => {
+  // req.body artık tip güvenli
+});
+```
+**Beklenen çıktı:**
+```typescript
+const registerSchema = z.object({
+  username: z.string()
+    .min(3, "Kullanıcı adı en az 3 karakter")
+    .max(20, "Kullanıcı adı en fazla 20 karakter")
+    .regex(/^[a-zA-Z0-9_]+$/, "Sadece harf, rakam ve alt çizgi"),
+  email: z.string().email("Geçerli bir email girin"),
+  password: z.string()
+    .min(8, "Şifre en az 8 karakter")
+    .regex(/[A-Z]/, "En az 1 büyük harf")
+    .regex(/[0-9]/, "En az 1 rakam")
+    .regex(/[!@#$%^&*]/, "En az 1 özel karakter"),
+  age: z.number().int().min(18).max(120).optional(),
+  role: z.enum(["user", "admin"]).default("user"),
+});
+
+type RegisterInput = z.infer<typeof registerSchema>;
+
+function validate(schema: z.ZodSchema) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({
+        error: "Validation hatası",
+        details: result.error.flatten().fieldErrors,
+      });
+    }
+    req.body = result.data;
+    next();
+  };
+}
+```
+**İpucu:** `z.infer<typeof schema>` ile Zod schema'dan TypeScript tipi otomatik çıkarılır. `safeParse` exception fırlatmaz, result döndürür.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 5: Multer ile Güvenli Dosya Yükleme
+**Görev:** Multer kullanarak profil resmi yükleme endpoint'i yaz. Güvenlik kontrollerini uygula.
+**Başlangıç kodu:**
+```javascript
+const multer = require("multer");
+const path = require("path");
+const crypto = require("crypto");
+
+// TODO: Storage konfigürasyonu
+// - Dosyaları uploads/ klasörüne kaydet
+// - Orijinal dosya adını KULLANMA (UUID ile yeniden adlandır)
+// - Dosya uzantısını koru
+
+// TODO: File filter
+// - Sadece resim dosyalarına izin ver (jpeg, png, gif, webp)
+// - MIME type VE uzantı kontrolü yap (ikisi de eşleşmeli)
+
+// TODO: Limits
+// - Maksimum 5MB dosya boyutu
+// - Tek seferde 1 dosya
+
+// TODO: Upload endpoint
+// POST /api/profile/avatar
+```
+**Beklenen çıktı:**
+```javascript
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) => {
+    const uniqueName = crypto.randomUUID() + path.extname(file.originalname);
+    cb(null, uniqueName);
+  },
+});
+
+const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+const allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+
+const fileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (allowedMimeTypes.includes(file.mimetype) && allowedExtensions.includes(ext)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Sadece resim dosyaları kabul edilir"), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+});
+
+app.post("/api/profile/avatar", upload.single("avatar"), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "Dosya yüklenmedi" });
+  res.json({ url: `/uploads/${req.file.filename}` });
+});
+```
+**İpucu:** Orijinal dosya adını ASLA kullanma - path traversal saldırısı riski var. UUID ile yeniden adlandır. Hem MIME type hem uzantı kontrol et.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Winston ile Structured Logging
+**Görev:** Winston logger konfigürasyonu yaz: development'ta renkli console, production'da JSON dosya.
+**Başlangıç kodu:**
+```javascript
+const winston = require("winston");
+
+// TODO: Logger konfigürasyonu oluştur
+// Development: renkli, okunabilir console çıktısı
+// Production: JSON formatında dosyaya yaz
+//   - error.log: sadece error seviyesi
+//   - combined.log: tüm seviyeler
+// Her log'da: timestamp, seviye, mesaj, metadata
+
+// TODO: Request logging middleware yaz
+// Her istek için: method, url, status, response time
+```
+**Beklenen çıktı:**
+```javascript
+const logger = winston.createLogger({
+  level: process.env.NODE_ENV === "production" ? "info" : "debug",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
+    new winston.transports.File({ filename: "logs/combined.log" }),
+  ],
+});
+
+if (process.env.NODE_ENV !== "production") {
+  logger.add(new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.simple()
+    ),
+  }));
+}
+
+// Request logging middleware
+function requestLogger(req, res, next) {
+  const start = Date.now();
+  res.on("finish", () => {
+    logger.info("HTTP Request", {
+      method: req.method,
+      url: req.originalUrl,
+      status: res.statusCode,
+      duration: `${Date.now() - start}ms`,
+      ip: req.ip,
+    });
+  });
+  next();
+}
+```
+**İpucu:** `res.on("finish")` response tamamlandığında çalışır - bu sayede status code ve duration bilgisine erişirsin. Production'da asla console.log kullanma, her zaman logger kullan.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Environment Variables Yönetimi
+**Görev:** Environment variables'ı güvenli yöneten bir config modülü yaz. Zorunlu değişkenler eksikse uygulama başlamasın.
+**Başlangıç kodu:**
+```typescript
+// TODO: config.ts modülü yaz
+// - .env dosyasından değişkenleri oku
+// - Zorunlu değişkenler eksikse hata fırlat
+// - Tip güvenli erişim sağla
+// - Varsayılan değerler belirle
+```
+**Beklenen çıktı:**
+```typescript
+import dotenv from "dotenv";
+dotenv.config();
+
+function getEnv(key: string, defaultValue?: string): string {
+  const value = process.env[key] || defaultValue;
+  if (value === undefined) {
+    throw new Error(`Zorunlu environment variable eksik: ${key}`);
+  }
+  return value;
+}
+
+function getEnvNumber(key: string, defaultValue?: number): number {
+  const value = process.env[key];
+  if (value === undefined && defaultValue !== undefined) return defaultValue;
+  const num = Number(value);
+  if (isNaN(num)) throw new Error(`${key} geçerli bir sayı değil`);
+  return num;
+}
+
+export const config = {
+  port: getEnvNumber("PORT", 3000),
+  nodeEnv: getEnv("NODE_ENV", "development"),
+  db: {
+    host: getEnv("DB_HOST"),
+    port: getEnvNumber("DB_PORT", 5432),
+    name: getEnv("DB_NAME"),
+    user: getEnv("DB_USER"),
+    password: getEnv("DB_PASSWORD"),
+  },
+  jwt: {
+    secret: getEnv("JWT_SECRET"),
+    expiresIn: getEnv("JWT_EXPIRES_IN", "15m"),
+  },
+} as const;
+```
+**İpucu:** Uygulama başlangıcında tüm zorunlu değişkenleri kontrol et. Runtime'da eksik değişken bulmak yerine başlangıçta hata ver. `.env` dosyasını ASLA git'e commit etme.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 8: Custom Error Class'ları
+**Görev:** Katmanlı hata yönetimi için custom error class'ları ve global error handler yaz.
+**Başlangıç kodu:**
+```typescript
+// TODO: AppError base class
+// TODO: NotFoundError, ValidationError, UnauthorizedError alt class'ları
+// TODO: Global error handler middleware
+// - Operational error'lar: kullanıcıya anlamlı mesaj
+// - Programming error'lar: generic mesaj + loglama
+```
+**Beklenen çıktı:**
+```typescript
+class AppError extends Error {
+  public readonly statusCode: number;
+  public readonly isOperational: boolean;
+
+  constructor(message: string, statusCode: number, isOperational = true) {
+    super(message);
+    this.statusCode = statusCode;
+    this.isOperational = isOperational;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+class NotFoundError extends AppError {
+  constructor(resource: string) {
+    super(`${resource} bulunamadı`, 404);
+  }
+}
+
+class ValidationError extends AppError {
+  constructor(message: string, public details?: Record<string, string[]>) {
+    super(message, 400);
+  }
+}
+
+class UnauthorizedError extends AppError {
+  constructor(message = "Yetkilendirme gerekli") {
+    super(message, 401);
+  }
+}
+
+// Global Error Handler
+function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      error: { message: err.message, ...(err instanceof ValidationError && { details: err.details }) },
+    });
+  }
+  // Programming error
+  console.error("Unexpected error:", err);
+  res.status(500).json({ error: { message: "Sunucu hatası" } });
+}
+```
+**İpucu:** `isOperational` flag'i ile beklenen hatalar (validation, not found) ve beklenmeyen hatalar (null pointer, type error) ayrımı yap. Production'da sadece operational error detayı göster.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: CORS Konfigürasyonu
+**Görev:** Farklı ortamlar için (development, staging, production) CORS ayarlarını yapılandır.
+**Başlangıç kodu:**
+```javascript
+const cors = require("cors");
+
+// TODO: Ortama göre CORS ayarla
+// Development: tüm origin'lere izin ver
+// Production: sadece belirli domain'lere izin ver
+// Credentials (cookie) desteği
+// İzin verilen HTTP metodları ve header'lar
+```
+**Beklenen çıktı:**
+```javascript
+const allowedOrigins = {
+  development: ["http://localhost:3000", "http://localhost:5173"],
+  production: ["https://myapp.com", "https://admin.myapp.com"],
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    const env = process.env.NODE_ENV || "development";
+    const origins = allowedOrigins[env] || allowedOrigins.development;
+
+    // origin undefined olabilir (Postman, server-to-server)
+    if (!origin || origins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS: ${origin} izin verilmedi`));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  maxAge: 86400, // Preflight cache: 24 saat
+};
+
+app.use(cors(corsOptions));
+```
+**İpucu:** `credentials: true` ise `origin: "*"` KULLANILMAZ - spesifik origin belirtmek zorunlu. `maxAge` ile preflight (OPTIONS) isteklerini cache'le.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 10: Production-Ready Proje Yapısı
+**Görev:** Express projesini katmanlı mimariye (layered architecture) göre organize et.
+**Başlangıç kodu:**
+```
+TODO: Aşağıdaki monolitik kodu katmanlı yapıya dönüştür
+
+// YANLIŞ: Her şey tek dosyada
+app.post("/api/users", async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email) return res.status(400).json({error: "..."});
+  const hashedPassword = await bcrypt.hash(password, 12);
+  const user = await db.query("INSERT INTO users ...", [name, email, hashedPassword]);
+  const token = jwt.sign({ id: user.id }, SECRET);
+  res.status(201).json({ user, token });
+});
+
+TODO: Şu katmanlara ayır:
+- Route → Controller → Service → Repository
+```
+**Beklenen çıktı:**
+```
+Dosya yapısı:
+src/
+  routes/userRoutes.ts       → HTTP endpoint tanımları
+  controllers/userController.ts → Request/Response handling
+  services/userService.ts    → İş mantığı
+  repositories/userRepo.ts   → Veritabanı işlemleri
+  middleware/validate.ts     → Validation
+  validators/userValidator.ts → Zod schema'lar
+
+// routes/userRoutes.ts
+router.post("/", validate(registerSchema), userController.register);
+
+// controllers/userController.ts
+async register(req, res) {
+  const user = await userService.register(req.body);
+  res.status(201).json(user);
+}
+
+// services/userService.ts
+async register(data) {
+  const hashedPassword = await bcrypt.hash(data.password, 12);
+  const user = await userRepo.create({ ...data, password: hashedPassword });
+  const token = jwt.sign({ id: user.id }, config.jwt.secret);
+  return { user, token };
+}
+
+// repositories/userRepo.ts
+async create(data) {
+  return db.query("INSERT INTO users ...", [data.name, data.email, data.password]);
+}
+```
+**İpucu:** Her katman sadece altındaki katmanı çağırır. Controller asla doğrudan DB'ye erişmez. Service katmanı iş kurallarını içerir. Bu yapı test edilebilirliği ve bakımı kolaylaştırır.
+**Zorluk:** Zor
+:::
+
 :::must-note
 - express-validator = middleware-based, chain API; Zod = schema-based, TypeScript-friendly
 - Zod'da `z.infer<typeof schema>` ile TypeScript tipi çıkarılır (DRY prensibi)

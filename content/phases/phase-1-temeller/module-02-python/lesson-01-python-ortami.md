@@ -767,6 +767,726 @@ explanation: "pyproject.toml (PEP 518/621), sadece bağımlılıkları değil, p
 Proje kurarken AI'a pyproject.toml dosyani yapistir: "Bu pyproject.toml yapilandirmasini incele. Eksik veya iyilestirilmesi gereken ayarlar var mi? ruff, mypy ve pytest konfigurasyonu icin best practice onerilerin neler?"
 :::
 
+:::exercise
+### Alıştırma 4: Ortam Değişkenleri Yöneticisi
+
+**Görev:** `.env` dosyasını okuyan ve ortam değişkenlerini yöneten bir Python modülü yaz.
+
+**Başlangıç kodu:**
+```python
+import os
+from pathlib import Path
+
+class EnvManager:
+    def __init__(self, env_file: str = ".env"):
+        self.env_file = Path(env_file)
+        self.variables: dict[str, str] = {}
+
+    def load(self) -> int:
+        """
+        .env dosyasini oku ve degiskenleri yukle.
+        Returns: Yuklenen degisken sayisi
+        """
+        # TODO:
+        # 1. Dosya var mi kontrol et
+        # 2. Her satiri oku, yorum (#) ve bos satirlari atla
+        # 3. KEY=VALUE formatini parse et (tirnak icindeki degerleri handle et)
+        # 4. os.environ'a ve self.variables'a ekle
+        pass
+
+    def get(self, key: str, default: str = None) -> str | None:
+        """Ortam degiskenini al."""
+        return self.variables.get(key, os.environ.get(key, default))
+
+    def generate_example(self, output_file: str = ".env.example"):
+        """Mevcut .env'den .env.example olustur (degerleri gizle)."""
+        # TODO: Her degiskeni KEY= formatinda yaz (degerler bos)
+        pass
+
+    def validate(self, required_keys: list[str]) -> list[str]:
+        """Gerekli degiskenlerin tanimli olup olmadigini kontrol et."""
+        # TODO: Eksik key'leri dondur
+        pass
+
+# Test
+# .env dosyasi olustur
+Path(".env").write_text("""
+# Database ayarlari
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=myapp
+DB_PASSWORD="super-secret-123"
+
+# API anahtarlari
+API_KEY=sk-1234567890
+DEBUG=true
+""".strip())
+
+env = EnvManager()
+loaded = env.load()
+print(f"Yuklenen degisken sayisi: {loaded}")
+print(f"DB_HOST: {env.get('DB_HOST')}")
+print(f"DB_PORT: {env.get('DB_PORT')}")
+print(f"MISSING: {env.get('MISSING', 'default_value')}")
+
+missing = env.validate(["DB_HOST", "DB_PORT", "REDIS_URL", "SECRET_KEY"])
+print(f"Eksik degiskenler: {missing}")
+
+env.generate_example()
+print(f"\n.env.example olusturuldu:")
+print(Path(".env.example").read_text())
+```
+
+**Beklenen çıktı:**
+```
+Yuklenen degisken sayisi: 6
+DB_HOST: localhost
+DB_PORT: 5432
+MISSING: default_value
+Eksik degiskenler: ['REDIS_URL', 'SECRET_KEY']
+
+.env.example olusturuldu:
+DB_HOST=
+DB_PORT=
+DB_NAME=
+DB_PASSWORD=
+API_KEY=
+DEBUG=
+```
+
+**İpucu:** Tırnak içindeki değerleri `strip('"').strip("'")` ile temizle. Yorum satırları `#` ile başlar.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Proje Şablonu Oluşturucu
+
+**Görev:** Komut satırından proje adı alıp standart Python proje yapısını oluşturan bir script yaz.
+
+**Başlangıç kodu:**
+```python
+import os
+from pathlib import Path
+
+def create_project(project_name: str, project_type: str = "basic"):
+    """
+    Python proje sablonu olustur.
+    project_type: "basic", "api", "cli"
+    """
+    root = Path(project_name)
+
+    # TODO: Proje yapisini olustur
+    # basic:
+    #   src/<project_name>/__init__.py, main.py
+    #   tests/__init__.py, test_main.py
+    #   pyproject.toml, .gitignore, .env.example, README.md
+
+    # TODO: pyproject.toml sablonu yaz
+    pyproject_content = f"""[project]
+name = "{project_name}"
+version = "0.1.0"
+requires-python = ">= 3.12"
+
+[tool.ruff]
+line-length = 88
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+"""
+    # TODO: .gitignore sablonu yaz
+    gitignore_content = """__pycache__/
+*.pyc
+.venv/
+.env
+dist/
+*.egg-info/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+"""
+    # TODO: Dosyalari olustur ve iceriklerini yaz
+    pass
+
+# Test
+create_project("my-awesome-app")
+
+# Olusturulan yapiya bak
+for p in sorted(Path("my-awesome-app").rglob("*")):
+    prefix = "  " * (len(p.relative_to("my-awesome-app").parts) - 1)
+    print(f"{prefix}{p.name}")
+```
+
+**Beklenen çıktı:**
+```
+.env.example
+.gitignore
+README.md
+pyproject.toml
+src
+  my_awesome_app
+    __init__.py
+    main.py
+tests
+  __init__.py
+  test_main.py
+```
+
+**İpucu:** `Path.mkdir(parents=True, exist_ok=True)` ile dizinleri oluştur. Proje adındaki `-` karakterini `_` ile değiştir (Python modül adı).
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: Bağımlılık Çakışması Tespit Aracı
+
+**Görev:** İki requirements.txt dosyasını karşılaştırıp bağımlılık çakışmalarını tespit eden bir program yaz.
+
+**Başlangıç kodu:**
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Dependency:
+    name: str
+    version: str
+    operator: str  # ==, >=, <=, ~=, !=
+
+def parse_requirements(content: str) -> list[Dependency]:
+    """requirements.txt icerigini parse et."""
+    deps = []
+    for line in content.strip().split("\n"):
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        # TODO: "package==1.0.0", "package>=2.0", "package~=1.5" formatlarini parse et
+        pass
+    return deps
+
+def find_conflicts(reqs1: list[Dependency], reqs2: list[Dependency]) -> list[dict]:
+    """Iki requirements listesi arasindaki catismalari bul."""
+    # TODO:
+    # 1. Ayni paket, farkli versiyon -> CONFLICT
+    # 2. Ayni paket, uyumsuz operator -> CONFLICT
+    # 3. Sadece birinde olan -> MISSING
+    pass
+
+# Test
+project_a = """
+Django==4.2.0
+requests>=2.28.0
+celery==5.3.1
+redis==4.5.0
+psycopg2>=2.9.0
+"""
+
+project_b = """
+Django==5.1.0
+requests>=2.31.0
+celery==5.3.6
+boto3==1.28.0
+psycopg2>=2.9.0
+"""
+
+deps_a = parse_requirements(project_a)
+deps_b = parse_requirements(project_b)
+conflicts = find_conflicts(deps_a, deps_b)
+
+print("=== Bagimlilik Catisma Raporu ===")
+for c in conflicts:
+    print(f"  [{c['type']:8s}] {c['package']:15s} -> {c['detail']}")
+```
+
+**Beklenen çıktı:**
+```
+=== Bagimlilik Catisma Raporu ===
+  [CONFLICT] Django          -> A: ==4.2.0, B: ==5.1.0
+  [CONFLICT] celery          -> A: ==5.3.1, B: ==5.3.6
+  [MISSING ] redis           -> Sadece A'da: ==4.5.0
+  [MISSING ] boto3           -> Sadece B'da: ==1.28.0
+```
+
+**İpucu:** Operatör ve versiyon ayırmak için `re.split(r'(==|>=|<=|~=|!=)', line)` kullan.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Python REPL Komut Geçmişi
+
+**Görev:** Basit bir Python REPL (Read-Eval-Print Loop) yaz. Komut geçmişi, çok satırlı giriş ve özel komutları desteklesin.
+
+**Başlangıç kodu:**
+```python
+import sys
+
+class MiniREPL:
+    def __init__(self):
+        self.history: list[str] = []
+        self.variables: dict = {}
+
+    def execute(self, code: str) -> str:
+        """Python kodunu calistir ve sonucu dondur."""
+        try:
+            # TODO:
+            # 1. Once eval() ile dene (expression ise sonucu dondur)
+            # 2. eval basarisiz olursa exec() ile dene (statement ise)
+            # 3. Degiskenleri self.variables'ta sakla
+            # 4. Hata olursa hata mesajini dondur
+            pass
+        except Exception as e:
+            return f"Hata: {type(e).__name__}: {e}"
+
+    def run_command(self, cmd: str) -> str | None:
+        """Ozel komutlari isle."""
+        # TODO:
+        # !history -> komut gecmisini goster
+        # !clear -> gecmisi temizle
+        # !vars -> tanimli degiskenleri goster
+        # !help -> yardim mesaji goster
+        pass
+
+    def start(self):
+        """REPL dongusunu baslat."""
+        print("Mini Python REPL v1.0 (cikmak icin 'exit' yazin)")
+        while True:
+            try:
+                code = input(">>> ")
+                if code.strip() == "exit":
+                    break
+                if code.startswith("!"):
+                    result = self.run_command(code)
+                else:
+                    self.history.append(code)
+                    result = self.execute(code)
+                if result is not None:
+                    print(result)
+            except (EOFError, KeyboardInterrupt):
+                break
+
+# Test (non-interactive)
+repl = MiniREPL()
+test_commands = [
+    "x = 10",
+    "y = 20",
+    "x + y",
+    "name = 'Python'",
+    "f'{name} sonucu: {x + y}'",
+    "1 / 0",
+]
+
+for cmd in test_commands:
+    result = repl.execute(cmd)
+    output = result if result is not None else "(no output)"
+    print(f">>> {cmd}\n{output}\n")
+```
+
+**Beklenen çıktı:**
+```
+>>> x = 10
+(no output)
+
+>>> y = 20
+(no output)
+
+>>> x + y
+30
+
+>>> name = 'Python'
+(no output)
+
+>>> f'{name} sonucu: {x + y}'
+Python sonucu: 30
+
+>>> 1 / 0
+Hata: ZeroDivisionError: division by zero
+```
+
+**İpucu:** `eval()` expression'ları döner (2+2, x+y), `exec()` statement'ları çalıştırır (x=10, import). `compile()` ile hangi tür olduğunu tespit edebilirsin.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Makefile Oluşturucu
+
+**Görev:** Python projesi için standart Makefile oluşturan bir program yaz. Yaygın görevleri (test, lint, format, run) otomatize etsin.
+
+**Başlangıç kodu:**
+```python
+def generate_makefile(project_name: str, package_manager: str = "uv") -> str:
+    """
+    Python projesi icin Makefile olustur.
+    package_manager: "uv", "pip", "poetry"
+    """
+    # TODO: Package manager'a gore komutlari belirle
+    commands = {
+        "uv": {
+            "install": "uv sync",
+            "run": "uv run",
+            "add": "uv add",
+            "add_dev": "uv add --dev",
+        },
+        "pip": {
+            "install": "pip install -r requirements.txt",
+            "run": "python",
+            "add": "pip install",
+            "add_dev": "pip install",
+        },
+    }
+
+    cmd = commands.get(package_manager, commands["uv"])
+
+    makefile = f""".PHONY: help install test lint format run clean
+
+help: ## Bu yardim mesajini goster
+\t@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \\
+\t\tawk 'BEGIN {{FS = ":.*?## "}}; {{printf "\\033[36m%-15s\\033[0m %s\\n", $$1, $$2}}'
+
+install: ## Bagimliliklari yukle
+\t{cmd['install']}
+
+test: ## Testleri calistir
+\t{cmd['run']} pytest tests/ -v
+
+lint: ## Kod kalitesini kontrol et
+\t{cmd['run']} ruff check .
+\t{cmd['run']} mypy src/
+
+format: ## Kodu formatla
+\t{cmd['run']} ruff format .
+\t{cmd['run']} ruff check --fix .
+
+run: ## Uygulamayi calistir
+\t{cmd['run']} python -m {project_name.replace('-', '_')}.main
+
+clean: ## Gecici dosyalari temizle
+\trm -rf __pycache__ .pytest_cache .mypy_cache .ruff_cache dist *.egg-info
+\tfind . -type d -name __pycache__ -exec rm -rf {{}} + 2>/dev/null || true
+
+check: lint test ## Lint + test birlikte calistir
+"""
+    return makefile
+
+# Test
+makefile = generate_makefile("my-project", "uv")
+print(makefile)
+```
+
+**Beklenen çıktı:**
+```
+.PHONY: help install test lint format run clean
+
+help: ## Bu yardim mesajini goster
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+install: ## Bagimliliklari yukle
+	uv sync
+
+test: ## Testleri calistir
+	uv run pytest tests/ -v
+...
+```
+
+**İpucu:** Makefile'da indentation TAB olmalı (space değil). Python string'inde `\t` kullan.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 9: Python Versiyon Uyumluluk Kontrolcüsü
+
+**Görev:** Bir Python dosyasını analiz edip kullanılan syntax özelliklerinin hangi Python versiyonunu gerektirdiğini tespit eden bir program yaz.
+
+**Başlangıç kodu:**
+```python
+import re
+
+FEATURES = {
+    "match ": ("3.10", "Pattern matching (match/case)"),
+    "case ": ("3.10", "Pattern matching (match/case)"),
+    ":=": ("3.8", "Walrus operator"),
+    "f\"": ("3.6", "f-string"),
+    "f'": ("3.6", "f-string"),
+    "async def": ("3.5", "Async/await"),
+    "await ": ("3.5", "Async/await"),
+    "yield from": ("3.3", "yield from"),
+    "type ": ("3.12", "Type alias (type X = ...)"),
+    "| None": ("3.10", "Union type with |"),
+    "list[": ("3.9", "Built-in generic types"),
+    "dict[": ("3.9", "Built-in generic types"),
+    "tuple[": ("3.9", "Built-in generic types"),
+}
+
+def check_compatibility(code: str) -> dict:
+    """
+    Python kodunu analiz et ve gereken minimum versiyonu belirle.
+    Returns: {"min_version": str, "features_used": list[dict]}
+    """
+    features_found = []
+    # TODO:
+    # 1. Her feature pattern'ini kodda ara
+    # 2. Bulunan features'lari listele
+    # 3. En yuksek versiyon gereksinimi belirle
+    pass
+
+# Test
+test_code = """
+import asyncio
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+    age: int
+    email: str | None = None
+
+async def fetch_user(user_id: int) -> User:
+    data = {"name": "Ahmet", "age": 25}
+    if (n := data.get("name")) is not None:
+        print(f"Kullanici: {n}")
+
+    match user_id:
+        case 1:
+            return User(name="Admin", age=30)
+        case _:
+            return User(**data)
+
+users: list[User] = []
+"""
+
+result = check_compatibility(test_code)
+print(f"Minimum Python versiyonu: {result['min_version']}")
+print(f"\nKullanilan ozellikler:")
+for feat in result['features_used']:
+    print(f"  Python {feat['version']}: {feat['description']}")
+```
+
+**Beklenen çıktı:**
+```
+Minimum Python versiyonu: 3.10
+Kullanilan ozellikler:
+  Python 3.6: f-string
+  Python 3.8: Walrus operator
+  Python 3.9: Built-in generic types
+  Python 3.10: Pattern matching (match/case)
+  Python 3.10: Union type with |
+```
+
+**İpucu:** `in` operatörü ile basit pattern arama yap. Versiyon karşılaştırması için `tuple(map(int, v.split(".")))` kullan.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: Paket Boyut Analiz Aracı
+
+**Görev:** Virtual environment'taki yüklü paketlerin disk boyutlarını analiz eden bir program yaz.
+
+**Başlangıç kodu:**
+```python
+import os
+from pathlib import Path
+
+def get_venv_packages(venv_path: str = ".venv") -> list[dict]:
+    """
+    Virtual environment'taki paketlerin boyutlarini hesapla.
+    Returns: [{"name": str, "version": str, "size_mb": float, "path": str}]
+    """
+    site_packages = None
+    venv = Path(venv_path)
+
+    # TODO:
+    # 1. site-packages dizinini bul (lib/pythonX.Y/site-packages veya Lib/site-packages)
+    # 2. Her paket dizininin boyutunu hesapla
+    # 3. .dist-info dizinlerinden paket adini ve versiyonunu cikar
+    # 4. Boyuta gore sirala
+    pass
+
+def format_size(size_bytes: int) -> str:
+    """Byte'i okunabilir formata cevir."""
+    for unit in ["B", "KB", "MB", "GB"]:
+        if size_bytes < 1024:
+            return f"{size_bytes:.1f} {unit}"
+        size_bytes /= 1024
+    return f"{size_bytes:.1f} TB"
+
+def dir_size(path: Path) -> int:
+    """Dizin boyutunu hesapla."""
+    total = 0
+    for f in path.rglob("*"):
+        if f.is_file():
+            total += f.stat().st_size
+    return total
+
+# Test (venv yoksa ornek veri kullan)
+if Path(".venv").exists():
+    packages = get_venv_packages()
+else:
+    # Simule edilmis veri
+    packages = [
+        {"name": "django", "version": "5.1.0", "size_mb": 28.5},
+        {"name": "requests", "version": "2.31.0", "size_mb": 0.8},
+        {"name": "numpy", "version": "1.26.0", "size_mb": 55.2},
+        {"name": "pandas", "version": "2.1.0", "size_mb": 42.1},
+        {"name": "pip", "version": "24.0", "size_mb": 12.3},
+    ]
+
+total_size = sum(p["size_mb"] for p in packages)
+print(f"{'Paket':25s} {'Versiyon':12s} {'Boyut':>10s} {'Yuzde':>8s}")
+print("-" * 60)
+for p in sorted(packages, key=lambda x: x["size_mb"], reverse=True):
+    pct = (p["size_mb"] / total_size * 100) if total_size > 0 else 0
+    bar = "#" * int(pct / 2)
+    print(f"{p['name']:25s} {p['version']:12s} {p['size_mb']:>8.1f} MB {pct:>5.1f}% {bar}")
+print(f"\nToplam: {total_size:.1f} MB, {len(packages)} paket")
+```
+
+**Beklenen çıktı:**
+```
+Paket                     Versiyon         Boyut    Yuzde
+------------------------------------------------------------
+numpy                     1.26.0          55.2 MB  39.7% ####################
+pandas                    2.1.0           42.1 MB  30.3% ###############
+django                    5.1.0           28.5 MB  20.5% ##########
+pip                       24.0            12.3 MB   8.9% ####
+requests                  2.31.0           0.8 MB   0.6%
+
+Toplam: 138.9 MB, 5 paket
+```
+
+**İpucu:** `.dist-info` dizin adı `paket_adi-versiyon.dist-info` formatındadır. `os.walk()` ile dizin boyutunu hesapla.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Python Path ve Import Sistemi Keşfi
+
+**Görev:** Python'un import sistemini keşfeden bir script yaz. `sys.path`, `__init__.py` ve relative/absolute import farklarını göstersin.
+
+**Başlangıç kodu:**
+```python
+import sys
+import os
+
+def explore_python_path():
+    """Python'un modulleri nerede aradigini goster."""
+    print("=== sys.path (Import Arama Sirasi) ===")
+    for i, path in enumerate(sys.path):
+        exists = "OK" if os.path.exists(path) else "YOK"
+        print(f"  {i}. [{exists}] {path}")
+
+    print(f"\n=== Python Bilgileri ===")
+    print(f"  Executable: {sys.executable}")
+    print(f"  Version: {sys.version}")
+    print(f"  Platform: {sys.platform}")
+    print(f"  Prefix: {sys.prefix}")
+
+    # Virtual env kontrolu
+    in_venv = sys.prefix != sys.base_prefix
+    print(f"  Virtual Env: {'Evet' if in_venv else 'Hayir'}")
+
+    print(f"\n=== Yuklu Moduller (ilk 10) ===")
+    for name in sorted(sys.modules.keys())[:10]:
+        mod = sys.modules[name]
+        path = getattr(mod, '__file__', 'built-in')
+        print(f"  {name}: {path}")
+
+explore_python_path()
+```
+
+**Beklenen çıktı:**
+```
+=== sys.path (Import Arama Sirasi) ===
+  0. [OK] /current/directory
+  1. [OK] /usr/lib/python3.13
+  ...
+=== Python Bilgileri ===
+  Virtual Env: Evet (veya Hayir)
+```
+
+**İpucu:** `sys.prefix != sys.base_prefix` ise virtual environment aktif demektir.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 12: Pre-commit Hook Yapılandırması
+
+**Görev:** Python projesi için `.pre-commit-config.yaml` oluşturan ve test eden bir script yaz.
+
+**Başlangıç kodu:**
+```python
+from pathlib import Path
+
+def create_precommit_config(project_dir: str, tools: list[str] = None) -> str:
+    """Pre-commit yapilandirmasi olustur."""
+    if tools is None:
+        tools = ["ruff", "mypy", "pytest"]
+
+    config = """repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+"""
+    if "mypy" in tools:
+        config += """
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        additional_dependencies: []
+"""
+    if "pytest" in tools:
+        config += """
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: python -m pytest tests/ -x -q
+        language: system
+        pass_filenames: false
+        always_run: true
+"""
+    return config
+
+# Test
+config = create_precommit_config("my-project", ["ruff", "mypy", "pytest"])
+print("=== .pre-commit-config.yaml ===")
+print(config)
+
+print("=== Kurulum Adimlari ===")
+print("1. pip install pre-commit")
+print("2. pre-commit install")
+print("3. pre-commit run --all-files")
+```
+
+**Beklenen çıktı:**
+```
+=== .pre-commit-config.yaml ===
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+...
+
+=== Kurulum Adimlari ===
+1. pip install pre-commit
+2. pre-commit install
+3. pre-commit run --all-files
+```
+
+**İpucu:** Pre-commit hook'lar her `git commit` öncesinde otomatik çalışır. `--fix` flag'i ile ruff otomatik düzeltme yapar.
+
+**Zorluk:** Kolay
+:::
+
 :::must-note
 - Virtual environment: `python3 -m venv .venv` ile oluştur, `source .venv/bin/activate` ile aktif et
 - **Asla** sistem Python'una paket kurma -- her zaman venv veya pyenv kullan

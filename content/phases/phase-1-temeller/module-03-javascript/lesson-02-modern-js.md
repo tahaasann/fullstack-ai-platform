@@ -993,6 +993,720 @@ Async kod yazarken AI'a kodunu yapistir: "Bu async fonksiyondaki hata yonetimini
 - **Senior cevabi:** Spread ve rest ayni syntax'i kullanir ama farkli context'lerde farkli is yapar. Spread, iterable'lari acar (shallow copy olusturur, deep clone degil). Rest ise fonksiyon parametrelerinde veya destructuring'de kalan elemanlari toplar. Object spread ile Object.assign benzerdir ama spread daha okunaklidir. Performance-critical kodda spread'in yeni nesne olusturma maliyetine dikkat edilmelidir.
 :::
 
+:::exercise
+### Alıştırma 4: Promise.all, race, allSettled Karşılaştırması
+
+**Görev:** `Promise.all`, `Promise.race` ve `Promise.allSettled` arasındaki farkları gösteren senaryolar yaz.
+
+**Başlangıç kodu:**
+```javascript
+// API simulasyonlari
+function fetchUser(id) {
+  return new Promise((resolve, reject) => {
+    const delay = Math.random() * 1000;
+    setTimeout(() => {
+      if (id === 3) reject(new Error(`User ${id} not found`));
+      else resolve({ id, name: `User_${id}`, delay: Math.round(delay) });
+    }, delay);
+  });
+}
+
+async function testPromiseAll() {
+  console.log("=== Promise.all (hepsi basarili olmali) ===");
+  try {
+    const results = await Promise.all([fetchUser(1), fetchUser(2)]);
+    results.forEach(u => console.log(`  ${u.name} (${u.delay}ms)`));
+  } catch (e) {
+    console.log(`  Hata: ${e.message}`);
+  }
+
+  console.log("\n=== Promise.all (biri basarisiz) ===");
+  // TODO: fetchUser(1), fetchUser(3), fetchUser(2) ile test et
+  // Bir tanesi reject olunca hepsi basarisiz olur
+}
+
+async function testPromiseRace() {
+  console.log("\n=== Promise.race (ilk tamamlanan kazanir) ===");
+  // TODO: 3 fetch baslat, ilk tamamlanani yazdir
+}
+
+async function testPromiseAllSettled() {
+  console.log("\n=== Promise.allSettled (hepsini bekle, basarisiz olsa bile) ===");
+  // TODO: fetchUser(1), fetchUser(3), fetchUser(2) ile test et
+  // Her birinin durumunu (fulfilled/rejected) goster
+}
+
+// Bonus: Kendi Promise.allSettled implementasyonun
+function myAllSettled(promises) {
+  // TODO: Her promise'i catch ile sarmalayarak hepsinin sonucunu topla
+}
+
+testPromiseAll()
+  .then(testPromiseRace)
+  .then(testPromiseAllSettled);
+```
+
+**Beklenen çıktı:**
+```
+=== Promise.all (hepsi basarili olmali) ===
+  User_1 (234ms)
+  User_2 (567ms)
+
+=== Promise.all (biri basarisiz) ===
+  Hata: User 3 not found
+
+=== Promise.race (ilk tamamlanan kazanir) ===
+  Kazanan: User_1 (123ms)
+
+=== Promise.allSettled (hepsini bekle, basarisiz olsa bile) ===
+  User_1: fulfilled
+  User_3: rejected - User 3 not found
+  User_2: fulfilled
+```
+
+**İpucu:** `Promise.allSettled` ES2020 ile geldi. Sonuçlar `{status: "fulfilled", value}` veya `{status: "rejected", reason}` formatında.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Async Iterator ile Sayfalı API
+
+**Görev:** `async function*` (async generator) kullanarak sayfalı API verilerini otomatik çeken bir iterator yaz.
+
+**Başlangıç kodu:**
+```javascript
+// Sayfalı API simulasyonu
+function fetchPage(page, pageSize = 3) {
+  const totalItems = 10;
+  const start = (page - 1) * pageSize;
+  const items = [];
+  for (let i = start; i < Math.min(start + pageSize, totalItems); i++) {
+    items.push({ id: i + 1, title: `Item ${i + 1}` });
+  }
+  return new Promise((resolve) =>
+    setTimeout(() => resolve({
+      data: items,
+      page,
+      totalPages: Math.ceil(totalItems / pageSize),
+      hasMore: page * pageSize < totalItems,
+    }), 100)
+  );
+}
+
+async function* paginatedFetch(fetchFn, pageSize = 3) {
+  // TODO:
+  // 1. page = 1'den basla
+  // 2. Her sayfayi fetch et
+  // 3. Sayfa verilerini yield et
+  // 4. hasMore false olana kadar devam et
+}
+
+// Test: for await...of ile kullan
+async function main() {
+  console.log("=== Sayfali API Verisi ===");
+  let totalItems = 0;
+
+  for await (const page of paginatedFetch(fetchPage, 3)) {
+    console.log(`Sayfa ${page.page}/${page.totalPages}:`);
+    page.data.forEach((item) => {
+      console.log(`  - ${item.title}`);
+      totalItems++;
+    });
+  }
+
+  console.log(`\nToplam: ${totalItems} item`);
+}
+
+main();
+```
+
+**Beklenen çıktı:**
+```
+=== Sayfali API Verisi ===
+Sayfa 1/4:
+  - Item 1
+  - Item 2
+  - Item 3
+Sayfa 2/4:
+  - Item 4
+  - Item 5
+  - Item 6
+Sayfa 3/4:
+  - Item 7
+  - Item 8
+  - Item 9
+Sayfa 4/4:
+  - Item 10
+
+Toplam: 10 item
+```
+
+**İpucu:** `async function*` ile async generator tanımlanır. `yield` ile her sayfayı dışarı ver. `for await...of` ile consume et.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Map, Set ve WeakMap Kullanım Senaryoları
+
+**Görev:** Map, Set ve WeakMap'in gerçek kullanım senaryolarını gösteren örnekler yaz.
+
+**Başlangıç kodu:**
+```javascript
+// Senaryo 1: Map ile object key kullanma (Object ile yapilamaz)
+function testMapWithObjectKeys() {
+  const userPermissions = new Map();
+  const user1 = { id: 1, name: "Ahmet" };
+  const user2 = { id: 2, name: "Ayse" };
+
+  // TODO: Her user objesini key olarak kullanarak permission ata
+  // user1 -> ["read", "write"]
+  // user2 -> ["read"]
+
+  console.log("=== Map ile Object Key ===");
+  console.log(`${user1.name}: ${userPermissions.get(user1)}`);
+  console.log(`${user2.name}: ${userPermissions.get(user2)}`);
+}
+
+// Senaryo 2: Set ile benzersiz deger toplama
+function testSetOperations() {
+  const setA = new Set([1, 2, 3, 4, 5]);
+  const setB = new Set([4, 5, 6, 7, 8]);
+
+  // TODO: union, intersection, difference islemleri yaz
+  const union = new Set([...setA, ...setB]);
+  const intersection = new Set(/* TODO */);
+  const difference = new Set(/* TODO */);
+
+  console.log("\n=== Set Islemleri ===");
+  console.log(`A: ${[...setA]}`);
+  console.log(`B: ${[...setB]}`);
+  console.log(`Union: ${[...union]}`);
+  console.log(`Intersection: ${[...intersection]}`);
+  console.log(`Difference (A-B): ${[...difference]}`);
+}
+
+// Senaryo 3: WeakMap ile metadata cache
+function testWeakMapCache() {
+  const cache = new WeakMap();
+
+  function processUser(user) {
+    if (cache.has(user)) {
+      console.log(`  Cache hit: ${user.name}`);
+      return cache.get(user);
+    }
+    const result = { ...user, processed: true, timestamp: Date.now() };
+    cache.set(user, result);
+    console.log(`  Processed: ${user.name}`);
+    return result;
+  }
+
+  console.log("\n=== WeakMap Cache ===");
+  let user = { id: 1, name: "Ahmet" };
+  processUser(user);  // miss
+  processUser(user);  // hit
+  // user = null; -> garbage collection sonrasi cache'ten otomatik silinir
+}
+
+testMapWithObjectKeys();
+testSetOperations();
+testWeakMapCache();
+```
+
+**Beklenen çıktı:**
+```
+=== Map ile Object Key ===
+Ahmet: read,write
+Ayse: read
+
+=== Set Islemleri ===
+A: 1,2,3,4,5
+B: 4,5,6,7,8
+Union: 1,2,3,4,5,6,7,8
+Intersection: 4,5
+Difference (A-B): 1,2,3
+
+=== WeakMap Cache ===
+  Processed: Ahmet
+  Cache hit: Ahmet
+```
+
+**İpucu:** Intersection: `[...setA].filter(x => setB.has(x))`. Difference: `[...setA].filter(x => !setB.has(x))`.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 7: ES Module Sistemi Simülasyonu
+
+**Görev:** ES module sisteminin import/export mekanizmasını simüle eden bir mini module loader yaz.
+
+**Başlangıç kodu:**
+```javascript
+class ModuleLoader {
+  constructor() {
+    this.modules = new Map();
+    this.cache = new Map();
+  }
+
+  define(name, dependencies, factory) {
+    // TODO: Modulu kaydet
+    // name: modul adi
+    // dependencies: bagimli modul adlari listesi
+    // factory: modul fonksiyonu (dependency exports'larini alir)
+    this.modules.set(name, { dependencies, factory });
+  }
+
+  require(name) {
+    // TODO:
+    // 1. Cache'te varsa dondur
+    // 2. Modulu bul
+    // 3. Dependency'leri recursive olarak resolve et
+    // 4. Factory'yi cagir ve sonucu cache'le
+    if (this.cache.has(name)) return this.cache.get(name);
+
+    const mod = this.modules.get(name);
+    if (!mod) throw new Error(`Module not found: ${name}`);
+
+    const deps = mod.dependencies.map((dep) => this.require(dep));
+    const exports = mod.factory(...deps);
+    this.cache.set(name, exports);
+    return exports;
+  }
+}
+
+// Test
+const loader = new ModuleLoader();
+
+// Modul tanimlari
+loader.define("utils", [], () => ({
+  capitalize: (s) => s.charAt(0).toUpperCase() + s.slice(1),
+  sum: (arr) => arr.reduce((a, b) => a + b, 0),
+}));
+
+loader.define("validator", ["utils"], (utils) => ({
+  isValidName: (name) => name.length >= 2 && utils.capitalize(name) === name,
+  isValidAge: (age) => age > 0 && age < 150,
+}));
+
+loader.define("userService", ["utils", "validator"], (utils, validator) => ({
+  createUser: (name, age) => {
+    if (!validator.isValidAge(age)) throw new Error("Invalid age");
+    return {
+      name: utils.capitalize(name),
+      age,
+      displayName: `${utils.capitalize(name)} (${age})`,
+    };
+  },
+}));
+
+// Kullanim
+const userService = loader.require("userService");
+const user = userService.createUser("ahmet", 25);
+console.log(`User: ${user.displayName}`);
+
+const utils = loader.require("utils");
+console.log(`Sum: ${utils.sum([1, 2, 3, 4, 5])}`);
+console.log(`Capitalize: ${utils.capitalize("javascript")}`);
+```
+
+**Beklenen çıktı:**
+```
+User: Ahmet (25)
+Sum: 15
+Capitalize: Javascript
+```
+
+**İpucu:** Circular dependency'lere dikkat. Cache kullanarak aynı modülün birden fazla kez yüklenmesini önle.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Array Method Chaining ile Veri Analizi
+
+**Görev:** Karmaşık bir veri seti üzerinde `filter`, `map`, `reduce`, `sort`, `flatMap` ve `groupBy` kullanarak analiz yap.
+
+**Başlangıç kodu:**
+```javascript
+const orders = [
+  { id: 1, customer: "Ahmet", items: [{ name: "Laptop", price: 15000, qty: 1 }, { name: "Mouse", price: 200, qty: 2 }], date: "2026-01-15" },
+  { id: 2, customer: "Ayse", items: [{ name: "Phone", price: 8000, qty: 1 }], date: "2026-01-20" },
+  { id: 3, customer: "Ahmet", items: [{ name: "Keyboard", price: 500, qty: 1 }, { name: "Monitor", price: 3000, qty: 1 }], date: "2026-02-10" },
+  { id: 4, customer: "Mehmet", items: [{ name: "Tablet", price: 5000, qty: 2 }], date: "2026-02-15" },
+  { id: 5, customer: "Ayse", items: [{ name: "Headphones", price: 1000, qty: 1 }, { name: "Cable", price: 50, qty: 3 }], date: "2026-03-01" },
+];
+
+// GOREV 1: Her siparişin toplam tutarini hesapla
+const orderTotals = orders.map((order) => ({
+  // TODO: id, customer, total (items icindeki price * qty toplami)
+}));
+console.log("=== Siparis Toplamlari ===");
+orderTotals.forEach((o) => console.log(`  #${o.id} ${o.customer}: ${o.total} TL`));
+
+// GOREV 2: Musteriye gore grupla ve toplam harcamayi hesapla
+const customerSpending = orders.reduce((acc, order) => {
+  // TODO: { customer: totalSpending } objesi olustur
+}, {});
+console.log("\n=== Musteri Harcamalari ===");
+Object.entries(customerSpending)
+  .sort(([, a], [, b]) => b - a)
+  .forEach(([customer, total]) => console.log(`  ${customer}: ${total} TL`));
+
+// GOREV 3: Tum urunleri flatMap ile tek listeye cevir, fiyata gore sirala
+const allProducts = orders.flatMap((order) =>
+  // TODO: Her item'i { name, price, qty, customer, orderId } formatina cevir
+  []
+);
+console.log("\n=== En Pahali 3 Urun ===");
+allProducts
+  .sort((a, b) => b.price - a.price)
+  .slice(0, 3)
+  .forEach((p) => console.log(`  ${p.name}: ${p.price} TL (${p.customer})`));
+
+// GOREV 4: Aylik siparis sayisi
+const monthlyOrders = orders.reduce((acc, order) => {
+  // TODO: { "2026-01": 2, "2026-02": 2, ... }
+}, {});
+console.log("\n=== Aylik Siparis Sayisi ===");
+Object.entries(monthlyOrders).forEach(([month, count]) =>
+  console.log(`  ${month}: ${count} siparis`)
+);
+```
+
+**Beklenen çıktı:**
+```
+=== Siparis Toplamlari ===
+  #1 Ahmet: 15400 TL
+  #2 Ayse: 8000 TL
+  #3 Ahmet: 3500 TL
+  #4 Mehmet: 10000 TL
+  #5 Ayse: 1150 TL
+
+=== Musteri Harcamalari ===
+  Ahmet: 18900 TL
+  Mehmet: 10000 TL
+  Ayse: 9150 TL
+
+=== En Pahali 3 Urun ===
+  Laptop: 15000 TL (Ahmet)
+  Phone: 8000 TL (Ayse)
+  Tablet: 5000 TL (Mehmet)
+
+=== Aylik Siparis Sayisi ===
+  2026-01: 2 siparis
+  2026-02: 2 siparis
+  2026-03: 1 siparis
+```
+
+**İpucu:** `flatMap` nested array'leri tek seviyeye indirir. `reduce` ile gruplama yaparken accumulator'ü `{}` olarak başlat.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: Proxy ile Reactive Data Binding
+
+**Görev:** ES6 Proxy kullanarak basit bir reactive veri bağlama sistemi yaz. Veri değiştiğinde otomatik UI güncellemesi tetiklensin.
+
+**Başlangıç kodu:**
+```javascript
+function reactive(target, onChange) {
+  // TODO: Proxy ile target objesini sarmala
+  // Her set isleminde onChange callback'ini cagir
+  // Nested objeler icin de proxy olustur (deep reactivity)
+  return new Proxy(target, {
+    get(obj, prop) {
+      const value = obj[prop];
+      // TODO: Eger value obje ise, onu da reactive yap
+      return value;
+    },
+    set(obj, prop, value) {
+      const oldValue = obj[prop];
+      obj[prop] = value;
+      // TODO: Degisiklik varsa onChange cagir
+      return true;
+    },
+  });
+}
+
+// Test
+const state = reactive(
+  {
+    user: { name: "Ahmet", age: 25 },
+    count: 0,
+    items: [],
+  },
+  (path, oldVal, newVal) => {
+    console.log(`  Degisiklik: ${path} = ${JSON.stringify(oldVal)} -> ${JSON.stringify(newVal)}`);
+  }
+);
+
+console.log("=== Reactive State ===");
+state.count = 1;
+state.count = 2;
+state.user.name = "Mehmet";
+state.user.age = 30;
+state.items.push("item1");
+```
+
+**Beklenen çıktı:**
+```
+=== Reactive State ===
+  Degisiklik: count = 0 -> 1
+  Degisiklik: count = 1 -> 2
+  Degisiklik: user.name = "Ahmet" -> "Mehmet"
+  Degisiklik: user.age = 25 -> 30
+  Degisiklik: items.0 = undefined -> "item1"
+```
+
+**İpucu:** Nested reactivity için `get` trap'inde obje dönerken onu da `new Proxy()` ile sar. Path bilgisini parent'tan child'a aktarmak için closure kullan.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 10: Error Handling Best Practices
+
+**Görev:** Custom error sınıfları ve kapsamlı hata yönetim stratejileri gösteren bir modül yaz.
+
+**Başlangıç kodu:**
+```javascript
+// Custom error siniflari
+class AppError extends Error {
+  constructor(message, code, details = {}) {
+    super(message);
+    this.name = "AppError";
+    this.code = code;
+    this.details = details;
+    this.timestamp = new Date().toISOString();
+  }
+}
+
+class ValidationError extends AppError {
+  constructor(field, message) {
+    super(message, "VALIDATION_ERROR", { field });
+    this.name = "ValidationError";
+  }
+}
+
+class NotFoundError extends AppError {
+  constructor(resource, id) {
+    super(`${resource} not found: ${id}`, "NOT_FOUND", { resource, id });
+    this.name = "NotFoundError";
+  }
+}
+
+// TODO: AuthenticationError ve RateLimitError siniflarini yaz
+
+// Error handler
+function handleError(error) {
+  // TODO: Hata tipine gore uygun response olustur
+  // ValidationError -> 400
+  // NotFoundError -> 404
+  // AuthenticationError -> 401
+  // RateLimitError -> 429
+  // Bilinmeyen -> 500
+  const response = {
+    status: 500,
+    error: { code: "UNKNOWN", message: "Internal server error" },
+  };
+
+  if (error instanceof ValidationError) {
+    response.status = 400;
+    response.error = { code: error.code, message: error.message, field: error.details.field };
+  }
+  // TODO: Diger hata tiplerini handle et
+
+  return response;
+}
+
+// Test
+const errors = [
+  new ValidationError("email", "Gecersiz email formati"),
+  new NotFoundError("User", 42),
+  new AppError("Sunucu hatasi", "SERVER_ERROR"),
+];
+
+errors.forEach((err) => {
+  const response = handleError(err);
+  console.log(`${err.name}: ${response.status} -> ${JSON.stringify(response.error)}`);
+});
+
+// Async error handling pattern
+async function safeFetch(url) {
+  try {
+    // Simulasyon
+    if (url.includes("404")) throw new NotFoundError("Page", url);
+    if (url.includes("auth")) throw new AppError("Unauthorized", "AUTH_ERROR");
+    return { data: "success" };
+  } catch (error) {
+    const response = handleError(error);
+    console.log(`safeFetch error: ${response.status}`);
+    return null;
+  }
+}
+
+safeFetch("/api/users/404");
+safeFetch("/api/auth/login");
+```
+
+**Beklenen çıktı:**
+```
+ValidationError: 400 -> {"code":"VALIDATION_ERROR","message":"Gecersiz email formati","field":"email"}
+NotFoundError: 404 -> {"code":"NOT_FOUND","message":"User not found: 42"}
+AppError: 500 -> {"code":"UNKNOWN","message":"Internal server error"}
+safeFetch error: 404
+safeFetch error: 500
+```
+
+**İpucu:** `instanceof` ile hata tipini kontrol et. Custom error'larda `this.name` ayarlamayı unutma.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Observable Pattern ile Reactive Store
+
+**Görev:** ES6+ özellikleri kullanarak basit bir reactive state management store yaz.
+
+**Başlangıç kodu:**
+```javascript
+class Store {
+  #state;
+  #listeners;
+
+  constructor(initialState) {
+    this.#state = structuredClone(initialState);
+    this.#listeners = new Map();
+  }
+
+  getState() {
+    return structuredClone(this.#state);
+  }
+
+  setState(updater) {
+    const oldState = this.#state;
+    this.#state = typeof updater === "function"
+      ? { ...this.#state, ...updater(this.#state) }
+      : { ...this.#state, ...updater };
+    this.#notify(oldState, this.#state);
+  }
+
+  subscribe(key, callback) {
+    if (!this.#listeners.has(key)) {
+      this.#listeners.set(key, new Set());
+    }
+    this.#listeners.get(key).add(callback);
+    return () => this.#listeners.get(key)?.delete(callback);
+  }
+
+  #notify(oldState, newState) {
+    for (const [key, callbacks] of this.#listeners) {
+      if (oldState[key] !== newState[key]) {
+        callbacks.forEach((cb) => cb(newState[key], oldState[key]));
+      }
+    }
+  }
+}
+
+// Test
+const store = new Store({ count: 0, user: null, theme: "dark" });
+
+const unsub = store.subscribe("count", (newVal, oldVal) => {
+  console.log(`  count: ${oldVal} -> ${newVal}`);
+});
+
+store.subscribe("user", (newVal) => {
+  console.log(`  user: ${newVal?.name ?? "null"}`);
+});
+
+console.log("=== State Degisiklikleri ===");
+store.setState({ count: 1 });
+store.setState((s) => ({ count: s.count + 1 }));
+store.setState({ user: { name: "Ahmet" } });
+store.setState({ theme: "light" }); // theme listener yok
+
+unsub(); // count listener'i kaldir
+store.setState({ count: 99 }); // Bildirim gelmemeli
+console.log("Final state:", store.getState());
+```
+
+**Beklenen çıktı:**
+```
+=== State Degisiklikleri ===
+  count: 0 -> 1
+  count: 1 -> 2
+  user: Ahmet
+Final state: { count: 99, user: { name: 'Ahmet' }, theme: 'light' }
+```
+
+**İpucu:** `#` ile private field tanımla. `structuredClone()` deep copy yapar. `subscribe()` unsubscribe fonksiyonu döner.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 12: Tagged Template Literal ile SQL Builder
+
+**Görev:** Tagged template literal kullanarak SQL injection'a karşı güvenli bir query builder yaz.
+
+**Başlangıç kodu:**
+```javascript
+function sql(strings, ...values) {
+  // TODO:
+  // 1. String parcalarini ve degerleri birlestir
+  // 2. Degerleri parametrize et ($1, $2, ...)
+  // 3. SQL injection'a karsi guvenli query olustur
+  const params = [];
+  let query = "";
+
+  strings.forEach((str, i) => {
+    query += str;
+    if (i < values.length) {
+      params.push(values[i]);
+      query += `$${params.length}`;
+    }
+  });
+
+  return { query: query.trim(), params };
+}
+
+// Test: Guvenli sorgular
+const userId = 42;
+const role = "admin";
+const minAge = 18;
+
+const q1 = sql`SELECT * FROM users WHERE id = ${userId}`;
+console.log(q1);
+// { query: "SELECT * FROM users WHERE id = $1", params: [42] }
+
+const q2 = sql`SELECT * FROM users WHERE role = ${role} AND age > ${minAge}`;
+console.log(q2);
+// { query: "SELECT * FROM users WHERE role = $1 AND age > $2", params: ["admin", 18] }
+
+// SQL Injection denemesi - guvenli!
+const malicious = "'; DROP TABLE users; --";
+const q3 = sql`SELECT * FROM users WHERE name = ${malicious}`;
+console.log(q3);
+// Deger parametrize edildigi icin SQL injection calismaz
+console.log("SQL Injection engellendi!");
+```
+
+**Beklenen çıktı:**
+```
+{ query: 'SELECT * FROM users WHERE id = $1', params: [ 42 ] }
+{ query: 'SELECT * FROM users WHERE role = $1 AND age > $2', params: [ 'admin', 18 ] }
+{ query: "SELECT * FROM users WHERE name = $1", params: ["'; DROP TABLE users; --"] }
+SQL Injection engellendi!
+```
+
+**İpucu:** Tagged template literal'da `strings` array'i sabit metin parçalarını, `values` interpolated değerleri içerir. Değerleri query string'e yerleştirmek yerine parametre olarak ayır.
+
+**Zorluk:** Orta
+:::
+
 :::must-note
 - Destructuring: `const { name: n = 'default' } = obj` - rename + default birlikte kullanılabilir
 - Spread yayar (`[...arr]`), Rest toplar (`function(...args)`) - aynı syntax, farklı amaç

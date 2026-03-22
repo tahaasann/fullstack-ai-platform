@@ -971,6 +971,734 @@ Generator, `yield` ile değer üreten lazy iterator'dır. Normal fonksiyon tüm 
 Generator veya async kod yazarken AI'a kodunu yapistir: "Bu generator pipeline'imin bellek kullanim profilini analiz et. Darbogazlar nerede? itertools ile nasil optimize edebilirim?"
 :::
 
+:::exercise
+### Alıştırma 4: Cache Decorator (Memoization)
+
+**Görev:** LRU cache mantığıyla çalışan bir `@memoize(max_size=100)` decorator yaz. Cache hit/miss istatistiklerini tutsun.
+
+**Başlangıç kodu:**
+```python
+from functools import wraps
+from collections import OrderedDict
+
+def memoize(max_size: int = 128):
+    def decorator(func):
+        cache = OrderedDict()
+        stats = {"hits": 0, "misses": 0}
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # TODO:
+            # 1. args + kwargs'dan hashable bir key olustur
+            # 2. Key cache'te varsa -> hit, deger dondur
+            # 3. Yoksa -> miss, fonksiyonu cagir, sonucu cache'e kaydet
+            # 4. Cache max_size'i astiysa en eski elemani sil (LRU)
+            pass
+
+        wrapper.cache_info = lambda: stats
+        wrapper.cache_clear = lambda: cache.clear()
+        return wrapper
+    return decorator
+
+# Test
+@memoize(max_size=3)
+def fibonacci(n: int) -> int:
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+# Hesapla
+for i in range(10):
+    print(f"fib({i}) = {fibonacci(i)}")
+
+print(f"\nCache stats: {fibonacci.cache_info()}")
+
+# Max size testi
+@memoize(max_size=3)
+def square(x: int) -> int:
+    print(f"  Hesaplaniyor: {x}^2")
+    return x * x
+
+square(1)  # miss
+square(2)  # miss
+square(3)  # miss
+square(1)  # hit
+square(4)  # miss, 2 cache'ten duser (LRU)
+square(2)  # miss (cache'ten dustu!)
+print(f"Square cache stats: {square.cache_info()}")
+```
+
+**Beklenen çıktı:**
+```
+fib(0) = 0
+fib(1) = 1
+fib(2) = 1
+...
+fib(9) = 34
+
+Cache stats: {'hits': 16, 'misses': 10}
+  Hesaplaniyor: 1^2
+  Hesaplaniyor: 2^2
+  Hesaplaniyor: 3^2
+  Hesaplaniyor: 4^2
+  Hesaplaniyor: 2^2
+Square cache stats: {'hits': 1, 'misses': 5}
+```
+
+**İpucu:** `OrderedDict.move_to_end(key)` ile erişilen elemanı sona taşı (en yeni). `popitem(last=False)` ile en eskiyi sil.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 5: Context Manager ile Database Transaction
+
+**Görev:** `with` statement ile kullanılabilen bir database transaction context manager yaz. Hata olursa rollback, başarılıysa commit yapsın.
+
+**Başlangıç kodu:**
+```python
+from contextlib import contextmanager
+
+class FakeDatabase:
+    def __init__(self):
+        self.data: dict[str, list] = {"users": [], "orders": []}
+        self._backup: dict | None = None
+        self.committed = False
+
+    def insert(self, table: str, record: dict):
+        if table not in self.data:
+            raise ValueError(f"Tablo bulunamadi: {table}")
+        self.data[table].append(record)
+        print(f"  INSERT into {table}: {record}")
+
+    def _create_backup(self):
+        import copy
+        self._backup = copy.deepcopy(self.data)
+
+    def _rollback(self):
+        if self._backup:
+            self.data = self._backup
+            self._backup = None
+            print("  ROLLBACK yapildi")
+
+    def _commit(self):
+        self._backup = None
+        self.committed = True
+        print("  COMMIT yapildi")
+
+@contextmanager
+def transaction(db: FakeDatabase):
+    """Database transaction context manager."""
+    # TODO:
+    # 1. Backup olustur
+    # 2. yield ile db'yi ver
+    # 3. Hata olursa rollback
+    # 4. Basariliysa commit
+    pass
+
+# Test 1: Basarili transaction
+db = FakeDatabase()
+print("=== Basarili Transaction ===")
+with transaction(db) as conn:
+    conn.insert("users", {"id": 1, "name": "Ahmet"})
+    conn.insert("orders", {"id": 1, "user_id": 1, "total": 150})
+
+print(f"Users: {db.data['users']}")
+
+# Test 2: Basarisiz transaction (rollback)
+print("\n=== Basarisiz Transaction ===")
+with transaction(db) as conn:
+    conn.insert("users", {"id": 2, "name": "Ayse"})
+    conn.insert("invalid_table", {"id": 1})  # Hata!
+
+print(f"Users (degismemeli): {db.data['users']}")
+```
+
+**Beklenen çıktı:**
+```
+=== Basarili Transaction ===
+  INSERT into users: {'id': 1, 'name': 'Ahmet'}
+  INSERT into orders: {'id': 1, 'user_id': 1, 'total': 150}
+  COMMIT yapildi
+Users: [{'id': 1, 'name': 'Ahmet'}]
+
+=== Basarisiz Transaction ===
+  INSERT into users: {'id': 2, 'name': 'Ayse'}
+  ROLLBACK yapildi
+Users (degismemeli): [{'id': 1, 'name': 'Ahmet'}]
+```
+
+**İpucu:** `try/except/else` bloğu kullan. `yield` öncesi backup, except'te rollback, else'de commit.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Generator ile Dosya İşleme Pipeline
+
+**Görev:** Generator'lar zincirleyerek büyük log dosyalarını bellek-verimli şekilde işleyen bir pipeline yaz.
+
+**Başlangıç kodu:**
+```python
+from typing import Generator, Iterator
+from datetime import datetime
+
+# Simule edilmis log satirlari
+SAMPLE_LOGS = """
+2026-03-22 10:15:23 INFO  [auth] User login successful: user_id=42
+2026-03-22 10:15:24 ERROR [db] Connection timeout after 30s
+2026-03-22 10:15:25 WARN  [api] Rate limit approaching: 80/100
+2026-03-22 10:15:26 INFO  [auth] User login successful: user_id=15
+2026-03-22 10:15:27 ERROR [api] Internal server error: NullPointerException
+2026-03-22 10:15:28 INFO  [cache] Cache hit ratio: 95%
+2026-03-22 10:15:29 ERROR [db] Deadlock detected on table 'orders'
+2026-03-22 10:15:30 WARN  [auth] Failed login attempt: user_id=99
+2026-03-22 10:15:31 INFO  [api] Request processed in 250ms
+2026-03-22 10:15:32 ERROR [auth] Invalid token: expired
+""".strip()
+
+def read_lines(text: str) -> Generator[str, None, None]:
+    """Metni satir satir yield et (dosya okuma simulasyonu)."""
+    for line in text.split("\n"):
+        if line.strip():
+            yield line.strip()
+
+def parse_log(lines: Iterator[str]) -> Generator[dict, None, None]:
+    """Log satirini parse et."""
+    # TODO: Her satiri {"timestamp", "level", "module", "message"} dict'ine cevir
+    pass
+
+def filter_by_level(logs: Iterator[dict], level: str) -> Generator[dict, None, None]:
+    """Belirli seviyedeki loglari filtrele."""
+    # TODO
+    pass
+
+def filter_by_module(logs: Iterator[dict], module: str) -> Generator[dict, None, None]:
+    """Belirli moduldeki loglari filtrele."""
+    # TODO
+    pass
+
+def format_output(logs: Iterator[dict]) -> Generator[str, None, None]:
+    """Loglari formatli string'e cevir."""
+    # TODO
+    pass
+
+# Test: Pipeline zincirleme
+print("=== Tum ERROR loglari ===")
+pipeline = format_output(
+    filter_by_level(
+        parse_log(read_lines(SAMPLE_LOGS)),
+        "ERROR"
+    )
+)
+for line in pipeline:
+    print(line)
+
+print("\n=== Auth modulu loglari ===")
+pipeline = format_output(
+    filter_by_module(
+        parse_log(read_lines(SAMPLE_LOGS)),
+        "auth"
+    )
+)
+for line in pipeline:
+    print(line)
+```
+
+**Beklenen çıktı:**
+```
+=== Tum ERROR loglari ===
+[ERROR] [db] Connection timeout after 30s
+[ERROR] [api] Internal server error: NullPointerException
+[ERROR] [db] Deadlock detected on table 'orders'
+[ERROR] [auth] Invalid token: expired
+
+=== Auth modulu loglari ===
+[INFO] [auth] User login successful: user_id=42
+[INFO] [auth] User login successful: user_id=15
+[WARN] [auth] Failed login attempt: user_id=99
+[ERROR] [auth] Invalid token: expired
+```
+
+**İpucu:** Her generator sadece `yield` ile iletir, bellekte tüm veriyi tutmaz. `split()` ile log satırını parçalara ayır.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 7: Retry Decorator ile Exponential Backoff
+
+**Görev:** Başarısız fonksiyonları otomatik olarak tekrar deneyen bir `@retry` decorator yaz. Exponential backoff stratejisi uygulasın.
+
+**Başlangıç kodu:**
+```python
+import time
+import random
+from functools import wraps
+
+class RetryExhausted(Exception):
+    """Tum denemeler basarisiz oldugunda firlatilir."""
+    pass
+
+def retry(max_attempts: int = 3, base_delay: float = 1.0,
+          backoff_factor: float = 2.0, exceptions: tuple = (Exception,)):
+    """
+    Retry decorator with exponential backoff.
+    delay = base_delay * (backoff_factor ** attempt)
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # TODO:
+            # 1. max_attempts kadar dene
+            # 2. Basarisiz olursa delay kadar bekle
+            # 3. Her denemede delay'i backoff_factor ile carp
+            # 4. Sadece belirtilen exception turlerini yakala
+            # 5. Tum denemeler basarisiz olursa RetryExhausted firlat
+            pass
+        return wrapper
+    return decorator
+
+# Test: Rastgele basarisiz olan fonksiyon
+call_count = 0
+
+@retry(max_attempts=5, base_delay=0.1, backoff_factor=2.0, exceptions=(ConnectionError,))
+def unreliable_api_call(endpoint: str) -> dict:
+    global call_count
+    call_count += 1
+    if random.random() < 0.7:  # %70 basarisizlik orani
+        raise ConnectionError(f"Baglanti hatasi: {endpoint}")
+    return {"status": "ok", "data": [1, 2, 3]}
+
+try:
+    result = unreliable_api_call("/api/data")
+    print(f"Basarili! Sonuc: {result}")
+    print(f"Toplam deneme: {call_count}")
+except RetryExhausted as e:
+    print(f"Tum denemeler basarisiz: {e}")
+    print(f"Toplam deneme: {call_count}")
+```
+
+**Beklenen çıktı:**
+```
+Deneme 1/5 basarisiz: Baglanti hatasi: /api/data (0.1s bekleniyor)
+Deneme 2/5 basarisiz: Baglanti hatasi: /api/data (0.2s bekleniyor)
+Basarili! Sonuc: {'status': 'ok', 'data': [1, 2, 3]}
+Toplam deneme: 3
+```
+
+**İpucu:** `time.sleep(delay)` ile bekle. `delay *= backoff_factor` ile artır. Jitter eklemek için `delay * random.uniform(0.5, 1.5)` kullan.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Async Web Scraper
+
+**Görev:** `asyncio` ve `aiohttp` benzeri bir pattern ile birden fazla URL'i paralel olarak çeken bir async scraper yaz.
+
+**Başlangıç kodu:**
+```python
+import asyncio
+import time
+
+async def fetch_url(url: str, delay: float = 0) -> dict:
+    """URL'i fetch et (simulasyon)."""
+    await asyncio.sleep(delay)  # Network gecikmesi simulasyonu
+    # Gercek projede aiohttp kullanilir
+    return {
+        "url": url,
+        "status": 200,
+        "size": len(url) * 100,
+        "time": delay,
+    }
+
+async def fetch_all_sequential(urls: list[str]) -> list[dict]:
+    """URL'leri sirayla cek."""
+    results = []
+    for url in urls:
+        result = await fetch_url(url, delay=0.5)
+        results.append(result)
+    return results
+
+async def fetch_all_parallel(urls: list[str], max_concurrent: int = 3) -> list[dict]:
+    """URL'leri paralel cek (semaphore ile sinirli)."""
+    # TODO:
+    # 1. asyncio.Semaphore(max_concurrent) olustur
+    # 2. Her URL icin semaphore ile sinirli task olustur
+    # 3. asyncio.gather ile hepsini paralel calistir
+    pass
+
+async def main():
+    urls = [
+        "https://example.com/page1",
+        "https://example.com/page2",
+        "https://example.com/page3",
+        "https://example.com/page4",
+        "https://example.com/page5",
+        "https://example.com/page6",
+    ]
+
+    # Sirayla
+    start = time.time()
+    results = await fetch_all_sequential(urls)
+    seq_time = time.time() - start
+    print(f"Sirayla: {seq_time:.2f}s ({len(results)} URL)")
+
+    # Paralel
+    start = time.time()
+    results = await fetch_all_parallel(urls, max_concurrent=3)
+    par_time = time.time() - start
+    print(f"Paralel: {par_time:.2f}s ({len(results)} URL)")
+    print(f"Hizlanma: {seq_time / par_time:.1f}x")
+
+asyncio.run(main())
+```
+
+**Beklenen çıktı:**
+```
+Sirayla: 3.00s (6 URL)
+Paralel: 1.00s (6 URL)
+Hizlanma: 3.0x
+```
+
+**İpucu:** `asyncio.Semaphore` ile concurrent task sayısını sınırla. `asyncio.gather(*tasks)` ile tüm task'ları paralel çalıştır.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: Functional Programming ile Veri Pipeline
+
+**Görev:** `map`, `filter`, `reduce` ve `functools.partial` kullanarak fonksiyonel bir veri işleme pipeline'ı yaz.
+
+**Başlangıç kodu:**
+```python
+from functools import reduce, partial
+from typing import Callable
+
+# Pipeline builder
+class Pipeline:
+    def __init__(self, data):
+        self.data = data
+        self._steps: list[tuple[str, Callable]] = []
+
+    def pipe(self, func: Callable, name: str = "") -> "Pipeline":
+        """Pipeline'a adim ekle."""
+        # TODO: fonksiyonu kaydet ve self dondur (chaining icin)
+        pass
+
+    def execute(self, verbose: bool = False) -> any:
+        """Pipeline'i calistir."""
+        result = self.data
+        for name, func in self._steps:
+            result = func(result)
+            if verbose:
+                preview = str(result)[:60]
+                print(f"  [{name}] -> {preview}...")
+        return result
+
+# Helper fonksiyonlar
+def filter_by(predicate: Callable, data: list) -> list:
+    return list(filter(predicate, data))
+
+def map_with(transform: Callable, data: list) -> list:
+    return list(map(transform, data))
+
+def sort_by(key: str, reverse: bool = False):
+    return lambda data: sorted(data, key=lambda x: x[key], reverse=reverse)
+
+# Test
+products = [
+    {"name": "Laptop", "price": 15000, "category": "electronics", "stock": 5},
+    {"name": "T-Shirt", "price": 200, "category": "clothing", "stock": 50},
+    {"name": "Phone", "price": 8000, "category": "electronics", "stock": 0},
+    {"name": "Book", "price": 50, "category": "education", "stock": 100},
+    {"name": "Tablet", "price": 5000, "category": "electronics", "stock": 12},
+    {"name": "Jeans", "price": 400, "category": "clothing", "stock": 30},
+    {"name": "Monitor", "price": 3000, "category": "electronics", "stock": 8},
+]
+
+result = (
+    Pipeline(products)
+    .pipe(partial(filter_by, lambda p: p["stock"] > 0), "stokta olanlar")
+    .pipe(partial(filter_by, lambda p: p["category"] == "electronics"), "elektronik")
+    .pipe(sort_by("price", reverse=True), "fiyata gore sirala")
+    .pipe(partial(map_with, lambda p: {**p, "discounted": int(p["price"] * 0.9)}), "indirim uygula")
+    .execute(verbose=True)
+)
+
+print("\nSonuc:")
+for item in result:
+    print(f"  {item['name']:10s} {item['price']:>6d} TL -> {item['discounted']:>6d} TL")
+```
+
+**Beklenen çıktı:**
+```
+  [stokta olanlar] -> [{'name': 'Laptop', 'price': 15000, 'catego...
+  [elektronik] -> [{'name': 'Laptop', 'price': 15000, 'catego...
+  [fiyata gore sirala] -> [{'name': 'Laptop', 'price': 15000, 'catego...
+  [indirim uygula] -> [{'name': 'Laptop', 'price': 15000, 'catego...
+
+Sonuc:
+  Laptop     15000 TL ->  13500 TL
+  Tablet      5000 TL ->   4500 TL
+  Monitor     3000 TL ->   2700 TL
+```
+
+**İpucu:** `partial(filter_by, lambda p: ...)` ile predicate'i önceden bağla. `Pipeline.pipe()` `self` dönerek method chaining sağlar.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: Descriptor Protocol ile Validated Attributes
+
+**Görev:** Python descriptor protocol kullanarak otomatik validation yapan attribute'lar oluştur.
+
+**Başlangıç kodu:**
+```python
+class Validated:
+    """Descriptor: attribute atanirken validation uygular."""
+    def __init__(self, validator: callable, error_msg: str = "Validation failed"):
+        self.validator = validator
+        self.error_msg = error_msg
+        self.attr_name = ""
+
+    def __set_name__(self, owner, name):
+        self.attr_name = f"_{name}"
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        return getattr(obj, self.attr_name, None)
+
+    def __set__(self, obj, value):
+        # TODO: Validator'i cagir, basarisiz olursa ValueError firlat
+        pass
+
+class Range(Validated):
+    """Sayisal degerin belirli aralikta olmasini zorunlu kilar."""
+    def __init__(self, min_val: float, max_val: float):
+        # TODO: min_val <= value <= max_val kontrolu yapan validator olustur
+        pass
+
+class NonEmpty(Validated):
+    """String'in bos olmamasini zorunlu kilar."""
+    def __init__(self):
+        super().__init__(
+            validator=lambda v: isinstance(v, str) and len(v.strip()) > 0,
+            error_msg="Bos string olamaz"
+        )
+
+class Email(Validated):
+    """Email formatini dogrular."""
+    def __init__(self):
+        # TODO: Basit email validation (@ ve . icermeli)
+        pass
+
+class Product:
+    name = NonEmpty()
+    price = Range(0, 1_000_000)
+    stock = Range(0, 10_000)
+    email = Email()
+
+    def __init__(self, name: str, price: float, stock: int, email: str):
+        self.name = name
+        self.price = price
+        self.stock = stock
+        self.email = email
+
+    def __str__(self):
+        return f"Product({self.name}, {self.price} TL, stok: {self.stock})"
+
+# Test: Gecerli urun
+p = Product("Laptop", 15000, 10, "info@shop.com")
+print(p)
+
+# Test: Validation hatalari
+test_cases = [
+    ("", 100, 5, "a@b.com", "Bos isim"),
+    ("Phone", -100, 5, "a@b.com", "Negatif fiyat"),
+    ("Tablet", 500, -1, "a@b.com", "Negatif stok"),
+    ("Monitor", 3000, 5, "invalid", "Gecersiz email"),
+]
+
+for name, price, stock, email, desc in test_cases:
+    try:
+        p = Product(name, price, stock, email)
+        print(f"HATA: {desc} kabul edildi!")
+    except ValueError as e:
+        print(f"Dogru yakalandi - {desc}: {e}")
+```
+
+**Beklenen çıktı:**
+```
+Product(Laptop, 15000 TL, stok: 10)
+Dogru yakalandi - Bos isim: Bos string olamaz
+Dogru yakalandi - Negatif fiyat: 0 <= value <= 1000000 olmali
+Dogru yakalandi - Negatif stok: 0 <= value <= 10000 olmali
+Dogru yakalandi - Gecersiz email: Gecerli email adresi giriniz
+```
+
+**İpucu:** `__set_name__` Python 3.6+'da descriptor'a attribute adını otomatik verir. `__get__`/`__set__` ile okuma/yazma kontrol edilir.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Plugin Sistemi ile Decorator Registry
+
+**Görev:** Decorator kullanarak otomatik fonksiyon kaydı yapan bir plugin sistemi yaz.
+
+**Başlangıç kodu:**
+```python
+class PluginRegistry:
+    def __init__(self):
+        self._plugins: dict[str, callable] = {}
+
+    def register(self, name: str = None):
+        """Fonksiyonu plugin olarak kaydet."""
+        def decorator(func):
+            plugin_name = name or func.__name__
+            self._plugins[plugin_name] = func
+            return func
+        return decorator
+
+    def run(self, name: str, *args, **kwargs):
+        if name not in self._plugins:
+            raise KeyError(f"Plugin bulunamadi: {name}")
+        return self._plugins[name](*args, **kwargs)
+
+    def list_plugins(self) -> list[str]:
+        return list(self._plugins.keys())
+
+# Test
+registry = PluginRegistry()
+
+@registry.register("uppercase")
+def to_upper(text: str) -> str:
+    return text.upper()
+
+@registry.register("reverse")
+def reverse_text(text: str) -> str:
+    return text[::-1]
+
+@registry.register()
+def word_count(text: str) -> int:
+    return len(text.split())
+
+print(f"Plugins: {registry.list_plugins()}")
+print(f"uppercase: {registry.run('uppercase', 'hello world')}")
+print(f"reverse: {registry.run('reverse', 'python')}")
+print(f"word_count: {registry.run('word_count', 'hello beautiful world')}")
+```
+
+**Beklenen çıktı:**
+```
+Plugins: ['uppercase', 'reverse', 'word_count']
+uppercase: HELLO WORLD
+reverse: nohtyp
+word_count: 3
+```
+
+**İpucu:** `register()` decorator factory olarak çalışır - parametre alıp decorator döner.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 12: AsyncIO ile Concurrent Task Runner
+
+**Görev:** Birden fazla async görevi yöneten, timeout ve hata yönetimi destekleyen bir task runner yaz.
+
+**Başlangıç kodu:**
+```python
+import asyncio
+from dataclasses import dataclass, field
+from typing import Callable, Any
+
+@dataclass
+class TaskResult:
+    name: str
+    success: bool
+    result: Any = None
+    error: str = ""
+    duration: float = 0.0
+
+class TaskRunner:
+    def __init__(self, max_concurrent: int = 5, timeout: float = 10.0):
+        self.max_concurrent = max_concurrent
+        self.timeout = timeout
+        self.results: list[TaskResult] = []
+
+    async def run_task(self, name: str, coro, semaphore: asyncio.Semaphore) -> TaskResult:
+        """Tek bir task'i timeout ve hata yonetimi ile calistir."""
+        import time
+        start = time.time()
+        async with semaphore:
+            try:
+                result = await asyncio.wait_for(coro, timeout=self.timeout)
+                return TaskResult(name, True, result, duration=time.time()-start)
+            except asyncio.TimeoutError:
+                return TaskResult(name, False, error="Timeout", duration=time.time()-start)
+            except Exception as e:
+                return TaskResult(name, False, error=str(e), duration=time.time()-start)
+
+    async def run_all(self, tasks: dict[str, Any]) -> list[TaskResult]:
+        """Tum task'lari paralel calistir."""
+        sem = asyncio.Semaphore(self.max_concurrent)
+        coros = [self.run_task(name, coro, sem) for name, coro in tasks.items()]
+        self.results = await asyncio.gather(*coros)
+        return self.results
+
+    def summary(self):
+        success = sum(1 for r in self.results if r.success)
+        failed = len(self.results) - success
+        total_time = max(r.duration for r in self.results) if self.results else 0
+        print(f"\n=== Ozet: {success} basarili, {failed} basarisiz, {total_time:.2f}s ===")
+
+# Test
+async def fetch_data(name: str, delay: float, should_fail: bool = False):
+    await asyncio.sleep(delay)
+    if should_fail:
+        raise ConnectionError(f"{name} baglanti hatasi")
+    return f"{name} verisi"
+
+async def main():
+    runner = TaskRunner(max_concurrent=3, timeout=2.0)
+    tasks = {
+        "API-1": fetch_data("API-1", 0.5),
+        "API-2": fetch_data("API-2", 0.3),
+        "API-3": fetch_data("API-3", 0.8, should_fail=True),
+        "API-4": fetch_data("API-4", 3.0),  # Timeout olacak
+        "API-5": fetch_data("API-5", 0.2),
+    }
+    results = await runner.run_all(tasks)
+    for r in results:
+        status = "OK" if r.success else f"FAIL: {r.error}"
+        print(f"  {r.name}: {status} ({r.duration:.2f}s)")
+    runner.summary()
+
+asyncio.run(main())
+```
+
+**Beklenen çıktı:**
+```
+  API-1: OK (0.50s)
+  API-2: OK (0.30s)
+  API-3: FAIL: API-3 baglanti hatasi (0.80s)
+  API-4: FAIL: Timeout (2.00s)
+  API-5: OK (0.20s)
+
+=== Ozet: 3 basarili, 2 basarisiz, 2.00s ===
+```
+
+**İpucu:** `asyncio.wait_for(coro, timeout=n)` ile timeout uygula. `asyncio.Semaphore` ile concurrent task sayısını sınırla.
+
+**Zorluk:** Zor
+:::
+
 :::must-note
 - Decorator = callable alıp callable döndüren higher-order function. `@dec` -> `func = dec(func)`
 - `functools.wraps` her zaman kullan: orijinal fonksiyonun `__name__`, `__doc__` bilgilerini korur

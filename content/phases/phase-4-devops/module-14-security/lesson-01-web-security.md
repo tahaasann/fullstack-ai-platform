@@ -755,6 +755,301 @@ Bir Express uygulamasina asagidaki guvenlik header'larini ekleyin:
 - Strict-Transport-Security
 - X-Frame-Options
 **Gorev:** Helmet.js kullanarak ve manuel olarak iki farkli implementasyon yazin.
+
+---
+
+### Alistirma 4: CSRF Token Implementasyonu (Kolay)
+
+Bir form submission'da CSRF korunmasi ekle.
+
+```javascript
+// server.js
+const crypto = require("crypto");
+
+function generateCSRFToken(sessionId) {
+  return crypto.createHmac("sha256", process.env.CSRF_SECRET)
+    .update(sessionId)
+    .digest("hex");
+}
+
+app.get("/form", (req, res) => {
+  const token = generateCSRFToken(req.session.id);
+  res.render("form", { csrfToken: token });
+});
+
+app.post("/submit", (req, res) => {
+  const { _csrf } = req.body;
+  const expected = generateCSRFToken(req.session.id);
+  if (_csrf !== expected) {
+    return res.status(403).json({ error: "Invalid CSRF token" });
+  }
+  // TODO: Form islemini gerceklestir
+});
+
+// TODO: SameSite cookie attribute'unu ekle
+// TODO: Double submit cookie pattern'i uygula
+// TODO: Token'in her form submission'da yenilenmesini sagla
+```
+
+**Beklenen Sonuc:** CSRF token olmadan POST istekleri reddedilmeli. Token her oturum icin unique olmali. SameSite=Strict ile ek koruma saglanmali.
+**Ipucu:** Modern tarayicilar SameSite=Lax default kullanir ama eski tarayicilar icin CSRF token hala gereklidir.
+
+---
+
+### Alistirma 5: Rate Limiting ve Brute Force Korunma (Kolay)
+
+Login endpoint'ine rate limiting ve hesap kilitleme mekanizmasi ekle.
+
+```javascript
+const rateLimit = require("express-rate-limit");
+
+// Genel API rate limit
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 dakika
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Cok fazla istek, 15 dakika sonra tekrar deneyin" },
+});
+
+// Login icin siki rate limit
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5, // 15 dakikada max 5 deneme
+  skipSuccessfulRequests: true,
+});
+
+app.use("/api/", apiLimiter);
+app.post("/api/auth/login", loginLimiter, loginHandler);
+
+// TODO: IP bazli ve kullanici bazli ayri limit uygula
+// TODO: Basarisiz denemelerden sonra progressive delay ekle (1s, 2s, 4s, 8s)
+// TODO: Redis store ile distributed rate limiting yap
+// TODO: Basarisiz login denemelerini logla (guvenlik auditi icin)
+```
+
+**Beklenen Sonuc:** 5 basarisiz login denemesinden sonra 429 status donmeli. Basarili login'ler sayilmamali. Rate limit bilgisi response header'larinda gorunmeli.
+**Ipucu:** Production'da Redis store kullan (memory store tek instance'ta calisir). `X-RateLimit-Remaining` header'i ile kullaniciya bilgi ver.
+
+---
+
+### Alistirma 6: Input Validation ve Sanitization (Orta)
+
+Kullanici girdilerini guvenli sekilde dogrula ve temizle.
+
+```javascript
+const { z } = require("zod");
+const createDOMPurify = require("dompurify");
+const { JSDOM } = require("jsdom");
+const DOMPurify = createDOMPurify(new JSDOM("").window);
+
+// Zod ile input validation
+const userSchema = z.object({
+  name: z.string().min(2).max(50).regex(/^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/),
+  email: z.string().email().max(255),
+  bio: z.string().max(500).transform(val => DOMPurify.sanitize(val)),
+  age: z.number().int().min(13).max(120),
+  website: z.string().url().optional().refine(
+    url => !url || url.startsWith("https://"),
+    "Sadece HTTPS URL kabul edilir"
+  ),
+});
+
+app.post("/api/users", (req, res) => {
+  const result = userSchema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({ errors: result.error.flatten() });
+  }
+  // result.data guvenli ve dogrulanmis
+  // TODO: SQL injection icin parameterized query kullan
+});
+
+// TODO: File upload icin MIME type ve boyut kontrolu ekle
+// TODO: URL redirect icin whitelist kontrolu ekle (open redirect korunma)
+// TODO: JSON payload boyut limiti ekle (DoS korunma)
+```
+
+**Beklenen Sonuc:** Gecersiz input'larda anlamli hata mesajlari donmeli. HTML tag'leri sanitize edilmeli. Script injection girisimi engellenimeli.
+**Ipucu:** "Validate input, encode output" prensibi. Zod ile type-safe validation yap, DOMPurify ile HTML temizle.
+
+---
+
+### Alistirma 7: JWT Guvenligi ve Token Yonetimi (Orta)
+
+Guvenli JWT implementasyonu yap: token rotation, blacklisting, refresh token.
+
+```javascript
+const jwt = require("jsonwebtoken");
+
+// Access token (kisa omurlu)
+function generateAccessToken(user) {
+  return jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_ACCESS_SECRET,
+    { expiresIn: "15m", algorithm: "HS256" }
+  );
+}
+
+// Refresh token (uzun omurlu, DB'de sakla)
+function generateRefreshToken(user) {
+  const token = jwt.sign(
+    { id: user.id, tokenVersion: user.tokenVersion },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: "7d" }
+  );
+  // TODO: Refresh token'i DB'ye kaydet (revoke edebilmek icin)
+  return token;
+}
+
+// Token refresh endpoint
+app.post("/api/auth/refresh", async (req, res) => {
+  const { refreshToken } = req.cookies;
+  // TODO: Refresh token'i dogrula ve DB'deki versiyonla karsilastir
+  // TODO: Yeni access + refresh token cifti uret (token rotation)
+  // TODO: Eski refresh token'i invalidate et
+});
+
+// TODO: Logout'ta refresh token'i blacklist'e ekle
+// TODO: Tum cihazlardan cikis yap (tokenVersion artir)
+// TODO: JWT payload'da hassas bilgi olmadigini dogrula
+```
+
+**Beklenen Sonuc:** Access token 15 dakikada expire olmali. Refresh token ile yeni access token alinabilmeli. Logout sonrasi refresh token kullanilamamali.
+**Ipucu:** JWT'de sifre, kredi karti gibi hassas bilgi SAKLAMA — payload Base64 encoded, encrypted degil. Token rotation ile calinti refresh token'in omrunu kisalt.
+
+---
+
+### Alistirma 8: Dependency Vulnerability Scanning (Orta)
+
+Proje bagimliklarindaki guvenlik aciklarina karsi tarama ve otomatik guncelleme kur.
+
+```bash
+# 1. Manuel tarama
+pnpm audit
+pnpm audit --fix
+
+# 2. pip icin
+pip audit
+pip install --upgrade vulnerable-package
+
+# 3. GitHub Actions ile otomatik tarama
+```
+
+```yaml
+# .github/workflows/security-scan.yml
+name: Security Scan
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Her Pazartesi sabah 8
+  push:
+    branches: [main]
+
+jobs:
+  dependency-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pnpm audit --audit-level moderate
+      - uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+# TODO: Dependabot yapilandirmasi ekle (.github/dependabot.yml)
+# TODO: Kritik guvenlik guncellemeleri icin otomatik PR acilmasini sagla
+# TODO: License compliance kontrolu ekle (lisans uyumlulugu)
+# TODO: SBOM (Software Bill of Materials) olustur
+```
+
+**Beklenen Sonuc:** Haftalik otomatik guvenlik taramasi calismali. Kritik aciklarda bildirim gelmeli. Dependabot PR'lari otomatik acilmali.
+**Ipucu:** `pnpm audit --audit-level critical` ile sadece kritik aciklari goster. Snyk free tier acik kaynak projeler icin sinisrsiz.
+
+---
+
+### Alistirma 9: Content Security Policy Detayli Yapilandirma (Zor)
+
+Siki bir CSP politikasi yapilandir ve XSS saldirilarini engelle.
+
+```javascript
+const helmet = require("helmet");
+
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'nonce-{RANDOM}'"],
+    styleSrc: ["'self'", "'unsafe-inline'"], // Tailwind icin gerekli
+    imgSrc: ["'self'", "data:", "https://cdn.example.com"],
+    connectSrc: ["'self'", "https://api.example.com"],
+    fontSrc: ["'self'", "https://fonts.gstatic.com"],
+    objectSrc: ["'none'"],
+    frameSrc: ["'none'"],
+    baseUri: ["'self'"],
+    formAction: ["'self'"],
+    upgradeInsecureRequests: [],
+  },
+}));
+
+// Nonce-based CSP icin middleware
+app.use((req, res, next) => {
+  const nonce = crypto.randomBytes(16).toString("base64");
+  res.locals.nonce = nonce;
+  // TODO: CSP header'daki nonce'u dinamik olarak set et
+  next();
+});
+
+// TODO: CSP violation raporlamasi icin report-uri endpoint'i ekle
+// TODO: Report-only mode ile CSP'yi test et (engellemeden raporla)
+// TODO: Inline script'leri nonce veya hash ile whitelist et
+// TODO: Third-party script'ler icin strict CSP kurallari yaz
+```
+
+**Beklenen Sonuc:** CSP header response'da gorunmeli. Inline script'ler nonce olmadan calisamamali. CSP violation'lari raporlanmali.
+**Ipucu:** Oncelikle `Content-Security-Policy-Report-Only` ile test et, site bozulmadan kurallari ayarla. `report-uri` ile ihlalleri topla.
+
+---
+
+### Alistirma 10: Penetration Testing Simulasyonu (Zor)
+
+Kendi uygulamana temel penetrasyon testi uygula.
+
+```bash
+# 1. OWASP ZAP ile otomatik tarama (Docker ile)
+docker run -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+  -t https://your-app.com -r report.html
+
+# 2. Manuel test senaryolari
+```
+
+```javascript
+// test/security/penetration.test.js
+describe("Guvenlik Testleri", () => {
+  test("SQL injection girisimi engellenmeli", async () => {
+    const res = await request(app)
+      .post("/api/login")
+      .send({ email: "' OR 1=1 --", password: "anything" });
+    expect(res.status).toBe(400); // gecersiz email formati
+  });
+
+  test("XSS payload'i sanitize edilmeli", async () => {
+    const res = await request(app)
+      .post("/api/comments")
+      .send({ text: '<script>alert("xss")</script>' });
+    expect(res.body.text).not.toContain("<script>");
+  });
+
+  test("Path traversal engellenmeli", async () => {
+    const res = await request(app).get("/api/files/../../etc/passwd");
+    expect(res.status).toBe(400);
+  });
+
+  // TODO: IDOR (Insecure Direct Object Reference) testi
+  // TODO: Mass assignment testi (beklenmeyen field'lar gondererek)
+  // TODO: HTTP method tampering testi (GET ile DELETE islemi)
+  // TODO: Header injection testi
+});
+```
+
+**Beklenen Sonuc:** Tum saldiri girisilemleri engellenimeli. ZAP taramasinda yuksek riskli bulgu olmamali. Test raporunda her saldiri vektoru icin sonuc bulunmali.
+**Ipucu:** OWASP ZAP ucretsizdir ve CI/CD'ye entegre edilebilir. Penetrasyon testini SADECE kendi uygulamana yap, baskalarinin sistemine izinsiz test etme.
 :::
 
 :::ai-guidance

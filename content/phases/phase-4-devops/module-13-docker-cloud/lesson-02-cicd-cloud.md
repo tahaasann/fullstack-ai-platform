@@ -1013,6 +1013,341 @@ Farkli ortamlar icin konfigurasyoon yonetimi kurun:
 ```
 
 **Beklenen sonuc:** Hicbir secret kod icerisinde olmamali, her ortam kendi konfigurasyonuyla calismali, deploy durumlari Slack'te bildirilmeli.
+
+---
+
+### Alistirma 4: Branch Protection ve PR Workflow (Kolay)
+
+GitHub branch protection kurallari ve otomatik PR kontrolleri yapilandir.
+
+```yaml
+# .github/workflows/pr-check.yml
+name: PR Checks
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm type-check
+      - run: pnpm test -- --ci --coverage
+      - name: Coverage Check
+        run: |
+          COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+          echo "Coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "::error::Coverage $COVERAGE% is below 80% threshold"
+            exit 1
+          fi
+
+# TODO: PR boyut kontrolu ekle (max 500 satir degisiklik uyarisi)
+# TODO: Commit message format kontrolu (conventional commits)
+# TODO: Auto-assign reviewer kurali ekle
+```
+
+**Beklenen Sonuc:** PR acildiginda lint, type-check ve test otomatik calismali. Coverage %80'in altindaysa PR merge edilememeli.
+**Ipucu:** GitHub Settings > Branches > Branch protection rules ile main branch'i koruyabilirsin.
+
+---
+
+### Alistirma 5: Docker Image Build ve Registry Push (Kolay)
+
+CI pipeline'da Docker image olustur ve container registry'ye gonder.
+
+```yaml
+# .github/workflows/docker-publish.yml
+name: Docker Build & Push
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+# TODO: Semantic versioning ile tag'leme ekle (v1.0.0)
+# TODO: Multi-platform build ekle (linux/amd64, linux/arm64)
+# TODO: Image vulnerability scan adimi ekle (trivy)
+```
+
+**Beklenen Sonuc:** Her main push'ta image build edilip GHCR'a push edilmeli. Build cache ile sonraki build'ler hizlanmali. Git SHA ile her image izlenebilir olmali.
+**Ipucu:** GitHub Container Registry (ghcr.io) ucretsiz ve GITHUB_TOKEN ile otomatik authenticate olur.
+
+---
+
+### Alistirma 6: Kubernetes Manifest Yazma (Orta)
+
+Basit bir uygulamayi Kubernetes'e deploy etmek icin manifest dosyalari yaz.
+
+```yaml
+# k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/username/my-app:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: password
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+---
+# TODO: Service manifest yaz (ClusterIP ve LoadBalancer)
+# TODO: Ingress manifest yaz (domain routing)
+# TODO: HorizontalPodAutoscaler ekle (CPU %70'te scale)
+# TODO: ConfigMap ve Secret manifest'leri olustur
+```
+
+**Beklenen Sonuc:** `kubectl apply -f k8s/` ile tum kaynaklar olusturulmali. Pod'lar healthy olmali. Secret'lar environment variable olarak inject edilmeli.
+**Ipucu:** `kubectl get pods -w` ile pod durumlarini canli izle. `kubectl describe pod <name>` ile hata detaylarini gor.
+
+---
+
+### Alistirma 7: Rollback ve Blue-Green Deployment (Orta)
+
+Basarisiz bir deployment'i geri alma ve zero-downtime deployment stratejisi uygula.
+
+```bash
+# 1. Deployment history'yi gor
+kubectl rollout history deployment/my-app
+
+# 2. Yeni versiyon deploy et
+kubectl set image deployment/my-app app=ghcr.io/username/my-app:v2.0
+
+# 3. Rollout durumunu izle
+kubectl rollout status deployment/my-app
+
+# 4. Sorun varsa geri al
+kubectl rollout undo deployment/my-app
+kubectl rollout undo deployment/my-app --to-revision=2
+
+# TODO: Rolling update stratejisini yapilandir (maxSurge: 1, maxUnavailable: 0)
+# TODO: Canary deployment simule et (%10 trafik yeni versiyona)
+# TODO: Health check basarisiz olursa otomatik rollback'i test et
+```
+
+```yaml
+# deployment.yaml - Rolling update strategy
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+```
+
+**Beklenen Sonuc:** Zero-downtime deployment calismali. Basarisiz deployment otomatik geri alinmali. Rollout history ile gecmis versiyonlara donulebilmeli.
+**Ipucu:** `maxUnavailable: 0` ile her zaman en az mevcut replica sayisi kadar pod ayakta kalir.
+
+---
+
+### Alistirma 8: Terraform ile Infrastructure as Code (Orta)
+
+Basit bir cloud altyapisini Terraform ile tanimla ve yonet.
+
+```hcl
+# main.tf
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.region
+}
+
+resource "aws_s3_bucket" "frontend" {
+  bucket = "${var.project_name}-frontend"
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+resource "aws_s3_bucket_website_configuration" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
+  index_document { suffix = "index.html" }
+  error_document { key = "404.html" }
+}
+
+# TODO: CloudFront distribution ekle (CDN)
+# TODO: Route53 DNS kaydı olustur
+# TODO: RDS PostgreSQL instance olustur
+# TODO: variables.tf ve outputs.tf dosyalarini tamamla
+```
+
+**Beklenen Sonuc:** `terraform plan` ile degisiklikler onizlenebilmeli. `terraform apply` ile altyapi olusturulmali. State dosyasi remote backend'de saklanmali.
+**Ipucu:** `terraform destroy` ile tum kaynaklari temizleyebilirsin. Production'da state'i S3 + DynamoDB lock ile sakla.
+
+---
+
+### Alistirma 9: Monitoring ve Alerting Pipeline (Zor)
+
+CI/CD pipeline'ina deployment sonrasi monitoring ve alert entegrasyonu ekle.
+
+```yaml
+# .github/workflows/deploy-and-monitor.yml
+name: Deploy & Monitor
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Production
+        run: |
+          # Deploy komutu
+          kubectl set image deployment/app app=ghcr.io/${{ github.repository }}:${{ github.sha }}
+          kubectl rollout status deployment/app --timeout=300s
+
+      - name: Smoke Test
+        run: |
+          sleep 30
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.example.com/health)
+          if [ "$STATUS" != "200" ]; then
+            echo "::error::Health check failed with status $STATUS"
+            kubectl rollout undo deployment/app
+            exit 1
+          fi
+
+      - name: Notify Success
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
+            -H 'Content-Type: application/json' \
+            -d '{"text":"Deploy basarili: ${{ github.sha }}"}'
+
+# TODO: Sentry release tracking ekle
+# TODO: Deploy sonrasi error rate kontrolu (5 dakika bekle, %1 ustundeyse rollback)
+# TODO: Performance regression testi ekle (Lighthouse CI)
+```
+
+**Beklenen Sonuc:** Deploy sonrasi smoke test basarisiz olursa otomatik rollback yapilmali. Basarili deploy Slack'te bildirilmeli.
+**Ipucu:** Smoke test ile critical endpoint'leri kontrol et. Canary analysis ile metrikleri karsilastir.
+
+---
+
+### Alistirma 10: GitOps Workflow ile Argo CD (Zor)
+
+GitOps prensibiyle Kubernetes deployment'larini yonet.
+
+```yaml
+# argocd/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/username/my-app-k8s
+    targetRevision: main
+    path: k8s/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+```
+
+```
+# Dizin yapisi (Kustomize)
+k8s/
+├── base/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── kustomization.yaml
+├── overlays/
+│   ├── staging/
+│   │   ├── kustomization.yaml
+│   │   └── replicas-patch.yaml  # replicas: 1
+│   └── production/
+│       ├── kustomization.yaml
+│       └── replicas-patch.yaml  # replicas: 3
+```
+
+```bash
+# TODO: Kustomize base ve overlay dosyalarini olustur
+# TODO: Staging ve production icin farkli konfigurasyonlar tanimla
+# TODO: Git commit ile deployment tetikle (push to k8s repo)
+# TODO: Argo CD UI'da sync durumunu izle
+```
+
+**Beklenen Sonuc:** Git repo'ya push yapildiginda Argo CD otomatik olarak Kubernetes'e deploy etmeli. Staging ve production farkli konfigurasyonlarla calismali.
+**Ipucu:** GitOps'ta "truth" her zaman Git'tedir. Manuel kubectl degisiklikleri Argo CD tarafindan geri alinir (selfHeal: true).
 :::
 
 ## Interview'da CI/CD ve Cloud Soruları

@@ -1890,6 +1890,203 @@ GOREV: Asagidaki her bolumu detayli tasarla
 
 **Beklenen Sonuc:** WebSocket tercih edilmeli (dusuk latency, bidirectional). Fan-out on write kucuk gruplar icin, fan-out on read buyuk gruplar icin uygun. Cassandra veya ScyllaDB mesaj depolama icin ideal. Her bolumde trade-off analizi yapilmali.
 **Ipucu:** WhatsApp her mesaji her cihaz icin ayri queue'da tutar. Online olunca queue'dan teslim eder. Bu "inbox model" olarak bilinir.
+
+---
+
+### Alistirma 4: Rate Limiter Tasarimi (Kolay)
+
+Distributed rate limiter sistemi tasarla.
+
+```
+Requirements:
+- API gateway seviyesinde rate limiting
+- IP bazli ve kullanici bazli ayri limitler
+- Sliding window algoritmasiyla
+- Distributed (birden fazla sunucu)
+
+Cevaplaman gerekenler:
+1. Hangi algoritmay kullanirsin? (Token Bucket, Sliding Window, Fixed Window)
+2. State nerede saklanir? (Redis, local memory, database)
+3. Distributed lock gerekir mi?
+4. Rate limit asildiginda client'a ne dondurursun?
+5. Burst traffic'e nasil izin verirsin?
+```
+
+**Beklenen Sonuc:** Redis + Sliding Window Log algoritmasi onerilmeli. 429 Too Many Requests + Retry-After header donmeli. X-RateLimit-Remaining header'i ile client bilgilendirilmeli.
+**Ipucu:** Token Bucket burst traffic'e izin verir. Sliding Window daha hassas ama daha fazla bellek kullanir.
+
+---
+
+### Alistirma 5: Notification System Tasarimi (Kolay)
+
+Multi-channel bildirim sistemi tasarla (email, SMS, push notification, in-app).
+
+```
+Requirements:
+- Gunluk 10M bildirim
+- Priority: critical (aninda), high (1 dakika), normal (batch)
+- Template destegi (dinamik icerik)
+- Delivery tracking (teslim edildi mi?)
+- Rate limiting (spam onleme)
+
+Cevaplaman gerekenler:
+1. Kanal bazli ayrı queue'lar mi, tek queue mu?
+2. Priority-based routing nasil yapilir?
+3. Retry mekanizmasi nasil calisir? (exponential backoff)
+4. Template rendering nerede yapilir?
+5. User preference yonetimi (hangi kanali tercih ediyor?)
+```
+
+**Beklenen Sonuc:** Message queue (Kafka/RabbitMQ) ile asenkron islem onerilmeli. Priority queue ile kritik bildirimler oncelikli islenmeli. Dead letter queue ile basarisiz teslimatlar yonetilmeli.
+
+---
+
+### Alistirma 6: Instagram/Twitter Feed Tasarimi (Orta)
+
+Social media feed sistemi tasarla (timeline generation).
+
+```
+Requirements:
+- 100M aktif kullanici, ortalama 300 takipci
+- Feed: takip edilen kisilerin son paylasimlari
+- Siralamaÿ: chronological + relevance-based
+- 100M DAU ile <500ms latency
+
+Cevaplaman gerekenler:
+1. Fan-out on write vs fan-out on read: ne zaman hangisi?
+2. Celebrity problemi (10M+ takipci) nasil cozulur?
+3. Feed ranking algoritması hangi sinyalleri kullanir?
+4. Cache stratejisi: hangi feed'ler cache'lenir?
+5. Pagination: cursor-based mi, offset-based mi?
+
+Back-of-envelope:
+- 100M DAU × gunluk 10 feed refresh = 1B feed request/gun
+- QPS: 1B / 86400 = ~12K, peak: ~36K
+- Her feed 50 post × 1KB = 50KB
+```
+
+**Beklenen Sonuc:** Hybrid fan-out (push for normal users, pull for celebrities) onerilmeli. Redis sorted set ile pre-computed feed saklanmali. Cursor-based pagination ile consistent paging saglanmali.
+**Ipucu:** Twitter hybrid yaklaşim kullanir: <5K takipci icin push, >5K icin pull. Instagram ML-based ranking kullanir.
+
+---
+
+### Alistirma 7: Payment System Tasarimi (Orta)
+
+Guvenli ve reliable odeme sistemi tasarla.
+
+```
+Requirements:
+- Gunluk 1M islem
+- Multi-currency destegi
+- Idempotency (ayni islem iki kez islennemeli)
+- PCI DSS compliance
+- Reconciliation (uzlasma) destegi
+
+Cevaplaman gerekenler:
+1. Idempotency key nasil calisir?
+2. Double-spending nasil onlenir? (distributed lock, optimistic locking)
+3. Failed payment retry stratejisi nasil olmali?
+4. Event sourcing odeme sisteminde nasil kullanilir?
+5. Reconciliation sureci nasil tasarlanir? (3rd party payment provider ile)
+
+Kritik edge case'ler:
+- Odeme basarili ama callback gelmedi
+- Kullanici sayfayi iki kez tikladi (duplicate submission)
+- Payment provider timeout ama para cekildis mi belirsiz
+```
+
+**Beklenen Sonuc:** Idempotency key ile duplicate islemler engellenimeli. Event sourcing ile her odeme adimi kayit altinda olmali. Saga pattern ile multi-step transaction yonetilmeli.
+**Ipucu:** Stripe'in idempotency key yaklasimine bak. Her odeme istegine unique key ver, ayni key ile gelen istegi tekrar isleme.
+
+---
+
+### Alistirma 8: Distributed Cache Tasarimi (Orta)
+
+Redis-benzeri distributed caching sistemi tasarla.
+
+```
+Requirements:
+- Multi-node caching cluster
+- Consistent hashing ile key dagitimi
+- Cache eviction: LRU, LFU, TTL
+- High availability (node duserse veri kaybi yok)
+- Sub-millisecond read latency
+
+Cevaplaman gerekenler:
+1. Consistent hashing nasil calisir? Virtual node'lar neden onemli?
+2. Cache-aside, read-through, write-through, write-behind: hangisi ne zaman?
+3. Cache invalidation stratejisi (pub/sub, event-driven)?
+4. Hot key problemi nasil cozulur? (bir key'e cok yuksek trafik)
+5. Cache stampede nasil onlenir? (cache miss'te herkes DB'ye gider)
+
+Back-of-envelope:
+- 1M key × ortalama 1KB = 1GB bellek
+- 100K QPS, p99 latency < 1ms
+- 3 node cluster, replication factor 2
+```
+
+**Beklenen Sonuc:** Consistent hashing ile node ekleme/cikarma durumunda minimum key redistribution saglanmali. Lock/lease ile cache stampede onlenmeli. Hot key icin local cache + distributed cache hybrid onerilmeli.
+
+---
+
+### Alistirma 9: File Storage System Tasarimi (Zor)
+
+Google Drive/Dropbox benzeri dosya depolama sistemi tasarla.
+
+```
+Requirements:
+- 100M kullanici, ortalama 2GB depolama
+- Dosya upload/download (max 10GB)
+- Dosya paylasimi ve izin yonetimi
+- Versiyon gecmisi (son 30 gun)
+- Cihazlar arasi senkronizasyon
+
+Cevaplaman gerekenler:
+1. Buyuk dosya upload: chunked upload nasil calısir?
+2. Deduplication: ayni dosyanin birden fazla kopyasi nasil onlenir?
+3. Metadata vs file content: nerede saklanir? (SQL vs Object Storage)
+4. Sync conflict resolution: iki cihazdan ayni anda degisiklik?
+5. CDN ile download hizlandirma?
+
+Back-of-envelope:
+- 100M × 2GB = 200PB toplam depolama
+- Gunluk 10M upload (ortalama 5MB) = 50TB/gun
+- QPS: metadata: 100K, upload: 1K, download: 10K
+```
+
+**Beklenen Sonuc:** Object storage (S3) + metadata DB (PostgreSQL) ayrimli olmali. Content-addressable storage ile deduplication saglanmali. Operational Transform veya CRDT ile conflict resolution onerilmeli.
+**Ipucu:** Dropbox block-level sync kullanir: dosyanin sadece degisen bloklari senkronize edilir (rsync benzeri).
+
+---
+
+### Alistirma 10: Search Engine Tasarimi (Zor)
+
+Elasticsearch benzeri full-text search sistemi tasarla.
+
+```
+Requirements:
+- 1B dokuman, ortalama 1KB
+- Full-text search (<100ms latency)
+- Fuzzy matching ve autocomplete
+- Real-time indexing (yeni dokuman 1 dakikada aranabilir)
+- Faceted search (filtreleme)
+
+Cevaplaman gerekenler:
+1. Inverted index nasil calisir? Neden B-tree yerine?
+2. Tokenization ve stemming süreci nasil isler?
+3. TF-IDF vs BM25 ranking farkı nedir?
+4. Sharding stratejisi: document-based mi, term-based mi?
+5. Real-time indexing ile batch indexing dengesi?
+
+Back-of-envelope:
+- 1B × 1KB = 1TB ham veri
+- Inverted index: ~2-3x ham veri = 2-3TB
+- QPS: 10K search, 1K write
+- Shard basina 50M dokuman, 20 shard
+```
+
+**Beklenen Sonuc:** Inverted index yapisi anlatilmali. BM25 ranking onerilmeli. Term-based sharding hotspot olusturur, document-based tercih edilmeli. Near-real-time indexing icin buffer + periodic flush mekanizmasi tanimlanmali.
+**Ipucu:** Elasticsearch Lucene uzerine kuruludur. Segment-based architecture kullanir: yeni dokumanlar in-memory buffer'da birikir, periyodik olarak disk'e segment olarak yazilir.
 :::
 
 :::external-resource

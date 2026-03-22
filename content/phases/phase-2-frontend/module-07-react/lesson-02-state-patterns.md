@@ -844,6 +844,422 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 Performance sorunlarinda AI'a component kodunu ve Profiler ciktisini ver: "Bu Dashboard component'inde 3 farkli Zustand store'dan veri cekiyorum ama her state degisiminde tum component re-render oluyor. Selector'larimi ve component yapisini optimize et."
 :::
 
+:::exercise
+### Alıştırma 4: useReducer ile Alışveriş Sepeti
+**Görev:** useReducer kullanarak bir alışveriş sepeti yönetimi yaz: ürün ekle, çıkar, miktar güncelle.
+**Başlangıç kodu:**
+```tsx
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+type CartAction =
+  | { type: "ADD_ITEM"; payload: Omit<CartItem, "quantity"> }
+  | { type: "REMOVE_ITEM"; payload: { id: number } }
+  | { type: "UPDATE_QUANTITY"; payload: { id: number; quantity: number } }
+  | { type: "CLEAR_CART" };
+
+// TODO: cartReducer fonksiyonunu yaz
+function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
+  switch (action.type) {
+    case "ADD_ITEM":
+      // Ürün zaten varsa quantity artır, yoksa yeni ekle
+    case "REMOVE_ITEM":
+      // id'ye göre filtrele
+    case "UPDATE_QUANTITY":
+      // quantity 0 ise sil, değilse güncelle
+    case "CLEAR_CART":
+      // Boş array döndür
+  }
+}
+```
+**Beklenen çıktı:**
+```tsx
+case "ADD_ITEM": {
+  const existing = state.find(item => item.id === action.payload.id);
+  if (existing) {
+    return state.map(item =>
+      item.id === action.payload.id
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    );
+  }
+  return [...state, { ...action.payload, quantity: 1 }];
+}
+case "REMOVE_ITEM":
+  return state.filter(item => item.id !== action.payload.id);
+case "UPDATE_QUANTITY":
+  if (action.payload.quantity <= 0) {
+    return state.filter(item => item.id !== action.payload.id);
+  }
+  return state.map(item =>
+    item.id === action.payload.id
+      ? { ...item, quantity: action.payload.quantity }
+      : item
+  );
+case "CLEAR_CART":
+  return [];
+```
+**İpucu:** Reducer pure function olmalı - state'i doğrudan değiştirme, her zaman yeni array/obje döndür. `Omit<CartItem, "quantity">` ile quantity dışındaki alanları al.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 5: Context API ile Tema Provider
+**Görev:** Context API ile uygulamanın her yerinden erişilebilir bir tema sistemi oluştur.
+**Başlangıç kodu:**
+```tsx
+import { createContext, useContext, useState, ReactNode } from "react";
+
+// TODO: ThemeContext tipini tanımla
+interface ThemeContextType {
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+}
+
+// TODO: Context oluştur (varsayılan değer null)
+
+// TODO: ThemeProvider component'i yaz
+function ThemeProvider({ children }: { children: ReactNode }) {
+  // TODO: theme state'i
+  // TODO: toggleTheme fonksiyonu
+  // TODO: Context.Provider ile children'ı sar
+}
+
+// TODO: useTheme custom hook'u yaz (context null kontrolü ile)
+
+// Kullanım:
+function Header() {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    <header className={theme === "dark" ? "bg-gray-900" : "bg-white"}>
+      <button onClick={toggleTheme}>Tema Değiştir</button>
+    </header>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+const ThemeContext = createContext<ThemeContextType | null>(null);
+
+function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const toggleTheme = () => setTheme(prev => prev === "dark" ? "light" : "dark");
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("useTheme must be used within ThemeProvider");
+  return context;
+}
+```
+**İpucu:** Context null kontrolü yapan custom hook yaz - bu hem tip güvenliği sağlar hem de Provider olmadan kullanmayı engeller.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: React Router ile Sayfa Navigasyonu
+**Görev:** React Router v6 ile temel bir sayfa yapısı kur: layout, nested routes ve dynamic route parametresi.
+**Başlangıç kodu:**
+```tsx
+import { BrowserRouter, Routes, Route, Link, Outlet, useParams } from "react-router-dom";
+
+// TODO: Layout component - Navbar + Outlet
+function Layout() {
+  return (
+    <div>
+      <nav>
+        {/* TODO: Link component'leri ile navigasyon */}
+      </nav>
+      {/* TODO: Alt route'ların render edileceği yer */}
+    </div>
+  );
+}
+
+// TODO: ProductDetail - URL'den id parametresini al
+function ProductDetail() {
+  // TODO: useParams ile id'yi al
+  return <h1>Ürün #{/* id */}</h1>;
+}
+
+// TODO: Route yapısını kur
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* TODO: Layout içinde nested routes
+            /          → HomePage
+            /products  → ProductList
+            /products/:id → ProductDetail
+            *          → NotFound */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+function Layout() {
+  return (
+    <div>
+      <nav>
+        <Link to="/">Ana Sayfa</Link>
+        <Link to="/products">Ürünler</Link>
+      </nav>
+      <Outlet />
+    </div>
+  );
+}
+
+function ProductDetail() {
+  const { id } = useParams<{ id: string }>();
+  return <h1>Ürün #{id}</h1>;
+}
+
+<Routes>
+  <Route path="/" element={<Layout />}>
+    <Route index element={<HomePage />} />
+    <Route path="products" element={<ProductList />} />
+    <Route path="products/:id" element={<ProductDetail />} />
+    <Route path="*" element={<NotFound />} />
+  </Route>
+</Routes>
+```
+**İpucu:** `<Outlet />` nested route'ların render edildiği yerdir. `useParams` ile URL parametrelerini oku. `index` route parent path'te gösterilir.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: React Hook Form ile Kayıt Formu
+**Görev:** React Hook Form ve Zod ile doğrulamalı bir kayıt formu oluştur.
+**Başlangıç kodu:**
+```tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+// TODO: Zod schema tanımla
+const registerSchema = z.object({
+  // name: min 2 karakter
+  // email: geçerli email
+  // password: min 8 karakter, en az 1 büyük harf, 1 rakam
+  // confirmPassword: password ile aynı olmalı
+}).refine(/* TODO: password eşleşme kontrolü */);
+
+type RegisterForm = z.infer<typeof registerSchema>;
+
+function RegisterPage() {
+  const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = (data: RegisterForm) => console.log(data);
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {/* TODO: Her alan için input + hata mesajı */}
+    </form>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+const registerSchema = z.object({
+  name: z.string().min(2, "Ad en az 2 karakter olmalı"),
+  email: z.string().email("Geçerli bir email girin"),
+  password: z.string()
+    .min(8, "Şifre en az 8 karakter olmalı")
+    .regex(/[A-Z]/, "En az 1 büyük harf")
+    .regex(/[0-9]/, "En az 1 rakam"),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Şifreler eşleşmiyor",
+  path: ["confirmPassword"],
+});
+```
+**İpucu:** `z.infer<typeof schema>` ile Zod schema'dan TypeScript tipi çıkarılır. `.refine()` ile cross-field validation yapılır.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Zustand ile Global State
+**Görev:** Zustand kullanarak bir bildirim (notification) store'u oluştur.
+**Başlangıç kodu:**
+```tsx
+import { create } from "zustand";
+
+interface Notification {
+  id: string;
+  message: string;
+  type: "success" | "error" | "info";
+}
+
+// TODO: NotificationStore interface
+interface NotificationStore {
+  notifications: Notification[];
+  addNotification: (message: string, type: Notification["type"]) => void;
+  removeNotification: (id: string) => void;
+  clearAll: () => void;
+}
+
+// TODO: Zustand store oluştur
+const useNotificationStore = create<NotificationStore>((set) => ({
+  // TODO: notifications başlangıç değeri
+  // TODO: addNotification - benzersiz id ile ekle
+  // TODO: removeNotification - id'ye göre sil
+  // TODO: clearAll - hepsini temizle
+}));
+
+// TODO: 3 saniye sonra otomatik kaldıran addNotification yaz
+```
+**Beklenen çıktı:**
+```tsx
+const useNotificationStore = create<NotificationStore>((set) => ({
+  notifications: [],
+  addNotification: (message, type) => {
+    const id = crypto.randomUUID();
+    set(state => ({
+      notifications: [...state.notifications, { id, message, type }],
+    }));
+    setTimeout(() => {
+      set(state => ({
+        notifications: state.notifications.filter(n => n.id !== id),
+      }));
+    }, 3000);
+  },
+  removeNotification: (id) =>
+    set(state => ({
+      notifications: state.notifications.filter(n => n.id !== id),
+    })),
+  clearAll: () => set({ notifications: [] }),
+}));
+```
+**İpucu:** `set(state => ...)` ile mevcut state'e göre güncelleme yap. `crypto.randomUUID()` benzersiz id üretir.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: React.memo ile Gereksiz Render Engelleme
+**Görev:** Gereksiz re-render'ları tespit et ve `React.memo` ile optimize et.
+**Başlangıç kodu:**
+```tsx
+import { useState, memo, useCallback } from "react";
+
+// TODO: Bu component her parent render'da yeniden render oluyor
+// React.memo ile sararak sadece props değişince render edilmesini sağla
+function ExpensiveList({ items, onItemClick }: {
+  items: string[];
+  onItemClick: (item: string) => void;
+}) {
+  console.log("ExpensiveList rendered!");
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item} onClick={() => onItemClick(item)}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  const [items] = useState(["a", "b", "c"]);
+
+  // TODO: Bu fonksiyon her render'da yeniden oluşuyor
+  // useCallback ile memoize et
+  const handleItemClick = (item: string) => {
+    console.log("Clicked:", item);
+  };
+
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+      <ExpensiveList items={items} onItemClick={handleItemClick} />
+    </div>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+const ExpensiveList = memo(function ExpensiveList({ items, onItemClick }: {
+  items: string[];
+  onItemClick: (item: string) => void;
+}) {
+  console.log("ExpensiveList rendered!");
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item} onClick={() => onItemClick(item)}>{item}</li>
+      ))}
+    </ul>
+  );
+});
+
+// Parent içinde:
+const handleItemClick = useCallback((item: string) => {
+  console.log("Clicked:", item);
+}, []);
+```
+**İpucu:** `React.memo` props referansı değişmediyse render'ı atlar. Ama fonksiyon prop'lar her render'da yeni referans olur - `useCallback` ile stabilize et.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 10: State Colocation Prensibi
+**Görev:** Aşağıdaki kodda state'leri doğru yere taşıyarak refactor et. Her state mümkün olan en yakın component'te olmalı.
+**Başlangıç kodu:**
+```tsx
+// YANLIŞ: Tüm state en üstte
+function App() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+
+  return (
+    <div>
+      <SearchBar query={searchQuery} setQuery={setSearchQuery} />
+      <TabPanel selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+      <ContactForm name={formName} setName={setFormName}
+                   email={formEmail} setEmail={setFormEmail} />
+      <Tooltip visible={tooltipVisible} setVisible={setTooltipVisible} />
+      <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+    </div>
+  );
+}
+```
+**Beklenen çıktı:**
+```tsx
+// DOĞRU: Her state kendi component'inde
+function App() {
+  return (
+    <div>
+      <SearchBar />      {/* searchQuery state'i SearchBar içinde */}
+      <TabPanel />       {/* selectedTab state'i TabPanel içinde */}
+      <ContactForm />    {/* formName, formEmail state'i ContactForm içinde */}
+      <Tooltip />        {/* tooltipVisible state'i Tooltip içinde */}
+      <Modal />          {/* isModalOpen state'i Modal içinde */}
+    </div>
+  );
+}
+
+// Sadece birden fazla component aynı state'i kullanıyorsa yukarı kaldır (lift state up)
+```
+**İpucu:** State colocation = state'i kullanan en yakın component'te tut. Gereksiz prop drilling'i önler ve performance artırır. Sadece paylaşılan state yukarı taşınır.
+**Zorluk:** Kolay
+:::
+
 :::must-note
 - useReducer: 3+ ilişkili state varsa veya state geçişleri karmaşıksa useState yerine kullan
 - Reducer = pure function: (state, action) => newState, yan etkisi olmamalı

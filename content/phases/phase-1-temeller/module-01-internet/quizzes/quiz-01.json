@@ -109,6 +109,36 @@
       "explanation": "127.0.0.1 localhost (loopback) adresidir - kendi bilgisayarını ifade eder. Geliştirme sırasında local server'ına bağlanmak için kullanırsın. 192.168.x.x ve 10.x.x.x özel (private) ağ adresleridir. 255.255.255.0 ise bir subnet mask'tir.",
       "difficulty": "kolay",
       "points": 10
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "Bir web sitesine erişmeye çalıştığında DNS sunucusu yanıt vermezse ne olur?",
+      "options": [
+        "Tarayıcı otomatik olarak IP adresi tahmin eder",
+        "Tarayıcı doğrudan sunucuya bağlanır",
+        "Tarayıcı domain adını IP adresine çeviremez ve siteye erişilemez",
+        "Tarayıcı HTTP yerine HTTPS kullanmaya geçer"
+      ],
+      "correct": 2,
+      "explanation": "DNS (Domain Name System), domain adlarını IP adreslerine çevirir. DNS sunucusu yanıt vermezse tarayıcı hedef sunucunun IP adresini bilemez ve bağlantı kurulamaz. Bu durumda 'DNS_PROBE_FINISHED_NXDOMAIN' veya benzeri bir hata görürsün. Alternatif DNS sunucuları (8.8.8.8, 1.1.1.1) kullanarak bu sorunu çözebilirsin.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": "HTTP/2'nin HTTP/1.1'e göre en önemli avantajı hangisidir?",
+      "options": [
+        "Daha güvenli şifreleme kullanır",
+        "Tek bir TCP bağlantısı üzerinden birden fazla isteği eş zamanlı gönderebilir (multiplexing)",
+        "Daha kısa URL'ler kullanır",
+        "Sadece GET ve POST method'larını destekler"
+      ],
+      "correct": 1,
+      "explanation": "HTTP/1.1'de her istek sırayla gönderilir (head-of-line blocking). HTTP/2 multiplexing ile tek TCP bağlantısı üzerinden birden fazla request/response'u paralel olarak gönderir. Ayrıca header compression (HPACK) ve server push gibi özellikler de sunar. Bu, sayfa yükleme hızını önemli ölçüde artırır.",
+      "difficulty": "orta",
+      "points": 10
     }
   ]
 }

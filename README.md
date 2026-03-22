@@ -37,6 +37,7 @@ DevMaster is a self-hosted, open-source education platform designed to take you 
 | English Vocabulary | 504 terms |
 | Sentence Patterns | 195 |
 | Work Scenarios | 77 |
+| Build-Along Substeps | 3,780+ |
 
 ### Curriculum
 
@@ -59,6 +60,11 @@ DevMaster is a self-hosted, open-source education platform designed to take you 
 - 🏗️ **Real-world patterns** — Every concept tied to production use cases
 - 🌙 **Dark theme** — Developer-friendly UI
 - 📊 **Progress tracking** — Daily goals, streaks, completion stats
+- 🔨 **Build-along projects** — 3,780+ substeps with real developer workflow (skeleton → import → implement → validate)
+
+### Screenshots
+
+> _Coming soon — run the platform locally to see it in action!_
 
 ### Tech Stack
 
@@ -161,6 +167,7 @@ DevMaster, sıfırdan **Full Stack AI Engineer** olmayı hedefleyen, açık kayn
 | İngilizce Kelime | 504 |
 | Cümle Kalıbı | 195 |
 | İş Senaryosu | 77 |
+| Build-Along Alt Adım | 3,780+ |
 
 ### Müfredat
 
@@ -183,6 +190,11 @@ DevMaster, sıfırdan **Full Stack AI Engineer** olmayı hedefleyen, açık kayn
 - 🏗️ **Gerçek dünya pattern'leri** — Her kavram production kullanım senaryolarıyla
 - 🌙 **Dark tema** — Göz yormayan, modern arayüz
 - 📊 **İlerleme takibi** — Günlük hedefler, streak'ler, tamamlanma istatistikleri
+- 🔨 **Build-along projeler** — 3,780+ alt adım, gerçek geliştirme akışıyla (iskelet → import → uygulama → doğrulama)
+
+### Ekran Görüntüleri
+
+> _Yakında eklenecek — platformu yerel olarak çalıştırarak görebilirsiniz!_
 
 ### Teknoloji Yığını
 

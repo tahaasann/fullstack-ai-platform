@@ -1013,6 +1013,799 @@ TypeScript hatalariyla karsilastiginda AI'a hata mesajini yapistir: "Bu TypeScri
 - **Senior cevabi:** Generic'ler type-safe ve reusable kod yazmanin temelidir. `Array<T>`, `Promise<T>` gibi built-in tipler generic'tir. Constraints ile (`T extends HasId`) tip güvenliğini korurken esneklik sağlanır. Örneğin bir API response wrapper `ApiResponse<T>` ile tüm endpoint'lerin return tipini type-safe yapabilirsiniz. Overuse'dan kacinmak gerekir, çünkü gereksiz generic'ler kodu okunakligi dusurur.
 :::
 
+:::exercise
+### Alıştırma 4: Discriminated Union ile State Machine
+
+**Görev:** TypeScript discriminated union kullanarak bir sipariş durumu state machine'i yaz.
+
+**Başlangıç kodu:**
+```typescript
+// Discriminated union ile siparis durumlari
+type OrderState =
+  | { status: "pending"; createdAt: Date }
+  | { status: "confirmed"; confirmedAt: Date; estimatedDelivery: Date }
+  | { status: "shipped"; shippedAt: Date; trackingNumber: string }
+  | { status: "delivered"; deliveredAt: Date }
+  | { status: "cancelled"; cancelledAt: Date; reason: string };
+
+// TODO: State gecislerini tanimlayan fonksiyonlar yaz
+function confirmOrder(order: OrderState): OrderState {
+  // TODO: Sadece "pending" durumundaki siparis onaylanabilir
+  // Aksi halde hata firlat
+  if (order.status !== "pending") {
+    throw new Error(`Cannot confirm order in ${order.status} state`);
+  }
+  return {
+    status: "confirmed",
+    confirmedAt: new Date(),
+    estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+  };
+}
+
+// TODO: shipOrder, deliverOrder, cancelOrder fonksiyonlarini yaz
+
+function getOrderMessage(order: OrderState): string {
+  // TODO: switch ile her duruma ozel mesaj dondur
+  // TypeScript exhaustiveness check ile tum durumlarin handle edildigini garanti et
+  switch (order.status) {
+    case "pending":
+      return "Siparisiniz onay bekliyor";
+    // TODO: Diger durumlari ekle
+    default:
+      const _exhaustive: never = order;
+      return _exhaustive;
+  }
+}
+
+// Test
+let order: OrderState = { status: "pending", createdAt: new Date() };
+console.log(getOrderMessage(order));
+
+order = confirmOrder(order);
+console.log(getOrderMessage(order));
+
+// Bu derleme hatasi vermeli:
+// order = shipOrder(order as { status: "pending"; createdAt: Date });
+```
+
+**Beklenen çıktı:**
+```
+Siparisiniz onay bekliyor
+Siparisiniz onaylandi, tahmini teslimat: [tarih]
+```
+
+**İpucu:** `never` tipi exhaustiveness check sağlar. Switch'te tüm case'ler handle edilmezse TypeScript derleme hatası verir.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Generic Constraint ile API Response Wrapper
+
+**Görev:** Generic ve constraint kullanarak tip-güvenli bir API response wrapper sistemi yaz.
+
+**Başlangıç kodu:**
+```typescript
+// Base response tipleri
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  timestamp: string;
+}
+
+interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  pagination: {
+    page: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+  };
+}
+
+interface ErrorResponse {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    details?: Record<string, string>;
+  };
+  timestamp: string;
+}
+
+// TODO: Result tipi tanimla (basarili VEYA hata)
+type Result<T> = ApiResponse<T> | ErrorResponse;
+
+// TODO: Generic constraint ile CRUD fonksiyonlari yaz
+interface HasId {
+  id: number;
+}
+
+// TODO: Bu fonksiyonlari implement et
+function createResponse<T>(data: T): ApiResponse<T> {
+  return { success: true, data, timestamp: new Date().toISOString() };
+}
+
+function createPaginatedResponse<T>(
+  items: T[],
+  page: number,
+  pageSize: number,
+  totalItems: number
+): PaginatedResponse<T> {
+  // TODO
+  return {} as PaginatedResponse<T>;
+}
+
+function createErrorResponse(code: string, message: string): ErrorResponse {
+  // TODO
+  return {} as ErrorResponse;
+}
+
+// TODO: isSuccess type guard yaz
+function isSuccess<T>(result: Result<T>): result is ApiResponse<T> {
+  // TODO
+  return false;
+}
+
+// Test
+interface User extends HasId {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const userResponse = createResponse<User>({ id: 1, name: "Ahmet", email: "a@test.com" });
+console.log(`User: ${userResponse.data.name}`);
+
+const usersResponse = createPaginatedResponse<User>(
+  [{ id: 1, name: "Ahmet", email: "a@test.com" }],
+  1, 10, 50
+);
+console.log(`Page: ${usersResponse.pagination.page}/${usersResponse.pagination.totalPages}`);
+
+const errorResp = createErrorResponse("NOT_FOUND", "User not found");
+const result: Result<User> = Math.random() > 0.5 ? userResponse : errorResp;
+
+if (isSuccess(result)) {
+  console.log(`Success: ${result.data.name}`); // TypeScript data.name'i biliyor
+} else {
+  console.log(`Error: ${result.error.message}`); // TypeScript error'u biliyor
+}
+```
+
+**Beklenen çıktı:**
+```
+User: Ahmet
+Page: 1/5
+Success: Ahmet  (veya)  Error: User not found
+```
+
+**İpucu:** Type guard fonksiyonu `result is ApiResponse<T>` dönüş tipi ile TypeScript'e narrowing bilgisi verir.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Mapped Types ile Form Builder
+
+**Görev:** TypeScript Mapped Types kullanarak otomatik form tipi oluşturan bir sistem yaz.
+
+**Başlangıç kodu:**
+```typescript
+// Orijinal model
+interface UserProfile {
+  name: string;
+  email: string;
+  age: number;
+  isActive: boolean;
+  bio?: string;
+}
+
+// TODO: Mapped type'lar ile form tipleri olustur
+
+// 1. Her alanı form input'una cevir
+type FormField<T> = {
+  value: T;
+  error: string | null;
+  touched: boolean;
+  dirty: boolean;
+};
+
+// TODO: Model'deki her alan icin FormField olustur
+type FormState<T> = {
+  [K in keyof T]: FormField<T[K]>;
+};
+
+// TODO: Sadece required alanlari cikar
+type RequiredKeys<T> = {
+  [K in keyof T]-?: undefined extends T[K] ? never : K;
+}[keyof T];
+
+// TODO: Validation rule tipi
+type ValidationRules<T> = {
+  [K in keyof T]?: (value: T[K]) => string | null;
+};
+
+// Form helper fonksiyonlari
+function createFormState<T extends Record<string, any>>(
+  initial: T
+): FormState<T> {
+  const state = {} as FormState<T>;
+  for (const key in initial) {
+    (state as any)[key] = {
+      value: initial[key],
+      error: null,
+      touched: false,
+      dirty: false,
+    };
+  }
+  return state;
+}
+
+function validateForm<T extends Record<string, any>>(
+  state: FormState<T>,
+  rules: ValidationRules<T>
+): boolean {
+  // TODO: Her alan icin validation rule'u calistir
+  // Hata varsa field.error'a yaz
+  let isValid = true;
+  return isValid;
+}
+
+// Test
+const formState = createFormState<UserProfile>({
+  name: "",
+  email: "",
+  age: 0,
+  isActive: true,
+  bio: "",
+});
+
+const rules: ValidationRules<UserProfile> = {
+  name: (v) => (v.length < 2 ? "En az 2 karakter" : null),
+  email: (v) => (!v.includes("@") ? "Gecersiz email" : null),
+  age: (v) => (v < 18 ? "18 yasindan buyuk olmalisiniz" : null),
+};
+
+console.log("Form state:", JSON.stringify(formState.name));
+// { value: "", error: null, touched: false, dirty: false }
+
+const isValid = validateForm(formState, rules);
+console.log(`Valid: ${isValid}`);
+console.log(`Name error: ${formState.name.error}`);
+console.log(`Email error: ${formState.email.error}`);
+```
+
+**Beklenen çıktı:**
+```
+Form state: {"value":"","error":null,"touched":false,"dirty":false}
+Valid: false
+Name error: En az 2 karakter
+Email error: Gecersiz email
+```
+
+**İpucu:** Mapped type `{[K in keyof T]: NewType}` ile her key'i dönüştürür. `-?` modifier optional'ı kaldırır.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Conditional Types ile Type-Safe Event System
+
+**Görev:** Conditional types kullanarak event adına göre otomatik tip çıkarımı yapan bir event sistemi yaz.
+
+**Başlangıç kodu:**
+```typescript
+// Event tanimlari
+interface EventMap {
+  "user:login": { userId: number; ip: string };
+  "user:logout": { userId: number };
+  "order:created": { orderId: number; total: number };
+  "order:shipped": { orderId: number; trackingNumber: string };
+  "notification:sent": { to: string; message: string };
+}
+
+// TODO: Event adina gore veri tipini cikar
+type EventData<K extends keyof EventMap> = EventMap[K];
+
+class TypedEventEmitter {
+  private listeners = new Map<string, Function[]>();
+
+  on<K extends keyof EventMap>(
+    event: K,
+    callback: (data: EventData<K>) => void
+  ): void {
+    // TODO: Listener kaydet
+    const list = this.listeners.get(event) || [];
+    list.push(callback);
+    this.listeners.set(event, list);
+  }
+
+  emit<K extends keyof EventMap>(event: K, data: EventData<K>): void {
+    // TODO: Kayitli listener'lari cagir
+    const list = this.listeners.get(event) || [];
+    list.forEach((cb) => cb(data));
+  }
+}
+
+// Test
+const emitter = new TypedEventEmitter();
+
+// TypeScript doğru tipleri biliyor!
+emitter.on("user:login", (data) => {
+  console.log(`Login: userId=${data.userId}, ip=${data.ip}`);
+  // data.orderId -> Derleme hatasi! (user:login'de yok)
+});
+
+emitter.on("order:created", (data) => {
+  console.log(`Order: #${data.orderId}, total=${data.total} TL`);
+});
+
+emitter.emit("user:login", { userId: 42, ip: "192.168.1.1" });
+emitter.emit("order:created", { orderId: 1, total: 15000 });
+
+// Bu derleme hatasi vermeli:
+// emitter.emit("user:login", { orderId: 1 }); // Yanlis tip!
+```
+
+**Beklenen çıktı:**
+```
+Login: userId=42, ip=192.168.1.1
+Order: #1, total=15000 TL
+```
+
+**İpucu:** `K extends keyof EventMap` ile event adını sınırla. TypeScript `EventMap[K]` ile ilişkili veri tipini otomatik çıkarır.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Builder Pattern ile Type-Safe Query Builder
+
+**Görev:** TypeScript generics ile tip-güvenli bir SQL query builder yaz.
+
+**Başlangıç kodu:**
+```typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+  role: "admin" | "user";
+}
+
+class QueryBuilder<T extends Record<string, any>> {
+  private table: string;
+  private conditions: string[] = [];
+  private selectedFields: string[] = [];
+  private orderByField: string = "";
+  private limitCount: number = 0;
+
+  constructor(table: string) {
+    this.table = table;
+  }
+
+  select<K extends keyof T>(...fields: K[]): this {
+    // TODO: Sadece T'nin key'lerini kabul et
+    this.selectedFields = fields as string[];
+    return this;
+  }
+
+  where<K extends keyof T>(field: K, operator: "=" | ">" | "<" | "!=" | "LIKE", value: T[K]): this {
+    // TODO: Tip-guvenli where kosulu ekle
+    const val = typeof value === "string" ? `'${value}'` : value;
+    this.conditions.push(`${String(field)} ${operator} ${val}`);
+    return this;
+  }
+
+  orderBy<K extends keyof T>(field: K, direction: "ASC" | "DESC" = "ASC"): this {
+    this.orderByField = `${String(field)} ${direction}`;
+    return this;
+  }
+
+  limit(count: number): this {
+    this.limitCount = count;
+    return this;
+  }
+
+  build(): string {
+    // TODO: SQL string olustur
+    const fields = this.selectedFields.length > 0
+      ? this.selectedFields.join(", ")
+      : "*";
+    let sql = `SELECT ${fields} FROM ${this.table}`;
+    if (this.conditions.length > 0) {
+      sql += ` WHERE ${this.conditions.join(" AND ")}`;
+    }
+    if (this.orderByField) sql += ` ORDER BY ${this.orderByField}`;
+    if (this.limitCount > 0) sql += ` LIMIT ${this.limitCount}`;
+    return sql;
+  }
+}
+
+// Test
+const query1 = new QueryBuilder<User>("users")
+  .select("name", "email")
+  .where("role", "=", "admin")
+  .where("age", ">", 25)
+  .orderBy("name", "ASC")
+  .limit(10)
+  .build();
+
+console.log(query1);
+
+const query2 = new QueryBuilder<User>("users")
+  .where("email", "LIKE", "%@gmail.com")
+  .build();
+
+console.log(query2);
+
+// Bu derleme hatasi vermeli:
+// new QueryBuilder<User>("users").select("invalid_field");
+// new QueryBuilder<User>("users").where("age", "=", "not-a-number");
+```
+
+**Beklenen çıktı:**
+```
+SELECT name, email FROM users WHERE role = 'admin' AND age > 25 ORDER BY name ASC LIMIT 10
+SELECT * FROM users WHERE email LIKE '%@gmail.com'
+```
+
+**İpucu:** `K extends keyof T` ile sadece geçerli alanları kabul et. `T[K]` ile o alanın tipini zorunlu kıl.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: Template Literal Types ile Route Parser
+
+**Görev:** TypeScript template literal types kullanarak URL route parametrelerini otomatik çıkaran bir parser yaz.
+
+**Başlangıç kodu:**
+```typescript
+// Template literal type ile URL parametrelerini cikar
+type ExtractParams<T extends string> =
+  T extends `${string}:${infer Param}/${infer Rest}`
+    ? Param | ExtractParams<Rest>
+    : T extends `${string}:${infer Param}`
+      ? Param
+      : never;
+
+// Test: Tipler derleme zamaninda kontrol edilir
+type UserRouteParams = ExtractParams<"/users/:userId/posts/:postId">;
+// UserRouteParams = "userId" | "postId"
+
+type Params<T extends string> = Record<ExtractParams<T>, string>;
+
+class Router {
+  private routes: Map<string, Function> = new Map();
+
+  add<T extends string>(
+    pattern: T,
+    handler: (params: Params<T>) => void
+  ): void {
+    this.routes.set(pattern, handler);
+  }
+
+  match(url: string): void {
+    // TODO:
+    // 1. Kayitli route pattern'leri ile URL'i eslestir
+    // 2. :param kisimlrini URL'den cikar
+    // 3. Handler'i parametrelerle cagir
+    for (const [pattern, handler] of this.routes) {
+      const params = this.extractParams(pattern, url);
+      if (params) {
+        handler(params);
+        return;
+      }
+    }
+    console.log(`404: ${url}`);
+  }
+
+  private extractParams(pattern: string, url: string): Record<string, string> | null {
+    // TODO: Pattern'deki :param'lari URL'deki degerlerle esle
+    const patternParts = pattern.split("/");
+    const urlParts = url.split("/");
+    if (patternParts.length !== urlParts.length) return null;
+
+    const params: Record<string, string> = {};
+    for (let i = 0; i < patternParts.length; i++) {
+      if (patternParts[i].startsWith(":")) {
+        params[patternParts[i].slice(1)] = urlParts[i];
+      } else if (patternParts[i] !== urlParts[i]) {
+        return null;
+      }
+    }
+    return params;
+  }
+}
+
+// Test
+const router = new Router();
+
+router.add("/users/:userId", (params) => {
+  console.log(`User: ${params.userId}`);
+  // params.postId -> Derleme hatasi! (bu route'ta yok)
+});
+
+router.add("/users/:userId/posts/:postId", (params) => {
+  console.log(`User ${params.userId}, Post ${params.postId}`);
+});
+
+router.match("/users/42");
+router.match("/users/42/posts/7");
+router.match("/unknown/path");
+```
+
+**Beklenen çıktı:**
+```
+User: 42
+User 42, Post 7
+404: /unknown/path
+```
+
+**İpucu:** `infer` keyword'ü ile template literal'dan parça çıkart. Recursive conditional type ile birden fazla parametre yakala.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 10: Zod Benzeri Schema Validator
+
+**Görev:** TypeScript'in tip sistemini kullanarak basit bir runtime schema validator yaz. Tip çıkarımı otomatik olsun.
+
+**Başlangıç kodu:**
+```typescript
+// Schema builder
+const z = {
+  string() {
+    return {
+      _type: "string" as const,
+      parse(value: unknown): string {
+        if (typeof value !== "string") throw new Error(`Expected string, got ${typeof value}`);
+        return value;
+      },
+    };
+  },
+
+  number() {
+    return {
+      _type: "number" as const,
+      parse(value: unknown): number {
+        if (typeof value !== "number") throw new Error(`Expected number, got ${typeof value}`);
+        return value;
+      },
+    };
+  },
+
+  boolean() {
+    return {
+      _type: "boolean" as const,
+      parse(value: unknown): boolean {
+        if (typeof value !== "boolean") throw new Error(`Expected boolean, got ${typeof value}`);
+        return value;
+      },
+    };
+  },
+
+  // TODO: object() fonksiyonunu yaz
+  // Schema'daki her alani dogrula ve tip-guvenli obje dondur
+  object<T extends Record<string, { parse: (v: unknown) => any }>>(shape: T) {
+    return {
+      _type: "object" as const,
+      parse(value: unknown): { [K in keyof T]: ReturnType<T[K]["parse"]> } {
+        if (typeof value !== "object" || value === null) {
+          throw new Error("Expected object");
+        }
+        const result: any = {};
+        for (const key in shape) {
+          result[key] = shape[key].parse((value as any)[key]);
+        }
+        return result;
+      },
+    };
+  },
+};
+
+// Kullanim
+const UserSchema = z.object({
+  name: z.string(),
+  age: z.number(),
+  isActive: z.boolean(),
+});
+
+// TypeScript tipi otomatik cikarilir!
+type User = ReturnType<typeof UserSchema.parse>;
+// User = { name: string; age: number; isActive: boolean }
+
+// Test: Gecerli veri
+try {
+  const user = UserSchema.parse({ name: "Ahmet", age: 25, isActive: true });
+  console.log(`Valid user: ${user.name}, ${user.age}`);
+} catch (e) {
+  console.log(`Error: ${(e as Error).message}`);
+}
+
+// Test: Gecersiz veri
+try {
+  const user = UserSchema.parse({ name: 123, age: "yirmibes", isActive: "true" });
+} catch (e) {
+  console.log(`Error: ${(e as Error).message}`);
+}
+
+// Test: Eksik veri
+try {
+  const user = UserSchema.parse({ name: "Ahmet" });
+} catch (e) {
+  console.log(`Error: ${(e as Error).message}`);
+}
+```
+
+**Beklenen çıktı:**
+```
+Valid user: Ahmet, 25
+Error: Expected number, got string
+Error: Expected number, got undefined
+```
+
+**İpucu:** `ReturnType<T["parse"]>` ile her schema alanının parse dönüş tipini çıkar. `{ [K in keyof T]: ... }` mapped type ile obje tipini oluştur.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Recursive Types ile JSON Schema Validator
+
+**Görev:** Recursive TypeScript tipleri kullanarak JSON benzeri veri yapılarını tip-güvenli şekilde tanımla.
+
+**Başlangıç kodu:**
+```typescript
+// Recursive JSON tipi
+type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+type JsonObject = { [key: string]: JsonValue };
+type JsonArray = JsonValue[];
+
+// Deep readonly
+type DeepReadonly<T> = {
+  readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K];
+};
+
+// Deep partial
+type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
+};
+
+// TODO: JSON path ile derin erisim tipi
+type PathValue<T, P extends string> =
+  P extends `${infer Key}.${infer Rest}`
+    ? Key extends keyof T
+      ? PathValue<T[Key], Rest>
+      : never
+    : P extends keyof T
+      ? T[P]
+      : never;
+
+// Test
+interface Config {
+  server: {
+    host: string;
+    port: number;
+    ssl: {
+      enabled: boolean;
+      cert: string;
+    };
+  };
+  database: {
+    url: string;
+    pool: { min: number; max: number };
+  };
+}
+
+// TypeScript tip cikarimi
+type ServerHost = PathValue<Config, "server.host">; // string
+type SSLEnabled = PathValue<Config, "server.ssl.enabled">; // boolean
+type PoolMax = PathValue<Config, "database.pool.max">; // number
+
+function getConfig<T extends Config, P extends string>(config: T, path: P): PathValue<T, P> {
+  return path.split(".").reduce((obj: any, key) => obj[key], config) as PathValue<T, P>;
+}
+
+const config: Config = {
+  server: { host: "localhost", port: 8080, ssl: { enabled: true, cert: "/path" } },
+  database: { url: "postgres://...", pool: { min: 2, max: 10 } },
+};
+
+console.log(getConfig(config, "server.host"));        // "localhost"
+console.log(getConfig(config, "server.ssl.enabled"));  // true
+console.log(getConfig(config, "database.pool.max"));   // 10
+```
+
+**Beklenen çıktı:**
+```
+localhost
+true
+10
+```
+
+**İpucu:** Template literal type ile `"a.b.c"` string'ini recursive olarak parse et. `infer` ile her seviye ayrıştırılır.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 12: Type-Safe Middleware Chain
+
+**Görev:** Express.js benzeri tip-güvenli bir middleware zinciri sistemi yaz.
+
+**Başlangıç kodu:**
+```typescript
+interface Context {
+  path: string;
+  method: string;
+  body?: unknown;
+  user?: { id: number; role: string };
+  response?: { status: number; data: unknown };
+}
+
+type Middleware = (ctx: Context, next: () => Promise<void>) => Promise<void>;
+
+class App {
+  private middlewares: Middleware[] = [];
+
+  use(middleware: Middleware): this {
+    this.middlewares.push(middleware);
+    return this;
+  }
+
+  async handle(ctx: Context): Promise<Context> {
+    let index = 0;
+    const next = async (): Promise<void> => {
+      if (index < this.middlewares.length) {
+        const middleware = this.middlewares[index++];
+        await middleware(ctx, next);
+      }
+    };
+    await next();
+    return ctx;
+  }
+}
+
+// Middleware'ler
+const logger: Middleware = async (ctx, next) => {
+  const start = Date.now();
+  await next();
+  console.log(`  ${ctx.method} ${ctx.path} -> ${ctx.response?.status} (${Date.now() - start}ms)`);
+};
+
+const auth: Middleware = async (ctx, next) => {
+  ctx.user = { id: 1, role: "admin" };
+  await next();
+};
+
+const handler: Middleware = async (ctx, next) => {
+  ctx.response = { status: 200, data: { message: "OK", user: ctx.user } };
+};
+
+// Test
+const app = new App();
+app.use(logger).use(auth).use(handler);
+
+(async () => {
+  const result = await app.handle({ path: "/api/users", method: "GET" });
+  console.log("Response:", JSON.stringify(result.response));
+})();
+```
+
+**Beklenen çıktı:**
+```
+  GET /api/users -> 200 (1ms)
+Response: {"status":200,"data":{"message":"OK","user":{"id":1,"role":"admin"}}}
+```
+
+**İpucu:** Middleware pattern: her middleware `next()` çağırarak zincirdeki sonraki middleware'e geçer. `next()` çağırmadan önce ve sonra işlem yapılabilir.
+
+**Zorluk:** Orta
+:::
+
 :::must-note
 - TypeScript = JavaScript + statik tip sistemi. Her geçerli JS, geçerli TS'dir
 - `strict: true` ile başla, asla kapatma. Bu ayar TypeScript'in gucunu verir

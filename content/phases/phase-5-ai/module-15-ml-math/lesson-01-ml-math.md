@@ -1193,6 +1193,345 @@ for text in test_texts:
 
 **Beklenen Sonuc:** Spam mesajlari "spam", normal mesajlari "ham" olarak siniflandirilmali. Laplace smoothing ile bilinmeyen kelimeler sifir olasilik vermemeli. Log-space'te hesaplama underflow'u onlemeli.
 **Ipucu:** Olasiliklarla carpma yerine log'lari topluyoruz (underflow onleme). Laplace smoothing: her kelimeye +1 ekliyoruz ki hic gorulmemis kelimeler sifir olasilik vermesin.
+
+---
+
+### Alistirma 4: Eigenvalue ve PCA Implementasyonu (Kolay)
+
+Principal Component Analysis'i sifirdan implement ederek boyut indirgeme yap.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Sentetik veri olustur (2D)
+np.random.seed(42)
+mean = [3, 5]
+cov = [[2, 1.5], [1.5, 3]]
+X = np.random.multivariate_normal(mean, cov, 200)
+
+# PCA sifirdan
+def pca_from_scratch(X, n_components):
+    # 1. Veriyi merkezle (ortalamayi cikar)
+    X_centered = X - np.mean(X, axis=0)
+
+    # 2. Covariance matrix hesapla
+    cov_matrix = np.cov(X_centered.T)
+
+    # 3. Eigenvalue ve eigenvector hesapla
+    eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
+
+    # 4. En buyuk eigenvalue'lara gore sirala
+    idx = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[idx]
+    eigenvectors = eigenvectors[:, idx]
+
+    # TODO: Explained variance ratio hesapla
+    # TODO: n_components kadar eigenvector sec ve project et
+    return X_centered @ eigenvectors[:, :n_components], eigenvalues
+
+X_pca, eigenvalues = pca_from_scratch(X, 1)
+print(f"Explained variance: {eigenvalues[0]/sum(eigenvalues)*100:.1f}%")
+
+# TODO: 2D veriyi ve principal component'leri ciz
+# TODO: sklearn PCA ile sonuclari karsilastir
+```
+
+**Beklenen Sonuc:** Ilk principal component varyans'in %70+'ini aciklamali. Sklearn PCA ile ayni sonuclar elde edilmeli.
+**Ipucu:** PCA'da eigenvalue ne kadar buyukse, o yon o kadar fazla bilgi tasir. Dimensionality reduction icin kucuk eigenvalue'lu yonleri atiyoruz.
+
+---
+
+### Alistirma 5: Loss Function Karsilastirmasi (Kolay)
+
+Farkli loss function'lari implement et ve davranislarini gorsellestir.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+def mse_loss(y_true, y_pred):
+    return np.mean((y_true - y_pred) ** 2)
+
+def mae_loss(y_true, y_pred):
+    return np.mean(np.abs(y_true - y_pred))
+
+def huber_loss(y_true, y_pred, delta=1.0):
+    error = y_true - y_pred
+    is_small = np.abs(error) <= delta
+    squared = 0.5 * error ** 2
+    linear = delta * (np.abs(error) - 0.5 * delta)
+    return np.mean(np.where(is_small, squared, linear))
+
+def cross_entropy_loss(y_true, y_pred):
+    y_pred = np.clip(y_pred, 1e-15, 1 - 1e-15)
+    return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+
+# TODO: Her loss function'in gradient'ini hesapla
+# TODO: Outlier'lara karsi dayanikliligini karsilastir
+# TODO: MSE vs MAE vs Huber'i ayni grafikte ciz
+# TODO: Cross-entropy'nin 0 ve 1'deki davranisini incele
+```
+
+**Beklenen Sonuc:** MSE outlier'lara duyarli, MAE robust, Huber ikisinin ortasi olmali. Cross-entropy yanlis tahminlerde cok yuksek ceza vermeli.
+**Ipucu:** MSE gradient'i 2*(y_pred - y_true), buyuk hatalarda buyuk adimlar atar. MAE gradient'i sabit, kucuk hatalarda yeterli olmayabilir.
+
+---
+
+### Alistirma 6: Activation Function'lari ve Turevleri (Orta)
+
+Neural network activation function'larini ve turevlerini implement et.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+class ActivationFunctions:
+    @staticmethod
+    def sigmoid(x):
+        return 1 / (1 + np.exp(-np.clip(x, -500, 500)))
+
+    @staticmethod
+    def sigmoid_derivative(x):
+        s = ActivationFunctions.sigmoid(x)
+        return s * (1 - s)
+
+    @staticmethod
+    def relu(x):
+        return np.maximum(0, x)
+
+    @staticmethod
+    def relu_derivative(x):
+        return (x > 0).astype(float)
+
+    @staticmethod
+    def tanh(x):
+        return np.tanh(x)
+
+    @staticmethod
+    def tanh_derivative(x):
+        return 1 - np.tanh(x) ** 2
+
+    # TODO: Leaky ReLU implement et (alpha=0.01)
+    # TODO: ELU implement et
+    # TODO: GELU implement et (Transformer'larda kullanilir)
+    # TODO: Softmax implement et (multi-class icin)
+    # TODO: Her fonksiyonu ve turevini ayni grafikte ciz
+
+x = np.linspace(-5, 5, 200)
+af = ActivationFunctions()
+# Gorsellesitirme kodu...
+```
+
+**Beklenen Sonuc:** Her activation function ve turevi dogru hesaplanmali. ReLU'nun vanishing gradient problemini cozdugu, sigmoid'in saturasyon bolgesinde gradient'in sifira yaklastigi gorunmeli.
+**Ipucu:** GELU = x * Phi(x), Transformer'larda ReLU yerine kullanilir. Softmax ciktilari toplamda 1 yapar (olasilik dagilimi).
+
+---
+
+### Alistirma 7: Regularization Teknikleri Karsilastirmasi (Orta)
+
+L1, L2 ve Dropout regularization'i implement et ve overfitting'e etkisini gozlemle.
+
+```python
+import numpy as np
+
+class LinearRegressionWithRegularization:
+    def __init__(self, lr=0.01, reg_type=None, reg_lambda=0.1):
+        self.lr = lr
+        self.reg_type = reg_type
+        self.reg_lambda = reg_lambda
+
+    def fit(self, X, y, epochs=1000):
+        n, d = X.shape
+        self.W = np.random.randn(d) * 0.01
+        self.b = 0
+        self.losses = []
+
+        for epoch in range(epochs):
+            y_pred = X @ self.W + self.b
+            loss = np.mean((y - y_pred) ** 2)
+
+            # Regularization penalty
+            if self.reg_type == "L2":
+                loss += self.reg_lambda * np.sum(self.W ** 2)
+                reg_grad = 2 * self.reg_lambda * self.W
+            elif self.reg_type == "L1":
+                loss += self.reg_lambda * np.sum(np.abs(self.W))
+                reg_grad = self.reg_lambda * np.sign(self.W)
+            else:
+                reg_grad = 0
+
+            self.losses.append(loss)
+            grad_W = -(2/n) * X.T @ (y - y_pred) + reg_grad
+            grad_b = -(2/n) * np.sum(y - y_pred)
+            self.W -= self.lr * grad_W
+            self.b -= self.lr * grad_b
+
+        return self
+
+# TODO: Overfitting veri seti olustur (az veri, cok feature)
+# TODO: Regularization'siz, L1, L2 ile egit ve karsilastir
+# TODO: L1'in sparse weight'ler olusturdugunuu dogrula (feature selection)
+# TODO: Dropout simulasyonu yap (training sirasinda rastgele weight'leri sifirla)
+```
+
+**Beklenen Sonuc:** Regularization'siz model overfit etmeli. L1 bazi weight'leri sifira cekmeli (feature selection). L2 tum weight'leri kucultmeli.
+**Ipucu:** L1 regularization feature selection yapar (sparse model). L2 regularization weight decay yapar (kucuk weight'ler).
+
+---
+
+### Alistirma 8: Cross-Validation Implementasyonu (Orta)
+
+K-Fold Cross Validation'i sifirdan implement et.
+
+```python
+import numpy as np
+
+def k_fold_cross_validation(X, y, model_class, k=5, **model_params):
+    n = len(X)
+    indices = np.random.permutation(n)
+    fold_size = n // k
+    scores = []
+
+    for i in range(k):
+        # Validation indeksleri
+        val_start = i * fold_size
+        val_end = val_start + fold_size
+        val_idx = indices[val_start:val_end]
+        train_idx = np.concatenate([indices[:val_start], indices[val_end:]])
+
+        X_train, X_val = X[train_idx], X[val_idx]
+        y_train, y_val = y[train_idx], y[val_idx]
+
+        # Model egit ve degerlendir
+        model = model_class(**model_params)
+        model.fit(X_train, y_train)
+        score = model.score(X_val, y_val)
+        scores.append(score)
+        print(f"Fold {i+1}: {score:.4f}")
+
+    print(f"\nOrtalama: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
+    return scores
+
+# TODO: Stratified K-Fold implement et (sinif dagilimini koru)
+# TODO: Leave-One-Out CV implement et
+# TODO: Farkli k degerleri ile (3, 5, 10) sonuclari karsilastir
+# TODO: sklearn KFold ile dogrula
+```
+
+**Beklenen Sonuc:** Her fold'da farkli skor elde edilmeli. Ortalama ve standart sapma raporlanmali. Stratified versiyonda her fold'da sinif dagilimlari esit olmali.
+**Ipucu:** k=5 veya k=10 standart secimlerdir. Kucuk veri setlerinde Leave-One-Out, buyuk veri setlerinde k=5 tercih edilir.
+
+---
+
+### Alistirma 9: Confusion Matrix ve Metrikler (Zor)
+
+Binary classification metrikleri sifirdan implement et.
+
+```python
+import numpy as np
+
+class ClassificationMetrics:
+    def __init__(self, y_true, y_pred):
+        self.y_true = np.array(y_true)
+        self.y_pred = np.array(y_pred)
+        self.tp = np.sum((y_true == 1) & (y_pred == 1))
+        self.tn = np.sum((y_true == 0) & (y_pred == 0))
+        self.fp = np.sum((y_true == 0) & (y_pred == 1))
+        self.fn = np.sum((y_true == 1) & (y_pred == 0))
+
+    def accuracy(self):
+        return (self.tp + self.tn) / len(self.y_true)
+
+    def precision(self):
+        return self.tp / (self.tp + self.fp) if (self.tp + self.fp) > 0 else 0
+
+    def recall(self):
+        return self.tp / (self.tp + self.fn) if (self.tp + self.fn) > 0 else 0
+
+    def f1_score(self):
+        p, r = self.precision(), self.recall()
+        return 2 * p * r / (p + r) if (p + r) > 0 else 0
+
+    # TODO: Specificity hesapla (TN / (TN + FP))
+    # TODO: ROC curve icin farkli threshold'larda TPR ve FPR hesapla
+    # TODO: AUC (Area Under Curve) hesapla (trapezoidal rule ile)
+    # TODO: Confusion matrix'i gorsel olarak ciz (heatmap)
+
+# Test
+y_true = [1, 0, 1, 1, 0, 1, 0, 0, 1, 0]
+y_pred = [1, 0, 1, 0, 0, 1, 1, 0, 1, 0]
+m = ClassificationMetrics(y_true, y_pred)
+print(f"Accuracy: {m.accuracy():.4f}")
+print(f"Precision: {m.precision():.4f}")
+print(f"Recall: {m.recall():.4f}")
+print(f"F1: {m.f1_score():.4f}")
+```
+
+**Beklenen Sonuc:** Precision, recall, F1 score dogru hesaplanmali. ROC curve cizilebilmeli. AUC degeri sklearn ile uyumlu olmali.
+**Ipucu:** Imbalanced data'da accuracy yaniltici olur. Precision (yanlislikla pozitif deme) vs Recall (pozitifi kacirma) trade-off'unu anla.
+
+---
+
+### Alistirma 10: Optimization Algoritmalari Karsilastirmasi (Zor)
+
+SGD, Momentum, Adam optimizer'larini sifirdan implement et ve karsilastir.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Rosenbrock fonksiyonu (zor optimizasyon problemi)
+def rosenbrock(x, y):
+    return (1 - x)**2 + 100 * (y - x**2)**2
+
+def rosenbrock_grad(x, y):
+    dx = -2*(1 - x) - 400*x*(y - x**2)
+    dy = 200*(y - x**2)
+    return np.array([dx, dy])
+
+class SGD:
+    def __init__(self, lr=0.001):
+        self.lr = lr
+
+    def step(self, params, grads):
+        return params - self.lr * grads
+
+class Momentum:
+    def __init__(self, lr=0.001, beta=0.9):
+        self.lr, self.beta = lr, beta
+        self.v = None
+
+    def step(self, params, grads):
+        if self.v is None:
+            self.v = np.zeros_like(params)
+        self.v = self.beta * self.v + (1 - self.beta) * grads
+        return params - self.lr * self.v
+
+class Adam:
+    def __init__(self, lr=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
+        self.lr, self.beta1, self.beta2, self.eps = lr, beta1, beta2, eps
+        self.m, self.v, self.t = None, None, 0
+
+    def step(self, params, grads):
+        if self.m is None:
+            self.m = np.zeros_like(params)
+            self.v = np.zeros_like(params)
+        self.t += 1
+        self.m = self.beta1 * self.m + (1 - self.beta1) * grads
+        self.v = self.beta2 * self.v + (1 - self.beta2) * grads**2
+        m_hat = self.m / (1 - self.beta1**self.t)
+        v_hat = self.v / (1 - self.beta2**self.t)
+        return params - self.lr * m_hat / (np.sqrt(v_hat) + self.eps)
+
+# TODO: 3 optimizer'i ayni baslangic noktasindan calistir
+# TODO: Her birinin izledigi yolu 2D contour plot uzerinde ciz
+# TODO: Convergence hizlarini karsilastir (loss vs epoch)
+# TODO: Learning rate scheduler ekle (decay)
+```
+
+**Beklenen Sonuc:** Adam en hizli converge etmeli. SGD en yavas, Momentum ortada olmali. Contour plot uzerinde izlenen yollar farkli olmali.
+**Ipucu:** Adam = Momentum + RMSprop. Bias correction (m_hat, v_hat) ilk adimilardaki sapmayı duzeltir. AdamW = Adam + weight decay (modern standart).
 :::
 
 :::external-resource

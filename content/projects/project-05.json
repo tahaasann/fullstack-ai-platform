@@ -3688,5 +3688,21 @@
     ],
     "live_demo_url_template": "https://analytics-dashboard.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/analytics-anomaly-detection"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "Full-stack uygulama gelistirme deneyimi",
+      "Veritabani sorgulama ve veri modelleme",
+      "Temel istatistik ve veri analizi kavramlari",
+      "Chart/grafik kutuphanesi kullanimi"
+    ],
+    "what_you_should_know": [
+      "Phase 3 Module 11 - SQL ileri sorgular ve aggregation",
+      "Phase 4 Module 13 - Docker ve deployment",
+      "Phase 5 Module 15 - ML matematik temelleri",
+      "Phase 5 Module 15 - Python ML kutuphaneleri (NumPy, Pandas)"
+    ],
+    "next_project": "project-06",
+    "skills_bridge": "Bu projede ogrendigin veri gorsellestirme, anomaly detection ve dashboard tasarimi bilgisi, sonraki projede AI content platform icin LLM API entegrasyonu ve veri pipeline olusturma becerilerini destekleyecek."
   }
 }

@@ -1595,6 +1595,298 @@ Kural basit: Eger endpoint içinde `await` kullaniyorsan `async def`, kullanmiyo
 FastAPI'nin gizli gucu: OpenAPI spec'i programatik olarak kullanabilirsin. `app.openapi()` ile tam API spec'ini alip, frontend SDK otomatik uretebilir, API test'leri generate edebilir veya baska servislere API kontrati olarak sunabilirsin. Bu, büyük takimlarda frontend-backend paralel geliştirme yapmayi mumkun kilar. Öncelikle schema'lari tasarla, OpenAPI spec'i paylaş, sonra implementasyona başla.
 :::
 
+:::exercise
+### Alistirma 6: Pydantic Model Validasyonu
+**Görev:** Pydantic v2 ile karmaşık veri doğrulama modelleri yaz: nested model, custom validator, computed field.
+**Başlangıç kodu:**
+```python
+from pydantic import BaseModel, field_validator, model_validator, computed_field
+from datetime import datetime
+
+# TODO: Address modeli (nested)
+# TODO: UserCreate modeli
+#   - username: 3-20 karakter
+#   - email: geçerli email
+#   - password: min 8, büyük harf + rakam kontrolü
+#   - birth_date: 18 yaşından büyük olmalı
+#   - address: Address modeli (opsiyonel)
+# TODO: computed_field ile yaş hesapla
+# TODO: model_validator ile password != username kontrolü
+```
+**Beklenen çıktı:**
+```python
+class Address(BaseModel):
+    street: str
+    city: str
+    country: str = "Türkiye"
+
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
+    birth_date: datetime
+    address: Address | None = None
+
+    @field_validator("username")
+    @classmethod
+    def validate_username(cls, v: str) -> str:
+        if len(v) < 3 or len(v) > 20:
+            raise ValueError("Kullanıcı adı 3-20 karakter olmalı")
+        return v.lower()
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("Şifre en az 8 karakter")
+        if not any(c.isupper() for c in v):
+            raise ValueError("En az 1 büyük harf gerekli")
+        if not any(c.isdigit() for c in v):
+            raise ValueError("En az 1 rakam gerekli")
+        return v
+
+    @computed_field
+    @property
+    def age(self) -> int:
+        return (datetime.now() - self.birth_date).days // 365
+
+    @model_validator(mode="after")
+    def check_password_not_username(self):
+        if self.password.lower() == self.username.lower():
+            raise ValueError("Şifre kullanıcı adıyla aynı olamaz")
+        return self
+```
+**İpucu:** Pydantic v2'de `@validator` yerine `@field_validator`, `@root_validator` yerine `@model_validator` kullan. `@classmethod` decorator'ü gerekli.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alistirma 7: Dependency Injection ile Auth
+**Görev:** FastAPI Depends sistemi ile JWT authentication ve role-based authorization yaz.
+**Başlangıç kodu:**
+```python
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
+# TODO: get_current_user dependency
+# TODO: get_current_active_user dependency (zincirleme)
+# TODO: require_role dependency factory (admin, moderator, user)
+# TODO: Endpoint'lerde kullanım
+```
+**Beklenen çıktı:**
+```python
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user_id = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Geçersiz token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token doğrulanamadı")
+    user = await get_user_by_id(user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Kullanıcı bulunamadı")
+    return user
+
+async def get_current_active_user(user: User = Depends(get_current_user)) -> User:
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Hesap devre dışı")
+    return user
+
+def require_role(*roles: str):
+    async def role_checker(user: User = Depends(get_current_active_user)):
+        if user.role not in roles:
+            raise HTTPException(status_code=403, detail="Yetkiniz yok")
+        return user
+    return role_checker
+
+# Kullanım:
+@app.get("/admin/users")
+async def list_users(user: User = Depends(require_role("admin"))):
+    return await get_all_users()
+
+@app.get("/profile")
+async def get_profile(user: User = Depends(get_current_active_user)):
+    return user
+```
+**İpucu:** Dependency'ler zincirleme çalışır: `require_role` -> `get_current_active_user` -> `get_current_user`. `require_role` bir factory fonksiyondur - parametre alıp dependency döndürür.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alistirma 8: SQLAlchemy 2.0 ile CRUD
+**Görev:** SQLAlchemy 2.0 (Mapped style) ile async CRUD repository yaz.
+**Başlangıç kodu:**
+```python
+from sqlalchemy import String, ForeignKey, select
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.ext.asyncio import AsyncSession
+
+# TODO: User ve Post modelleri (SQLAlchemy 2.0 style)
+# TODO: UserRepository class'ı (async CRUD)
+# TODO: Dependency injection ile endpoint'lerde kullan
+```
+**Beklenen çıktı:**
+```python
+class User(Base):
+    __tablename__ = "users"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(50), unique=True)
+    email: Mapped[str] = mapped_column(String(100), unique=True)
+    posts: Mapped[list["Post"]] = relationship(back_populates="author")
+
+class Post(Base):
+    __tablename__ = "posts"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(200))
+    content: Mapped[str]
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    author: Mapped["User"] = relationship(back_populates="posts")
+
+class UserRepository:
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def get_by_id(self, user_id: int) -> User | None:
+        return await self.session.get(User, user_id)
+
+    async def get_all(self, skip: int = 0, limit: int = 100) -> list[User]:
+        result = await self.session.execute(
+            select(User).offset(skip).limit(limit)
+        )
+        return list(result.scalars().all())
+
+    async def create(self, data: UserCreate) -> User:
+        user = User(**data.model_dump())
+        self.session.add(user)
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user
+
+    async def delete(self, user_id: int) -> bool:
+        user = await self.get_by_id(user_id)
+        if not user:
+            return False
+        await self.session.delete(user)
+        await self.session.commit()
+        return True
+```
+**İpucu:** SQLAlchemy 2.0'da `Mapped[str]` ve `mapped_column()` kullanılır, eski `Column()` syntax'i deprecated. `select()` ile sorgu oluştur, `session.execute()` ile çalıştır.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alistirma 9: FastAPI Testing
+**Görev:** pytest ile FastAPI endpoint'lerini test et: unit test, integration test, dependency override.
+**Başlangıç kodu:**
+```python
+import pytest
+from httpx import AsyncClient, ASGITransport
+from main import app
+
+# TODO: Test fixture'ları (client, test DB)
+# TODO: GET /users endpoint testi
+# TODO: POST /users endpoint testi (validation dahil)
+# TODO: Dependency override ile mock DB
+```
+**Beklenen çıktı:**
+```python
+@pytest.fixture
+async def client():
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test"
+    ) as ac:
+        yield ac
+
+@pytest.fixture
+def override_db():
+    async def mock_get_db():
+        # Test veritabanı session'ı
+        async with test_engine.begin() as conn:
+            yield conn
+    app.dependency_overrides[get_db] = mock_get_db
+    yield
+    app.dependency_overrides.clear()
+
+@pytest.mark.anyio
+async def test_get_users(client: AsyncClient, override_db):
+    response = await client.get("/api/users")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+@pytest.mark.anyio
+async def test_create_user_success(client: AsyncClient, override_db):
+    response = await client.post("/api/users", json={
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "Test1234!"
+    })
+    assert response.status_code == 201
+    assert response.json()["username"] == "testuser"
+
+@pytest.mark.anyio
+async def test_create_user_validation_error(client: AsyncClient):
+    response = await client.post("/api/users", json={
+        "username": "ab",  # çok kısa
+        "email": "invalid",
+        "password": "123"
+    })
+    assert response.status_code == 422
+```
+**İpucu:** `app.dependency_overrides` ile production dependency'lerini test mock'ları ile değiştir. `httpx.AsyncClient` ile async test yaz. Test sonrası `clear()` ile override'ları temizle.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alistirma 10: Background Tasks ve Lifespan
+**Görev:** FastAPI'de background task ile email gönderimi ve lifespan ile kaynak yönetimi yaz.
+**Başlangıç kodu:**
+```python
+from fastapi import BackgroundTasks
+from contextlib import asynccontextmanager
+
+# TODO: Lifespan - uygulama başlangıç ve kapanışında kaynak yönetimi
+# TODO: Background task ile async email gönderimi
+# TODO: Endpoint'te background task kullanımı
+```
+**Beklenen çıktı:**
+```python
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    print("Uygulama başlıyor...")
+    app.state.db_pool = await create_pool(config.db_url)
+    app.state.redis = await aioredis.from_url(config.redis_url)
+    yield
+    # Shutdown
+    print("Uygulama kapanıyor...")
+    await app.state.db_pool.close()
+    await app.state.redis.close()
+
+app = FastAPI(lifespan=lifespan)
+
+async def send_welcome_email(email: str, username: str):
+    # Simüle: gerçekte SMTP veya SendGrid kullanılır
+    await asyncio.sleep(2)  # Email gönderme simülasyonu
+    print(f"Hoş geldin emaili gönderildi: {email}")
+
+@app.post("/api/register", status_code=201)
+async def register(
+    user_data: UserCreate,
+    background_tasks: BackgroundTasks
+):
+    user = await create_user(user_data)
+    # Email gönderimini arka plana at (kullanıcı beklemez)
+    background_tasks.add_task(send_welcome_email, user.email, user.username)
+    return {"message": "Kayıt başarılı", "user_id": user.id}
+```
+**İpucu:** `lifespan` context manager ile eski `@app.on_event("startup/shutdown")` yerine kullanılır. `BackgroundTasks` hafif işler için uygundur, ağır işler için Celery tercih edilir.
+**Zorluk:** Orta
+:::
+
 :::must-note
 FastAPI projelerinde MUTLAKA bilmen gerekenler:
 1. **Pydantic v2 syntax'i:** `from_attributes`, `field_validator`, `model_config` - eski v1 syntax'i artik deprecated

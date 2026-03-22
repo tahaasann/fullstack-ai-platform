@@ -706,6 +706,710 @@ HTML yazilarken AI'a Lighthouse accessibility raporu ciktisini yapistir ve sor: 
 - **Senior cevabi:** `<div>` saf container'dir, anlamsal degeri yoktur, sadece gruplama ve styling icindir. `<section>` tematik bir icerigi gruplar ve bir heading (h2-h6) icermelidir. `<article>` ise bagimsiz, kendi basina anlam ifade eden icerik icindir (blog post, yorum, urun karti). Genel kural: icerik RSS feed'de tek basina anlam ifade ediyorsa article, sayfanin bir bolumu ise section, sadece stil icinse div kullanin. Gereksiz section kullanimi accessibility sorunlarina yol acar.
 :::
 
+:::exercise
+### Alıştırma 4: Erişilebilir Form Oluşturma
+
+**Görev:** Tamamen erişilebilir bir kayıt formu oluştur. ARIA attributeleri, doğru label eşleştirmesi ve klavye navigasyonu destekle.
+
+**Başlangıç kodu:**
+```html
+<!-- GOREV: Bu formu erisilebilir hale getir -->
+<form>
+  <div>
+    <span>Ad Soyad</span>
+    <input type="text">
+  </div>
+
+  <div>
+    <span>Email</span>
+    <input type="text">
+  </div>
+
+  <div>
+    <span>Sifre</span>
+    <input type="text">
+  </div>
+
+  <div>
+    <span>Cinsiyet</span>
+    <input type="radio" name="gender"> Erkek
+    <input type="radio" name="gender"> Kadin
+    <input type="radio" name="gender"> Belirtmek istemiyorum
+  </div>
+
+  <div>
+    <span>Sehir</span>
+    <select>
+      <option>Istanbul</option>
+      <option>Ankara</option>
+      <option>Izmir</option>
+    </select>
+  </div>
+
+  <div>
+    <input type="checkbox"> Kosullari kabul ediyorum
+  </div>
+
+  <div>
+    <button>Kayit Ol</button>
+  </div>
+</form>
+```
+
+**Beklenen çıktı:**
+```html
+<form novalidate aria-labelledby="form-title">
+  <h2 id="form-title">Kayit Formu</h2>
+
+  <div>
+    <label for="fullname">Ad Soyad <span aria-hidden="true">*</span></label>
+    <input type="text" id="fullname" name="fullname" required
+           aria-required="true" autocomplete="name">
+  </div>
+
+  <div>
+    <label for="email">Email <span aria-hidden="true">*</span></label>
+    <input type="email" id="email" name="email" required
+           aria-required="true" aria-describedby="email-hint" autocomplete="email">
+    <small id="email-hint">ornek: ahmet@email.com</small>
+  </div>
+
+  <!-- ... devami -->
+</form>
+```
+
+**İpucu:** Her `<input>` bir `<label for="id">` ile eşleşmeli. `aria-required`, `aria-describedby` ile ekran okuyucu desteği sağla. `type="email"` mobilde doğru klavyeyi açar.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: SEO-Optimize Edilmiş Blog Sayfası
+
+**Görev:** SEO için optimize edilmiş bir blog yazısı sayfası oluştur. Doğru heading hiyerarşisi, meta taglar ve yapısal veri kullan.
+
+**Başlangıç kodu:**
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- TODO: SEO meta taglari ekle -->
+  <!-- title, description, og:title, og:description, og:image, twitter:card -->
+
+  <title><!-- TODO --></title>
+</head>
+<body>
+  <!-- TODO: Semantik HTML ile blog sayfasi olustur -->
+  <!-- header > nav -->
+  <!-- main > article > (header, sections, footer) -->
+  <!-- aside (ilgili yazilar) -->
+  <!-- footer -->
+
+  <!-- TODO: Schema.org yapısal veri ekle (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "React Hooks Rehberi",
+    "author": {
+      "@type": "Person",
+      "name": "Ahmet Yilmaz"
+    },
+    "datePublished": "2026-03-22",
+    "image": "https://example.com/react-hooks.jpg"
+  }
+  </script>
+</body>
+</html>
+```
+
+**Beklenen çıktı:**
+```
+Lighthouse SEO skoru: 100/100
+- title etiketi var ve 60 karakterden kisa
+- meta description var ve 160 karakterden kisa
+- Open Graph taglari var (sosyal medya paylasimi icin)
+- h1 -> h2 -> h3 hiyerarsisi dogru
+- Schema.org yapısal veri var
+- lang attribute dogru
+```
+
+**İpucu:** `<meta name="description">` arama sonuçlarında gösterilir. Open Graph (`og:`) tagları sosyal medya paylaşımında kullanılır.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: Tablo Erişilebilirliği
+
+**Görev:** Karmaşık bir veri tablosunu erişilebilir hale getir. `caption`, `thead`, `scope`, `aria-sort` kullan.
+
+**Başlangıç kodu:**
+```html
+<!-- GOREV: Bu tabloyu erisilebilir hale getir -->
+<table>
+  <tr>
+    <td>Urun</td>
+    <td>Kategori</td>
+    <td>Fiyat</td>
+    <td>Stok</td>
+    <td>Durum</td>
+  </tr>
+  <tr>
+    <td>Laptop</td>
+    <td>Elektronik</td>
+    <td>15000</td>
+    <td>5</td>
+    <td>Aktif</td>
+  </tr>
+  <tr>
+    <td>Phone</td>
+    <td>Elektronik</td>
+    <td>8000</td>
+    <td>0</td>
+    <td>Tukendi</td>
+  </tr>
+  <tr>
+    <td>T-Shirt</td>
+    <td>Giyim</td>
+    <td>200</td>
+    <td>50</td>
+    <td>Aktif</td>
+  </tr>
+</table>
+```
+
+**Beklenen çıktı:**
+```html
+<table aria-label="Urun Listesi">
+  <caption>Magazadaki Urunler - Mart 2026</caption>
+  <thead>
+    <tr>
+      <th scope="col" aria-sort="none">Urun</th>
+      <th scope="col">Kategori</th>
+      <th scope="col" aria-sort="descending">Fiyat (TL)</th>
+      <th scope="col">Stok</th>
+      <th scope="col">Durum</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Laptop</th>
+      <td>Elektronik</td>
+      <td>15.000</td>
+      <td>5</td>
+      <td><span aria-label="Stokta var">Aktif</span></td>
+    </tr>
+    <!-- ... -->
+  </tbody>
+</table>
+```
+
+**İpucu:** `<th scope="col">` sütun başlığı, `<th scope="row">` satır başlığı. `<caption>` tablo açıklaması ekler. `<thead>`/`<tbody>` semantik gruplama sağlar.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: HTML5 Dialog ve Modal
+
+**Görev:** Native HTML5 `<dialog>` elemanı kullanarak erişilebilir bir modal oluştur.
+
+**Başlangıç kodu:**
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Dialog Ornegi</title>
+  <style>
+    dialog {
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 500px;
+    }
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <h1>HTML5 Dialog</h1>
+
+  <button id="openBtn">Kayit Formunu Ac</button>
+
+  <!-- TODO: Erisilebilir dialog olustur -->
+  <dialog id="registerDialog" aria-labelledby="dialog-title">
+    <form method="dialog">
+      <h2 id="dialog-title">Kayit Ol</h2>
+
+      <div>
+        <label for="dialog-name">Ad</label>
+        <input type="text" id="dialog-name" required autofocus>
+      </div>
+
+      <div>
+        <label for="dialog-email">Email</label>
+        <input type="email" id="dialog-email" required>
+      </div>
+
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button type="button" id="cancelBtn">Iptal</button>
+        <button type="submit" value="confirm">Kayit Ol</button>
+      </div>
+    </form>
+  </dialog>
+
+  <p id="result"></p>
+
+  <script>
+    const dialog = document.getElementById('registerDialog');
+    const openBtn = document.getElementById('openBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const result = document.getElementById('result');
+
+    // TODO: Dialog ac/kapat islemlerini yaz
+    openBtn.addEventListener('click', () => {
+      dialog.showModal(); // Modal olarak ac (backdrop + focus trap)
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      dialog.close('cancel');
+    });
+
+    dialog.addEventListener('close', () => {
+      if (dialog.returnValue === 'confirm') {
+        result.textContent = 'Kayit basarili!';
+      } else {
+        result.textContent = 'Kayit iptal edildi.';
+      }
+    });
+
+    // ESC ile kapatmayi handle et
+    dialog.addEventListener('cancel', (e) => {
+      result.textContent = 'Dialog ESC ile kapatildi.';
+    });
+  </script>
+</body>
+</html>
+```
+
+**Beklenen çıktı:**
+```
+- "Kayit Formunu Ac" butonuna tikla -> Modal acilir
+- ESC ile veya "Iptal" ile kapatilabilir
+- Tab ile sadece modal icinde gezinilir (focus trap)
+- Backdrop tiklama ile kapanmaz (showModal)
+- Ekran okuyucu dialog'u dogru anons eder
+```
+
+**İpucu:** `dialog.showModal()` modal olarak açar (focus trap + backdrop). `dialog.show()` ise non-modal açar. `method="dialog"` form submit'inde dialog'u kapatır.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Picture ve Responsive Images
+
+**Görev:** `<picture>`, `srcset` ve `sizes` kullanarak responsive ve performanslı resim yükleme sistemi oluştur.
+
+**Başlangıç kodu:**
+```html
+<!-- GOREV: Bu img'i responsive ve performansli hale getir -->
+<img src="hero-large.jpg" alt="Hero image">
+
+<!-- Hedef: -->
+<!-- 1. Farkli ekran boyutlari icin farkli boyut resimler -->
+<!-- 2. WebP destegi (fallback olarak JPEG) -->
+<!-- 3. Dark mode icin farkli resim -->
+<!-- 4. Lazy loading -->
+```
+
+**Beklenen çıktı:**
+```html
+<!-- Tam responsive resim -->
+<picture>
+  <!-- Dark mode -->
+  <source media="(prefers-color-scheme: dark)"
+          srcset="hero-dark-400.webp 400w,
+                  hero-dark-800.webp 800w,
+                  hero-dark-1200.webp 1200w"
+          sizes="(max-width: 600px) 100vw,
+                 (max-width: 1200px) 50vw,
+                 33vw"
+          type="image/webp">
+
+  <!-- WebP (light mode) -->
+  <source srcset="hero-400.webp 400w,
+                  hero-800.webp 800w,
+                  hero-1200.webp 1200w"
+          sizes="(max-width: 600px) 100vw,
+                 (max-width: 1200px) 50vw,
+                 33vw"
+          type="image/webp">
+
+  <!-- JPEG fallback -->
+  <img src="hero-800.jpg"
+       srcset="hero-400.jpg 400w,
+              hero-800.jpg 800w,
+              hero-1200.jpg 1200w"
+       sizes="(max-width: 600px) 100vw,
+              (max-width: 1200px) 50vw,
+              33vw"
+       alt="Modern web gelistirme ortami gorseli"
+       loading="lazy"
+       decoding="async"
+       width="1200"
+       height="630">
+</picture>
+```
+
+**İpucu:** `srcset` ile farklı boyutlar sun, tarayıcı ekrana uygununu seçer. `sizes` tarayıcıya resmin viewport'un ne kadarını kaplayacağını söyler. `loading="lazy"` sayfa yüklenirken görünmeyen resimleri yüklemez.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: Micro-data ve Schema.org
+
+**Görev:** Bir ürün sayfası için Schema.org yapısal verisi ekle. Google arama sonuçlarında zengin snippet gösterilmesini sağla.
+
+**Başlangıç kodu:**
+```html
+<!-- GOREV: Schema.org micro-data ekle -->
+<div>
+  <h1>Samsung Galaxy S24 Ultra</h1>
+  <img src="s24-ultra.jpg" alt="Samsung Galaxy S24 Ultra">
+
+  <div>
+    <span>Fiyat: 54.999 TL</span>
+    <span>Stokta var</span>
+  </div>
+
+  <div>
+    <span>4.5 / 5</span>
+    <span>(128 degerlendirme)</span>
+  </div>
+
+  <p>Samsung'un amiral gemisi telefonu. 200MP kamera, S Pen destegi...</p>
+</div>
+
+<!-- GOREV: JSON-LD formatinda da ekle -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Samsung Galaxy S24 Ultra",
+  "image": "https://example.com/s24-ultra.jpg",
+  "description": "Samsung amiral gemisi telefonu",
+  "brand": {
+    "@type": "Brand",
+    "name": "Samsung"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "54999",
+    "priceCurrency": "TRY",
+    "availability": "https://schema.org/InStock",
+    "seller": {
+      "@type": "Organization",
+      "name": "TechShop"
+    }
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.5",
+    "reviewCount": "128"
+  }
+}
+</script>
+```
+
+**Beklenen çıktı:**
+```
+Google Rich Results Test sonucu:
+- Product: Samsung Galaxy S24 Ultra
+- Price: 54,999 TRY
+- Availability: In Stock
+- Rating: 4.5/5 (128 reviews)
+- Tum alanlar gecerli, hata yok
+```
+
+**İpucu:** `schema.org/Product` en yaygın yapısal veri tipi. Google Rich Results Test aracı ile doğrula. JSON-LD formatı Google tarafından tercih edilir.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: ARIA Live Regions ile Dinamik İçerik
+
+**Görev:** Ekran okuyucuların dinamik içerik değişikliklerini duyurmasını sağlayan ARIA live region'lar oluştur.
+
+**Başlangıç kodu:**
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>ARIA Live Regions</title>
+</head>
+<body>
+  <h1>Alısveris Sepeti</h1>
+
+  <!-- Urun listesi -->
+  <div>
+    <button onclick="addToCart('Laptop', 15000)">Laptop Ekle (15.000 TL)</button>
+    <button onclick="addToCart('Phone', 8000)">Phone Ekle (8.000 TL)</button>
+    <button onclick="addToCart('Mouse', 200)">Mouse Ekle (200 TL)</button>
+  </div>
+
+  <!-- TODO: aria-live="polite" ile sepet guncelleme bildirimi -->
+  <div id="cart-status" role="status" aria-live="polite" aria-atomic="true">
+    Sepet bos
+  </div>
+
+  <!-- TODO: aria-live="assertive" ile hata bildirimi -->
+  <div id="error-msg" role="alert" aria-live="assertive" hidden>
+  </div>
+
+  <!-- Sepet ozeti -->
+  <div id="cart-summary" aria-label="Sepet ozeti">
+    <h2>Sepetim</h2>
+    <ul id="cart-items" role="list"></ul>
+    <p id="cart-total">Toplam: 0 TL</p>
+  </div>
+
+  <script>
+    const cart = [];
+
+    function addToCart(name, price) {
+      // TODO:
+      // 1. Urunu sepete ekle
+      // 2. cart-status'u guncelle (ekran okuyucu duyuracak)
+      // 3. Stok yoksa error-msg'i goster (assertive - hemen duyurulur)
+      // 4. Sepet listesini guncelle
+
+      cart.push({ name, price });
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+      // Status guncelle (polite - siradaki bosluktaduyurulur)
+      document.getElementById('cart-status').textContent =
+        `${name} sepete eklendi. Toplam: ${total.toLocaleString('tr-TR')} TL`;
+
+      // Liste guncelle
+      const list = document.getElementById('cart-items');
+      const li = document.createElement('li');
+      li.textContent = `${name} - ${price.toLocaleString('tr-TR')} TL`;
+      list.appendChild(li);
+
+      document.getElementById('cart-total').textContent =
+        `Toplam: ${total.toLocaleString('tr-TR')} TL`;
+    }
+
+    function showError(message) {
+      const errorEl = document.getElementById('error-msg');
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+      // 3 saniye sonra gizle
+      setTimeout(() => { errorEl.hidden = true; }, 3000);
+    }
+  </script>
+</body>
+</html>
+```
+
+**Beklenen çıktı:**
+```
+"Laptop Ekle" butonuna tikla:
+  Gorsel: "Laptop sepete eklendi. Toplam: 15.000 TL"
+  Ekran okuyucu: "Laptop sepete eklendi. Toplam: 15.000 TL" (polite - siradaki boslukta)
+
+Stok hatasi durumunda:
+  Ekran okuyucu: "Urun stokta yok!" (assertive - hemen duyurulur)
+
+ARIA live region tipleri:
+  polite = mevcut konusma bittikten sonra duyur
+  assertive = hemen duyur (acil mesajlar icin)
+  off = duyurma
+```
+
+**İpucu:** `aria-live="polite"` rutin güncellemeler, `role="alert"` + `aria-live="assertive"` acil bildirimler için. `aria-atomic="true"` tüm bölgeyi tekrar okur.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Landmark Navigation Testi
+
+**Görev:** Bir web sayfasının ARIA landmark'larını test eden bir JavaScript script yaz.
+
+**Başlangıç kodu:**
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head><title>Landmark Test</title></head>
+<body>
+  <!-- TODO: Bu sayfaya dogru landmark'lari ekle -->
+  <div id="header">
+    <div id="nav">
+      <a href="/">Ana Sayfa</a>
+      <a href="/about">Hakkimda</a>
+    </div>
+  </div>
+  <div id="content">
+    <div id="article">
+      <h1>Blog Yazisi</h1>
+      <p>Icerik buraya...</p>
+    </div>
+    <div id="sidebar">
+      <h2>Ilgili Yazilar</h2>
+    </div>
+  </div>
+  <div id="footer">
+    <p>2026 Tum haklar saklidir</p>
+  </div>
+
+  <script>
+  // Landmark kontrol script'i
+  function checkLandmarks() {
+    const landmarks = {
+      banner: document.querySelector('header, [role="banner"]'),
+      navigation: document.querySelector('nav, [role="navigation"]'),
+      main: document.querySelector('main, [role="main"]'),
+      contentinfo: document.querySelector('footer, [role="contentinfo"]'),
+      complementary: document.querySelector('aside, [role="complementary"]'),
+    };
+
+    console.log("=== Landmark Kontrolu ===");
+    let score = 0;
+    for (const [name, element] of Object.entries(landmarks)) {
+      const status = element ? "OK" : "EKSIK";
+      if (element) score++;
+      console.log(`  ${name}: ${status}`);
+    }
+
+    // Ek kontroller
+    const h1Count = document.querySelectorAll('h1').length;
+    console.log(`\n  h1 sayisi: ${h1Count} (${h1Count === 1 ? 'OK' : 'HATALI - tek olmali'})`);
+
+    const mainCount = document.querySelectorAll('main').length;
+    console.log(`  main sayisi: ${mainCount} (${mainCount === 1 ? 'OK' : 'HATALI - tek olmali'})`);
+
+    console.log(`\n  Skor: ${score}/5 landmark`);
+  }
+
+  checkLandmarks();
+  </script>
+</body>
+</html>
+```
+
+**Beklenen çıktı:**
+```
+=== Landmark Kontrolu ===
+  banner: EKSIK (header etiketi kullanilmali)
+  navigation: EKSIK (nav etiketi kullanilmali)
+  main: EKSIK (main etiketi kullanilmali)
+  contentinfo: EKSIK (footer etiketi kullanilmali)
+  complementary: EKSIK (aside etiketi kullanilmali)
+
+GOREV: div'leri semantic etiketlerle degistir ve 5/5 skor al
+```
+
+**İpucu:** Her landmark sadece 1 kez kullanılmalı (navigation hariç, birden fazla olabilir). `<main>` sayfada sadece 1 tane olmalı.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 12: Erişilebilirlik Denetim Aracı
+
+**Görev:** Bir HTML sayfasındaki erişilebilirlik sorunlarını otomatik tespit eden bir JavaScript aracı yaz.
+
+**Başlangıç kodu:**
+```html
+<!DOCTYPE html>
+<html>
+<head><title>A11y Checker</title></head>
+<body>
+  <!-- Kasitli hatali sayfa -->
+  <img src="photo.jpg">
+  <input type="text" placeholder="Adiniz">
+  <a href="#">Tikla</a>
+  <div onclick="handleClick()">Buton Gibi Div</div>
+  <p style="color: #ccc; background: #fff;">Dusuk kontrast metin</p>
+  <table><tr><td>Veri 1</td><td>Veri 2</td></tr></table>
+
+  <script>
+  function auditAccessibility() {
+    const issues = [];
+
+    // 1. Alt attribute eksik img'ler
+    document.querySelectorAll('img:not([alt])').forEach((img) => {
+      issues.push({level: "error", rule: "img-alt", message: "img alt attribute eksik", element: img.outerHTML.slice(0, 50)});
+    });
+
+    // 2. Label'siz input'lar
+    document.querySelectorAll('input:not([aria-label]):not([aria-labelledby])').forEach((input) => {
+      const label = document.querySelector(`label[for="${input.id}"]`);
+      if (!label && !input.closest('label')) {
+        issues.push({level: "error", rule: "input-label", message: "input icin label eksik", element: input.outerHTML.slice(0, 50)});
+      }
+    });
+
+    // 3. Bos link'ler
+    document.querySelectorAll('a').forEach((a) => {
+      if (a.textContent.trim().length < 2 || a.textContent.trim() === "Tikla") {
+        issues.push({level: "warning", rule: "link-text", message: "Link metni aciklayici degil", element: a.outerHTML.slice(0, 50)});
+      }
+    });
+
+    // TODO: 4. role="button" olmayan tikanabilir div'ler
+    // TODO: 5. thead'siz tablo'lar
+    // TODO: 6. html lang attribute kontrolu
+
+    console.log("=== Erisebilirlik Denetimi ===");
+    console.log(`Toplam: ${issues.length} sorun bulundu\n`);
+
+    issues.forEach((issue, i) => {
+      const icon = issue.level === "error" ? "HATA" : "UYARI";
+      console.log(`${i+1}. [${icon}] ${issue.rule}: ${issue.message}`);
+      console.log(`   Element: ${issue.element}`);
+    });
+  }
+
+  auditAccessibility();
+  </script>
+</body>
+</html>
+```
+
+**Beklenen çıktı:**
+```
+=== Erisebilirlik Denetimi ===
+Toplam: 5 sorun bulundu
+
+1. [HATA] img-alt: img alt attribute eksik
+   Element: <img src="photo.jpg">
+2. [HATA] input-label: input icin label eksik
+   Element: <input type="text" placeholder="Adiniz">
+3. [UYARI] link-text: Link metni aciklayici degil
+   Element: <a href="#">Tikla</a>
+4. [HATA] div-button: Tikanabilir div role="button" olmali
+   Element: <div onclick="handleClick()">
+5. [HATA] table-header: Tablo thead/th eksik
+   Element: <table><tr><td>...
+```
+
+**İpucu:** Her `img` bir `alt` attribute'u olmalı. Her `input` bir `label` ile eşleştirilmeli. Tıklanabilir `div`'ler `role="button"` ve `tabindex="0"` olmalı.
+
+**Zorluk:** Zor
+:::
+
 :::must-note
 - Semantic HTML elemanları: header, nav, main (sayfada 1 tane), article, section, aside, footer
 - `<div>` yerine uygun semantic eleman kullan - erişilebilirlik ve SEO için kritik

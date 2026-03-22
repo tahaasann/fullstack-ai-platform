@@ -5194,5 +5194,21 @@
     ],
     "live_demo_url_template": "https://ecommerce-api.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/ecommerce-fraud-detection"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "REST API gelistirme deneyimi",
+      "Veritabani tasarimi ve SQL/NoSQL kullanimi",
+      "Authentication ve authorization mekanizmalari",
+      "Temel AI/ML API kullanimi"
+    ],
+    "what_you_should_know": [
+      "Phase 3 Module 10 - API tasarimi ve dokumantasyon",
+      "Phase 3 Module 11 - SQL ve PostgreSQL ileri konular",
+      "Phase 3 Module 12 - Authentication, testing",
+      "Phase 4 Module 14 - Web guvenligi temelleri"
+    ],
+    "next_project": "project-05",
+    "skills_bridge": "Bu projede ogrendigin odeme sistemi entegrasyonu, fraud detection ve guvenlik pratikleri, sonraki projede analytics dashboard ve anomaly detection icin veri isleme ve ML model entegrasyonu becerilerini gelistirecek."
   }
 }

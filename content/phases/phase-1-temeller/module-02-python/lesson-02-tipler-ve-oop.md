@@ -746,6 +746,721 @@ explanation: "@dataclass varsayılan olarak __init__, __repr__ ve __eq__ oluştu
 OOP tasarimi yaparken AI'a class kodunu yapistir: "Bu sinif tasarimimi incele. SOLID prensiplerine uygun mu? Type hints eksik mi? @dataclass kullanarak nasil basitlestirebilirim?"
 :::
 
+:::exercise
+### Alıştırma 4: Type-Safe Dictionary Wrapper
+
+**Görev:** Python dictionary'sini type-safe bir şekilde kullanan bir wrapper sınıfı yaz. Yanlış tipte değer atanmaya çalışılırsa hata fırlatsın.
+
+**Başlangıç kodu:**
+```python
+from typing import TypeVar, Generic
+
+T = TypeVar("T")
+
+class TypedDict(Generic[T]):
+    def __init__(self, value_type: type):
+        self.value_type = value_type
+        self._data: dict[str, T] = {}
+
+    def set(self, key: str, value: T) -> None:
+        # TODO: value'nun tipi self.value_type degilse TypeError firlat
+        pass
+
+    def get(self, key: str, default: T = None) -> T | None:
+        return self._data.get(key, default)
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def __contains__(self, key: str) -> bool:
+        return key in self._data
+
+    def __str__(self) -> str:
+        return f"TypedDict[{self.value_type.__name__}]({self._data})"
+
+# Test
+scores = TypedDict(int)
+scores.set("math", 95)
+scores.set("physics", 87)
+print(scores)
+print(f"math: {scores.get('math')}")
+print(f"Toplam: {len(scores)} ders")
+
+try:
+    scores.set("english", "ninety")  # TypeError firlatmali!
+except TypeError as e:
+    print(f"Hata yakalandi: {e}")
+
+names = TypedDict(str)
+names.set("user1", "Ahmet")
+print(f"\n{names}")
+```
+
+**Beklenen çıktı:**
+```
+TypedDict[int]({'math': 95, 'physics': 87})
+math: 95
+Toplam: 2 ders
+Hata yakalandi: Expected int, got str
+TypedDict[str]({'user1': 'Ahmet'})
+```
+
+**İpucu:** `isinstance(value, self.value_type)` ile tip kontrolü yap.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Linked List Implementasyonu
+
+**Görev:** Type hints ile tam donanımlı bir Singly Linked List implementasyonu yaz. `__iter__`, `__len__`, `__contains__` magic method'larını desteklesin.
+
+**Başlangıç kodu:**
+```python
+from typing import TypeVar, Generic, Iterator
+
+T = TypeVar("T")
+
+class Node(Generic[T]):
+    def __init__(self, data: T):
+        self.data = data
+        self.next: Node[T] | None = None
+
+class LinkedList(Generic[T]):
+    def __init__(self):
+        self.head: Node[T] | None = None
+        self._size: int = 0
+
+    def append(self, data: T) -> None:
+        """Sona eleman ekle."""
+        # TODO
+        pass
+
+    def prepend(self, data: T) -> None:
+        """Basa eleman ekle."""
+        # TODO
+        pass
+
+    def delete(self, data: T) -> bool:
+        """Ilk eslesen elemani sil. Silindiyse True dondur."""
+        # TODO
+        pass
+
+    def reverse(self) -> None:
+        """Listeyi yerinde tersine cevir."""
+        # TODO
+        pass
+
+    def __len__(self) -> int:
+        return self._size
+
+    def __iter__(self) -> Iterator[T]:
+        # TODO: yield ile her eleman uzerinden gec
+        pass
+
+    def __contains__(self, data: T) -> bool:
+        # TODO
+        pass
+
+    def __str__(self) -> str:
+        return " -> ".join(str(item) for item in self) + " -> None"
+
+# Test
+ll = LinkedList[int]()
+for num in [10, 20, 30, 40, 50]:
+    ll.append(num)
+
+print(f"Liste: {ll}")
+print(f"Uzunluk: {len(ll)}")
+print(f"30 var mi: {30 in ll}")
+
+ll.prepend(5)
+print(f"Prepend 5: {ll}")
+
+ll.delete(30)
+print(f"Delete 30: {ll}")
+
+ll.reverse()
+print(f"Reversed: {ll}")
+```
+
+**Beklenen çıktı:**
+```
+Liste: 10 -> 20 -> 30 -> 40 -> 50 -> None
+Uzunluk: 5
+30 var mi: True
+Prepend 5: 5 -> 10 -> 20 -> 30 -> 40 -> 50 -> None
+Delete 30: 5 -> 10 -> 20 -> 40 -> 50 -> None
+Reversed: 50 -> 40 -> 20 -> 10 -> 5 -> None
+```
+
+**İpucu:** `reverse()` için üç pointer kullan: `prev`, `current`, `next_node`. Her adımda `current.next = prev` yap.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Mixin ile Loglama ve Serialization
+
+**Görev:** Mixin pattern kullanarak modüler sınıflar oluştur. LogMixin, SerializerMixin ve ValidatorMixin yaz.
+
+**Başlangıç kodu:**
+```python
+import json
+from datetime import datetime
+
+class LogMixin:
+    """Her metodun cagrilisini logla."""
+    def log(self, message: str) -> None:
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        print(f"[{timestamp}] {self.__class__.__name__}: {message}")
+
+class SerializerMixin:
+    """Objeyi JSON'a cevir ve JSON'dan olustur."""
+    def to_json(self) -> str:
+        # TODO: __dict__'i JSON string'e cevir
+        pass
+
+    @classmethod
+    def from_json(cls, json_str: str):
+        # TODO: JSON string'den obje olustur
+        pass
+
+class ValidatorMixin:
+    """Alanlari dogrula."""
+    _validators: dict = {}
+
+    def validate(self) -> list[str]:
+        """Tum validation kurallarini kontrol et. Hata mesajlarini dondur."""
+        errors = []
+        # TODO: _validators dict'indeki kurallari uygula
+        pass
+        return errors
+
+class User(LogMixin, SerializerMixin, ValidatorMixin):
+    _validators = {
+        "name": lambda v: len(v) >= 2,
+        "email": lambda v: "@" in v,
+        "age": lambda v: 0 < v < 150,
+    }
+
+    def __init__(self, name: str, email: str, age: int):
+        self.name = name
+        self.email = email
+        self.age = age
+
+    def update_email(self, new_email: str):
+        self.log(f"Email guncelleniyor: {self.email} -> {new_email}")
+        self.email = new_email
+
+# Test
+user = User("Ahmet", "ahmet@test.com", 25)
+user.log("Kullanici olusturuldu")
+
+# Serialization
+json_str = user.to_json()
+print(f"JSON: {json_str}")
+
+user2 = User.from_json(json_str)
+print(f"From JSON: {user2.name}, {user2.email}")
+
+# Validation
+user.update_email("invalid-email")
+errors = user.validate()
+print(f"Validation hatalari: {errors}")
+
+# Gecerli kullanici
+user.update_email("ahmet@valid.com")
+errors = user.validate()
+print(f"Validation hatalari: {errors}")
+```
+
+**Beklenen çıktı:**
+```
+[HH:MM:SS] User: Kullanici olusturuldu
+JSON: {"name": "Ahmet", "email": "ahmet@test.com", "age": 25}
+From JSON: Ahmet, ahmet@test.com
+[HH:MM:SS] User: Email guncelleniyor: ahmet@test.com -> invalid-email
+Validation hatalari: ['email: validation failed']
+[HH:MM:SS] User: Email guncelleniyor: invalid-email -> ahmet@valid.com
+Validation hatalari: []
+```
+
+**İpucu:** `to_json()` için `json.dumps(self.__dict__)` kullan. `from_json()` için `cls(**json.loads(json_str))`.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Immutable Stack ve Queue
+
+**Görev:** `@dataclass(frozen=True)` kullanarak immutable Stack ve Queue veri yapıları oluştur. Her operasyon yeni bir nesne dönsün.
+
+**Başlangıç kodu:**
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class ImmutableStack:
+    _items: tuple = ()
+
+    def push(self, item) -> "ImmutableStack":
+        """Yeni eleman eklenmiş yeni stack dondur."""
+        # TODO: Mevcut tuple'a eleman ekle, yeni ImmutableStack olustur
+        pass
+
+    def pop(self) -> tuple:  # (item, new_stack)
+        """Ust elemani cikar, (eleman, yeni_stack) dondur."""
+        # TODO: Son elemani cikar, kalan elemanlarla yeni stack olustur
+        pass
+
+    def peek(self):
+        """Ust elemani dondur (cikarma)."""
+        # TODO
+        pass
+
+    @property
+    def size(self) -> int:
+        return len(self._items)
+
+    @property
+    def is_empty(self) -> bool:
+        return len(self._items) == 0
+
+    def __str__(self) -> str:
+        return f"Stack({list(reversed(self._items))})"
+
+# Test
+s = ImmutableStack()
+s1 = s.push(10)
+s2 = s1.push(20)
+s3 = s2.push(30)
+print(f"s3: {s3}")
+print(f"s3 peek: {s3.peek()}")
+
+item, s4 = s3.pop()
+print(f"Pop: {item}, kalan: {s4}")
+
+# Orijinal stack degismedi!
+print(f"s3 hala: {s3}")
+print(f"s (bos): {s}")
+```
+
+**Beklenen çıktı:**
+```
+s3: Stack([30, 20, 10])
+s3 peek: 30
+Pop: 30, kalan: Stack([20, 10])
+s3 hala: Stack([30, 20, 10])
+s (bos): Stack([])
+```
+
+**İpucu:** `frozen=True` olduğu için `self._items` değiştirilemez. Her operasyonda yeni `ImmutableStack(_items=...)` oluştur.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Abstract Factory ile Veritabanı Bağlantısı
+
+**Görev:** Abstract Factory pattern kullanarak farklı veritabanı bağlantı nesneleri oluşturan bir sistem yaz.
+
+**Başlangıç kodu:**
+```python
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+class DatabaseConnection(ABC):
+    @abstractmethod
+    def connect(self) -> str: ...
+
+    @abstractmethod
+    def execute(self, query: str) -> str: ...
+
+    @abstractmethod
+    def close(self) -> str: ...
+
+class PostgresConnection(DatabaseConnection):
+    def __init__(self, host: str, port: int, db: str):
+        self.host = host
+        self.port = port
+        self.db = db
+
+    def connect(self) -> str:
+        return f"PostgreSQL baglantisi: {self.host}:{self.port}/{self.db}"
+
+    def execute(self, query: str) -> str:
+        return f"PostgreSQL sorgusu: {query}"
+
+    def close(self) -> str:
+        return "PostgreSQL baglantisi kapatildi"
+
+# TODO: SQLiteConnection ve MongoConnection siniflarini yaz
+
+class DatabaseFactory(ABC):
+    @abstractmethod
+    def create_connection(self, **kwargs) -> DatabaseConnection: ...
+
+# TODO: PostgresFactory, SQLiteFactory, MongoFactory siniflarini yaz
+
+def get_factory(db_type: str) -> DatabaseFactory:
+    """Veritabani tipine gore uygun factory dondur."""
+    # TODO: db_type'a gore factory sec
+    pass
+
+# Test
+for db_type in ["postgres", "sqlite", "mongo"]:
+    factory = get_factory(db_type)
+    conn = factory.create_connection(
+        host="localhost", port=5432, db="myapp"
+    )
+    print(conn.connect())
+    print(conn.execute("SELECT * FROM users"))
+    print(conn.close())
+    print()
+```
+
+**Beklenen çıktı:**
+```
+PostgreSQL baglantisi: localhost:5432/myapp
+PostgreSQL sorgusu: SELECT * FROM users
+PostgreSQL baglantisi kapatildi
+
+SQLite baglantisi: myapp.db
+SQLite sorgusu: SELECT * FROM users
+SQLite baglantisi kapatildi
+
+MongoDB baglantisi: mongodb://localhost:27017/myapp
+MongoDB sorgusu: db.users.find({})
+MongoDB baglantisi kapatildi
+```
+
+**İpucu:** Her veritabanı tipi için Connection ve Factory sınıfı çifti oluştur. `get_factory()` basit bir dictionary mapping kullanabilir.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: Deep Copy ve Shallow Copy Görselleştirici
+
+**Görev:** Nested veri yapılarında shallow copy vs deep copy farkını görselleştiren bir program yaz.
+
+**Başlangıç kodu:**
+```python
+import copy
+
+def visualize_copies(original: dict) -> None:
+    """
+    Original, shallow copy ve deep copy'nin bellek iliskisini goster.
+    id() ile ayni objeye mi isaret ettiklerini kontrol et.
+    """
+    shallow = copy.copy(original)
+    deep = copy.deepcopy(original)
+
+    print("=== Bellek Analizi ===\n")
+
+    def compare_ids(path: str, orig_val, shallow_val, deep_val):
+        """Uc kopyanin id'lerini karsilastir."""
+        same_shallow = "AYNI" if id(orig_val) == id(shallow_val) else "FARKLI"
+        same_deep = "AYNI" if id(orig_val) == id(deep_val) else "FARKLI"
+        print(f"{path:30s} | Shallow: {same_shallow:7s} | Deep: {same_deep:7s}")
+
+    # TODO:
+    # 1. Root objelerin id'lerini karsilastir
+    # 2. Her ic ice objenin id'lerini recursive olarak karsilastir
+    # 3. Immutable degerler (str, int) icin id'lerin ayni oldugunu goster
+    # 4. Mutable degerler (list, dict) icin farkli oldugunu goster
+
+    compare_ids("root", original, shallow, deep)
+    for key in original:
+        val = original[key]
+        compare_ids(f"  [{key}]", val, shallow[key], deep[key])
+        if isinstance(val, (list, dict)):
+            if isinstance(val, list):
+                for i, item in enumerate(val):
+                    compare_ids(f"    [{key}][{i}]", item, shallow[key][i], deep[key][i])
+
+# Test
+data = {
+    "name": "Ahmet",       # str (immutable)
+    "age": 25,             # int (immutable)
+    "scores": [85, 90],    # list (mutable)
+    "address": {           # dict (mutable)
+        "city": "Istanbul",
+        "district": "Kadikoy",
+    },
+    "hobbies": ["coding", "reading"],  # list (mutable)
+}
+
+visualize_copies(data)
+
+# Mutation testi
+print("\n=== Mutation Testi ===")
+original = {"items": [1, 2, 3], "nested": {"x": 10}}
+shallow = copy.copy(original)
+deep = copy.deepcopy(original)
+
+shallow["items"].append(4)
+print(f"Shallow'a ekleme sonrasi original: {original['items']}")  # [1,2,3,4] !
+print(f"Deep copy etkilendi mi: {deep['items']}")  # [1,2,3]
+```
+
+**Beklenen çıktı:**
+```
+=== Bellek Analizi ===
+
+root                           | Shallow: FARKLI | Deep: FARKLI
+  [name]                       | Shallow: AYNI   | Deep: AYNI
+  [age]                        | Shallow: AYNI   | Deep: AYNI
+  [scores]                     | Shallow: AYNI   | Deep: FARKLI
+    [scores][0]                | Shallow: AYNI   | Deep: AYNI
+    [scores][1]                | Shallow: AYNI   | Deep: AYNI
+  [address]                    | Shallow: AYNI   | Deep: FARKLI
+  [hobbies]                    | Shallow: AYNI   | Deep: FARKLI
+
+=== Mutation Testi ===
+Shallow'a ekleme sonrasi original: [1, 2, 3, 4]
+Deep copy etkilendi mi: [1, 2, 3]
+```
+
+**İpucu:** `id()` fonksiyonu objenin bellek adresini döner. Immutable objeler (str, int) Python tarafından paylaşılır (interning).
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 10: Event Sistemi ile Observer Pattern
+
+**Görev:** Type hints ile tam donanımlı bir Event/Observer sistemi yaz. Birden fazla listener desteklesin, event data taşısın.
+
+**Başlangıç kodu:**
+```python
+from typing import Callable, Any
+from dataclasses import dataclass, field
+
+@dataclass
+class Event:
+    name: str
+    data: dict = field(default_factory=dict)
+    timestamp: float = field(default_factory=lambda: __import__("time").time())
+
+class EventEmitter:
+    def __init__(self):
+        self._listeners: dict[str, list[Callable]] = {}
+
+    def on(self, event_name: str, callback: Callable) -> None:
+        """Event listener kaydet."""
+        # TODO
+        pass
+
+    def off(self, event_name: str, callback: Callable) -> None:
+        """Event listener'i kaldir."""
+        # TODO
+        pass
+
+    def emit(self, event_name: str, **data) -> int:
+        """Event'i tetikle, cagrilan listener sayisini dondur."""
+        # TODO: Kayitli tum listener'lari cagir
+        pass
+
+    def once(self, event_name: str, callback: Callable) -> None:
+        """Sadece bir kez calisacak listener kaydet."""
+        # TODO: Calistiktan sonra kendini kaldiracak wrapper olustur
+        pass
+
+# Test
+emitter = EventEmitter()
+
+# Listener'lari kaydet
+def on_user_created(event: Event):
+    print(f"  Kullanici olusturuldu: {event.data.get('name')}")
+
+def on_user_created_log(event: Event):
+    print(f"  [LOG] Yeni kullanici: {event.data}")
+
+def on_login_once(event: Event):
+    print(f"  Ilk giris bildirimi: {event.data.get('name')}")
+
+emitter.on("user:created", on_user_created)
+emitter.on("user:created", on_user_created_log)
+emitter.once("user:login", on_login_once)
+
+print("Event: user:created")
+count = emitter.emit("user:created", name="Ahmet", email="ahmet@test.com")
+print(f"  {count} listener cagrildi\n")
+
+print("Event: user:login (1. kez)")
+emitter.emit("user:login", name="Ahmet")
+
+print("\nEvent: user:login (2. kez - once listener calismamali)")
+count = emitter.emit("user:login", name="Ahmet")
+print(f"  {count} listener cagrildi")
+```
+
+**Beklenen çıktı:**
+```
+Event: user:created
+  Kullanici olusturuldu: Ahmet
+  [LOG] Yeni kullanici: {'name': 'Ahmet', 'email': 'ahmet@test.com'}
+  2 listener cagrildi
+
+Event: user:login (1. kez)
+  Ilk giris bildirimi: Ahmet
+
+Event: user:login (2. kez - once listener calismamali)
+  0 listener cagrildi
+```
+
+**İpucu:** `once()` için inner function tanımla, bu function çalıştıktan sonra `self.off()` ile kendini kaldırsın.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Custom Collection ile __getitem__ ve Slicing
+
+**Görev:** `__getitem__`, `__setitem__` ve slicing destekleyen custom bir collection sınıfı yaz.
+
+**Başlangıç kodu:**
+```python
+class SortedList:
+    """Her zaman sirali kalan bir liste."""
+    def __init__(self):
+        self._items: list = []
+
+    def add(self, item):
+        """Elemani dogru pozisyona ekle (sira bozulmasin)."""
+        # TODO: bisect modulu ile dogru pozisyonu bul ve ekle
+        import bisect
+        bisect.insort(self._items, item)
+
+    def __getitem__(self, index):
+        """Index veya slice ile erisim."""
+        # TODO: int ise tek eleman, slice ise yeni SortedList dondur
+        return self._items[index]
+
+    def __len__(self):
+        return len(self._items)
+
+    def __contains__(self, item):
+        # TODO: Binary search ile hizli arama
+        import bisect
+        i = bisect.bisect_left(self._items, item)
+        return i < len(self._items) and self._items[i] == item
+
+    def __str__(self):
+        return f"SortedList({self._items})"
+
+# Test
+sl = SortedList()
+for num in [5, 2, 8, 1, 9, 3, 7, 4, 6]:
+    sl.add(num)
+
+print(sl)                    # SortedList([1, 2, 3, 4, 5, 6, 7, 8, 9])
+print(f"sl[0] = {sl[0]}")   # 1
+print(f"sl[-1] = {sl[-1]}") # 9
+print(f"sl[2:5] = {sl[2:5]}")  # [3, 4, 5]
+print(f"5 in sl: {5 in sl}")   # True
+print(f"10 in sl: {10 in sl}") # False
+print(f"len: {len(sl)}")       # 9
+```
+
+**Beklenen çıktı:**
+```
+SortedList([1, 2, 3, 4, 5, 6, 7, 8, 9])
+sl[0] = 1
+sl[-1] = 9
+sl[2:5] = [3, 4, 5]
+5 in sl: True
+10 in sl: False
+len: 9
+```
+
+**İpucu:** `bisect.insort()` sıralı listeye eleman ekler. `bisect.bisect_left()` ile O(log n) arama yapılır.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 12: Money Class ile Operatör Overloading
+
+**Görev:** Para hesaplamları için `Decimal` tabanlı bir `Money` sınıfı yaz. Aritmetik operatörleri ve karşılaştırmaları desteklesin.
+
+**Başlangıç kodu:**
+```python
+from decimal import Decimal
+from functools import total_ordering
+
+@total_ordering
+class Money:
+    def __init__(self, amount: str | int | float, currency: str = "TRY"):
+        self.amount = Decimal(str(amount))
+        self.currency = currency
+
+    def __add__(self, other: "Money") -> "Money":
+        # TODO: Ayni para birimi kontrolu, toplama
+        pass
+
+    def __sub__(self, other: "Money") -> "Money":
+        pass
+
+    def __mul__(self, multiplier: int | float) -> "Money":
+        # TODO: Sayi ile carpma (Money * 3)
+        pass
+
+    def __eq__(self, other: "Money") -> bool:
+        pass
+
+    def __lt__(self, other: "Money") -> bool:
+        pass
+
+    def __str__(self) -> str:
+        return f"{self.amount:,.2f} {self.currency}"
+
+    def __repr__(self) -> str:
+        return f"Money('{self.amount}', '{self.currency}')"
+
+# Test
+price = Money("15000.00")
+tax = Money("2700.00")
+total = price + tax
+print(f"Fiyat: {price}")
+print(f"KDV:   {tax}")
+print(f"Toplam: {total}")
+
+discount = Money("1500")
+final = total - discount
+print(f"Indirimli: {final}")
+
+unit_price = Money("49.99")
+bulk = unit_price * 100
+print(f"Toptan: {bulk}")
+
+print(f"Karsilastirma: {price} > {tax} = {price > tax}")
+
+try:
+    usd = Money(100, "USD")
+    result = price + usd  # Hata!
+except ValueError as e:
+    print(f"Hata: {e}")
+```
+
+**Beklenen çıktı:**
+```
+Fiyat: 15,000.00 TRY
+KDV:   2,700.00 TRY
+Toplam: 17,700.00 TRY
+Indirimli: 16,200.00 TRY
+Toptan: 4,999.00 TRY
+Karsilastirma: 15,000.00 TRY > 2,700.00 TRY = True
+Hata: Cannot add TRY and USD
+```
+
+**İpucu:** `@total_ordering` sadece `__eq__` ve `__lt__` tanımlanınca diğer karşılaştırmaları otomatik oluşturur. `Decimal` ile float hassasiyet sorunlarından kaçın.
+
+**Zorluk:** Orta
+:::
+
 :::must-note
 - **Immutable:** int, float, str, bool, tuple, frozenset, bytes / **Mutable:** list, dict, set, bytearray
 - Mutable default argument tuzağı: `def f(x=[])` yapma, `def f(x=None)` yap

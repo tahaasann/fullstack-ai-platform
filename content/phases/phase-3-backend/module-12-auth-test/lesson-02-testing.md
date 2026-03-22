@@ -868,6 +868,286 @@ describe("UserService", () => {
 
 **Beklenen Sonuc:** Dis servisler mock'lanmis olmali (gercek email gonderilmemeli). Mock fonksiyonlarin cagrilma sayisi ve parametreleri dogrulanmali. Coverage %80'in ustunde olmali.
 **Ipucu:** `jest.fn()` mock fonksiyon olusturur. `.mockResolvedValue()` async fonksiyonlar icin Promise dondurur. `toHaveBeenCalledWith()` ile parametreleri kontrol et.
+
+---
+
+### Alistirma 4: Snapshot Testing ile UI Component Testi (Kolay)
+
+React component'lerinin beklenmeyen degisikliklerini snapshot test ile yakala.
+
+```javascript
+// __tests__/UserCard.test.jsx
+import { render } from "@testing-library/react";
+import UserCard from "../src/UserCard";
+
+describe("UserCard snapshot", () => {
+  test("varsayilan props ile dogru render edilmeli", () => {
+    const { container } = render(
+      <UserCard name="Ahmet" role="Developer" avatar="/img/ahmet.png" />
+    );
+    expect(container).toMatchSnapshot();
+  });
+
+  // TODO: Online/offline durumlarini ayri snapshot'larla test et
+  // TODO: Uzun isim ve bos avatar durumlarini test et
+  // TODO: Dark mode class'inin eklenmesini dogrula
+});
+```
+
+**Beklenen Sonuc:** Ilk calistirmada `__snapshots__` klasorune snapshot dosyasi olusturulmali. Component degistiginde test basarisiz olmali ve `--updateSnapshot` ile guncellenebilmeli.
+**Ipucu:** Snapshot testleri UI regresyonlarini hizli yakalar ama cok detayli snapshot'lar kirilgan olur. Kritik UI elementlerine odaklan.
+
+---
+
+### Alistirma 5: Parameterized Test ile Coklu Senaryo (Kolay)
+
+Tek bir test fonksiyonuyla birden fazla veri setini test et.
+
+```javascript
+// __tests__/emailValidator.test.js
+const { isValidEmail } = require("../src/emailValidator");
+
+describe.each([
+  ["test@example.com", true],
+  ["user.name+tag@domain.co", true],
+  ["invalid-email", false],
+  ["@no-local.com", false],
+  ["no-at-sign.com", false],
+  ["user@.com", false],
+  // TODO: 4 test case daha ekle (Turkce karakter, bosluk, uzun domain, emoji)
+])("isValidEmail('%s')", (email, expected) => {
+  test(`${expected ? "gecerli" : "gecersiz"} olmali`, () => {
+    expect(isValidEmail(email)).toBe(expected);
+  });
+});
+```
+
+**Beklenen Sonuc:** Her test case ayri test olarak raporlanmali. Tum gecerli/gecersiz email'ler dogru sonuc donmeli.
+**Ipucu:** `describe.each` ve `test.each` tekrarli test kodunu azaltir. Edge case'leri dusun: unicode, max uzunluk, subdomain'ler.
+
+---
+
+### Alistirma 6: Error Handling ve Async Test (Orta)
+
+Asenkron hata senaryolarini dogru sekilde test et.
+
+```javascript
+// __tests__/apiClient.test.js
+const { fetchUser, fetchUsers } = require("../src/apiClient");
+
+// Mock fetch global
+global.fetch = jest.fn();
+
+afterEach(() => jest.resetAllMocks());
+
+describe("fetchUser", () => {
+  test("basarili response donmeli", async () => {
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: 1, name: "Ali" }),
+    });
+    const user = await fetchUser(1);
+    expect(user).toEqual({ id: 1, name: "Ali" });
+    expect(fetch).toHaveBeenCalledWith("/api/users/1");
+  });
+
+  test("404 hatasi firlatmali", async () => {
+    fetch.mockResolvedValueOnce({ ok: false, status: 404 });
+    await expect(fetchUser(999)).rejects.toThrow("User not found");
+  });
+
+  // TODO: Network hatasi (fetch reject) senaryosu
+  // TODO: Timeout senaryosu (AbortController ile)
+  // TODO: Retry mekanizmasi testi (3 deneme sonra basarisiz)
+});
+```
+
+**Beklenen Sonuc:** Her hata senaryosu icin dogru exception firlatilmali. Mock'lar her test sonrasi temizlenmeli.
+**Ipucu:** `rejects.toThrow()` async hatalari yakalamak icin kullanilir. `mockRejectedValueOnce()` network hatalarini simule eder.
+
+---
+
+### Alistirma 7: Database Integration Test (Orta)
+
+Gercek veritabani ile CRUD operasyonlarini test et.
+
+```javascript
+// __tests__/integration/userRepository.test.js
+const { Pool } = require("pg");
+const UserRepository = require("../../src/repositories/userRepository");
+
+let pool, repo;
+
+beforeAll(async () => {
+  pool = new Pool({ connectionString: process.env.TEST_DATABASE_URL });
+  repo = new UserRepository(pool);
+  await pool.query("CREATE TABLE IF NOT EXISTS users (id SERIAL, name TEXT, email TEXT UNIQUE)");
+});
+
+afterEach(async () => {
+  await pool.query("DELETE FROM users");
+});
+
+afterAll(async () => {
+  await pool.query("DROP TABLE IF EXISTS users");
+  await pool.end();
+});
+
+describe("UserRepository integration", () => {
+  test("kullanici olusturup getirmeli", async () => {
+    const created = await repo.create({ name: "Test", email: "test@test.com" });
+    const found = await repo.findById(created.id);
+    expect(found.name).toBe("Test");
+  });
+
+  // TODO: Duplicate email'de hata donmeli
+  // TODO: Var olmayan id'de null donmeli
+  // TODO: Update islemi dogru calismali
+  // TODO: Delete islemi dogru calismali
+});
+```
+
+**Beklenen Sonuc:** Her test bagimsiz calismali (afterEach ile temizlik). Veritabani islemleri gercek SQL ile dogrulanmali.
+**Ipucu:** Test veritabani production'dan ayri olmali. `beforeAll` ile setup, `afterAll` ile teardown yap.
+
+---
+
+### Alistirma 8: React Testing Library ile Form Testi (Orta)
+
+Kullanici perspektifinden form interaksiyonlarini test et.
+
+```javascript
+// __tests__/LoginForm.test.jsx
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import LoginForm from "../src/LoginForm";
+
+describe("LoginForm", () => {
+  const mockOnSubmit = jest.fn();
+
+  beforeEach(() => {
+    mockOnSubmit.mockClear();
+    render(<LoginForm onSubmit={mockOnSubmit} />);
+  });
+
+  test("bos form submit edilememeli", async () => {
+    await userEvent.click(screen.getByRole("button", { name: /giris/i }));
+    expect(screen.getByText(/email zorunlu/i)).toBeInTheDocument();
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  test("gecerli bilgilerle submit edilmeli", async () => {
+    await userEvent.type(screen.getByLabelText(/email/i), "test@test.com");
+    await userEvent.type(screen.getByLabelText(/sifre/i), "Passw0rd!");
+    await userEvent.click(screen.getByRole("button", { name: /giris/i }));
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith({
+        email: "test@test.com",
+        password: "Passw0rd!",
+      });
+    });
+  });
+
+  // TODO: Gecersiz email formatinda hata mesaji gostermeli
+  // TODO: Kisa sifrede hata mesaji gostermeli
+  // TODO: Loading durumunda buton disable olmali
+});
+```
+
+**Beklenen Sonuc:** Kullanici etkilesileri (type, click) ile testler calismali. Hata mesajlari DOM'da gorunmeli. Submit callback dogru parametrelerle cagrilmali.
+**Ipucu:** `getByRole`, `getByLabelText` gibi accessibility sorgulari kullan. Implementation detayi degil kullanici davranisi test et.
+
+---
+
+### Alistirma 9: E2E Test ile Tam Kullanici Akisi (Zor)
+
+Playwright ile uçtan uca kullanici akisini test et.
+
+```javascript
+// e2e/auth-flow.spec.js
+const { test, expect } = require("@playwright/test");
+
+test.describe("Authentication Flow", () => {
+  test("kayit ol → giris yap → profil guncelle → cikis yap", async ({ page }) => {
+    const email = `test-${Date.now()}@example.com`;
+
+    // 1. Kayit ol
+    await page.goto("/register");
+    await page.fill('[name="name"]', "Test User");
+    await page.fill('[name="email"]', email);
+    await page.fill('[name="password"]', "SecureP@ss1");
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL("/dashboard");
+
+    // 2. Profil guncelle
+    await page.click('a[href="/profile"]');
+    await page.fill('[name="bio"]', "Full Stack Developer");
+    await page.click('button:has-text("Kaydet")');
+    await expect(page.locator(".toast-success")).toBeVisible();
+
+    // TODO: 3. Profil bilgisinin guncellenmis oldugunu dogrula
+    // TODO: 4. Cikis yap ve login sayfasina yonlendirilmeyi dogrula
+    // TODO: 5. Cikis sonrasi /dashboard'a erisilemedigini dogrula (redirect)
+  });
+
+  // TODO: Gecersiz bilgilerle kayit senaryosu
+  // TODO: Yanlis sifre ile giris senaryosu
+});
+```
+
+**Beklenen Sonuc:** Tam kullanici akisi basariyla tamamlanmali. Her adimda sayfa durumu dogrulanmali. Unique email ile test izolasyonu saglanmali.
+**Ipucu:** Playwright `test.describe.serial` ile testleri sirali calistirabilirsin. `page.waitForResponse` ile API cevaplarini bekleyebilirsin.
+
+---
+
+### Alistirma 10: Test Pipeline ve CI Entegrasyonu (Zor)
+
+GitHub Actions ile otomatik test pipeline'i kur.
+
+```yaml
+# .github/workflows/test.yml
+name: Test Pipeline
+on: [push, pull_request]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test -- --coverage --ci
+      - uses: codecov/codecov-action@v4
+        # TODO: Coverage raporunu Codecov'a yukle
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 10s
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:integration
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:testpass@localhost:5432/testdb
+
+  # TODO: e2e-tests job'u ekle (Playwright ile)
+  # TODO: Test sonuclarini PR comment olarak paylas
+  # TODO: Coverage threshold altinda PR'i blocklama kurali ekle
+```
+
+**Beklenen Sonuc:** Her PR'da unit, integration ve E2E testleri otomatik calismali. Coverage raporu PR'da gorunmeli. Threshold altinda merge engellenmeli.
+**Ipucu:** `services` ile Docker container'lari CI ortaminda calistirabilirsin. Matrix strategy ile birden fazla Node versiyonunda test edebilirsin.
 :::
 
 :::knowledge-check

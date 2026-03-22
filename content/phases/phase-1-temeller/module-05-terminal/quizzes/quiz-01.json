@@ -114,6 +114,36 @@
       "explanation": "Debug akışı: Önce launch.json ile debug konfigürasyonunu ayarla → breakpoint koy → debug başlat → program breakpoint'te durduğunda değişkenleri incele → step over/into ile adım adım ilerle.",
       "difficulty": "orta",
       "points": 15
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "ps aux | grep node komutu ne yapar?",
+      "options": [
+        "Node.js'i yükler ve çalıştırır",
+        "Çalışan tüm process'leri listeler ve içlerinden 'node' geçenleri filtreler",
+        "Node.js dosyalarını arar",
+        "Node.js process'ini sonlandırır"
+      ],
+      "correct": 1,
+      "explanation": "ps aux tüm çalışan process'leri detaylı listeler (user, PID, CPU%, MEM%, komut). Pipe (|) ile grep'e aktarılır ve sadece 'node' içeren satırlar filtrelenir. Bu, çalışan Node.js uygulamalarını bulmak için yaygın bir yöntemdir. PID'yi öğrendikten sonra kill PID ile process'i sonlandırabilirsin.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": "Aşağıdaki environment variable tanımlamalarından hangisi sadece mevcut komut için geçerlidir?",
+      "options": [
+        "export NODE_ENV=production",
+        "echo $NODE_ENV",
+        "NODE_ENV=production node server.js",
+        "set NODE_ENV=production"
+      ],
+      "correct": 2,
+      "explanation": "NODE_ENV=production node server.js komutu, NODE_ENV değişkenini yalnızca o komutun çalışma süresince tanımlar. Komut bittikten sonra değişken kaybolur. export NODE_ENV=production ise değişkeni tüm shell oturumu boyunca ve alt process'ler için kalıcı yapar. Bu farkı bilmek, farklı ortamlar (development, production) arasında geçiş yaparken önemlidir.",
+      "difficulty": "orta",
+      "points": 10
     }
   ]
 }

@@ -103,6 +103,36 @@
       "sample_answer": "Bu kod bir optimistic update (iyimser guncelleme) pattern'i uygular: 1) onMutate: Sunucuya istek gondermeden ONCE calisan callback. Devam eden fetch'leri iptal eder (cancelQueries), mevcut cache verisini kaydeder (rollback icin), ve cache'i aninda gunceller (likes + 1, isLiked: true). Kullanici begeni butonuna tikladiginda UI aninda guncellenir. 2) onError: Sunucu hatasi donerse, onceden kaydedilen 'previous' verisiyle cache eski haline dondurulur (rollback). 3) onSettled: Basari veya hata farketmeksizin, sunucudan guncel veriyi almak icin query invalidate edilir. Bu pattern, kullaniciya aninda geri bildirim verirken veri tutarlIlIgInI korur.",
       "difficulty": "zor",
       "points": 20
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "React'te Compound Component pattern'inin en büyük avantajı nedir?",
+      "options": [
+        "Performansı artırır çünkü daha az re-render olur",
+        "Component'ler arası ilişkiyi açıkça ifade eder ve kullanıcıya esnek composition API sunar",
+        "Daha az kod yazmayı sağlar",
+        "TypeScript ile daha iyi çalışır"
+      ],
+      "correct": 1,
+      "explanation": "Compound Component pattern'i (örneğin <Select>, <Select.Option>, <Select.Group>), birbiriyle ilişkili component'lerin birlikte kullanılmasını sağlar. Kullanıcı, component'lerin sırasını ve yapısını istediği gibi düzenleyebilir. Context API ile state paylaşımı yapılır. Bu pattern, HTML'in <select> ve <option> ilişkisinden esinlenmiştir.",
+      "difficulty": "orta",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": "Aşağıdaki kodda performans problemi nedir?\n\nfunction UserList({ users }) {\n  return users.map(user => (\n    <UserCard\n      key={user.id}\n      user={user}\n      onClick={() => handleClick(user.id)}\n      style={{ padding: '16px' }}\n    />\n  ));\n}",
+      "options": [
+        "key prop'u yanlış kullanılmış",
+        "users.map doğrudan return edilmemiş",
+        "Her render'da yeni arrow function ve yeni style object oluşturuluyor, React.memo kullanılsa bile re-render'ı engelleyemez",
+        "UserCard component'i import edilmemiş"
+      ],
+      "correct": 2,
+      "explanation": "Her render'da () => handleClick(user.id) yeni bir fonksiyon referansı ve { padding: '16px' } yeni bir object referansı oluşturur. React.memo ile UserCard sarılsa bile, props referansları her seferinde değiştiği için memo çalışmaz. Çözüm: useCallback ile fonksiyonu, useMemo veya component dışı sabit ile style objesini memoize etmek.",
+      "difficulty": "zor",
+      "points": 10
     }
   ]
 }

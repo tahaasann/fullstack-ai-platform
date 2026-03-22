@@ -4127,5 +4127,21 @@
     ],
     "live_demo_url_template": "https://ml-pipeline.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/ml-pipeline-platform"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "ML model egitimi ve evaluation",
+      "Docker ve containerization",
+      "Python ile veri isleme (Pandas, NumPy)",
+      "REST API tasarimi ve implementasyonu"
+    ],
+    "what_you_should_know": [
+      "Phase 5 Module 15 - ML matematik ve Python ML kutuphaneleri",
+      "Phase 5 Module 16 - Neural networks ve deep learning",
+      "Phase 4 Module 13 - Docker, CI/CD ve Kubernetes temelleri",
+      "Phase 6 Module 18 - Yazilim mimarisi patterns"
+    ],
+    "next_project": "project-10",
+    "skills_bridge": "Bu projede ogrendigin ML pipeline orchestration, model versioning ve serving bilgisi, capstone projesinde AI-powered code review araci icin end-to-end ML ve AI sistem entegrasyonu becerilerini tamamlayacak."
   }
 }

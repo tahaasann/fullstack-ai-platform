@@ -3726,5 +3726,21 @@
     ],
     "live_demo_url_template": "https://multi-agent-support.vercel.app",
     "github_repo_template": "https://github.com/USERNAME/multi-agent-support"
+  },
+  "transition_guide": {
+    "prerequisites": [
+      "RAG sistemi gelistirme deneyimi",
+      "LangChain/LangGraph kullanimi",
+      "Agent ve tool-calling kavramlari",
+      "Full-stack web uygulama gelistirme"
+    ],
+    "what_you_should_know": [
+      "Phase 5 Module 17 - AI Agents ve LangChain ileri konular",
+      "Phase 5 Module 17 - RAG pipeline ve evaluation",
+      "Phase 3 Module 10 - API tasarimi (GraphQL dahil)",
+      "Phase 4 Module 13 - Docker ve deployment"
+    ],
+    "next_project": "project-09",
+    "skills_bridge": "Bu projede ogrendigin multi-agent orchestration, conversation management ve AI workflow tasarimi bilgisi, sonraki projede ML pipeline ve model serving platformu icin end-to-end AI sistem tasarimi becerilerini gucllendirecek."
   }
 }

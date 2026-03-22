@@ -668,6 +668,394 @@ Express middleware yazarken AI'a hata loglarini goster ve sor: "Bu error stack t
 - **Senior cevabi:** Middleware (req, res, next) imzasina sahiptir ve request pipeline'inda sirayla calisir. Sira onemlidir: CORS middleware auth'dan once gelmeli, error handler en sonda olmalidir (4 parametre: err, req, res, next). Yaygin pattern'ler: authentication (JWT verify), authorization (role check), validation (input sanitize), logging (request/response log), rate limiting, compression. app.use() global, router.use() route-specific middleware atar. next('route') ile ayni route'un bir sonraki handler'ina atlanir.
 :::
 
+:::exercise
+### Alıştırma 4: Event Loop Sıralaması
+**Görev:** Aşağıdaki kodun çıktı sırasını tahmin et ve nedenini açıkla.
+**Başlangıç kodu:**
+```javascript
+console.log("1: Senkron");
+
+setTimeout(() => console.log("2: setTimeout 0"), 0);
+
+Promise.resolve().then(() => console.log("3: Promise"));
+
+process.nextTick(() => console.log("4: nextTick"));
+
+setImmediate(() => console.log("5: setImmediate"));
+
+Promise.resolve().then(() => {
+  console.log("6: Promise 2");
+  process.nextTick(() => console.log("7: nextTick içinde Promise"));
+});
+
+console.log("8: Senkron 2");
+
+// TODO: Çıktı sırasını yaz ve her satırı açıkla
+```
+**Beklenen çıktı:**
+```
+1: Senkron
+8: Senkron 2
+4: nextTick
+3: Promise
+6: Promise 2
+7: nextTick içinde Promise
+2: setTimeout 0
+5: setImmediate
+
+Açıklama:
+1,8 → Senkron kod her zaman önce
+4   → nextTick microtask queue'da en öncelikli
+3,6 → Promise.then microtask (nextTick'ten sonra)
+7   → Promise içindeki nextTick, bir sonraki microtask check'inde
+2   → setTimeout timer fazında
+5   → setImmediate check fazında
+```
+**İpucu:** Öncelik sırası: Senkron > process.nextTick > Promise > setTimeout/setInterval > setImmediate.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 5: Stream ile Büyük Dosya Okuma
+**Görev:** Stream kullanarak büyük bir dosyayı satır satır oku ve işle (belleği taşırmadan).
+**Başlangıç kodu:**
+```javascript
+const fs = require("fs");
+const readline = require("readline");
+
+// TODO: 1GB'lık bir log dosyasını satır satır oku
+// - Belleğe tümünü yükleme (fs.readFile KULLANMA)
+// - Her satırda "ERROR" içerenleri say
+// - Toplam satır sayısını ve hata sayısını raporla
+
+async function processLogFile(filePath) {
+  // TODO: createReadStream ile okuma stream'i oluştur
+  // TODO: readline interface ile satır satır işle
+  // TODO: Sonuçları döndür
+}
+
+// Kullanım:
+// processLogFile("./server.log").then(console.log);
+```
+**Beklenen çıktı:**
+```javascript
+async function processLogFile(filePath) {
+  const stream = fs.createReadStream(filePath, { encoding: "utf-8" });
+  const rl = readline.createInterface({ input: stream });
+
+  let totalLines = 0;
+  let errorCount = 0;
+
+  for await (const line of rl) {
+    totalLines++;
+    if (line.includes("ERROR")) {
+      errorCount++;
+    }
+  }
+
+  return { totalLines, errorCount };
+}
+
+// Sonuç: { totalLines: 1000000, errorCount: 342 }
+// Bellek kullanımı: ~10MB (dosya boyutu ne olursa olsun)
+```
+**İpucu:** `createReadStream` dosyayı chunk'lar halinde okur, tüm dosyayı belleğe yüklemez. `for await...of` ile asenkron iteration yapılır.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Express Temel CRUD API
+**Görev:** Express ile basit bir CRUD API yaz: GET, POST, PUT, DELETE.
+**Başlangıç kodu:**
+```javascript
+const express = require("express");
+const app = express();
+app.use(express.json());
+
+let books = [
+  { id: 1, title: "Clean Code", author: "Robert Martin" },
+  { id: 2, title: "The Pragmatic Programmer", author: "David Thomas" },
+];
+
+// TODO: GET /api/books - Tüm kitapları listele
+// TODO: GET /api/books/:id - Tek kitap getir (404 kontrolü)
+// TODO: POST /api/books - Yeni kitap ekle (validation)
+// TODO: PUT /api/books/:id - Kitap güncelle
+// TODO: DELETE /api/books/:id - Kitap sil
+```
+**Beklenen çıktı:**
+```javascript
+app.get("/api/books", (req, res) => {
+  res.json(books);
+});
+
+app.get("/api/books/:id", (req, res) => {
+  const book = books.find(b => b.id === parseInt(req.params.id));
+  if (!book) return res.status(404).json({ error: "Kitap bulunamadı" });
+  res.json(book);
+});
+
+app.post("/api/books", (req, res) => {
+  const { title, author } = req.body;
+  if (!title || !author) {
+    return res.status(400).json({ error: "title ve author gerekli" });
+  }
+  const book = { id: books.length + 1, title, author };
+  books.push(book);
+  res.status(201).json(book);
+});
+
+app.put("/api/books/:id", (req, res) => {
+  const book = books.find(b => b.id === parseInt(req.params.id));
+  if (!book) return res.status(404).json({ error: "Kitap bulunamadı" });
+  const { title, author } = req.body;
+  if (title) book.title = title;
+  if (author) book.author = author;
+  res.json(book);
+});
+
+app.delete("/api/books/:id", (req, res) => {
+  const index = books.findIndex(b => b.id === parseInt(req.params.id));
+  if (index === -1) return res.status(404).json({ error: "Kitap bulunamadı" });
+  books.splice(index, 1);
+  res.status(204).send();
+});
+```
+**İpucu:** `req.params.id` string döner, `parseInt()` ile number'a çevir. POST'ta 201, DELETE'te 204 status code kullan.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 7: Middleware Zinciri
+**Görev:** Aşağıdaki middleware'leri doğru sırada uygula ve her birini yaz.
+**Başlangıç kodu:**
+```javascript
+// TODO: 1. Request Logger - her isteği logla
+function requestLogger(req, res, next) {
+  // Method, URL ve timestamp logla
+}
+
+// TODO: 2. Auth Middleware - token kontrolü
+function authMiddleware(req, res, next) {
+  // Authorization header'dan token al
+  // Token yoksa 401 döndür
+  // Token varsa req.user'a kullanıcı bilgisini ekle
+}
+
+// TODO: 3. Rate Limiter - IP başına istek sınırla
+const requestCounts = new Map();
+function rateLimiter(req, res, next) {
+  // IP başına dakikada max 100 istek
+  // Aşılırsa 429 döndür
+}
+
+// TODO: Doğru sırada uygula
+// app.use(???);
+```
+**Beklenen çıktı:**
+```javascript
+function requestLogger(req, res, next) {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
+  next();
+}
+
+function authMiddleware(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Token gerekli" });
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch {
+    res.status(401).json({ error: "Geçersiz token" });
+  }
+}
+
+function rateLimiter(req, res, next) {
+  const ip = req.ip;
+  const now = Date.now();
+  const windowMs = 60 * 1000;
+  const maxRequests = 100;
+
+  if (!requestCounts.has(ip)) requestCounts.set(ip, []);
+  const timestamps = requestCounts.get(ip).filter(t => now - t < windowMs);
+  if (timestamps.length >= maxRequests) {
+    return res.status(429).json({ error: "Çok fazla istek" });
+  }
+  timestamps.push(now);
+  requestCounts.set(ip, timestamps);
+  next();
+}
+
+// Sıra: logger > rateLimiter > auth (her istek için)
+app.use(requestLogger);
+app.use(rateLimiter);
+app.use("/api/protected", authMiddleware);
+```
+**İpucu:** Middleware sırası önemlidir: önce loglama, sonra rate limiting, sonra auth. `next()` çağrılmazsa istek burada kalır.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Async Error Handler Wrapper
+**Görev:** Async route handler'larda try/catch tekrarını önleyen bir wrapper fonksiyonu yaz.
+**Başlangıç kodu:**
+```javascript
+// YANLIŞ: Her route'da try/catch tekrarı
+app.get("/api/users", async (req, res) => {
+  try {
+    const users = await db.users.findAll();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/users/:id", async (req, res) => {
+  try {
+    const user = await db.users.findById(req.params.id);
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// TODO: asyncHandler wrapper fonksiyonu yaz
+// TODO: Global error handler middleware yaz
+// TODO: Route'ları wrapper ile yeniden yaz
+```
+**Beklenen çıktı:**
+```javascript
+// Async Handler Wrapper
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+// Temiz route'lar
+app.get("/api/users", asyncHandler(async (req, res) => {
+  const users = await db.users.findAll();
+  res.json(users);
+}));
+
+app.get("/api/users/:id", asyncHandler(async (req, res) => {
+  const user = await db.users.findById(req.params.id);
+  if (!user) throw new AppError("Kullanıcı bulunamadı", 404);
+  res.json(user);
+}));
+
+// Global Error Handler (en sonda)
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    error: {
+      message: err.message,
+      ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    },
+  });
+});
+```
+**İpucu:** `asyncHandler` try/catch'i bir yere toplar. Hatalar `next(err)` ile global error handler'a iletilir. Error handler 4 parametre alır (err, req, res, next).
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: Express Router ile Modüler Yapı
+**Görev:** Express Router kullanarak route'ları ayrı dosyalara böl.
+**Başlangıç kodu:**
+```javascript
+// TODO: routes/users.js - Kullanıcı route'ları
+// TODO: routes/products.js - Ürün route'ları
+// TODO: app.js - Ana dosyada router'ları birleştir
+
+// Yapı:
+// /api/users       → GET, POST
+// /api/users/:id   → GET, PUT, DELETE
+// /api/products    → GET, POST
+// /api/products/:id → GET, PUT, DELETE
+```
+**Beklenen çıktı:**
+```javascript
+// routes/users.js
+const router = require("express").Router();
+
+router.get("/", async (req, res) => {
+  const users = await User.findAll();
+  res.json(users);
+});
+
+router.post("/", async (req, res) => {
+  const user = await User.create(req.body);
+  res.status(201).json(user);
+});
+
+router.get("/:id", async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+  res.json(user);
+});
+
+module.exports = router;
+
+// app.js
+const usersRouter = require("./routes/users");
+const productsRouter = require("./routes/products");
+
+app.use("/api/users", usersRouter);
+app.use("/api/products", productsRouter);
+```
+**İpucu:** `express.Router()` mini Express uygulaması gibi çalışır. `app.use("/api/users", router)` ile prefix ekler. Router içindeki path'ler prefix'e göre relative olur.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 10: Buffer ve Encoding İşlemleri
+**Görev:** Node.js Buffer kullanarak binary veri işle ve farklı encoding'ler arası dönüşüm yap.
+**Başlangıç kodu:**
+```javascript
+// TODO 1: String'den Buffer oluştur ve hex'e çevir
+const message = "Merhaba Dünya";
+// Buffer.from ile oluştur
+// .toString("hex") ile hex'e çevir
+// .toString("base64") ile base64'e çevir
+
+// TODO 2: İki Buffer'ı birleştir
+const buf1 = Buffer.from("Hello ");
+const buf2 = Buffer.from("World");
+// Buffer.concat ile birleştir
+
+// TODO 3: Buffer karşılaştırma
+const a = Buffer.from("abc");
+const b = Buffer.from("abc");
+// a === b sonucu? (referans karşılaştırma)
+// a.equals(b) sonucu? (içerik karşılaştırma)
+
+// TODO 4: JSON'u Buffer'a çevir ve geri al
+const data = { name: "Test", value: 42 };
+// Buffer'a çevir ve geri JSON'a parse et
+```
+**Beklenen çıktı:**
+```javascript
+// 1. String → Buffer → Encoding
+const buf = Buffer.from("Merhaba Dünya", "utf-8");
+console.log(buf.toString("hex"));    // "4d65726861626120..."
+console.log(buf.toString("base64")); // "TWVyaGFiYSBEw7xu..."
+
+// 2. Buffer birleştirme
+const combined = Buffer.concat([buf1, buf2]);
+console.log(combined.toString()); // "Hello World"
+
+// 3. Karşılaştırma
+console.log(a === b);       // false (farklı referans)
+console.log(a.equals(b));   // true (aynı içerik)
+
+// 4. JSON ↔ Buffer
+const jsonBuf = Buffer.from(JSON.stringify(data));
+const parsed = JSON.parse(jsonBuf.toString());
+console.log(parsed); // { name: "Test", value: 42 }
+```
+**İpucu:** Buffer binary veriyi temsil eder. `===` referans karşılaştırır, `equals()` içerik karşılaştırır. Network ve dosya I/O işlemlerinde her yerde Buffer kullanılır.
+**Zorluk:** Kolay
+:::
+
 :::must-note
 - Node.js tek thread çalışır ama libuv thread pool (4 thread) ve OS async mekanizmalarıyla non-blocking I/O sağlar
 - Event Loop fazları: timers → pending callbacks → idle/prepare → poll → check → close callbacks

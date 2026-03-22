@@ -114,6 +114,36 @@
       "explanation": "GitHub Flow iş akışı: main'den branch oluştur → değişiklikleri commit et → remote'a push et → PR aç → review ve merge. Bu akış, takım çalışmasında standart bir iş akışıdır.",
       "difficulty": "orta",
       "points": 15
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "git log --oneline --graph komutu ne gösterir?",
+      "options": [
+        "Sadece son commit'i detaylı gösterir",
+        "Commit geçmişini kısa hash ve mesajlarla, branch yapısını ASCII grafiği olarak gösterir",
+        "Dosya değişikliklerini satır satır gösterir",
+        "Remote repository'deki commit'leri gösterir"
+      ],
+      "correct": 1,
+      "explanation": "--oneline her commit'i tek satırda (kısa hash + mesaj) gösterir, --graph ise branch'ler ve merge'lerin görsel ASCII grafiğini ekler. Bu komut, projenin branch yapısını ve geçmişini hızlıca anlamak için çok kullanışlıdır. Alias olarak git lg şeklinde kaydedebilirsin.",
+      "difficulty": "kolay",
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": ".gitignore dosyasına node_modules/ ekledikten sonra, daha önce commit edilmiş node_modules klasörü ne olur?",
+      "options": [
+        "Otomatik olarak takipten çıkar ve silinir",
+        "Bir sonraki commit'te otomatik olarak kaldırılır",
+        "Hâlâ takip edilmeye devam eder; git rm --cached ile manuel olarak kaldırılmalıdır",
+        ".gitignore dosyası geriye dönük olarak tüm commit'lerden siler"
+      ],
+      "correct": 2,
+      "explanation": ".gitignore sadece henüz takip edilmeyen (untracked) dosyaları etkiler. Daha önce commit edilmiş dosyalar takip edilmeye devam eder. Takipten çıkarmak için: git rm -r --cached node_modules/ && git commit -m 'Remove node_modules from tracking'. Bu, dosyaları diskten silmeden sadece Git takibinden çıkarır.",
+      "difficulty": "orta",
+      "points": 10
     }
   ]
 }

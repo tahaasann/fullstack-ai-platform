@@ -694,6 +694,399 @@ export const config = {
 Next.js projelerinde AI'a build output veya deployment loglarini goster ve sor: "Build ciktisinda hangi sayfalar static, hangisi dynamic render ediliyor? Bekledigim stratejiyle uyusuyor mu? Yanlis render edilen sayfalari nasil duzeltirim?"
 :::
 
+:::exercise
+### Alıştırma 4: Next.js Dosya Yapısı ve Routing
+**Görev:** Aşağıdaki URL yapısı için gerekli dosya/klasör yapısını oluştur.
+**Başlangıç kodu:**
+```
+Gerekli URL'ler:
+/                    → Ana sayfa
+/about               → Hakkımızda
+/blog                → Blog listesi
+/blog/[slug]         → Blog detay
+/dashboard           → Dashboard (layout ile sidebar)
+/dashboard/settings  → Dashboard ayarlar
+/dashboard/profile   → Dashboard profil
+
+TODO: app/ klasörü altında dosya yapısını oluştur
+app/
+  ???
+```
+**Beklenen çıktı:**
+```
+app/
+  layout.tsx          ← Genel layout (navbar, footer)
+  page.tsx            ← / (Ana sayfa)
+  about/
+    page.tsx          ← /about
+  blog/
+    page.tsx          ← /blog (liste)
+    [slug]/
+      page.tsx        ← /blog/merhaba-dunya
+  dashboard/
+    layout.tsx        ← Dashboard layout (sidebar)
+    page.tsx          ← /dashboard
+    settings/
+      page.tsx        ← /dashboard/settings
+    profile/
+      page.tsx        ← /dashboard/profile
+```
+**İpucu:** Her `page.tsx` bir route oluşturur. `layout.tsx` alt route'ları sarar. `[slug]` dynamic segment'tir.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Server Component vs Client Component
+**Görev:** Aşağıdaki component'lerin hangisinin Server, hangisinin Client Component olması gerektiğini belirle ve nedenini açıkla.
+**Başlangıç kodu:**
+```tsx
+// Component 1: Blog yazısı görüntüleme
+function BlogPost({ slug }: { slug: string }) {
+  // Veritabanından blog yazısını çek
+  // Markdown'ı HTML'e çevir
+  // Statik içerik göster
+}
+
+// Component 2: Beğeni butonu
+function LikeButton({ postId }: { postId: string }) {
+  // Tıklanınca beğeni sayısını artır
+  // Beğeni animasyonu göster
+}
+
+// Component 3: Yorum listesi
+function CommentList({ postId }: { postId: string }) {
+  // Veritabanından yorumları çek
+  // Statik liste olarak göster
+}
+
+// Component 4: Yorum formu
+function CommentForm({ postId }: { postId: string }) {
+  // Input state'i yönet
+  // Form submit et
+}
+
+// Component 5: Navigasyon çubuğu
+function Navbar() {
+  // Aktif sayfayı vurgula (usePathname)
+  // Hamburger menü toggle (useState)
+}
+```
+**Beklenen çıktı:**
+```
+Component 1: SERVER ✓ - DB erişimi var, state/event yok, async olabilir
+Component 2: CLIENT ✓ - onClick event, useState gerekli → "use client"
+Component 3: SERVER ✓ - DB erişimi var, interaktivite yok
+Component 4: CLIENT ✓ - form state, onSubmit event → "use client"
+Component 5: CLIENT ✓ - usePathname hook, useState → "use client"
+
+Kural: State, event handler veya browser API kullanıyorsa → Client
+       DB/API erişimi, statik render → Server (varsayılan)
+```
+**İpucu:** Varsayılan Server Component'tir. Sadece interaktivite gerektiğinde `"use client"` ekle. Server Component içinde Client Component kullanabilirsin ama tersi olmaz.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: SSR, SSG ve ISR Seçimi
+**Görev:** Her sayfa için doğru rendering stratejisini seç ve Next.js kodunu yaz.
+**Başlangıç kodu:**
+```tsx
+// Senaryo 1: Ürün listesi sayfası (fiyatlar saatte bir güncellenir)
+// TODO: Hangi strateji? Kodu yaz.
+
+// Senaryo 2: Blog yazısı (yayınlandıktan sonra nadiren değişir)
+// TODO: Hangi strateji? Kodu yaz.
+
+// Senaryo 3: Kullanıcı profil sayfası (her kullanıcı farklı görür)
+// TODO: Hangi strateji? Kodu yaz.
+
+// Senaryo 4: Hakkımızda sayfası (hiç değişmez)
+// TODO: Hangi strateji? Kodu yaz.
+```
+**Beklenen çıktı:**
+```tsx
+// Senaryo 1: ISR (Incremental Static Regeneration) - 1 saat
+export default async function ProductList() {
+  const products = await fetch("https://api.example.com/products", {
+    next: { revalidate: 3600 },
+  }).then(res => res.json());
+  return <div>{/* render */}</div>;
+}
+
+// Senaryo 2: SSG (Static Site Generation)
+export async function generateStaticParams() {
+  const posts = await fetch("https://api.example.com/posts").then(r => r.json());
+  return posts.map((post: any) => ({ slug: post.slug }));
+}
+
+// Senaryo 3: SSR (Server-Side Rendering) - her istekte
+export const dynamic = "force-dynamic";
+
+// Senaryo 4: SSG (varsayılan - fetch yok veya cache)
+// Next.js varsayılan olarak static render eder
+```
+**İpucu:** Hiç değişmeyen → SSG, Nadiren değişen → ISR (revalidate), Her kullanıcıya farklı → SSR (force-dynamic).
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: API Route Handler
+**Görev:** Next.js App Router'da RESTful API route handler yaz.
+**Başlangıç kodu:**
+```tsx
+// app/api/todos/route.ts
+
+// TODO: GET - Tüm todo'ları getir
+export async function GET(request: Request) {
+  // URL'den search params al (?completed=true)
+  // Filtrelenmiş todo listesini döndür
+}
+
+// TODO: POST - Yeni todo oluştur
+export async function POST(request: Request) {
+  // Body'den title al
+  // Validasyon yap (boş olamaz)
+  // Yeni todo oluştur ve döndür
+}
+
+// app/api/todos/[id]/route.ts
+
+// TODO: DELETE - Todo sil
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  // id'ye göre sil
+}
+```
+**Beklenen çıktı:**
+```tsx
+// app/api/todos/route.ts
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const completed = searchParams.get("completed");
+  let todos = await db.todo.findMany();
+  if (completed !== null) {
+    todos = todos.filter(t => t.completed === (completed === "true"));
+  }
+  return Response.json(todos);
+}
+
+export async function POST(request: Request) {
+  const { title } = await request.json();
+  if (!title?.trim()) {
+    return Response.json({ error: "Title gerekli" }, { status: 400 });
+  }
+  const todo = await db.todo.create({ data: { title, completed: false } });
+  return Response.json(todo, { status: 201 });
+}
+
+// app/api/todos/[id]/route.ts
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  await db.todo.delete({ where: { id: params.id } });
+  return new Response(null, { status: 204 });
+}
+```
+**İpucu:** `Response.json()` ile JSON döndür. URL search params için `new URL(request.url).searchParams` kullan. Status code'ları: 200 başarı, 201 oluşturuldu, 204 içerik yok, 400 hatalı istek.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Next.js Middleware
+**Görev:** Middleware ile authentication kontrolü ve redirect yapan bir sistem yaz.
+**Başlangıç kodu:**
+```tsx
+// middleware.ts (proje kökünde)
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(request: NextRequest) {
+  // TODO 1: /dashboard ile başlayan yollar için token kontrolü
+  // Cookie'den "auth-token" oku
+  // Token yoksa /login'e yönlendir
+
+  // TODO 2: /login sayfasına gelen kullanıcı zaten giriş yapmışsa
+  // /dashboard'a yönlendir
+
+  // TODO 3: Tüm response'lara custom header ekle
+}
+
+// TODO: Middleware'in hangi yollarda çalışacağını belirle
+export const config = {
+  matcher: [/* ? */],
+};
+```
+**Beklenen çıktı:**
+```tsx
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get("auth-token")?.value;
+  const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith("/dashboard") && !token) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (pathname === "/login" && token) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  const response = NextResponse.next();
+  response.headers.set("x-custom-header", "my-app");
+  return response;
+}
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/login"],
+};
+```
+**İpucu:** `request.cookies.get()` ile cookie oku. `NextResponse.redirect()` ile yönlendir. `matcher` ile middleware'in çalışacağı yolları belirle.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: Loading ve Error UI
+**Görev:** Next.js'in loading.tsx ve error.tsx dosyalarını kullanarak UX-dostu yükleme ve hata ekranları oluştur.
+**Başlangıç kodu:**
+```tsx
+// app/products/loading.tsx
+// TODO: Skeleton loader oluştur (ürün kartları için)
+
+// app/products/error.tsx
+// TODO: Error boundary component'i yaz
+// "use client" gerekli!
+// error ve reset props'larını al
+// Kullanıcıya hata mesajı ve "Tekrar Dene" butonu göster
+
+// app/products/not-found.tsx
+// TODO: 404 sayfası oluştur
+```
+**Beklenen çıktı:**
+```tsx
+// loading.tsx
+export default function Loading() {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="animate-pulse">
+          <div className="bg-gray-700 h-48 rounded-lg" />
+          <div className="bg-gray-700 h-4 mt-2 rounded w-3/4" />
+          <div className="bg-gray-700 h-4 mt-1 rounded w-1/2" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// error.tsx
+"use client";
+export default function Error({ error, reset }: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  return (
+    <div className="text-center py-10">
+      <h2 className="text-xl text-red-400">Bir hata oluştu</h2>
+      <p className="text-gray-400 mt-2">{error.message}</p>
+      <button onClick={reset} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+        Tekrar Dene
+      </button>
+    </div>
+  );
+}
+
+// not-found.tsx
+export default function NotFound() {
+  return (
+    <div className="text-center py-20">
+      <h1 className="text-4xl font-bold text-gray-300">404</h1>
+      <p className="text-gray-500 mt-2">Sayfa bulunamadı</p>
+    </div>
+  );
+}
+```
+**İpucu:** `loading.tsx` otomatik Suspense boundary oluşturur. `error.tsx` client component olmalı ve `reset` fonksiyonu ile yeniden deneme sağlar. `animate-pulse` Tailwind ile skeleton efekti.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 10: Server Actions ile Form İşlemi
+**Görev:** Next.js Server Actions kullanarak veritabanına veri ekleyen bir form yaz (API route'a gerek yok).
+**Başlangıç kodu:**
+```tsx
+// app/actions.ts
+"use server";
+
+// TODO: Server action fonksiyonu yaz
+// FormData alıp veritabanına kaydetsin
+// Zod ile validasyon yapsın
+// Hata durumunda mesaj döndürsün
+// Başarıda revalidatePath çağırsın
+
+// app/contact/page.tsx
+// TODO: Server action'ı kullanan form component'i yaz
+// useFormStatus ile loading durumu göster
+// useFormState ile hata/başarı mesajı göster
+```
+**Beklenen çıktı:**
+```tsx
+// app/actions.ts
+"use server";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  message: z.string().min(10),
+});
+
+export async function submitContact(prevState: any, formData: FormData) {
+  const parsed = contactSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    message: formData.get("message"),
+  });
+
+  if (!parsed.success) {
+    return { error: parsed.error.flatten().fieldErrors };
+  }
+
+  await db.contact.create({ data: parsed.data });
+  revalidatePath("/contact");
+  return { success: true };
+}
+
+// app/contact/page.tsx
+"use client";
+import { useFormState, useFormStatus } from "react-dom";
+import { submitContact } from "../actions";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return <button disabled={pending}>{pending ? "Gönderiliyor..." : "Gönder"}</button>;
+}
+
+export default function ContactPage() {
+  const [state, formAction] = useFormState(submitContact, null);
+  return (
+    <form action={formAction}>
+      <input name="name" />
+      <input name="email" />
+      <textarea name="message" />
+      {state?.error && <p className="text-red-400">Hata var</p>}
+      {state?.success && <p className="text-emerald-400">Gönderildi!</p>}
+      <SubmitButton />
+    </form>
+  );
+}
+```
+**İpucu:** Server Actions `"use server"` ile işaretlenir. `useFormStatus` form gönderilirken loading gösterir. `revalidatePath` ile cache temizlenir.
+**Zorluk:** Zor
+:::
+
 :::must-note
 - Next.js = React üzerine full-stack framework (routing, SSR, API, optimization kutudan çıkar)
 - App Router (yeni standart): file-based routing, layout.tsx, page.tsx, loading.tsx, error.tsx

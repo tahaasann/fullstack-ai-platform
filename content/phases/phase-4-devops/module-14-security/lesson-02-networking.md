@@ -762,6 +762,293 @@ Docker Compose ile basit bir load balancer ortami kurun:
 ```
 
 **Beklenen sonuc:** Request'ler 3 backend arasinda esit dagilmali, bir backend durdugunca kalan ikisi trafigi almali.
+
+---
+
+### Alistirma 4: DNS Cozumleme Analizi (Kolay)
+
+Farkli DNS sunuculari ile domain cozumleme surelerini karsilastir.
+
+```bash
+# 1. Farkli DNS sunuculari ile sorgula
+nslookup google.com 8.8.8.8       # Google DNS
+nslookup google.com 1.1.1.1       # Cloudflare DNS
+nslookup google.com 208.67.222.222 # OpenDNS
+
+# 2. Detayli DNS sorgusu
+dig google.com +trace    # Tum cozumleme zincirini gor
+dig google.com ANY       # Tum DNS kayitlarini listele
+
+# 3. Response surelerini karsilastir
+for dns in 8.8.8.8 1.1.1.1 208.67.222.222; do
+  echo "=== $dns ==="
+  dig @$dns google.com | grep "Query time"
+done
+
+# TODO: Kendi domain'in icin MX, TXT, CNAME kayitlarini sorgula
+# TODO: TTL degerlerini incele ve cache etkisini anla
+# TODO: DNSSEC dogrulamasini kontrol et: dig +dnssec example.com
+```
+
+**Beklenen Sonuc:** Farkli DNS sunuculari farkli response sureleri verebilir. DNS kayit turleri (A, AAAA, MX, CNAME, TXT) dogru listelenmeli.
+**Ipucu:** Cloudflare DNS (1.1.1.1) genellikle en hizlidir. `dig +short` ile sadece IP adresini gor.
+
+---
+
+### Alistirma 5: TLS Sertifika Analizi (Kolay)
+
+Bir web sitesinin TLS sertifikasini ve guvenlik yapilandirmasini incele.
+
+```bash
+# 1. Sertifika bilgilerini gor
+openssl s_client -connect google.com:443 -servername google.com </dev/null 2>/dev/null | \
+  openssl x509 -noout -text | head -30
+
+# 2. Sertifika zincirini incele
+openssl s_client -connect google.com:443 -showcerts </dev/null 2>/dev/null
+
+# 3. Sertifika gecerlilik tarihlerini kontrol et
+echo | openssl s_client -connect google.com:443 2>/dev/null | \
+  openssl x509 -noout -dates
+
+# 4. Desteklenen TLS versiyonlarini test et
+nmap --script ssl-enum-ciphers -p 443 google.com
+
+# TODO: Kendi deploy ettigin sitenin sertifikasini incele
+# TODO: Self-signed sertifika olustur ve farkini anla
+# TODO: SSL Labs API ile sertifika notu al
+```
+
+**Beklenen Sonuc:** Sertifika zinciri (leaf → intermediate → root CA) gorunmeli. TLS 1.3 desteklenmeli. Sertifika gecerlilik tarihleri dogru olmali.
+**Ipucu:** Let's Encrypt sertifikalari 90 gun gecerlidir ve otomatik yenilenir. `certbot` ile kolayca yonetilebilir.
+
+---
+
+### Alistirma 6: Wireshark ile Paket Analizi (Orta)
+
+Network trafigini yakalayip HTTP ve TCP paketlerini analiz et.
+
+```bash
+# tcpdump ile terminal bazli paket yakalama
+# 1. HTTP trafigini yakala
+sudo tcpdump -i any -A port 80 -c 20
+
+# 2. Belirli bir host'a giden trafigi yakala
+sudo tcpdump -i any host api.example.com -w capture.pcap
+
+# 3. TCP handshake'i gozlemle
+sudo tcpdump -i any 'tcp[tcpflags] & (tcp-syn|tcp-ack|tcp-fin) != 0' -c 10
+
+# 4. DNS trafigini yakala
+sudo tcpdump -i any port 53 -c 10
+```
+
+```python
+# Python ile basit paket analizi (scapy)
+from scapy.all import sniff, IP, TCP
+
+def packet_callback(packet):
+    if IP in packet:
+        print(f"{packet[IP].src} -> {packet[IP].dst} | "
+              f"Proto: {packet[IP].proto} | Size: {len(packet)}")
+
+# TODO: 20 paket yakala ve analiz et
+# TODO: TCP SYN paketlerini filtrele
+# TODO: HTTP GET request'lerini bul
+# TODO: Ortalama paket boyutunu hesapla
+```
+
+**Beklenen Sonuc:** TCP 3-way handshake (SYN, SYN-ACK, ACK) gozlemlenmeli. HTTP request/response icerigi okunabilmeli. HTTPS trafiginde icerik sifreli gorunmeli.
+**Ipucu:** Wireshark GUI kullanirken `http` veya `tcp.port == 443` filtresi ile trafigi daralt. HTTPS icerigi decrypt etmek icin SSLKEYLOGFILE gerekir.
+
+---
+
+### Alistirma 7: Reverse Proxy Yapilandirmasi (Orta)
+
+Nginx reverse proxy ile SSL termination, caching ve gzip compression yapilandir.
+
+```nginx
+# nginx.conf
+upstream backend {
+    server api:3000;
+    server api2:3000;
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name example.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+
+    ssl_certificate /etc/ssl/certs/fullchain.pem;
+    ssl_certificate_key /etc/ssl/private/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    # Gzip compression
+    gzip on;
+    gzip_types text/plain application/json application/javascript text/css;
+    gzip_min_length 1000;
+
+    # Security headers
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+
+    location /api/ {
+        proxy_pass http://backend/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # TODO: Static dosyalar icin cache kurallari ekle (images, css, js)
+    # TODO: Rate limiting ekle (limit_req_zone)
+    # TODO: WebSocket proxy yapilandirmasi ekle
+    # TODO: Access log formatini JSON olarak yapilandir
+}
+```
+
+**Beklenen Sonuc:** HTTP→HTTPS yonlendirmesi calismali. Gzip ile response boyutu kuculmus olmali. Backend'e X-Real-IP header'i ile gercek IP iletilmeli.
+**Ipucu:** `nginx -t` ile konfigurasyonu dogrula. `curl -I https://example.com` ile response header'larini kontrol et.
+
+---
+
+### Alistirma 8: SSH Tunnel ve Port Forwarding (Orta)
+
+SSH tunnel ile uzak servislere guvenli erisim sagla.
+
+```bash
+# 1. Local port forwarding (uzak DB'ye lokal erisim)
+ssh -L 5433:localhost:5432 user@remote-server
+# Simdi localhost:5433 uzerinden uzak PostgreSQL'e baglanabilirsin
+
+# 2. Remote port forwarding (lokal servisi disariya ac)
+ssh -R 8080:localhost:3000 user@remote-server
+# Simdi remote-server:8080 uzerinden lokal app'ine erisilir
+
+# 3. Dynamic port forwarding (SOCKS proxy)
+ssh -D 9090 user@remote-server
+# Tarayicida SOCKS proxy olarak localhost:9090 kullan
+
+# 4. SSH config dosyasi ile kolaylastir
+cat >> ~/.ssh/config << 'EOF'
+Host production-db
+    HostName 10.0.1.50
+    User deploy
+    LocalForward 5433 localhost:5432
+    IdentityFile ~/.ssh/id_ed25519
+EOF
+
+# TODO: SSH key pair olustur (ed25519 algoritmasiyla)
+# TODO: Password authentication'i kapat, sadece key authentication kalsın
+# TODO: Jump host (bastion server) uzerinden ic aga eris
+# TODO: sshfs ile uzak dosya sistemini mount et
+```
+
+**Beklenen Sonuc:** Lokal porttan uzak veritabanina baglanilabilmeli. SSH key ile sifresiz erisim saglanmali. Config dosyasi ile tek komutla baglanti kurulmali.
+**Ipucu:** `ssh-keygen -t ed25519` modern ve guvenli key olusturur. `ssh-copy-id user@server` ile public key'i kolayca yukle.
+
+---
+
+### Alistirma 9: Network Guvenligi Audit Scripti (Zor)
+
+Bir sunucunun network guvenligini otomatik kontrol eden script yaz.
+
+```bash
+#!/bin/bash
+# security-audit.sh
+
+echo "=== Network Security Audit ==="
+echo "Tarih: $(date)"
+echo ""
+
+# 1. Acik portlari tara
+echo "--- Acik Portlar ---"
+ss -tlnp | grep LISTEN
+
+# 2. Firewall kurallarini kontrol et
+echo "--- Firewall Kurallari ---"
+sudo iptables -L -n --line-numbers 2>/dev/null || sudo ufw status verbose
+
+# 3. Dinleyen servisleri listele
+echo "--- Dinleyen Servisler ---"
+ss -tlnp | awk 'NR>1 {print $4, $7}'
+
+# 4. SSL/TLS yapilandirmasini kontrol et
+echo "--- TLS Kontrolu ---"
+echo | openssl s_client -connect localhost:443 2>/dev/null | grep "Protocol\|Cipher"
+
+# TODO: Zayif SSH konfigurasyonlarini kontrol et
+# TODO: Default credentials kontrolu (common username/password)
+# TODO: Gereksiz servisleri tespit et ve raporla
+# TODO: DNS leak testi yap
+# TODO: Sonuclari JSON formatinda kaydet
+```
+
+**Beklenen Sonuc:** Raporda acik portlar, firewall durumu, TLS versiyonu ve potansiyel guvenlik riskleri listelenmeli.
+**Ipucu:** Production sunucularda sadece gerekli portlar acik olmali (22, 80, 443). `nmap -sV localhost` ile servis versiyonlarini tespit et.
+
+---
+
+### Alistirma 10: WebSocket Guvenli Iletisim (Zor)
+
+WebSocket uzerinden guvenli real-time iletisim kur.
+
+```javascript
+// server.js
+const { WebSocketServer } = require("ws");
+const jwt = require("jsonwebtoken");
+
+const wss = new WebSocketServer({ noServer: true });
+
+// HTTP upgrade sirasinda authentication
+server.on("upgrade", (request, socket, head) => {
+  const token = new URL(request.url, "http://localhost").searchParams.get("token");
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      ws.user = user;
+      wss.emit("connection", ws, request);
+    });
+  } catch (err) {
+    socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+    socket.destroy();
+  }
+});
+
+wss.on("connection", (ws) => {
+  console.log(`User connected: ${ws.user.id}`);
+
+  ws.on("message", (data) => {
+    const message = JSON.parse(data);
+    // TODO: Message validation ve sanitization
+    // TODO: Rate limiting (saniyede max 10 mesaj)
+    // TODO: Room/channel bazli yetkilendirme
+    // TODO: Mesaj boyut limiti (max 4KB)
+  });
+
+  // Heartbeat mekanizmasi
+  ws.isAlive = true;
+  ws.on("pong", () => { ws.isAlive = true; });
+});
+
+// Dead connection temizligi
+setInterval(() => {
+  wss.clients.forEach((ws) => {
+    if (!ws.isAlive) return ws.terminate();
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, 30000);
+```
+
+**Beklenen Sonuc:** JWT olmadan WebSocket baglantisi reddedilmeli. Heartbeat ile olü baglantilar temizlenmeli. Mesaj boyut ve hiz limitleri uygulanmali.
+**Ipucu:** WebSocket URL'inde token gondermek yerine, ilk mesajda authentication yapmak daha guvenlidir (URL server loglarinda gorunur).
 :::
 
 :::interview

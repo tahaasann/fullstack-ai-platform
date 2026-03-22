@@ -93,6 +93,34 @@
       "question": "Asagidaki LinkedIn headline ornegini profesyonel bir Full Stack Developer icin tamamlayin. Headline'da pozisyon, ana teknolojiler ve bir anahtar kelime olmali:\n\n\"_______________ | React & Node.js | _______________\"",
       "correct": "Full Stack Developer | React & Node.js | Building Scalable Web Applications",
       "explanation": "LinkedIn headline'i 120 karakter limiti icinde maximum bilgiyi vermelidir. Ideal format: [Pozisyon] | [Ana Teknolojiler] | [Deger Onerisi/Anahtar Kelime]. 'Open to Work' veya 'Looking for Job' gibi ifadeler yerine becerilerinizi ve deger onerinizi vurgulamak daha etkilidir. Recruiter'lar keyword bazli arama yapar."
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "System design interview'da interviewer 'Bu sistemi nasil olceklendirirsin?' diye sordugunda, ilk adim ne olmalidir?",
+      "options": [
+        "Hemen Kubernetes ve microservice mimarisi cizmek",
+        "Beklenen kullanici sayisi, trafik pattern'i ve darbogazin nerede oldugunu sormak",
+        "Cache eklemek",
+        "Veritabani degistirmek"
+      ],
+      "correct": 1,
+      "explanation": "Olceklendirme sorusuna hemen cozum sunmak yerine, once gereksinimleri netlestirmelisin: Kac kullanici bekleniyor? Read-heavy mi write-heavy mi? Darbogazin (bottleneck) neresi? Bu sorular hem dogru cozumu bulmeni saglar hem de interviewer'a sistematik dusundugun gosterir. Premature optimization'dan kacinmak kural #1'dir."
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "difficulty": "orta",
+      "question": "Teknik interview sonrasi 'Sorulariniz var mi?' dendiginde hangisi en etkili sorudur?",
+      "options": [
+        "Maas ne kadar?",
+        "Tatil gunleri kac gun?",
+        "Takimda code review sureci nasil isliyor ve yeni bir developer'in ilk 90 gunu nasil planlanmis?",
+        "Soru yok, tesekkur ederim"
+      ],
+      "correct": 2,
+      "explanation": "Interview sonundaki sorular, senin ilgin ve arastirman hakkinda cok sey soyler. Teknik surec (code review, CI/CD, testing), takim kulturu ve onboarding hakkinda sormak, senin is yapma sekline ve buyumeye onem verdigini gosterir. Maas/tatil sorulari HR gorusmesine birakilmali, soru sormamak ise ilgisiz gorunmene neden olur."
     }
   ]
 }

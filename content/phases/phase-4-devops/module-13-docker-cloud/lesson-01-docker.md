@@ -1043,6 +1043,299 @@ docker network inspect my-app_default
 
 **Beklenen Sonuc:** Image boyutu Alpine kullanarak ve multi-stage build ile minimize edilmis olmali. Layer caching ile src degisikliginde sadece ilgili layer'lar yeniden build edilmeli. Container icinden DB ve Redis'e erisim dogrulanmali.
 **Ipucu:** `docker system df` ile disk kullanimini gor. `docker builder prune` ile build cache'ini temizle. `docker compose logs -f service_name` ile tek servisin logunu izle.
+
+---
+
+### Alistirma 4: .dockerignore ve Guvenlik Taramasi (Kolay)
+
+Docker image'inda gereksiz ve hassas dosyalarin bulunmadigini dogrula.
+
+```bash
+# 1. .dockerignore dosyasi olustur
+cat > .dockerignore << 'EOF'
+node_modules
+.git
+.env
+.env.*
+*.md
+tests/
+coverage/
+.vscode/
+docker-compose*.yml
+EOF
+
+# 2. Image'i build et ve icerigini incele
+docker build -t my-app:secure .
+docker run --rm my-app:secure ls -la /app/
+
+# TODO: .env dosyasinin image'da OLMADIGINI dogrula
+# TODO: node_modules'un host'tan degil, build sirasinda yuklendigini kontrol et
+# TODO: docker scout cves my-app:secure ile guvenlik taramasi yap
+# TODO: Trivy ile alternatif tarama: trivy image my-app:secure
+```
+
+**Beklenen Sonuc:** .env, .git, node_modules gibi dosyalar image'da bulunmamali. Guvenlik taramasinda kritik CVE olmamali.
+**Ipucu:** `docker history my-app:secure` ile her layer'in ne yaptigini gor. Secret'lari build-time'da ARG olarak gecme, runtime'da environment variable kullan.
+
+---
+
+### Alistirma 5: Docker Volume ve Persistent Data (Kolay)
+
+Container silinse bile verilerin kaybolmamasini saglayan volume yapilandirmasi yap.
+
+```bash
+# 1. Named volume ile PostgreSQL
+docker volume create pgdata
+docker run -d \
+  --name postgres-test \
+  -e POSTGRES_PASSWORD=secret \
+  -v pgdata:/var/lib/postgresql/data \
+  -p 5432:5432 \
+  postgres:16-alpine
+
+# 2. Veri ekle
+docker exec -it postgres-test psql -U postgres -c "
+  CREATE TABLE test_data (id SERIAL, name TEXT);
+  INSERT INTO test_data (name) VALUES ('container silinse bile kalacak');
+"
+
+# 3. Container'i sil ve yeniden olustur
+docker stop postgres-test && docker rm postgres-test
+docker run -d --name postgres-test2 -e POSTGRES_PASSWORD=secret -v pgdata:/var/lib/postgresql/data postgres:16-alpine
+
+# TODO: Verinin hala mevcut oldugunu dogrula (SELECT * FROM test_data)
+# TODO: docker volume inspect pgdata ile volume bilgilerini incele
+# TODO: Bind mount vs named volume farklarini dene
+```
+
+**Beklenen Sonuc:** Container silinip yeniden olusturulsa bile veriler korunmali. Volume inspect ile mount point ve boyut bilgileri gorunmeli.
+**Ipucu:** Named volume'lar Docker tarafindan yonetilir ve production'da tercih edilir. Bind mount'lar development'ta (hot reload) kullanilir.
+
+---
+
+### Alistirma 6: Multi-Stage Build ile Image Optimizasyonu (Orta)
+
+Ayni uygulamayi farkli build stratejileriyle karsilastir.
+
+```dockerfile
+# Dockerfile.naive — Kotu ornek
+FROM node:20
+WORKDIR /app
+COPY . .
+RUN npm install
+CMD ["node", "server.js"]
+
+# Dockerfile.optimized — Multi-stage build
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY src/ ./src/
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+USER appuser
+EXPOSE 3000
+CMD ["node", "src/server.js"]
+```
+
+```bash
+# Her iki image'i build et ve karsilastir
+docker build -f Dockerfile.naive -t app:naive .
+docker build -f Dockerfile.optimized -t app:optimized .
+docker images | grep app
+
+# TODO: Image boyutlarini karsilastir (naive vs optimized)
+# TODO: Layer sayisini karsilastir: docker history app:naive vs app:optimized
+# TODO: Non-root user ile calistigini dogrula: docker run app:optimized whoami
+# TODO: Distroless base image ile ucuncu bir varyant dene
+```
+
+**Beklenen Sonuc:** Optimized image en az %50 daha kucuk olmali. Non-root user ile calismali. Gereksiz build araclari final image'da bulunmamali.
+**Ipucu:** `npm ci --only=production` devDependencies'i atlar. `USER appuser` ile root yetkisiyle calismak engellenir.
+
+---
+
+### Alistirma 7: Docker Network ve Container Iletisimi (Orta)
+
+Birden fazla container'in ozel bir network uzerinden iletisim kurmasini sagla.
+
+```bash
+# 1. Custom bridge network olustur
+docker network create --driver bridge app-network
+
+# 2. Backend container'i baslat
+docker run -d --name api --network app-network -e DB_HOST=db node-api:latest
+
+# 3. Database container'i baslat
+docker run -d --name db --network app-network \
+  -e POSTGRES_PASSWORD=secret postgres:16-alpine
+
+# 4. Frontend container'i baslat (farkli network'te)
+docker run -d --name web --network app-network -p 80:80 nginx:alpine
+
+# TODO: api container'indan db'ye ping at: docker exec api ping db
+# TODO: Container DNS cozumlemesini test et: docker exec api nslookup db
+# TODO: Network inspect ile bagli container'lari listele
+# TODO: Farkli network'teki container'larin birbirini goremedigini dogrula
+```
+
+**Beklenen Sonuc:** Ayni network'teki container'lar birbirlerini isimle bulabilmeli. Farkli network'teki container'lar izole olmali.
+**Ipucu:** Docker Compose otomatik olarak bir bridge network olusturur. Service isimleri DNS olarak cozumlenir.
+
+---
+
+### Alistirma 8: Docker Health Check ve Restart Policy (Orta)
+
+Container saglik kontrolu ve otomatik yeniden baslatma yapilandir.
+
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY src/ ./src/
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+EXPOSE 3000
+CMD ["node", "src/server.js"]
+```
+
+```bash
+# Restart policy ile calistir
+docker run -d \
+  --name resilient-app \
+  --restart unless-stopped \
+  --memory 512m \
+  --cpus 0.5 \
+  app:healthcheck
+
+# TODO: docker inspect resilient-app | grep -A5 Health ile saglik durumunu gor
+# TODO: Container icindeki process'i kill et ve otomatik restart'i gozlemle
+# TODO: Memory limitini as ve OOM killer'in devreye girmesini gozlemle
+# TODO: docker stats ile resource kullanimini izle
+```
+
+**Beklenen Sonuc:** Health check basarisiz olursa container "unhealthy" durumuna gecmeli. Restart policy ile otomatik yeniden baslatilmali. Kaynak limitleri asildinda uygun davranis sergilenmeli.
+**Ipucu:** `--restart unless-stopped` production'da standart politikadir. `docker events` ile container lifecycle olaylarini izleyebilirsin.
+
+---
+
+### Alistirma 9: Docker Compose ile Development Ortami (Zor)
+
+Production benzeri bir development ortami kur: hot reload, debug, seeding.
+
+```yaml
+# docker-compose.dev.yml
+services:
+  api:
+    build:
+      context: ./backend
+      target: development
+    volumes:
+      - ./backend/src:/app/src  # Hot reload
+      - /app/node_modules       # node_modules'u koru
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db
+      - REDIS_URL=redis://cache:6379
+    ports:
+      - "3000:3000"
+      - "9229:9229"  # Node.js debugger
+    depends_on:
+      db:
+        condition: service_healthy
+    command: node --inspect=0.0.0.0:9229 src/server.js
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: devdb
+      POSTGRES_PASSWORD: devpass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Seed data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+
+  cache:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # TODO: pgAdmin servisi ekle (web UI ile DB yonetimi)
+  # TODO: Mailhog servisi ekle (development email testi)
+  # TODO: api servisi icin Dockerfile.dev yaz (development target)
+
+volumes:
+  pgdata:
+```
+
+**Beklenen Sonuc:** `docker compose -f docker-compose.dev.yml up` ile tum ortam ayaga kalkmali. Backend kodu degistiginde hot reload calismali. Debugger VS Code'dan baglanabilir olmali.
+**Ipucu:** `target: development` multi-stage build'de development stage'ini kullanir. `depends_on.condition` ile saglikli servisleri bekleyebilirsin.
+
+---
+
+### Alistirma 10: Container Logging ve Monitoring (Zor)
+
+Centralized logging ve basit monitoring yapilandirmasi kur.
+
+```yaml
+# docker-compose.monitoring.yml
+services:
+  app:
+    image: my-app:latest
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "{{.Name}}/{{.ID}}"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+```
+
+```yaml
+# prometheus.yml
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: 'app'
+    static_configs:
+      - targets: ['app:3000']
+    metrics_path: '/metrics'
+```
+
+```bash
+# TODO: App'e /metrics endpoint'i ekle (prom-client kullanarak)
+# TODO: Grafana'da dashboard olustur (CPU, memory, request count)
+# TODO: docker compose logs --since 1h app ile son 1 saatin loglarini gor
+# TODO: Alert rule ekle: response time > 500ms ise bildirim
+```
+
+**Beklenen Sonuc:** Prometheus app'ten metrikleri toplamalı. Grafana'da gorsel dashboard olusturulmali. Log rotation ile disk dolmasi onlenmeli.
+**Ipucu:** `prom-client` Node.js icin Prometheus metrikleri olusturur. Grafana'da hazir dashboard'lar import edebilirsin (ID: 1860 — Node.js).
 :::
 
 ## Debugging Docker

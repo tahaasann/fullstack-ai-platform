@@ -1426,6 +1426,374 @@ tools = [calculator, get_date_info, query_database]
 ```
 
 **Beklenen sonuç:** Agent doğru tool'ları doğru sırada çağırmalı. Thought-Action-Observation döngüsünü console'da göster. En az 3 test sorusunun tamamını doğru cevaplamalı.
+
+---
+
+### Alıştırma 4: Embedding Model Karsilastirmasi (Kolay)
+
+Farkli embedding modelleriyle retrieval kalitesini karsilastir.
+
+```python
+from sentence_transformers import SentenceTransformer
+import numpy as np
+
+models = {
+    "all-MiniLM-L6-v2": SentenceTransformer("all-MiniLM-L6-v2"),
+    "multilingual": SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2"),
+}
+
+documents = [
+    "Python ile web gelistirme icin Django ve FastAPI kullanilir",
+    "React component lifecycle ve hooks kullanimi",
+    "PostgreSQL indeks optimizasyonu ve query planlama",
+    "Docker container'lari ile uygulama paketleme",
+    "Machine learning model egitimi ve evaluation",
+]
+
+queries = [
+    "web uygulamasi nasil yapilir",
+    "veritabani performansi nasil arttirilir",
+    "yapay zeka modeli nasil egitilir",
+]
+
+for model_name, model in models.items():
+    doc_embeddings = model.encode(documents)
+    print(f"\n=== {model_name} ===")
+    for query in queries:
+        query_emb = model.encode([query])
+        scores = np.dot(doc_embeddings, query_emb.T).flatten()
+        best_idx = np.argmax(scores)
+        print(f"Q: {query}")
+        print(f"A: {documents[best_idx]} (score: {scores[best_idx]:.4f})")
+
+# TODO: OpenAI text-embedding-3-small ile karsilastir
+# TODO: Turkce sorularda multilingual modelin avantajini goster
+# TODO: Embedding boyutu vs kalite trade-off'unu analiz et
+# TODO: Retrieval latency'yi olc (milisaniye bazinda)
+```
+
+**Beklenen Sonuc:** Multilingual model Turkce sorgularda daha iyi sonuc vermeli. OpenAI embedding'leri genel olarak en yuksek kaliteyi saglamali ama daha pahali.
+**Ipucu:** all-MiniLM-L6-v2 hizli ve ucretiz. Production'da OpenAI embedding'leri daha iyi retrieval kalitesi verir.
+
+---
+
+### Alıştırma 5: Hybrid Search — BM25 + Semantic (Kolay)
+
+Keyword search ve semantic search'u birlestirerek daha iyi sonuclar al.
+
+```python
+from rank_bm25 import BM25Okapi
+from sentence_transformers import SentenceTransformer
+import numpy as np
+
+documents = [
+    "FastAPI ile RESTful API gelistirme ve Pydantic validation",
+    "React hooks: useState, useEffect, useContext kullanimi",
+    "PostgreSQL JSONB indeks ve full-text search ozellikleri",
+    "Kubernetes pod scaling ve resource management",
+    "Transformer attention mechanism ve positional encoding",
+]
+
+# BM25 (keyword-based)
+tokenized_docs = [doc.lower().split() for doc in documents]
+bm25 = BM25Okapi(tokenized_docs)
+
+# Semantic search
+model = SentenceTransformer("all-MiniLM-L6-v2")
+doc_embeddings = model.encode(documents)
+
+def hybrid_search(query, alpha=0.5, top_k=3):
+    # BM25 scores
+    bm25_scores = bm25.get_scores(query.lower().split())
+    bm25_norm = bm25_scores / (bm25_scores.max() + 1e-8)
+
+    # Semantic scores
+    query_emb = model.encode([query])
+    semantic_scores = np.dot(doc_embeddings, query_emb.T).flatten()
+    semantic_norm = (semantic_scores - semantic_scores.min()) / (semantic_scores.max() - semantic_scores.min() + 1e-8)
+
+    # Hybrid (weighted combination)
+    hybrid_scores = alpha * semantic_norm + (1 - alpha) * bm25_norm
+    top_indices = np.argsort(hybrid_scores)[::-1][:top_k]
+    return [(documents[i], hybrid_scores[i]) for i in top_indices]
+
+# TODO: "PostgreSQL JSONB" gibi teknik terimlerle test et (BM25 avantajli)
+# TODO: "veritabani arama ozellikleri" gibi anlamsal sorgularla test et (semantic avantajli)
+# TODO: Farkli alpha degerlerini dene (0.3, 0.5, 0.7)
+# TODO: Reciprocal Rank Fusion (RRF) ile karsilastir
+```
+
+**Beklenen Sonuc:** Teknik terimler iceren sorgularda BM25 daha iyi, anlamsal sorgularda semantic search daha iyi olmali. Hybrid her iki durumda da makul sonuc vermeli.
+**Ipucu:** alpha=0.5 baslangic icin iyi. Domain'e gore ayarla: teknik dokumanlar icin BM25 agirligini artir.
+
+---
+
+### Alıştırma 6: RAG Evaluation — RAGAS ile Kalite Olcumu (Orta)
+
+RAG sisteminin kalitesini RAGAS metrikleriyle degerlendir.
+
+```python
+from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
+from datasets import Dataset
+
+# Evaluation dataset
+eval_data = {
+    "question": [
+        "Python'da list comprehension nasil kullanilir?",
+        "Docker volume nedir?",
+        "React useEffect hook'u ne ise yarar?",
+    ],
+    "answer": [
+        "List comprehension [expression for item in iterable] seklinde kullanilir.",
+        "Docker volume container verilerini kalici olarak saklar.",
+        "useEffect side effect'leri yonetmek icin kullanilir.",
+    ],
+    "contexts": [
+        ["Python'da list comprehension tek satirda liste olusturma yontemidir. [x**2 for x in range(10)] gibi kullanilir."],
+        ["Docker volume, container silinse bile verilerin korunmasini saglar. Named volume ve bind mount turleri vardir."],
+        ["useEffect hook'u component mount, update ve unmount yasam dongusunde yan etkileri yonetir."],
+    ],
+    "ground_truth": [
+        "List comprehension [expression for item in iterable if condition] formatinda kullanilir.",
+        "Docker volume container'larin disinda veri saklama mekanizmasidir.",
+        "useEffect React'te side effect yonetimi icin kullanilan bir hook'tur.",
+    ],
+}
+
+dataset = Dataset.from_dict(eval_data)
+results = evaluate(dataset, metrics=[faithfulness, answer_relevancy, context_precision, context_recall])
+
+# TODO: 20+ soru ile kapsamli evaluation dataset olustur
+# TODO: Farkli chunking stratejileriyle RAGAS skorlarini karsilastir
+# TODO: Faithfulness ve relevancy arasindaki korelasyonu analiz et
+# TODO: Dusuk skorlu sorulari analiz et ve RAG pipeline'i iyilestir
+```
+
+**Beklenen Sonuc:** Faithfulness (cevap context'e dayaniyor mu) >0.8 olmali. Answer relevancy (cevap soruyla ilgili mi) >0.7 olmali. Context precision (dogru context getirilmis mi) >0.6 olmali.
+**Ipucu:** RAGAS metrikleri LLM-based evaluation yapar. Faithfulness en kritik metrik — dusukse model hallucination yapiyor demektir.
+
+---
+
+### Alıştırma 7: Multi-Document RAG ve Citation (Orta)
+
+Birden fazla kaynaktan bilgi toplayip kaynak gostererek cevap oluştur.
+
+```python
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain.prompts import PromptTemplate
+
+# Farkli kaynaklardan dokumanlar
+sources = {
+    "python_guide.md": "Python programlama rehberi...",
+    "docker_docs.md": "Docker containerization...",
+    "react_tutorial.md": "React ile frontend gelistirme...",
+}
+
+# Chunk'la ve metadata ekle
+splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+all_chunks = []
+for source_name, content in sources.items():
+    chunks = splitter.create_documents([content], metadatas=[{"source": source_name}])
+    all_chunks.extend(chunks)
+
+# Vector store
+vectorstore = Chroma.from_documents(all_chunks, OpenAIEmbeddings())
+
+# Citation prompt
+citation_prompt = PromptTemplate.from_template("""Asagidaki kaynaklara dayanarak soruyu cevapla.
+Her ifadenin sonuna kaynak belirt: [Kaynak: dosya_adi]
+
+Kaynaklar:
+{context}
+
+Soru: {question}
+
+Cevap (kaynak gostererek):""")
+
+# TODO: Retriever ile top-5 chunk getir
+# TODO: Her chunk'in hangi dosyadan geldigini goster
+# TODO: Cevaptaki citation'larin dogru oldugunu dogrula
+# TODO: Kaynak bulunamazsa "Bu konuda kaynagim yok" dedirt
+```
+
+**Beklenen Sonuc:** Cevaplar ilgili kaynaklar ile desteklenmeli. Her kaynak dogru dosyaya isaret etmeli. Kaynaksiz bilgi uretilmemeli.
+**Ipucu:** Metadata ile kaynak takibi yap. Citation dogrulama icin cevaptaki bilgiyi kaynak chunk ile karsilastir.
+
+---
+
+### Alıştırma 8: Conversational RAG — Chat History ile (Zor)
+
+Sohbet gecmisini kullanarak baglam-duyarli RAG sistemi olustur.
+
+```python
+from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferWindowMemory
+from langchain_openai import ChatOpenAI
+from langchain.prompts import PromptTemplate
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+memory = ConversationBufferWindowMemory(
+    k=5,  # Son 5 mesaji hatirla
+    memory_key="chat_history",
+    return_messages=True,
+    output_key="answer",
+)
+
+# Standalone question olusturma (chat history'den)
+condense_prompt = PromptTemplate.from_template("""Sohbet gecmisine bakarak, son soruyu bagimsiz bir soruya donustur.
+Sohbet gecmisi onemli baglam sagliyorsa kullan.
+
+Sohbet Gecmisi: {chat_history}
+Son Soru: {question}
+Bagimsiz Soru:""")
+
+qa_chain = ConversationalRetrievalChain.from_llm(
+    llm=llm,
+    retriever=vectorstore.as_retriever(),
+    memory=memory,
+    condense_question_prompt=condense_prompt,
+)
+
+# Test sohbeti
+# User: "Docker nedir?"
+# Bot: "Docker containerization platformudur..."
+# User: "Peki bunu Python ile nasil kullanabilirim?"  ← "bunu" = Docker
+# Bot: Docker Python SDK ile...
+
+# TODO: 5 turlu sohbet senaryosu test et
+# TODO: "o", "bunu", "onceki" gibi referanslarin dogru cozumlendigini dogrula
+# TODO: Memory window boyutunun cevap kalitesine etkisini test et
+# TODO: Sohbet gecmisini asiri uzun yapip context window sorununu gozlemle
+```
+
+**Beklenen Sonuc:** "bunu", "o" gibi referanslar dogru cozumlenmeli. Sohbet baglami korunmali. Context window asildiginda uygun truncation yapilmali.
+**Ipucu:** Condense question adimi kritik: "bunu nasil yaparim" → "Docker'i Python ile nasil kullanirim" seklinde donusturmeli.
+
+---
+
+### Alıştırma 9: Production RAG Pipeline — End to End (Zor)
+
+Production-ready RAG sistemi olustur: ingestion, retrieval, generation, monitoring.
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import time
+import logging
+
+app = FastAPI()
+logger = logging.getLogger("rag_pipeline")
+
+class QueryRequest(BaseModel):
+    question: str
+    top_k: int = 5
+    temperature: float = 0.1
+
+class QueryResponse(BaseModel):
+    answer: str
+    sources: list[dict]
+    latency_ms: float
+    token_count: int
+
+@app.post("/query", response_model=QueryResponse)
+async def query(req: QueryRequest):
+    start = time.time()
+
+    # 1. Retrieve
+    results = vectorstore.similarity_search_with_score(req.question, k=req.top_k)
+
+    # 2. Filter (minimum similarity threshold)
+    filtered = [(doc, score) for doc, score in results if score > 0.3]
+    if not filtered:
+        raise HTTPException(404, "Ilgili dokuman bulunamadi")
+
+    # 3. Generate
+    context = "\n\n".join([doc.page_content for doc, _ in filtered])
+    answer = llm.invoke(f"Context: {context}\n\nSoru: {req.question}")
+
+    # 4. Log metrics
+    latency = (time.time() - start) * 1000
+    logger.info(f"Query: {req.question} | Latency: {latency:.0f}ms | Sources: {len(filtered)}")
+
+    return QueryResponse(
+        answer=answer.content,
+        sources=[{"content": d.page_content[:100], "metadata": d.metadata} for d, _ in filtered],
+        latency_ms=latency,
+        token_count=len(answer.content.split()),
+    )
+
+# TODO: Caching layer ekle (ayni sorulara hizli cevap)
+# TODO: Rate limiting ekle
+# TODO: Admin endpoint: dokuman ekleme/silme
+# TODO: Feedback endpoint: kullanici cevabi begenip begenemdi
+# TODO: Prometheus metrikleri ekle (latency, token count, cache hit rate)
+```
+
+**Beklenen Sonuc:** API endpoint'i <2 saniyede cevap vermeli. Kaynak bilgileri response'ta yer almali. Irrelevant sorgularda 404 donmeli.
+**Ipucu:** Production'da caching %50+ latency dususu saglar. Redis ile semantic cache (benzer sorulara cache'ten cevap) daha da etkili.
+
+---
+
+### Alıştırma 10: Multi-Agent System — Takim Calismasi (Zor)
+
+Birden fazla agent'in birlikte calisarak karmasik gorevleri cozdugu bir sistem olustur.
+
+```python
+from langchain.agents import AgentExecutor, create_react_agent
+from langchain_openai import ChatOpenAI
+from langchain.tools import Tool
+
+# Agent roller
+researcher_tools = [
+    Tool(name="web_search", func=lambda q: f"Arama sonuclari: {q}", description="Web'de arama yapar"),
+    Tool(name="read_doc", func=lambda p: f"Dokuman icerigi: {p}", description="Dokuman okur"),
+]
+
+coder_tools = [
+    Tool(name="write_code", func=lambda spec: f"Kod: {spec}", description="Kod yazar"),
+    Tool(name="run_test", func=lambda code: "Testler gecti", description="Test calistirir"),
+]
+
+reviewer_tools = [
+    Tool(name="review_code", func=lambda code: "Review: LGTM", description="Kod inceler"),
+    Tool(name="check_security", func=lambda code: "Guvenli", description="Guvenlik kontrolu"),
+]
+
+class MultiAgentOrchestrator:
+    def __init__(self):
+        self.researcher = self._create_agent("Researcher", researcher_tools)
+        self.coder = self._create_agent("Coder", coder_tools)
+        self.reviewer = self._create_agent("Reviewer", reviewer_tools)
+
+    def _create_agent(self, role, tools):
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        # Agent olusturma kodu...
+        return {"role": role, "tools": tools}
+
+    async def solve(self, task):
+        # 1. Researcher: konuyu arastir
+        research = self.researcher  # .invoke(task)
+
+        # 2. Coder: arastirma sonuclarina gore kod yaz
+        code = self.coder  # .invoke(research)
+
+        # 3. Reviewer: kodu incele
+        review = self.reviewer  # .invoke(code)
+
+        # TODO: Agent'lar arasi iletisim protokolu tasarla
+        # TODO: Supervisor agent ekle (is dagitimi ve kalite kontrolu)
+        # TODO: Deadlock ve sonsuz dongu korunmasi ekle (max iteration)
+        # TODO: Her agent'in calisma logunu kaydet
+        # TODO: Hata durumunda retry mekanizmasi ekle
+
+orchestrator = MultiAgentOrchestrator()
+```
+
+**Beklenen Sonuc:** 3 agent sirali olarak calisip gorev tamamlamali. Supervisor agent kalite kontrolu yapmali. Max iteration ile sonsuz dongu onlenmeli.
+**Ipucu:** CrewAI veya AutoGen gibi framework'ler multi-agent sistemi kolaylastirir. Agent rolleri net tanimlanmali — overlapping roller tutarsizliga yol acar.
 :::
 
 :::interview

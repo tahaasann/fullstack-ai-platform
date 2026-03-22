@@ -803,6 +803,706 @@ pair_programming_tip: "Terminal'de karmasik bir islem yapmak istediginde AI'a am
 - **Senior cevabi:** Pipe (|) stdout'u bir sonraki komutun stdin'ine baglar, Unix felsefesinin temelidir: kucuk programlar birlestirilerek karmasik islemler yapilir. `>` stdout'u dosyaya yazar (uzerine), `>>` ekler. `2>` stderr'i yonlendirir, `2>&1` stderr'i stdout'a birlesitirir. `tee` komutu hem ekrana hem dosyaya yazar. Ornek: `find / -name "*.log" 2>/dev/null | xargs grep "error" | sort | uniq -c | sort -rn | head -10` en cok tekrar eden 10 hatayi bulur.
 :::
 
+:::exercise
+### Alıştırma 4: Log Dosyası Analiz Pipeline
+
+**Görev:** Unix pipe'ları kullanarak bir log dosyasını analiz eden komut zinciri yaz.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+# Ornek log dosyasi olustur
+cat > /tmp/app.log << 'EOF'
+2026-03-22 10:15:23 INFO  [auth] User login: user_id=42 ip=192.168.1.100
+2026-03-22 10:15:24 ERROR [db] Connection timeout: host=db.local port=5432
+2026-03-22 10:15:25 WARN  [api] Rate limit: 80/100 client=192.168.1.50
+2026-03-22 10:15:26 INFO  [auth] User login: user_id=15 ip=10.0.0.5
+2026-03-22 10:15:27 ERROR [api] 500 Internal Server Error: /api/users
+2026-03-22 10:15:28 INFO  [auth] User login: user_id=42 ip=192.168.1.100
+2026-03-22 10:15:29 ERROR [db] Deadlock: table=orders
+2026-03-22 10:15:30 WARN  [auth] Failed login: user_id=99 ip=192.168.1.200
+2026-03-22 10:15:31 INFO  [api] Request: GET /api/products 200 250ms
+2026-03-22 10:15:32 ERROR [auth] Invalid token: ip=10.0.0.99
+2026-03-22 10:15:33 INFO  [auth] User login: user_id=42 ip=192.168.1.100
+2026-03-22 10:15:34 INFO  [api] Request: POST /api/orders 201 180ms
+EOF
+
+echo "=== 1. Sadece ERROR loglari ==="
+grep "ERROR" /tmp/app.log
+
+echo -e "\n=== 2. Modul basina hata sayisi ==="
+grep "ERROR" /tmp/app.log | grep -oP '\[\K[^\]]+' | sort | uniq -c | sort -rn
+
+echo -e "\n=== 3. En cok login yapan user ==="
+# TODO: user_id degerlerini cikar, say, sirala
+grep "User login" /tmp/app.log | grep -oP 'user_id=\K\d+' | sort | uniq -c | sort -rn
+
+echo -e "\n=== 4. Benzersiz IP adresleri ==="
+# TODO: Tum IP adreslerini cikar ve benzersiz olanlari listele
+grep -oP 'ip=\K[\d.]+' /tmp/app.log | sort -u
+
+echo -e "\n=== 5. Log seviyesi dagilimi ==="
+# TODO: INFO, WARN, ERROR sayilarini goster
+awk '{print $3}' /tmp/app.log | sort | uniq -c | sort -rn
+```
+
+**Beklenen çıktı:**
+```
+=== 1. Sadece ERROR loglari ===
+2026-03-22 10:15:24 ERROR [db] Connection timeout...
+...
+
+=== 2. Modul basina hata sayisi ===
+      2 db
+      1 api
+      1 auth
+
+=== 3. En cok login yapan user ===
+      3 42
+      1 15
+
+=== 4. Benzersiz IP adresleri ===
+10.0.0.5
+10.0.0.99
+192.168.1.100
+192.168.1.200
+192.168.1.50
+
+=== 5. Log seviyesi dagilimi ===
+      6 INFO
+      4 ERROR
+      2 WARN
+```
+
+**İpucu:** `grep -oP '\K'` lookbehind pattern kullanır. `sort | uniq -c | sort -rn` frekans analizi kalıbıdır.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Dosya İzinleri ve Kullanıcı Yönetimi
+
+**Görev:** Linux dosya izinlerini anlama ve yönetme pratiği yap.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+mkdir -p /tmp/permissions-lab && cd /tmp/permissions-lab
+
+# Dosyalar olustur
+echo "public content" > public.txt
+echo "secret data" > secret.txt
+echo "#!/bin/bash\necho hello" > script.sh
+
+# GOREV 1: Mevcut izinleri oku ve acikla
+echo "=== Mevcut Izinler ==="
+ls -la
+echo ""
+echo "GOREV: Her dosyanin izinlerini oku:"
+echo "  r=read(4), w=write(2), x=execute(1)"
+echo "  Owner | Group | Others"
+
+# GOREV 2: Izinleri degistir
+echo -e "\n=== Izin Degisiklikleri ==="
+
+# public.txt: herkes okuyabilir, sadece owner yazabilir
+chmod 644 public.txt
+echo "public.txt -> $(stat -c '%A (%a)' public.txt 2>/dev/null || stat -f '%Sp (%Lp)' public.txt)"
+
+# secret.txt: sadece owner okuyup yazabilir
+chmod 600 secret.txt
+echo "secret.txt -> $(stat -c '%A (%a)' secret.txt 2>/dev/null || stat -f '%Sp (%Lp)' secret.txt)"
+
+# script.sh: owner calistirabilir
+chmod 755 script.sh
+echo "script.sh  -> $(stat -c '%A (%a)' script.sh 2>/dev/null || stat -f '%Sp (%Lp)' script.sh)"
+
+# GOREV 3: Sembolik vs numerik karsilastirma
+echo -e "\n=== Sembolik Notation ==="
+echo "chmod u+x script.sh    # owner'a execute ekle"
+echo "chmod g-w secret.txt   # group'tan write kaldir"
+echo "chmod o=r public.txt   # others'a sadece read ver"
+echo "chmod a+r public.txt   # herkese read ekle"
+
+echo -e "\n=== Numerik Notation ==="
+echo "chmod 755 script.sh    # rwxr-xr-x"
+echo "chmod 644 public.txt   # rw-r--r--"
+echo "chmod 600 secret.txt   # rw-------"
+echo "chmod 777 open.txt     # rwxrwxrwx (ASLA yapma!)"
+```
+
+**Beklenen çıktı:**
+```
+=== Izin Degisiklikleri ===
+public.txt -> -rw-r--r-- (644)
+secret.txt -> -rw------- (600)
+script.sh  -> -rwxr-xr-x (755)
+```
+
+**İpucu:** İzin sayısı: `r=4`, `w=2`, `x=1`. `755` = owner:rwx(7), group:r-x(5), others:r-x(5).
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 6: Cron Job Oluşturma
+
+**Görev:** Zamanlanmış görevler (cron jobs) oluştur ve yönet.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+# Cron syntax aciklamasi
+echo "=== Cron Syntax ==="
+echo "* * * * * komut"
+echo "| | | | |"
+echo "| | | | +-- Haftanin gunu (0-7, 0 ve 7 = Pazar)"
+echo "| | | +---- Ay (1-12)"
+echo "| | +------ Ayin gunu (1-31)"
+echo "| +-------- Saat (0-23)"
+echo "+---------- Dakika (0-59)"
+
+echo -e "\n=== Ornek Cron Ifadeleri ==="
+echo "Her dakika:           * * * * *"
+echo "Her saat basinda:     0 * * * *"
+echo "Her gun 09:00:        0 9 * * *"
+echo "Hafta ici 09:00:      0 9 * * 1-5"
+echo "Her Pzt 08:30:        30 8 * * 1"
+echo "Ayin 1'i gece 00:00:  0 0 1 * *"
+echo "Her 5 dakikada:       */5 * * * *"
+echo "Her 2 saatte:         0 */2 * * *"
+
+# GOREV: Asagidaki gorevler icin cron ifadelerini yaz
+echo -e "\n=== GOREV: Bu gorevlerin cron ifadelerini yaz ==="
+
+# 1. Her gun saat 03:00'te veritabani yedekle
+# Cevap: 0 3 * * * /usr/local/bin/backup_db.sh
+echo "DB backup:    0 3 * * * /usr/local/bin/backup_db.sh"
+
+# 2. Her 15 dakikada sistem durumunu kontrol et
+echo "Health check: */15 * * * * /usr/local/bin/health_check.sh"
+
+# 3. Her Cuma 17:00'de haftalik rapor gonder
+# TODO
+
+# 4. Her ayin 1'inde saat 01:00'de log temizligi
+# TODO
+
+# 5. Hafta ici her gun 08:00 ve 18:00'de
+# TODO
+
+# Ornek cron script'i
+cat > /tmp/backup.sh << 'SCRIPT'
+#!/bin/bash
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/tmp/backups"
+mkdir -p $BACKUP_DIR
+
+echo "[$DATE] Backup basliyor..." >> /tmp/backup.log
+# tar -czf $BACKUP_DIR/db_$DATE.tar.gz /var/lib/postgresql/data
+echo "[$DATE] Backup tamamlandi" >> /tmp/backup.log
+SCRIPT
+chmod +x /tmp/backup.sh
+
+echo -e "\n=== Cron yonetim komutlari ==="
+echo "crontab -e    # Cron tablosunu duzenle"
+echo "crontab -l    # Mevcut cron job'lari listele"
+echo "crontab -r    # Tum cron job'lari sil (dikkatli ol!)"
+```
+
+**Beklenen çıktı:**
+```
+=== Cron Syntax ===
+* * * * * komut
+| | | | |
+| | | | +-- Haftanin gunu
+...
+
+=== Ornek Cron Ifadeleri ===
+Her dakika:           * * * * *
+Her saat basinda:     0 * * * *
+...
+```
+
+**İpucu:** `*/n` her n birimde bir çalıştırır. `1-5` Pazartesi-Cuma aralığıdır. Online cron expression validator kullan.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Process Yönetimi
+
+**Görev:** Linux process yönetim komutlarını kullanarak process'leri izle, yönet ve otomatize et.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+echo "=== Process Listeleme ==="
+# En cok CPU kullanan 5 process
+ps aux --sort=-%cpu | head -6
+
+echo -e "\n=== Bellek Kullanimi ==="
+# En cok RAM kullanan 5 process
+ps aux --sort=-%mem | head -6
+
+echo -e "\n=== Arka Plan Process Yonetimi ==="
+# Uzun suren bir process baslat
+sleep 300 &
+SLEEP_PID=$!
+echo "Arka plan process PID: $SLEEP_PID"
+
+# Process bilgisi
+echo "Process bilgisi:"
+ps -p $SLEEP_PID -o pid,ppid,state,cmd
+
+# Process'i durdur ve devam ettir
+kill -STOP $SLEEP_PID
+echo "Process durduruldu (SIGSTOP)"
+ps -p $SLEEP_PID -o pid,state
+
+kill -CONT $SLEEP_PID
+echo "Process devam etti (SIGCONT)"
+ps -p $SLEEP_PID -o pid,state
+
+# Process'i sonlandir
+kill $SLEEP_PID
+echo "Process sonlandirildi (SIGTERM)"
+
+echo -e "\n=== Onemli Sinyaller ==="
+echo "SIGTERM (15): Nazikce sonlandir (varsayilan)"
+echo "SIGKILL (9):  Zorla sonlandir (yakalanamaz)"
+echo "SIGSTOP (19): Duraklat"
+echo "SIGCONT (18): Devam ettir"
+echo "SIGHUP (1):   Yeniden yukle (daemon'lar)"
+
+echo -e "\n=== GOREV: Port kullanan process'i bul ==="
+echo "lsof -i :3000          # 3000 portunu kullanan process"
+echo "fuser 3000/tcp         # Alternatif"
+echo "kill \$(lsof -t -i :3000)  # O process'i sonlandir"
+```
+
+**Beklenen çıktı:**
+```
+=== Process Listeleme ===
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+...
+
+=== Arka Plan Process Yonetimi ===
+Arka plan process PID: 12345
+Process durduruldu (SIGSTOP)
+Process devam etti (SIGCONT)
+Process sonlandirildi (SIGTERM)
+```
+
+**İpucu:** `&` ile arka planda başlat, `$!` son arka plan PID'i. `jobs` ile arka plan işlerini listele. `fg %1` ile ön plana getir.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: SSH Anahtar ve Bağlantı Yönetimi
+
+**Görev:** SSH yapılandırma dosyası oluştur ve bağlantıları yönet.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+echo "=== SSH Config Dosyasi ==="
+# ~/.ssh/config dosyasi ornegi
+cat << 'EOF'
+# GitHub
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_github
+    AddKeysToAgent yes
+
+# Production sunucu
+Host prod
+    HostName 203.0.113.50
+    User deploy
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519_prod
+    ForwardAgent no
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+
+# Staging sunucu
+Host staging
+    HostName 198.51.100.25
+    User deploy
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519_prod
+
+# Tum sunucular icin varsayilan ayarlar
+Host *
+    AddKeysToAgent yes
+    IdentitiesOnly yes
+    ServerAliveInterval 120
+EOF
+
+echo -e "\n=== SSH Anahtar Olusturma ==="
+echo "ssh-keygen -t ed25519 -C 'email@example.com' -f ~/.ssh/id_ed25519_github"
+echo "ssh-keygen -t ed25519 -C 'deploy@prod' -f ~/.ssh/id_ed25519_prod"
+
+echo -e "\n=== SSH Kullanim Ornekleri ==="
+echo "ssh prod                          # Kisayol ile baglan"
+echo "ssh staging                       # Staging'e baglan"
+echo "scp local.txt prod:/tmp/          # Dosya kopyala"
+echo "ssh prod 'ls -la /var/www'        # Uzaktan komut calistir"
+echo "ssh -L 5432:localhost:5432 prod   # Port forwarding (local)"
+echo "ssh -R 8080:localhost:3000 prod   # Port forwarding (remote)"
+echo "ssh -D 1080 prod                  # SOCKS proxy"
+
+echo -e "\n=== GOREV: SSH Config olustur ==="
+echo "~/.ssh/config dosyasina kendi sunucu bilgilerini ekle"
+echo "chmod 600 ~/.ssh/config"
+echo "chmod 700 ~/.ssh"
+echo "chmod 600 ~/.ssh/id_*"
+echo "chmod 644 ~/.ssh/id_*.pub"
+```
+
+**Beklenen çıktı:**
+```
+=== SSH Config Dosyasi ===
+# GitHub
+Host github.com
+    HostName github.com
+...
+
+=== SSH Kullanim Ornekleri ===
+ssh prod                          # Kisayol ile baglan
+...
+```
+
+**İpucu:** SSH config dosyası `~/.ssh/config` yolunda olmalı. İzinler: dizin 700, private key 600, public key 644.
+
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 9: Disk ve Sistem Monitör Script'i
+
+**Görev:** Sistem kaynaklarını izleyen ve alarm veren bir monitoring script'i yaz.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+# Sistem monitoru
+echo "=== Sistem Durumu ==="
+echo "Tarih: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Hostname: $(hostname)"
+echo "Uptime: $(uptime -p 2>/dev/null || uptime)"
+
+echo -e "\n=== CPU Kullanimi ==="
+# TODO: CPU kullanim yuzdesini goster
+top -bn1 | grep "Cpu(s)" 2>/dev/null || echo "CPU bilgisi alinamadi"
+
+echo -e "\n=== Bellek Kullanimi ==="
+# Bellek bilgisi (MB cinsinden)
+free -m 2>/dev/null || vm_stat 2>/dev/null || echo "Bellek bilgisi alinamadi"
+
+echo -e "\n=== Disk Kullanimi ==="
+df -h | grep -E "^/dev|Filesystem"
+
+echo -e "\n=== Disk Uyarilari (>80% kullanim) ==="
+# TODO: %80'den fazla dolu disk bolumleri icin uyari ver
+df -h | awk 'NR>1 {
+    gsub(/%/, "", $5);
+    if ($5+0 > 80) {
+        printf "  UYARI: %s -> %s%% dolu (%s kullaniliyor, %s toplam)\n", $6, $5, $3, $2
+    }
+}'
+
+echo -e "\n=== Ag Baglantilari ==="
+# Acik port sayisi
+echo "Dinleyen portlar:"
+ss -tlnp 2>/dev/null | head -5 || netstat -tlnp 2>/dev/null | head -5 || echo "Port bilgisi alinamadi"
+
+echo -e "\n=== Son 5 Basarisiz Giris Denemesi ==="
+# TODO: auth.log'dan basarisiz giris denemelerini bul
+# grep "Failed password" /var/log/auth.log 2>/dev/null | tail -5 || echo "Log dosyasi erisilemedi"
+echo "(sudo yetkisi gerekli)"
+
+echo -e "\n=== Buyuk Dosyalar (>100MB) ==="
+find /tmp -type f -size +100M 2>/dev/null | head -5 || echo "Buyuk dosya bulunamadi"
+```
+
+**Beklenen çıktı:**
+```
+=== Sistem Durumu ===
+Tarih: 2026-03-22 14:30:00
+Hostname: dev-machine
+Uptime: up 5 days, 3 hours
+
+=== Disk Kullanimi ===
+Filesystem  Size  Used Avail Use% Mounted on
+/dev/sda1   100G   75G   25G  75% /
+
+=== Disk Uyarilari (>80% kullanim) ===
+  (eger varsa uyarilar burada gorunur)
+```
+
+**İpucu:** `awk` ile sütunları parse et. `gsub(/%/, "", $5)` yüzde işaretini kaldırır. `$5+0` ile string'i sayıya çevirir.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: Tmux ile Çoklu Terminal Yönetimi
+
+**Görev:** Tmux kullanarak geliştirme ortamını organize et: birden fazla pencere ve panel ile çalış.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+echo "=== Tmux Temel Komutlar ==="
+echo ""
+echo "--- Oturum Yonetimi ---"
+echo "tmux new -s dev            # 'dev' adinda yeni oturum"
+echo "tmux ls                    # Oturumlari listele"
+echo "tmux attach -t dev         # Oturuma baglan"
+echo "tmux kill-session -t dev   # Oturumu sonlandir"
+echo "Ctrl+b d                   # Oturumdan ayril (detach)"
+
+echo -e "\n--- Pencere Yonetimi ---"
+echo "Ctrl+b c    # Yeni pencere olustur"
+echo "Ctrl+b n    # Sonraki pencere"
+echo "Ctrl+b p    # Onceki pencere"
+echo "Ctrl+b 0-9  # Pencere numarasina git"
+echo "Ctrl+b ,    # Pencereyi yeniden adlandir"
+echo "Ctrl+b &    # Pencereyi kapat"
+
+echo -e "\n--- Panel Yonetimi ---"
+echo 'Ctrl+b %    # Dikey bolme'
+echo 'Ctrl+b "    # Yatay bolme'
+echo "Ctrl+b o    # Sonraki panel"
+echo "Ctrl+b x    # Paneli kapat"
+echo "Ctrl+b z    # Paneli tam ekran / kucult"
+echo "Ctrl+b {    # Paneli sola tasi"
+echo "Ctrl+b }    # Paneli saga tasi"
+
+echo -e "\n=== Gelistirme Ortami Script'i ==="
+cat << 'SCRIPT'
+#!/bin/bash
+# dev-env.sh: Gelistirme ortamini tek komutla kur
+
+SESSION="myproject"
+
+# Oturum varsa baglan, yoksa olustur
+tmux has-session -t $SESSION 2>/dev/null
+if [ $? != 0 ]; then
+    # Pencere 0: Editor
+    tmux new-session -d -s $SESSION -n "editor"
+    tmux send-keys -t $SESSION:0 "cd ~/projects/myapp && vim ." C-m
+
+    # Pencere 1: Server (2 panel)
+    tmux new-window -t $SESSION -n "server"
+    tmux send-keys -t $SESSION:1 "cd ~/projects/myapp && npm run dev" C-m
+    tmux split-window -h -t $SESSION:1
+    tmux send-keys -t $SESSION:1.1 "cd ~/projects/myapp && npm run api" C-m
+
+    # Pencere 2: Git + Terminal
+    tmux new-window -t $SESSION -n "git"
+    tmux send-keys -t $SESSION:2 "cd ~/projects/myapp && git status" C-m
+
+    # Pencere 3: Logs (3 panel)
+    tmux new-window -t $SESSION -n "logs"
+    tmux send-keys -t $SESSION:3 "tail -f /tmp/app.log" C-m
+    tmux split-window -v -t $SESSION:3
+    tmux send-keys -t $SESSION:3.1 "tail -f /tmp/error.log" C-m
+
+    # Ilk pencereye don
+    tmux select-window -t $SESSION:0
+fi
+
+tmux attach -t $SESSION
+SCRIPT
+
+echo -e "\n=== GOREV ==="
+echo "1. tmux yaz ve yeni bir oturum baslat"
+echo "2. Ctrl+b % ile dikey bol, bir panelde 'htop', digerinde 'git log' calistir"
+echo "3. Ctrl+b c ile yeni pencere olustur"
+echo "4. Ctrl+b d ile oturumdan ayril"
+echo "5. tmux attach ile geri baglan - her sey oldugu gibi!"
+```
+
+**Beklenen çıktı:**
+```
+=== Tmux Temel Komutlar ===
+
+--- Oturum Yonetimi ---
+tmux new -s dev            # 'dev' adinda yeni oturum
+...
+
+--- Panel Yonetimi ---
+Ctrl+b %    # Dikey bolme
+...
+```
+
+**İpucu:** `Ctrl+b` tmux'un prefix tuşudur. Tüm komutlar önce `Ctrl+b`'ye basıp bıraktıktan sonra ikinci tuşa basılarak verilir.
+
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 11: Regex ile Metin İşleme
+
+**Görev:** `grep`, `sed` ve `awk` kullanarak karmaşık metin işleme görevlerini tamamla.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+# Ornek veri
+cat > /tmp/data.csv << 'EOF'
+id,name,email,department,salary
+1,Ahmet Yilmaz,ahmet@company.com,Engineering,15000
+2,Ayse Demir,ayse@company.com,Marketing,12000
+3,Mehmet Kaya,mehmet@gmail.com,Engineering,18000
+4,Fatma Ozturk,fatma@company.com,HR,11000
+5,Ali Can,ali@hotmail.com,Engineering,16000
+6,Zeynep Arslan,zeynep@company.com,Marketing,13000
+7,Hasan Yildiz,hasan@company.com,Engineering,20000
+EOF
+
+echo "=== 1. Sadece Engineering departmani ==="
+awk -F',' '$4 == "Engineering"' /tmp/data.csv
+
+echo -e "\n=== 2. Email'i @company.com olmayanlar ==="
+grep -v "@company.com" /tmp/data.csv | grep -v "^id"
+
+echo -e "\n=== 3. Ortalama maas (awk ile) ==="
+awk -F',' 'NR>1 {sum+=$5; count++} END {printf "Ortalama: %.0f TL\n", sum/count}' /tmp/data.csv
+
+echo -e "\n=== 4. Departman bazinda calisan sayisi ==="
+awk -F',' 'NR>1 {dept[$4]++} END {for (d in dept) print d": "dept[d]}' /tmp/data.csv
+
+echo -e "\n=== 5. Email domain'ini degistir (sed) ==="
+sed 's/@company\.com/@newcompany.com/g' /tmp/data.csv | head -4
+
+echo -e "\n=== 6. En yuksek maasli 3 kisi ==="
+sort -t',' -k5 -rn /tmp/data.csv | head -3
+```
+
+**Beklenen çıktı:**
+```
+=== 1. Sadece Engineering departmani ===
+1,Ahmet Yilmaz,ahmet@company.com,Engineering,15000
+3,Mehmet Kaya,mehmet@gmail.com,Engineering,18000
+...
+
+=== 3. Ortalama maas (awk ile) ===
+Ortalama: 15000 TL
+
+=== 4. Departman bazinda calisan sayisi ===
+Engineering: 4
+Marketing: 2
+HR: 1
+```
+
+**İpucu:** `awk -F','` virgülle ayrılan CSV dosyalarını parse eder. `NR>1` ilk satırı (header) atlar. `sort -t',' -k5 -rn` 5. sütuna göre sayısal ters sıralar.
+
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 12: Shell Script ile API Test Aracı
+
+**Görev:** REST API endpoint'lerini test eden bir bash script yaz. curl ile istek at, status code ve response body kontrol et.
+
+**Başlangıç kodu:**
+```bash
+#!/bin/bash
+
+# Renkli cikti
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+PASS=0
+FAIL=0
+
+assert_status() {
+    local url=$1
+    local expected=$2
+    local method=${3:-GET}
+
+    status=$(curl -s -o /dev/null -w "%{http_code}" -X $method "$url")
+
+    if [ "$status" = "$expected" ]; then
+        echo -e "  ${GREEN}PASS${NC} $method $url -> $status"
+        ((PASS++))
+    else
+        echo -e "  ${RED}FAIL${NC} $method $url -> $status (beklenen: $expected)"
+        ((FAIL++))
+    fi
+}
+
+assert_contains() {
+    local url=$1
+    local expected=$2
+
+    body=$(curl -s "$url")
+    if echo "$body" | grep -q "$expected"; then
+        echo -e "  ${GREEN}PASS${NC} Response contains '$expected'"
+        ((PASS++))
+    else
+        echo -e "  ${RED}FAIL${NC} Response does not contain '$expected'"
+        ((FAIL++))
+    fi
+}
+
+echo "=== API Test Suite ==="
+
+# JSONPlaceholder API testleri
+BASE="https://jsonplaceholder.typicode.com"
+
+echo -e "\n--- GET Tests ---"
+assert_status "$BASE/posts" 200
+assert_status "$BASE/posts/1" 200
+assert_status "$BASE/posts/99999" 404 GET
+
+echo -e "\n--- POST Test ---"
+assert_status "$BASE/posts" 201 POST
+
+echo -e "\n--- Response Body Tests ---"
+assert_contains "$BASE/posts/1" "userId"
+assert_contains "$BASE/users/1" "Leanne Graham"
+
+echo -e "\n=== Sonuc: $PASS passed, $FAIL failed ==="
+```
+
+**Beklenen çıktı:**
+```
+=== API Test Suite ===
+
+--- GET Tests ---
+  PASS GET https://jsonplaceholder.typicode.com/posts -> 200
+  PASS GET https://jsonplaceholder.typicode.com/posts/1 -> 200
+  PASS GET https://jsonplaceholder.typicode.com/posts/99999 -> 404
+
+--- POST Test ---
+  PASS POST https://jsonplaceholder.typicode.com/posts -> 201
+
+--- Response Body Tests ---
+  PASS Response contains 'userId'
+  PASS Response contains 'Leanne Graham'
+
+=== Sonuc: 6 passed, 0 failed ===
+```
+
+**İpucu:** `curl -s -o /dev/null -w "%{http_code}"` sadece status code'u döner. `grep -q` sessiz arama yapar (sadece exit code döner).
+
+**Zorluk:** Zor
+:::
+
 :::must-note
 - `ls -la` → gizli dosyalar dahil detaylı listeleme, dosya izinlerini okumayı öğren
 - `cd -` → önceki dizine geri dön, `cd ~` → home dizini

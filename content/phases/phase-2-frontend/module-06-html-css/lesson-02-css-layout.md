@@ -877,6 +877,318 @@ Layout sorunlarinda AI'a DevTools'tan alinan computed styles veya element screen
 - **Senior cevabi:** Specificity (a,b,c) seklinde hesaplanir: a=ID sayisi, b=class/attribute/pseudo-class, c=element/pseudo-element. `#nav .link:hover` = (1,2,0). Esit specificity'de son yazilan kazanir (cascade). `!important` tum specificity'yi ezer ama bakim kabusuna yol acar, sadece utility class'larda kabul edilebilir. Modern yaklasim: BEM metodolojisi ile flat specificity (tek class), CSS Modules veya Tailwind ile scope izolasyonu. Specificity savaslari mimari sorununun belirtisidir.
 :::
 
+:::exercise
+### Alıştırma 4: Flexbox ile Centering Teknikleri
+**Görev:** Aşağıdaki 4 farklı senaryoda elementleri Flexbox ile ortala.
+**Başlangıç kodu:**
+```css
+/* Senaryo 1: Hem yatay hem dikey ortala (tam sayfa) */
+.center-page {
+  height: 100vh;
+  /* TODO: Flexbox ile ortala */
+}
+
+/* Senaryo 2: Sadece yatay ortala */
+.center-horizontal {
+  /* TODO */
+}
+
+/* Senaryo 3: Son elemanı sağa yapıştır */
+.space-between-row {
+  display: flex;
+  /* TODO: İlk 2 eleman solda, son eleman sağda */
+}
+
+/* Senaryo 4: Flex item'ı kendi satırında ortala */
+.self-center {
+  /* TODO: Sadece bu item dikey ortada */
+}
+```
+**Beklenen çıktı:**
+```
+Senaryo 1: justify-content: center + align-items: center
+Senaryo 2: justify-content: center
+Senaryo 3: .last-item { margin-left: auto; }
+Senaryo 4: align-self: center
+```
+**İpucu:** `margin-left: auto` bir Flexbox item'ını sağa iterken çok kullanışlıdır.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Flex-grow, Flex-shrink, Flex-basis Hesaplama
+**Görev:** Aşağıdaki kodda her elemanın son genişliğini hesapla.
+**Başlangıç kodu:**
+```css
+.container {
+  display: flex;
+  width: 600px;
+}
+
+.item-a { flex: 2 1 100px; } /* flex-grow:2, shrink:1, basis:100px */
+.item-b { flex: 1 1 100px; } /* flex-grow:1, shrink:1, basis:100px */
+.item-c { flex: 1 1 200px; } /* flex-grow:1, shrink:1, basis:200px */
+
+/* Toplam basis = 100 + 100 + 200 = 400px */
+/* Kalan alan = 600 - 400 = 200px */
+/* Toplam grow = 2 + 1 + 1 = 4 */
+
+/* TODO: Her item'ın son genişliğini hesapla */
+```
+**Beklenen çıktı:**
+```
+item-a: 100 + (200 * 2/4) = 200px
+item-b: 100 + (200 * 1/4) = 150px
+item-c: 200 + (200 * 1/4) = 250px
+Toplam: 200 + 150 + 250 = 600px ✓
+```
+**İpucu:** Kalan alan = container genişliği - toplam basis. Her item'a grow oranına göre dağıtılır.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: CSS Grid ile Fotoğraf Galerisi
+**Görev:** CSS Grid kullanarak Pinterest tarzı masonry-benzeri bir fotoğraf galerisi oluştur.
+**Başlangıç kodu:**
+```css
+.gallery {
+  display: grid;
+  /* TODO: 3 sütunlu grid, her sütun eşit genişlikte */
+  grid-template-columns: /* ? */;
+  gap: 10px;
+  /* TODO: Satır yüksekliğini otomatik ayarla */
+  grid-auto-rows: /* ? */;
+}
+
+.gallery-item:nth-child(1) {
+  /* TODO: 2 satır kaplasın (dikey uzun fotoğraf) */
+  grid-row: /* ? */;
+}
+
+.gallery-item:nth-child(4) {
+  /* TODO: 2 sütun kaplasın (yatay geniş fotoğraf) */
+  grid-column: /* ? */;
+}
+```
+**Beklenen çıktı:**
+```
+grid-template-columns: repeat(3, 1fr);
+grid-auto-rows: 200px;
+grid-row: span 2;
+grid-column: span 2;
+```
+**İpucu:** `span 2` ile bir grid item'ı 2 satır veya 2 sütun kaplayabilir. `grid-auto-rows` otomatik oluşan satırların yüksekliğini belirler.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Grid Template Areas ile Blog Layout
+**Görev:** `grid-template-areas` kullanarak responsive bir blog sayfası düzeni oluştur.
+**Başlangıç kodu:**
+```css
+.blog-layout {
+  display: grid;
+  gap: 20px;
+  /* TODO: Desktop layout tanımla
+     header  header  header
+     sidebar content content
+     sidebar content content
+     footer  footer  footer  */
+  grid-template-areas:
+    /* ? */;
+  grid-template-columns: /* ? */;
+}
+
+.blog-header  { grid-area: /* ? */; }
+.blog-sidebar { grid-area: /* ? */; }
+.blog-content { grid-area: /* ? */; }
+.blog-footer  { grid-area: /* ? */; }
+
+/* TODO: Mobilde sidebar üstte, content altta olacak şekilde düzenle */
+@media (max-width: 768px) {
+  .blog-layout {
+    grid-template-areas:
+      /* ? */;
+    grid-template-columns: /* ? */;
+  }
+}
+```
+**Beklenen çıktı:**
+```css
+/* Desktop */
+grid-template-areas:
+  "header header header"
+  "sidebar content content"
+  "sidebar content content"
+  "footer footer footer";
+grid-template-columns: 250px 1fr 1fr;
+
+/* Mobil */
+grid-template-areas:
+  "header"
+  "sidebar"
+  "content"
+  "footer";
+grid-template-columns: 1fr;
+```
+**İpucu:** `grid-template-areas` her satırı tırnak içinde yaz. Alan isimleri tekrar ederse birleşir.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: Flexbox Order ve Reverse
+**Görev:** HTML değiştirmeden CSS ile elemanların sırasını değiştir.
+**Başlangıç kodu:**
+```html
+<div class="flex-container">
+  <div class="item" id="a">A</div>
+  <div class="item" id="b">B</div>
+  <div class="item" id="c">C</div>
+  <div class="item" id="d">D</div>
+</div>
+```
+```css
+.flex-container {
+  display: flex;
+}
+
+/* TODO 1: Sırayı D, C, B, A yap (tümünü ters çevir) */
+/* TODO 2: Sadece C'yi en başa getir (C, A, B, D) */
+/* TODO 3: Sırayı B, D, A, C yap (her birini ayrı order ile) */
+```
+**Beklenen çıktı:**
+```css
+/* TODO 1 */
+.flex-container { flex-direction: row-reverse; }
+
+/* TODO 2 */
+#c { order: -1; }
+
+/* TODO 3 */
+#b { order: 1; }
+#d { order: 2; }
+#a { order: 3; }
+#c { order: 4; }
+```
+**İpucu:** `order` varsayılan 0'dır. Negatif değerler elemanı öne taşır. `flex-direction: row-reverse` tüm sırayı tersler.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 9: Responsive Grid - auto-fit vs auto-fill
+**Görev:** `auto-fit` ve `auto-fill` arasındaki farkı gözlemle ve doğru olanı seç.
+**Başlangıç kodu:**
+```css
+/* Senaryo: 1200px container'da sadece 2 kart var */
+
+.grid-autofill {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.grid-autofit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+/* TODO: Her iki grid için kaç sütun oluşur?
+   1200px / 250px = 4 sütun potansiyel
+
+   auto-fill: Kaç sütun? Kartlar ne kadar geniş?
+   auto-fit:  Kaç sütun? Kartlar ne kadar geniş?
+*/
+```
+**Beklenen çıktı:**
+```
+auto-fill: 4 sütun oluşur, 2 kart ilk 2 sütunda (250px), 2 boş sütun ayrılır
+auto-fit:  Boş sütunlar daraltılır, 2 kart eşit genişlikte yayılır (~592px)
+
+Sonuç: Kartlar yayılsın istiyorsan → auto-fit
+        Grid yapısı sabit kalsın istiyorsan → auto-fill
+```
+**İpucu:** DevTools'ta Grid inspector açarak sütun çizgilerini gözlemle. `auto-fill` boş track oluşturur, `auto-fit` oluşturmaz.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: Karmaşık Layout - Holy Grail Pattern
+**Görev:** CSS Grid ve Flexbox birlikte kullanarak "Holy Grail" layout'unu oluştur: header, footer, sol sidebar, sağ sidebar ve ortada ana içerik. Responsive olmalı.
+**Başlangıç kodu:**
+```css
+.holy-grail {
+  display: grid;
+  min-height: 100vh;
+  /* TODO: 3 sütunlu layout:
+     - Sol sidebar: 200px
+     - Ana içerik: kalan alan
+     - Sağ sidebar: 200px */
+  grid-template-columns: /* ? */;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    /* TODO: Header tüm genişlikte
+       Sol sidebar | main | Sağ sidebar
+       Footer tüm genişlikte */;
+}
+
+/* TODO: İçerik alanında Flexbox ile kart dizilimi */
+.main-content {
+  grid-area: main;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px;
+}
+
+.content-card {
+  /* TODO: Minimum 300px, eşit genişlik paylaşımı */
+  flex: /* ? */;
+}
+
+/* TODO: Tablet - sağ sidebar gizle */
+@media (max-width: 1024px) {
+  .holy-grail {
+    grid-template-columns: /* ? */;
+    grid-template-areas: /* ? */;
+  }
+  .right-sidebar { display: none; }
+}
+
+/* TODO: Mobil - her şey tek sütun */
+@media (max-width: 768px) {
+  .holy-grail {
+    grid-template-columns: /* ? */;
+    grid-template-areas: /* ? */;
+  }
+  .left-sidebar { display: none; }
+}
+```
+**Beklenen çıktı:**
+```css
+grid-template-columns: 200px 1fr 200px;
+grid-template-areas:
+  "header header header"
+  "left-sidebar main right-sidebar"
+  "footer footer footer";
+
+.content-card { flex: 1 1 300px; }
+
+/* Tablet */
+grid-template-columns: 200px 1fr;
+grid-template-areas:
+  "header header"
+  "left-sidebar main"
+  "footer footer";
+
+/* Mobil */
+grid-template-columns: 1fr;
+grid-template-areas: "header" "main" "footer";
+```
+**İpucu:** Grid ile genel sayfa yapısını, Flexbox ile içerik alanındaki kartları düzenle. Bu "Grid dışı, Flexbox içi" yaklaşımı en yaygın production pattern'idir.
+**Zorluk:** Zor
+:::
+
 :::must-note
 - Box Model: content + padding + border + margin. Her zaman `box-sizing: border-box` kullan
 - Margin collapse: Dikey margin'ler birleşir (büyük olan kazanır). Flexbox/Grid içinde collapse olmaz

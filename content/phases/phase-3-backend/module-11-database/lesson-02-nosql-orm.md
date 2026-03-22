@@ -854,6 +854,455 @@ explanation: "N+1 problemi, ilişkili verileri teker teker sorgulamaktan kaynakl
 ORM kullanirken AI'a Prisma schema veya Mongoose model tanimini goster ve sor: "Bu model taniminda N+1 sorgu riski var mi? include/populate stratejim dogru mu? Hangi alanlara index eklemeliyim? Query performansini nasil optimize ederim?"
 :::
 
+:::exercise
+### Alıştırma 4: MongoDB CRUD İşlemleri
+**Görev:** MongoDB shell komutları ile temel CRUD işlemlerini yap.
+**Başlangıç kodu:**
+```javascript
+// Koleksiyon: products
+
+// TODO 1: Yeni ürün ekle (insertOne)
+// TODO 2: Fiyatı 100-500 arası olan ürünleri bul
+// TODO 3: Kategorisi "electronics" olan ürünlerin fiyatını %10 artır
+// TODO 4: Stoku 0 olan ürünleri sil
+// TODO 5: Aggregation ile kategori bazlı ortalama fiyat hesapla
+```
+**Beklenen çıktı:**
+```javascript
+// 1. Insert
+db.products.insertOne({
+  name: "Wireless Mouse",
+  price: 199.99,
+  category: "electronics",
+  stock: 50,
+  tags: ["wireless", "mouse", "computer"],
+  specs: { color: "black", weight: "80g" },
+  createdAt: new Date(),
+});
+
+// 2. Find with range
+db.products.find({
+  price: { $gte: 100, $lte: 500 }
+}).sort({ price: 1 });
+
+// 3. Update many
+db.products.updateMany(
+  { category: "electronics" },
+  { $mul: { price: 1.10 } }  // %10 artır
+);
+
+// 4. Delete many
+db.products.deleteMany({ stock: 0 });
+
+// 5. Aggregation pipeline
+db.products.aggregate([
+  { $group: {
+    _id: "$category",
+    avgPrice: { $avg: "$price" },
+    count: { $sum: 1 },
+    maxPrice: { $max: "$price" },
+  }},
+  { $sort: { avgPrice: -1 } },
+]);
+```
+**İpucu:** MongoDB'de `$gte` (>=), `$lte` (<=), `$mul` (çarpma), `$inc` (artırma). Aggregation pipeline aşamaları sırayla çalışır: `$match` -> `$group` -> `$sort`.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 5: Mongoose Schema ve Model
+**Görev:** Mongoose ile TypeScript uyumlu schema, model ve ilişkilendirme (populate) yaz.
+**Başlangıç kodu:**
+```typescript
+import mongoose, { Schema, Document } from "mongoose";
+
+// TODO: User ve Post schema/model tanımla
+// - User: name, email (unique), password, role (enum), posts (ref)
+// - Post: title, content, author (ref: User), tags, published
+// - Virtual field: User.fullUrl
+// - Middleware: pre('save') ile şifre hashleme
+// - Populate ile kullanım
+```
+**Beklenen çıktı:**
+```typescript
+interface IUser extends Document {
+  name: string;
+  email: string;
+  password: string;
+  role: "user" | "admin";
+  createdAt: Date;
+}
+
+const userSchema = new Schema<IUser>({
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: true, unique: true, lowercase: true },
+  password: { type: String, required: true, minlength: 8, select: false },
+  role: { type: String, enum: ["user", "admin"], default: "user" },
+}, { timestamps: true, toJSON: { virtuals: true } });
+
+// Virtual: User'ın post'ları
+userSchema.virtual("posts", {
+  ref: "Post",
+  localField: "_id",
+  foreignField: "author",
+});
+
+// Middleware: şifre hashleme
+userSchema.pre("save", async function(next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+const User = mongoose.model<IUser>("User", userSchema);
+
+// Post schema
+const postSchema = new Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  tags: [{ type: String }],
+  published: { type: Boolean, default: false },
+}, { timestamps: true });
+
+const Post = mongoose.model("Post", postSchema);
+
+// Populate kullanımı
+const user = await User.findById(id).populate("posts");
+const post = await Post.findById(id).populate("author", "name email");
+```
+**İpucu:** `select: false` ile password varsayılan sorgularda gelmez. `populate("author", "name email")` ile sadece belirli alanları getir. Virtual populate ile ilişki kurulabilir.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 6: Redis Veri Yapıları ve Kullanım Senaryoları
+**Görev:** Redis'in farklı veri yapılarını gerçek senaryolarda kullan.
+**Başlangıç kodu:**
+```javascript
+const Redis = require("ioredis");
+const redis = new Redis();
+
+// TODO 1: String - API response cache'le (TTL ile)
+// TODO 2: Hash - Kullanıcı oturumu sakla
+// TODO 3: List - Bildirim kuyruğu
+// TODO 4: Sorted Set - Leaderboard (en yüksek puan sıralaması)
+// TODO 5: Set - Online kullanıcılar listesi
+```
+**Beklenen çıktı:**
+```javascript
+// 1. String - Cache
+async function getCachedProducts(category) {
+  const cacheKey = `products:${category}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
+  const products = await db.products.find({ category });
+  await redis.set(cacheKey, JSON.stringify(products), "EX", 3600); // 1 saat TTL
+  return products;
+}
+
+// 2. Hash - Oturum
+async function createSession(userId, data) {
+  const sessionId = crypto.randomUUID();
+  await redis.hset(`session:${sessionId}`, {
+    userId: userId.toString(),
+    email: data.email,
+    role: data.role,
+    createdAt: Date.now().toString(),
+  });
+  await redis.expire(`session:${sessionId}`, 86400); // 24 saat
+  return sessionId;
+}
+
+// 3. List - Bildirim kuyruğu
+await redis.lpush(`notifications:${userId}`, JSON.stringify({
+  type: "new_order", message: "Yeni sipariş!", timestamp: Date.now()
+}));
+const notifications = await redis.lrange(`notifications:${userId}`, 0, 9); // Son 10
+
+// 4. Sorted Set - Leaderboard
+await redis.zadd("leaderboard", score, `user:${userId}`);
+const top10 = await redis.zrevrange("leaderboard", 0, 9, "WITHSCORES");
+
+// 5. Set - Online kullanıcılar
+await redis.sadd("online_users", userId);
+await redis.srem("online_users", userId); // Çıkış
+const onlineCount = await redis.scard("online_users");
+const isOnline = await redis.sismember("online_users", friendId);
+```
+**İpucu:** String = cache, Hash = profil/oturum (alan bazlı erişim), List = kuyruk/bildirim, Set = benzersiz koleksiyon, Sorted Set = sıralı veri (leaderboard). Her yapı farklı use-case için optimize.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 7: Cache-Aside Pattern Uygulaması
+**Görev:** Express middleware olarak Cache-Aside (Lazy Loading) pattern'ini uygula.
+**Başlangıç kodu:**
+```javascript
+// TODO: Cache middleware yaz
+// 1. Request gelince Redis'te cache'e bak
+// 2. Cache'te varsa direkt döndür
+// 3. Yoksa route handler çalışsın, response'u cache'le
+// 4. Cache invalidation stratejisi
+
+// Bonus: Cache key'i nasıl oluşturulur? (URL + query params)
+```
+**Beklenen çıktı:**
+```javascript
+function cacheMiddleware(ttl = 300) {
+  return async (req, res, next) => {
+    if (req.method !== "GET") return next();
+
+    const cacheKey = `cache:${req.originalUrl}`;
+
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        return res.json(JSON.parse(cached));
+      }
+    } catch (err) {
+      console.error("Redis cache hatası:", err);
+    }
+
+    // Response'u yakalayıp cache'le
+    const originalJson = res.json.bind(res);
+    res.json = (body) => {
+      redis.set(cacheKey, JSON.stringify(body), "EX", ttl).catch(console.error);
+      return originalJson(body);
+    };
+
+    next();
+  };
+}
+
+// Cache invalidation
+function invalidateCache(pattern) {
+  return async (req, res, next) => {
+    res.on("finish", async () => {
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        const keys = await redis.keys(`cache:${pattern}`);
+        if (keys.length) await redis.del(...keys);
+      }
+    });
+    next();
+  };
+}
+
+// Kullanım
+app.get("/api/products", cacheMiddleware(600), getProducts);
+app.post("/api/products", invalidateCache("/api/products*"), createProduct);
+```
+**İpucu:** GET istekleri cache'le, POST/PUT/DELETE sonrası ilgili cache'i invalidate et. Redis bağlantısı koparsa cache'siz devam et (graceful degradation).
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 8: Prisma ORM ile CRUD
+**Görev:** Prisma schema tanımla ve type-safe CRUD operasyonları yaz.
+**Başlangıç kodu:**
+```prisma
+// TODO: schema.prisma dosyasını tamamla
+// User, Post, Comment modelleri
+// İlişkiler: User -> Post (1:N), Post -> Comment (1:N), User -> Comment (1:N)
+```
+**Beklenen çıktı:**
+```prisma
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String
+  password  String
+  posts     Post[]
+  comments  Comment[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  published Boolean   @default(false)
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  Int       @map("author_id")
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+
+  @@index([authorId])
+  @@map("posts")
+}
+
+model Comment {
+  id       Int    @id @default(autoincrement())
+  text     String
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   Int
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId Int
+
+  @@map("comments")
+}
+```
+```typescript
+// Prisma CRUD
+// Create
+const user = await prisma.user.create({
+  data: { name: "Ali", email: "ali@test.com", password: hashedPw },
+});
+
+// Read with relations
+const post = await prisma.post.findUnique({
+  where: { id: 1 },
+  include: { author: { select: { name: true, email: true } }, comments: true },
+});
+
+// Update
+await prisma.post.update({
+  where: { id: 1 },
+  data: { published: true },
+});
+
+// Delete with cascade
+await prisma.post.delete({ where: { id: 1 } }); // comments da silinir
+
+// Transaction
+await prisma.$transaction([
+  prisma.user.update({ where: { id: 1 }, data: { name: "Yeni Ad" } }),
+  prisma.post.updateMany({ where: { authorId: 1 }, data: { published: false } }),
+]);
+```
+**İpucu:** Prisma type-safe: yanlış alan adı veya tip kullanırsan TypeScript derleme hatası verir. `include` ile ilişkili veriyi getir, `select` ile sadece belirli alanları al.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 9: N+1 Query Tespiti ve Çözümü
+**Görev:** ORM kullanırken N+1 query problemini tespit et ve çöz.
+**Başlangıç kodu:**
+```typescript
+// YANLIŞ: N+1 problemi var
+async function getUsersWithPosts() {
+  const users = await prisma.user.findMany(); // 1 sorgu
+
+  for (const user of users) {
+    // Her user için ayrı sorgu (N sorgu!)
+    const posts = await prisma.post.findMany({
+      where: { authorId: user.id },
+    });
+    user.posts = posts;
+  }
+
+  return users;
+}
+
+// TODO: N+1 problemini 3 farklı yöntemle çöz
+```
+**Beklenen çıktı:**
+```typescript
+// Yöntem 1: Prisma include (eager loading)
+async function getUsersWithPosts_v1() {
+  return prisma.user.findMany({
+    include: { posts: true },
+  });
+  // Arka planda 2 sorgu: SELECT users + SELECT posts WHERE author_id IN (...)
+}
+
+// Yöntem 2: Prisma select (sadece gerekli alanlar)
+async function getUsersWithPosts_v2() {
+  return prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      posts: {
+        select: { id: true, title: true },
+        take: 5, // Her user'dan max 5 post
+      },
+    },
+  });
+}
+
+// Yöntem 3: Manuel batch (DataLoader benzeri)
+async function getUsersWithPosts_v3() {
+  const users = await prisma.user.findMany();
+  const userIds = users.map(u => u.id);
+
+  const posts = await prisma.post.findMany({
+    where: { authorId: { in: userIds } },
+  });
+
+  const postsByUser = posts.reduce((acc, post) => {
+    if (!acc[post.authorId]) acc[post.authorId] = [];
+    acc[post.authorId].push(post);
+    return acc;
+  }, {} as Record<number, typeof posts>);
+
+  return users.map(u => ({ ...u, posts: postsByUser[u.id] || [] }));
+}
+```
+**İpucu:** N+1 tespit: DB query loglarını aç ve aynı tabloya N kez sorgu gittiğini gör. Çözüm: eager loading (include), batch loading (IN query), veya DataLoader.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 10: SQL vs NoSQL Karar Verme
+**Görev:** Aşağıdaki senaryolar için doğru veritabanını seç ve nedenini açıkla.
+**Başlangıç kodu:**
+```
+Senaryolar:
+1. Bankacılık işlemleri (para transferi, hesap bakiyesi)
+2. Sosyal medya kullanıcı profilleri (değişken alanlar)
+3. IoT sensör verileri (saniyede binlerce veri noktası)
+4. E-ticaret ürün kataloğu (farklı kategorilerin farklı özellikleri)
+5. Oturum yönetimi (milisaniye seviyesinde erişim)
+6. Log analizi (büyük hacimli, zamana dayalı veri)
+7. Öneri sistemi (kullanıcı-ürün ilişkileri)
+8. Gerçek zamanlı skor tablosu
+
+TODO: Her biri için PostgreSQL/MongoDB/Redis/Elasticsearch/Neo4j seç
+```
+**Beklenen çıktı:**
+```
+1. Bankacılık → PostgreSQL ✓
+   Neden: ACID transaction'lar zorunlu, veri tutarlılığı kritik
+
+2. Kullanıcı profilleri → MongoDB ✓
+   Neden: Esnek şema (biyografi, sosyal linkler kullanıcıya göre değişir)
+
+3. IoT sensör verileri → TimescaleDB (PostgreSQL) veya InfluxDB
+   Neden: Zaman serisi optimizasyonu, otomatik partitioning
+
+4. E-ticaret ürün kataloğu → MongoDB ✓ (veya PostgreSQL JSONB)
+   Neden: Telefon specs ≠ kıyafet specs, esnek şema gerekli
+
+5. Oturum yönetimi → Redis ✓
+   Neden: Sub-millisecond erişim, TTL ile otomatik expire
+
+6. Log analizi → Elasticsearch ✓
+   Neden: Full-text search, aggregation, Kibana ile görselleştirme
+
+7. Öneri sistemi → Neo4j (Graph DB) ✓
+   Neden: "Bu ürünü alanlar bunları da aldı" = graph traversal
+
+8. Gerçek zamanlı skor tablosu → Redis Sorted Set ✓
+   Neden: ZADD/ZRANGE O(log N), anında sıralama
+```
+**İpucu:** Tek veritabanı her sorunu çözmez. Polyglot persistence: ana veri PostgreSQL'de, cache Redis'te, arama Elasticsearch'te, ilişki analizi Neo4j'de olabilir.
+**Zorluk:** Kolay
+:::
+
 :::must-note
 - MongoDB: document-based, esnek şema, BSON formatı, $lookup ile JOIN, aggregation pipeline ile karmaşık sorgular
 - Redis veri yapıları: String (cache), Hash (profil), List (kuyruk/bildirim), Set (benzersiz), Sorted Set (leaderboard)

@@ -715,6 +715,414 @@ explanation: "HOC'u render içinde oluşturmak her render'da yeni bir component 
 Yeni component tasarlarken AI'a önce kullanım ornegini (JSX) göster: "Bu component'i bu şekilde kullanmak istiyorum. Simdi bu API'yi karşılayan implementasyonu yaz. Progressive disclosure prensibini uygula - basit kullanım için minimum props, gelişmiş kullanım için ek props olsun."
 :::
 
+:::exercise
+### Alıştırma 4: Compound Components Pattern
+**Görev:** Tabs component'ini Compound Components pattern'i ile yaz. Context ile iletişim kursun.
+**Başlangıç kodu:**
+```tsx
+// Hedef kullanım:
+// <Tabs defaultTab="tab1">
+//   <Tabs.List>
+//     <Tabs.Tab id="tab1">Genel</Tabs.Tab>
+//     <Tabs.Tab id="tab2">Ayarlar</Tabs.Tab>
+//   </Tabs.List>
+//   <Tabs.Panel id="tab1">Genel içerik</Tabs.Panel>
+//   <Tabs.Panel id="tab2">Ayarlar içerik</Tabs.Panel>
+// </Tabs>
+
+// TODO: TabsContext oluştur
+// TODO: Tabs (parent), Tabs.List, Tabs.Tab, Tabs.Panel component'lerini yaz
+```
+**Beklenen çıktı:**
+```tsx
+interface TabsContextType {
+  activeTab: string;
+  setActiveTab: (id: string) => void;
+}
+
+const TabsContext = createContext<TabsContextType | null>(null);
+
+function Tabs({ children, defaultTab }: { children: ReactNode; defaultTab: string }) {
+  const [activeTab, setActiveTab] = useState(defaultTab);
+  return (
+    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+      <div>{children}</div>
+    </TabsContext.Provider>
+  );
+}
+
+Tabs.List = function TabList({ children }: { children: ReactNode }) {
+  return <div className="flex gap-2 border-b">{children}</div>;
+};
+
+Tabs.Tab = function Tab({ id, children }: { id: string; children: ReactNode }) {
+  const { activeTab, setActiveTab } = useContext(TabsContext)!;
+  return (
+    <button
+      onClick={() => setActiveTab(id)}
+      className={activeTab === id ? "border-b-2 border-blue-500" : ""}
+    >{children}</button>
+  );
+};
+
+Tabs.Panel = function TabPanel({ id, children }: { id: string; children: ReactNode }) {
+  const { activeTab } = useContext(TabsContext)!;
+  return activeTab === id ? <div className="p-4">{children}</div> : null;
+};
+```
+**İpucu:** Parent component Context sağlar, child component'ler Context'ten state okur. Bu pattern React'te Tab, Accordion, Dropdown gibi bileşik component'ler için idealdir.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 5: Polymorphic Component (as prop)
+**Görev:** `as` prop'u ile render edilen HTML elementini değiştirebilen bir Button component'i yaz.
+**Başlangıç kodu:**
+```tsx
+// Hedef kullanım:
+// <Button>Normal Buton</Button>              → <button>
+// <Button as="a" href="/about">Link</Button> → <a>
+// <Button as={Link} to="/home">Router</Button> → <Link>
+
+// TODO: ButtonProps tipini tanımla (generic olmalı)
+// TODO: Button component'ini yaz
+```
+**Beklenen çıktı:**
+```tsx
+type ButtonProps<T extends React.ElementType = "button"> = {
+  as?: T;
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md" | "lg";
+  children: ReactNode;
+} & Omit<React.ComponentPropsWithoutRef<T>, "as" | "variant" | "size">;
+
+function Button<T extends React.ElementType = "button">({
+  as,
+  variant = "primary",
+  size = "md",
+  children,
+  ...props
+}: ButtonProps<T>) {
+  const Component = as || "button";
+  const baseStyles = "rounded font-medium transition-colors";
+  const variants = {
+    primary: "bg-blue-500 text-white hover:bg-blue-600",
+    secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
+    ghost: "bg-transparent text-gray-600 hover:bg-gray-100",
+  };
+  const sizes = { sm: "px-2 py-1 text-sm", md: "px-4 py-2", lg: "px-6 py-3 text-lg" };
+
+  return (
+    <Component className={`${baseStyles} ${variants[variant]} ${sizes[size]}`} {...props}>
+      {children}
+    </Component>
+  );
+}
+```
+**İpucu:** `React.ElementType` tüm HTML elementlerini ve React component'lerini kapsar. `Omit` ile çakışan prop'ları çıkar.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 6: Presentational vs Container Ayrımı
+**Görev:** Monolitik bir component'i Presentational ve Container olarak ikiye ayır.
+**Başlangıç kodu:**
+```tsx
+// YANLIŞ: Tek component'te hem iş mantığı hem görünüm
+function UserProfile() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/user/me")
+      .then(res => res.json())
+      .then(data => { setUser(data); setLoading(false); });
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login";
+  };
+
+  if (loading) return <p>Yükleniyor...</p>;
+  return (
+    <div className="p-4 bg-gray-800 rounded">
+      <img src={user.avatar} className="w-20 h-20 rounded-full" />
+      <h2 className="text-white">{user.name}</h2>
+      <p className="text-gray-400">{user.email}</p>
+      <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 mt-2">
+        Çıkış Yap
+      </button>
+    </div>
+  );
+}
+
+// TODO: Presentational component (sadece props alır, UI render eder)
+// TODO: Container component (veri çeker, iş mantığı yönetir)
+```
+**Beklenen çıktı:**
+```tsx
+// Presentational - sadece görünüm
+interface UserProfileViewProps {
+  user: { name: string; email: string; avatar: string };
+  onLogout: () => void;
+}
+
+function UserProfileView({ user, onLogout }: UserProfileViewProps) {
+  return (
+    <div className="p-4 bg-gray-800 rounded">
+      <img src={user.avatar} className="w-20 h-20 rounded-full" />
+      <h2 className="text-white">{user.name}</h2>
+      <p className="text-gray-400">{user.email}</p>
+      <button onClick={onLogout} className="bg-red-500 text-white px-4 py-2 mt-2">
+        Çıkış Yap
+      </button>
+    </div>
+  );
+}
+
+// Container - iş mantığı
+function UserProfileContainer() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/user/me").then(r => r.json()).then(d => { setUser(d); setLoading(false); });
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login";
+  };
+
+  if (loading) return <p>Yükleniyor...</p>;
+  return <UserProfileView user={user} onLogout={handleLogout} />;
+}
+```
+**İpucu:** Presentational component test etmesi kolaydır (sadece props ver), Storybook'ta gösterilebilir. Container component iş mantığını yönetir.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 7: Error Boundary Component
+**Görev:** Hata yakalayan ve kullanıcıya güzel bir hata mesajı gösteren Error Boundary yaz.
+**Başlangıç kodu:**
+```tsx
+// TODO: ErrorBoundary class component'i yaz
+// - componentDidCatch ile hatayı logla
+// - getDerivedStateFromError ile hata state'ini güncelle
+// - fallback prop'u ile özelleştirilebilir hata UI'ı
+// - "Tekrar Dene" butonu ile state sıfırlama
+
+// Kullanım:
+// <ErrorBoundary fallback={<p>Hata!</p>}>
+//   <BuggyComponent />
+// </ErrorBoundary>
+```
+**Beklenen çıktı:**
+```tsx
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Error caught:", error, errorInfo);
+  }
+
+  handleReset = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="p-4 bg-red-900 rounded text-center">
+          <h2 className="text-red-200">Bir şeyler ters gitti</h2>
+          <p className="text-red-300 text-sm">{this.state.error?.message}</p>
+          <button onClick={this.handleReset} className="mt-2 bg-red-500 text-white px-4 py-2 rounded">
+            Tekrar Dene
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+```
+**İpucu:** Error Boundary sadece class component olabilir (React hooks'ta henüz karşılığı yok). `getDerivedStateFromError` render aşamasında, `componentDidCatch` commit aşamasında çalışır.
+**Zorluk:** Orta
+:::
+
+:::exercise
+### Alıştırma 8: HOC (Higher-Order Component) Pattern
+**Görev:** Authentication kontrolü yapan bir `withAuth` HOC'u yaz.
+**Başlangıç kodu:**
+```tsx
+// TODO: withAuth HOC'u yaz
+// - Kullanıcı giriş yapmamışsa login sayfasına yönlendir
+// - Giriş yapmışsa component'e user prop'u ekle
+// - Loading durumunu yönet
+
+// Kullanım:
+// const ProtectedDashboard = withAuth(Dashboard);
+// <ProtectedDashboard /> → giriş yapılmışsa Dashboard, yoksa redirect
+```
+**Beklenen çıktı:**
+```tsx
+interface WithAuthProps {
+  user: { id: string; name: string; email: string };
+}
+
+function withAuth<T extends WithAuthProps>(
+  WrappedComponent: React.ComponentType<T>
+) {
+  return function AuthenticatedComponent(
+    props: Omit<T, keyof WithAuthProps>
+  ) {
+    const [user, setUser] = useState<WithAuthProps["user"] | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      fetch("/api/auth/me")
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(setUser)
+        .catch(() => window.location.href = "/login")
+        .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) return <div>Yükleniyor...</div>;
+    if (!user) return null;
+
+    return <WrappedComponent {...(props as T)} user={user} />;
+  };
+}
+
+// Kullanım:
+const ProtectedDashboard = withAuth(Dashboard);
+```
+**İpucu:** HOC bir fonksiyondur ve component alıp yeni component döndürür. Modern React'te custom hook'lar genellikle tercih edilir ama HOC pattern'ını bilmek legacy kodları anlamak için önemlidir.
+**Zorluk:** Zor
+:::
+
+:::exercise
+### Alıştırma 9: Atomic Design Sınıflandırma
+**Görev:** Aşağıdaki component'leri Atomic Design seviyelerine göre sınıflandır.
+**Başlangıç kodu:**
+```
+Verilen component'ler:
+1. Avatar (kullanıcı profil resmi)
+2. SearchBar (input + buton)
+3. ProductCard (resim + başlık + fiyat + sepet butonu)
+4. Header (logo + navbar + search + avatar)
+5. Badge (bildirim sayısı)
+6. Input (text input alanı)
+7. LoginForm (email + password + submit)
+8. DashboardTemplate (sidebar + header + content area)
+9. HomePage (gerçek verilerle dolu sayfa)
+10. StarRating (yıldız ikonları + puan)
+
+TODO: Her birini doğru seviyeye yerleştir:
+Atoms:
+Molecules:
+Organisms:
+Templates:
+Pages:
+```
+**Beklenen çıktı:**
+```
+Atoms (en küçük, bölünemez):
+  - Avatar, Badge, Input
+
+Molecules (atom kombinasyonları):
+  - SearchBar (Input + Button atom'ları)
+  - StarRating (Icon atom'ları)
+
+Organisms (molecule + atom grupları):
+  - ProductCard (Avatar + Badge + Button)
+  - Header (Logo + SearchBar + Avatar)
+  - LoginForm (Input + Input + Button)
+
+Templates (sayfa iskeletleri, veri yok):
+  - DashboardTemplate (layout yapısı)
+
+Pages (template + gerçek veri):
+  - HomePage (DashboardTemplate + API verisi)
+```
+**İpucu:** Atom = tek HTML elementi gibi basit. Molecule = birkaç atom bir arada. Organism = bağımsız çalışabilen bölüm. Template = yerleşim. Page = gerçek veri.
+**Zorluk:** Kolay
+:::
+
+:::exercise
+### Alıştırma 10: Folder Structure - Feature-Based Organizasyon
+**Görev:** Aşağıdaki dosyaları feature-based klasör yapısına taşı.
+**Başlangıç kodu:**
+```
+YANLIŞ: Tip-bazlı yapı (büyük projelerde sorunlu)
+src/
+  components/
+    Button.tsx, Input.tsx, Modal.tsx, ProductCard.tsx,
+    CartItem.tsx, UserAvatar.tsx, LoginForm.tsx
+  hooks/
+    useAuth.ts, useCart.ts, useProducts.ts
+  services/
+    authService.ts, cartService.ts, productService.ts
+  types/
+    auth.ts, cart.ts, product.ts
+
+TODO: Feature-based yapıya dönüştür
+```
+**Beklenen çıktı:**
+```
+DOĞRU: Feature-bazlı yapı
+src/
+  features/
+    auth/
+      components/LoginForm.tsx, UserAvatar.tsx
+      hooks/useAuth.ts
+      services/authService.ts
+      types/auth.ts
+      index.ts          ← barrel export
+    cart/
+      components/CartItem.tsx
+      hooks/useCart.ts
+      services/cartService.ts
+      types/cart.ts
+      index.ts
+    products/
+      components/ProductCard.tsx
+      hooks/useProducts.ts
+      services/productService.ts
+      types/product.ts
+      index.ts
+  shared/
+    components/Button.tsx, Input.tsx, Modal.tsx
+    index.ts
+
+// Barrel export örneği (features/auth/index.ts):
+export { LoginForm } from "./components/LoginForm";
+export { useAuth } from "./hooks/useAuth";
+export type { AuthUser } from "./types/auth";
+```
+**İpucu:** Feature-based yapıda ilgili dosyalar bir arada. Paylaşılan component'ler `shared/` altında. Barrel export ile temiz import'lar: `import { useAuth } from "@/features/auth"`.
+**Zorluk:** Orta
+:::
+
 :::must-note
 - Atomic Design 5 seviye: Atoms (buton, input) -> Molecules (search bar) -> Organisms (header) -> Templates (layout) -> Pages (gerçek veri)
 - Presentational component = sadece gösterim (props alir, render eder), Container component = is mantığı + state yönetimi
